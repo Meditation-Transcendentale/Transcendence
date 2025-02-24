@@ -1,0 +1,16 @@
+{
+  "name": "pong-server",
+  "version": "1.0.0",
+  "description": "WebSocket server for multiplayer Pong",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
