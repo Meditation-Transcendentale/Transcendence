@@ -1,3 +1,96 @@
+//const WebSocket = require("ws");
+//
+//const server = new WebSocket.Server({ port: 8080 });
+//
+//// Game state
+//let ball = { x: 0, y: 0, vx: 0.1, vy: 0.1, radius: 0.25 };
+//let paddles = {
+//	player1: { x: 0, y: -9.5, width: 2, height: 0.5 },
+//	player2: { x: 0, y: 9.5, width: 2, height: 0.5 },
+//};
+//let scores = { player1: 0, player2: 0 };
+//let players = {};
+//
+//server.on("connection", (socket) => {
+//	console.log("A player connected");
+//
+//	const playerId = Object.keys(players).length < 1 ? "player1" : "player2";
+//	players[playerId] = { socket };
+//
+//	socket.send(JSON.stringify({ type: "assignPlayer", playerId }));
+//
+//	socket.on("message", (message) => {
+//		const data = JSON.parse(message);
+//		if (data.type === "move") {
+//			paddles[data.playerId].x = data.x;
+//		}
+//	});
+//
+//	socket.on("close", () => {
+//		console.log(`${playerId} disconnected`);
+//		delete players[playerId];
+//	});
+//});
+//
+//setInterval(() => {
+//	if (ball.x - ball.radius <= -5 || ball.x + ball.radius >= 5) {
+//		ball.vx *= -1;
+//		//ball.x = Math.max(-5 + ball.radius, Math.min(ball.x, 5 - ball.radius));
+//	}
+//
+//	ball.x += ball.vx;
+//	ball.y += ball.vy;
+//
+//	checkPaddleCollision("player1");
+//	checkPaddleCollision("player2");
+//
+//	if (ball.y - ball.radius < -10) {
+//		scores.player2 += 1;
+//		resetBall();
+//	} else if (ball.y + ball.radius > 10) {
+//		scores.player1 += 1;
+//		resetBall();
+//	}
+//
+//	const now = Date.now();
+//	server.clients.forEach((client) => {
+//		if (client.readyState === WebSocket.OPEN) {
+//			client.send(JSON.stringify({
+//				type: "update",
+//				timestamp: now,
+//				ball,
+//				paddles,
+//				scores,
+//			}));
+//		}
+//	});
+//}, 1000 / 60);
+//
+//function checkPaddleCollision(player) {
+//	const paddle = paddles[player];
+//	const closestX = Math.max(paddle.x - paddle.width / 2, Math.min(ball.x, paddle.x + paddle.width / 2));
+//	const closestY = Math.max(paddle.y - paddle.height / 2, Math.min(ball.y, paddle.y + paddle.height / 2));
+//	const distanceX = ball.x - closestX;
+//	const distanceY = ball.y - closestY;
+//	const distanceSquared = distanceX * distanceX + distanceY * distanceY;
+//
+//	if (distanceSquared < ball.radius * ball.radius) {
+//		let s = Math.sign(ball.y);
+//		const dist = Math.sqrt(distanceSquared) || 1;
+//		ball.vx = (ball.x - paddle.x) / dist * 0.16;
+//		ball.vy = s * Math.abs((ball.y - paddle.y) / dist) * 0.16;
+//	}
+//}
+//
+//function resetBall() {
+//	ball = {
+//		x: 0,
+//		y: 0,
+//		vx: 0.1 * (Math.random() > 0.5 ? 1 : -1),
+//		vy: 0.15 * (Math.random() > 0.5 ? 1 : -1),
+//		radius: 0.25
+//	};
+//}
 const WebSocket = require("ws");
 
 const server = new WebSocket.Server({ port: 8080 });
@@ -43,13 +136,14 @@ server.on("connection", (socket) => {
 // **Game loop: runs every 16ms (~60 FPS)**
 setInterval(() => {
 	// Move the ball
-	ball.x += ball.vx;
-	ball.y += ball.vy;
 
 	// **Collision with left & right walls (bounce)**
-	if (ball.x - 0.25 <= -5 || ball.x + 0.25 >= 5) {
+	if (ball.x <= -4.65 || ball.x >= 4.65) {
 		ball.vx *= -1;
 	}
+
+	ball.x += ball.vx;
+	ball.y += ball.vy;
 
 	// **Collision with paddles (better detection)**
 	checkPaddleCollision("player1");
@@ -64,6 +158,10 @@ setInterval(() => {
 		resetBall();
 	}
 
+	velocity.x = ball.vx;
+	velocity.y = ball.vy;
+	//console.log("velocity = " + velocity.x + " " + velocity.y)
+	//console.log("pos = " + ball.x + " " + ball.y)
 	// **Send updated game state to all clients**
 	const now = Date.now(); // Current timestamp
 	server.clients.forEach((client) => {
@@ -119,8 +217,6 @@ function checkPaddleCollision(player) {
 		let yy = s * playerCenterToBall.y / dist;
 		let Orientation = Math.atan2(playerCenterToBall.y, playerCenterToBall.x);
 		//console.log("Orientation = " + Orientation);
-		velocity.x *= 1.06;
-		velocity.y *= 1.06;
 		const distance = Math.sqrt(distanceSquared) || 1;
 
 		// Determine the collision normal (direction vector)

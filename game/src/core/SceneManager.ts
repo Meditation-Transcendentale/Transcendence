@@ -12,6 +12,8 @@ export class SceneManager {
 	private ball2!: Ball;
 	private playerPaddle!: Paddle;
 	private aiPaddle!: Paddle;
+	private lastSimulationTime!: number;
+	private lastServerUpdate!: number;
 	private keysPressed: { [key: string]: boolean } = {};
 	private webSocketManager!: WebSocketManager;
 	private redmaterial!: StandardMaterial;
@@ -21,10 +23,13 @@ export class SceneManager {
 		velocity: { x: number, y: number },
 		timestamp: number,
 	};
+	private SIMULATION_INTERVAL!: number;
+	private stateHistory: { timestamp: number; position: Vector3; velocity: Vector3 }[] = [];
 
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
 		this.engine = engine;
 		this.canvas = canvas;
+		this.SIMULATION_INTERVAL = 1000 / 60;
 	}
 
 	public createScene(): void {
@@ -109,14 +114,40 @@ export class SceneManager {
 		return this.scene;
 	}
 
-	public start(): void {
-		this.engine.runRenderLoop(() => {
-			this.handlePlayerInput();
-			this.ball.update(this.serverState);
-			//this.ball2.update2();
-			this.scene.render();
-		});
+	public renderLoop = () => {
+		//interpolateGameState(); // Smooth out corrections
+		this.scene.render();
+
+
+		requestAnimationFrame(this.renderLoop);
 	}
+	public start(): void {
+		//console.log("Game started! Initializing lastSimulationTime.");
+		this.lastSimulationTime = performance.now() - this.SIMULATION_INTERVAL; // Prevent zero deltaTime
+		this.simulationLoop(); // Start game logic loop
+		requestAnimationFrame(this.renderLoop); // Start rendering loop
+	}
+	public simulationLoop(): void {
+		const now = performance.now();
+		//let deltaTime = (now - this.lastSimulationTime);
+		//deltaTime = Math.min(deltaTime, 0.05);
+
+		let loops = 0;
+		while (now - this.lastSimulationTime >= this.SIMULATION_INTERVAL) {
+
+			this.handlePlayerInput();
+			this.applyServerState(); // Apply reconciliation logic
+
+			this.ball.update(this.serverState); // Normal physics update
+
+			this.lastSimulationTime += this.SIMULATION_INTERVAL;
+			loops++;
+		}
+
+		//console.log(`Completed ${loops} updates.`);
+		setTimeout(this.simulationLoop.bind(this), this.SIMULATION_INTERVAL);
+	}
+
 	private handlePlayerInput(): void {
 		let playerid = this.webSocketManager.getPlayerId();
 		if (this.keysPressed["a"]) {
@@ -140,25 +171,74 @@ export class SceneManager {
 		}
 	}
 	private updateGameState(data: any): void {
-		//const latencyCompensation = this.webSocketManager.getLatency() * 0.001; // Convert ms to seconds
-		//
-		//// Adjust ball position based on latency
-		////const estimatedX = data.ball.x + data.ball.vx * latencyCompensation;
-		////const estimatedZ = data.ball.y + data.ball.vy * latencyCompensation;
-		//const estimatedX = data.ball.x + data.ball.vx;
-		//const estimatedZ = data.ball.y + data.ball.vy;
-		//
-		//this.ball.updatePosition(estimatedX, estimatedZ, data.ball.vx, data.ball.vy);
-		//this.ball2.updatePosition(data.ball.x + data.ball.vx, data.ball.y + data.ball.vy, data.ball.vx, data.ball.vy);
-		//
-		//this.playerPaddle.updatePosition(data.paddles["player1"].x);
-		//this.aiPaddle.updatePosition(data.paddles["player2"].x);
+		const now = performance.now();
+		//console.log(`Server Update Received | Time Since Last: ${now - (this.lastServerUpdate || now)} ms`);
+
+
+		this.lastServerUpdate = now;
+
 		this.serverState = {
 			position: { x: data.ball.x, y: data.ball.y },
 			velocity: { x: data.ball.vx, y: data.ball.vy },
 			timestamp: data.timestamp,
 		};
-		console.log(`Server Ball: x=${data.ball.x}, y=${data.ball.y}, vx=${data.ball.vx}, vy=${data.ball.vy}`);
+		this.ball2.ball.position.x = data.ball.x;
+		this.ball2.ball.position.z = data.ball.y;
+		//console.log("SERVER x=" + this.ball2.ball.position.x + "y=" + this.ball2.ball.position.z);
+	}
+
+	private applyServerState(): void {
+		if (!this.serverState) return; // No server update yet
+		const serverPosition = new Vector3(this.serverState.position.x, this.serverState.position.y, 0);
+		const serverVelocity = new Vector3(this.serverState.velocity.x, this.serverState.velocity.y, 0);
+		const error = Math.abs(this.ball.ball.position.x - serverPosition.x) + Math.abs(this.ball.ball.position.z - serverPosition.y);
+		const interpolationFactor = error > 0.4 ? 0.3 : error > 0.15 ? 0.15 : 0.05;
+
+		// Find the closest predicted state
+
+		if (error > 2) {
+			console.warn(`Reconciliation: Correcting position. Error: ${error}`);
+
+			//this.ball.ball.position.x = this.lerp(this.ball.ball.position.x, serverPosition.x, interpolationFactor);
+			//this.ball.ball.position.z = this.lerp(this.ball.ball.position.z, serverPosition.y, interpolationFactor);
+			this.ball.ball.position.x = serverPosition.x;
+			this.ball.ball.position.z = serverPosition.y;
+
+			this.ball.velocity.x = serverVelocity.x;
+			this.ball.velocity.y = serverVelocity.y;
+		}
+		//else if (error > 0.5) {
+		//	console.warn(`Reconciliation: Correcting position. Error: ${error}`);
+		//
+		//	this.ball.ball.position.x = this.lerp(this.ball.ball.position.x, serverPosition.x, interpolationFactor);
+		//	this.ball.ball.position.z = this.lerp(this.ball.ball.position.z, serverPosition.y, interpolationFactor);
+		//	//this.ball.ball.position.x = serverPosition.x;
+		//	//this.ball.ball.position.z = serverPosition.y;
+		//
+		//	//this.ball.velocity.x = serverVelocity.x;
+		//	//this.ball.velocity.y = serverVelocity.y;
+		//}
+		//else {
+		//	// ✅ Ensure velocity gradually adjusts, but doesn't lag behind
+		//	if (Math.abs(this.ball.velocity.x - this.serverState.velocity.x) > 0.1 ||
+		//		Math.abs(this.ball.velocity.y - this.serverState.velocity.y) > 0.1) {
+		//		this.ball.velocity.x = this.lerp(this.ball.velocity.x, this.serverState.velocity.x, 0.5);
+		//		this.ball.velocity.y = this.lerp(this.ball.velocity.y, this.serverState.velocity.y, 0.5);
+		//	}
+		//	this.ball.ball.position.x = serverPosition.x;
+		//	this.ball.ball.position.z = serverPosition.y;
+		//}
+
+		// Remove outdated history
+		//this.stateHistory = this.stateHistory.filter(state => state.timestamp > this.serverState.timestamp);
+	}
+	private lerp(start: number, end: number, t: number): number {
+		const distance = Math.abs(end - start);
+
+		const adaptiveFactor = distance > 0.5 ? 0.15 : 0.03;
+		t = Math.max(0, Math.min(1, adaptiveFactor));
+
+		return start + (end - start) * t;
 	}
 }
 
