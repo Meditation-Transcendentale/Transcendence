@@ -1,6 +1,6 @@
 export class WebSocketManager {
 	private socket: WebSocket;
-	private playerId: string = "";
+	private playerId: number;
 	private onUpdateCallback: (data: any) => void = () => { };
 	private lastServerTimestamp: number = 0;
 	private latency: number = 0;
@@ -50,7 +50,7 @@ export class WebSocketManager {
 		this.onUpdateCallback = callback;
 	}
 
-	public getPlayerId(): string {
+	public getPlayerId(): number {
 		return this.playerId;
 	}
 

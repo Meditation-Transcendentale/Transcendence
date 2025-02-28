@@ -15,7 +15,8 @@ export class SceneManager {
 	private engine: Engine;
 	private canvas: HTMLCanvasElement;
 	private scene!: Scene;
-	private player: Player;
+	private playerid: number;
+	private player!: { [key: number]: Player };
 	//private ball!: Ball;
 	//private ball2!: Ball;
 	//private playerPaddle!: Paddle;
@@ -25,11 +26,11 @@ export class SceneManager {
 	//private fixedDelta: number = 1 / 120;
 	//private accumulator: number = 0;
 	//
-	//private keysPressed: { [key: string]: boolean } = {};
+	private keysPressed: { [key: string]: boolean } = {};
 	//private material!: StandardMaterial;
 	//private redmaterial!: StandardMaterial;
 	//
-	//private webSocketManager!: WebSocketManager;
+	private webSocketManager!: WebSocketManager;
 	//
 	//private previousServerState: ServerState | null = null;
 	//private currentServerState: ServerState | null = null;
@@ -53,8 +54,8 @@ export class SceneManager {
 		new HemisphericLight("light", new Vector3(2, 1, 0), this.scene);
 
 
-		const numPlayers = 100;
-		const playerWidth = 11; // Updated width
+		const numPlayers = 50;
+		const playerWidth = 10; // Updated width
 		const centralAngleDeg = 360 / numPlayers;  // 3.6° between each player's center
 		const halfCentralAngleRad = (centralAngleDeg / 2) * Math.PI / 180; // convert 1.8° to radians
 
@@ -62,27 +63,24 @@ export class SceneManager {
 		const radius = playerWidth / (2 * Math.sin(halfCentralAngleRad));
 
 		for (let i = 0; i < numPlayers; i++) {
-			// Calculate the center angle in degrees for the i-th player.
 			const angleDeg = i * centralAngleDeg;
 
-			// Convert the angle to radians for position calculations.
 			const angleRad = angleDeg * Math.PI / 180;
 
-			// Determine the player's center position on the circle.
 			const posX = radius * Math.cos(angleRad);
 			const posZ = radius * Math.sin(angleRad);
 			const position = new Vector3(posX, 0.5, posZ);
 
-			// Rotate the player so that its rectangle is tangent to the circle.
-			// Assuming the rectangle's long edge is along the local X-axis,
-			// set the rotation as the center angle plus 90°.
-			const rotationDeg = angleDeg + 90;
+			const rotationDeg = angleDeg;
+			this.player[i] = new Player(this.scene, position, angleDeg, true, i);
 
-			// Create the player with the calculated position and rotation.
-			const player = new Player(this.scene, position, rotationDeg, true);
-
-			// Optionally, store or manage the player instance.
 		}
+		const circleFloor = MeshBuilder.CreateDisc("circleFloor", {
+			radius: radius,
+			tessellation: 64  // More segments = smoother circle.
+		}, this.scene);
+
+		circleFloor.rotation.x = Math.PI / 2;
 
 		//this.player = new Player(this.scene, new Vector3(5, 0.5, 5), 90, true);
 		//MeshBuilder.CreateGround("ground", { width: 10, height: 20 }, this.scene);
@@ -93,20 +91,20 @@ export class SceneManager {
 		//this.playerPaddle = new Paddle(this.scene, new Vector3(0, 0.5, -9.5), true);
 		//this.aiPaddle = new Paddle(this.scene, new Vector3(0, 0.5, 9.5), true);
 		//
-		//this.webSocketManager = new WebSocketManager("ws://10.12.12.4:8080");
-		//this.webSocketManager.onUpdate((data) => this.updateGameState(data));
-
-		//this.setupInput();
+		this.webSocketManager = new WebSocketManager("ws://10.12.12.4:8080");
+		this.webSocketManager.onUpdate((data) => this.updateGameState(data));
+		this.playerid = this.webSocketManager.getPlayerId();
+		this.setupInput();
 	}
 
-	//private setupInput(): void {
-	//	window.addEventListener("keydown", (event) => {
-	//		this.keysPressed[event.key] = true;
-	//	});
-	//	window.addEventListener("keyup", (event) => {
-	//		this.keysPressed[event.key] = false;
-	//	});
-	//}
+	private setupInput(): void {
+		window.addEventListener("keydown", (event) => {
+			this.keysPressed[event.key] = true;
+		});
+		window.addEventListener("keyup", (event) => {
+			this.keysPressed[event.key] = false;
+		});
+	}
 	//
 	//private createWalls(): void {
 	//	const wallHeight = 1;
@@ -174,47 +172,54 @@ export class SceneManager {
 
 	public start(): void {
 		//this.lastSimulationTime = performance.now();
-		//this.simulationLoop();
+		this.simulationLoop();
 		requestAnimationFrame(this.renderLoop);
 	}
 
-	//public simulationLoop(): void {
-	//	const now = performance.now();
-	//	let frameTime = (now - this.lastSimulationTime) / 1000;
-	//
-	//	frameTime = Math.min(frameTime, 0.1);
-	//	this.lastSimulationTime = now;
-	//	this.accumulator += frameTime;
-	//
-	//	this.handlePlayerInput();
-	//	while (this.accumulator >= this.fixedDelta) {
-	//		this.applyServerState();
-	//		this.ball.update(this.fixedDelta);
-	//		this.accumulator -= this.fixedDelta;
-	//	}
-	//	requestAnimationFrame(this.simulationLoop.bind(this));
-	//}
-	//
-	//private handlePlayerInput(): void {
-	//	const playerid = this.webSocketManager.getPlayerId();
-	//	if (this.keysPressed["a"]) {
-	//		if (playerid === "player1") {
-	//			this.playerPaddle.move(-0.25);
-	//			this.webSocketManager.sendMove(this.playerPaddle.getMesh().position.x);
-	//		} else if (playerid === "player2") {
-	//			this.aiPaddle.move(-0.25);
-	//			this.webSocketManager.sendMove(this.aiPaddle.getMesh().position.x);
-	//		}
-	//	} else if (this.keysPressed["d"]) {
-	//		if (playerid === "player1") {
-	//			this.playerPaddle.move(0.25);
-	//			this.webSocketManager.sendMove(this.playerPaddle.getMesh().position.x);
-	//		} else if (playerid === "player2") {
-	//			this.aiPaddle.move(0.25);
-	//			this.webSocketManager.sendMove(this.aiPaddle.getMesh().position.x);
-	//		}
-	//	}
-	//}
+	public simulationLoop(): void {
+		//const now = performance.now();
+		//let frameTime = (now - this.lastSimulationTime) / 1000;
+		//
+		//frameTime = Math.min(frameTime, 0.1);
+		//this.lastSimulationTime = now;
+		//this.accumulator += frameTime;
+
+		this.handlePlayerInput();
+		//while (this.accumulator >= this.fixedDelta) {
+		//	this.applyServerState();
+		//	this.ball.update(this.fixedDelta);
+		//	this.accumulator -= this.fixedDelta;
+		//}
+		requestAnimationFrame(this.simulationLoop.bind(this));
+	}
+
+	private handlePlayerInput(): void {
+		//const playerid = this.webSocketManager.getPlayerId();
+		//if (this.keysPressed["a"]) {
+		//	if (playerid === "player1") {
+		//		this.playerPaddle.move(-0.25);
+		//		this.webSocketManager.sendMove(this.playerPaddle.getMesh().position.x);
+		//	} else if (playerid === "player2") {
+		//		this.aiPaddle.move(-0.25);
+		//		this.webSocketManager.sendMove(this.aiPaddle.getMesh().position.x);
+		//	}
+		//} else if (this.keysPressed["d"]) {
+		//	if (playerid === "player1") {
+		//		this.playerPaddle.move(0.25);
+		//		this.webSocketManager.sendMove(this.playerPaddle.getMesh().position.x);
+		//	} else if (playerid === "player2") {
+		//		this.aiPaddle.move(0.25);
+		//		this.webSocketManager.sendMove(this.aiPaddle.getMesh().position.x);
+		//	}
+		//}
+		if (this.keysPressed["a"]) {
+			this.player[this.playerid].move(-0.25);
+		} else if (this.keysPressed["d"]) {
+			this.player[this.playerid].move(0.25);
+		}
+		this.webSocketManager.sendMove(this.player[this.playerid].getPaddle().position.x);
+
+	}
 	//
 	//private updateGameState(data: any): void {
 	//	const playerid = this.webSocketManager.getPlayerId();

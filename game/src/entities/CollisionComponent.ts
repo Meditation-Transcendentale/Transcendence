@@ -12,19 +12,19 @@ export class CollisionComponent {
 
 	constructor(scene: Scene, playerPos: Vector3, paddle: Mesh, angle: number, parent: TransformNode) {
 		this.playerPos = playerPos;
-		console.log("player pos =" + playerPos);
+		//console.log("player pos =" + playerPos);
 		this.leftCornerPos = playerPos;
 		this.leftCornerPos.x -= 5;
-		console.log("left corner pos =" + this.leftCornerPos);
+		//console.log("left corner pos =" + this.leftCornerPos);
 		this.rightCornerPos = playerPos;
 		this.rightCornerPos.x += 5;
 		this.paddleMesh = paddle;
 		this.leftCorner = MeshBuilder.CreateBox("leftcorner", { width: 0.5, height: 2, depth: 0.5 }, scene);
-		this.leftCorner.parent = parent;
 		this.leftCorner.setPivotPoint(playerPos);
+		this.leftCorner.parent = parent;
 		this.rightCorner = MeshBuilder.CreateBox("rightcorner", { width: 0.5, height: 2, depth: 0.5 }, scene);
-		this.rightCorner.parent = parent;
 		this.rightCorner.setPivotPoint(playerPos);
+		this.rightCorner.parent = parent;
 		this.material = new StandardMaterial("cornerMaterial", scene);
 		this.material.diffuseColor = new Color3(0, 0, 0);
 		this.leftCorner.material = this.material;

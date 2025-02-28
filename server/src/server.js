@@ -1,32 +1,36 @@
-const WebSocket = require("ws");
+import WebSocket from "ws";
+import { Vector } from "./Vector";
+import { Player } from "./Player";
 
 const server = new WebSocket.Server({ port: 8080 });
-
-let ball = { x: 0, y: 0, vx: 0.1, vy: 0.1 }; // Ball position & velocity
-let paddles = {
-	player1: { x: 0, y: -9.5, width: 2, height: 0.5 },
-	player2: { x: 0, y: 9.5, width: 2, height: 0.5 },
-};
+const player = new Map();
+let ball = { x: 0, y: 0, vx: 0.1, vy: 0.1 };
 let scores = { player1: 0, player2: 0 };
 
 let playerCenterToBall = { x: 0, y: 0 };
 let hit = 0;
 let velocity = { x: 0.1, y: 0.1 };
+let i = 0;
 let players = {};
 
 server.on("connection", (socket) => {
 	console.log("A player connected");
-
-	const playerId = Object.keys(players).length < 1 ? "player1" : "player2";
+	const playerId = i;
+	i++;
+	player.set(playerId, new Player(playerId, new Vector(0, 0), new Vector(0, 0)));
 	players[playerId] = { socket };
+
 
 	socket.send(JSON.stringify({ type: "assignPlayer", playerId }));
 
 	socket.on("message", (message) => {
 		const data = JSON.parse(message);
 
+		if (data.type === "init") {
+			player[data.playerId].init();
+		}
 		if (data.type === "move") {
-			paddles[data.playerId].x = data.x; // Update paddle position
+			paddles[data.playerId].x = data.x;
 		}
 		if (data.type === 'ping') {
 			socket.send(JSON.stringify({ type: 'pong', serverTime: performance.now() }));
@@ -61,7 +65,7 @@ setInterval(() => {
 
 	velocity.x = ball.vx;
 	velocity.y = ball.vy;
-	const now = performance.now(); // Current timestamp
+	const now = performance.now();
 	server.clients.forEach((client) => {
 		if (client.readyState === WebSocket.OPEN) {
 			client.send(JSON.stringify({
@@ -73,11 +77,11 @@ setInterval(() => {
 			}));
 		}
 	});
-}, 1000 / 60); // **Run at 60 FPS**
+}, 1000 / 60);
 
 function checkPaddleCollision(player) {
 	const paddle = paddles[player];
-	const radius = ball.radius || 0.25; // Use a variable for ball radius
+	const radius = ball.radius || 0.25;
 
 	const closestX = Math.max(paddle.x - paddle.width / 2, Math.min(ball.x, paddle.x + paddle.width / 2));
 	const closestY = Math.max(paddle.y - paddle.height / 2, Math.min(ball.y, paddle.y + paddle.height / 2));
