@@ -1,21 +1,11 @@
-import { Vector } from "./Vector";
+export default class Paddle {
+    constructor() {
+        this.position = { x: 0, y: 0, z: 0 };
+        this.rotation = 0;
+    }
 
-export class Paddle {
-	position = new Vector();
-	rotation = new Vector();
-
-	constructor(position, rotation) {
-		this.position.set(position);
-		this.rotation.set(rotation);
-	}
-
-	setPosition(x, y) {
-		this.position.x = x;
-		this.position.x = y;
-	}
-
-	setRotation(x, y) {
-		this.rotation.x = x;
-		this.rotation.x = y;
-	}
+    update(newPosition, newRotation) {
+        this.position = newPosition;
+        this.rotation = newRotation;
+    }
 }

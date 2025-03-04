@@ -1,118 +1,122 @@
-import WebSocket from "ws";
-import { Vector } from "./Vector";
-import { Player } from "./Player";
+import WebSocket, { WebSocketServer } from "ws";
+import Player from "./Player.js";
+import Game from "./Game.js";
+//import { v4 as uuidv4 } from "uuid";
 
-const server = new WebSocket.Server({ port: 8080 });
-const player = new Map();
-let ball = { x: 0, y: 0, vx: 0.1, vy: 0.1 };
-let scores = { player1: 0, player2: 0 };
+const wss = new WebSocketServer({ port: 8080 });
+const game = new Game(100, 200, 130); // 100 players, 5 balls
+const clientsMap = new Map();
 
-let playerCenterToBall = { x: 0, y: 0 };
-let hit = 0;
-let velocity = { x: 0.1, y: 0.1 };
-let i = 0;
-let players = {};
+wss.on("connection", function (ws) {
+    const id = game.getSize() + 1;
+    const newPlayer = new Player(id);
 
-server.on("connection", (socket) => {
-	console.log("A player connected");
-	const playerId = i;
-	i++;
-	player.set(playerId, new Player(playerId, new Vector(0, 0), new Vector(0, 0)));
-	players[playerId] = { socket };
+    if (!game.addPlayer(newPlayer)) {
+        ws.send(JSON.stringify({ type: "error", message: "Game is full" }));
+        ws.close();
+        return;
+    }
 
+    clientsMap.set(id.toString(), ws);
+    ws.send(JSON.stringify({ type: "init", id }));
 
-	socket.send(JSON.stringify({ type: "assignPlayer", playerId }));
+    ws.on("message", function (message) {
+        try {
+            const data = JSON.parse(message);
+            if (data.type === "move" && data.id === id) {
+                game.updateState(data.position, data.rotation, id);
+            }
+        } catch (err) {
+            console.error("Error processing message:", err);
+        }
+    });
 
-	socket.on("message", (message) => {
-		const data = JSON.parse(message);
-
-		if (data.type === "init") {
-			player[data.playerId].init();
-		}
-		if (data.type === "move") {
-			paddles[data.playerId].x = data.x;
-		}
-		if (data.type === 'ping') {
-			socket.send(JSON.stringify({ type: 'pong', serverTime: performance.now() }));
-		}
-	});
-
-	socket.on("close", () => {
-		console.log(`${playerId} disconnected`);
-		delete players[playerId];
-	});
+    ws.on("close", function () {
+        game.removePlayer(id);
+        clientsMap.delete(id);
+    });
 });
 
+const TICK_RATE = 60;
+const TICK_INTERVAL = 1000 / TICK_RATE;
+
 setInterval(() => {
+    const deltaTime = 1 / TICK_RATE;
+    game.update(deltaTime);
+    const deltaSnapshot = game.getDeltaSnapshot();
 
-	if (ball.x <= -4.65 || ball.x >= 4.65) {
-		ball.vx *= -1;
-	}
+    if (Object.keys(deltaSnapshot.players).length > 0 || deltaSnapshot.balls.length > 0) {
+        const message = JSON.stringify({ type: "update", state: deltaSnapshot });
 
-	ball.x += ball.vx;
-	ball.y += ball.vy;
+        clientsMap.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+    }
+}, TICK_INTERVAL);
 
-	checkPaddleCollision("player1");
-	checkPaddleCollision("player2");
-
-	if (ball.y - 0.25 < -10) {
-		scores.player2 += 1;
-		resetBall();
-	} else if (ball.y + 0.25 > 10) {
-		scores.player1 += 1;
-		resetBall();
-	}
-
-	velocity.x = ball.vx;
-	velocity.y = ball.vy;
-	const now = performance.now();
-	server.clients.forEach((client) => {
-		if (client.readyState === WebSocket.OPEN) {
-			client.send(JSON.stringify({
-				type: "update",
-				timestamp: now,
-				ball,
-				paddles,
-				scores,
-			}));
-		}
-	});
-}, 1000 / 60);
-
-function checkPaddleCollision(player) {
-	const paddle = paddles[player];
-	const radius = ball.radius || 0.25;
-
-	const closestX = Math.max(paddle.x - paddle.width / 2, Math.min(ball.x, paddle.x + paddle.width / 2));
-	const closestY = Math.max(paddle.y - paddle.height / 2, Math.min(ball.y, paddle.y + paddle.height / 2));
-
-	const distanceX = ball.x - closestX;
-	const distanceY = ball.y - closestY;
-	const distanceSquared = distanceX * distanceX + distanceY * distanceY;
-
-	if (distanceSquared < radius * radius) {
-		if (!hit)
-			hit = 1;
-		else
-			hit *= 1.1;
-		let s = Math.sign(ball.y);
-		playerCenterToBall.x = ball.x - paddle.x;
-		playerCenterToBall.y = Math.abs(ball.y) - Math.abs(paddle.y);
-		const dist = Math.sqrt(playerCenterToBall.x * playerCenterToBall.x + playerCenterToBall.y * playerCenterToBall.y);
-		let xx = playerCenterToBall.x / dist;
-		let yy = s * playerCenterToBall.y / dist;
-
-		ball.vx = xx * 0.16 * 1.05 * hit;// * velocity.x;
-		ball.vy = yy * 0.16 * 1.05 * hit;// * velocity.y;
-	}
-}
-
-function resetBall() {
-	ball = {
-		x: 0,
-		y: 0,
-		vx: 0,
-		vy: 0.15 * (Math.random() > 0.5 ? 1 : -1),
-	};
-	hit = 0;
-}
+console.log("WebSocket server running on ws://localhost:8080");
+//import WebSocket, { WebSocketServer } from 'ws';
+//import Player from "./Player.js";
+//import Game from "./Game.js";
+////import { v4 as uuidv4 } from 'uuid';
+//
+//const wss = new WebSocketServer({ port: 8080 });
+//const game = new Game(100);
+//const clientsMap = new Map();
+//
+//wss.on('connection', function (ws) {
+//    //const uid = uuidv4();
+//    const id = game.getSize() + 1;
+//    const newPlayer = new Player(id);
+//
+//    if (!game.addPlayer(newPlayer)) {
+//        ws.send(JSON.stringify({ type: 'error', message: 'Game is full' }));
+//        ws.close();
+//        return;
+//    }
+//
+//    clientsMap.set(id.toString(), ws);
+//
+//    ws.send(JSON.stringify({ type: 'init', id }));
+//
+//    ws.on('message', function (message) {
+//        try {
+//            const data = JSON.parse(message);
+//            // Expecting messages like: { type: 'move', uid, position, rotation }
+//            if (data.type === 'move' && data.id === id) {
+//                //console.log("receiving content move =" + id);
+//                game.updateState(data.position, data.rotation, id);
+//            }
+//        } catch (err) {
+//            console.error('Error processing message:', err);
+//        }
+//    });
+//
+//    ws.on('close', function () {
+//        game.removePlayer(id);
+//        clientsMap.delete(id);
+//    });
+//});
+//
+//const TICK_RATE = 60;
+//const TICK_INTERVAL = 1000 / TICK_RATE;
+//
+//setInterval(() => {
+//    const deltaTime = 1 / TICK_RATE;
+//    game.update(deltaTime);
+//    const deltaSnapshot = game.getDeltaSnapshot();
+//
+//    if (Object.keys(deltaSnapshot).length > 0) {
+//        const message = JSON.stringify({ type: 'update', state: deltaSnapshot });
+//
+//        for (const id in deltaSnapshot) {
+//            const client = clientsMap.get(id.toString());
+//
+//            if (client) {
+//                client.send(message);
+//            }
+//        }
+//    }
+//}, TICK_INTERVAL);

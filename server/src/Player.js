@@ -1,17 +1,23 @@
-import { Paddle } from "./Paddle";
+import Paddle from "./Paddle.js";
 
-export class Player {
+export default class Player {
+    id;
+    constructor(id) {
+        this.id = id;
+        //this.uid = uid;
+        this.paddle = new Paddle();
+        this.dirty = false;
+    }
 
-	id;
-	paddle;
+    updateState(newPosition, newRotation) {
+        this.paddle.update(newPosition, newRotation);
+        this.dirty = true;
+    }
 
-	constructor(id, pos, rotation) {
-		this.id = id;
-		this.paddle = new Paddle(pos, rotation);
-	}
+    clearDirty() {
+        this.dirty = false;
+    }
 
-	init(pos, rotation) {
-		this.paddle.setPosition(pos.x, pos.y);
-		this.paddle.setRotation(rotation.x, rotation.y);
-	}
+    update(deltaTime) {
+    }
 }
