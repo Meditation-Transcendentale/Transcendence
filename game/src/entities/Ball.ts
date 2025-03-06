@@ -1,14 +1,27 @@
-import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Color3, GlowLayer, ShadowGenerator, DirectionalLight } from "@babylonjs/core";
+import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Matrix, Color3 } from "@babylonjs/core";
 export class Ball {
-    public ball: Mesh;
+    private static masterBall: Mesh | null = null;
+    private static matrices: Matrix[] = [];
+    private static needsUpdate = false;
     private targetPosition: Vector3 = new Vector3(0, 0, 0);
     public velocity: Vector3 = new Vector3(0, 0, 0);
+    public position: Vector3 = new Vector3(0, 0, 0);
+    public instanceIndex: number;
 
-    constructor(scene: Scene, material: StandardMaterial) {
-        this.ball = MeshBuilder.CreateSphere("ball", { diameter: 0.5 }, scene);
-        this.ball.position = new Vector3(0, 0.25, 0);
-        this.ball.material = material;
+    constructor(scene: Scene, position: Vector3) {
+        if (!Ball.masterBall) {
+            Ball.masterBall = MeshBuilder.CreateSphere("masterBall", { diameter: 1 }, scene);
+            //Ball.masterBall.isVisible = false; // Hide the master mesh
+            Ball.masterBall.material = new StandardMaterial("ballmaterial", scene);
+            Ball.masterBall.material.diffuseColor = new Color3(1, 1, 0);
+        }
 
+        // Create thin instance
+        this.setPosition(position);
+        this.instanceIndex = Ball.matrices.length;
+        Ball.matrices.push(Matrix.Translation(position.x, 0.5, position.z));
+        //Ball.matrices.flatMap(m => [...m.toArray()]);
+        Ball.masterBall.thinInstanceSetBuffer("matrix", Ball.matrices.flatMap(m => [...m.toArray()]), 16);
     }
 
     public updatePosition(x: number, z: number, vx: number, vz: number): void {
@@ -17,18 +30,28 @@ export class Ball {
     }
 
     public update(delta: number): void {
-
         // Linear interpolation for smooth movement
-        this.ball.position.x += (this.targetPosition.x - this.ball.position.x) * 0.1;
-        this.ball.position.z += (this.targetPosition.z - this.ball.position.z) * 0.1;
+        this.position.x += (this.targetPosition.x - this.position.x) * 0.1;
+        this.position.z += (this.targetPosition.z - this.position.z) * 0.1;
 
         // Simulate real movement based on velocity
-        this.ball.position.x += this.velocity.x * delta;
-        this.ball.position.z += this.velocity.z * delta;
+        this.position.x += this.velocity.x * delta;
+        this.position.z += this.velocity.z * delta;
+        Ball.matrices[this.instanceIndex].setTranslation(new Vector3(this.position.x, 0.5, this.position.z));
+        Ball.needsUpdate = true;
+        //this.instanceMatrix.setTranslation(this.position);
+        //Ball.masterBall?.thinInstanceBufferUpdated("matrix");
+    }
+
+    public static updateAllInstances() {
+        if (Ball.needsUpdate && Ball.masterBall) {
+            Ball.masterBall.thinInstanceSetBuffer("matrix", Ball.matrices.flatMap(m => [...m.toArray()]), 16);
+            Ball.needsUpdate = false; // Reset update flag
+        }
     }
 
     public getPosition(): Vector3 {
-        return this.ball.position;
+        return this.position;
     }
 
     public getVelocity(): Vector3 {
@@ -36,56 +59,11 @@ export class Ball {
     }
 
     public setPosition(position: Vector3): void {
-        this.ball.position.x = position.x;
-        this.ball.position.z = position.z;
+        this.position.x = position.x;
+        this.position.z = position.z;
     }
 
     public setVelocity(velocity: Vector3): void {
         this.velocity.copyFrom(velocity);
     }
 }
-//import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial } from "@babylonjs/core";
-//
-//export class Ball {
-//	public ball: Mesh;
-//	private targetPosition: Vector3 = new Vector3(0, 0, 0);
-//	public velocity: Vector3 = new Vector3(0, 0, 0);
-//
-//	constructor(scene: Scene, material: StandardMaterial) {
-//		this.ball = MeshBuilder.CreateSphere("ball", { diameter: 0.5 }, scene);
-//		this.ball.position = new Vector3(0, 0.25, 0);
-//		this.ball.material = material;
-//	}
-//
-//	public updatePosition(x: number, z: number, vx: number, vz: number): void {
-//		this.targetPosition.set(x, 0.25, z);
-//		this.velocity.set(vx, 0, vz);
-//	}
-//
-//	public update(delta: number): void {
-//		if (delta) {
-//			const predictedX = Math.max(-4.65, Math.min(this.ball.position.x + this.velocity.x * delta, 4.65));
-//			const predictedY = Math.max(-9, Math.min(this.ball.position.z + this.velocity.y * delta, 9));
-//
-//			this.ball.position.x = predictedX;
-//			this.ball.position.z = predictedY;
-//		}
-//	}
-//
-//	public getMesh(): Mesh {
-//		return this.ball;
-//	}
-//	public getPosition(): Vector3 {
-//		return this.ball.position;
-//	}
-//	public getVelocity(): Vector3 {
-//		return this.velocity;
-//	}
-//	public setPosition(position: Vector3): void {
-//		this.ball.position.x = position.x;
-//		this.ball.position.z = position.y;
-//	}
-//	public setVelocity(velocity: Vector3): void {
-//		this.velocity.copyFrom(velocity);
-//	}
-//}

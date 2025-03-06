@@ -61,14 +61,11 @@ export default class Game {
             balls: [],
             walls: []
         };
-
         this.players.forEach((player, id) => {
             if (player.dirty) {
                 snapshot.players[id] = {
-                    paddle: {
-                        position: player.paddle.position,
-                        rotation: player.paddle.rotation
-                    }
+                    position: player.paddle.position,
+                    rotation: player.paddle.rotation
                 };
                 player.clearDirty();
             }

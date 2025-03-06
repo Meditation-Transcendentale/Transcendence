@@ -37,7 +37,7 @@ wss.on("connection", function (ws) {
     });
 });
 
-const TICK_RATE = 60;
+const TICK_RATE = 30;
 const TICK_INTERVAL = 1000 / TICK_RATE;
 
 setInterval(() => {

@@ -1,6 +1,6 @@
 import { Engine, Scene, HemisphericLight, Vector3, ArcRotateCamera, MeshBuilder, StandardMaterial, Color3 } from "@babylonjs/core";
 //import { Ball } from "../entities/Ball";
-//import { Paddle } from "../entities/Paddle";
+import { Paddle } from "../entities/Paddle";
 import { Player } from "../entities/Player";
 import { Ball } from "../entities/Ball";
 import Client from "./Client";
@@ -73,7 +73,7 @@ export class SceneManager {
             const posZ = radius * Math.sin(angleRad);
             const position = new Vector3(posX, 0.5, posZ);
 
-            this.player[i] = new Player(this.scene, position, angleDeg, true, i);
+            this.player[i] = new Player(this.scene, position, angleDeg, true, i, radius);
 
         }
 
@@ -175,6 +175,8 @@ export class SceneManager {
         for (const id in balls) {
             balls[id].update(1 / 60); // Update balls at 60FPS
         }
+        Ball.updateAllInstances();
+        Paddle.updateAllInstances();
         this.scene.render();
         requestAnimationFrame(this.renderLoop);
     };
@@ -209,19 +211,19 @@ export class SceneManager {
         let player = this.player[id];
         if (this.keysPressed["a"]) {
             //console.log("Pressing A");
-            player.move(-0.25);
-            move = -0.25;
+            player.move(-0.05, this.client);
+            move = -0.05;
         } else if (this.keysPressed["d"]) {
             //console.log("Pressing D");
-            player.move(0.25);
-            move = 0.25;
+            player.move(0.05, this.client);
+            move = 0.05;
         }
 
-        const minX = this.player[id].position.x - 4; // Left wall
-        const maxX = this.player[id].position.x + 4;  // Right wall
+        //const minX = this.player[id].position.x - 4; // Left wall
+        //const maxX = this.player[id].position.x + 4;  // Right wall
 
-        let paddle = Math.max(minX, Math.min(maxX, this.player[id].getPaddle().position.x + move));
-        this.client.sendMove(new Vector3(paddle, 0.5, player.getPaddle().position.z), player.getPaddle().rotation.x)
+        //let paddle = Math.max(minX, Math.min(maxX, this.player[id].getPaddle().position.x + move));
+        //this.client.sendMove(new Vector3(paddle, 0.5, player.getPaddle().position.z), player.getPaddle().rotation.x)
 
     }
 //

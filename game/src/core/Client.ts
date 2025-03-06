@@ -18,7 +18,7 @@ export default class Client {
 
         this.material = new StandardMaterial("ballMaterial", this.scene);
         this.material.diffuseColor.set(1, 1, 1);
-        this.walls = {}; // Initialize walls
+        this.walls = {};
 
         this.material = new StandardMaterial("wallMaterial", this.scene);
         this.material.diffuseColor.set(1, 0, 0);
@@ -86,16 +86,22 @@ export default class Client {
                 }
                 const player = this.player[id];
                 if (player) {
-                    player.updateState(data.state.players[id]);
+                    const serverState = data.state.players[id];
+
+                    //console.log("posx =", serverState.position.x, "posy =", serverState.position.z);
+
+                    player.updateState(
+                        new Vector3(serverState.position.x, 0.5, serverState.position.z),
+                        serverState.rotation
+                    );
                 }
             }
         }
-
         // Update balls
         if (data.state.balls) {
             for (const ball of data.state.balls) {
                 if (!this.balls[ball.id]) {
-                    this.balls[ball.id] = new Ball(this.scene, this.material);
+                    this.balls[ball.id] = new Ball(this.scene, new Vector3(ball.x, 0.5, ball.y));
                 }
                 this.balls[ball.id].updatePosition(ball.x, ball.y, ball.vx, ball.vy);
             }
@@ -105,7 +111,6 @@ export default class Client {
                 const isWallActive = data.state.walls[id];
 
                 if (isWallActive) {
-                    // Create wall if missing
                     if (!this.walls[id]) {
                         this.walls[id] = MeshBuilder.CreateBox(`wall_${id}`, { width: 10, height: 1, depth: 0.2 }, this.scene);
                         this.walls[id].position = this.player[id].position;
@@ -113,7 +118,6 @@ export default class Client {
                         this.walls[id].material = this.material;
                     }
                 } else {
-                    // Remove wall if player is present
                     if (this.walls[id]) {
                         this.walls[id].dispose();
                         delete this.walls[id];
