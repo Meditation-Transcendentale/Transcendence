@@ -1,15 +1,25 @@
-import { Engine } from "@babylonjs/core";
-import { SceneManager } from "./core/SceneManager";
+import { Engine } from '@babylonjs/core';
+import { initializeGame } from './gameManager';
+import { createScene } from './sceneManager';
+import { initializeInput } from './inputHandler';
+import { setupNetwork } from './websocketManager';
+import "@babylonjs/inspector";
 
 const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 
 const engine = new Engine(canvas, true);
 
-const sceneManager = new SceneManager(engine, canvas);
-//window.onbeforeunload = function () {
-//}
+const scene = createScene(engine, canvas);
 
-sceneManager.createScene();
-sceneManager.start();
+scene.debugLayer.show();
+setupNetwork();
 
-window.addEventListener("resize", () => engine.resize());
+//initializeInput();
+
+const numPlayers = 100; // For example, 6 players.
+const playerZones = initializeGame(scene, numPlayers);
+
+engine.runRenderLoop(() => {
+    scene.render();
+});
+
