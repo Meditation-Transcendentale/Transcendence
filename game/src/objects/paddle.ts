@@ -1,10 +1,8 @@
 import { MeshBuilder, Matrix, Scene, Mesh, StandardMaterial } from "@babylonjs/core";
 
 export class Paddle {
-    // Static property to hold the master mesh.
     private static masterMesh: Mesh;
 
-    // Instance method to get the master mesh, creating it if it doesn't exist.
     public static getMasterMesh(scene: Scene): Mesh {
         if (!Paddle.masterMesh) {
             Paddle.masterMesh = MeshBuilder.CreateBox("paddleMaster", { width: 1, height: 0.2, depth: 0.1 }, scene);
