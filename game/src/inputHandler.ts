@@ -4,49 +4,49 @@ import { GameManager } from "./gameManager";
 
 let gameManager: GameManager | null = null;
 
-/**
- * Initializes the input event listeners and stores the GameManager instance.
- * @param gm - The GameManager instance to use for local paddle updates.
- */
 export function initializeInput(gm: GameManager): void {
-	gameManager = gm;
+    gameManager = gm;
 
-	// Keydown event: mark the key as pressed.
-	window.addEventListener("keydown", (event: KeyboardEvent) => {
-		// Prevent default behavior for arrow keys.
-		if (["ArrowLeft", "ArrowRight"].includes(event.key)) {
-			event.preventDefault();
-		}
+    window.addEventListener("keydown", (event: KeyboardEvent) => {
+        if (["ArrowLeft", "ArrowRight"].includes(event.key)) {
+            event.preventDefault();
+        }
 
-		switch (event.key) {
-			case "a":
-				inputState.left = true;
-				break;
-			case "d":
-				inputState.right = true;
-				break;
-			default:
-				break;
-		}
+        switch (event.key) {
+            case "a":
+                inputState.a = true;
+                break;
+            case "d":
+                inputState.d = true;
+                break;
+            default:
+                break;
+        }
 
-		// Optionally, you can send the keydown event to the server immediately.
-		sendInput({ type: "MOVE_PADDLE", key: event.key, isPressed: true });
-	});
+        //sendInput({ type: "MOVE_PADDLE", key: event.key, isPressed: true });
+        //sendInput({ type: "MOVE_PADDLE", direction: getDirectionFromInput() });
+    });
 
-	// Keyup event: mark the key as released.
-	window.addEventListener("keyup", (event: KeyboardEvent) => {
-		switch (event.key) {
-			case "a":
-				inputState.left = false;
-				break;
-			case "d":
-				inputState.right = false;
-				break;
-			default:
-				break;
-		}
-
-		// Optionally, send the keyup event to the server.
-		sendInput({ type: "MOVE_PADDLE", key: event.key, isPressed: false });
-	});
+    window.addEventListener("keyup", (event: KeyboardEvent) => {
+        switch (event.key) {
+            case "a":
+                inputState.a = false;
+                break;
+            case "d":
+                inputState.d = false;
+                break;
+            default:
+                break;
+        }
+        //sendInput({ type: "MOVE_PADDLE", direction: getDirectionFromInput() });
+    });
+}
+function getDirectionFromInput(): number {
+    if (inputState.a && !inputState.d) {
+        return -1;
+    } else if (!inputState.a && inputState.d) {
+        return 1;
+    } else {
+        return 0;
+    }
 }

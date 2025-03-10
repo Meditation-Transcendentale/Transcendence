@@ -1,21 +1,21 @@
+import { MeshBuilder, Matrix, Scene, Mesh, StandardMaterial, Color3 } from "@babylonjs/core";
 
 export class Ball {
-    // Define properties (position, velocity)
-    public position: Vector3;
-    public velocity: Vector3;
+    private masterMesh: Mesh;
 
-    constructor(initialPosition: Vector3, initialVelocity: Vector3) {
-        this.position = initialPosition;
-        this.velocity = initialVelocity;
+    constructor(scene: Scene) {
+        this.masterMesh = MeshBuilder.CreateSphere("ballMaster", { diameter: 0.5 }, scene);
+        const ballMaterial = new StandardMaterial("ballMat", scene);
+        ballMaterial.diffuseColor = new Color3(1, 0, 0);
+        this.masterMesh.material = ballMaterial;
     }
 
-    // Update ball position based on velocity and time elapsed
-    public update(deltaTime: number): void {
-        this.position.addInPlace(this.velocity.scale(deltaTime));
+    public addInstance(scene: Scene, instanceMatrix: Matrix): number {
+        return this.masterMesh.thinInstanceAdd(instanceMatrix);
     }
 
-    // Methods for handling collisions (reflection, speed adjustment)
-    public onCollision(): void {
-        // Modify velocity based on collision response
+    public updateInstance(instanceIndex: number, newMatrix: Matrix, scene: Scene): void {
+        this.masterMesh.thinInstanceSetMatrixAt(instanceIndex, newMatrix);
+        this.masterMesh.thinInstanceBufferUpdated("matrix");
     }
 }

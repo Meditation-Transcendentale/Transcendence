@@ -1,61 +1,58 @@
 import { createScene } from "./sceneManager";
+import { sendInput } from "./websocketManager";
 import { initializeInput } from "./inputHandler";
-import { setupNetwork, onServerState } from "./websocketManager";
+import { setupNetwork, onServerState, localPlayerId } from "./websocketManager";
 import { GameManager } from "./gameManager";
 import { inputState } from "./inputState";
 import { Engine } from "@babylonjs/core";
+import "@babylonjs/inspector";
 
-// Get the canvas and create the BabylonJS engine/scene.
 const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 const engine = new Engine(canvas, true);
 const scene = createScene(engine, canvas);
 
-// Setup network connection.
+//scene.debugLayer.show();
+
 setupNetwork();
+const waitForId = setInterval(() => {
+    if (localPlayerId !== null) {
+        clearInterval(waitForId);
 
-// Set number of players and determine which one is local.
-const numPlayers = 100;
-const localPlayerIndex = 1;
+        const numPlayers = 100;
+        const numBalls = 3;
+        const gameManager = new GameManager(scene, numPlayers, localPlayerId, numBalls);
 
-// Create the GameManager.
-const gameManager = new GameManager(scene, numPlayers, localPlayerIndex);
+        initializeInput(gameManager);
 
-// Initialize input handling, injecting the GameManager via dependency injection.
-initializeInput(gameManager);
+        onServerState((serverState: any) => {
+            gameManager.applyServerDelta(serverState);
+        });
 
-// Register network callback to receive authoritative state updates.
-onServerState((serverState: any) => {
-	gameManager.applyServerState(serverState);
-});
+        let previousTime = performance.now();
+        const movementSpeed = 0.1; // units per second
 
-// Set up a continuous game loop for smooth input processing and rendering.
-let previousTime = performance.now();
-const movementSpeed = 5; // units per second
+        function gameLoop(currentTime: number) {
+            //const deltaTime = (currentTime - previousTime) / 1000; // Convert milliseconds to seconds.
+            previousTime = currentTime;
 
-function gameLoop(currentTime: number) {
-	const deltaTime = (currentTime - previousTime) / 1000; // Convert milliseconds to seconds.
-	previousTime = currentTime;
+            let moveDelta = 0;
+            if (inputState.a) {
+                moveDelta -= movementSpeed;
+            }
+            if (inputState.d) {
+                moveDelta += movementSpeed;
+            }
 
-	// Continuously check the current input state.
-	let moveDelta = 0;
-	if (inputState.a) {
-		moveDelta -= movementSpeed * deltaTime;
-	}
-	if (inputState.d) {
-		moveDelta += movementSpeed * deltaTime;
-	}
+            if (moveDelta !== 0) {
+                gameManager.updateLocalPaddleByDelta(moveDelta);
+                sendInput({ type: "MOVE_PADDLE", direction: moveDelta });
+            }
 
-	// If there is any movement, update the local paddle.
-	if (moveDelta !== 0) {
-		gameManager.updateLocalPaddleByDelta(moveDelta);
-	}
+            scene.render();
 
-	// Render the scene.
-	scene.render();
+            requestAnimationFrame(gameLoop);
+        }
 
-	// Request the next frame.
-	requestAnimationFrame(gameLoop);
-}
-
-// Start the game loop.
-requestAnimationFrame(gameLoop);
+        requestAnimationFrame(gameLoop);
+    }
+}, 50);
