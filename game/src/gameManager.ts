@@ -1,8 +1,14 @@
+import { Vector3 } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core";
 import { Arena, calculateArenaRadius } from "./objects/arena";
 import { Player } from "./objects/Player";
 import { BallManager } from "./BallManager";
 
+interface PaddleUpdate {
+    id: number;
+    offset: number;
+    // Add any other properties if needed
+}
 export class GameManager {
     public scene: Scene;
     public playerZones: Player[];
@@ -34,18 +40,20 @@ export class GameManager {
     }
 
     public applyServerDelta(delta: any): void {
-        if (delta.paddleUpdates) {
-            for (const update of delta.paddleUpdates) {
+        if (!delta.state) return;
+        if (delta.state.paddles) {
+            for (const update of Object.values(delta.state.paddles) as PaddleUpdate[]) {
+                if (update.id == this.localPlayerIndex) continue;
                 const zone = this.playerZones[update.id];
+                //console.log(update.offset);
                 zone.predictedX = update.offset;
                 zone.updatePaddleX(update.offset, this.scene);
             }
         }
 
-        if (delta.ballUpdates) {
-            console.log("ball update");
-            for (const ballUpdate of delta.ballUpdates) {
-                this.ballManager.updateBall(ballUpdate.id, ballUpdate.position);
+        if (delta.state.balls) {
+            for (const ballUpdate of delta.state.balls) {
+                this.ballManager.updateBall(ballUpdate.id, new Vector3(ballUpdate.x, 0.5, ballUpdate.y));
             }
         }
 

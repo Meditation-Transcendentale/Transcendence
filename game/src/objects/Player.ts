@@ -42,6 +42,7 @@ export class Player implements IPlayer {
         this.rightPillarPosition = new Vector3(pillarOffset * Math.cos(rightAngle), 0, pillarOffset * Math.sin(rightAngle));
         const chordLength = 2 * pillarOffset * Math.sin(zoneAngleWidth / 2);
         this.maxOffset = chordLength / 2 - 0.56;
+        console.log(this.maxOffset);
         this.localBaseMatrix = Matrix.Translation(this.zoneCenter.x, 0.5, this.zoneCenter.z);
         const tangentangle = angle + Math.PI / 2;
         const rotationMatrix = Matrix.RotationY(-tangentangle);

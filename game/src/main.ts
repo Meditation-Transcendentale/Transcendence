@@ -10,7 +10,6 @@ import "@babylonjs/inspector";
 const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 const engine = new Engine(canvas, true);
 const scene = createScene(engine, canvas);
-
 //scene.debugLayer.show();
 
 setupNetwork();
@@ -19,7 +18,7 @@ const waitForId = setInterval(() => {
         clearInterval(waitForId);
 
         const numPlayers = 100;
-        const numBalls = 3;
+        const numBalls = 100;
         const gameManager = new GameManager(scene, numPlayers, localPlayerId, numBalls);
 
         initializeInput(gameManager);
@@ -45,7 +44,7 @@ const waitForId = setInterval(() => {
 
             if (moveDelta !== 0) {
                 gameManager.updateLocalPaddleByDelta(moveDelta);
-                sendInput({ type: "MOVE_PADDLE", direction: moveDelta });
+                sendInput({ type: "input", direction: moveDelta });
             }
 
             scene.render();

@@ -11,8 +11,8 @@ export function setupNetwork(): void {
 
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === "ASSIGN_ID") {
-            localPlayerId = data.id;
+        if (data.type === "welcome") {
+            localPlayerId = data.playerId;
             console.log("Assigned local player ID:", localPlayerId);
         } else {
             if (serverStateCallback) {
