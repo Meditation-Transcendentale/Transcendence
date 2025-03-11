@@ -12,9 +12,9 @@ export const dirtyState = {
     zoneActiveChanged: false
 };
 let CELL_SIZE = 5;
-export let numPlayersGlobal = 0;
-export let globalArenaRadius = 0;
-export let initialBallSpeed = 0;
+export let numPlayersGlobal = 100;
+export let globalArenaRadius = 190;
+export let initialBallSpeed = 5;
 
 export function initializeState(numPlayers, numBalls = 1) {
     numPlayersGlobal = numPlayers;
@@ -25,6 +25,15 @@ export function initializeState(numPlayers, numBalls = 1) {
         gameState.ballPositions.push({ x: 0, y: 0, vx: initialBallSpeed, vy: initialBallSpeed });
     }
 }
+export function processInput(clientId, input, deltaTime) {
+    if (input.type === "MOVE_PADDLE") {
+        const displacement = input.direction;
+        const offset = Math.max(-2.905, Math.min(gameState.paddleOffsets[clientId] + displacement, 2.905));
+        gameState.paddleOffsets[clientId] = offset;
+        dirtyState.paddleUpdates.add(clientId);
+    }
+}
+
 export function updateZoneActive() {
 
     gameState.zoneActive = [];
@@ -81,12 +90,9 @@ export function updateState(deltaTime) {
             }
         }
 
-        // Check if the ball passed a player's goal.
-        // For simplicity, assume that if the ball's distance from the center exceeds a threshold, it's a goal.
         const centerDist = Math.sqrt(newX * newX + newY * newY);
-        const goalThreshold = globalArenaRadius; // If the ball goes beyond the arena radius, it's a goal.
+        const goalThreshold = globalArenaRadius;
         if (centerDist > goalThreshold) {
-            // Reset ball: center it and set velocity to initial values.
             newX = 0;
             newY = 0;
             ball.vx = initialBallSpeed;
@@ -116,8 +122,7 @@ export function getDirtyDelta() {
             delta.ballUpdates.push({ id, position: { x: gameState.ballPositions[id].x, y: gameState.ballPositions[id].y } });
         }
     }
-
-    // (Include zoneActive if applicable)
+    delta.zoneActive = gameState.zoneActive;
 
     // Clear dirty flags.
     dirtyState.paddleUpdates.clear();

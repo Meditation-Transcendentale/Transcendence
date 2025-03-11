@@ -12,7 +12,7 @@ wss.on("connection", (socket) => {
 });
 
 const numPlayers = 100;
-const numBalls = 3;
+const numBalls = 4;
 initializeState(numPlayers, numBalls);
 
 startGameLoop();

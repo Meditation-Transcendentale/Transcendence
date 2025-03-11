@@ -43,6 +43,7 @@ export class GameManager {
         }
 
         if (delta.ballUpdates) {
+            console.log("ball update");
             for (const ballUpdate of delta.ballUpdates) {
                 this.ballManager.updateBall(ballUpdate.id, ballUpdate.position);
             }
