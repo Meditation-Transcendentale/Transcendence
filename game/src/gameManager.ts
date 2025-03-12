@@ -4,9 +4,15 @@ import { Arena, calculateArenaRadius } from "./objects/arena";
 import { Player } from "./objects/Player";
 import { BallManager } from "./BallManager";
 
+interface Walls {
+    id: number;
+    wall: boolean;
+    // Add any other properties if needed
+}
 interface PaddleUpdate {
     id: number;
     offset: number;
+    isStatic: number;
     // Add any other properties if needed
 }
 export class GameManager {
@@ -40,9 +46,19 @@ export class GameManager {
     }
 
     public applyServerDelta(delta: any): void {
-        if (!delta.state) return;
-        if (delta.state.paddles) {
-            for (const update of Object.values(delta.state.paddles) as PaddleUpdate[]) {
+        if (delta.walls) {
+            //console.log("walls=" + delta.walls);
+            for (const id of delta.walls) {
+                console.log("id=" + id.id + " bool=" + id.wall)
+                if (id.wall == true)
+                    this.playerZones[id.id].showWall(this.scene);
+                else if (id.wall == false)
+                    this.playerZones[id.id].hideWall(this.scene);
+
+            }
+        }
+        if (delta.paddles) {
+            for (const update of Object.values(delta.paddles) as PaddleUpdate[]) {
                 if (update.id == this.localPlayerIndex) continue;
                 const zone = this.playerZones[update.id];
                 //console.log(update.offset);
@@ -51,21 +67,11 @@ export class GameManager {
             }
         }
 
-        if (delta.state.balls) {
-            for (const ballUpdate of delta.state.balls) {
+        if (delta.balls) {
+            for (const ballUpdate of delta.balls) {
                 this.ballManager.updateBall(ballUpdate.id, new Vector3(ballUpdate.x, 0.5, ballUpdate.y));
             }
         }
 
-        if (delta.zoneActive) {
-            for (let i = 0; i < delta.zoneActive.length; i++) {
-                const zone = this.playerZones[i];
-                if (!delta.zoneActive[i]) {
-                    zone.showWall(this.scene);
-                } else {
-                    zone.hideWall(this.scene);
-                }
-            }
-        }
     }
 }

@@ -20,9 +20,9 @@ class GameLoop {
 
         Physics.update(deltaTime);
         const gameState = Physics.getState();
-
         Networking.broadcastState(this.wss, gameState);
 
+        Physics.clearDirty();
         setTimeout(() => this.loop(), this.interval);
     }
 }

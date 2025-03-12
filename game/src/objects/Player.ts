@@ -48,6 +48,7 @@ export class Player implements IPlayer {
         const rotationMatrix = Matrix.RotationY(-tangentangle);
         this.localBaseMatrix = rotationMatrix.multiply(this.localBaseMatrix);
         this.instanceIndex = Paddle.addInstance(scene, this.localBaseMatrix);
+        this.showWall(scene);
     }
 
     public updatePaddleX(newLocalX: number, scene: Scene): void {

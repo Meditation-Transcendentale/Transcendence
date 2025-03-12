@@ -12,46 +12,69 @@ const engine = new Engine(canvas, true);
 const scene = createScene(engine, canvas);
 //scene.debugLayer.show();
 
+// Create an array to hold any state updates received before GameManager is ready.
+const pendingUpdates: any[] = [];
+
+// This will hold our GameManager instance once initialized.
+let gameManagerInstance: GameManager | null = null;
+
+// Setup the network connection.
 setupNetwork();
+
+// Register the server state callback immediately.
+onServerState((serverState: any) => {
+    console.log("Server state update received:", serverState);
+    // If the GameManager instance is ready, apply the update.
+    if (gameManagerInstance) {
+        gameManagerInstance.applyServerDelta(serverState);
+    } else {
+        // Otherwise, push it to the pending queue.
+        pendingUpdates.push(serverState);
+    }
+});
+
+// Wait until localPlayerId is assigned before creating the GameManager.
 const waitForId = setInterval(() => {
-	if (localPlayerId !== null) {
-		clearInterval(waitForId);
+    if (localPlayerId !== null) {
+        clearInterval(waitForId);
 
-		const numPlayers = 100;
-		const numBalls = 1;
-		const gameManager = new GameManager(scene, numPlayers, localPlayerId, numBalls);
+        const numPlayers = 100;
+        const numBalls = 1;
+        gameManagerInstance = new GameManager(scene, numPlayers, localPlayerId, numBalls);
 
-		initializeInput(gameManager);
+        // Process any pending state updates received before GameManager was created.
+        pendingUpdates.forEach((update) => {
+            gameManagerInstance!.applyServerDelta(update);
+        });
+        pendingUpdates.length = 0; // Clear the queue.
 
-		onServerState((serverState: any) => {
-			gameManager.applyServerDelta(serverState);
-		});
+        // Initialize input handling now that GameManager exists.
+        initializeInput(gameManagerInstance);
 
-		let previousTime = performance.now();
-		const movementSpeed = 0.1; // units per second
+        let previousTime = performance.now();
+        const movementSpeed = 0.1; // units per second
 
-		function gameLoop(currentTime: number) {
-			//const deltaTime = (currentTime - previousTime) / 1000; // Convert milliseconds to seconds.
-			previousTime = currentTime;
+        function gameLoop(currentTime: number) {
+            const deltaTime = currentTime - previousTime;
+            previousTime = currentTime;
 
-			let moveDelta = 0;
-			if (inputState.a) {
-				moveDelta -= movementSpeed;
-			}
-			if (inputState.d) {
-				moveDelta += movementSpeed;
-			}
+            let moveDelta = 0;
+            if (inputState.a) {
+                moveDelta -= movementSpeed;
+            }
+            if (inputState.d) {
+                moveDelta += movementSpeed;
+            }
 
-			if (moveDelta !== 0) {
-				gameManager.updateLocalPaddleByDelta(moveDelta);
-				sendInput({ type: "input", direction: moveDelta });
-			}
+            if (moveDelta !== 0) {
+                gameManagerInstance!.updateLocalPaddleByDelta(moveDelta);
+                sendInput({ type: "input", direction: moveDelta });
+            }
 
-			scene.render();
+            scene.render();
+            requestAnimationFrame(gameLoop);
+        }
 
-			requestAnimationFrame(gameLoop);
-		}
-
-		requestAnimationFrame(gameLoop);
-	}
+        requestAnimationFrame(gameLoop);
+    }
 }, 50);

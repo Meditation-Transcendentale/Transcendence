@@ -3,7 +3,7 @@ export class Paddle {
         this.id = id;
         this.offset = 0;
         this.speed = speed;
-        this.isStatic = false;
+        this.isStatic = true;
         this.maxOffset = 2.94;
     }
 
