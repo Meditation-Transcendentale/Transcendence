@@ -13,7 +13,7 @@
     { "players": 2, "radius": 100 }
   ],
   "INITIAL_ARENA_RADIUS": 400,
-  "BALL_COUNT": 100,
+  "BALL_COUNT": 1,
   "BALL_RADIUS": 5,
   "BALL_INITIAL_SPEED": 15,
   "BALL_SPEED_INCREMENT": 0.5,

@@ -14,44 +14,44 @@ const scene = createScene(engine, canvas);
 
 setupNetwork();
 const waitForId = setInterval(() => {
-    if (localPlayerId !== null) {
-        clearInterval(waitForId);
+	if (localPlayerId !== null) {
+		clearInterval(waitForId);
 
-        const numPlayers = 100;
-        const numBalls = 100;
-        const gameManager = new GameManager(scene, numPlayers, localPlayerId, numBalls);
+		const numPlayers = 100;
+		const numBalls = 1;
+		const gameManager = new GameManager(scene, numPlayers, localPlayerId, numBalls);
 
-        initializeInput(gameManager);
+		initializeInput(gameManager);
 
-        onServerState((serverState: any) => {
-            gameManager.applyServerDelta(serverState);
-        });
+		onServerState((serverState: any) => {
+			gameManager.applyServerDelta(serverState);
+		});
 
-        let previousTime = performance.now();
-        const movementSpeed = 0.1; // units per second
+		let previousTime = performance.now();
+		const movementSpeed = 0.1; // units per second
 
-        function gameLoop(currentTime: number) {
-            //const deltaTime = (currentTime - previousTime) / 1000; // Convert milliseconds to seconds.
-            previousTime = currentTime;
+		function gameLoop(currentTime: number) {
+			//const deltaTime = (currentTime - previousTime) / 1000; // Convert milliseconds to seconds.
+			previousTime = currentTime;
 
-            let moveDelta = 0;
-            if (inputState.a) {
-                moveDelta -= movementSpeed;
-            }
-            if (inputState.d) {
-                moveDelta += movementSpeed;
-            }
+			let moveDelta = 0;
+			if (inputState.a) {
+				moveDelta -= movementSpeed;
+			}
+			if (inputState.d) {
+				moveDelta += movementSpeed;
+			}
 
-            if (moveDelta !== 0) {
-                gameManager.updateLocalPaddleByDelta(moveDelta);
-                sendInput({ type: "input", direction: moveDelta });
-            }
+			if (moveDelta !== 0) {
+				gameManager.updateLocalPaddleByDelta(moveDelta);
+				sendInput({ type: "input", direction: moveDelta });
+			}
 
-            scene.render();
+			scene.render();
 
-            requestAnimationFrame(gameLoop);
-        }
+			requestAnimationFrame(gameLoop);
+		}
 
-        requestAnimationFrame(gameLoop);
-    }
+		requestAnimationFrame(gameLoop);
+	}
 }, 50);

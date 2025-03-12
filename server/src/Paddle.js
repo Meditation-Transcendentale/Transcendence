@@ -11,7 +11,7 @@ export class Paddle {
         if (!this.isStatic) {
             this.offset += direction;
             this.offset = Math.max(-this.maxOffset, Math.min(this.offset, this.maxOffset));
-            console.log(this.offset);
+            //console.log(this.offset);
         }
     }
 
