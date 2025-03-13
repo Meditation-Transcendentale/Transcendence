@@ -1,80 +1,85 @@
-import { createScene } from "./sceneManager";
-import { sendInput } from "./websocketManager";
-import { initializeInput } from "./inputHandler";
-import { setupNetwork, onServerState, localPlayerId } from "./websocketManager";
-import { GameManager } from "./gameManager";
-import { inputState } from "./inputState";
-import { Engine } from "@babylonjs/core";
-import "@babylonjs/inspector";
+import { Engine, Scene, Vector3, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial } from "@babylonjs/core";
+import { ECSManager } from "./ecs/ECSManager.js";
+import { StateManager } from "./state/StateManager.js";
+import { MovementSystem } from "./systems/MovementSystem.js";
+import { InputSystem } from "./systems/InputSystem.js";
+import { NetworkingSystem } from "./systems/NetworkingSystem.js";
+import { ThinInstanceSystem } from "./systems/ThinInstanceSystem.js";
+import { WebSocketManager } from "./network/WebSocketManager.js";
+import { InputManager } from "./input/InputManager.js";
+import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
+import { calculateArenaRadius, createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
 
-const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-const engine = new Engine(canvas, true);
-const scene = createScene(engine, canvas);
-//scene.debugLayer.show();
+class Game {
+    private engine: Engine;
+    private scene: Scene;
+    private ecs: ECSManager;
+    private stateManager: StateManager;
+    private wsManager: WebSocketManager;
+    private inputManager: InputManager;
+    private camera: ArcRotateCamera;
 
-// Create an array to hold any state updates received before GameManager is ready.
-const pendingUpdates: any[] = [];
+    constructor(canvas: HTMLCanvasElement) {
+        this.engine = new Engine(canvas, true);
+        this.scene = new Scene(this.engine);
 
-// This will hold our GameManager instance once initialized.
-let gameManagerInstance: GameManager | null = null;
+        this.camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 2, 40, Vector3.Zero(), this.scene);
+        this.camera.attachControl(canvas, true);
+        new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
 
-// Setup the network connection.
-setupNetwork();
+        const arenaMesh = MeshBuilder.CreateDisc("arenaDisc", { radius: calculateArenaRadius(100), tessellation: 128 }, this.scene);
+        const material = new StandardMaterial("arenaMaterial", this.scene);
+        material.diffuseColor.set(0, 0, 0);
+        arenaMesh.rotation.x = Math.PI / 2;
+        arenaMesh.material = material;
+        const ballBaseMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 0.5 }, this.scene);
+        ballBaseMesh.setEnabled(true);
+        const paddleBaseMesh = MeshBuilder.CreateBox("paddleBase", { width: 1, height: 0.2, depth: 0.1 }, this.scene);
+        paddleBaseMesh.setEnabled(true);
+        const wallBaseMesh = MeshBuilder.CreateBox("wallBase", { width: 3, height: 1, depth: 1 }, this.scene);
+        wallBaseMesh.setEnabled(true);
+        const pillarBaseMesh = MeshBuilder.CreateCylinder("pillarBase", { height: 5, diameter: 1 }, this.scene);
+        pillarBaseMesh.setEnabled(true);
 
-// Register the server state callback immediately.
-onServerState((serverState: any) => {
-    console.log("Server state update received:", serverState);
-    // If the GameManager instance is ready, apply the update.
-    if (gameManagerInstance) {
-        gameManagerInstance.applyServerDelta(serverState);
-    } else {
-        // Otherwise, push it to the pending queue.
-        pendingUpdates.push(serverState);
-    }
-});
+        const ballInstanceManager = new ThinInstanceManager(ballBaseMesh, 1000, 50, 100);
+        const paddleInstanceManager = new ThinInstanceManager(paddleBaseMesh, 100, 50, 100);
+        const wallInstanceManager = new ThinInstanceManager(wallBaseMesh, 100, 50, 100);
+        const pillarInstanceManager = new ThinInstanceManager(pillarBaseMesh, 100, 50, 100);
 
-// Wait until localPlayerId is assigned before creating the GameManager.
-const waitForId = setInterval(() => {
-    if (localPlayerId !== null) {
-        clearInterval(waitForId);
+        this.ecs = new ECSManager();
+        this.wsManager = new WebSocketManager("ws://10.12.12.4:8080");
+        this.inputManager = new InputManager();
 
-        const numPlayers = 100;
-        const numBalls = 1;
-        gameManagerInstance = new GameManager(scene, numPlayers, localPlayerId, numBalls);
+        this.ecs.addSystem(new MovementSystem());
+        this.ecs.addSystem(new InputSystem(this.inputManager));
+        this.ecs.addSystem(new NetworkingSystem(this.wsManager));
+        this.ecs.addSystem(new ThinInstanceSystem(
+            ballInstanceManager,
+            paddleInstanceManager,
+            wallInstanceManager,
+            pillarInstanceManager,
+            this.camera
+        ));
 
-        // Process any pending state updates received before GameManager was created.
-        pendingUpdates.forEach((update) => {
-            gameManagerInstance!.applyServerDelta(update);
+        const config: GameTemplateConfig = {
+            numberOfPlayers: 100,
+            numberOfBalls: 50,
+            arenaRadius: calculateArenaRadius(100),
+            numPillars: 100,
+            numWalls: 100
+        };
+        createGameTemplate(this.ecs, config);
+
+        this.stateManager = new StateManager(this.ecs);
+        this.stateManager.update();
+
+        this.engine.runRenderLoop(() => {
+            this.scene.render();
         });
-        pendingUpdates.length = 0; // Clear the queue.
-
-        // Initialize input handling now that GameManager exists.
-        initializeInput(gameManagerInstance);
-
-        let previousTime = performance.now();
-        const movementSpeed = 0.1; // units per second
-
-        function gameLoop(currentTime: number) {
-            const deltaTime = currentTime - previousTime;
-            previousTime = currentTime;
-
-            let moveDelta = 0;
-            if (inputState.a) {
-                moveDelta -= movementSpeed;
-            }
-            if (inputState.d) {
-                moveDelta += movementSpeed;
-            }
-
-            if (moveDelta !== 0) {
-                gameManagerInstance!.updateLocalPaddleByDelta(moveDelta);
-                sendInput({ type: "input", direction: moveDelta });
-            }
-
-            scene.render();
-            requestAnimationFrame(gameLoop);
-        }
-
-        requestAnimationFrame(gameLoop);
     }
-}, 50);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
+    new Game(canvas);
+});
