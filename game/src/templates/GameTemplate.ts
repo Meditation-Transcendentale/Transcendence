@@ -3,9 +3,11 @@ import { ECSManager } from "../ecs/ECSManager.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
+import { ShieldComponent } from "../components/ShieldComponent.js"
 import { PillarComponent } from "../components/PillarComponent.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
+import { InputComponent } from "../components/InputComponent.js";
 
 export interface GameTemplateConfig {
 	numberOfPlayers: number;
@@ -59,6 +61,8 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig):
 		const z = (config.arenaRadius) * Math.sin(angle);
 		const paddleEntity = new Entity();
 		paddleEntity.addComponent(new PaddleComponent(new Vector3(x, 0, z)));
+		paddleEntity.addComponent(new InputComponent());
+		paddleEntity.addComponent(new ShieldComponent());
 		paddleEntity.addComponent(new TransformComponent(
 			new Vector3(x, 0.5, z),
 			new Vector3(0, -(angle + (Math.PI / 2)), 0),

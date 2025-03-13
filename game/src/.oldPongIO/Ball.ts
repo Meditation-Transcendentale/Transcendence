@@ -1,5 +1,5 @@
 import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial } from "@babylonjs/core";
-import { Player } from "../entities/Player";
+import { Player } from "../.oldPongIO/Player";
 
 export class Ball {
 	public ball: Mesh;

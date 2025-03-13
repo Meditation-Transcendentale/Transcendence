@@ -2,7 +2,10 @@ export class InputManager {
     private keysPressed: Set<string> = new Set();
 
     constructor() {
-        window.addEventListener("keydown", (e) => this.keysPressed.add(e.code));
+        window.addEventListener("keydown", (e) => {
+			this.keysPressed.add(e.code);
+			console.log(e.code);
+		});
         window.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
     }
 
