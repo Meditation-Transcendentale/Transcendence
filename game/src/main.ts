@@ -1,4 +1,4 @@
-import { Engine, Scene, Vector3, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial } from "@babylonjs/core";
+import { Engine, Scene, Vector3, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, ShaderMaterial, Effect } from "@babylonjs/core";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -35,9 +35,18 @@ class Game {
 		const ballBaseMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 0.5 }, this.scene);
 		ballBaseMesh.setEnabled(false);
 		ballBaseMesh.setPivotPoint(Vector3.Zero());
-		const paddleBaseMesh = MeshBuilder.CreateBox("paddleBase", { width: 1, height: 0.2, depth: 0.1 }, this.scene);
+		const paddleBaseMesh = MeshBuilder.CreateCylinder("goal", {height: 0.5, diameter:1, subdivisions:16}, this.scene);
 		paddleBaseMesh.setEnabled(true);
 		paddleBaseMesh.setPivotPoint(Vector3.Zero());
+		const shieldBaseMesh = MeshBuilder.CreateCylinder("shield", {height: 0.25, diameter: 1.65, tessellation: 12, arc: 0.5, enclose: true, updatable: true}, this.scene);
+		shieldBaseMesh.setEnabled(true);
+		shieldBaseMesh.setPivotPoint(Vector3.Zero());
+		const paddleShader = new ShaderMaterial("paddleShader", this.scene, "./shader/shield.vertex.fx",{
+			attributes: ["position"],
+			uniforms: ["worldViewProjection", "shieldAngle", "baseAngle", "cylinderCenter", "cylinderAxis", "intensity"]
+		});
+		shieldBaseMesh.material = paddleShader;
+
 		const wallBaseMesh = MeshBuilder.CreateBox("wallBase", { width: 3, height: 1, depth: 1 }, this.scene);
 		wallBaseMesh.setEnabled(false);
 		wallBaseMesh.setPivotPoint(Vector3.Zero());
