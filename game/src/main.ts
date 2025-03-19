@@ -23,7 +23,7 @@ class Game {
 		this.engine = new Engine(canvas, true);
 		this.scene = new Scene(this.engine);
 
-		this.camera = new ArcRotateCamera("camera", Math.PI * 1.5, Math.PI / 3, 10, Vector3.Zero(), this.scene);
+		this.camera = new ArcRotateCamera("camera", Math.PI * 0.5, 0, 10, Vector3.Zero(), this.scene);
 		this.camera.attachControl(canvas, true);
 		new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
 
@@ -129,45 +129,26 @@ class Game {
 
 			// Varying
 			varying vec3 vNormal;
+			const float PI = 3.14159265;
 
 			void main(void) {
-
+				// Transform the normal for proper lighting
 				vNormal = normalize(mat3(world) * normal);
 
-				float size = 0.825;
-				vec3 center = vec3(0, 0, 0);  // Centre du cylindre
-				vec3 axe = vec3(0, 1, 0);  // Axe de rotation (Y)
-				float intense = 0.01;  // Intensité de la rotation
-				vec3 P = position;  // Position du vertex
-				vec3 CP = P - center;  // Vecteur du point par rapport au centre
-
-				// Calcul de la distance du point à l'axe Y (distance dans le plan XY)
-				float distanceToAxis = length(vec2(CP.x, CP.z));  // Distance en XZ
-				float distanceNorm = distanceToAxis / size;
-				float rotationAngle = intense * 3.1415926535897932384626433832795 * 0.5 * distanceToAxis;  // Rotation en fonction de la distance
-
-				// Calcul du signe de la rotation : positive ou négative (rotation horaire ou anti-horaire)
-				float signRotation = -sign(P.x);  // Rotation dans le sens positif ou négatif
-
-				// Appliquer la rotation dans le plan XY
-				float cosAngle = cos(rotationAngle * signRotation);
-				float sinAngle = sin(rotationAngle * signRotation);
-
-				// Nouvelle position après rotation autour de l'axe Y
-				vec3 rotatedPosition;
-				rotatedPosition.x = CP.x * cosAngle - CP.z * sinAngle;  // Rotation en X
-				rotatedPosition.y = P.y;  // Pas de changement en Y
-				rotatedPosition.z = CP.x * sinAngle + CP.z * cosAngle;  // Rotation en Z
-
-				// Nouvelle position après avoir réajusté par rapport au centre
-				vec3 newPosition = rotatedPosition + center;
-
-				// Appliquer la projection
-				vec4 p = vec4(newPosition, 1.);
-				gl_Position = worldViewProjection * p;
-
-				// gl_Position = worldViewProjection * vec4(position, 1.0);
-
+				float fanFactor = 0.9;
+				float angle = atan(position.z, position.x) + (PI / 2.0);
+				
+				// Interpolate the vertex's angle from its original (shieldAngle) to the hinge angle (0.0)
+				float newAngle = mix(angle, 0.0, fanFactor) - PI * 0.5;
+				
+				// Compute the original radial distance from the center (preserved during the fan closing)
+				float radius = length(vec2(position.x, position.z));
+				
+				// Reconstruct the new XZ coordinates from the new angle, keeping Y unchanged
+				vec2 newXZ = vec2(cos(newAngle), sin(newAngle)) * radius;
+				vec3 newPosition = vec3(newXZ.x, position.y, newXZ.y);
+				
+				gl_Position = worldViewProjection * vec4(newPosition, 1.0);
 			}
 		`;
 

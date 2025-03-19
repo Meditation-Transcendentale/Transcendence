@@ -6,10 +6,12 @@ import { BallComponent } from "../components/BallComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { PillarComponent } from "../components/PillarComponent.js";
+import { ShieldComponent } from "../components/ShieldComponent.js";
 
 export class ThinInstanceSystem extends System {
     private ballManager: ThinInstanceManager;
     private paddleManager: ThinInstanceManager;
+	private shieldManager: ThinInstanceManager;
     private wallManager: ThinInstanceManager;
     private pillarManager: ThinInstanceManager;
     private camera: Camera;
@@ -18,6 +20,7 @@ export class ThinInstanceSystem extends System {
     constructor(
         ballManager: ThinInstanceManager,
         paddleManager: ThinInstanceManager,
+		shieldManager: ThinInstanceManager,
         wallManager: ThinInstanceManager,
         pillarManager: ThinInstanceManager,
         camera: Camera
@@ -25,6 +28,7 @@ export class ThinInstanceSystem extends System {
         super();
         this.ballManager = ballManager;
         this.paddleManager = paddleManager;
+		this.shieldManager = shieldManager;
         this.wallManager = wallManager;
         this.pillarManager = pillarManager;
         this.camera = camera;
@@ -34,6 +38,7 @@ export class ThinInstanceSystem extends System {
         this.frameCount++;
         this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
         this.paddleManager.update(entities, PaddleComponent, this.camera, this.frameCount);
+		this.shieldManager.update(entities, ShieldComponent, this.camera, this.frameCount);
         this.wallManager.update(entities, WallComponent, this.camera, this.frameCount);
         this.pillarManager.update(entities, PillarComponent, this.camera, this.frameCount);
     }

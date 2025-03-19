@@ -1,9 +1,11 @@
 precision highp float;
 
 attribute vec3 position;
+attribute float shieldAngle;
+attribute float isActive;
 // uniform mat4 world;
 uniform mat4 worldViewProjection;
-uniform float baseAngle; //radian
+// uniform float baseAngle; //radian
 
 uniform vec3 cylinderCenter;
 uniform vec3 cylinderAxis;
@@ -22,7 +24,7 @@ void main() {
 	float distanceToAxis = length(P - projectedPoint); // Distance between point and projection
 
 	float distanceFactor = distanceToAxis;
-	float rotationAngle = baseAngle * distanceFactor;
+	float rotationAngle = shieldAngle * distanceFactor;
 
 	float cosAngle = cos(rotationAngle);
 	float sinAngle = sin(rotationAngle);
@@ -38,5 +40,4 @@ void main() {
 	vec3 newPosition = cylinderCenter + rotatedPoint.xyz * (1.0 - intensity * distanceToAxis);
 
 	gl_Position = worldViewProjection * vec4(newPosition, 1.0);
-
 }

@@ -1,11 +1,14 @@
 import { Mesh, Matrix, Vector3, Quaternion, Camera } from "@babylonjs/core";
 import { Entity } from "../ecs/Entity.js";
 import { TransformComponent } from "../components/TransformComponent.js";
+import { ShieldComponent } from "../components/ShieldComponent.js";
 
 export class ThinInstanceManager {
 	private mesh: Mesh;
 	private capacity: number;
 	private instanceTransforms: Float32Array;
+	private shieldAngles: Float32Array;
+	private visibilityBuffer: Float32Array;
 
 	// LOD/culling thresholds (world units)
 	private updateThreshold: number;
@@ -18,6 +21,8 @@ export class ThinInstanceManager {
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16);
 		this.updateThreshold = updateThreshold;
 		this.cullThreshold = cullThreshold;
+		this.shieldAngles = new Float32Array(100);  //edit 100 by max number of instances
+		this.visibilityBuffer = new Float32Array(100);
 	}
 
 	private computeWorldMatrix(entity: Entity, allEntities: Entity[]): Matrix {
@@ -60,18 +65,23 @@ export class ThinInstanceManager {
 				if (distance > this.cullThreshold) {
 					shouldUpdate = false;
 				} else if (distance > this.updateThreshold) {
-					if (frameCount % 5 !== 0) {
-						shouldUpdate = false;
-					}
+					shouldUpdate = (frameCount % 5 === 0);
 				}
 				shouldUpdate = true;
 				if (shouldUpdate) {
 					matrix.copyToArray(this.instanceTransforms, count * 16);
+					if (entity.hasComponent(ShieldComponent)){
+						const shield = entity.getComponent(ShieldComponent) as ShieldComponent;
+						this.shieldAngles[count] = entity.getComponent(ShieldComponent)?.angle ?? 0;
+						this.visibilityBuffer[count] = shield.isActive ? 1.0 : 0.0;
+					}
+					count++;
 				}
-				count++;
 			}
 		});
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16, true);
+		// this.mesh.thinInstanceSetBuffer("shieldAngle", this.shieldAngles, 1, true); // update shader
+		// this.mesh.thinInstanceSetBuffer("isActive", this.visibilityBuffer, 1, true);
 		this.mesh.thinInstanceCount = count;
 	}
 }

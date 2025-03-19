@@ -8,6 +8,7 @@ import { PillarComponent } from "../components/PillarComponent.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputComponent } from "../components/InputComponent.js";
+import { ThinInstanceComponent } from "../components/ThinInstanceComponent.js";
 
 export interface GameTemplateConfig {
 	numberOfPlayers: number;
@@ -59,6 +60,7 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig):
 		const angle = (2 * Math.PI / config.numberOfPlayers) * i;
 		const x = (config.arenaRadius) * Math.cos(angle);
 		const z = (config.arenaRadius) * Math.sin(angle);
+		console.log("x = ",x, "z = ", z);
 		const paddleEntity = new Entity();
 		paddleEntity.addComponent(new PaddleComponent(new Vector3(x, 0, z)));
 		paddleEntity.addComponent(new InputComponent());

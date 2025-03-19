@@ -5,7 +5,7 @@ export class ShieldComponent implements Component {
 	public angleFactor: number;
 	public oldAngleFactor: number;
 	public angle: number;
-	public shieldIsActivate: boolean;
+	public isActive: boolean;
 	public lastInputDelay: number;
 
 	public shieldAngle: number;
@@ -18,7 +18,7 @@ export class ShieldComponent implements Component {
 		this.angleFactor = 0.5;
 		this.oldAngleFactor = 0.5;
 		this.angle = Math.PI * 0.5;
-		this.shieldIsActivate = false;
+		this.isActive = false;
 		this.lastInputDelay = performance.now();
 
 		this.shieldAngle = Math.PI * 0.5;

@@ -19,9 +19,8 @@ export class ShieldSystem extends System {
 	private spawnShield(input: InputComponent, player: PaddleComponent, shield: ShieldComponent): void {
 		if (!player.isAlive) return;
 
-
 		if (shield.angleFactor != 0)
-			shield.shieldIsActivate = input.down;
+			shield.isActive = input.down;
 	
 		if (input.down === true) {
 			shield.lastInputDelay = performance.now();
@@ -30,21 +29,12 @@ export class ShieldSystem extends System {
 			shield.angleFactor = Math.min(0.5, shield.angleFactor + 0.01);
 		}
 		if (shield.angleFactor == 0)
-			shield.shieldIsActivate = false;
-		if (shield.oldAngleFactor != shield.angleFactor)
-		{
-			shield.angle = Math.PI * 0.5 * shield.angleFactor;
-			// applyVertexRotation(shield);
-			if (shield.shaderMaterial instanceof ShaderMaterial) {
-				shield.shaderMaterial.setFloat("shieldAngle", shield.angle);
-				shield.shaderMaterial.setFloat("baseAngle", Math.PI * 0.5);  // À ajuster selon ton setup
-				shield.shaderMaterial.setVector3("cylinderCenter", shield.cylinderCenter);
-				shield.shaderMaterial.setVector3("cylinderAxis", shield.cylinderAxis);
-				shield.shaderMaterial.setFloat("intensity", shield.shieldIsActivate ? 1.0 : 0.5);
-			}
-		}
-		shield.oldAngleFactor = shield.angleFactor;
+			shield.isActive = false;
 
+		if (shield.oldAngleFactor != shield.angleFactor)
+			shield.angle = Math.PI * 0.5 * shield.angleFactor;
+
+		shield.oldAngleFactor = shield.angleFactor;
 	}
 	
 	// private applyVertexRotation(player: PaddleComponent): void {
