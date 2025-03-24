@@ -29,8 +29,9 @@ export class InputSystem extends System {
                 // } else {
                 //     input.down = false;
                 // }
-				if (this.inputManager.isKeyPressed(" ")) {
-                    input.down = true;
+				if (this.inputManager.isKeyPressed("Space")) {
+					input.down = true;
+					// console.log("input down: ", input.down);
                 } else if (input.down == true){
                     input.down = false;
                 }

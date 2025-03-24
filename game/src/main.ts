@@ -9,6 +9,7 @@ import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
 import { calculateArenaRadius, createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
+import { ShieldSystem } from "./systems/ShieldSystem.js";
 
 class Game {
 	private engine: Engine;
@@ -45,73 +46,12 @@ class Game {
 		shieldBaseMesh.setEnabled(true);
 		shieldBaseMesh.setPivotPoint(Vector3.Zero());
 
-		// Effect.ShadersStore['customVertexShader'] = `precision highp float;
-
-		// 	attribute vec3 position;
-		// 	attribute float shieldAngle;
-		// 	attribute float isActive;
-		// 	// uniform mat4 world;
-		// 	uniform mat4 worldViewProjection;
-		// 	// uniform float baseAngle; //radian
-
-		// 	uniform vec3 cylinderCenter;
-		// 	uniform vec3 cylinderAxis;
-		// 	uniform float intensity;
-
-
-		// 	void main() {
-		// 		float size = 1.0;
-		// 		vec3 center = vec3(0, 0, 0);  // Centre du cylindre
-		// 		vec3 axe = vec3(0, 1, 0);  // Axe de rotation (Y)
-		// 		float intense = 0.0;  // Intensité de la rotation
-		// 		vec3 P = position;  // Position du vertex
-		// 		vec3 CP = P - center;  // Vecteur du point par rapport au centre
-
-		// 		// Calcul de la distance du point à l'axe Y (distance dans le plan XY)
-		// 		float distanceToAxis = length(vec2(CP.x, CP.z));  // Distance en XZ
-		// 		float distanceNorm = distanceToAxis / size;
-		// 		float rotationAngle = intense * 3.1415926535897932384626433832795 * 0.5 * distanceNorm;  // Rotation en fonction de la distance
-
-		// 		// Calcul du signe de la rotation : positive ou négative (rotation horaire ou anti-horaire)
-		// 		float signRotation = -sign(CP.x);  // Rotation dans le sens positif ou négatif
-
-		// 		// Appliquer la rotation dans le plan XY
-		// 		float cosAngle = cos(rotationAngle * signRotation);
-		// 		float sinAngle = sin(rotationAngle * signRotation);
-
-		// 		// Nouvelle position après rotation autour de l'axe Y
-		// 		vec3 rotatedPosition;
-		// 		rotatedPosition.x = CP.x * cosAngle - CP.z * sinAngle;  // Rotation en X
-		// 		rotatedPosition.y = P.y;  // Pas de changement en Y
-		// 		rotatedPosition.z = CP.x * sinAngle + CP.z * cosAngle;  // Rotation en Z
-
-		// 		// Nouvelle position après avoir réajusté par rapport au centre
-		// 		vec3 newPosition = rotatedPosition + center;
-
-		// 		// Appliquer la projection
-		// 		vec4 p = vec4(newPosition, 1.);
-		// 		gl_Position = worldViewProjection * p;
-		// 	}
-		// `;
-
-		// Effect.ShadersStore['customFragmentShader'] = `
-		// 	precision highp float;
-
-		// 	void main() {
-		// 		vec3 color = vec3(1.0,0.0,0.0);
-		// 		gl_FragColor = vec4(color, 1.0);
-		// 	}
-		// `;
-
 		Effect.ShadersStore['customFragmentShader'] = `
 			precision highp float;
 
-			varying vec3 vNormal;
-
 			void main(void) {
-
-				vec3 normalColor = normalize(vNormal) * 0.5 + 0.5;
-				gl_FragColor = vec4( normalColor, 1. );
+				vec3 color = vec3(1.0,0.0,0.0);
+				gl_FragColor = vec4( color, 1.0);
 			}
 		`;
 
@@ -122,24 +62,32 @@ class Game {
 			attribute vec3 position;
 			attribute vec3 normal;
 			attribute vec2 uv;
-
+			attribute float angleFactor;
+			attribute float isActive;
+			
 			// Uniforms
 			uniform mat4 world;
 			uniform mat4 worldViewProjection;
 
 			// Varying
-			varying vec3 vNormal;
+			// varying vec3 vNormal;
+
+
 			const float PI = 3.14159265;
 
 			void main(void) {
 				// Transform the normal for proper lighting
-				vNormal = normalize(mat3(world) * normal);
+				// vNormal = normalize(mat3(world) * normal);
+				if (isActive == 0.0){
+					vec3 newPos = vec3(0.0, 0.0, 0.0);
+					gl_Position = worldViewProjection * vec4(newPos, 1.0);
+					return;
+				}
 
-				float fanFactor = 0.9;
 				float angle = atan(position.z, position.x) + (PI / 2.0);
 				
 				// Interpolate the vertex's angle from its original (shieldAngle) to the hinge angle (0.0)
-				float newAngle = mix(angle, 0.0, fanFactor) - PI * 0.5;
+				float newAngle = mix(angle, 0.0, angleFactor) - PI * 0.5;
 				
 				// Compute the original radial distance from the center (preserved during the fan closing)
 				float radius = length(vec2(position.x, position.z));
@@ -156,7 +104,7 @@ class Game {
 		shieldBaseMesh.computeWorldMatrix(true);
 		console.log(Effect.ShadersStore);
 		let shaderMaterial = new ShaderMaterial('custom', this.scene, 'custom', {
-			attributes: ['position', 'normal'],
+			attributes: ['position', 'normal', 'angleFactor', 'isActive'],
 			uniforms: ['world', 'worldViewProjection']
 		});
 		shieldBaseMesh.material = shaderMaterial;
@@ -181,6 +129,7 @@ class Game {
 		this.ecs.addSystem(new MovementSystem());
 		this.ecs.addSystem(new InputSystem(this.inputManager));
 		this.ecs.addSystem(new NetworkingSystem(this.wsManager));
+		this.ecs.addSystem(new ShieldSystem());
 		this.ecs.addSystem(new ThinInstanceSystem(
 			ballInstanceManager,
 			paddleInstanceManager,

@@ -34,12 +34,20 @@ export class ThinInstanceSystem extends System {
         this.camera = camera;
     }
 
-    update(entities: Entity[], deltaTime: number): void {
-        this.frameCount++;
-        this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
-        this.paddleManager.update(entities, PaddleComponent, this.camera, this.frameCount);
+	update(entities: Entity[], deltaTime: number): void {
+		this.frameCount++;
+		this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
+		this.paddleManager.update(entities, PaddleComponent, this.camera, this.frameCount);
+		
+		// const shieldEntities = entities.filter(e => e.hasComponent(ShieldComponent));
+		// const activeShieldEntities = shieldEntities.filter(e => {
+		// 	const shield = e.getComponent(ShieldComponent);
+		// 	return shield && shield.isActive;
+		// });
+		
 		this.shieldManager.update(entities, ShieldComponent, this.camera, this.frameCount);
-        this.wallManager.update(entities, WallComponent, this.camera, this.frameCount);
-        this.pillarManager.update(entities, PillarComponent, this.camera, this.frameCount);
-    }
+		this.wallManager.update(entities, WallComponent, this.camera, this.frameCount);
+		this.pillarManager.update(entities, PillarComponent, this.camera, this.frameCount);
+		
+	}
 }

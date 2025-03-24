@@ -9,6 +9,7 @@ import { WallComponent } from "../components/WallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputComponent } from "../components/InputComponent.js";
 import { ThinInstanceComponent } from "../components/ThinInstanceComponent.js";
+import { ShieldTransformComponent } from "../components/ShieldTransformComponent.js";
 
 export interface GameTemplateConfig {
 	numberOfPlayers: number;
@@ -69,6 +70,12 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig):
 			new Vector3(x, 0.5, z),
 			new Vector3(0, -(angle + (Math.PI / 2)), 0),
 			new Vector3(1, 1, 1)
+		));
+		paddleEntity.addComponent(new ShieldTransformComponent(
+			new Vector3(x, 0.5, z),
+			new Vector3(0, -(angle + (Math.PI / 2)), 0),
+			new Vector3(0, 0, 0),
+			i
 		));
 		ecs.addEntity(paddleEntity);
 	}

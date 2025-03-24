@@ -7,8 +7,8 @@ export class ThinInstanceManager {
 	private mesh: Mesh;
 	private capacity: number;
 	private instanceTransforms: Float32Array;
-	private shieldAngles: Float32Array;
-	private visibilityBuffer: Float32Array;
+	private anglesFactors: Float32Array;
+	private actives: Float32Array;
 
 	// LOD/culling thresholds (world units)
 	private updateThreshold: number;
@@ -21,8 +21,8 @@ export class ThinInstanceManager {
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16);
 		this.updateThreshold = updateThreshold;
 		this.cullThreshold = cullThreshold;
-		this.shieldAngles = new Float32Array(100);  //edit 100 by max number of instances
-		this.visibilityBuffer = new Float32Array(100);
+		this.anglesFactors = new Float32Array(100);  //edit 100 by max number of instances
+		this.actives = new Float32Array(100);
 	}
 
 	private computeWorldMatrix(entity: Entity, allEntities: Entity[]): Matrix {
@@ -71,17 +71,17 @@ export class ThinInstanceManager {
 				if (shouldUpdate) {
 					matrix.copyToArray(this.instanceTransforms, count * 16);
 					if (entity.hasComponent(ShieldComponent)){
-						const shield = entity.getComponent(ShieldComponent) as ShieldComponent;
-						this.shieldAngles[count] = entity.getComponent(ShieldComponent)?.angle ?? 0;
-						this.visibilityBuffer[count] = shield.isActive ? 1.0 : 0.0;
+						const shield = entity.getComponent(ShieldComponent)!;
+						this.anglesFactors[count] = shield.angleFactor;
+						this.actives[count] = shield.isActive;
 					}
 					count++;
 				}
 			}
 		});
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16, true);
-		// this.mesh.thinInstanceSetBuffer("shieldAngle", this.shieldAngles, 1, true); // update shader
-		// this.mesh.thinInstanceSetBuffer("isActive", this.visibilityBuffer, 1, true);
+		this.mesh.thinInstanceSetBuffer("angleFactor", this.anglesFactors, 1, true); // Mettre à jour le shader
+		this.mesh.thinInstanceSetBuffer("isActive", this.actives, 1, true);
 		this.mesh.thinInstanceCount = count;
 	}
 }
