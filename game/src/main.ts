@@ -69,15 +69,9 @@ class Game {
 			uniform mat4 world;
 			uniform mat4 worldViewProjection;
 
-			// Varying
-			// varying vec3 vNormal;
-
-
 			const float PI = 3.14159265;
 
 			void main(void) {
-				// Transform the normal for proper lighting
-				// vNormal = normalize(mat3(world) * normal);
 				if (isActive == 0.0){
 					vec3 newPos = vec3(0.0, 0.0, 0.0);
 					gl_Position = worldViewProjection * vec4(newPos, 1.0);
@@ -85,14 +79,8 @@ class Game {
 				}
 
 				float angle = atan(position.z, position.x) + (PI / 2.0);
-				
-				// Interpolate the vertex's angle from its original (shieldAngle) to the hinge angle (0.0)
 				float newAngle = mix(angle, 0.0, angleFactor) - PI * 0.5;
-				
-				// Compute the original radial distance from the center (preserved during the fan closing)
 				float radius = length(vec2(position.x, position.z));
-				
-				// Reconstruct the new XZ coordinates from the new angle, keeping Y unchanged
 				vec2 newXZ = vec2(cos(newAngle), sin(newAngle)) * radius;
 				vec3 newPosition = vec3(newXZ.x, position.y, newXZ.y);
 				

@@ -2,29 +2,15 @@ import { Vector3 } from "@babylonjs/core";
 import { Component } from "../ecs/Component.js";
 
 export class ShieldComponent implements Component {
-	public angleFactor: number;
+	public angleFactor: number; // 0 = 180d arc cylinder, 1 = 0d arc cylinder
 	public oldAngleFactor: number;
-	public angle: number;
-	public isActive: boolean;
+	public isActive: number;
 	public lastInputDelay: number;
-
-	public shieldAngle: number;
-	public baseAngle: number;
-	public cylinderCenter: Vector3;
-	public cylinderAxis: Vector3;
-	public intensity: number;
 
 	constructor() {
 		this.angleFactor = 0.5;
 		this.oldAngleFactor = 0.5;
-		this.angle = Math.PI * 0.5;
-		this.isActive = false;
+		this.isActive = 0.0;
 		this.lastInputDelay = performance.now();
-
-		this.shieldAngle = Math.PI * 0.5;
-		this.baseAngle = 0;
-		this.cylinderCenter = new Vector3(0,1,0);
-		this.cylinderAxis = new Vector3(0,1,0);
-		this.intensity = 1;
 	}
 }

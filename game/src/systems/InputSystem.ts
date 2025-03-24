@@ -31,7 +31,7 @@ export class InputSystem extends System {
                 // }
 				if (this.inputManager.isKeyPressed("Space")) {
 					input.down = true;
-					// console.log("input down: ", input.down);
+					console.log("input down: ", input.down);
                 } else if (input.down == true){
                     input.down = false;
                 }
