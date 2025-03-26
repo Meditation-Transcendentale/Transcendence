@@ -66,16 +66,15 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig):
 		paddleEntity.addComponent(new PaddleComponent(new Vector3(x, 0, z)));
 		paddleEntity.addComponent(new InputComponent());
 		paddleEntity.addComponent(new ShieldComponent());
+		// paddleEntity.addComponent(new TransformComponent(
+		// 	new Vector3(x, 0.25, z),
+		// 	new Vector3(0, -(angle + (Math.PI / 2)), 0),
+		// 	new Vector3(1, 1, 1)
+		// ));
 		paddleEntity.addComponent(new TransformComponent(
-			new Vector3(x, 0.5, z),
-			new Vector3(0, -(angle + (Math.PI / 2)), 0),
-			new Vector3(1, 1, 1)
-		));
-		paddleEntity.addComponent(new ShieldTransformComponent(
-			new Vector3(x, 0.5, z),
-			new Vector3(0, -(angle + (Math.PI / 2)), 0),
+			new Vector3(0, 0.25, 0),
 			new Vector3(0, 0, 0),
-			i
+			new Vector3(1, 1, 1)
 		));
 		ecs.addEntity(paddleEntity);
 	}

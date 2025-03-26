@@ -3,7 +3,6 @@ import { Vector2 } from "@babylonjs/core";
 export class InputManager {
     private keysPressed: Set<string> = new Set();
 	private pointer: Vector2 = new Vector2(0, 0);
-	private oldPointer: Vector2 = new Vector2(0, 0);
 
     constructor() {
         window.addEventListener("keydown", (e) => {

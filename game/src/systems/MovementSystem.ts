@@ -1,6 +1,8 @@
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
+import { PaddleComponent } from "../components/PaddleComponent.js";
+import { TransformComponent } from "../components/TransformComponent.js";
 
 export class MovementSystem extends System {
     update(entities: Entity[], deltaTime: number): void {
@@ -9,6 +11,13 @@ export class MovementSystem extends System {
                 const ball = entity.getComponent(BallComponent)!;
                 ball.position.addInPlace(ball.velocity.scale(deltaTime / 1000));
             }
+			if (entity.hasComponent(PaddleComponent)){
+				const player = entity.getComponent(PaddleComponent)!;
+				const transform = entity.getComponent(TransformComponent)!;
+				player.position.addInPlace(player.velocity.scale(deltaTime / 100));
+				transform.position = player.position;
+				transform.rotation = player.rotation;
+			}
         });
     }
 }

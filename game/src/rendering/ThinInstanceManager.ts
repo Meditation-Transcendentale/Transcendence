@@ -2,6 +2,7 @@ import { Mesh, Matrix, Vector3, Quaternion, Camera } from "@babylonjs/core";
 import { Entity } from "../ecs/Entity.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { ShieldComponent } from "../components/ShieldComponent.js";
+import { PaddleComponent } from "../components/PaddleComponent.js";
 
 export class ThinInstanceManager {
 	private mesh: Mesh;
@@ -9,6 +10,8 @@ export class ThinInstanceManager {
 	private instanceTransforms: Float32Array;
 	private anglesFactors: Float32Array;
 	private actives: Float32Array;
+	private positions: Float32Array;
+	private rotations: Float32Array;
 
 	// LOD/culling thresholds (world units)
 	private updateThreshold: number;
@@ -23,6 +26,8 @@ export class ThinInstanceManager {
 		this.cullThreshold = cullThreshold;
 		this.anglesFactors = new Float32Array(100);  //edit 100 by max number of instances
 		this.actives = new Float32Array(100);
+		this.positions = new Float32Array(100 * 3);
+		this.rotations = new Float32Array(100 * 3);
 	}
 
 	private computeWorldMatrix(entity: Entity, allEntities: Entity[]): Matrix {
@@ -59,7 +64,7 @@ export class ThinInstanceManager {
 					const comp = entity.getComponent(componentClass) as { position: Vector3 };
 					matrix = Matrix.Translation(comp.position.x, comp.position.y, comp.position.z);
 				}
-				const pos = Vector3.TransformCoordinates(Vector3.Zero(), matrix);
+				const pos = Vector3.TransformCoordinates(Vector3.Zero( ), matrix);
 				const distance = Vector3.Distance(camera.position, pos);
 				let shouldUpdate = true;
 				if (distance > this.cullThreshold) {
@@ -70,18 +75,28 @@ export class ThinInstanceManager {
 				shouldUpdate = true;
 				if (shouldUpdate) {
 					matrix.copyToArray(this.instanceTransforms, count * 16);
-					if (entity.hasComponent(ShieldComponent)){
+					if (entity.hasComponent(PaddleComponent) && entity.hasComponent(ShieldComponent)){
 						const shield = entity.getComponent(ShieldComponent)!;
+						const paddle = entity.getComponent(PaddleComponent)!;
 						this.anglesFactors[count] = shield.angleFactor;
 						this.actives[count] = shield.isActive;
+						const index = count * 3;
+						this.positions[index] = paddle.position.x;
+						this.positions[index + 1] = paddle.position.y;
+						this.positions[index + 2] = paddle.position.z;
+						this.rotations[index] = paddle.rotation.x;
+						this.rotations[index + 1] = paddle.rotation.y;
+						this.rotations[index + 2] = paddle.rotation.z;
 					}
 					count++;
 				}
 			}
 		});
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16, true);
-		this.mesh.thinInstanceSetBuffer("angleFactor", this.anglesFactors, 1, true); // Mettre à jour le shader
+		this.mesh.thinInstanceSetBuffer("angleFactor", this.anglesFactors, 1, true);
 		this.mesh.thinInstanceSetBuffer("isActive", this.actives, 1, true);
+		this.mesh.thinInstanceSetBuffer("paddlePosition", this.positions, 3, true);
+		this.mesh.thinInstanceSetBuffer("paddleRotation", this.rotations, 3, true);
 		this.mesh.thinInstanceCount = count;
 	}
 }
