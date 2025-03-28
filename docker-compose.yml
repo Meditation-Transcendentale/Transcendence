@@ -4,6 +4,7 @@ services:
   register-service:
     build: 
       context: ./services/user/register-service
+    container_name: register-service
     ports:
       - "3001:3001"
     volumes:
@@ -22,6 +23,7 @@ services:
   auth-service:
     build:
       context: ./services/user/auth-service
+    container_name: auth-service
     ports:
       - "3002:3002"
     volumes:
@@ -41,6 +43,7 @@ services:
   update_user_info-service:
     build:
       context: ./services/user/update_user_info-service
+    container_name: update_user_info-service
     ports:
       - "3003:3003"
     volumes:
@@ -59,6 +62,7 @@ services:
   api-gateway:
     build:
       context: ./gateway
+    container_name: api-gateway
     ports:
       - "3000:3000"
     volumes:
@@ -78,6 +82,7 @@ services:
   docs-service:
     build:
       context: ./doc/doc_API
+    container_name: doc-service
     ports:
       - "3004:3004"
     volumes:
