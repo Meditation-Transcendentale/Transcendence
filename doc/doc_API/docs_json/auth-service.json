@@ -1,0 +1,264 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Auth service Documentation",
+		"version": "1.0.0",
+		"description": "Documentation for the Auth Service in the API."
+	},
+	"components": {
+		"securitySchemes": {
+			"ApiKey": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "x-api-key",
+				"description" : "API Key required to access the endpoints."
+			}
+		}
+	},
+	"security": [
+		{
+			"ApiKey": []
+		}
+	],
+	"paths": {
+		"/auth/login": {
+			"post": {
+				"summary": "Login to the API",
+				"tags": ["Auth"],
+				"description": "Login to the API to get an access token.",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": ["email", "password"],
+								"properties": {
+									"email": {
+										"type": "string",
+										"format": "email",
+										"example": "user@example.com"
+									},
+									"password": {
+										"type": "string",
+										"format": "password",
+										"example": "password1234"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successful login",
+						"headers": {
+							"Set-Cookie": {
+								"description": "JWT Token stored in a cookie",
+								"schema": {
+									"type": "string"
+								}
+							}
+						},
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Logged in successfully"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "2FA token is required"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized (Invalid password or 2FA failed)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "2FA verification failed"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "User not found from email in DB",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "User not found"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Server error"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/auth-google": {
+			"post" : {
+				"summary": "Authenticate with Google",
+				"tags": ["Auth"],
+				"description": "Authenticate with Google to get an access token.",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": ["token"],
+								"properties": {
+									"token": { 	"type": "string", "example": "Google ID Token" }
+								}
+							}
+						}
+					}
+				},
+				"responses" : {
+					"200": {
+						"description": "Successful login",
+						"headers": {
+							"Set-Cookie": {
+								"description": "JWT Token stored in a cookie",
+								"schema": {
+									"type": "string"
+								}
+							}
+						},
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Logged in successfully"
+										}
+									}
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Successful registration",
+						"headers": {
+							"Set-Cookie": {
+								"description": "JWT Token stored in a cookie",
+								"schema": {
+									"type": "string"
+								}
+							}
+						},
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Registered and logged in successfully"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Google ID Token is required"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized (Invalid token)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Google ID Token verification failed"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Server error"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

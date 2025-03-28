@@ -1,0 +1,81 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Gateway",
+        "version": "1.0.0",
+        "description": "Handles request forwarding and security checks for all microservices."
+    },
+    "paths": {
+        "/register": {
+            "post": {
+                "summary": "User Registration",
+                "tags": ["Auth"],
+                "description": "Forwards request to the register microservice.",
+                "parameters": [
+                    {
+                        "name": "x-api-key",
+                        "in": "header",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "API key required for authentication."
+                    }
+                ]
+            }
+        },
+        "/auth": {
+            "post": {
+                "summary": "User Authentication",
+                "tags": ["Auth"],
+                "description": "Forwards request to the auth microservice.",
+                "parameters": [
+                    {
+                        "name": "x-api-key",
+                        "in": "header",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "API key required for authentication."
+                    }
+                ]
+            }
+        },
+        "/update-info": {
+            "post": {
+                "summary": "Update User Information",
+                "tags": ["User"],
+                "description": "Forwards request to update-user-info microservice after verifying JWT.",
+                "parameters": [
+                    {
+                        "name": "x-api-key",
+                        "in": "header",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "API key required for authentication."
+                    },
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "User authentication details (added by API Gateway after JWT verification)."
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized - Invalid API key or JWT missing",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Unauthorized: Missing or invalid token" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+  

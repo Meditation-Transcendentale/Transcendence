@@ -1,14 +1,14 @@
 FROM node:18
 
-WORKDIR /app/api-gateway/
+WORKDIR /app/auth-service/
 
-COPY package*.json /app/api-gateway/
+COPY package*.json /app/auth-service/
 
 RUN npm install 
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 3002
 
 # CMD ["npm", "run", "dev"]
 CMD ["npm", "start"]

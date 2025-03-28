@@ -1,0 +1,854 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Auth service Documentation",
+		"version": "1.0.0",
+		"description": "Documentation for the Auth Service in the API."
+	},
+	"components": {
+		"securitySchemes": {
+			"ApiKey": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "x-api-key",
+				"description" : "API Key required to access the endpoints."
+			}
+		}
+	},
+	"security": [
+		{
+			"ApiKey": []
+		}
+	],
+	"paths": {
+        "/update-info": {
+            "patch": {
+                "summary": "Update user information",
+                "tags": ["Update Infos"],
+                "description": "Update user information in DB.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "minProperties": 1,
+                                "properties": {
+                                    "username": { "type": "string", "example": "user123" },
+                                    "email": { "type": "string", "format": "email", "example": "user@example.com" },
+                                    "avatar": { "type": "string", "format": "uri", "example": "https://example.com/avatar.png" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful update",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User information updated successfully." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Nothing to update." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update-info/password": {
+            "patch": {
+                "summary": "Update user password",
+                "tags": ["Update Infos"],
+                "description": "Update user password in DB.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["password", "newPassword"],
+                                "properties": {
+                                    "password": { "type": "string", "format": "password", "example": "password123" },
+                                    "newPassword": { "type": "string", "format": "password", "example": "newpassword123" },
+                                    "token": { "type": "string", "example": "2FA token if enabled" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful update",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Password updated successfully." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Nothing to update" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Invalid password or invalid 2FA token" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update-info/add-friend": {
+            "post": {
+                "summary": "Send friend request",
+                "tags": ["Update Infos"],
+                "description": "Send a friend request to another user.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["addedPlayerUsername"],
+                                "properties": {
+                                    "addedPlayerUsername": { "type": "string", "example": "user1234" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Friend request sent",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Friend request sent successfully." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Player username is required" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update-info/accept-friend": {
+            "post": {
+                "summary": "Accept friend request",
+                "tags": ["Update Infos"],
+                "description": "Accept a friend request from another user.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["requestId"],
+                                "properties": {
+                                    "requestId": { "type": "integer", "example": "1243" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Friend request accepted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Friend request accepted." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Player id is required" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update-info/decline-friend": {
+            "delete": {
+                "summary": "Decline friend request",
+                "tags": ["Update Infos"],
+                "description": "Decline a friend request from another user.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["requestId"],
+                                "properties": {
+                                    "requestId": { "type": "integer", "example": "1243" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Friend request declined",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Friend request declined." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Player id is required" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update-info/friend-requests": {
+            "get": {
+                "summary": "Get friend requests list",
+                "tags": ["Update Infos"],
+                "description": "Get friend requests list for the user.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Friend requests list get returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": { "type": "integer", "example": "67890" },
+                                            "user_id_1": { "type": "string", "example": "67890" },
+                                            "user_id_2": { "type": "string", "example": "12345" },
+                                            "status": { "type": "string", "example": "pending" },
+                                            "created_at": { "type": "string", "format": "date-time", "example": "2024-03-01T12:34:56Z" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Unauthorized" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update-info/delete-friends": {
+            "delete": {
+                "summary": "Delete friend from friends list",
+                "tags": ["Update Infos"],
+                "description": "Delete friend from friends list.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["friendId"],
+                                "properties": {
+                                    "friendId": { "type": "integer", "example": "1243" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Friendship successfully deleted.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Friendship successfully deleted." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Player id is required" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update-info/enable-2fa": {
+            "post": {
+                "summary": "Enable 2FA for user",
+                "tags": ["Update Infos"],
+                "description": "Enable 2FA for user.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "2FA enabled.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "2FA enabled." },
+                                        "qrCode": { "type": "string", "example": "https://example.com/qr-code.png" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "2FA already enabled" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update-info/verify-2fa": {
+            "post": {
+                "summary": "Verify 2FA token",
+                "tags": ["Update Infos"],
+                "description": "Verify 2FA token during login for example.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["token"],
+                                "properties": {
+                                    "token": { "type": "string", "example": "123456" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "2FA enabled.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "2FA verified." },
+                                        "valid": { "type": "boolean", "example": "true" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "2FA not enabled" },
+                                        "valid": { "type": "boolean", "example": "false" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." },
+                                        "valid": { "type": "boolean", "example": "false" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." },
+                                        "valid": { "type": "boolean", "example": "false" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
