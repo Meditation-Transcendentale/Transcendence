@@ -16,7 +16,9 @@ services:
     image: docker.elastic.co/logstash/logstash:8.1.0
     container_name: logstash
     volumes:
-      - ./logstash:/usr/share/logstash/pipeline:ro
+      - /home/efayolle/Final/elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    environment:
+      - "LS_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - "5044:5044"
       - "9600:9600"
@@ -40,7 +42,7 @@ services:
     container_name: filebeat
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - ./filebeat:/usr/share/filebeat
+      - /home/efayolle/Final/elk/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
     networks:
       - logging
     depends_on:
