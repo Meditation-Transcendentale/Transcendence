@@ -12,7 +12,7 @@ The backend is powered by **Node.js** and **Fastify**, with asynchronous communi
 - API Gateway: Fastify + Docker
 - Message Broker: RabbitMQ (or Kafka)
 - CDN: Nginx
-- Auth: JWT + OAuth2 (Google, GitHub, etc.)
+- Auth: JWT + OAuth2 (Google Sign in)
 - Logging: ELK (Elasticsearch, Logstash, Kibana)
 - Monitoring: Docker healthchecks + auto-restart
 - CI/CD: GitHub Actions
