@@ -1,0 +1,7 @@
+services:
+  cdn:
+    build: .
+    container_name: babylonjs-cdn
+    ports:
+      - "8081:80"
+    restart: unless-stopped
