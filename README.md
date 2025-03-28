@@ -22,7 +22,7 @@ The backend is powered by **Node.js** and **Fastify**, with asynchronous communi
 
 ## 📁 Project Structure (summary)
 
-Transcendence/ 
+Transcendence 
     .github/workflows # CI/CD 
     frontend/ # SPA Babylon.js 
     cdn/ # Assets 3D 
