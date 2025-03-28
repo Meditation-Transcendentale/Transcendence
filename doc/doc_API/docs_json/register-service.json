@@ -1,0 +1,114 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Auth service Documentation",
+		"version": "1.0.0",
+		"description": "Documentation for the Auth Service in the API."
+	},
+	"components": {
+		"securitySchemes": {
+			"ApiKey": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "x-api-key",
+				"description" : "API Key required to access the endpoints."
+			}
+		}
+	},
+	"security": [
+		{
+			"ApiKey": []
+		}
+	],
+	"paths": {
+        "/register": {
+            "post": {
+                "summary": "Register a new user",
+                "tags": ["Register"],
+                "description": "Register a new user in DB.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["username", "email", "password"],
+                                "properties": {
+                                    "username": { "type": "string", "example": "user123"},
+									"email": { "type": "string", "format": "email", "example": "user@example.com" },
+									"password": { "type": "string", "format": "password", "example": "password1234" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful registration",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User registered successfully."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Name, email, and password are required"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Email or Username already exists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Username is already in use"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Server Error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

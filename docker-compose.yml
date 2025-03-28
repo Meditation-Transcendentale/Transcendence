@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  register-service:
+    build: 
+      context: ./services/user/register-service
+    ports:
+      - "3001:3001"
+    volumes:
+      - database:/app/database
+      - certs:/app/certs:ro
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRETKEY=${JWT_SECRETKEY}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+    networks:
+      - transcendence-network
+
+  auth-service:
+    build:
+      context: ./services/user/auth-service
+    ports:
+      - "3002:3002"
+    volumes:
+      - database:/app/database
+      - certs:/app/certs:ro
+    environment:
+      - NODE_ENV=development
+      - JWT_SECRETKEY=${JWT_SECRETKEY}
+      - DATABASE_URL=${DATABASE_URL}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+    networks:
+      - transcendence-network
+
+  update_user_info-service:
+    build:
+      context: ./services/user/update_user_info-service
+    ports:
+      - "3003:3003"
+    volumes:
+      - database:/app/database
+      - certs:/app/certs:ro
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    networks:
+      - transcendence-network
+
+  api-gateway:
+    build:
+      context: ./gateway
+    ports:
+      - "3000:3000"
+    volumes:
+      - certs:/app/certs:ro
+    environment:
+      - NODE_ENV=development
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+    networks:
+      - transcendence-network
+    depends_on:
+      - auth-service
+      - register-service
+      - update_user_info-service
+
+  docs-service:
+    build:
+      context: ./doc/doc_API
+    ports:
+      - "3004:3004"
+    volumes:
+      - certs:/app/certs:ro
+    environment:
+      - NODE_ENV=development
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+    networks:
+      - transcendence-network
+    depends_on:
+      - api-gateway
+      - auth-service
+      - register-service
+      - update_user_info-service
+
+
+
+volumes:
+  database:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATABASE_URL_PATH}
+  certs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${CERT_PATH}
+
+networks:
+  transcendence-network:
+    driver: bridge
