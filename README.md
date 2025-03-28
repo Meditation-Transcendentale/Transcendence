@@ -22,21 +22,20 @@ The backend is powered by **Node.js** and **Fastify**, with asynchronous communi
 
 ## 📁 Project Structure (summary)
 
-
 Transcendence/ 
-    ├── .github/workflows # CI/CD 
-    ├── frontend/ # SPA Babylon.js 
-    ├── cdn/ # Assets 3D 
-    ├── gateway/ # API Gateway 
-    ├── broker/ # RabbitMQ / Kafka 
-    ├── elk/ # ELK stack 
-    ├── services/ 
-        │ ├── game/ # Game services 
-        │ ├── user/ # Auth & user services 
-        │ └── stats/ # Analytics / Dashboard 
-    ├── docker-compose.yml # Orchestration 
-    ├── Makefile # Commandes dev 
-    ├── .env # Vars globales
+    .github/workflows # CI/CD 
+    frontend/ # SPA Babylon.js 
+    cdn/ # Assets 3D 
+    gateway/ # API Gateway 
+    broker/ # RabbitMQ / Kafka 
+    elk/ # ELK stack 
+    services/ 
+    game/ # Game services 
+    user/ # Auth & user services 
+    stats/ # Analytics / Dashboard 
+    docker-compose.yml # Orchestration 
+    Makefile # Commandes dev 
+    .env # Vars globales
 
 ---
 
