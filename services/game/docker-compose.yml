@@ -1,81 +1,55 @@
-version: "3.8"
-
 services:
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+
   game-manager:
     build: ./game-manager
     environment:
-      - PORT=3001
       - SERVICE_NAME=game-manager
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
     ports:
       - "3001:3001"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   user-interface:
     build: ./user-interface
     environment:
-      - PORT=3002
       - SERVICE_NAME=user-interface
-    ports:
-      - "3002:3002"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
 
   pong-physics:
     build: ./pong-physics
     environment:
-      - PORT=3003
       - SERVICE_NAME=pong-physics
-    ports:
-      - "3003:3003"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
 
   pongbr-physics:
     build: ./pongBR-physics
     environment:
-      - PORT=3004
       - SERVICE_NAME=pongBR-physics
-    ports:
-      - "3004:3004"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
 
   pongio-physics:
     build: ./pongIO-physics
     environment:
-      - PORT=3005
       - SERVICE_NAME=pongIO-physics
-    ports:
-      - "3005:3005"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3005/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
 
   ai:
     build: ./ai
     environment:
-      - PORT=3006
       - SERVICE_NAME=ai
-    ports:
-      - "3006:3006"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3006/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats

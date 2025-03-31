@@ -1,0 +1,40 @@
+name: Game Services CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  test-services:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - services/game/game-manager
+          - services/game/user-interface
+          - services/game/pong-physics
+          - services/game/pongBR-physics
+          - services/game/pongIO-physics
+          - services/game/ai
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.service }}
+
+    steps:
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v3
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run tests
+        run: npm test
+
