@@ -15,7 +15,7 @@
 Thumbs.db
 
 # npm cache & lock
-package-lock.json
+# package-lock.json
 npm-debug.log*
 
 # Docker junk
