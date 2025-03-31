@@ -2,6 +2,7 @@
   "name": "user-interface",
   "version": "1.0.0",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/index.js",
 	"dev": "nodemon src/index.js",
@@ -9,7 +10,8 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3",
-    "nats": "^2.29.3"
+    "nats": "^2.29.3",
+    "ws": "^8.18.1"
   },
   "devDependencies": {
 	"nodemon": "^2.0.22",
