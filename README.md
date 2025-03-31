@@ -1,57 +1,78 @@
-# 🌀 Transcendence
+# 🕹️ Transcendence – Microservices Game Platform
 
-A 3D web game project built with **Babylon.js** using a **microservice architecture** orchestrated with **Docker**.  
-The backend is powered by **Node.js** and **Fastify**, with asynchronous communication between services via a **message broker**, and centralized logging using the **ELK stack**.
-
----
-
-## 📦 Tech Stack
-
-- Frontend: Babylon.js SPA served via Nginx
-- Backend: Node.js + Fastify
-- API Gateway: Fastify + Docker
-- Message Broker: RabbitMQ (or Kafka)
-- CDN: Nginx
-- Auth: JWT + OAuth2 (Google Sign in)
-- Logging: ELK (Elasticsearch, Logstash, Kibana)
-- Monitoring: Docker healthchecks + auto-restart
-- CI/CD: GitHub Actions
-- Dev Tools: Makefile for automation
+Welcome to the **Transcendence** project! This repository is a full-stack multiplayer game platform built with a microservice architecture using **Docker**, **Node.js**, **NATS**, and **Babylon.js** for the 3D frontend.
 
 ---
 
-## 📁 Project Structure (summary)
+## 📦 Stack Overview
+
+| Layer         | Tech                   |
+|---------------|-------------------------|
+| Frontend      | Babylon.js + Nginx      |
+| API Gateway   | Node.js + Fastify       |
+| Message Broker| NATS                    |
+| Game Services | Node.js Microservices   |
+| Auth          | JWT / OAuth2 (planned)  |
+| Logging       | ELK Stack (planned)     |
+| CI/CD         | GitHub Actions + Docker |
+
+---
+
+## 🧱 Project Structure
 
 ```
-Transcendence/ 
-    ├── .github/workflows # CI/CD 
-    ├── frontend/ # SPA Babylon.js 
-    ├── cdn/ # Assets 3D 
-    ├── gateway/ # API Gateway 
-    ├── broker/ # RabbitMQ / Kafka 
-    ├── elk/ # ELK stack 
-    ├── services/ 
-    │ ├── game/ # Game services 
-    │ ├── user/ # Auth & user services 
-    │ └── stats/ # Analytics / Dashboard 
-    ├── docker-compose.yml # Orchestration 
-    ├── Makefile # Commandes dev 
-    ├── .env # Vars globales
+Transcendence/
+├── frontend/              # Babylon.js SPA (served via Nginx)
+├── services/
+│   ├── game/              # Game-related microservices
+│   ├── user/              # User management microservices
+│   └── stats/             # Stats & dashboard services
+├── gateway/               # API Gateway (Fastify + NATS)
+├── docker-compose.yml     # Production stack
+├── docker-compose.dev.yml # Dev stack with hot reload
+├── Makefile               # Developer commands
+├── README.md              # This file
+├── CONTRIBUTING.md        # Dev & contribution guide
+└── FEATURES.md            # Architecture & service checklist
 ```
+
 ---
 
-## 🚀 Getting Started (Local Dev)
-
-### Requirements
-
-- Docker + Docker Compose
-- Node.js ≥ 18 (optional, for local dev outside Docker)
-- `make` installed (recommended)
-
-### Quick Start
+## 🚀 Get Started
 
 ```bash
-# Build and launch all services
-make build
-make up
+# Clone the project
+$ git clone https://github.com/your-org/transcendence.git
+$ cd transcendence
 
+# Start dev environment
+$ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
+
+---
+
+## 🧪 Testing
+
+Each service uses `vitest` for unit testing:
+
+```bash
+cd services/game/pong-physics
+npm test
+```
+
+Or use `docker compose exec`:
+
+```bash
+docker compose exec pong-physics npm test
+```
+
+---
+
+## 🛠 Dev Shortcuts
+
+```bash
+make dev         # Run dev stack
+make prod        # Run prod stack
+make logs        # Tail all logs
+make test        # Run tests on all services
+```
