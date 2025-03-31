@@ -1,2 +1,47 @@
+# Node modules
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/build/
+**/*.log
+
+# Env files
 **/.env
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# npm cache & lock
+# package-lock.json
+npm-debug.log*
+
+# Docker junk
+**/.dockerignore
+**/Dockerfile~
+
+# VSCode / IDEs
+.vscode/
+.idea/
+
+# Coverage / testing
+coverage/
+.nyc_output/
+*.lcov
+
+# Local config
+*.local.js
+*.local.json
+*.local.env
+
+# Logs
+logs/
+*.log
+log.txt
+
+# Test snapshots
+__snapshots__/
+
 cert-database/

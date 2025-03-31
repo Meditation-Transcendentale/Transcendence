@@ -1,0 +1,55 @@
+services:
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+
+  game-manager:
+    build: ./game-manager
+    environment:
+      - SERVICE_NAME=game-manager
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
+    ports:
+      - "3001:3001"
+
+  user-interface:
+    build: ./user-interface
+    environment:
+      - SERVICE_NAME=user-interface
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
+
+  pong-physics:
+    build: ./pong-physics
+    environment:
+      - SERVICE_NAME=pong-physics
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
+
+  pongbr-physics:
+    build: ./pongBR-physics
+    environment:
+      - SERVICE_NAME=pongBR-physics
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
+
+  pongio-physics:
+    build: ./pongIO-physics
+    environment:
+      - SERVICE_NAME=pongIO-physics
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
+
+  ai:
+    build: ./ai
+    environment:
+      - SERVICE_NAME=ai
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
