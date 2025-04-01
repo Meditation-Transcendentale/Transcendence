@@ -1,6 +1,36 @@
 version: '3.8'
 
 services:
+
+  nats:
+    image: nats:latest
+    container_name: nats
+    ports:
+      - "4222:4222"
+    networks:
+      - transcendence-network
+
+  user-manager:
+    build:
+      context: ./services/user/userManager
+    container_name: user-manager
+    ports:
+      - "3005:3005"
+    volumes:
+      - certs:/app/certs:ro
+    environment:
+      - NODE_ENV=development
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+    networks:
+      - transcendence-network
+    depends_on:
+      - nats
+      - register-service
+      - auth-service
+      - update_user_info-service
+
   register-service:
     build: 
       context: ./services/user/register-service
@@ -114,7 +144,8 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ${CERT_PATH}
+      # device: ${CERT_PATH}
+      device: ${DATABASE_URL_PATH}
 
 networks:
   transcendence-network:

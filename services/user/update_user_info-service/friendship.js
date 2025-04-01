@@ -8,7 +8,9 @@ import { promisify } from "util";
 // database.get = promisify(database.get);
 // database.run = promisify(database.run);
 // database.all = promisify(database.all);
-import database from "./update_user_infos.js";
+
+
+// import database from "./update_user_infos.js";
 
 // const getUserFromId = database.prepare(`SELECT * FROM users WHERE id = ?`);
 
