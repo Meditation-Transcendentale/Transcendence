@@ -31,6 +31,7 @@ export class GameManager {
 		if (!game) return;
 		game.state = state;
 
+		console.log(`[game-manager] Received state for game ${gameId} at tick ${tick}`);
 		this.nc.publish(game.options.stateTopic, JSON.stringify({ gameId, state, tick }));
 	}
 
@@ -45,16 +46,8 @@ export class GameManager {
 			tick: 0,
 			inputs: {},
 			options,
-			interval: setInterval(() => {
-				match.tick++;
-				const inputs = match.inputs[match.tick] || [];
-				this.nc.publish(options.physicsTopic, JSON.stringify({
-					gameId,
-					tick: match.tick,
-					state: match.state,
-					inputs
-				}));
-			}, tickRate)
+			status: 'created',
+			interval: null
 		};
 
 		this.games.set(gameId, match);
@@ -70,4 +63,26 @@ export class GameManager {
 			console.log(`[game-manager] Ended match ${gameId}`);
 		}
 	}
+
+	launchGame(gameId) {
+		const match = this.games.get(gameId);
+		if (!match || match.status !== 'created') return false;
+
+		match.status = 'running';
+		const tickRate = 1000 / (match.options.tickRate || 60);
+		match.interval = setInterval(() => {
+			match.tick++;
+			const inputs = match.inputs[match.tick] || [];
+			this.nc.publish(match.options.physicsTopic, JSON.stringify({
+				gameId,
+				tick: match.tick,
+				state: match.state,
+				inputs
+			}));
+		}, tickRate);
+
+		console.log(`[game-manager] Launched match ${gameId}`);
+		return true;
+	}
+
 }

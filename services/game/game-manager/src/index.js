@@ -34,6 +34,27 @@ fastify.post('/match', async (request, reply) => {
 	}
 });
 
+fastify.post('/match/:id/end', async (req, reply) => {
+	const gameId = req.params.id;
+	const match = gameManager.games.get(gameId);
+
+	if (!match) {
+		return reply.status(404).send({ error: 'Match not found' });
+	}
+
+	gameManager.endMatch(gameId);
+	return { success: true, gameId };
+});
+
+fastify.post('/match/:id/launch', async (req, reply) => {
+	const gameId = req.params.id;
+	const launched = gameManager.launchGame(gameId);
+	if (launched) {
+		return { success: true, gameId };
+	} else {
+		return reply.status(400).send({ error: 'Game not found or already launched' });
+	}
+});
 async function start() {
 	nc = await connect({ servers: NATS_URL });
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
