@@ -16,7 +16,7 @@ async function start() {
 	const sub = nc.subscribe('game.pongBR.tick');
 	for await (const msg of sub) {
 		const data = jc.decode(msg.data);
-		const result = await Physics.processTick(data);
+		const result = Physics.processTick(data);
 		nc.publish('game.state', jc.encode(result));
 	}
 }

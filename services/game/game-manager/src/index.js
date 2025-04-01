@@ -1,40 +1,65 @@
-// services/game-manager/src/index.js
-import { connect } from 'nats';
+// services/game/game-manager/src/index.js
+import Fastify from 'fastify';
+import { connect, JSONCodec } from 'nats';
+import { loadTemplates, getTemplate } from './templateService.js';
+import { GameManager } from './GameManager.js';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 dotenv.config();
 
-import { GameManager } from './GameLoop.js';
-
 const SERVICE_NAME = process.env.SERVICE_NAME || 'game-manager';
+const PORT = process.env.PORT || 4000;
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
+const jc = JSONCodec();
+
+const fastify = Fastify();
+let nc;
+const gameManager = new GameManager();
+
+fastify.post('/match', async (request, reply) => {
+	try {
+		const { player = [], options = {}, mode = 'pongBR' } = request.body;
+		console.log('[POST /match] received:', { mode, options });
+		const template = getTemplate(mode);
+		if (!template) {
+			return reply.status(400).send({ error: `No template found for mode: ${mode}` });
+		}
+		const mergedOptions = { ...template, ...options, mode };
+		const gameId = gameManager.createMatch(mergedOptions);
+		return { gameId };
+	} catch (err) {
+		console.error(`[${SERVICE_NAME}] Error creating match`, err);
+		return reply.status(500).send({ error: 'Internal server error' });
+	}
+});
 
 async function start() {
-	const nc = await connect({ servers: NATS_URL });
+	nc = await connect({ servers: NATS_URL });
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
 
-	const gameManager = new GameManager(nc);
+
+	const __dirname = path.dirname(fileURLToPath(import.meta.url));
+	loadTemplates(path.join(__dirname, './template'));
+	gameManager.nc = nc;
 	gameManager.start();
 
-	// Subscribe to player inputs
-	const inputSub = nc.subscribe('game.input');
-	for await (const msg of inputSub) {
-		const data = JSON.parse(msg.data);
-		gameManager.handleInput(data);
-	}
+	const sub = nc.subscribe('game.state');
+	(async () => {
+		for await (const msg of sub) {
+			const data = jc.decode(msg.data);
+			gameManager.handlePhysicsResult(data);
+		}
+	})();
 
-	// Subscribe to physics responses
-	const stateSub = nc.subscribe('game.state');
-	for await (const msg of stateSub) {
-		const data = JSON.parse(msg.data);
-		gameManager.handlePhysicsResult(data);
-	}
 
-	// Optional: handle bot input from AI
-	//const aiSub = nc.subscribe('ai.input');
-	//for await (const msg of aiSub) {
-	//	const data = JSON.parse(msg.data);
-	//	gameManager.handleInput(data);
-	//}
+	fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
+		if (err) {
+			console.error(err);
+			process.exit(1);
+		}
+		console.log(`[${SERVICE_NAME}] HTTP API running at ${address}`);
+	});
 }
 
 start();

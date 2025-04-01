@@ -1,18 +1,22 @@
-// services/game-manager/src/GameLoop.js
+// services/game/game-manager/src/GameManager.js
 import { Game } from './Game.js';
 
 export class GameManager {
-	constructor(nc) {
-		this.nc = nc;
+	constructor() {
+		this.nc = null;
 		this.games = new Map(); // gameId -> { type, state, inputs, tick, interval }
 	}
 
 	start() {
 		console.log('[game-manager] Ready to manage games');
-		const players = ['p1', 'p2', 'p3', 'p4', 'p5'];
-		const options = { mode: 'pongBR', ballCount: 3 };
-		const gameId = this.createMatch(players, options);
-		console.log(`[game-manager] Test match started: ${gameId}`);
+		this.nc.subscribe('game.state', {
+			callback: (err, msg) => {
+				if (err) return console.error('NATS error:', err);
+				const data = JSON.parse(msg.data.toString());
+				this.handlePhysicsResult(data);
+			}
+		});
+
 	}
 
 	handleInput({ gameId, playerId, input, tick }) {
@@ -27,23 +31,24 @@ export class GameManager {
 		if (!game) return;
 		game.state = state;
 
-		this.nc.publish('game.update', JSON.stringify({ gameId, state, tick }));
+		this.nc.publish(game.options.stateTopic, JSON.stringify({ gameId, state, tick }));
 	}
 
-	createMatch(players, options = {}) {
-		const gameInstance = new Game(players, options);
+	createMatch(options = {}) {
+		const gameInstance = new Game(options);
 		const gameId = gameInstance.getState().gameId;
-		const tickRate = 1000 / 30; // 30Hz
+		const tickRate = 1000 / (options.tickRate || 60);
 
 		const match = {
 			type: gameInstance.mode,
 			state: gameInstance.getState(),
 			tick: 0,
 			inputs: {},
+			options,
 			interval: setInterval(() => {
 				match.tick++;
 				const inputs = match.inputs[match.tick] || [];
-				this.nc.publish(`game.${match.type}.tick`, JSON.stringify({
+				this.nc.publish(options.physicsTopic, JSON.stringify({
 					gameId,
 					tick: match.tick,
 					state: match.state,

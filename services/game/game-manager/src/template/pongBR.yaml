@@ -1,0 +1,10 @@
+mode: pongBR
+tickRate: 30
+ballCount: 3
+maxPlayers: 100
+physicsTopic: game.pongBR.tick
+stateTopic: game.update
+inputTopic: game.input
+duration: 300       
+winCondition: lastAlive 
+map: classic

@@ -11,6 +11,7 @@
 	"dependencies": {
 		"fastify": "^4.25.1",
 		"nats": "^2.17.0",
+		"js-yaml": "^4.1.0",
 		"dotenv": "^16.0.3"
 	},
 	"devDependencies": {

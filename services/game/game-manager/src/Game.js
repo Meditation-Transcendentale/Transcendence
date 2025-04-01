@@ -1,8 +1,8 @@
-// services/game-manager/src/Game.js
-
+// services/game/game-manager/src/Game.js
 export class Game {
-	constructor(players, options = {}) {
-		this.players = players; // Array of playerIds
+	constructor(options = {}) {
+		this.players = []; // Array of playerIds
+		this.options = options;
 		this.mode = options.mode || 'pong';
 		this.ballCount = options.ballCount || 1;
 		this.state = this.initializeState();
@@ -15,7 +15,8 @@ export class Game {
 			balls: [],
 			paddles: {},
 			score: {},
-			mode: this.mode
+			mode: this.mode,
+			options: this.options
 		};
 
 		for (let i = 0; i < this.ballCount; i++) {
@@ -27,7 +28,12 @@ export class Game {
 			});
 		}
 
-		for (const playerId of this.players) {
+		const maxPlayers = this.options.maxPlayers || this.players.length || 2;
+		const playerIds = this.players.length > 0
+			? this.players
+			: Array.from({ length: maxPlayers }, (_, i) => `slot-${i}`);
+
+		for (const playerId of playerIds) {
 			state.paddles[playerId] = { y: 40 };
 			state.score[playerId] = 0;
 		}
