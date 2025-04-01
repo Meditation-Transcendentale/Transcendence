@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    networks:
+      - logging
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.1.0
+    container_name: logstash
+    volumes:
+      - ../cert-database/logstash.crt:/certs/logstash.crt:ro
+      - ../cert-database/logstash.key:/certs/logstash.key:ro
+      - ./elk/logstash/logstash.conf:/pipeline/logstash.conf:ro
+    environment:
+      - "LS_JAVA_OPTS=-Xms512m -Xmx512m"
+    #   - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/bin/java
+    # command: ["/bin/bash", "-c", "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 && /usr/share/logstash/bin/logstash"]
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    networks:
+      - logging
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.1.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    networks:
+      - logging
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.1.0
+    container_name: filebeat
+    volumes:
+      - /goinfre/docker/containers:/goinfre/docker/containers:ro
+      - ./elk/filebeat/filebeat.yml:/filebeat/filebeat.yml:ro
+    command: ["filebeat", "-e", "-c", "/filebeat/filebeat.yml"]
+    networks:
+      - logging
+    depends_on:
+      - logstash
+
+networks:
+  logging:
+    driver: bridge
