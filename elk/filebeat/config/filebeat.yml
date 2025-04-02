@@ -1,5 +1,5 @@
 filebeat.inputs:
-  - type: log
+  - type: container
     paths:
       - /goinfre/docker/containers/*/*.log
     processors:
@@ -7,6 +7,7 @@ filebeat.inputs:
 
 output.logstash:
   hosts: ["logstash:5044"]
+
   # ssl.enabled: true
   # ssl.certificate_authorities: ["certs/logstash.crt"]
 
