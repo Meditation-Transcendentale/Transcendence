@@ -4,8 +4,8 @@ xpack.monitoring.enabled: true
 xpack.monitoring.ui.enabled: true
 xpack.monitoring.elasticsearch.hosts: ["http://elasticsearch:9200"]
 xpack.monitoring.ui.container.elasticsearch.enabled: true
-# xpack.monitoring.ui.container.logstash.enabled: true
-# xpack.monitoring.ui.container.kibana.enabled: true
-# xpack.monitoring.ui.container.beats.enabled: true
+xpack.monitoring.ui.container.logstash.enabled: true
+xpack.monitoring.ui.container.kibana.enabled: true
+xpack.monitoring.ui.container.beats.enabled: true
 # xpack.security.enabled: false
 elasticsearch.hosts: ["http://elasticsearch:9200"]

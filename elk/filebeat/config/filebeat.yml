@@ -1,16 +1,24 @@
 filebeat.inputs:
   - type: container
+    enabled: true
     paths:
-      - /goinfre/docker/containers/*/*.log
+      - /var/lib/docker/containers/*/*.log
     processors:
       - add_docker_metadata: ~
 
 output.logstash:
   hosts: ["logstash:5044"]
 
-  # ssl.enabled: true
-  # ssl.certificate_authorities: ["certs/logstash.crt"]
+# output.elasticsearch:
+#   hosts: ["http://elasticsearch:9200"]
+#   index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
-# path.home: "/"
-# path.config: "/filebeat"
+setup.kibana:
+  host: "kibana:5601"
 
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+
+logging.level: debug
+logging.selectors: ["*"]

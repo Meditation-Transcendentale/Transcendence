@@ -11,7 +11,7 @@ services:
     volumes:
       # - /home/efayolle/Documents/Transcendence/Transcendence/elk/elasticsearch/data:/usr/share/elasticsearch/data
       # - /home/efayolle/Documents/Transcendence/Transcendence/elk/elasticsearch/logs:/usr/share/elasticsearch/logs
-      - /home/efayolle/Documents/Transcendence/Transcendence/elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ${HOME_PATH}elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - "9200:9200"
     networks:
@@ -23,9 +23,9 @@ services:
     environment:
       - LS_JAVA_OPTS=-Xms512m -Xmx512m
     volumes:
-      - /home/efayolle/Documents/Transcendence/Transcendence/elk/logstash/pipeline:/usr/share/logstash/pipeline
-      - /home/efayolle/Documents/Transcendence/Transcendence/elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - /home/efayolle/Documents/Transcendence/Transcendence/elk/logstash/logs:/usr/share/logstash/logs
+      - ${HOME_PATH}elk/logstash/pipeline:/usr/share/logstash/pipeline
+      - ${HOME_PATH}elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      # - ${HOME_PATH}elk/logstash/logs:/usr/share/logstash/logs
     ports:
       - "5044:5044"
       - "9600:9600"
@@ -40,8 +40,8 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     volumes:
-      - /home/efayolle/Documents/Transcendence/Transcendence/elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
-      - /home/efayolle/Documents/Transcendence/Transcendence/elk/kibana/logs:/usr/share/kibana/logs
+      - ${HOME_PATH}elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+      # - ${HOME_PATH}elk/kibana/logs:/usr/share/kibana/logs
     ports:
       - "5601:5601"
     networks:
@@ -53,13 +53,14 @@ services:
     image: elastic/filebeat:8.6.2
     container_name: filebeat
     volumes:
-      - /home/efayolle/Documents/Transcendence/Transcendence/elk/filebeat/config/filebeat.yml:/filebeat/config/filebeat.yml
-      - /home/efayolle/Documents/Transcendence/Transcendence/elk/filebeat/logs:/filebeat/logs
-      - /home/efayolle/goinfre/docker/containers:/goinfre/docker/containers:ro
+      - ${HOME_PATH}elk/filebeat/config/filebeat.yml:/usr/share/filebeat/config/filebeat.yml
+      # - ${HOME_PATH}elk/filebeat/logs:/usr/share/filebeat/logs
+      - ${DOCKER_PATH_HOME}:/var/lib/docker/containers/:ro
     networks:
       - logging
     depends_on:
       - logstash
+    user: root
 
 networks:
   logging:
