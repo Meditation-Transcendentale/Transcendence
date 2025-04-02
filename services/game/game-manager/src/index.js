@@ -1,5 +1,6 @@
 // services/game/game-manager/src/index.js
 import Fastify from 'fastify';
+import cors from '@fastify/cors';
 import { connect, JSONCodec } from 'nats';
 import { loadTemplates, getTemplate } from './templateService.js';
 import { GameManager } from './GameManager.js';
@@ -16,6 +17,10 @@ const jc = JSONCodec();
 const fastify = Fastify();
 let nc;
 const gameManager = new GameManager();
+
+await fastify.register(cors, {
+	origin: true // or origin: 'http://localhost:3000' to lock it down
+});
 
 fastify.post('/match', async (request, reply) => {
 	try {

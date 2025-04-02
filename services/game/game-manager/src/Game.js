@@ -20,11 +20,16 @@ export class Game {
 		};
 
 		for (let i = 0; i < this.ballCount; i++) {
+			const circleRadius = 50;
+			const r = Math.sqrt(Math.random()) * circleRadius;
+			const theta = Math.random() * 2 * Math.PI;
+			const x = r * Math.cos(theta);
+			const y = r * Math.sin(theta);
 			state.balls.push({
-				x: 50,
-				y: 50,
-				vx: 1,
-				vy: 1
+				x: x,
+				y: y,
+				vx: 0,
+				vy: 25
 			});
 		}
 

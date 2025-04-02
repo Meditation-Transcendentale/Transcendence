@@ -5,7 +5,7 @@ import { CircleCollider, BoxCollider } from './components.js';
 import { movementSystem } from './systems.js';
 import { config } from './utils/config.js';
 
-class Game {
+export class Game {
 	constructor() {
 		this.arenaRadius = this.calculateArenaRadius(100);
 		this.entityManager = new EntityManager();
@@ -208,4 +208,3 @@ class Game {
 	}
 }
 
-export default new Game();

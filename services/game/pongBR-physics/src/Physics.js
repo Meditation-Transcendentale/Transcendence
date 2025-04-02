@@ -161,7 +161,7 @@ export const Physics = {
 		return {
 			gameId,
 			tick,
-			state: game.state
+			state: game.getFullState()
 		};
 	}
 };
