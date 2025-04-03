@@ -5,6 +5,18 @@ filebeat.inputs:
       - /var/lib/docker/containers/*/*.log
     processors:
       - add_docker_metadata: ~
+      - drop_event:
+          when:
+            or:
+              - equals:
+                  docker.container.name: "kibana"
+              - equals:
+                  docker.container.name: "elasticsearch"
+              - equals:
+                  docker.container.name: "logstash"
+              - equals:
+                  docker.container.name: "filebeat"
+
 
 output.logstash:
   hosts: ["logstash:5044"]
@@ -20,5 +32,5 @@ xpack.monitoring.enabled: true
 xpack.monitoring.elasticsearch:
   hosts: ["http://elasticsearch:9200"]
 
-logging.level: debug
-logging.selectors: ["*"]
+# logging.level: debug
+# logging.selectors: ["*"]
