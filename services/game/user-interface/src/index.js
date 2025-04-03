@@ -49,27 +49,68 @@ async function start() {
 			console.log(`New player: UIID=${clientUIID}, assigned paddleId=${paddleId}`);
 		}
 		ws.paddleId = paddleId;
+		// Disable the wall for this player via NATS
+		nc.publish('game.input', jc.encode({
+			type: 'disableWall',
+			playerId: paddleId
+		}));
+
 		clients.set(paddleId, ws);
 
 		ws.send(JSON.stringify({ type: 'welcome', uiid: clientUIID, paddleId }));
 
+		//ws.on('message', (raw) => {
+		//	try {
+		//		const { type, data } = JSON.parse(raw);
+		//		if (type === 'paddleUpdate') {
+		//			nc.publish('game.input', jc.encode({ playerId: paddleId, input: data }));
+		//		} else if (type === 'registerGame') {
+		//			const { gameId } = data;
+		//			playerGames.set(paddleId, gameId);
+		//			if (!gamePlayers.has(gameId)) gamePlayers.set(gameId, new Set());
+		//			gamePlayers.get(gameId).add(paddleId);
+		//			console.log(`[${SERVICE_NAME}] Registered paddle ${paddleId} to game ${gameId}`);
+		//		}
+		//	} catch (err) {
+		//		console.error(`[${SERVICE_NAME}] Error processing message`, err);
+		//	}
+		//});
+
 		ws.on('message', (raw) => {
 			try {
 				const { type, data } = JSON.parse(raw);
+
 				if (type === 'paddleUpdate') {
-					nc.publish('game.input', jc.encode({ playerId: paddleId, input: data }));
-				} else if (type === 'registerGame') {
+					const gameId = playerGames.get(paddleId);
+					if (gameId) {
+						nc.publish('game.input', jc.encode({
+							type: 'paddleUpdate',
+							gameId,
+							playerId: paddleId,
+							input: data
+						}));
+					}
+				}
+
+				else if (type === 'registerGame') {
 					const { gameId } = data;
 					playerGames.set(paddleId, gameId);
 					if (!gamePlayers.has(gameId)) gamePlayers.set(gameId, new Set());
 					gamePlayers.get(gameId).add(paddleId);
+
 					console.log(`[${SERVICE_NAME}] Registered paddle ${paddleId} to game ${gameId}`);
+
+					nc.publish('game.input', jc.encode({
+						type: 'disableWall',
+						gameId,
+						playerId: paddleId
+					}));
 				}
+
 			} catch (err) {
 				console.error(`[${SERVICE_NAME}] Error processing message`, err);
 			}
 		});
-
 		ws.on('close', () => {
 			console.log(`Player disconnected: paddleId=${paddleId}`);
 			clients.delete(paddleId);
@@ -84,7 +125,9 @@ async function start() {
 	const sub = nc.subscribe('game.update');
 	for await (const msg of sub) {
 		const { gameId, state, tick } = jc.decode(msg.data);
+		//console.log(`[user-interface] Received update for ${gameId} tick ${tick}`, state);
 		const targets = gamePlayers.get(gameId) || new Set();
+		//console.log(`[user-interface] Found ${targets.size} players in game ${gameId}`);
 		for (const playerId of targets) {
 			const ws = clients.get(playerId);
 			if (ws && ws.readyState === 1) {

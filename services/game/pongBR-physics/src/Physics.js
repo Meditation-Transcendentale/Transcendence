@@ -15,12 +15,20 @@ export const Physics = {
 		if (!this.games.has(gameId)) {
 			this.games.set(gameId, new Game(gameId, state));
 		}
-
 		const game = this.games.get(gameId);
 		const em = game.entityManager;
 		const subSteps = 20;
 		const dt = 1 / 60 / subSteps;
 
+		for (const { playerId, input, type } of inputs) {
+			if (type === 'disableWall') {
+				game.setWallOff(playerId);
+				continue;
+			}
+			if (type === 'paddleUpdate') {
+				game.updatePaddleInput(playerId, input);
+			}
+		}
 		const collidableEntities = em.getEntitiesWithComponents(['position', 'collider']);
 		const tree = new AABBTree();
 		collidableEntities.forEach(entity => {
@@ -40,7 +48,7 @@ export const Physics = {
 				tree.updateEntity(entity, collider.aabb);
 			});
 
-			const ballEntities = em.getEntitiesWithComponents(['ball', 'position', 'velocity', 'collider']);
+			const ballEntities = game.entityManager.getEntitiesWithComponents(['ball', 'position', 'velocity', 'collider']);
 
 			ballEntities.forEach(ball => {
 				const ballCollider = ball.getComponent('collider');
@@ -163,5 +171,31 @@ export const Physics = {
 			tick,
 			state: game.getFullState()
 		};
+	},
+	handleImmediateInput({ gameId, playerId, type }) {
+		if (!this.games.has(gameId)) return;
+		const game = this.games.get(gameId);
+
+		if (type === 'disableWall') {
+			console.log(playerId);
+			const wallEntities = game.entityManager.getEntitiesWithComponents(['paddle']);
+			const wallEntity = wallEntities.find(e => {
+				const wall = e.getComponent('paddle');
+				return wall.id == playerId; // or match by playerId logic
+			});
+			if (wallEntity) {
+				console.log("disabling");
+				const wall = wallEntity.getComponent('paddle');
+				wall.isConnected = true;
+				//wall.dirty = true;
+			}
+		}
+	},
+
+	removeGame(gameId) {
+		if (this.games.has(gameId)) {
+			this.games.delete(gameId);
+			console.log(`[Physics] Removed game ${gameId}`);
+		}
 	}
 };

@@ -1,5 +1,7 @@
 // services/game/game-manager/src/GameManager.js
 import { Game } from './Game.js';
+import { JSONCodec } from 'nats';
+const jc = JSONCodec();
 
 export class GameManager {
 	constructor() {
@@ -9,19 +11,40 @@ export class GameManager {
 
 	start() {
 		console.log('[game-manager] Ready to manage games');
+
 		this.nc.subscribe('game.state', {
 			callback: (err, msg) => {
 				if (err) return console.error('NATS error:', err);
-				const data = JSON.parse(msg.data.toString());
-				this.handlePhysicsResult(data);
+				try {
+					const data = jc.decode(msg.data);
+					this.handlePhysicsResult(data);
+				} catch (err) {
+					console.error('[game-manager] Failed to decode message:', err);
+					console.error('Raw message:', msg.data.toString());
+				}
 			}
 		});
-
 	}
 
-	handleInput({ gameId, playerId, input, tick }) {
+
+	handleInput({ type, gameId, playerId }) {
 		const game = this.games.get(gameId);
 		if (!game) return;
+
+		// Handle special commands directly
+		if (type === 'disableWall') {
+			// Send a tickless immediate command to physics
+
+			this.nc.publish(`game.pongBR.input`, JSON.stringify({
+				gameId,
+				inputs: [{ playerId, type }],
+				//tick: game.tick,
+				state: game.state
+			}));
+			return;
+		}
+
+		// Default input queuing
 		if (!game.inputs[tick]) game.inputs[tick] = [];
 		game.inputs[tick].push({ playerId, input });
 	}
@@ -31,7 +54,7 @@ export class GameManager {
 		if (!game) return;
 		game.state = state;
 
-		console.log(`[game-manager] Received state for game ${gameId} at tick ${tick}`);
+		//console.log(`[game-manager] Received state for game ${gameId} at tick ${tick}`);
 		this.nc.publish(game.options.stateTopic, JSON.stringify({ gameId, state, tick }));
 	}
 
@@ -58,7 +81,9 @@ export class GameManager {
 	endMatch(gameId) {
 		const match = this.games.get(gameId);
 		if (match) {
+
 			clearInterval(match.interval);
+			this.nc.publish(`game.${match.type}.end`, JSON.stringify({ gameId }));
 			this.games.delete(gameId);
 			console.log(`[game-manager] Ended match ${gameId}`);
 		}

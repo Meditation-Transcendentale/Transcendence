@@ -78,6 +78,14 @@ async function start() {
 		}
 	})();
 
+	const subInput = nc.subscribe('game.input');
+	(async () => {
+		for await (const msg of subInput) {
+			const data = jc.decode(msg.data);
+			console.log(data);
+			gameManager.handleInput(data);
+		}
+	})();
 
 	fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
 		if (err) {

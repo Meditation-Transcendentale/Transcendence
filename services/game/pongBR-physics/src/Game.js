@@ -11,7 +11,7 @@ export class Game {
 		this.paddleEntities = {};
 		this.options = initialState.options || {};
 		this.players = this.options.players || [];
-		this.arenaRadius = this.calculateArenaRadius(this.players.length);
+		this.arenaRadius = this.calculateArenaRadius(100);
 
 		this.init();
 	}
@@ -39,36 +39,43 @@ export class Game {
 				.addComponent('collider', CircleCollider(config.BALL_RADIUS));
 		}
 
-		// Create one wall and one paddle per player
-		this.players.forEach((playerId, i) => {
-			const angle = (2 * Math.PI / this.players.length) * i;
+		const maxPlayers = this.options.maxPlayers || this.players.length || 2;
+
+		for (let i = 0; i < maxPlayers; i++) {
+			const angle = (2 * Math.PI / maxPlayers) * i;
 			const x = this.arenaRadius * Math.cos(angle);
 			const y = this.arenaRadius * Math.sin(angle);
 			const rotationY = -(angle + Math.PI / 2);
 
-			// Paddle entity
-			const paddleEntity = this.entityManager.createEntity();
-			paddleEntity
-				.addComponent('position', Position(x, y))
-				.addComponent('paddle', {
-					id: playerId,
-					speed: config.PADDLE_SPEED,
-					offset: 0,
-					maxOffset: config.MAX_OFFSET,
-					isConnected: true,
-					dirty: true
-				})
-				.addComponent('collider', BoxCollider(config.PADDLE_WIDTH, config.PADDLE_HEIGHT, rotationY));
-
-			this.paddleEntities[playerId] = paddleEntity;
-
-			// Wall entity
+			// Wall entity (always created)
 			const wallEntity = this.entityManager.createEntity();
 			wallEntity
 				.addComponent('position', Position(x, y))
 				.addComponent('wall', { id: i, rotation: rotationY, isActive: true, dirty: true })
 				.addComponent('collider', BoxCollider(config.WALL_WIDTH, config.WALL_HEIGHT, rotationY));
-		});
+
+			console.log("wall config", config.WALL_WIDTH, config.WALL_HEIGHT, rotationY);
+			// Only create paddle if a player is assigned to this slot
+			if (this.players[i]) {
+				const playerId = i;
+				console.log(playerId);
+				const paddleEntity = this.entityManager.createEntity();
+				paddleEntity
+					.addComponent('position', Position(x, y))
+					.addComponent('paddle', {
+						id: playerId,
+						speed: config.PADDLE_SPEED,
+						offset: 0,
+						maxOffset: config.MAX_OFFSET,
+						isConnected: true,
+						dirty: true
+					})
+					.addComponent('collider', BoxCollider(config.PADDLE_WIDTH, config.PADDLE_HEIGHT, rotationY));
+
+				this.paddleEntities[playerId] = paddleEntity;
+			}
+		}
+
 	}
 
 	update(tick, inputs) {
@@ -96,6 +103,14 @@ export class Game {
 		position.y = input.y;
 	}
 
+	setWallOff(playerId) {
+		const walls = this.entityManager.getEntitiesWithComponents(['wall']);
+		const wall = walls.find(w => w.getComponent('wall').id == playerId);
+		if (wall) {
+			wall.getComponent('wall').isActive = false;
+			wall.getComponent('wall').dirty = true;
+		}
+	}
 	getFullState() {
 		const balls = this.entityManager.getEntitiesWithComponents(['ball', 'position', 'velocity']).map(entity => {
 			const pos = entity.getComponent('position');

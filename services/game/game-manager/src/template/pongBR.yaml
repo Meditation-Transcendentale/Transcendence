@@ -1,6 +1,6 @@
 mode: pongBR
 tickRate: 60
-ballCount: 100
+ballCount: 200
 maxPlayers: 100
 physicsTopic: game.pongBR.tick
 stateTopic: game.update
