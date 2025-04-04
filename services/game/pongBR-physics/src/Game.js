@@ -9,9 +9,10 @@ export class Game {
 		this.gameId = gameId;
 		this.entityManager = createEntityManager();
 		this.paddleEntities = {};
+		this.wallEntities = {};
 		this.options = initialState.options || {};
 		this.players = this.options.players || [];
-		this.arenaRadius = this.calculateArenaRadius(100);
+		this.arenaRadius = this.calculateArenaRadius(this.options.maxPlayers || this.players.length || 2);
 
 		this.init();
 	}
@@ -41,51 +42,48 @@ export class Game {
 
 		const maxPlayers = this.options.maxPlayers || this.players.length || 2;
 
-		for (let i = 0; i < maxPlayers; i++) {
+		for (let i = 0; i < 100; i++) {
 			const angle = (2 * Math.PI / maxPlayers) * i;
 			const x = this.arenaRadius * Math.cos(angle);
 			const y = this.arenaRadius * Math.sin(angle);
 			const rotationY = -(angle + Math.PI / 2);
 
-			// Wall entity (always created)
 			const wallEntity = this.entityManager.createEntity();
 			wallEntity
 				.addComponent('position', Position(x, y))
 				.addComponent('wall', { id: i, rotation: rotationY, isActive: true, dirty: true })
 				.addComponent('collider', BoxCollider(config.WALL_WIDTH, config.WALL_HEIGHT, rotationY));
 
-			console.log("wall config", config.WALL_WIDTH, config.WALL_HEIGHT, rotationY);
-			// Only create paddle if a player is assigned to this slot
-			if (this.players[i]) {
-				const playerId = i;
-				console.log(playerId);
-				const paddleEntity = this.entityManager.createEntity();
-				paddleEntity
-					.addComponent('position', Position(x, y))
-					.addComponent('paddle', {
-						id: playerId,
-						speed: config.PADDLE_SPEED,
-						offset: 0,
-						maxOffset: config.MAX_OFFSET,
-						isConnected: true,
-						dirty: true
-					})
-					.addComponent('collider', BoxCollider(config.PADDLE_WIDTH, config.PADDLE_HEIGHT, rotationY));
+			this.wallEntities[i] = wallEntity;
 
-				this.paddleEntities[playerId] = paddleEntity;
+			const paddleEntity = this.entityManager.createEntity();
+			paddleEntity
+				.addComponent('position', Position(x, y))
+				.addComponent('paddle', {
+					id: i,
+					speed: config.PADDLE_SPEED,
+					offset: 0,
+					maxOffset: config.MAX_OFFSET,
+					isConnected: !!this.players[i],
+					dirty: true
+				})
+				.addComponent('collider', BoxCollider(config.PADDLE_WIDTH, config.PADDLE_HEIGHT, rotationY));
+
+			this.paddleEntities[i] = paddleEntity;
+
+			if (this.players[i]) {
+				wallEntity.getComponent('wall').isActive = false;
+				wallEntity.getComponent('wall').dirty = true;
 			}
 		}
-
 	}
 
 	update(tick, inputs) {
-		// Handle paddle inputs
 		for (const { playerId, input } of inputs || []) {
 			this.updatePaddleInput(playerId, input);
 		}
-		// optional: handle inputs here to update paddles
 		movementSystem(this.entityManager, 1 / 60);
-		return this.getFullState();
+		return this.getState();
 	}
 
 	updatePaddleInput(playerId, input) {
@@ -94,23 +92,47 @@ export class Game {
 
 		const paddle = paddleEntity.getComponent('paddle');
 		const position = paddleEntity.getComponent('position');
-
-		paddle.offset = input.offset;
-		paddle.offset = Math.max(-paddle.maxOffset, Math.min(paddle.offset, paddle.maxOffset));
-		paddle.dirty = true;
-
-		position.x = input.x;
-		position.y = input.y;
+		if (paddle.offset !== input.offset || position.x !== input.x || position.y !== input.y) {
+			paddle.offset = input.offset;
+			paddle.offset = Math.max(-paddle.maxOffset, Math.min(paddle.offset, paddle.maxOffset));
+			position.x = input.x;
+			position.y = input.y;
+			paddle.dirty = true;
+		}
 	}
 
 	setWallOff(playerId) {
-		const walls = this.entityManager.getEntitiesWithComponents(['wall']);
-		const wall = walls.find(w => w.getComponent('wall').id == playerId);
+		const wall = this.wallEntities[playerId];
+		console.log(wall);
 		if (wall) {
+			console.log("wall is off");
 			wall.getComponent('wall').isActive = false;
 			wall.getComponent('wall').dirty = true;
 		}
+
+		const paddle = this.paddleEntities[playerId]?.getComponent('paddle');
+		console.log(paddle);
+		if (paddle) {
+			console.log("paddle is off");
+			paddle.isConnected = true;
+			paddle.dirty = true;
+		}
 	}
+
+	setWallOn(playerId) {
+		const wall = this.wallEntities[playerId];
+		if (wall) {
+			wall.getComponent('wall').isActive = true;
+			wall.getComponent('wall').dirty = true;
+		}
+
+		const paddle = this.paddleEntities[playerId]?.getComponent('paddle');
+		if (paddle) {
+			paddle.isConnected = false;
+			paddle.dirty = true;
+		}
+	}
+
 	getFullState() {
 		const balls = this.entityManager.getEntitiesWithComponents(['ball', 'position', 'velocity']).map(entity => {
 			const pos = entity.getComponent('position');
@@ -119,7 +141,7 @@ export class Game {
 			return { id: ball.id, x: pos.x, y: pos.y, vx: vel.x, vy: vel.y };
 		});
 
-		const walls = this.entityManager.getEntitiesWithComponents(['wall']).map(entity => {
+		const walls = Object.values(this.wallEntities).map(entity => {
 			const wall = entity.getComponent('wall');
 			return { id: wall.id, wall: wall.isActive };
 		});
@@ -133,4 +155,59 @@ export class Game {
 
 		return { balls, walls, paddles };
 	}
+	round(n, decimals = 2) {
+		const factor = Math.pow(10, decimals);
+		return Math.round(n * factor) / factor;
+	}
+	getState() {
+		function round(n, decimals = 2) {
+			const factor = Math.pow(10, decimals);
+			return Math.round(n * factor) / factor;
+		}
+
+		const balls = this.entityManager.getEntitiesWithComponents(['ball', 'position', 'velocity'])
+			.map(entity => {
+				const pos = entity.getComponent('position');
+				const vel = entity.getComponent('velocity');
+				const ball = entity.getComponent('ball');
+				return [
+					ball.id,
+					round(pos.x, 2),
+					round(pos.y, 2),
+					round(vel.x, 2),
+					round(vel.y, 2)
+				];
+			});
+
+		const walls = Object.values(this.wallEntities)
+			.filter(e => e.getComponent('wall').dirty)
+			.map(entity => {
+				const wall = entity.getComponent('wall');
+				wall.dirty = false;
+				return { id: wall.id, wall: wall.isActive };
+			});
+
+		const paddles = Object.keys(this.paddleEntities)
+			.map(key => {
+				const paddleEntity = this.paddleEntities[key];
+				const paddle = paddleEntity.getComponent('paddle');
+				if (!paddle.dirty) return null;
+				paddle.dirty = false;
+				return { id: paddle.id, offset: paddle.offset, connected: paddle.isConnected };
+			})
+			.filter(Boolean);
+
+		return { balls, walls, paddles };
+	}
+	markAllEntitiesDirty() {
+		// Object.values(this.wallEntities).forEach(entity => {
+		// 	const wall = entity.getComponent('wall');
+		// 	wall.dirty = true;
+		// });
+		Object.values(this.paddleEntities).forEach(entity => {
+			const paddle = entity.getComponent('paddle');
+			paddle.dirty = true;
+		});
+	}
+
 }

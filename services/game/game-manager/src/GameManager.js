@@ -26,29 +26,28 @@ export class GameManager {
 		});
 	}
 
-
-	handleInput({ type, gameId, playerId }) {
+	handleInput({ type, gameId, playerId, input, tick }) {
 		const game = this.games.get(gameId);
 		if (!game) return;
+		// console.log('Received input:', { type, gameId, playerId, input, tick });
 
-		// Handle special commands directly
-		if (type === 'disableWall') {
-			// Send a tickless immediate command to physics
-
+		// Immediate inputs
+		if (type === 'disableWall' || type === 'enableWall' || type === 'newPlayerConnected') {
 			this.nc.publish(`game.pongBR.input`, JSON.stringify({
 				gameId,
-				inputs: [{ playerId, type }],
-				//tick: game.tick,
-				state: game.state
+				inputs: [{ playerId, type }]
 			}));
 			return;
 		}
 
-		// Default input queuing
-		if (!game.inputs[tick]) game.inputs[tick] = [];
-		game.inputs[tick].push({ playerId, input });
+		const currentTick = typeof tick === 'number' ? tick : game.tick + 1;
+		// console.log(currentTick);
+		if (!game.inputs[currentTick]) {
+			game.inputs[currentTick] = [];
+		}
+		game.inputs[currentTick].push({ playerId, type, input });
+		// console.log(`Stored input for tick ${currentTick}`, game.inputs[currentTick]);
 	}
-
 	handlePhysicsResult({ gameId, state, tick }) {
 		const game = this.games.get(gameId);
 		if (!game) return;

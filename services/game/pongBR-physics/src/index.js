@@ -35,7 +35,12 @@ async function start() {
 
 			for (const { playerId, type } of inputs) {
 				console.log(`[${SERVICE_NAME}] Handling immediate input for ${gameId}`, type);
-				Physics.handleImmediateInput({ gameId, playerId, type });
+				Physics.handleImmediateInput({
+					gameId,
+					inputs: [
+						{ playerId, input: { type } }
+					]
+				});
 			}
 		}
 	})();
@@ -50,6 +55,8 @@ async function start() {
 
 		//console.log(`[${SERVICE_NAME}] Processing tick ${data.tick} for game ${data.gameId}`);
 		const result = Physics.processTick(data);
+		const encoded = jc.encode(result);
+		// console.log(`[physics] Tick ${result.tick} state size: ${encoded.length} bytes`);
 		nc.publish('game.state', jc.encode(result));
 	}
 }

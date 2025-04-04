@@ -82,7 +82,6 @@ async function start() {
 	(async () => {
 		for await (const msg of subInput) {
 			const data = jc.decode(msg.data);
-			console.log(data);
 			gameManager.handleInput(data);
 		}
 	})();

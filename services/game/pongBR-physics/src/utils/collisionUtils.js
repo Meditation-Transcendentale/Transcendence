@@ -1,5 +1,7 @@
 // collisionUtils.js
 
+const EPSILON = 0.01;
+
 export function updateAABB(position, collider) {
 	if (collider.type === 'circle') {
 		const r = collider.radius;
@@ -8,131 +10,33 @@ export function updateAABB(position, collider) {
 		collider.aabb.width = r * 2;
 		collider.aabb.height = r * 2;
 	} else if (collider.type === 'box') {
-		const cos = Math.cos(collider.rotation);
-		const sin = Math.sin(collider.rotation);
+		const cos = collider.cos;
+		const sin = collider.sin;
 		const hw = collider.width / 2;
 		const hh = collider.height / 2;
-		const cx = position.x + collider.offsetX;
-		const cy = position.y + collider.offsetY;
+		const cx = position.x + (collider.offsetX || 0);
+		const cy = position.y + (collider.offsetY || 0);
 
-		const corners = [
-			{ x: cx - hw * cos + hh * sin, y: cy - hw * sin - hh * cos },
-			{ x: cx + hw * cos + hh * sin, y: cy + hw * sin - hh * cos },
-			{ x: cx + hw * cos - hh * sin, y: cy + hw * sin + hh * cos },
-			{ x: cx - hw * cos - hh * sin, y: cy - hw * sin + hh * cos }
-		];
+		const x1 = cx - hw * cos + hh * sin;
+		const y1 = cy - hw * sin - hh * cos;
+		const x2 = cx + hw * cos + hh * sin;
+		const y2 = cy + hw * sin - hh * cos;
+		const x3 = cx + hw * cos - hh * sin;
+		const y3 = cy + hw * sin + hh * cos;
+		const x4 = cx - hw * cos - hh * sin;
+		const y4 = cy - hw * sin + hh * cos;
 
-		const xs = corners.map(c => c.x);
-		const ys = corners.map(c => c.y);
-		collider.aabb.x = Math.min(...xs);
-		collider.aabb.y = Math.min(...ys);
-		collider.aabb.width = Math.max(...xs) - collider.aabb.x;
-		collider.aabb.height = Math.max(...ys) - collider.aabb.y;
+		const minX = Math.min(x1, x2, x3, x4);
+		const minY = Math.min(y1, y2, y3, y4);
+		const maxX = Math.max(x1, x2, x3, x4);
+		const maxY = Math.max(y1, y2, y3, y4);
+
+		collider.aabb.x = minX;
+		collider.aabb.y = minY;
+		collider.aabb.width = maxX - minX;
+		collider.aabb.height = maxY - minY;
 	}
 }
-
-// export function getOBBPoints(position, collider) {
-// 	const cx = position.x + (collider.offsetX || 0);
-// 	const cy = position.y + (collider.offsetY || 0);
-// 	const hw = collider.width / 2;
-// 	const hh = collider.height / 2;
-// 	const cos = Math.cos(collider.rotation);
-// 	const sin = Math.sin(collider.rotation);
-//
-// 	return [
-// 		{ x: cx - hw * cos + hh * sin, y: cy - hw * sin - hh * cos },
-// 		{ x: cx + hw * cos + hh * sin, y: cy + hw * sin - hh * cos },
-// 		{ x: cx + hw * cos - hh * sin, y: cy + hw * sin + hh * cos },
-// 		{ x: cx - hw * cos - hh * sin, y: cy - hw * sin + hh * cos }
-// 	];
-// }
-// export function getAxes(points) {
-// 	const axes = [];
-// 	for (let i = 0; i < points.length; i++) {
-// 		const p1 = points[i];
-// 		const p2 = points[(i + 1) % points.length];
-// 		const edge = { x: p2.x - p1.x, y: p2.y - p1.y };
-// 		const normal = { x: -edge.y, y: edge.x };
-// 		const length = Math.hypot(normal.x, normal.y);
-// 		axes.push({ x: normal.x / length, y: normal.y / length });
-// 	}
-// 	return axes;
-// }
-
-// function projectPolygon(axis, points) {
-// 	let min = Infinity;
-// 	let max = -Infinity;
-// 	points.forEach(point => {
-// 		const projection = point.x * axis.x + point.y * axis.y;
-// 		if (projection < min) min = projection;
-// 		if (projection > max) max = projection;
-// 	});
-// 	return { min, max };
-// }
-//
-// function overlapIntervals(projA, projB) {
-// 	return projA.max >= projB.min && projB.max >= projA.min;
-// }
-
-// export function obbCollision(positionA, colliderA, positionB, colliderB) {
-// 	const pointsA = getOBBPoints(positionA, colliderA);
-// 	const pointsB = getOBBPoints(positionB, colliderB);
-//
-// 	const getAxes = (points) => {
-// 		const axes = [];
-// 		for (let i = 0; i < points.length; i++) {
-// 			const p1 = points[i];
-// 			const p2 = points[(i + 1) % points.length];
-// 			const edge = { x: p2.x - p1.x, y: p2.y - p1.y };
-// 			const normal = { x: -edge.y, y: edge.x };
-// 			const length = Math.hypot(normal.x, normal.y);
-// 			axes.push({ x: normal.x / length, y: normal.y / length });
-// 		}
-// 		return axes;
-// 	};
-//
-// 	const axesA = getAxes(pointsA);
-// 	const axesB = getAxes(pointsB);
-// 	const axes = axesA.concat(axesB);
-//
-// 	for (const axis of axes) {
-// 		const projA = projectPolygon(axis, pointsA);
-// 		const projB = projectPolygon(axis, pointsB);
-// 		if (!overlapIntervals(projA, projB)) {
-// 			return false;
-// 		}
-// 	}
-// 	return true;
-// }
-
-// export function getOBBResolution(positionA, colliderA, positionB, colliderB) {
-// 	const pointsA = getOBBPoints(positionA, colliderA);
-// 	const pointsB = getOBBPoints(positionB, colliderB);
-//
-// 	const axesA = getAxes(pointsA);
-// 	const axesB = getAxes(pointsB);
-// 	const axes = axesA.concat(axesB);
-//
-// 	let minOverlap = Infinity;
-// 	let smallestAxis = null;
-//
-// 	for (const axis of axes) {
-// 		const projA = projectPolygon(axis, pointsA);
-// 		const projB = projectPolygon(axis, pointsB);
-//
-// 		if (!overlapIntervals(projA, projB)) {
-// 			return { x: 0, y: 0 };
-// 		}
-//
-// 		const overlap = Math.min(projA.max, projB.max) - Math.max(projA.min, projB.min);
-// 		if (overlap < minOverlap) {
-// 			minOverlap = overlap;
-// 			smallestAxis = axis;
-// 		}
-// 	}
-//
-// 	return { x: smallestAxis.x * minOverlap, y: smallestAxis.y * minOverlap };
-// }
 
 export function resolveCircleBoxCollision(ballPos, ballCollider, ballVelocity, wallPos, wallCollider, restitution = 1) {
 	const wx = wallPos.x + (wallCollider.offsetX || 0);
@@ -141,8 +45,8 @@ export function resolveCircleBoxCollision(ballPos, ballCollider, ballVelocity, w
 	const dx = ballPos.x - wx;
 	const dy = ballPos.y - wy;
 
-	const cosTheta = Math.cos(-wallCollider.rotation);
-	const sinTheta = Math.sin(-wallCollider.rotation);
+	const cosTheta = wallCollider.cos;
+	const sinTheta = wallCollider.sin;
 	const localX = dx * cosTheta - dy * sinTheta;
 	const localY = dx * sinTheta + dy * cosTheta;
 
@@ -151,8 +55,8 @@ export function resolveCircleBoxCollision(ballPos, ballCollider, ballVelocity, w
 	const clampedX = Math.max(-halfW, Math.min(localX, halfW));
 	const clampedY = Math.max(-halfH, Math.min(localY, halfH));
 
-	const invCos = Math.cos(wallCollider.rotation);
-	const invSin = Math.sin(wallCollider.rotation);
+	const invCos = wallCollider.cos;       // cos(-theta)
+	const invSin = -wallCollider.sin;        // sin(-theta)
 	const closestX = wx + clampedX * invCos - clampedY * invSin;
 	const closestY = wy + clampedX * invSin + clampedY * invCos;
 
@@ -166,7 +70,6 @@ export function resolveCircleBoxCollision(ballPos, ballCollider, ballVelocity, w
 	}
 
 	const penetration = radius - dist;
-
 	let normalX, normalY;
 	if (dist === 0) {
 		normalX = 0;
@@ -180,8 +83,8 @@ export function resolveCircleBoxCollision(ballPos, ballCollider, ballVelocity, w
 	ballPos.y += normalY * penetration;
 
 	const dot = ballVelocity.x * normalX + ballVelocity.y * normalY;
-	ballVelocity.x = ballVelocity.x - 2 * dot * normalX;
-	ballVelocity.y = ballVelocity.y - 2 * dot * normalY;
+	ballVelocity.x -= 2 * dot * normalX;
+	ballVelocity.y -= 2 * dot * normalY;
 
 	ballVelocity.x *= restitution;
 	ballVelocity.y *= restitution;
@@ -196,8 +99,8 @@ export function computeCircleBoxMTV(ballPos, ballCollider, wallPos, wallCollider
 	const dx = ballPos.x - wx;
 	const dy = ballPos.y - wy;
 
-	const cosTheta = Math.cos(wallCollider.rotation);
-	const sinTheta = Math.sin(wallCollider.rotation);
+	const cosTheta = wallCollider.cos;
+	const sinTheta = -wallCollider.sin;
 	const localX = dx * cosTheta - dy * sinTheta;
 	const localY = dx * sinTheta + dy * cosTheta;
 
@@ -206,8 +109,8 @@ export function computeCircleBoxMTV(ballPos, ballCollider, wallPos, wallCollider
 	const clampedX = Math.max(-halfW, Math.min(localX, halfW));
 	const clampedY = Math.max(-halfH, Math.min(localY, halfH));
 
-	const invCos = Math.cos(-wallCollider.rotation);
-	const invSin = Math.sin(-wallCollider.rotation);
+	const invCos = wallCollider.cos;
+	const invSin = wallCollider.sin;
 	const closestX = wx + clampedX * invCos - clampedY * invSin;
 	const closestY = wy + clampedX * invSin + clampedY * invCos;
 
@@ -221,6 +124,9 @@ export function computeCircleBoxMTV(ballPos, ballCollider, wallPos, wallCollider
 	}
 
 	const penetration = radius - dist;
+	if (penetration < EPSILON) {
+		return { mtv: { x: 0, y: 0 }, penetration: 0 };
+	}
 
 	let normalX, normalY;
 	if (dist === 0) {
@@ -245,24 +151,26 @@ export function resolveCircleCircleCollision(posA, colliderA, velA, posB, collid
 	}
 
 	const penetration = sumRadii - distance;
-	const normal = { x: dx / distance, y: dy / distance };
+	const normalX = dx / distance;
+	const normalY = dy / distance;
 
-	posA.x -= normal.x * (penetration / 2);
-	posA.y -= normal.y * (penetration / 2);
-	posB.x += normal.x * (penetration / 2);
-	posB.y += normal.y * (penetration / 2);
+	posA.x -= normalX * (penetration / 2);
+	posA.y -= normalY * (penetration / 2);
+	posB.x += normalX * (penetration / 2);
+	posB.y += normalY * (penetration / 2);
 
-	const relativeVel = { x: velB.x - velA.x, y: velB.y - velA.y };
-	const velAlongNormal = relativeVel.x * normal.x + relativeVel.y * normal.y;
+	const relVelX = velB.x - velA.x;
+	const relVelY = velB.y - velA.y;
+	const velAlongNormal = relVelX * normalX + relVelY * normalY;
 
 	if (velAlongNormal > 0) return false;
 
 	const impulse = -(1 + restitution) * velAlongNormal / 2;
-
-	velA.x -= impulse * normal.x;
-	velA.y -= impulse * normal.y;
-	velB.x += impulse * normal.x;
-	velB.y += impulse * normal.y;
+	velA.x -= impulse * normalX;
+	velA.y -= impulse * normalY;
+	velB.x += impulse * normalX;
+	velB.y += impulse * normalY;
 
 	return true;
 }
+

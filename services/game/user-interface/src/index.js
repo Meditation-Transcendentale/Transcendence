@@ -49,32 +49,10 @@ async function start() {
 			console.log(`New player: UIID=${clientUIID}, assigned paddleId=${paddleId}`);
 		}
 		ws.paddleId = paddleId;
-		// Disable the wall for this player via NATS
-		nc.publish('game.input', jc.encode({
-			type: 'disableWall',
-			playerId: paddleId
-		}));
 
 		clients.set(paddleId, ws);
 
 		ws.send(JSON.stringify({ type: 'welcome', uiid: clientUIID, paddleId }));
-
-		//ws.on('message', (raw) => {
-		//	try {
-		//		const { type, data } = JSON.parse(raw);
-		//		if (type === 'paddleUpdate') {
-		//			nc.publish('game.input', jc.encode({ playerId: paddleId, input: data }));
-		//		} else if (type === 'registerGame') {
-		//			const { gameId } = data;
-		//			playerGames.set(paddleId, gameId);
-		//			if (!gamePlayers.has(gameId)) gamePlayers.set(gameId, new Set());
-		//			gamePlayers.get(gameId).add(paddleId);
-		//			console.log(`[${SERVICE_NAME}] Registered paddle ${paddleId} to game ${gameId}`);
-		//		}
-		//	} catch (err) {
-		//		console.error(`[${SERVICE_NAME}] Error processing message`, err);
-		//	}
-		//});
 
 		ws.on('message', (raw) => {
 			try {
@@ -89,6 +67,7 @@ async function start() {
 							playerId: paddleId,
 							input: data
 						}));
+						// console.log(data);
 					}
 				}
 
@@ -105,6 +84,18 @@ async function start() {
 						gameId,
 						playerId: paddleId
 					}));
+					nc.publish('game.input', jc.encode({
+						type: 'newPlayerConnected',
+						gameId,
+						playerId: paddleId
+					}));
+					ws.send(JSON.stringify({
+						type: 'registered',
+						gameId,
+						paddleId,
+						message: `You have been registered to game ${gameId}`
+					}));
+
 				}
 
 			} catch (err) {
@@ -118,6 +109,12 @@ async function start() {
 			if (gameId) {
 				gamePlayers.get(gameId)?.delete(paddleId);
 				playerGames.delete(paddleId);
+				nc.publish('game.input', jc.encode({
+					type: 'enableWall',
+					gameId,
+					playerId: paddleId
+				}));
+
 			}
 		});
 	});
