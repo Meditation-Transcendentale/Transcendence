@@ -24,6 +24,7 @@ services:
     volumes:
       - /home/efayolle/Documents/Transcendence/Transcendence/elk/logstash/pipeline:/usr/share/logstash/pipeline
       - /home/efayolle/Documents/Transcendence/Transcendence/elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      # - /home/efayolle/goinfre/docker/containers:/var/lib/docker/containers:ro
       # - ${42_PATH}elk/logstash/logs:/usr/share/logstash/logs
     ports:
       - "5044:5044"
@@ -56,7 +57,7 @@ services:
       - /home/efayolle/Documents/Transcendence/Transcendence/elk/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
       # - ${42_PATH}elk/filebeat/logs:/usr/share/filebeat/logs
       - /home/efayolle/goinfre/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run:/var/run
     networks:
       - logging
     depends_on:
