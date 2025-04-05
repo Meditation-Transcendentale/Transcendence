@@ -42,7 +42,6 @@ export class Game {
 
 		const arenaRadius = this.calculateArenaRadius(maxPlayers);
 
-		// Create static walls for all 100 slots
 		for (let i = 0; i < maxPlayers; i++) {
 			const angle = (2 * Math.PI / maxPlayers) * i;
 			const x = arenaRadius * Math.cos(angle);
@@ -58,7 +57,6 @@ export class Game {
 			});
 		}
 
-		// Assign paddles to connected players
 		for (let i = 0; i < maxPlayers; i++) {
 			const playerId = playerIds[i];
 			const angle = (2 * Math.PI / maxPlayers) * i;
@@ -79,7 +77,9 @@ export class Game {
 		}
 
 		return state;
-	} calculateArenaRadius(numPlayers) {
+	}
+
+	calculateArenaRadius(numPlayers) {
 		const playerWidth = 7;
 		const centralAngleDeg = 360 / numPlayers;
 		const halfCentralAngleRad = (centralAngleDeg / 2) * Math.PI / 180;

@@ -8,10 +8,9 @@ import {
 } from './utils/collisionUtils.js';
 
 export const Physics = {
-	games: new Map(), // gameId -> Game instance
+	games: new Map(),
 
 	processTick({ gameId, tick, state, inputs }) {
-		// Initialize game if needed.
 		if (!this.games.has(gameId)) {
 			console.log(`[physics] Initializing new game ${gameId}`);
 			this.games.set(gameId, new Game(gameId, state));
@@ -21,7 +20,6 @@ export const Physics = {
 		const subSteps = 5;
 		const dt = 1 / 60 / subSteps;
 
-		// Process normal inputs (paddle updates) before simulation.
 		for (let i = 0, ilen = inputs.length; i < ilen; i++) {
 			const { playerId, input, type } = inputs[i];
 			if (type === 'paddleUpdate') {
@@ -29,7 +27,6 @@ export const Physics = {
 			}
 		}
 
-		// Build AABB tree from collidable entities (only once per tick).
 		const collidableEntities = em.getEntitiesWithComponents(['position', 'collider']);
 		const tree = new AABBTree();
 		for (let i = 0, len = collidableEntities.length; i < len; i++) {

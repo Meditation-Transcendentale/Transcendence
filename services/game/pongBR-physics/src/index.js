@@ -15,12 +15,12 @@ async function start() {
 	const nc = await connect({ servers: NATS_URL });
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
 
-	const endSub = nc.subscribe('game.ended');
+	const endSub = nc.subscribe('game.pongBR.end');
 	(async () => {
 		for await (const msg of endSub) {
 			const { gameId } = jc.decode(msg.data);
 			endedGames.add(gameId);
-			Physics.removeGame(gameId); // Optional: clean up memory
+			Physics.removeGame(gameId);
 			console.log(`[${SERVICE_NAME}] Stopped processing for game ${gameId}`);
 		}
 	})();
@@ -30,11 +30,9 @@ async function start() {
 		for await (const msg of inputSub) {
 			console.log(`[${SERVICE_NAME}] Received input message`);
 			const { gameId, inputs } = jc.decode(msg.data);
-			console.log(`[${SERVICE_NAME}] Decoded input message:`, inputs);
 			if (endedGames.has(gameId)) continue;
 
 			for (const { playerId, type } of inputs) {
-				console.log(`[${SERVICE_NAME}] Handling immediate input for ${gameId}`, type);
 				Physics.handleImmediateInput({
 					gameId,
 					inputs: [
@@ -44,6 +42,7 @@ async function start() {
 			}
 		}
 	})();
+
 	const sub = nc.subscribe('game.pongBR.tick');
 	for await (const msg of sub) {
 		const data = jc.decode(msg.data);
@@ -53,13 +52,9 @@ async function start() {
 			continue;
 		}
 
-		//console.log(`[${SERVICE_NAME}] Processing tick ${data.tick} for game ${data.gameId}`);
 		const result = Physics.processTick(data);
-		const encoded = jc.encode(result);
-		// console.log(`[physics] Tick ${result.tick} state size: ${encoded.length} bytes`);
 		nc.publish('game.state', jc.encode(result));
 	}
 }
-
 
 start();

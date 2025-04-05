@@ -29,9 +29,7 @@ export class GameManager {
 	handleInput({ type, gameId, playerId, input, tick }) {
 		const game = this.games.get(gameId);
 		if (!game) return;
-		// console.log('Received input:', { type, gameId, playerId, input, tick });
 
-		// Immediate inputs
 		if (type === 'disableWall' || type === 'enableWall' || type === 'newPlayerConnected') {
 			this.nc.publish(`game.pongBR.input`, JSON.stringify({
 				gameId,
@@ -41,19 +39,16 @@ export class GameManager {
 		}
 
 		const currentTick = typeof tick === 'number' ? tick : game.tick + 1;
-		// console.log(currentTick);
 		if (!game.inputs[currentTick]) {
 			game.inputs[currentTick] = [];
 		}
 		game.inputs[currentTick].push({ playerId, type, input });
-		// console.log(`Stored input for tick ${currentTick}`, game.inputs[currentTick]);
 	}
 	handlePhysicsResult({ gameId, state, tick }) {
 		const game = this.games.get(gameId);
 		if (!game) return;
 		game.state = state;
 
-		//console.log(`[game-manager] Received state for game ${gameId} at tick ${tick}`);
 		this.nc.publish(game.options.stateTopic, JSON.stringify({ gameId, state, tick }));
 	}
 
@@ -81,7 +76,7 @@ export class GameManager {
 		const match = this.games.get(gameId);
 		if (match) {
 
-			clearInterval(match.interval);
+			match.status = 'ended'
 			this.nc.publish(`game.${match.type}.end`, JSON.stringify({ gameId }));
 			this.games.delete(gameId);
 			console.log(`[game-manager] Ended match ${gameId}`);
@@ -94,7 +89,10 @@ export class GameManager {
 
 		match.status = 'running';
 		const tickRate = 1000 / (match.options.tickRate || 60);
-		match.interval = setInterval(() => {
+
+		const gameLoop = () => {
+			if (match.status !== 'running') return;
+			const startTime = Date.now();
 			match.tick++;
 			const inputs = match.inputs[match.tick] || [];
 			this.nc.publish(match.options.physicsTopic, JSON.stringify({
@@ -103,10 +101,14 @@ export class GameManager {
 				state: match.state,
 				inputs
 			}));
-		}, tickRate);
 
+			const elapsed = Date.now() - startTime;
+			const delay = Math.max(0, tickRate - elapsed);
+			setTimeout(gameLoop, delay);
+		};
+
+		gameLoop();
 		console.log(`[game-manager] Launched match ${gameId}`);
 		return true;
 	}
-
 }

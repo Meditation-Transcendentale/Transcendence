@@ -60,10 +60,10 @@ fastify.post('/match/:id/launch', async (req, reply) => {
 		return reply.status(400).send({ error: 'Game not found or already launched' });
 	}
 });
+
 async function start() {
 	nc = await connect({ servers: NATS_URL });
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
-
 
 	const __dirname = path.dirname(fileURLToPath(import.meta.url));
 	loadTemplates(path.join(__dirname, './template'));
