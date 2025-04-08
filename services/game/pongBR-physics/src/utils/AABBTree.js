@@ -31,45 +31,54 @@ class AABBTree {
 		}
 
 		const leafAABB = leaf.aabb;
+		const lx = leafAABB.x, ly = leafAABB.y;
+		const lw = leafAABB.width, lh = leafAABB.height;
+		const leafMaxX = lx + lw, leafMaxY = ly + lh;
+
 		let node = this.root;
 
 		while (!node.isLeaf()) {
 			const left = node.left;
 			const right = node.right;
 
-			const l = left.aabb;
-			const leftArea = l.width * l.height;
-			const combinedLeftX = Math.min(l.x, leafAABB.x);
-			const combinedLeftY = Math.min(l.y, leafAABB.y);
-			const combinedLeftMaxX = Math.max(l.x + l.width, leafAABB.x + leafAABB.width);
-			const combinedLeftMaxY = Math.max(l.y + l.height, leafAABB.y + leafAABB.height);
+			const lAABB = left.aabb;
+			const l_x = lAABB.x, l_y = lAABB.y;
+			const l_w = lAABB.width, l_h = lAABB.height;
+			const leftArea = l_w * l_h;
+			const combinedLeftX = (l_x < lx) ? l_x : lx;
+			const combinedLeftY = (l_y < ly) ? l_y : ly;
+			const combinedLeftMaxX = ((l_x + l_w) > leafMaxX) ? (l_x + l_w) : leafMaxX;
+			const combinedLeftMaxY = ((l_y + l_h) > leafMaxY) ? (l_y + l_h) : leafMaxY;
 			const combinedLeftArea = (combinedLeftMaxX - combinedLeftX) * (combinedLeftMaxY - combinedLeftY);
 			const costLeft = combinedLeftArea - leftArea;
 
-			const r = right.aabb;
-			const rightArea = r.width * r.height;
-			const combinedRightX = Math.min(r.x, leafAABB.x);
-			const combinedRightY = Math.min(r.y, leafAABB.y);
-			const combinedRightMaxX = Math.max(r.x + r.width, leafAABB.x + leafAABB.width);
-			const combinedRightMaxY = Math.max(r.y + r.height, leafAABB.y + leafAABB.height);
+			const rAABB = right.aabb;
+			const r_x = rAABB.x, r_y = rAABB.y;
+			const r_w = rAABB.width, r_h = rAABB.height;
+			const rightArea = r_w * r_h;
+			const combinedRightX = (r_x < lx) ? r_x : lx;
+			const combinedRightY = (r_y < ly) ? r_y : ly;
+			const combinedRightMaxX = ((r_x + r_w) > leafMaxX) ? (r_x + r_w) : leafMaxX;
+			const combinedRightMaxY = ((r_y + r_h) > leafMaxY) ? (r_y + r_h) : leafMaxY;
 			const combinedRightArea = (combinedRightMaxX - combinedRightX) * (combinedRightMaxY - combinedRightY);
 			const costRight = combinedRightArea - rightArea;
 
-			node = costLeft < costRight ? left : right;
+			node = (costLeft < costRight) ? left : right;
 		}
 
 		const oldParent = node.parent;
 		const n = node.aabb;
-		const newParentX = Math.min(n.x, leafAABB.x);
-		const newParentY = Math.min(n.y, leafAABB.y);
-		const newParentMaxX = Math.max(n.x + n.width, leafAABB.x + leafAABB.width);
-		const newParentMaxY = Math.max(n.y + n.height, leafAABB.y + leafAABB.height);
+		const newParentX = (n.x < lx) ? n.x : lx;
+		const newParentY = (n.y < ly) ? n.y : ly;
+		const newParentMaxX = ((n.x + n.width) > leafMaxX) ? (n.x + n.width) : leafMaxX;
+		const newParentMaxY = ((n.y + n.height) > leafMaxY) ? (n.y + n.height) : leafMaxY;
 		const newParentAABB = {
 			x: newParentX,
 			y: newParentY,
 			width: newParentMaxX - newParentX,
 			height: newParentMaxY - newParentY
 		};
+
 		const newParent = new AABBNode(null, newParentAABB);
 		newParent.parent = oldParent;
 		newParent.left = node;
@@ -88,46 +97,6 @@ class AABBTree {
 			this.fixUpwardTree(oldParent);
 		}
 	}
-
-	// insertLeaf(leaf) {
-	// 	if (this.root === null) {
-	// 		this.root = leaf;
-	// 		return;
-	// 	}
-	//
-	// 	let node = this.root;
-	// 	while (!node.isLeaf()) {
-	// 		const left = node.left;
-	// 		const right = node.right;
-	//
-	// 		const combinedLeft = this.combineAABB(left.aabb, leaf.aabb);
-	// 		const combinedRight = this.combineAABB(right.aabb, leaf.aabb);
-	//
-	// 		const costLeft = this.aabbArea(combinedLeft) - this.aabbArea(left.aabb);
-	// 		const costRight = this.aabbArea(combinedRight) - this.aabbArea(right.aabb);
-	//
-	// 		node = costLeft < costRight ? left : right;
-	// 	}
-	//
-	// 	const oldParent = node.parent;
-	// 	const newParent = new AABBNode(null, this.combineAABB(node.aabb, leaf.aabb));
-	// 	newParent.parent = oldParent;
-	// 	newParent.left = node;
-	// 	newParent.right = leaf;
-	// 	node.parent = newParent;
-	// 	leaf.parent = newParent;
-	//
-	// 	if (oldParent === null) {
-	// 		this.root = newParent;
-	// 	} else {
-	// 		if (oldParent.left === node) {
-	// 			oldParent.left = newParent;
-	// 		} else {
-	// 			oldParent.right = newParent;
-	// 		}
-	// 		this.fixUpwardTree(oldParent);
-	// 	}
-	// }
 
 	fixUpwardTree(node) {
 		while (node !== null) {

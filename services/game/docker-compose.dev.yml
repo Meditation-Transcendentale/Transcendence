@@ -54,11 +54,14 @@ services:
   pongbr-physics:
     build: ./pongBR-physics
     volumes:
+      # - ./profiler-logs:/app/profiler-logs
       - ./pongBR-physics/src:/app/src
       - ./pongBR-physics/test:/app/test
       - ./pongBR-physics/package.json:/app/package.json
       - ./pongBR-physics/.env.example:/app/.env
-    command: npm run dev
+    command: npm run start
+    ports:
+    - "9229:9229"
     restart: unless-stopped
     environment:
       - SERVICE_NAME=pongBR-physics

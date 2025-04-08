@@ -15,6 +15,7 @@ export class Game {
 			tick: 0,
 			balls: [],
 			paddles: {},
+			pillar: [],
 			score: {},
 			walls: [],
 			mode: this.mode,
@@ -76,6 +77,20 @@ export class Game {
 			state.score[playerId] = 0;
 		}
 
+		const zoneAngleWidth = (2 * Math.PI) / maxPlayers;
+		for (let i = 0; i < maxPlayers; i++) {
+			const angle = (2 * Math.PI / maxPlayers) * i;
+			const leftAngle = angle - zoneAngleWidth / 2;
+			const x = arenaRadius * Math.cos(leftAngle);
+			const y = arenaRadius * Math.sin(leftAngle);
+			const rotation = -(leftAngle + (Math.PI / 2));
+			state.pillar.push({
+				id: i,
+				x,
+				y,
+				rotation,
+			});
+		}
 		return state;
 	}
 

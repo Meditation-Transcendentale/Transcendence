@@ -10,6 +10,7 @@ export class Game {
 		this.entityManager = createEntityManager();
 		this.paddleEntities = {};
 		this.wallEntities = {};
+		this.pillarEntities = {};
 		this.options = initialState.options || {};
 		this.players = this.options.players || [];
 		this.arenaRadius = this.calculateArenaRadius(this.options.maxPlayers || this.players.length || 2);
@@ -76,6 +77,25 @@ export class Game {
 				wallEntity.getComponent('wall').dirty = true;
 			}
 		}
+		const zoneAngleWidth = (2 * Math.PI) / maxPlayers;
+		for (let i = 0; i < maxPlayers; i++) {
+			const angle = (2 * Math.PI / maxPlayers) * i;
+			const leftAngle = angle - zoneAngleWidth / 2;
+			const x = this.arenaRadius * Math.cos(leftAngle);
+			const y = this.arenaRadius * Math.sin(leftAngle);
+			const rotation = -(leftAngle + (Math.PI / 2));
+
+			const pillarEntity = this.entityManager.createEntity();
+			pillarEntity
+				.addComponent('position', Position(x, y))
+				.addComponent('pillar', {
+					id: i,
+					rotation: rotation
+				})
+				.addComponent('collider', BoxCollider(0.2, 0.2, rotation));
+			this.pillarEntities[i] = pillarEntity;
+		}
+
 	}
 
 	update(tick, inputs) {
@@ -155,6 +175,7 @@ export class Game {
 
 		return { balls, walls, paddles };
 	}
+
 	round(n, decimals = 2) {
 		const factor = Math.pow(10, decimals);
 		return Math.round(n * factor) / factor;
