@@ -122,7 +122,7 @@ app.patch('/password', async (req, res) => {
 				return res.code(400).send({ message: 'Token is required' });
 			}
 
-			const response = await axios.post('https://update_user_info-service:3003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
+			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
 			
 			if (response.data.valid == false) {
 				return res.code(401).send({ message: response.data.message });
@@ -144,7 +144,7 @@ twoFARoutes(app);
 
 const start = async () => {
 	try {
-		await app.listen({ port: 3003, host: '0.0.0.0' });
+		await app.listen({ port: 4003, host: '0.0.0.0' });
 	} catch (err) {
 		app.log.error(err);
 		process.exit(1);

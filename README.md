@@ -75,4 +75,19 @@ make dev         # Run dev stack
 make prod        # Run prod stack
 make logs        # Tail all logs
 make test        # Run tests on all services
+
 ```
+
+## Port
+
+```
+API - 3000-3000
+DocApi - 3001-3001
+
+Register Service - 4001-4001
+Auth Service - 4002-4002
+Update User Infos Service - 4003-4003
+```
+
+
+

@@ -1,11 +1,11 @@
-version: '3.8'
+
 
 services:
   register-service:
     build: 
       context: ./services/user/register-service
     ports:
-      - "3001:3001"
+      - "4001:4001"
     volumes:
       - database:/app/database
       - certs:/app/certs:ro
@@ -23,7 +23,7 @@ services:
     build:
       context: ./services/user/auth-service
     ports:
-      - "3002:3002"
+      - "4002:4002"
     volumes:
       - database:/app/database
       - certs:/app/certs:ro
@@ -42,7 +42,7 @@ services:
     build:
       context: ./services/user/update_user_info-service
     ports:
-      - "3003:3003"
+      - "4003:4003"
     volumes:
       - database:/app/database
       - certs:/app/certs:ro
@@ -79,7 +79,7 @@ services:
     build:
       context: ./doc/doc_API
     ports:
-      - "3004:3004"
+      - "3001:3001"
     volumes:
       - certs:/app/certs:ro
     environment:
