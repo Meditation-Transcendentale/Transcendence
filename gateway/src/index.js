@@ -60,7 +60,7 @@ const verifyJWT = async (req, res) => {
 
 	const response = await axios.post('https://auth-service:4002/auth', { token }, {headers: {'x-api-key':process.env.API_GATEWAY_KEY}, httpsAgent: agent });
 	const data = response.data;
-	// console.log(data.user.email);
+
 	if (!data.valid) {
 		return res.code(401).send({ message: 'Invalid token' });
 	}

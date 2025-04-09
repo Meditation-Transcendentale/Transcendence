@@ -52,7 +52,6 @@
                                 "minProperties": 1,
                                 "properties": {
                                     "username": { "type": "string", "example": "user123" },
-                                    "email": { "type": "string", "format": "email", "example": "user@example.com" },
                                     "avatar": { "type": "string", "format": "uri", "example": "https://example.com/avatar.png" }
                                 }
                             }

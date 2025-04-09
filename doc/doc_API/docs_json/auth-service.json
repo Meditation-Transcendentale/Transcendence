@@ -32,17 +32,16 @@
 						"application/json": {
 							"schema": {
 								"type": "object",
-								"required": ["email", "password"],
+								"required": ["username", "password"],
 								"properties": {
-									"email": {
+									"username": {
 										"type": "string",
-										"format": "email",
-										"example": "user@example.com"
+										"example": "user123"
 									},
 									"password": {
 										"type": "string",
 										"format": "password",
-										"example": "password1234"
+										"example": "Password1234"
 									}
 								}
 							}
@@ -107,7 +106,7 @@
 						}
 					},
 					"404": {
-						"description": "User not found from email in DB",
+						"description": "User not found from username in DB",
 						"content": {
 							"application/json": {
 								"schema": {

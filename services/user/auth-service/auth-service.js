@@ -28,8 +28,8 @@ await database.run("PRAGMA journal_mode = WAL;");
 database.configure("busyTimeout", 5000);
 // database.get = promisify(database.get);
 
-const stmt_email = database.prepare(`SELECT * FROM users WHERE email = ?`);
-const getUserByEmail = promisify(stmt_email.get.bind(stmt_email));
+const stmt_username = database.prepare(`SELECT * FROM users WHERE username = ?`);
+const getUserByUsername = promisify(stmt_username.get.bind(stmt_username));
 // const stmt_id = database.prepare(`SELECT * FROM users WHERE id = ?`);
 // const getUserById = promisify(stmt_id.get.bind(stmt_id));
 const insertGoogleUser = promisify(database.run.bind(database));
@@ -39,9 +39,9 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const loginSchema = {
 	body: {
 		type: 'object',
-		required: ['email', 'password'],
+		required: ['username', 'password'],
 		properties: {
-			email: { type: 'string', format: 'email' },
+			username: { type: 'string' },
 			password: { type: 'string', format: 'password' }
 		}
 	}
@@ -60,9 +60,9 @@ app.addHook('onRequest', verifyApiKey);
 app.post('/login', { schema: loginSchema }, async (req, res) => {
 	try {
 
-		const { email, password, token } = req.body;
+		const { username, password, token } = req.body;
 
-		const user = await getUserByEmail(email);
+		const user = await getUserByUsername(username);
 		if (!user) {
 			return res.code(404).send({ message: 'User not found' });
 		}
@@ -120,12 +120,12 @@ app.post('/auth-google', async (req, res) => {
 
 		// console.log(payload);
 
-		const user = await getUserByEmail(email);
+		const user = await getUserByUsername(username);
 		if (!user) {
 			retCode = 201, retMessage = 'Registered and logged in with google';
 			await insertGoogleUser(`INSERT INTO users (google_id, username, email, avatar_path) VALUES (?, ?, ?, ?)`, google_id, username, email, avatar_path);
 		}
-		const finalUser = await getUserByEmail(email);
+		const finalUser = await getUserByUsername(username);
 
 		const accessToken = jwt.sign({ id: finalUser.id, role: finalUser.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 		res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
@@ -138,23 +138,16 @@ app.post('/auth-google', async (req, res) => {
 });
 
 
-// app.get('/registered', async (req, res) => {
-// 	try {
+// app.post('/auth-42', async (req, res) => {
 
-// 		const { email} = req.query;
-// 		const user = await database.get(`SELECT * FROM users WHERE email = ?`, email);
+// 	const { token } = req.body;
 
-// 		if (!user) {
-// 			return res.code(404).send({ message: 'User not found' });
-// 		}
-// 		const accessToken = jwt.sign({id : user.id, role : user.role}, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
-// 		res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
-
-// 		return res.code(200).send({ message: 'Logged in' });
-// 	} catch (error) {
-// 		console.log(error);
-// 		return res.code(500).send({ message: 'Server Error' });
+// 	if (!token) {
+// 		return res.code(400).send({ message: 'No token provided' });
 // 	}
+
+
+
 // });
 
 app.post('/auth', async (req, res) => {

@@ -25,15 +25,14 @@ await database.run("PRAGMA journal_mode = WAL;");
 database.configure("busyTimeout", 5000);
 database.get = promisify(database.get);
 
-const insert = database.prepare(`INSERT INTO users (username, email, password) VALUES (?, ?, ?)`);
+const insert = database.prepare(`INSERT INTO users (username, password) VALUES (?, ?)`);
 
 const registerSchema = {
 	body: {
 		type: 'object',
-		required: ['username', 'email', 'password'],
+		required: ['username', 'password'],
 		properties: {
 			username: { type: 'string' },
-			email: { type: 'string', format: 'email' },
 			password: { type: 'string', format: 'password' }
 		}
 	}
@@ -52,16 +51,20 @@ app.addHook('onRequest', verifyApiKey);
 app.post('/', {schema: registerSchema},  async (req, res) => {
 	try {
 		
-		const { username, email, password} = req.body;
+		const { username, password} = req.body;
 
-		if (!username || !email || !password) {
-			return res.status(400).send({ message: 'Name, email, and password are required' });
+		if (!username || !password) {
+			return res.status(400).send({ message: 'Username and password are required' });
 		}
 
-		const existingEmail = await database.get(`SELECT * FROM users WHERE email = ?`, email);
-		if (existingEmail) {
-			return res.status(409).send({ message: 'Email is already in use' });
+		if (/^[a-zA-Z0-9]{3,20}$/.test(username) === false) {
+			return res.status(400).send({ message: 'Username must be between 3 and 20 characters' });
 		}
+
+		if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password)	=== false) {
+			return res.status(400).send({ message: 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number' });
+		}
+
 		const existingUsername = await database.get(`SELECT * FROM users WHERE username = ?`, username);
 		if (existingUsername) {
 			return res.status(409).send({ message: 'Username is already in use' });
@@ -69,15 +72,14 @@ app.post('/', {schema: registerSchema},  async (req, res) => {
 
 		const hashedPassword = await bcrypt.hash(password, 10);
 
-		await insert.run(username, email, hashedPassword, (err) => {
+		await insert.run(username, hashedPassword, (err) => {
 			if (err) {
 				console.log(err);
 				return res.status(500).send({ message: err.message });
 			}
 		});
 
-	// return res.redirect(`https://localhost:3000/auth/registered?email=${encodeURIComponent(email)}`);
-	return res.status(201).send({ message: 'User registered' });
+		return res.status(201).send({ message: 'User registered' });
 
 	} catch (error) {
 		console.log(error);
@@ -88,7 +90,7 @@ app.post('/', {schema: registerSchema},  async (req, res) => {
 app.setErrorHandler((error, req, res) => {
 	if (error.validation) {
 		const errors = error.validation.map(err => err.message);
-		return res.code(400).send({ message: 'Name, email, and password are required', errors });
+		return res.code(400).send({ message: 'Username and password are required', errors });
 	}
 	console.log(error);
 	return res.code(500).send({ message: 'Server Error' });
@@ -107,6 +109,5 @@ start();
 
 // {
 // 	 "username":"",
-// 	 "email":"@gmail.com",
 // 	 "password":""
 // }

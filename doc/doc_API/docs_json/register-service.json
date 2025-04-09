@@ -3,7 +3,7 @@
 	"info": {
 		"title": "Auth service Documentation",
 		"version": "1.0.0",
-		"description": "Documentation for the Auth Service in the API."
+		"description": "Documentation for the Auth Service in the API. PORT=3001"
 	},
 	"components": {
 		"securitySchemes": {
@@ -32,10 +32,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["username", "email", "password"],
+                                "required": ["username", "password"],
                                 "properties": {
                                     "username": { "type": "string", "example": "user123"},
-									"email": { "type": "string", "format": "email", "example": "user@example.com" },
 									"password": { "type": "string", "format": "password", "example": "password1234" }
                                 }
                             }
@@ -68,7 +67,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Name, email, and password are required"
+                                            "example": "Name, and password are required"
                                         }
                                     }
                                 }
@@ -76,7 +75,7 @@
                         }
                     },
                     "409": {
-                        "description": "Email or Username already exists",
+                        "description": "Username already exists",
                         "content": {
                             "application/json": {
                                 "schema": {

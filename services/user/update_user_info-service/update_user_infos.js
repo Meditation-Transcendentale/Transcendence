@@ -55,14 +55,10 @@ app.patch('/', async (req, res) => {
 		if (!user) {
 			return res.code(404).send({ message: 'User not found' });
 		}
-		const { username, email, avatar,} = req.body;
+		const { username, avatar,} = req.body;
 
 		if (username) {
 			await database.run(`UPDATE users SET username = ? WHERE id = ?`, username, user.id);
-		}
-
-		if (email) {
-			await database.run(`UPDATE users SET email = ? WHERE id = ?`, email, user.id);
 		}
 
 		if (avatar) {
