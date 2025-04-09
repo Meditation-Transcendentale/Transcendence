@@ -80,7 +80,7 @@ const twoFARoutes = (app) => {
 
 			return res.code(200).send({ message: '2FA enabled', qrCode });
 		} catch (error) {
-			// console.log(error);
+			console.log(error);
 			return res.code(500).send({ message: 'Server Error' });
 		}
 	});
@@ -118,7 +118,7 @@ const twoFARoutes = (app) => {
 
 			return res.code(200).send({ message: '2FA verified', valid: true });
 		} catch (error) {
-			// console.log(error);
+			console.log(error);
 			return res.code(500).send({ message: 'Server Error', valid: false  });
 		}
 	});

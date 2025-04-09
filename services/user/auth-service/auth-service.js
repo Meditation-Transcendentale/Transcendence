@@ -93,7 +93,7 @@ app.post('/login', { schema: loginSchema }, async (req, res) => {
 
 		return res.code(200).send({ message: 'Logged in successfully' });
 	} catch (error) {
-		// console.log(error);
+		console.log(error);
 		return res.code(500).send({ message: error.message });
 	}
 });

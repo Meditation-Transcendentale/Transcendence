@@ -76,7 +76,7 @@ app.patch('/', async (req, res) => {
 
 		return res.code(200).send({ message: 'User info updated' });
 	} catch (error) {
-		// console.log(error);
+		console.log(error);
 		return res.code(500).send({ message: 'Server Error' });
 	}
 });
@@ -130,7 +130,7 @@ app.patch('/password', async (req, res) => {
 
 		return res.code(200).send({ message: 'Password updated' });
 	} catch (error) {
-		// console.log(error);
+		console.log(error);
 		return res.code(500).send({ message: 'Server Error' });
 	}
 });
