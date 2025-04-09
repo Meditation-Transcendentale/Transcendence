@@ -34,8 +34,9 @@ class Game {
 		this.canvas = canvas;
 		this.gameId = gameId;
 	}
-
+	
 	async start() {
+		console.log("start");
 		this.engine = new Engine(this.canvas, true);
 		this.scene = new Scene(this.engine);
 
@@ -44,13 +45,14 @@ class Game {
 		new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
 
 		// const arenaMesh = MeshBuilder.CreateDisc("arenaDisc", { radius: calculateArenaRadius(100), tessellation: 128 }, this.scene);
-		const arenaMesh = MeshBuilder.CreateBox("arenaBox", {width: 20, height: 1, depth: 30}, this.scene);
+		const arenaMesh = MeshBuilder.CreateBox("arenaBox", {width: 60, height: 40, depth: 1}, this.scene);
 		const material = new StandardMaterial("arenaMaterial", this.scene);
 		material.diffuseColor.set(0, 0, 0);
 		arenaMesh.rotation.x = Math.PI / 2;
+		arenaMesh.position.y = -0.5;
 		arenaMesh.material = material;
 
-		const ballBaseMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 0.5 }, this.scene);
+		const ballBaseMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 1 }, this.scene);
 
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		//ballMaterial.diffuseColor.set(1, 0, 0);
@@ -70,9 +72,9 @@ class Game {
 		wallBaseMesh.setEnabled(true);
 		wallBaseMesh.setPivotPoint(Vector3.Zero());
 
-		const pillarBaseMesh = MeshBuilder.CreateBox("pillarBase", { width: 0.2, height: 2, depth: 0.2 }, this.scene);
-		pillarBaseMesh.setEnabled(true);
-		pillarBaseMesh.setPivotPoint(Vector3.Zero());
+		// const pillarBaseMesh = MeshBuilder.CreateBox("pillarBase", { width: 0.2, height: 2, depth: 0.2 }, this.scene);
+		// pillarBaseMesh.setEnabled(true);
+		// pillarBaseMesh.setPivotPoint(Vector3.Zero());
 
 		const ballInstanceManager = new ThinInstanceManager(ballBaseMesh, 1000, 50, 100);
 		const paddleInstanceManager = new ThinInstanceManager(paddleBaseMesh, 100, 50, 100);
@@ -111,7 +113,6 @@ class Game {
 		this.stateManager = new StateManager(this.ecs);
 		this.stateManager.update();
 
-		console.log("render");
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
 		});
@@ -136,6 +137,16 @@ class Game {
 		});
 	}
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+	const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
+	if (!canvas) {
+		console.error("Canvas not found");
+		return;
+	}
+	const game = new Game(canvas, "test-game-id");
+	game.start();
+});
 
 // window.addEventListener("DOMContentLoaded", () => {
 // 	const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement | null;

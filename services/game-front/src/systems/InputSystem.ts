@@ -40,10 +40,12 @@ export class InputSystem extends System {
 			let offsetChange = 0;
 			let move = false;
 			if (this.inputManager.isKeyPressed("KeyA")) {
+				console.log("a");
 				offsetChange -= 0.1;
 				move = true;
 			}
 			if (this.inputManager.isKeyPressed("KeyD")) {
+				console.log("d");
 				offsetChange += 0.1;
 				move = true;
 			}
