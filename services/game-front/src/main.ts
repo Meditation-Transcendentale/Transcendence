@@ -9,10 +9,10 @@ import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
 import { getOrCreateUIID } from "./utils/getUIID.js";
-import { calculateArenaRadius, createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
+import { /*calculateArenaRadius,*/ createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
 import { DebugVisualizer } from "./debug/DebugVisualizer.js";
 
-// import "@babylonjs/inspector";
+import "@babylonjs/inspector";
 const API_BASE = "http://10.19.229.249:4000";
 // const API_BASE = "http://localhost:4000";
 export let localPaddleId: any = null;
@@ -27,10 +27,10 @@ class Game {
 	private debugVisualizer!: DebugVisualizer;
 	private gameId;
 	private canvas;
-	private paddleId: any;
+	private paddleId;
 
 
-	constructor(canvas: any, gameId: any) {
+	constructor(canvas, gameId) {
 		this.canvas = canvas;
 		this.gameId = gameId;
 	}
@@ -43,7 +43,8 @@ class Game {
 		this.camera.attachControl(this.canvas, true);
 		new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
 
-		const arenaMesh = MeshBuilder.CreateDisc("arenaDisc", { radius: calculateArenaRadius(100), tessellation: 128 }, this.scene);
+		// const arenaMesh = MeshBuilder.CreateDisc("arenaDisc", { radius: calculateArenaRadius(100), tessellation: 128 }, this.scene);
+		const arenaMesh = MeshBuilder.CreateBox("arenaBox", {width: 20, height: 1, depth: 30}, this.scene);
 		const material = new StandardMaterial("arenaMaterial", this.scene);
 		material.diffuseColor.set(0, 0, 0);
 		arenaMesh.rotation.x = Math.PI / 2;
@@ -76,7 +77,7 @@ class Game {
 		const ballInstanceManager = new ThinInstanceManager(ballBaseMesh, 1000, 50, 100);
 		const paddleInstanceManager = new ThinInstanceManager(paddleBaseMesh, 100, 50, 100);
 		const wallInstanceManager = new ThinInstanceManager(wallBaseMesh, 100, 50, 100);
-		const pillarInstanceManager = new ThinInstanceManager(pillarBaseMesh, 100, 50, 100);
+		// const pillarInstanceManager = new ThinInstanceManager(pillarBaseMesh, 100, 50, 100);
 
 		this.ecs = new ECSManager();
 		const uiid = getOrCreateUIID();
@@ -92,7 +93,7 @@ class Game {
 			ballInstanceManager,
 			paddleInstanceManager,
 			wallInstanceManager,
-			pillarInstanceManager,
+			// pillarInstanceManager,
 			this.camera
 		));
 
@@ -100,7 +101,7 @@ class Game {
 		const config = {
 			numberOfPlayers: 100,
 			numberOfBalls: 200,
-			arenaRadius: calculateArenaRadius(100),
+			// arenaRadius: calculateArenaRadius(100),
 			numPillars: 100,
 			numWalls: 100
 		};
@@ -228,4 +229,3 @@ window.addEventListener("DOMContentLoaded", () => {
 	setStatus("Idle", "black");
 	updateButtons();
 });
-
