@@ -67,9 +67,7 @@ const addFriendRoute = (app) => {
 			}
 
 			const userToken = JSON.parse(userHeader);
-			// const user = await getUserFromId.get(userToken.id);
 			const user = await database.get("SELECT * FROM users WHERE id = ?", userToken.id);
-
 			if (!user) {
 				return res.code(404).send({ message: 'User not found' });
 			}
@@ -208,6 +206,44 @@ const addFriendRoute = (app) => {
 			return res.code(500).send({ message: 'Server Error' });
 		}
 	});
+
+	// app.get('/block-user', async (req, res) => {
+	// 	try {
+	// 		const userHeader = req.headers['user'];
+
+	// 		if (!userHeader) {
+	// 			return res.code(400).send({ message: 'Unauthorized' });
+	// 		}
+
+	// 		const userToken = JSON.parse(userHeader);
+	// 		const user = await database.get("SELECT * FROM users WHERE id = ?", userToken.id);
+	// 		if (!user) {
+	// 			return res.code(404).send({ message: 'User not found' });
+	// 		}
+
+	// 		// const blockedUserId = req.body.blockedUserId;
+	// 		// if (!blockedUserId || !Number.isInteger(blockedUserId) ) {
+	// 		// 	return res.code(400).send({ message: 'Blocked user id is required' });
+	// 		// }
+
+	// 		// const isBlockedUserExisting = await database.get(`SELECT * FROM blocked_users WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)`, user.id, blockedUserId, blockedUserId, user.id);
+	// 		// if (!isBlockedUserExisting) {
+	// 		// 	return res.code(404).send({ message: 'Blocked user not found' });
+	// 		// }
+
+	// 		// await database.run(`DELETE FROM blocked_users WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)`, user.id, blockedUserId, blockedUserId, user.id), (err) => {
+	// 		// 	if (err) {
+	// 		// 		console.log(err);
+	// 		// 		return res.code(500).send({ message: 'Server Error' });
+	// 		// 	}
+	// 		// }
+			
+	// 		return res.code(200).send({ message: 'User unblocked' });
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		return res.code(500).send({ message: 'Server Error' });
+	// 	}
+	// });
 }
 
 export default addFriendRoute;

@@ -165,6 +165,21 @@ app.post('/auth', async (req, res) => {
 	}
 });
 
+app.post('/logout', async (req, res) => {
+	const token = req.cookies.accessToken;
+	if (!token) {
+		return res.code(400).send({ message: 'No token provided' });
+	}
+	try {
+		res.clearCookie('accessToken', { path: '/' });
+		return res.code(200).send({ message: 'Logged out successfully' });
+	} catch (error) {
+		return res.code(500).send({ message: error.message });
+	}
+});
+
+
+
 const start = async () => {
 	try {
 		await app.listen({ port: 4002, host: '0.0.0.0' });
