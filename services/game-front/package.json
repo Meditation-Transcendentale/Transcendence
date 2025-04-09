@@ -1,0 +1,16 @@
+{
+  "name": "transcendence-frontend",
+  "scripts": {
+    "build": "tsc && esbuild src/main.ts --bundle --minify --sourcemap --outfile=dist/app.js --target=es2020",
+    "dev": "vite --host",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+	  "vite": "^4.0.0",
+    "esbuild": "^0.19.11",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^6.37.0"
+  }
+}
