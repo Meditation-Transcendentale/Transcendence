@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node update_user_infos.js friendship.js 2FA.js",
-    "dev": "nodemon login-service.js"
+    "start": "node src/update_user_infos.js src/friendship.js src/2FA.js"
   },
   "keywords": [],
   "author": "",
