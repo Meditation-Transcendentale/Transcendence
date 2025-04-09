@@ -8,13 +8,13 @@ build:
 	docker build -f $(DOCKERFILE) -t $(IMAGE_NAME) .
 
 up:
-	docker-compose -f $(DOCKER_COMPOSE_FILE) up --build -d
+	docker compose -f $(DOCKER_COMPOSE_FILE) up --build -d
 
 down:
-	docker-compose -f $(DOCKER_COMPOSE_FILE) down
+	docker compose -f $(DOCKER_COMPOSE_FILE) down
 
 logs:
-	docker-compose -f $(DOCKER_COMPOSE_FILE) logs -f
+	docker compose -f $(DOCKER_COMPOSE_FILE) logs -f
 
 bash:
 	docker exec -it $(CONTAINER_NAME) bash
@@ -23,6 +23,6 @@ clean:
 	docker system prune -f
 
 rebuild:
-	docker-compose -f $(DOCKER_COMPOSE_FILE) down
-	docker-compose -f $(DOCKER_COMPOSE_FILE) up --build
+	docker compose -f $(DOCKER_COMPOSE_FILE) down
+	docker compose -f $(DOCKER_COMPOSE_FILE) up --build
 

@@ -12,7 +12,7 @@ import { getOrCreateUIID } from "./utils/getUIID.js";
 import { /*calculateArenaRadius,*/ createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
 import { DebugVisualizer } from "./debug/DebugVisualizer.js";
 
-import "@babylonjs/inspector";
+// import "@babylonjs/inspector";
 const API_BASE = "http://10.19.229.249:4000";
 // const API_BASE = "http://localhost:4000";
 export let localPaddleId: any = null;
@@ -27,10 +27,10 @@ class Game {
 	private debugVisualizer!: DebugVisualizer;
 	private gameId;
 	private canvas;
-	private paddleId;
+	private paddleId : any;
 
 
-	constructor(canvas, gameId) {
+	constructor(canvas : any, gameId: any) {
 		this.canvas = canvas;
 		this.gameId = gameId;
 	}
@@ -97,7 +97,8 @@ class Game {
 			this.camera
 		));
 
-		localPaddleId = await this.waitForWelcome();
+		// localPaddleId = await this.waitForWelcome();
+		localPaddleId = 0;
 		const config = {
 			numberOfPlayers: 100,
 			numberOfBalls: 200,
@@ -110,6 +111,7 @@ class Game {
 		this.stateManager = new StateManager(this.ecs);
 		this.stateManager.update();
 
+		console.log("render");
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
 		});
@@ -135,97 +137,97 @@ class Game {
 	}
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-	const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement | null;
-	const createBtn = document.getElementById("createBtn") as HTMLButtonElement | null;
-	const launchBtn = document.getElementById("launchBtn") as HTMLButtonElement | null;
-	const connectBtn = document.getElementById("connectBtn") as HTMLButtonElement | null;
-	const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement | null;
-	const gameIdInput = document.getElementById("gameIdInput") as HTMLInputElement | null;
-	const statusBadge = document.getElementById("statusBadge") as HTMLElement | null;
+// window.addEventListener("DOMContentLoaded", () => {
+// 	const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement | null;
+// 	const createBtn = document.getElementById("createBtn") as HTMLButtonElement | null;
+// 	const launchBtn = document.getElementById("launchBtn") as HTMLButtonElement | null;
+// 	const connectBtn = document.getElementById("connectBtn") as HTMLButtonElement | null;
+// 	const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement | null;
+// 	const gameIdInput = document.getElementById("gameIdInput") as HTMLInputElement | null;
+// 	const statusBadge = document.getElementById("statusBadge") as HTMLElement | null;
 
-	if (!canvas || !createBtn || !launchBtn || !connectBtn || !stopBtn || !gameIdInput || !statusBadge) {
-		throw new Error("One or more required DOM elements not found");
-	}
+// 	if (!canvas || !createBtn || !launchBtn || !connectBtn || !stopBtn || !gameIdInput || !statusBadge) {
+// 		throw new Error("One or more required DOM elements not found");
+// 	}
 
-	let gameId = "";
-	let gameInstance: any = null;
+// 	let gameId = "";
+// 	let gameInstance: any = null;
 
-	function setStatus(status: string, color: string = "black") {
-		statusBadge!.textContent = status;
-		statusBadge!.style.color = color;
-	}
+// 	function setStatus(status: string, color: string = "black") {
+// 		statusBadge!.textContent = status;
+// 		statusBadge!.style.color = color;
+// 	}
 
-	function updateButtons() {
-		const value = gameIdInput!.value.trim();
-		const valid = value.length > 0;
-		launchBtn!.disabled = !valid;
-		connectBtn!.disabled = !valid;
-		stopBtn!.disabled = !valid;
-	}
+// 	function updateButtons() {
+// 		const value = gameIdInput!.value.trim();
+// 		const valid = value.length > 0;
+// 		launchBtn!.disabled = !valid;
+// 		connectBtn!.disabled = !valid;
+// 		stopBtn!.disabled = !valid;
+// 	}
 
-	gameIdInput.addEventListener("input", updateButtons);
+// 	gameIdInput.addEventListener("input", updateButtons);
 
-	createBtn.onclick = async () => {
-		const res = await fetch(`${API_BASE}/match`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ mode: "pongBR" })
-		});
+// 	createBtn.onclick = async () => {
+// 		const res = await fetch(`${API_BASE}/match`, {
+// 			method: "POST",
+// 			headers: { "Content-Type": "application/json" },
+// 			body: JSON.stringify({ mode: "pongBR" })
+// 		});
 
-		if (!res.ok) {
-			const text = await res.text();
-			console.error("Failed to create game:", res.status, text);
-			setStatus("Create Failed", "red");
-			return;
-		}
+// 		if (!res.ok) {
+// 			const text = await res.text();
+// 			console.error("Failed to create game:", res.status, text);
+// 			setStatus("Create Failed", "red");
+// 			return;
+// 		}
 
-		let data;
-		try {
-			data = await res.json();
-		} catch (err) {
-			console.error("Failed to parse JSON response:", err);
-			setStatus("Invalid JSON", "red");
-			return;
-		}
+// 		let data;
+// 		try {
+// 			data = await res.json();
+// 		} catch (err) {
+// 			console.error("Failed to parse JSON response:", err);
+// 			setStatus("Invalid JSON", "red");
+// 			return;
+// 		}
 
-		gameId = data.gameId;
-		gameIdInput.value = gameId;
-		updateButtons();
-		console.log("Game created:", gameId);
-		setStatus("Created", "orange");
-	};
+// 		gameId = data.gameId;
+// 		gameIdInput.value = gameId;
+// 		updateButtons();
+// 		console.log("Game created:", gameId);
+// 		setStatus("Created", "orange");
+// 	};
 
-	launchBtn.onclick = async () => {
-		const id = gameIdInput.value.trim();
-		if (!id) return;
-		gameId = id;
-		await fetch(`${API_BASE}/match/${gameId}/launch`, { method: "POST" });
-		console.log("Game launched:", gameId);
-		setStatus("Launched", "green");
-	};
+// 	launchBtn.onclick = async () => {
+// 		const id = gameIdInput.value.trim();
+// 		if (!id) return;
+// 		gameId = id;
+// 		await fetch(`${API_BASE}/match/${gameId}/launch`, { method: "POST" });
+// 		console.log("Game launched:", gameId);
+// 		setStatus("Launched", "green");
+// 	};
 
-	connectBtn.onclick = () => {
-		const id = gameIdInput.value.trim();
-		if (!id) return;
-		gameId = id;
-		gameInstance = new Game(canvas, gameId);
-		gameInstance.start();
-		setStatus("Connected", "blue");
-	};
+// 	connectBtn.onclick = () => {
+// 		const id = gameIdInput.value.trim();
+// 		if (!id) return;
+// 		gameId = id;
+// 		gameInstance = new Game(canvas, gameId);
+// 		gameInstance.start();
+// 		setStatus("Connected", "blue");
+// 	};
 
-	stopBtn.onclick = async () => {
-		const id = gameIdInput.value.trim();
-		if (!id) return;
-		gameId = id;
-		await fetch(`${API_BASE}/match/${gameId}/end`, { method: "POST" });
-		console.log("Game stopped:", gameId);
-		if (gameInstance?.engine) {
-			gameInstance.engine.stopRenderLoop();
-		}
-		setStatus("Stopped", "gray");
-	};
+// 	stopBtn.onclick = async () => {
+// 		const id = gameIdInput.value.trim();
+// 		if (!id) return;
+// 		gameId = id;
+// 		await fetch(`${API_BASE}/match/${gameId}/end`, { method: "POST" });
+// 		console.log("Game stopped:", gameId);
+// 		if (gameInstance?.engine) {
+// 			gameInstance.engine.stopRenderLoop();
+// 		}
+// 		setStatus("Stopped", "gray");
+// 	};
 
-	setStatus("Idle", "black");
-	updateButtons();
-});
+// 	setStatus("Idle", "black");
+// 	updateButtons();
+// });

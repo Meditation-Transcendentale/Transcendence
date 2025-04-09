@@ -4,8 +4,6 @@ import { Entity } from "../ecs/Entity.js";
 import { ThinInstanceManager } from "../rendering/ThinInstanceManager.js";
 import { BallComponent } from "../components/BallComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
-import { WallComponent } from "../components/WallComponent.js";
-import { PillarComponent } from "../components/PillarComponent.js";
 
 export class ThinInstanceSystem extends System {
 	private ballManager: ThinInstanceManager;
