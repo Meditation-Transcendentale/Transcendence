@@ -57,7 +57,8 @@ services:
       - /home/efayolle/Documents/Transcendence/Transcendence/elk/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
       # - ${42_PATH}elk/filebeat/logs:/usr/share/filebeat/logs
       - /home/efayolle/goinfre/docker/containers:/var/lib/docker/containers:ro
-      - /var/run:/var/run
+      # - /var/run:/var/run
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - logging
     depends_on:
