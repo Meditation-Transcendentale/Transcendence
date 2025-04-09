@@ -6,7 +6,7 @@ import { PaddleComponent } from "../components/PaddleComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputManager } from "../input/InputManager.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
-import { localPaddleId } from "../main.js";
+import { localPaddleId } from "../main.ts";
 
 export class InputSystem extends System {
 	private inputManager: InputManager;

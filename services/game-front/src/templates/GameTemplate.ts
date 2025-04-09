@@ -11,45 +11,60 @@ import { InputComponent } from "../components/InputComponent.js";
 export interface GameTemplateConfig {
 	numberOfPlayers: number;
 	numberOfBalls: number;
-	arenaRadius: number;
+	// arenaRadius: number;
 	numPillars: number;
 	numWalls: number;
 }
 
-export function calculateArenaRadius(numPlayers: number): number {
-	const playerWidth = 7;
-	const centralAngleDeg = 360 / numPlayers;
-	const halfCentralAngleRad = (centralAngleDeg / 2) * Math.PI / 180;
+// export function calculateArenaRadius(numPlayers: number): number {
+// 	const playerWidth = 7;
+// 	const centralAngleDeg = 360 / numPlayers;
+// 	const halfCentralAngleRad = (centralAngleDeg / 2) * Math.PI / 180;
 
-	const radius = playerWidth / (2 * Math.sin(halfCentralAngleRad));
+// 	const radius = playerWidth / (2 * Math.sin(halfCentralAngleRad));
 
-	return radius;
-}
+// 	return radius;
+// }
 
 export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number): void {
-	const zoneAngleWidth = (2 * Math.PI) / config.numberOfPlayers;
 	console.log("localplayerif in template=" + localPaddleId);
 
-	for (let i = 0; i < config.numberOfPlayers; i++) {
-		const angle = (2 * Math.PI / config.numberOfPlayers) * i;
-		const x = (config.arenaRadius) * Math.cos(angle);
-		const z = (config.arenaRadius) * Math.sin(angle);
+	for (let i = 0; i < 2; i++) {
 		const paddleEntity = new Entity();
-		if (i === localPaddleId) {
-			paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0, z), 0, false));
+		const x = i ? -90 : 90;
+		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.5, 0), 0));
+		if (i === localPaddleId)
 			paddleEntity.addComponent(new InputComponent(true));
-		}
-		else {
-			paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0, z)));
+		else
 			paddleEntity.addComponent(new InputComponent());
-		}
 		paddleEntity.addComponent(new TransformComponent(
-			new Vector3(x, 0.5, z),
-			new Vector3(0, -(angle + (Math.PI / 2)), 0),
+			new Vector3(x, 0.5, 0),
+			new Vector3(0, 90, 0),
 			new Vector3(1, 1, 1)
 		));
 		ecs.addEntity(paddleEntity);
 	}
+
+	// for (let i = 0; i < config.numberOfPlayers; i++) {
+	// 	const angle = (2 * Math.PI / config.numberOfPlayers) * i;
+	// 	const x = (config.arenaRadius) * Math.cos(angle);
+	// 	const z = (config.arenaRadius) * Math.sin(angle);
+	// 	const paddleEntity = new Entity();
+	// 	if (i === localPaddleId) {
+	// 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0, z), 0, false));
+	// 		paddleEntity.addComponent(new InputComponent(true));
+	// 	}
+	// 	else {
+	// 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0, z)), 0, false);
+	// 		paddleEntity.addComponent(new InputComponent());
+	// 	}
+	// 	paddleEntity.addComponent(new TransformComponent(
+	// 		new Vector3(x, 0.5, z),
+	// 		new Vector3(0, -(angle + (Math.PI / 2)), 0),
+	// 		new Vector3(1, 1, 1)
+	// 	));
+	// 	ecs.addEntity(paddleEntity);
+	// }
 
 	for (let i = 0; i < config.numberOfBalls; i++) {
 		const pos = new Vector3(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5);
@@ -61,34 +76,48 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 		ecs.addEntity(ballEntity);
 	}
 
-	for (let i = 0; i < config.numPillars; i++) {
-		const angle = (2 * Math.PI / config.numberOfPlayers) * i;
-		const leftAngle = angle - zoneAngleWidth / 2;
-		const rightAngle = angle + zoneAngleWidth / 2;
-		const x = config.arenaRadius * Math.cos(leftAngle);
-		const z = config.arenaRadius * Math.sin(leftAngle);
-		const pillarEntity = new Entity();
-		pillarEntity.addComponent(new PillarComponent(new Vector3(x, 0, z)));
-		pillarEntity.addComponent(new TransformComponent(
-			new Vector3(x, 1, z),
-			new Vector3(0, -(leftAngle + (Math.PI / 2)), 0),
-			new Vector3(1, 1, 1)
-		));
-		ecs.addEntity(pillarEntity);
-	}
+	// for (let i = 0; i < config.numPillars; i++) {
+	// 	const angle = (2 * Math.PI / config.numberOfPlayers) * i;
+	// 	const leftAngle = angle - zoneAngleWidth / 2;
+	// 	const rightAngle = angle + zoneAngleWidth / 2;
+	// 	const x = config.arenaRadius * Math.cos(leftAngle);
+	// 	const z = config.arenaRadius * Math.sin(leftAngle);
+	// 	const pillarEntity = new Entity();
+	// 	pillarEntity.addComponent(new PillarComponent(new Vector3(x, 0, z)));
+	// 	pillarEntity.addComponent(new TransformComponent(
+	// 		new Vector3(x, 1, z),
+	// 		new Vector3(0, -(leftAngle + (Math.PI / 2)), 0),
+	// 		new Vector3(1, 1, 1)
+	// 	));
+	// 	ecs.addEntity(pillarEntity);
+	// }
 
-	for (let i = 0; i < config.numWalls; i++) {
-		const angle = (2 * Math.PI / config.numberOfPlayers) * i;
-		const x = (config.arenaRadius) * Math.cos(angle);
-		const z = (config.arenaRadius) * Math.sin(angle);
+	for (let i = 0; i < 2; i++) {
 		const wallEntity = new Entity();
+		const x = i ? 20 : 0;
+		const z = i ? 0 : 30;
+		const rot_y = i ? 0 : 90;
 		wallEntity.addComponent(new WallComponent(i, new Vector3(x, 1, z)));
 		wallEntity.addComponent(new TransformComponent(
 			new Vector3(x, 1, z),
-			new Vector3(0, -(angle + (Math.PI / 2)), 0),
+			new Vector3(0, rot_y, 0),
 			new Vector3(1, 1, 1)
 		));
-		console.log("wall ", i, x, z, angle);
 		ecs.addEntity(wallEntity);
 	}
+
+	// for (let i = 0; i < config.numWalls; i++) {
+	// 	const angle = (2 * Math.PI / config.numberOfPlayers) * i;
+	// 	const x = (config.arenaRadius) * Math.cos(angle);
+	// 	const z = (config.arenaRadius) * Math.sin(angle);
+	// 	const wallEntity = new Entity();
+	// 	wallEntity.addComponent(new WallComponent(i, new Vector3(x, 1, z)));
+	// 	wallEntity.addComponent(new TransformComponent(
+	// 		new Vector3(x, 1, z),
+	// 		new Vector3(0, -(angle + (Math.PI / 2)), 0),
+	// 		new Vector3(1, 1, 1)
+	// 	));
+	// 	console.log("wall ", i, x, z, angle);
+	// 	ecs.addEntity(wallEntity);
+	// }
 }

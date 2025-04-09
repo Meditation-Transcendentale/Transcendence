@@ -11,7 +11,7 @@ export class ThinInstanceSystem extends System {
 	private ballManager: ThinInstanceManager;
 	private paddleManager: ThinInstanceManager;
 	private wallManager: ThinInstanceManager;
-	private pillarManager: ThinInstanceManager;
+	// private pillarManager: ThinInstanceManager;
 	private camera: Camera;
 	private frameCount: number = 0;
 
@@ -19,30 +19,30 @@ export class ThinInstanceSystem extends System {
 		ballManager: ThinInstanceManager,
 		paddleManager: ThinInstanceManager,
 		wallManager: ThinInstanceManager,
-		pillarManager: ThinInstanceManager,
+		// pillarManager: ThinInstanceManager,
 		camera: Camera
 	) {
 		super();
 		this.ballManager = ballManager;
 		this.paddleManager = paddleManager;
 		this.wallManager = wallManager;
-		this.pillarManager = pillarManager;
+		// this.pillarManager = pillarManager;
 		this.camera = camera;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
 		this.frameCount++;
 		this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
-		this.pillarManager.update(entities, PillarComponent, this.camera, this.frameCount);
+		// this.pillarManager.update(entities, PillarComponent, this.camera, this.frameCount);
 
 		const paddleEntities = entities.filter(e => e.hasComponent(PaddleComponent));
 		const activePaddleEntities = paddleEntities.filter(e => {
 			const paddle = e.getComponent(PaddleComponent);
-			return paddle && !paddle.displayAsWall;
+			return paddle /*&& !paddle.displayAsWall*/;
 		});
 		const wallEntities = paddleEntities.filter(e => {
 			const paddle = e.getComponent(PaddleComponent);
-			return paddle && paddle.displayAsWall;
+			return paddle /*&& paddle.displayAsWall*/;
 		});
 		//console.log("Paddle count:", paddleEntities.length,
 		//	"Active paddles:", activePaddleEntities.length,
