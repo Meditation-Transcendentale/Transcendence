@@ -28,7 +28,9 @@ services:
       - ./user-interface/test:/app/test
       - ./user-interface/package.json:/app/package.json
       - ./user-interface/.env.example:/app/.env
-    command: npm run dev
+    command: npm run start
+    ports:
+    - "9229:9229"
     restart: unless-stopped
     environment:
       - SERVICE_NAME=user-interface
@@ -59,9 +61,9 @@ services:
       - ./pongBR-physics/test:/app/test
       - ./pongBR-physics/package.json:/app/package.json
       - ./pongBR-physics/.env.example:/app/.env
-    command: npm run start
-    ports:
-    - "9229:9229"
+    command: npm run dev
+    # ports:
+    # - "9229:9229"
     restart: unless-stopped
     environment:
       - SERVICE_NAME=pongBR-physics

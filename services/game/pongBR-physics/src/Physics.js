@@ -73,14 +73,14 @@ export const Physics = {
 					if (otherCollider.type === 'box' && other.getComponent('wall')) {
 						const wallPos = other.getComponent('position');
 						const wall = other.getComponent('wall');
-						if (wall.isActive === true) {
-							const { mtv, penetration } = computeCircleBoxMTV(ballPos, ballCollider, wallPos, otherCollider);
-							if (penetration > 0) {
-								weightedMTVx += mtv.x * penetration;
-								weightedMTVy += mtv.y * penetration;
-								totalPenetration += penetration;
-							}
+						// if (wall.isActive === true) {
+						const { mtv, penetration } = computeCircleBoxMTV(ballPos, ballCollider, wallPos, otherCollider);
+						if (penetration > 0) {
+							weightedMTVx += mtv.x * penetration;
+							weightedMTVy += mtv.y * penetration;
+							totalPenetration += penetration;
 						}
+						// }
 					}
 				}
 				if (totalPenetration > 0) {
