@@ -12,6 +12,7 @@ services:
     depends_on:
       - nats
     ports:
+      - "4000:4000"
       - "3001:3001"
 
   user-interface:
@@ -21,6 +22,8 @@ services:
       - NATS_URL=nats://nats:4222
     depends_on:
       - nats
+    ports:
+      - "3000:3000"
 
   pong-physics:
     build: ./pong-physics

@@ -1,29 +1,98 @@
-const Fastify = require('fastify');
-const { connect } = require('nats');
-require('dotenv').config();
+// services/game/game-manager/src/index.js
+import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import { connect, JSONCodec } from 'nats';
+import { loadTemplates, getTemplate } from './templateService.js';
+import { GameManager } from './GameManager.js';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+dotenv.config();
 
-const app = Fastify();
 const SERVICE_NAME = process.env.SERVICE_NAME || 'game-manager';
-const NATS_URL = process.env.NATS_URL || 'nats://nats:4222';
-const PORT = 3001;
+const PORT = process.env.PORT || 4000;
+const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
+const jc = JSONCodec();
 
-// Add a basic health endpoint
-app.get('/health', async () => {
-	return { status: 'ok', service: SERVICE_NAME };
+const fastify = Fastify();
+let nc;
+const gameManager = new GameManager();
+
+await fastify.register(cors, {
+	origin: true // or origin: 'http://localhost:3000' to lock it down
+});
+
+fastify.post('/match', async (request, reply) => {
+	try {
+		const { player = [], options = {}, mode = 'pongBR' } = request.body;
+		console.log('[POST /match] received:', { mode, options });
+		const template = getTemplate(mode);
+		if (!template) {
+			return reply.status(400).send({ error: `No template found for mode: ${mode}` });
+		}
+		const mergedOptions = { ...template, ...options, mode };
+		const gameId = gameManager.createMatch(mergedOptions);
+		return { gameId };
+	} catch (err) {
+		console.error(`[${SERVICE_NAME}] Error creating match`, err);
+		return reply.status(500).send({ error: 'Internal server error' });
+	}
+});
+
+fastify.post('/match/:id/end', async (req, reply) => {
+	const gameId = req.params.id;
+	const match = gameManager.games.get(gameId);
+
+	if (!match) {
+		return reply.status(404).send({ error: 'Match not found' });
+	}
+
+	gameManager.endMatch(gameId);
+	return { success: true, gameId };
+});
+
+fastify.post('/match/:id/launch', async (req, reply) => {
+	const gameId = req.params.id;
+	const launched = gameManager.launchGame(gameId);
+	if (launched) {
+		return { success: true, gameId };
+	} else {
+		return reply.status(400).send({ error: 'Game not found or already launched' });
+	}
 });
 
 async function start() {
-	const nc = await connect({ servers: NATS_URL });
+	nc = await connect({ servers: NATS_URL });
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
 
-	// Subscribe to something, e.g., 'game.ping'
-	const sub = nc.subscribe(`${SERVICE_NAME}.ping`);
-	for await (const msg of sub) {
-		console.log(`[${SERVICE_NAME}] received:`, msg.data.toString());
-	}
+	const __dirname = path.dirname(fileURLToPath(import.meta.url));
+	loadTemplates(path.join(__dirname, './template'));
+	gameManager.nc = nc;
+	gameManager.start();
 
-	await app.listen({ port: PORT, host: '0.0.0.0' });
-	console.log(`[${SERVICE_NAME}] Fastify listening on port ${PORT}`);
+	const sub = nc.subscribe('game.state');
+	(async () => {
+		for await (const msg of sub) {
+			const data = jc.decode(msg.data);
+			gameManager.handlePhysicsResult(data);
+		}
+	})();
+
+	const subInput = nc.subscribe('game.input');
+	(async () => {
+		for await (const msg of subInput) {
+			const data = jc.decode(msg.data);
+			gameManager.handleInput(data);
+		}
+	})();
+
+	fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
+		if (err) {
+			console.error(err);
+			process.exit(1);
+		}
+		console.log(`[${SERVICE_NAME}] HTTP API running at ${address}`);
+	});
 }
 
 start();
