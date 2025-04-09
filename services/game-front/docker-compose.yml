@@ -1,0 +1,29 @@
+# services:
+#   game-front:
+#     build: ./
+#     ports:
+#       - "8080:80"   # Map host port 8080 to container port 80
+#     restart: always
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#
+services:
+  game-front:
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:5173"  # Map host port 8080 to container port 5173
+    volumes:
+      - .:/app
+      - /app/node_modules 
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
