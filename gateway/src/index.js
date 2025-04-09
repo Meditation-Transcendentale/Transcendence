@@ -58,7 +58,7 @@ const verifyJWT = async (req, res) => {
 		rejectUnauthorized: false
 	});
 
-	const response = await axios.post('https://auth-service:3002/auth', { token }, {headers: {'x-api-key':process.env.API_GATEWAY_KEY}, httpsAgent: agent });
+	const response = await axios.post('https://auth-service:4002/auth', { token }, {headers: {'x-api-key':process.env.API_GATEWAY_KEY}, httpsAgent: agent });
 	const data = response.data;
 	// console.log(data.user.email);
 	if (!data.valid) {
@@ -73,7 +73,7 @@ const addApiKeyHeader = (req, headers) => {
 };
 
 app.register(fastifyHttpProxy, {
-	upstream: 'https://register-service:3001',
+	upstream: 'https://register-service:4001',
 	prefix: '/register',
 	http2: false,
 	replyOptions: {
@@ -82,7 +82,7 @@ app.register(fastifyHttpProxy, {
 });
 
 app.register(fastifyHttpProxy, {
-	upstream: 'https://auth-service:3002',
+	upstream: 'https://auth-service:4002',
 	prefix: '/auth',
 	http2: false,
 	replyOptions: {
@@ -91,7 +91,7 @@ app.register(fastifyHttpProxy, {
 });
 
 app.register(fastifyHttpProxy, {
-	upstream: 'https://update_user_info-service:3003',
+	upstream: 'https://update_user_info-service:4003',
 	prefix: '/update-info',
 	http2: false,
 	preHandler: verifyJWT,
@@ -107,7 +107,7 @@ app.register(fastifyHttpProxy, {
 });
 
 app.register(fastifyHttpProxy, {
-	upstream: 'https://docs-service:3004',
+	upstream: 'https://docs-service:3001',
 	prefix: '/docs',
 	http2: false,
 	replyOptions: {

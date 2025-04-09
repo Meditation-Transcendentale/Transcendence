@@ -80,7 +80,7 @@ app.post('/login', { schema: loginSchema }, async (req, res) => {
 				rejectUnauthorized: false
 			});
 
-			const response = await axios.post('https://update_user_info-service:3003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
+			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
 			console.log(response.data);
 			
 			if (response.data.valid == false) {
