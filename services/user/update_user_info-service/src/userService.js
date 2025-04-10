@@ -35,6 +35,13 @@ const userService = {
 		}
 		return friendship;
 	},
+	getFriendshipFromUser1Username: async (userId, friendId) => {
+		const friendship = await database.get("SELECT * FROM friendslist WHERE user_id_1 = ? AND user_id_2 = ?", friendId, userId);
+		if (!friendship) {
+			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIENDSHIP_NOT_FOUND };
+		}
+		return friendship;
+	},
 	acceptFriendRequest: async (friendshipId) => {
 		await database.run(`UPDATE friendslist SET status = 'accepted' WHERE id = ?`, friendshipId);
 	},

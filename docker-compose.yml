@@ -109,7 +109,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ${CERT_PATH}
+      device: ${DATABASE_URL_PATH}
 
 networks:
   transcendence-network:

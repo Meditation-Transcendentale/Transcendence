@@ -341,9 +341,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["requestId"],
+                                "required": ["requestFrom"],
                                 "properties": {
-                                    "requestId": { "type": "integer", "example": "1243" }
+                                    "requestFrom": { "type": "string", "example": "user1234" }
                                 }
                             }
                         }
@@ -433,9 +433,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["requestId"],
+                                "required": ["requestFrom"],
                                 "properties": {
-                                    "requestId": { "type": "integer", "example": "1243" }
+                                    "requestFrom": { "type": "string", "example": "user1243" }
                                 }
                             }
                         }
@@ -610,9 +610,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["friendId"],
+                                "required": ["friendName"],
                                 "properties": {
-                                    "friendId": { "type": "integer", "example": "1243" }
+                                    "friendName": { "type": "string", "example": "user1243" }
                                 }
                             }
                         }

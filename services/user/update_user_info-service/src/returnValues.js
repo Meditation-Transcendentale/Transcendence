@@ -19,6 +19,8 @@ const returnMessages = {
 	FRIEND_REQUEST_ACCEPTED: 'Friend request accepted',
 	FRIEND_REQUEST_DECLINED: 'Friend request declined',
 	AUTO_FRIEND_REQUEST: 'You cannot add yourself as a friend',
+	AUTO_DELETE_REQUEST: 'You cannot delete yourself as a friend',
+	AUTO_DECLINE_REQUEST: 'You cannot decline yourself as a friend',
 	AUTO_BLOCK_REQUEST: 'You cannot block yourself',
 	AUTO_UNBLOCK_REQUEST: 'You cannot unblock yourself',
 	FRIEND_DELETED: 'Friendship deleted',

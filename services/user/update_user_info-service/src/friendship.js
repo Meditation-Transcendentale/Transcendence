@@ -5,7 +5,7 @@ const handleErrors = (fn) => async (req, res) => {
 	try {
 		await fn(req, res);
 	} catch (error) {
-		console.error(error);
+		console.error(`Error in ${req.method} ${req.url}:`, error);
 		const status = error.status || statusCode.INTERNAL_SERVER_ERROR;
 		const message = error.message || returnMessages.INTERNAL_SERVER_ERROR;
 		res.code(status).send({ message });
@@ -35,7 +35,6 @@ async function checkFriendshipStatus(user, friend) {
 	}
 }
 
-
 const addFriendRoute = (app) => {
 	app.post('/add-friend', handleErrors(async (req, res) => {
 
@@ -63,18 +62,21 @@ const addFriendRoute = (app) => {
 		
 		const user = await userService.getUserFromHeader(req);
 
-		const request_id = req.body.requestId;
-
-		if (!request_id || !Number.isInteger(request_id) ) {
-			throw { status : statusCode.BAD_REQUEST, message: 'Request ID is required' };
+		const requestFrom = req.body.requestFrom;
+		if (!requestFrom) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
+		} else if (user.username === requestFrom) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_FRIEND_REQUEST };
 		}
 
-		const isFriendRequestExisting = await userService.getFriendshipFromId(request_id);
-		if (isFriendRequestExisting.status !== 'pending' || isFriendRequestExisting.user_id_2 !== user.id) {
+		const friend = await userService.getUserFromUsername(requestFrom);
+
+		const friendship = await userService.getFriendshipFromUser1Username(user.id, friend.id);
+		if (friendship.status !== 'pending') {
 			throw { status : statusCode.NOT_FOUND, message: returnMessages.FRIEND_REQUEST_NOT_FOUND };
 		}
 
-		await userService.acceptFriendRequest(request_id);
+		await userService.acceptFriendRequest(friendship.id);
 		
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_ACCEPTED });
 	}));
@@ -83,18 +85,21 @@ const addFriendRoute = (app) => {
 
 		const user = await userService.getUserFromHeader(req);
 
-		const request_id = req.body.requestId;
-
-		if (!request_id || !Number.isInteger(request_id) ) {
-			throw { status : statusCode.BAD_REQUEST, message: 'Request ID is required' };
+		const requestFrom = req.body.requestFrom;
+		if (!requestFrom) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
+		} else if (user.username === requestFrom) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_DECLINE_REQUEST };
 		}
 
-		const isFriendRequestExisting = await userService.getFriendshipFromId(request_id);
-		if (isFriendRequestExisting.status !== 'pending' || isFriendRequestExisting.user_id_2 !== user.id) {
+		const friend = await userService.getUserFromUsername(requestFrom);
+
+		const friendship = await userService.getFriendshipFromUser1Username(user.id, friend.id);
+		if (friendship.status !== 'pending') {
 			throw { status : statusCode.NOT_FOUND, message: returnMessages.FRIEND_REQUEST_NOT_FOUND };
 		}
 
-		await userService.declineFriendRequest(request_id);
+		await userService.declineFriendRequest(friendship.id);
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_DECLINED });
 	}));
@@ -112,17 +117,21 @@ const addFriendRoute = (app) => {
 
 		const user = await userService.getUserFromHeader(req);
 
-		const friendId = req.body.friendId;
-		if (!friendId || !Number.isInteger(friendId) ) {
-			throw { status : statusCode.BAD_REQUEST, message: 'Friendship id is required' };
+		const friendName = req.body.friendName;
+		if (!friendName) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
+		} else if (user.username === friendName) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_DELETE_REQUEST };
 		}
 
-		const isFriendshipExisting = await userService.isFriendshipExisting(user.id, friendId);
-		if (!isFriendshipExisting || isFriendshipExisting.status !== 'accepted') {
+		const friend = await userService.getUserFromUsername(friendName);
+
+		const friendship = await userService.isFriendshipExisting(user.id, friend.id);
+		if (!friendship || friendship.status !== 'accepted') {
 			throw { status : statusCode.NOT_FOUND, message: returnMessages.FRIENDSHIP_NOT_FOUND };
 		}
 
-		await userService.deleteFriendship(friendId);
+		await userService.deleteFriendship(friendship.id);
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_DELETED });
 	}));
