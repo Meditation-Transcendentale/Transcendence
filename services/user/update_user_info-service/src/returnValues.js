@@ -31,8 +31,8 @@ const returnMessages = {
 	USER_BLOCKED_YOU: 'This user has blocked you',
 	USER_UNBLOCKED: 'User unblocked successfully',
 	NOT_BLOCKED: 'You cannot unblock a user that you have not blocked',
-	: 'You cannot unblock a user that blocked you',
-
+	ADD_BLOCKED_USER: 'You cannot add a blocked user as a friend',
+	NO_BLOCKED_USERS: 'You have no blocked users',
 
 }
 

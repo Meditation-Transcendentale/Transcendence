@@ -56,11 +56,22 @@ const userService = {
 		await database.run(`DELETE FROM friendslist WHERE id = ?`, friendshipId);
 	},
 	blockUser: async (userId, blockedUserId) => {
-		await database.run(`INSERT INTO friendslist (user_id_1, user_id_2, status) VALUES (?, ?, ?)`, userId, blockedUserId, 'blocked');
+		await database.run(`INSERT INTO blocked_users (blocker_id, blocked_id) VALUES (?, ?)`, userId, blockedUserId);
 	},
-	blockFriend: async (userId, blockedUserId, friendshipId) => {
-		await database.run(`UPDATE friendslist SET user_id_1 = ?, user_id_2 = ? , status = 'blocked' WHERE id = ?`, userId, blockedUserId, friendshipId);
-	}
+	isBlocked: async (userId, blockedUserId) => {
+		const blockedUser = await database.get(`SELECT * FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?`, userId, blockedUserId);
+		return blockedUser;
+	},
+	unblockUser: async (userId, blockedUserId) => {
+		await database.run(`DELETE FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?`, userId, blockedUserId);
+	},
+	getBlockedUsers: async (userId) => {
+		const blockedUsers = await database.all(`SELECT * FROM blocked_users WHERE blocker_id = ?`, userId);
+		if (blockedUsers.length === 0) {
+			throw { status: statusCode.NOT_FOUND, message: returnMessages.NO_BLOCKED_USERS };
+		}
+		return blockedUsers;
+	},
 }
 
 export default userService;

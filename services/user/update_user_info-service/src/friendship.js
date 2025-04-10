@@ -12,7 +12,12 @@ const handleErrors = (fn) => async (req, res) => {
 	}
 };
 
-function checkFriendshipStatus(friendship) {
+async function checkFriendshipStatus(user, friend) {
+
+	const friendship = await userService.isFriendshipExisting(user.id, friend.id);
+	const isBlocked = await userService.isBlocked(user.id, friend.id);
+	const isBlockedBy = await userService.isBlocked(friend.id, user.id);
+
 	if (friendship) {
 		if (friendship.status === 'accepted') {
 			throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_FRIEND };
@@ -20,11 +25,13 @@ function checkFriendshipStatus(friendship) {
 			throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_FRIEND_REQUEST };
 		} else if (friendship.status === 'pending' && friendship.user_id_2 === user.id) {
 			throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_RECEIVED };
-		} else if ( friendship.status === 'blocked' && friendship.user_id_1 === user.id) {
-			throw { status : statusCode.CONFLICT, message: returnMessages.USER_BLOCKED };
-		} else if (friendship.status === 'blocked' && friendship.user_id_2 === user.id) {
-			throw { status : statusCode.CONFLICT, message: returnMessages.USER_BLOCKED_YOU };
 		}
+	}
+	if (isBlocked) {
+		throw { status : statusCode.CONFLICT, message: returnMessages.ADD_BLOCKED_USER };
+	}
+	if (isBlockedBy) {
+		throw { status : statusCode.CONFLICT, message: returnMessages.USER_BLOCKED_YOU };
 	}
 }
 
@@ -45,8 +52,7 @@ const addFriendRoute = (app) => {
 		if (user.id === friend.id) {
 			throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_FRIEND_REQUEST };
 		}
-		const isFriendshipExisting = await userService.isFriendshipExisting(user.id, friend.id);
-		checkFriendshipStatus(isFriendshipExisting);
+		await checkFriendshipStatus(user, friend);
 
 		await userService.addFriendRequest(user.id, friend.id);
 	
@@ -135,19 +141,18 @@ const addFriendRoute = (app) => {
 			throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_BLOCK_REQUEST };
 		}
 
-		const friendship = await userService.isFriendshipExisting(user.id, blockedUser.id);
-		if (!friendship)
-			await userService.blockUser(user.id, blockedUser.id);
-		else if (friendship.status === 'blocked')
+		const isBlocked = await userService.isBlocked(user.id, blockedUser.id);
+		if (isBlocked) {
 			throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_BLOCKED };
-		else
-			await userService.blockFriend(user.id, blockedUser.id, friendship.id);
+		}
+		
+		await userService.blockUser(user.id, blockedUser.id);
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.USER_BLOCKED_SUCCESS });
 
 	}));
 
-	app.patch('/unblock-user', handleErrors(async (req, res) => {
+	app.delete('/unblock-user', handleErrors(async (req, res) => {
 
 		const user = await userService.getUserFromHeader(req);
 
@@ -161,18 +166,22 @@ const addFriendRoute = (app) => {
 			throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_UNBLOCK_REQUEST };
 		}
 
-		const friendship = await userService.isFriendshipExisting(user.id, blockedUser.id);
-		if (!friendship) {
-			throw { status : statusCode.NOT_FOUND, message: returnMessages.FRIENDSHIP_NOT_FOUND };
-		} else if (friendship.status !== 'blocked') {
-			throw { status : statusCode.CONFLICT, message: returnMessages.NOT_BLOCKED };
-		} else if (friendship.user_id_2 === user.id) {
-			throw { status : statusCode.CONFLICT, message: returnMessages. };
-		} else if (friendship.user_id_1 === user.id) {
-			await userService.deleteFriendship(friendship.id);
-
+		const isBlocked = await userService.isBlocked(user.id, blockedUser.id);
+		if (!isBlocked) {
+			throw { status : statusCode.NOT_FOUND, message: returnMessages.NOT_BLOCKED };
+		}
+		await userService.unblockUser(user.id, blockedUser.id);
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.USER_UNBLOCKED });
+	}));
+
+	app.get('/blocked-users', handleErrors(async (req, res) => {
+
+		const user = await userService.getUserFromHeader(req);
+
+		const blockedUsers = await userService.getBlockedUsers(user.id);
+
+		res.code(statusCode.SUCCESS).send({ blockedUsers });
 	}));
 }
 
