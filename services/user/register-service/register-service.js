@@ -4,8 +4,9 @@ import bcrypt from 'bcrypt';
 import { promisify } from 'util';
 import dotenv from 'dotenv';
 import fs from 'fs';
-// import jwt from 'jsonwebtoken';
 import fastifyCookie from 'fastify-cookie';
+
+import handleErrors from '../update_user_infos-service/src/handleErrors.js';
 
 dotenv.config({path: "../../../.env"});
 

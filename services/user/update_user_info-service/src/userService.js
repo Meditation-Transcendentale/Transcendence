@@ -1,5 +1,12 @@
-import database from "./update_user_infos.js";
+// import database from "./update_user_infos.js";
+import sqlite3 from 'sqlite3';
 import { statusCode, returnMessages } from "./returnValues.js";
+
+const Database = sqlite3.Database;
+const database = new Database(process.env.DATABASE_URL, sqlite3.OPEN_READWRITE);
+await database.run("PRAGMA journal_mode = WAL;");
+database.configure("busyTimeout", 5000);
+
 
 const userService = {
 	getUserFromUsername: async (username) => {
