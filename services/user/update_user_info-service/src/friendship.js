@@ -12,10 +12,27 @@ const handleErrors = (fn) => async (req, res) => {
 	}
 };
 
+function checkFriendshipStatus(friendship) {
+	if (friendship) {
+		if (friendship.status === 'accepted') {
+			throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_FRIEND };
+		} else if (friendship.status === 'pending' && friendship.user_id_1 === user.id) {
+			throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_FRIEND_REQUEST };
+		} else if (friendship.status === 'pending' && friendship.user_id_2 === user.id) {
+			throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_RECEIVED };
+		} else if ( friendship.status === 'blocked' && friendship.user_id_1 === user.id) {
+			throw { status : statusCode.CONFLICT, message: returnMessages.USER_BLOCKED };
+		} else if (friendship.status === 'blocked' && friendship.user_id_2 === user.id) {
+			throw { status : statusCode.CONFLICT, message: returnMessages.USER_BLOCKED_YOU };
+		}
+	}
+}
+
+
 const addFriendRoute = (app) => {
 	app.post('/add-friend', handleErrors(async (req, res) => {
 
-		user = await userService.getUserFromHeader(req);
+		const user = await userService.getUserFromHeader(req);
 
 		const addedPlayerUsername = req.body.addedPlayerUsername;
 
@@ -28,6 +45,9 @@ const addFriendRoute = (app) => {
 		if (user.id === friend.id) {
 			throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_FRIEND_REQUEST };
 		}
+		const isFriendshipExisting = await userService.isFriendshipExisting(user.id, friend.id);
+		checkFriendshipStatus(isFriendshipExisting);
+
 		await userService.addFriendRequest(user.id, friend.id);
 	
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_SENT });
@@ -35,7 +55,7 @@ const addFriendRoute = (app) => {
 
 	app.post('/accept-friend', handleErrors(async (req, res) => {
 		
-		user = await userService.getUserFromHeader(req);
+		const user = await userService.getUserFromHeader(req);
 
 		const request_id = req.body.requestId;
 
@@ -55,7 +75,7 @@ const addFriendRoute = (app) => {
 
 	app.delete('/decline-friend', handleErrors(async (req, res) => {
 
-		user = await userService.getUserFromHeader(req);
+		const user = await userService.getUserFromHeader(req);
 
 		const request_id = req.body.requestId;
 
@@ -75,7 +95,7 @@ const addFriendRoute = (app) => {
 
 	app.get('/friend-requests', handleErrors(async (req, res) => {
 
-		user = await userService.getUserFromHeader(req);
+		const user = await userService.getUserFromHeader(req);
 
 		const friendsRequests = await userService.getFriendsRequests(user.id);
 
@@ -84,7 +104,7 @@ const addFriendRoute = (app) => {
 
 	app.delete('/delete-friends', handleErrors(async (req, res) => {
 
-		user = await userService.getUserFromHeader(req);
+		const user = await userService.getUserFromHeader(req);
 
 		const friendId = req.body.friendId;
 		if (!friendId || !Number.isInteger(friendId) ) {
@@ -99,6 +119,32 @@ const addFriendRoute = (app) => {
 		await userService.deleteFriendship(friendId);
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_DELETED });
+	}));
+
+	app.post('/block-user', handleErrors(async (req, res) => {
+		
+		const user = await userService.getUserFromHeader(req);
+
+		const blockedUserName = req.body.blockedUserName;
+		if (!blockedUserName) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
+		}
+
+		const blockedUser = await userService.getUserFromUsername(blockedUserName);
+		if (user.id === blockedUser.id) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_BLOCK_REQUEST };
+		}
+
+		const friendship = await userService.isFriendshipExisting(user.id, blockedUser.id);
+		if (!friendship)
+			await userService.blockUser(user.id, blockedUser.id);
+		else if (friendship.status === 'blocked')
+			throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_BLOCKED };
+		else
+			await userService.blockFriend(user.id, blockedUser.id, friendship.id);
+
+		res.code(statusCode.SUCCESS).send({ message: returnMessages.USER_BLOCKED_SUCCESS });
+
 	}));
 }
 

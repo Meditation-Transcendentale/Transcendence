@@ -54,6 +54,12 @@ const userService = {
 	},
 	deleteFriendship: async (friendshipId) => {
 		await database.run(`DELETE FROM friendslist WHERE id = ?`, friendshipId);
+	},
+	blockUser: async (userId, blockedUserId) => {
+		await database.run(`INSERT INTO friendslist (user_id_1, user_id_2, status) VALUES (?, ?, ?)`, userId, blockedUserId, 'blocked');
+	},
+	blockFriend: async (userId, blockedUserId, friendshipId) => {
+		await database.run(`UPDATE friendslist SET user_id_1 = ?, user_id_2 = ? , status = 'blocked' WHERE id = ?`, userId, blockedUserId, friendshipId);
 	}
 }
 

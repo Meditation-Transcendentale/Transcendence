@@ -19,7 +19,15 @@ const returnMessages = {
 	FRIEND_REQUEST_ACCEPTED: 'Friend request accepted',
 	FRIEND_REQUEST_DECLINED: 'Friend request declined',
 	AUTO_FRIEND_REQUEST: 'You cannot add yourself as a friend',
+	AUTO_BLOCK_REQUEST: 'You cannot block yourself',
 	FRIEND_DELETED: 'Friendship deleted',
+	ALREADY_FRIEND: 'You are already friends with this user',
+	ALREADY_FRIEND_REQUEST: 'Friend request already sent',
+	ALREADY_RECEIVED: 'This user has already sent you a friend request',
+	ALREADY_BLOCKED: 'You have already blocked this user',
+	USER_BLOCKED: 'User blocked',
+	USER_BLOCKED_SUCCESS: 'User blocked successfully',
+	USER_BLOCKED_YOU: 'This user has blocked you',
 
 }
 

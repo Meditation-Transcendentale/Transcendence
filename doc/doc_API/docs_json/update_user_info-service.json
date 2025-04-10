@@ -674,6 +674,111 @@
                 }
             }
         },
+		"/update-info/block-user": {
+			"post": {
+				"summary": "Block user",
+				"tags": ["Update Infos"],
+				"description": "Block a user.",
+				"parameters": [
+					{
+						"name": "user",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "object",
+							"properties": {
+								"id": { "type": "string", "example": "12345" },
+								"role": { "type": "string", "example": "user" },
+								"iat": { "type": "integer", "example": "1700000000" },
+								"exp": { "type": "integer", "example": "1700036000" }
+							}
+						},
+						"description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": ["blockedUserName"],
+								"properties": {
+									"blockedUserName": { "type": "string", 	"example":"user123" }
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "User Blocked Successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "User blocked successfully." }
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "User name is required." }
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "User not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "User not found." }
+									}
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "User already blocked",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "User already blocked." }
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "Server error." }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
         "/update-info/enable-2fa": {
             "post": {
                 "summary": "Enable 2FA for user",
