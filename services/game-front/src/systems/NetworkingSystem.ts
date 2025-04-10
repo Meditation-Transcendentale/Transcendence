@@ -54,11 +54,7 @@ export class NetworkingSystem extends System {
 						}
 						if (entity.hasComponent(PaddleComponent) && entity.hasComponent(TransformComponent)) {
 							const paddle = entity.getComponent(PaddleComponent)!;
-							// console.log(paddle.displayAsWall + " " + paddleState.connected)
-							// paddle.displayAsWall = !paddleState.connected;
 							paddle.offset = paddleState.offset;
-							// if (paddle.displayAsWall == true)
-							// 	paddle.offset = 0;
 							const transform = entity.getComponent(TransformComponent)!;
 							const rotationMatrix = Matrix.RotationYawPitchRoll(
 								transform.rotation.y,

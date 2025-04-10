@@ -40,12 +40,20 @@ class Game {
 		this.engine = new Engine(this.canvas, true);
 		this.scene = new Scene(this.engine);
 
-		this.camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 2, 40, Vector3.Zero(), this.scene);
+		// localPaddleId = await this.waitForWelcome();
+		localPaddleId = 0;
+		const config = {
+			numberOfBalls: 1,
+			arenaSizeX: 50,
+			arenaSizeZ: 20,
+			wallWidth: 1
+		};
+
+		this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 60, Vector3.Zero(), this.scene);
 		this.camera.attachControl(this.canvas, true);
 		new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
 
-		// const arenaMesh = MeshBuilder.CreateDisc("arenaDisc", { radius: calculateArenaRadius(100), tessellation: 128 }, this.scene);
-		const arenaMesh = MeshBuilder.CreateBox("arenaBox", {width: 60, height: 40, depth: 1}, this.scene);
+		const arenaMesh = MeshBuilder.CreateBox("arenaBox", {width: config.arenaSizeX, height: config.arenaSizeZ, depth: 1}, this.scene);
 		const material = new StandardMaterial("arenaMaterial", this.scene);
 		material.diffuseColor.set(0, 0, 0);
 		arenaMesh.rotation.x = Math.PI / 2;
@@ -61,25 +69,20 @@ class Game {
 		ballBaseMesh.setPivotPoint(Vector3.Zero());
 		ballBaseMesh.material = ballMaterial;
 
-		const paddleBaseMesh = MeshBuilder.CreateBox("paddleBase", { width: 1, height: 0.2, depth: 0.1 }, this.scene);
+		const paddleBaseMesh = MeshBuilder.CreateBox("paddleBase", { width: 3, height: 0.4, depth: 0.4 }, this.scene);
 		paddleBaseMesh.setEnabled(true);
 		paddleBaseMesh.setPivotPoint(Vector3.Zero());
 
-		const wallBaseMesh = MeshBuilder.CreateBox("wallBase", { width: 7, height: 2, depth: 0.5 }, this.scene);
+		const wallBaseMesh = MeshBuilder.CreateBox("wallBase", { width: config.wallWidth, height: 1, depth: 20 }, this.scene);
 		const wallMaterial = new StandardMaterial("arenaMaterial", this.scene);
 		wallMaterial.diffuseColor.set(1, 0, 0);
 		wallBaseMesh.material = wallMaterial;
 		wallBaseMesh.setEnabled(true);
 		wallBaseMesh.setPivotPoint(Vector3.Zero());
 
-		// const pillarBaseMesh = MeshBuilder.CreateBox("pillarBase", { width: 0.2, height: 2, depth: 0.2 }, this.scene);
-		// pillarBaseMesh.setEnabled(true);
-		// pillarBaseMesh.setPivotPoint(Vector3.Zero());
-
 		const ballInstanceManager = new ThinInstanceManager(ballBaseMesh, 1000, 50, 100);
 		const paddleInstanceManager = new ThinInstanceManager(paddleBaseMesh, 100, 50, 100);
 		const wallInstanceManager = new ThinInstanceManager(wallBaseMesh, 100, 50, 100);
-		// const pillarInstanceManager = new ThinInstanceManager(pillarBaseMesh, 100, 50, 100);
 
 		this.ecs = new ECSManager();
 		const uiid = getOrCreateUIID();
@@ -95,21 +98,12 @@ class Game {
 			ballInstanceManager,
 			paddleInstanceManager,
 			wallInstanceManager,
-			// pillarInstanceManager,
 			this.camera
 		));
 
-		// localPaddleId = await this.waitForWelcome();
-		localPaddleId = 0;
-		const config = {
-			numberOfPlayers: 100,
-			numberOfBalls: 200,
-			// arenaRadius: calculateArenaRadius(100),
-			numPillars: 100,
-			numWalls: 100
-		};
+		
 
-		createGameTemplate(this.ecs, config, this.paddleId);
+		createGameTemplate(this.ecs, config, localPaddleId);
 		this.stateManager = new StateManager(this.ecs);
 		this.stateManager.update();
 
