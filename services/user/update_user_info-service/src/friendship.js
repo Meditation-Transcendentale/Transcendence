@@ -146,6 +146,34 @@ const addFriendRoute = (app) => {
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.USER_BLOCKED_SUCCESS });
 
 	}));
+
+	app.patch('/unblock-user', handleErrors(async (req, res) => {
+
+		const user = await userService.getUserFromHeader(req);
+
+		const blockedUserName = req.body.blockedUserName;
+		if (!blockedUserName) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
+		}
+
+		const blockedUser = await userService.getUserFromUsername(blockedUserName);
+		if (user.id === blockedUser.id) {
+			throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_UNBLOCK_REQUEST };
+		}
+
+		const friendship = await userService.isFriendshipExisting(user.id, blockedUser.id);
+		if (!friendship) {
+			throw { status : statusCode.NOT_FOUND, message: returnMessages.FRIENDSHIP_NOT_FOUND };
+		} else if (friendship.status !== 'blocked') {
+			throw { status : statusCode.CONFLICT, message: returnMessages.NOT_BLOCKED };
+		} else if (friendship.user_id_2 === user.id) {
+			throw { status : statusCode.CONFLICT, message: returnMessages. };
+		} else if (friendship.user_id_1 === user.id) {
+			await userService.deleteFriendship(friendship.id);
+
+
+		res.code(statusCode.SUCCESS).send({ message: returnMessages.USER_UNBLOCKED });
+	}));
 }
 
 export default addFriendRoute;
