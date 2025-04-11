@@ -1,4 +1,5 @@
 import { Engine, Scene, Vector3, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Mesh } from "@babylonjs/core";
+import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -9,7 +10,7 @@ import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
 import { getOrCreateUIID } from "./utils/getUIID.js";
-import { /*calculateArenaRadius,*/ createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
+import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
 import { DebugVisualizer } from "./debug/DebugVisualizer.js";
 
 // import "@babylonjs/inspector";
@@ -29,7 +30,6 @@ class Game {
 	private canvas;
 	private paddleId : any;
 
-
 	constructor(canvas : any, gameId: any) {
 		this.canvas = canvas;
 		this.gameId = gameId;
@@ -44,10 +44,39 @@ class Game {
 		localPaddleId = 0;
 		const config = {
 			numberOfBalls: 1,
-			arenaSizeX: 50,
+			arenaSizeX: 30,
 			arenaSizeZ: 20,
 			wallWidth: 1
 		};
+
+		const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+		const scoreTitle = new TextBlock();
+		scoreTitle.text = "Score";
+		scoreTitle.color = "white";
+		scoreTitle.fontSize = 34;
+		scoreTitle.left = "0px";
+		scoreTitle.top = "-300px";
+		advancedTexture.addControl(scoreTitle);
+
+		const scorePipe = new TextBlock();
+		scorePipe.text = "|";
+		scorePipe.color = "white";
+		scorePipe.fontSize = 24;
+		scorePipe.left = "0px";
+		scorePipe.top = "-250px";
+		advancedTexture.addControl(scorePipe);
+
+		let scoreP1 = 0;
+		let scoreP2 = 0;
+
+		const score = new TextBlock();
+		score.text = scoreP1 + " | " + scoreP2;
+		score.color = "white";
+		score.fontSize = 24;
+		score.left = "0px";
+		score.top = "-250px";
+		advancedTexture.addControl(score);
 
 		this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 60, Vector3.Zero(), this.scene);
 		this.camera.attachControl(this.canvas, true);
@@ -101,8 +130,6 @@ class Game {
 			this.camera
 		));
 
-		
-
 		createGameTemplate(this.ecs, config, localPaddleId);
 		this.stateManager = new StateManager(this.ecs);
 		this.stateManager.update();
@@ -124,7 +151,6 @@ class Game {
 						type: "registerGame",
 						data: { gameId: this.gameId }
 					}));
-
 					resolve(data.paddleId);
 				}
 			});
