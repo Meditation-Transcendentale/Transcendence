@@ -1,4 +1,5 @@
 // services/game/game-manager/src/GameManager.js
+import { decodeStateUpdate } from './binary.js';
 import { Game } from './Game.js';
 import { JSONCodec } from 'nats';
 const jc = JSONCodec();
@@ -12,18 +13,18 @@ export class GameManager {
 	start() {
 		console.log('[game-manager] Ready to manage games');
 
-		this.nc.subscribe('game.state', {
-			callback: (err, msg) => {
-				if (err) return console.error('NATS error:', err);
-				try {
-					const data = jc.decode(msg.data);
-					this.handlePhysicsResult(data);
-				} catch (err) {
-					console.error('[game-manager] Failed to decode message:', err);
-					console.error('Raw message:', msg.data.toString());
-				}
-			}
-		});
+		// this.nc.subscribe('game.state', {
+		// 	callback: (err, msg) => {
+		// 		if (err) return console.error('NATS error:', err);
+		// 		try {
+		// 			// const data = jc.decode(msg.data);
+		// 			this.handlePhysicsResult(msg);
+		// 		} catch (err) {
+		// 			console.error('[game-manager] Failed to decode message:', err);
+		// 			console.error('Raw message:', msg.data.toString());
+		// 		}
+		// 	}
+		// });
 	}
 
 	handleInput({ type, gameId, playerId, input, tick }) {
@@ -44,12 +45,13 @@ export class GameManager {
 		}
 		game.inputs[currentTick].push({ playerId, type, input });
 	}
-	handlePhysicsResult({ gameId, state, tick }) {
-		const game = this.games.get(gameId);
+	handlePhysicsResult(buffer) {
+		const state = decodeStateUpdate(buffer);
+		const game = this.games.get(state.gameId);
 		if (!game) return;
 		game.state = state;
 
-		this.nc.publish(game.options.stateTopic, JSON.stringify({ gameId, state, tick }));
+		this.nc.publish(game.options.stateTopic, buffer);
 	}
 
 	createMatch(options = {}) {

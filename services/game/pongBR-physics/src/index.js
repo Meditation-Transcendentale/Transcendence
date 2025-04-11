@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { Physics } from './Physics.js';
+import { decodeStateUpdate, encodeStateUpdate } from './binary.js';
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'pongBR-physics';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
@@ -53,7 +54,9 @@ async function start() {
 		}
 
 		const result = Physics.processTick(data);
-		nc.publish('game.state', jc.encode(result));
+		const buffer = encodeStateUpdate(result.gameId, result.tick, result.balls, result.paddles);
+		const temp = decodeStateUpdate(buffer);
+		nc.publish('game.state', buffer);
 	}
 }
 
