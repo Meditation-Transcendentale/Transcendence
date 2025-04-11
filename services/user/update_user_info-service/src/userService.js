@@ -1,90 +1,97 @@
-// import database from "./update_user_infos.js";
-import sqlite3 from 'sqlite3';
-import { promisify } from 'util';
+import Database from 'better-sqlite3';
 import { statusCode, returnMessages } from "./returnValues.js";
 
-const Database = sqlite3.Database;
-const database = new Database(process.env.DATABASE_URL, sqlite3.OPEN_READWRITE);
-await database.run("PRAGMA journal_mode = WAL;");
-database.configure("busyTimeout", 5000);
-database.get = promisify(database.get);
-database.run = promisify(database.run);
-database.all = promisify(database.all);
+const database = new Database(process.env.DATABASE_URL, {fileMustExist: true });
+database.pragma("journal_mode=WAL");
 
+const getUserByUsernameStmt = database.prepare("SELECT * FROM users WHERE username = ?");
+const getUserByIdStmt = database.prepare("SELECT * FROM users WHERE id = ?");
+const addFriendRequestStmt = database.prepare("INSERT INTO friendslist (user_id_1, user_id_2) VALUES (?, ?)");
+const getFriendshipByIdStmt = database.prepare("SELECT * FROM friendslist WHERE id = ?");
+const getFriendshipByUser1UsernameStmt = database.prepare("SELECT * FROM friendslist WHERE user_id_1 = ? AND user_id_2 = ?");
+const acceptFriendRequestStmt = database.prepare("UPDATE friendslist SET status = 'accepted' WHERE id = ?");
+const declineFriendRequestStmt = database.prepare("DELETE FROM friendslist WHERE id = ?");
+const getFriendsRequestsStmt = database.prepare("SELECT * FROM friendslist WHERE user_id_2 = ?");
+const isFriendshipExistingStmt = database.prepare("SELECT * FROM friendslist WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)");
+const deleteFriendshipStmt = database.prepare("DELETE FROM friendslist WHERE id = ?");
+const blockUserStmt = database.prepare("INSERT INTO blocked_users (blocker_id, blocked_id) VALUES (?, ?)");
+const isBlockedStmt = database.prepare("SELECT * FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?");
+const unblockUserStmt = database.prepare("DELETE FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?");
+const getBlockedUsersStmt = database.prepare("SELECT * FROM blocked_users WHERE blocker_id = ?");
 
 const userService = {
-	getUserFromUsername: async (username) => {
-		const user = await database.get("SELECT * FROM users WHERE username = ?", username);
+	getUserFromUsername: (username) => {
+		const user = getUserByUsernameStmt.get(username);
 		if (!user) {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
 		}
 		return user;
 	},
-	getUserFromId: async (id) => {
-		const user = await database.get("SELECT * FROM users WHERE id = ?", id);
+	getUserFromId: (id) => {
+		const user = getUserByIdStmt.get(id);
 		if (!user) {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
 		}
 		return user;
 	},
-	getUserFromHeader: async (req) => {
+	getUserFromHeader: (req) => {
 		const userHeader = req.headers['user'];
 		if (!userHeader) {
 			throw { status : statusCode.BAD_REQUEST, message: returnMessages.UNAUTHORIZED };
 		}
 		const userToken = JSON.parse(userHeader);
-		const user = await userService.getUserFromId(userToken.id);
+		const user = userService.getUserFromId(userToken.id);
 		return user;
 	},
-	addFriendRequest: async (userId, friendId) => {
-		await database.run(`INSERT INTO friendslist (user_id_1, user_id_2) VALUES (?, ?)`, userId, friendId);
+	addFriendRequest: (userId, friendId) => {
+		addFriendRequestStmt.run(userId, friendId);
 	},
-	getFriendshipFromId: async (friendshipId) => {
-		const friendship = await database.get("SELECT * FROM friendslist WHERE id = ?", friendshipId);
+	getFriendshipFromId: (friendshipId) => {
+		const friendship = getFriendshipByIdStmt.get(friendshipId);
 		if (!friendship) {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIENDSHIP_NOT_FOUND };
 		}
 		return friendship;
 	},
-	getFriendshipFromUser1Username: async (userId, friendId) => {
-		const friendship = await database.get("SELECT * FROM friendslist WHERE user_id_1 = ? AND user_id_2 = ?", friendId, userId);
+	getFriendshipFromUser1Username: (userId, friendId) => {
+		const friendship = getFriendshipByUser1UsernameStmt.get(friendId, userId);
 		if (!friendship) {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIENDSHIP_NOT_FOUND };
 		}
 		return friendship;
 	},
-	acceptFriendRequest: async (friendshipId) => {
-		await database.run(`UPDATE friendslist SET status = 'accepted' WHERE id = ?`, friendshipId);
+	acceptFriendRequest: (friendshipId) => {
+		acceptFriendRequestStmt.run(friendshipId);
 	},
-	declineFriendRequest: async (friendshipId) => {
-		await database.run(`DELETE FROM friendslist WHERE id = ?`, friendshipId);
+	declineFriendRequest: (friendshipId) => {
+		declineFriendRequestStmt.run(friendshipId);
 	},
-	getFriendsRequests: async (userId) => {
-		const friendRequestsList = await database.all("SELECT * FROM friendslist WHERE user_id_2 = ?", userId);
+	getFriendsRequests: (userId) => {
+		const friendRequestsList = getFriendsRequestsStmt.all(userId);
 		if (friendRequestsList.length === 0) {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIEND_REQUEST_NOT_FOUND };
 		}
 		return friendRequestsList;
 	},
-	isFriendshipExisting: async (userId1, userId2) => {
-		const friendship = await database.get(`SELECT * FROM friendslist WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)`, userId1, userId2, userId2, userId1);
+	isFriendshipExisting: (userId1, userId2) => {
+		const friendship = isFriendshipExistingStmt.get(userId1, userId2, userId2, userId1);
 		return friendship;
 	},
-	deleteFriendship: async (friendshipId) => {
-		await database.run(`DELETE FROM friendslist WHERE id = ?`, friendshipId);
+	deleteFriendship: (friendshipId) => {
+		deleteFriendshipStmt.run(friendshipId);
 	},
-	blockUser: async (userId, blockedUserId) => {
-		await database.run(`INSERT INTO blocked_users (blocker_id, blocked_id) VALUES (?, ?)`, userId, blockedUserId);
+	blockUser: (userId, blockedUserId) => {
+		blockUserStmt.run(userId, blockedUserId);
 	},
-	isBlocked: async (userId, blockedUserId) => {
-		const blockedUser = await database.get(`SELECT * FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?`, userId, blockedUserId);
+	isBlocked: (userId, blockedUserId) => {
+		const blockedUser = isBlockedStmt.get(userId, blockedUserId);
 		return blockedUser;
 	},
-	unblockUser: async (userId, blockedUserId) => {
-		await database.run(`DELETE FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?`, userId, blockedUserId);
+	unblockUser: (userId, blockedUserId) => {
+		unblockUserStmt.run(userId, blockedUserId);
 	},
-	getBlockedUsers: async (userId) => {
-		const blockedUsers = await database.all(`SELECT * FROM blocked_users WHERE blocker_id = ?`, userId);
+	getBlockedUsers: (userId) => {
+		const blockedUsers = getBlockedUsersStmt.all(userId);
 		if (blockedUsers.length === 0) {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.NO_BLOCKED_USERS };
 		}

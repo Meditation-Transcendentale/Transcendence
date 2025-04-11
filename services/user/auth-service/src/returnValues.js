@@ -10,13 +10,15 @@ const statusCode = {
 
 const returnMessages = {
 
-	USERNAME_ALREADY_USED: 'Username is already in use',
-	USERNAME_PASSWORD_REQUIRED: 'Username and password are required',
-	USERNAME_INVALID: 'Username must be between 3 and 20 characters',
-	PASSWORD_INVALID: 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number',
-	USER_CREATED: 'User registered successfully',
-	INTERNAL_SERVER_ERROR: 'Internal server error',
+	BAD_PASSWORD: 'Invalid password',
+	MISSING_TOKEN: 'Token is required',
+	LOGGED_IN: 'Logged in successfully',
+	GOOGLE_LOGGED_IN: 'Logged in with Google successfully',
+	GOOGLE_CREATED_LOGGED_IN: 'Registered and logged in with Google successfully',
+	LOGGED_OUT: 'Logged out successfully',
 	UNAUTHORIZED: 'Unauthorized',
+	INTERNAL_SERVER_ERROR: 'Internal server error',
+	USER_NOT_FOUND: 'User not found'
 
 }
 

@@ -3,14 +3,16 @@ import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import fastifyCookie from 'fastify-cookie';
-import sqlite3 from 'sqlite3';
-import { promisify } from 'util';
 import bcrypt from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
 import https from 'https';
 import axios from 'axios';
 
-dotenv.config({ path: "../../../.env" });
+import { statusCode, returnMessages } from "./returnValues.js";
+import handleErrors from "./handleErrors.js";
+import userService from "./userService.js";
+
+dotenv.config({ path: "../../../../.env" });
 
 const app = fastify({
 	logger: true,
@@ -21,18 +23,6 @@ const app = fastify({
 });
 
 app.register(fastifyCookie);
-
-const Database = sqlite3.Database;
-const database = new Database(process.env.DATABASE_URL, sqlite3.OPEN_READWRITE);
-await database.run("PRAGMA journal_mode = WAL;");
-database.configure("busyTimeout", 5000);
-// database.get = promisify(database.get);
-
-const stmt_username = database.prepare(`SELECT * FROM users WHERE username = ?`);
-const getUserByUsername = promisify(stmt_username.get.bind(stmt_username));
-// const stmt_id = database.prepare(`SELECT * FROM users WHERE id = ?`);
-// const getUserById = promisify(stmt_id.get.bind(stmt_id));
-const insertGoogleUser = promisify(database.run.bind(database));
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -50,111 +40,87 @@ const loginSchema = {
 const verifyApiKey = (req, res, done) => {
 	const apiKey = req.headers['x-api-key'];
 	if (apiKey !== process.env.API_GATEWAY_KEY) {
-		return res.code(401).send({ message: 'Unauthorized' });
+		return res.code(statusCode.UNAUTHORIZED).send({ message: returnMessages.UNAUTHORIZED });
 	}
 	done();
 }
 
 app.addHook('onRequest', verifyApiKey);
 
-app.post('/login', { schema: loginSchema }, async (req, res) => {
-	try {
+app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 
-		const { username, password, token } = req.body;
+	const { username, password, token } = req.body;
 
-		const user = await getUserByUsername(username);
-		if (!user) {
-			return res.code(404).send({ message: 'User not found' });
-		}
-		const isPasswordValid = await bcrypt.compare(password, user.password);
-		if (!isPasswordValid) {
-			return res.code(401).send({ message: 'Invalid password' });
-		}
-
-		if (user.two_fa_enabled == true) {
-			if (!token) {
-				return res.code(400).send({ message: 'Token is required' });
-			}
-
-			const agent = new https.Agent({
-				rejectUnauthorized: false
-			});
-
-			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
-			console.log(response.data);
-			
-			if (response.data.valid == false) {
-				return res.code(401).send({ message: response.data.message });
-			}
-		}
-
-		const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
-		res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
-
-		return res.code(200).send({ message: 'Logged in successfully' });
-	} catch (error) {
-		console.log(error);
-		return res.code(500).send({ message: error.message });
+	const user = userService.getUserFromUsername(username);
+		
+	const isPasswordValid = await bcrypt.compare(password, user.password);
+	if (!isPasswordValid) {
+		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.BAD_PASSWORD };
 	}
-});
+
+	if (user.two_fa_enabled == true) {
+		if (!token) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
+		}
+
+		const agent = new https.Agent({
+			rejectUnauthorized: false
+		});
+
+		const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
+		console.log(response.data);
+		
+		if (response.data.valid == false) {
+			throw { status: statusCode.UNAUTHORIZED, message: response.data.message };
+		}
+	}
+
+	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
+
+	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_IN });
+}));
 
 
-app.post('/auth-google', async (req, res) => {
+app.post('/auth-google', handleErrors(async (req, res) => {
 	
 	const { token } = req.body;
-	const retCode = 200;
-	const retMessage = 'Logged in with google';
+	let retCode = statusCode.SUCCESS, retMessage = returnMessages.LOGGED_IN;
+
 	if (!token) {
-		return res.code(400).send({ message: 'No token provided' });
+		throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
 	}
 
-	try {
-		const ticket = await googleClient.verifyIdToken({
-			idToken: token,
-			audience: process.env.GOOGLE_CLIENT_ID
-		});
+	const ticket = await googleClient.verifyIdToken({
+		idToken: token,
+		audience: process.env.GOOGLE_CLIENT_ID
+	});
 	
-		const payload = ticket.getPayload();
+	const payload = ticket.getPayload();
 
-		const { sub: google_id, email, name: username, picture: avatar_path } = payload;
+	const { sub: google_id, email, name: username, picture: avatar_path } = payload;
 
-		// console.log(payload);
-
-		const user = await getUserByUsername(username);
-		if (!user) {
-			retCode = 201, retMessage = 'Registered and logged in with google';
-			await insertGoogleUser(`INSERT INTO users (google_id, username, email, avatar_path) VALUES (?, ?, ?, ?)`, google_id, username, email, avatar_path);
-		}
-		const finalUser = await getUserByUsername(username);
-
-		const accessToken = jwt.sign({ id: finalUser.id, role: finalUser.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
-		res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
-
-		return res.code(retCode).send({ message: retMessage });
-	} catch (error) {
-		console.log(error);
-		return res.code(500).send({ message: error.message });
+		
+	let user = userService.getUserFromUsername(username);
+	if (!user) {
+		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
+		userService.addGoogleUser(google_id, username, email, avatar_path);
+		user = userService.getUserFromUsername(username);
 	}
-});
 
+	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
 
-// app.post('/auth-42', async (req, res) => {
+	res.code(retCode).send({ message: retMessage});
 
-// 	const { token } = req.body;
-
-// 	if (!token) {
-// 		return res.code(400).send({ message: 'No token provided' });
-// 	}
-
-
-
-// });
+}));
 
 app.post('/auth', async (req, res) => {
 
 	const { token } = req.body;
 
 	if (!token) {
+
 		return res.code(400).send({ valid: false, message: 'No token provided' });
 	}
 	try {
@@ -165,18 +131,18 @@ app.post('/auth', async (req, res) => {
 	}
 });
 
-app.post('/logout', async (req, res) => {
+app.post('/logout', handleErrors(async (req, res) => {
+
 	const token = req.cookies.accessToken;
 	if (!token) {
-		return res.code(400).send({ message: 'No token provided' });
+		throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
 	}
-	try {
-		res.clearCookie('accessToken', { path: '/' });
-		return res.code(200).send({ message: 'Logged out successfully' });
-	} catch (error) {
-		return res.code(500).send({ message: error.message });
-	}
-});
+
+	res.clearCookie('accessToken', { path: '/' });
+	
+	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_OUT });
+
+}));
 
 
 
