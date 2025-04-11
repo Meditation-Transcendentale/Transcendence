@@ -9,7 +9,7 @@ import axios from "axios";
 import https from "https";
 import { twoFARoutes } from "./2FA.js";
 
-dotenv.config({ path: "../../../.env" });
+dotenv.config({ path: "../../../../.env" });
 
 const app = Fastify({
 	logger: true,

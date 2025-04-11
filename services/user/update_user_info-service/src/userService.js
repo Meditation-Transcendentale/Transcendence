@@ -1,11 +1,15 @@
 // import database from "./update_user_infos.js";
 import sqlite3 from 'sqlite3';
+import { promisify } from 'util';
 import { statusCode, returnMessages } from "./returnValues.js";
 
 const Database = sqlite3.Database;
 const database = new Database(process.env.DATABASE_URL, sqlite3.OPEN_READWRITE);
 await database.run("PRAGMA journal_mode = WAL;");
 database.configure("busyTimeout", 5000);
+database.get = promisify(database.get);
+database.run = promisify(database.run);
+database.all = promisify(database.all);
 
 
 const userService = {
@@ -85,7 +89,7 @@ const userService = {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.NO_BLOCKED_USERS };
 		}
 		return blockedUsers;
-	},
-}
+	}
+};
 
 export default userService;

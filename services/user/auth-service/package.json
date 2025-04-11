@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node auth-service.js",
+    "start": "node src/auth-service.js",
     "dev": "nodemon auth-service.js"
   },
   "keywords": [],
