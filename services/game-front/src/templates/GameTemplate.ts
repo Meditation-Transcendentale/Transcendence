@@ -21,25 +21,25 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 		const paddleEntity = new Entity();
 		const posX = config.arenaSizeX / 2 / 10 * 9;
 		const x = i ? -posX : posX ;
-		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.5, 0), 0));
+		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.25, 0), 0));
 		if (i === localPaddleId)
 			paddleEntity.addComponent(new InputComponent(true));
 		else
 			paddleEntity.addComponent(new InputComponent());
 		paddleEntity.addComponent(new TransformComponent(
-			new Vector3(x, 0.5, 0),
+			new Vector3(x, 0.25, 0),
 			new Vector3(0, 90 * Math.PI / 180, 0),
 			new Vector3(1, 1, 1)
 		));
 		ecs.addEntity(paddleEntity);
 	}
 
-	for (let i = 0; i < 4; i++) {
+	for (let i = 0; i < 2; i++) {
 		let x = i % 2 ? config.arenaSizeX / 2 + config.wallWidth / 4 : 0;
 		let z = i % 2 ? 0 : config.arenaSizeZ / 2 + config.wallWidth / 2;
 		const rotation_y = i % 2 ? 0 : 90 * Math.PI / 180;
-		const scale_x = i % 2 ? config.wallWidth / 2 : config.wallWidth;
-		const scale_z = i % 2 ? config.wallWidth : config.wallWidth / config.arenaSizeZ * (config.arenaSizeX + config.wallWidth);
+		const scale_x = i % 2 ? 1 / 2 : 1;
+		const scale_z = i % 2 ? 1 : 1 / config.arenaSizeZ * (config.arenaSizeX + config.wallWidth);
 		let wallEntity = new Entity();
 		wallEntity.addComponent(new WallComponent(0, new Vector3(x, 0, z)));
 		wallEntity.addComponent(new TransformComponent(
@@ -65,5 +65,4 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 	ballEntity.addComponent(new BallComponent(0, pos, vel));
 	ballEntity.addComponent(new TransformComponent(pos, Vector3.Zero(), new Vector3(1, 1, 1)));
 	ecs.addEntity(ballEntity);
-
 }
