@@ -18,6 +18,9 @@ const blockUserStmt = database.prepare("INSERT INTO blocked_users (blocker_id, b
 const isBlockedStmt = database.prepare("SELECT * FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?");
 const unblockUserStmt = database.prepare("DELETE FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?");
 const getBlockedUsersStmt = database.prepare("SELECT * FROM blocked_users WHERE blocker_id = ?");
+const updateUsernameStmt = database.prepare("UPDATE users SET username = ? WHERE id = ?");
+const updateAvatarStmt = database.prepare("UPDATE users SET avatar_path = ? WHERE id = ?");
+const updatePasswordStmt = database.prepare("UPDATE users SET password = ? WHERE id = ?");
 
 const userService = {
 	getUserFromUsername: (username) => {
@@ -96,7 +99,16 @@ const userService = {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.NO_BLOCKED_USERS };
 		}
 		return blockedUsers;
-	}
+	},
+	updateUsername: (username, userId) => {
+		updateUsernameStmt.run(username, userId);
+	},
+	updateAvatar: (avatar, userId) => {
+		updateAvatarStmt.run(avatar, userId);
+	},
+	updatePassword: (hashedPassword, userId) => {
+		updatePasswordStmt.run(hashedPassword, userId);
+	},
 };
 
 export default userService;

@@ -35,6 +35,13 @@ const returnMessages = {
 	NOT_BLOCKED: 'You cannot unblock a user that you have not blocked',
 	ADD_BLOCKED_USER: 'You cannot add a blocked user as a friend',
 	NO_BLOCKED_USERS: 'You have no blocked users',
+	NOTHING_TO_UPDATE: 'Nothing to update',
+	INFO_UPDATED: 'User info updated',
+	PASSWORD_UPDATED: 'Password updated successfully',
+	PASSWORD_REQUIRED: 'Password is required',
+	NEW_PASSWORD_REQUIRED: 'New password is required',
+	BAD_PASSWORD: 'Invalid password',
+	MISSING_TOKEN: 'Token is required',
 
 }
 
