@@ -67,11 +67,13 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 			rejectUnauthorized: false
 		});
 
-		const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
-		console.log(response.data);
-		
-		if (response.data.valid == false) {
-			throw { status: statusCode.UNAUTHORIZED, message: response.data.message };
+		try {
+			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
+			if (response.data.valid == false) {
+				throw { status: statusCode.UNAUTHORIZED, message: response.data.message };
+			}
+		} catch (error) {
+			throw { status: statusCode.UNAUTHORIZED, message: error.response.data.message };
 		}
 	}
 

@@ -2,8 +2,10 @@ import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import sqlite3 from "sqlite3";
-import { promisify } from "util";
+
+import userService from "./userService.js";
+import { statusCode, returnMessages } from "./returnValues.js";
+import handleErrors from "./handleErrors.js";
 
 dotenv.config({ path: "../../../.env" });
 
@@ -39,89 +41,52 @@ function decrypt(text) {
 	return decrypted.toString();
 }
 
-// const Database = sqlite3.Database;
-// const database = new Database(process.env.DATABASE_URL, sqlite3.OPEN_READWRITE);
-// await database.run("PRAGMA journal_mode = WAL;");
-// database.configure("busyTimeout", 5000);
-// database.get = promisify(database.get);
-// database.run = promisify(database.run);
-// database.all = promisify(database.all);
-import database from "./update_user_infos.js";
-
-
 const twoFARoutes = (app) => {
-	app.post('/enable-2fa', async (req, res) => {
-		try {
+	app.post('/enable-2fa', handleErrors(async (req, res) => {
 
-			const userHeader = req.headers['user'];
+		const user = userService.getUserFromHeader(req);
+			
+		if (user.two_fa_enabled) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_ALREADY_ENABLED };
+		}
 
-			if (!userHeader) {
-				return res.code(400).send({ message: 'Unauthorized' });
-			}
+		const secret = generateSecret();
 
-			const userToken = JSON.parse(userHeader);
-			const user = await database.get("SELECT * FROM users WHERE id = ?", userToken.id);
-			if (!user) {
-				return res.code(404).send({ message: 'User not found' });
-			}
-			if (user.two_fa_enabled) {
-				return res.code(400).send({ message: '2FA already enabled' });
-			}
+		// console.log(secret, user.id);
 
-			const secret = generateSecret();
+		userService.enable2FA(secret, user.id);
 
-			await database.run(`UPDATE users SET two_fa_secret = ?, two_fa_enabled = ? WHERE id = ?`, JSON.stringify(secret), true, user.id);
-			// await database.run(`UPDATE users SET WHERE id = ?`, true, user.id);
-
-			// console.log(user);
-
-			const qrCode = await generateQRCode(secret, user.username);
+		const qrCode = await generateQRCode(secret, user.username);
 			// console.log(qrCode);
 
-			return res.code(200).send({ message: '2FA enabled', qrCode });
-		} catch (error) {
-			console.log(error);
-			return res.code(500).send({ message: 'Server Error' });
+		res.code(statusCode.SUCCESS).send({ message: returnMessages.TWO_FA_ENABLED, qrCode });
+	}));
+
+	app.post('/verify-2fa', handleErrors(async (req, res) => {
+
+		const user = userService.getUserFromHeader(req);
+
+		if (!user.two_fa_enabled) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_NOT_ENABLED, valid: false };
 		}
-	});
 
-	app.post('/verify-2fa', async (req, res) => {
-		try {
-			const userHeader = req.headers['user'];
-
-			if (!userHeader) {
-				return res.code(400).send({ message: 'Unauthorized', valid: false });
-			}
-
-			const userToken = JSON.parse(userHeader);
-			const user = await database.get("SELECT * FROM users WHERE id = ?", userToken.id);
-			if (!user) {
-				return res.code(404).send({ message: 'User not found', valid: false });
-			}
-			if (!user.two_fa_enabled) {
-				return res.code(400).send({ message: '2FA not enabled', valid: false });
-			}
-
-			const token = req.body.token;
-			if (!token) {
-				return res.code(400).send({ message: 'Token is required', valid: false });
-			}
-			const secret = JSON.parse(user.two_fa_secret);
-			if (!secret) {
-				return res.code(400).send({ message: '2FA not enabled', valid: false });
-			}
-
-			const isTokenValid = verifyToken(secret, token);
-			if (!isTokenValid) {
-				return res.code(401).send({ message: 'Invalid code', valid: false });
-			}
-
-			return res.code(200).send({ message: '2FA verified', valid: true });
-		} catch (error) {
-			console.log(error);
-			return res.code(500).send({ message: 'Server Error', valid: false  });
+		const token = req.body.token;
+		if (!token) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN, valid: false };
 		}
-	});
+		const secret = JSON.parse(user.two_fa_secret);
+		if (!secret) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_NOT_ENABLED, valid: false };
+		}
+
+		const isTokenValid = verifyToken(secret, token);
+		if (!isTokenValid) {
+			throw { status: statusCode.UNAUTHORIZED, message: returnMessages.INVALID_CODE, valid: false };
+		}
+
+		res.code(statusCode.SUCCESS).send({ message: returnMessages.TWO_FA_VERIFIED, valid: true });
+
+	}));
 }
 
 export { twoFARoutes };

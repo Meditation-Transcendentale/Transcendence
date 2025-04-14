@@ -21,6 +21,7 @@ const getBlockedUsersStmt = database.prepare("SELECT * FROM blocked_users WHERE 
 const updateUsernameStmt = database.prepare("UPDATE users SET username = ? WHERE id = ?");
 const updateAvatarStmt = database.prepare("UPDATE users SET avatar_path = ? WHERE id = ?");
 const updatePasswordStmt = database.prepare("UPDATE users SET password = ? WHERE id = ?");
+const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_fa_enabled = ? WHERE id = ?");
 
 const userService = {
 	getUserFromUsername: (username) => {
@@ -109,6 +110,9 @@ const userService = {
 	updatePassword: (hashedPassword, userId) => {
 		updatePasswordStmt.run(hashedPassword, userId);
 	},
+	enable2FA: (secret, userId) => {
+		enable2FAStmt.run(JSON.stringify(secret), 1, userId);
+	}
 };
 
 export default userService;

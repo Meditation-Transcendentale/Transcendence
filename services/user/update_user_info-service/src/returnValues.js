@@ -42,6 +42,11 @@ const returnMessages = {
 	NEW_PASSWORD_REQUIRED: 'New password is required',
 	BAD_PASSWORD: 'Invalid password',
 	MISSING_TOKEN: 'Token is required',
+	TWO_FA_ALREADY_ENABLED: '2FA is already enabled',
+	TWO_FA_ENABLED: '2FA is enabled',
+	TWO_FA_NOT_ENABLED: '2FA is not enabled',
+	TWO_FA_VERIFIED: '2FA verified',
+	INVALID_CODE: 'Invalid code',
 
 }
 
