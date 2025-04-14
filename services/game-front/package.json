@@ -11,6 +11,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@babylonjs/core": "^6.37.0"
+    "@babylonjs/core": "^8.0.0",
+	"@babylonjs/gui": "8.2.0"
   }
 }

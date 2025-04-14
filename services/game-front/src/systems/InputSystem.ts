@@ -6,13 +6,13 @@ import { PaddleComponent } from "../components/PaddleComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputManager } from "../input/InputManager.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
-import { localPaddleId } from "../main.ts";
+import { localPaddleId } from "../main.js";
 
 export class InputSystem extends System {
 	private inputManager: InputManager;
 	private wsManager: WebSocketManager;
 	private localPaddleId: number | null = null;
-	private readonly MAX_OFFSET: number = 2.8;
+	private readonly MAX_OFFSET: number = 8.4;
 
 	constructor(inputManager: InputManager, wsManager: WebSocketManager) {
 		super();
@@ -40,11 +40,11 @@ export class InputSystem extends System {
 			let offsetChange = 0;
 			let move = false;
 			if (this.inputManager.isKeyPressed("KeyA")) {
-				offsetChange -= 0.1;
+				offsetChange += 0.1;
 				move = true;
 			}
 			if (this.inputManager.isKeyPressed("KeyD")) {
-				offsetChange += 0.1;
+				offsetChange -= 0.1;
 				move = true;
 			}
 			paddle.offset = Scalar.Clamp(paddle.offset, -this.MAX_OFFSET, this.MAX_OFFSET);

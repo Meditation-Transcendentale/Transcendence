@@ -3,121 +3,67 @@ import { ECSManager } from "../ecs/ECSManager.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
-import { PillarComponent } from "../components/PillarComponent.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputComponent } from "../components/InputComponent.js";
 
 export interface GameTemplateConfig {
-	numberOfPlayers: number;
 	numberOfBalls: number;
-	// arenaRadius: number;
-	numPillars: number;
-	numWalls: number;
+	arenaSizeX: number;
+	arenaSizeZ: number;
+	wallWidth: number;
 }
-
-// export function calculateArenaRadius(numPlayers: number): number {
-// 	const playerWidth = 7;
-// 	const centralAngleDeg = 360 / numPlayers;
-// 	const halfCentralAngleRad = (centralAngleDeg / 2) * Math.PI / 180;
-
-// 	const radius = playerWidth / (2 * Math.sin(halfCentralAngleRad));
-
-// 	return radius;
-// }
 
 export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number): void {
 	console.log("localplayerif in template=" + localPaddleId);
 
 	for (let i = 0; i < 2; i++) {
 		const paddleEntity = new Entity();
-		const x = i ? -90 : 90;
-		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.5, 0), 0));
+		const posX = config.arenaSizeX / 2 / 10 * 9;
+		const x = i ? -posX : posX ;
+		const rotation_y = i % 2 ? -90 * Math.PI / 180 : 90 * Math.PI / 180;
+		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.25, 0), 0));
 		if (i === localPaddleId)
 			paddleEntity.addComponent(new InputComponent(true));
 		else
 			paddleEntity.addComponent(new InputComponent());
 		paddleEntity.addComponent(new TransformComponent(
-			new Vector3(x, 0.5, 0),
-			new Vector3(0, 90, 0),
+			new Vector3(x, 0.25, 0),
+			new Vector3(0, rotation_y, 0),
 			new Vector3(1, 1, 1)
 		));
 		ecs.addEntity(paddleEntity);
 	}
 
-	// for (let i = 0; i < config.numberOfPlayers; i++) {
-	// 	const angle = (2 * Math.PI / config.numberOfPlayers) * i;
-	// 	const x = (config.arenaRadius) * Math.cos(angle);
-	// 	const z = (config.arenaRadius) * Math.sin(angle);
-	// 	const paddleEntity = new Entity();
-	// 	if (i === localPaddleId) {
-	// 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0, z), 0, false));
-	// 		paddleEntity.addComponent(new InputComponent(true));
-	// 	}
-	// 	else {
-	// 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0, z)), 0, false);
-	// 		paddleEntity.addComponent(new InputComponent());
-	// 	}
-	// 	paddleEntity.addComponent(new TransformComponent(
-	// 		new Vector3(x, 0.5, z),
-	// 		new Vector3(0, -(angle + (Math.PI / 2)), 0),
-	// 		new Vector3(1, 1, 1)
-	// 	));
-	// 	ecs.addEntity(paddleEntity);
-	// }
-
-	for (let i = 0; i < config.numberOfBalls; i++) {
-		const pos = new Vector3(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5);
-		const vel = new Vector3(Math.random(), Math.random(), 0);
-		const ballEntity = new Entity();
-		ballEntity.addComponent(new BallComponent(i, pos, vel));
-		ballEntity.addComponent(new TransformComponent(pos, Vector3.Zero(), new Vector3(1, 1, 1)));
-		console.log(i);
-		ecs.addEntity(ballEntity);
-	}
-
-	// for (let i = 0; i < config.numPillars; i++) {
-	// 	const angle = (2 * Math.PI / config.numberOfPlayers) * i;
-	// 	const leftAngle = angle - zoneAngleWidth / 2;
-	// 	const rightAngle = angle + zoneAngleWidth / 2;
-	// 	const x = config.arenaRadius * Math.cos(leftAngle);
-	// 	const z = config.arenaRadius * Math.sin(leftAngle);
-	// 	const pillarEntity = new Entity();
-	// 	pillarEntity.addComponent(new PillarComponent(new Vector3(x, 0, z)));
-	// 	pillarEntity.addComponent(new TransformComponent(
-	// 		new Vector3(x, 1, z),
-	// 		new Vector3(0, -(leftAngle + (Math.PI / 2)), 0),
-	// 		new Vector3(1, 1, 1)
-	// 	));
-	// 	ecs.addEntity(pillarEntity);
-	// }
-
 	for (let i = 0; i < 2; i++) {
-		const wallEntity = new Entity();
-		const x = i ? 20 : 0;
-		const z = i ? 0 : 30;
-		const rot_y = i ? 0 : 90;
-		wallEntity.addComponent(new WallComponent(i, new Vector3(x, 1, z)));
+		let x = i % 2 ? config.arenaSizeX / 2 + config.wallWidth / 4 : 0;
+		let z = i % 2 ? 0 : config.arenaSizeZ / 2 + config.wallWidth / 2;
+		const rotation_y = i % 2 ? 0 : 90 * Math.PI / 180;
+		const scale_x = i % 2 ? 1 / 2 : 1;
+		const scale_z = i % 2 ? 1 : 1 / config.arenaSizeZ * (config.arenaSizeX + config.wallWidth);
+		let wallEntity = new Entity();
+		wallEntity.addComponent(new WallComponent(0, new Vector3(x, 0, z)));
 		wallEntity.addComponent(new TransformComponent(
-			new Vector3(x, 1, z),
-			new Vector3(0, rot_y, 0),
-			new Vector3(1, 1, 1)
+			new Vector3(x, 0, z),
+			new Vector3(0, rotation_y, 0),
+			new Vector3(scale_x, 1, scale_z)
+		));
+		ecs.addEntity(wallEntity);
+
+		wallEntity = new Entity();
+		wallEntity.addComponent(new WallComponent(0, new Vector3(-x, 0, -z)));
+		wallEntity.addComponent(new TransformComponent(
+			new Vector3(-x, 0, -z),
+			new Vector3(0, rotation_y, 0),
+			new Vector3(scale_x, 1, scale_z)
 		));
 		ecs.addEntity(wallEntity);
 	}
 
-	// for (let i = 0; i < config.numWalls; i++) {
-	// 	const angle = (2 * Math.PI / config.numberOfPlayers) * i;
-	// 	const x = (config.arenaRadius) * Math.cos(angle);
-	// 	const z = (config.arenaRadius) * Math.sin(angle);
-	// 	const wallEntity = new Entity();
-	// 	wallEntity.addComponent(new WallComponent(i, new Vector3(x, 1, z)));
-	// 	wallEntity.addComponent(new TransformComponent(
-	// 		new Vector3(x, 1, z),
-	// 		new Vector3(0, -(angle + (Math.PI / 2)), 0),
-	// 		new Vector3(1, 1, 1)
-	// 	));
-	// 	console.log("wall ", i, x, z, angle);
-	// 	ecs.addEntity(wallEntity);
-	// }
+	const ballEntity = new Entity();
+	const pos = new Vector3(0, 0, 0);
+	const vel = new Vector3(Math.random(), Math.random(), 0);
+	ballEntity.addComponent(new BallComponent(0, pos, vel));
+	ballEntity.addComponent(new TransformComponent(pos, Vector3.Zero(), new Vector3(1, 1, 1)));
+	ecs.addEntity(ballEntity);
 }
