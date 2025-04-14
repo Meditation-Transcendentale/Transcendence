@@ -3,6 +3,8 @@ import { WebSocketServer } from 'ws';
 import { connect, JSONCodec } from 'nats';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
+import { decodeStateUpdate, encodeStateUpdate } from './binary.js';
+
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
@@ -72,7 +74,7 @@ async function start() {
 				}
 
 				else if (type === 'registerGame') {
-					const { gameId } = data;
+					const gameId = parseInt(data.gameId, 10);
 					playerGames.set(paddleId, gameId);
 					if (!gamePlayers.has(gameId)) gamePlayers.set(gameId, new Set());
 					gamePlayers.get(gameId).add(paddleId);
@@ -121,14 +123,12 @@ async function start() {
 
 	const sub = nc.subscribe('game.update');
 	for await (const msg of sub) {
-		const { gameId, state, tick } = jc.decode(msg.data);
-		//console.log(`[user-interface] Received update for ${gameId} tick ${tick}`, state);
+		const { gameId, tick, balls, paddles } = decodeStateUpdate(msg.data);
 		const targets = gamePlayers.get(gameId) || new Set();
-		//console.log(`[user-interface] Found ${targets.size} players in game ${gameId}`);
 		for (const playerId of targets) {
 			const ws = clients.get(playerId);
 			if (ws && ws.readyState === 1) {
-				ws.send(JSON.stringify({ type: 'stateUpdate', gameId, tick, state }));
+				ws.send(msg.data);
 			}
 		}
 	}

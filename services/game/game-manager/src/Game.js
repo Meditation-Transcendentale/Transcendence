@@ -1,3 +1,5 @@
+import { generateGameId, releaseGameId } from "./generateGameId.js";
+
 // services/game/game-manager/src/Game.js
 export class Game {
 	constructor(options = {}) {
@@ -6,12 +8,13 @@ export class Game {
 		this.mode = options.mode || 'pong';
 		this.ballCount = options.ballCount || 1;
 		this.state = this.initializeState();
+		this.existingGameIds = new Set();
 	}
 
 
 	initializeState() {
 		const state = {
-			gameId: this.generateGameId(),
+			gameId: this.createGameId(),
 			tick: 0,
 			balls: [],
 			paddles: {},
@@ -109,7 +112,13 @@ export class Game {
 		this.state = newState;
 	}
 
-	generateGameId() {
-		return 'game-' + Math.random().toString(36).substr(2, 9);
+	// generateGameId() {
+	// 	return 'game-' + Math.random().toString(36).substr(2, 9);
+	// }
+	createGameId() {
+		return generateGameId();
+	}
+	removeGameId(GameId) {
+		releaseGameId(GameId);
 	}
 }

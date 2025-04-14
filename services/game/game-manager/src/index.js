@@ -52,7 +52,8 @@ fastify.post('/match/:id/end', async (req, reply) => {
 });
 
 fastify.post('/match/:id/launch', async (req, reply) => {
-	const gameId = req.params.id;
+	const gameIdStr = req.params.id;
+	const gameId = parseInt(gameIdStr, 10);
 	const launched = gameManager.launchGame(gameId);
 	if (launched) {
 		return { success: true, gameId };
@@ -73,8 +74,8 @@ async function start() {
 	const sub = nc.subscribe('game.state');
 	(async () => {
 		for await (const msg of sub) {
-			const data = jc.decode(msg.data);
-			gameManager.handlePhysicsResult(data);
+			// const data = jc.decode(msg.data);
+			gameManager.handlePhysicsResult(msg.data);
 		}
 	})();
 

@@ -191,22 +191,23 @@ export class Game {
 				const pos = entity.getComponent('position');
 				const vel = entity.getComponent('velocity');
 				const ball = entity.getComponent('ball');
-				return [
-					ball.id,
-					round(pos.x, 2),
-					round(pos.y, 2),
-					round(vel.x, 2),
-					round(vel.y, 2)
-				];
+				return {
+					id: ball.id,
+					x: round(pos.x, 2),
+					y: round(pos.y, 2),
+					vx: round(vel.x, 2),
+					vy: round(vel.y, 2)
+				};
+
 			});
 
-		const walls = Object.values(this.wallEntities)
-			.filter(e => e.getComponent('wall').dirty)
-			.map(entity => {
-				const wall = entity.getComponent('wall');
-				wall.dirty = false;
-				return { id: wall.id, wall: wall.isActive };
-			});
+		// const walls = Object.values(this.wallEntities)
+		// 	.filter(e => e.getComponent('wall').dirty)
+		// 	.map(entity => {
+		// 		const wall = entity.getComponent('wall');
+		// 		wall.dirty = false;
+		// 		return { id: wall.id, wall: wall.isActive };
+		// 	});
 
 		const paddles = Object.keys(this.paddleEntities)
 			.map(key => {
@@ -218,7 +219,7 @@ export class Game {
 			})
 			.filter(Boolean);
 
-		return { balls, walls, paddles };
+		return { balls, paddles };
 	}
 	markAllEntitiesDirty() {
 		// Object.values(this.wallEntities).forEach(entity => {
