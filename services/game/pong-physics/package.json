@@ -1,10 +1,11 @@
 {
-  "name": "pong-physics",
+  "name": "pongBR-physics",
   "version": "1.0.0",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-	"dev": "nodemon src/index.js",
+    "start": "node --inspect=0.0.0.0:9229 src/index.js",
+    "dev": "nodemon src/index.js",
     "test": "vitest"
   },
   "dependencies": {
@@ -12,7 +13,8 @@
     "nats": "^2.29.3"
   },
   "devDependencies": {
-	"nodemon": "^2.0.22",
+    "@types/node": "^22.14.0",
+    "nodemon": "^2.0.22",
     "vitest": "^1.0.0"
   }
 }
