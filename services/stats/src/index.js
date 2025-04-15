@@ -1,10 +1,10 @@
 import Fastify from "fastify";
 import dotenv from "dotenv";
 import fs from "fs";
+import { connect, StringCodec } from "nats";
 
 import { statusCode, returnMessages } from "./returnValues.js";
-import handleErrors from "./handleErrors.js";
-import userService from "./userService.js";
+import handleGameFinished from "./natsHandler.js";
 
 dotenv.config({ path: "../../.env" });
 
@@ -26,8 +26,18 @@ const verifyApiKey = (req, res, done) => {
 
 app.addHook('onRequest', verifyApiKey);
 
+(async () => {
+    const nc = await connect({ servers: process.env.NATS_URL });
+    const sc = StringCodec();
 
+    const sub = nc.subscribe("game.finished");
+    for await (const msg of sub) {
+        const data = JSON.parse(sc.decode(msg.data));
+        handleGameFinished(data);
+    }
+})();
 
+// app.register(statsRoutes);
 
 const start = async () => {
 	try {
