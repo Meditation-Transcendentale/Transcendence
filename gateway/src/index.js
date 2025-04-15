@@ -57,10 +57,10 @@ const verifyJWT = async (req, res) => {
 	const agent = new https.Agent({
 		rejectUnauthorized: false
 	});
-
+	
 	const response = await axios.post('https://auth-service:4002/auth', { token }, {headers: {'x-api-key':process.env.API_GATEWAY_KEY}, httpsAgent: agent });
 	const data = response.data;
-	// console.log(data.user.email);
+
 	if (!data.valid) {
 		return res.code(401).send({ message: 'Invalid token' });
 	}
@@ -114,9 +114,6 @@ app.register(fastifyHttpProxy, {
 		rewriteRequestHeaders: addApiKeyHeader
 	}
 });
-
-
-
 
 const start = async () => {
 	try {
