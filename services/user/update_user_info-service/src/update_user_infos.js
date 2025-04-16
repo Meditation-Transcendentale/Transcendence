@@ -53,6 +53,8 @@ app.patch('/', handleErrors(async (req, res) => {
 
 }));
 
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
 app.patch('/password', handleErrors(async (req, res) => {
 
 	const user = userService.getUserFromHeader(req);
@@ -69,6 +71,10 @@ app.patch('/password', handleErrors(async (req, res) => {
 	
 	if (!newPassword) {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.NEW_PASSWORD_REQUIRED };
+	}
+
+	if (PASSWORD_REGEX.test(newPassword) === false) {
+		throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_INVALID };
 	}
 
 	const isPasswordValid = await bcrypt.compare(password, user.password);

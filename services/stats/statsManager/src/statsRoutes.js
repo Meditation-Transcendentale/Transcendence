@@ -1,5 +1,6 @@
 import handleErrors from "./handleErrors.js";
 import { statusCode, returnMessages } from "./returnValues.js";
+import { nc, sc } from "./index.js";
 
 const playerStatsSchema = {
 	params: {
@@ -25,7 +26,7 @@ export default async function statsRoutes(app) {
 		const playerId = req.params.playerId;
 		const mode = req.query.mode;
 		
-
+		// const response = await nc.request...
 
 
 

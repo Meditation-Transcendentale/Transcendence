@@ -55,6 +55,23 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     networks:
       - transcendence-network
+    
+  stats-service:
+    build:
+      context: ./services/stats
+    ports:
+      - "6000:6000"
+    volumes:
+      - database:/app/database
+      - certs:/app/certs:ro
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+    networks:
+      - transcendence-network
 
   api-gateway:
     build:
