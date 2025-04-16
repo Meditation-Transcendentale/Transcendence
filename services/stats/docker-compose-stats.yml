@@ -15,28 +15,38 @@ services:
       - "6000:6000"
     volumes:
       - certs:/app/certs:ro
+      - shared:/app/shared
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - NATS_URL=${NATS_URL}
     networks:
       - transcendence-network
 
   statsDatabase:
     build: 
-        context: ./services/stats/statsDatabase
+      context: ./services/stats/statsDatabase
       container_name: statsDatabase
       ports:
         - "6001:6001"
       volumes:
         - certs:/app/certs:ro
         - database:/app/database
+        - shared:/app/shared
       environment:
         - NODE_ENV=development
-        - SSL_KEY=${SSL_KEY}
-        - SSL_CERT=${SSL_CERT}
-        - API_GATEWAY_KEY=${API_GATEWAY_KEY}
         - DATABASE_URL=${DATABASE_URL}
+        - NATS_URL=${NATS_URL}
       networks:
         - transcendence-network
+
+volumes:
+  shared:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./shared
+  

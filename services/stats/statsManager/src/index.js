@@ -7,7 +7,7 @@ import { statusCode, returnMessages } from "./returnValues.js";
 import handleGameFinished from "./natsHandler.js";
 import statsRoutes from "./statsRoutes.js";
 
-dotenv.config({ path: "../../.env" });
+dotenv.config({ path: "../../../.env" });
 
 const app = Fastify({
 	logger: true,
@@ -27,9 +27,10 @@ const verifyApiKey = (req, res, done) => {
 
 app.addHook('onRequest', verifyApiKey);
 
+const nc = await connect({ servers: process.env.NATS_URL });
+const sc = StringCodec();
+
 (async () => {
-	const nc = await connect({ servers: process.env.NATS_URL });
-	const sc = StringCodec();
 
 	const sub = nc.subscribe("game.finished");
 	for await (const msg of sub) {
@@ -50,3 +51,5 @@ const start = async () => {
 };
 
 start();
+
+export { nc, sc };
