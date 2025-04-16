@@ -5,15 +5,16 @@ import { connect, StringCodec } from "nats";
 
 import { statusCode, returnMessages } from "./returnValues.js";
 import handleGameFinished from "./natsHandler.js";
+import statsRoutes from "./statsRoutes.js";
 
 dotenv.config({ path: "../../.env" });
 
 const app = Fastify({
-    logger: true,
-    https: {
-        key: fs.readFileSync(process.env.SSL_KEY),
-        cert: fs.readFileSync(process.env.SSL_CERT)
-    }
+	logger: true,
+	https: {
+		key: fs.readFileSync(process.env.SSL_KEY),
+		cert: fs.readFileSync(process.env.SSL_CERT)
+	}
 });
 
 const verifyApiKey = (req, res, done) => {
@@ -27,17 +28,17 @@ const verifyApiKey = (req, res, done) => {
 app.addHook('onRequest', verifyApiKey);
 
 (async () => {
-    const nc = await connect({ servers: process.env.NATS_URL });
-    const sc = StringCodec();
+	const nc = await connect({ servers: process.env.NATS_URL });
+	const sc = StringCodec();
 
-    const sub = nc.subscribe("game.finished");
-    for await (const msg of sub) {
-        const data = JSON.parse(sc.decode(msg.data));
-        handleGameFinished(data);
-    }
+	const sub = nc.subscribe("game.finished");
+	for await (const msg of sub) {
+		const data = JSON.parse(sc.decode(msg.data));
+		handleGameFinished(data);
+	}
 })();
 
-// app.register(statsRoutes);
+app.register(statsRoutes);
 
 const start = async () => {
 	try {
