@@ -1,0 +1,42 @@
+services:
+  nats:
+    image: nats:latest
+    container_name: nats
+    ports:
+      - "6002:6002"
+    networks:
+      - transcendence-network
+  
+  statsManager:
+    build: 
+      context: ./services/stats/statsManager
+    container_name: statsManager
+    ports:
+      - "6000:6000"
+    volumes:
+      - certs:/app/certs:ro
+    environment:
+      - NODE_ENV=development
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+    networks:
+      - transcendence-network
+
+  statsDatabase:
+    build: 
+        context: ./services/stats/statsDatabase
+      container_name: statsDatabase
+      ports:
+        - "6001:6001"
+      volumes:
+        - certs:/app/certs:ro
+        - database:/app/database
+      environment:
+        - NODE_ENV=development
+        - SSL_KEY=${SSL_KEY}
+        - SSL_CERT=${SSL_CERT}
+        - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+        - DATABASE_URL=${DATABASE_URL}
+      networks:
+        - transcendence-network

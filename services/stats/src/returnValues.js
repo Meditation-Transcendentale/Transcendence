@@ -11,7 +11,7 @@ const statusCode = {
 const returnMessages = {
 	UNAUTHORIZED: 'Unauthorized',
 	INTERNAL_SERVER_ERROR: 'Internal server error',
-	
+	PLAYER_ID_REQUIRED: 'Player ID is required',
 	
 }
 
