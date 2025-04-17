@@ -13,11 +13,13 @@ export let localPaddleId: number | null = null;
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
 	private uiid: string;
+	private scoreUI: any;
 
-	constructor(wsManager: WebSocketManager, uiid: string) {
+	constructor(wsManager: WebSocketManager, uiid: string, scoreUI: any) {
 		super();
 		this.wsManager = wsManager;
 		this.uiid = uiid;
+		this.scoreUI = scoreUI;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -84,6 +86,11 @@ export class NetworkingSystem extends System {
 					ball.position.set(msg.x, 0.5, msg.y);
 					ball.velocity.set(msg.vx, 0, msg.vy);
 				}
+			}
+			if (msg.type === "scoreUpdate") {
+				const scoreP1 = msg.score.player1;
+				const scoreP2 = msg.score.player2;
+				this.scoreUI.update(scoreP1, scoreP2);
 			}
 		});
 	}

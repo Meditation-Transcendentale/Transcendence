@@ -12,6 +12,9 @@ import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
 import { getOrCreateUIID } from "./utils/getUIID.js";
 import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
 import { DebugVisualizer } from "./debug/DebugVisualizer.js";
+import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
+import { gameScoreInterface } from "./utils/displayGameInfo.js";
+import { createArenaMesh, createBallMesh, createCamera, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
 
 // import "@babylonjs/inspector";
 const API_BASE = "http://10.19.229.249:4000";
@@ -29,6 +32,7 @@ class Game {
 	private gameId;
 	private canvas;
 	private paddleId : any;
+	private scoreUI: any;
 
 	constructor(canvas : any, gameId: any) {
 		this.canvas = canvas;
@@ -49,65 +53,12 @@ class Game {
 			wallWidth: 1
 		};
 
-		const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-
-		const scoreTitle = new TextBlock();
-		scoreTitle.text = "Score";
-		scoreTitle.color = "white";
-		scoreTitle.fontSize = 34;
-		scoreTitle.left = "0px";
-		scoreTitle.top = "-300px";
-		advancedTexture.addControl(scoreTitle);
-
-		const scorePipe = new TextBlock();
-		scorePipe.text = "|";
-		scorePipe.color = "white";
-		scorePipe.fontSize = 24;
-		scorePipe.left = "0px";
-		scorePipe.top = "-250px";
-		advancedTexture.addControl(scorePipe);
-
-		let scoreP1 = 0;
-		let scoreP2 = 0;
-
-		const score = new TextBlock();
-		score.text = scoreP1 + " | " + scoreP2;
-		score.color = "white";
-		score.fontSize = 24;
-		score.left = "0px";
-		score.top = "-250px";
-		advancedTexture.addControl(score);
-
-		this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 60, Vector3.Zero(), this.scene);
-		this.camera.attachControl(this.canvas, true);
-		new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
-
-		const arenaMesh = MeshBuilder.CreateBox("arenaBox", {width: config.arenaSizeX, height: config.arenaSizeZ, depth: 1}, this.scene);
-		const material = new StandardMaterial("arenaMaterial", this.scene);
-		material.diffuseColor.set(0, 0, 0);
-		arenaMesh.rotation.x = Math.PI / 2;
-		arenaMesh.position.y = -0.5;
-		arenaMesh.material = material;
-
-		const ballBaseMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 1 }, this.scene);
-
-		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
-		//ballMaterial.diffuseColor.set(1, 0, 0);
-		ballMaterial.diffuseTexture = new Texture("moi.png", this.scene);
-		ballBaseMesh.setEnabled(true);
-		ballBaseMesh.setPivotPoint(Vector3.Zero());
-		ballBaseMesh.material = ballMaterial;
-
-		const paddleBaseMesh = MeshBuilder.CreateBox("paddleBase", { width: 3, height: 0.4, depth: 0.4 }, this.scene);
-		paddleBaseMesh.setEnabled(true);
-		paddleBaseMesh.setPivotPoint(Vector3.Zero());
-
-		const wallBaseMesh = MeshBuilder.CreateBox("wallBase", { width: config.wallWidth, height: 1, depth: 20 }, this.scene);
-		const wallMaterial = new StandardMaterial("arenaMaterial", this.scene);
-		wallMaterial.diffuseColor.set(1, 0, 0);
-		wallBaseMesh.material = wallMaterial;
-		wallBaseMesh.setEnabled(true);
-		wallBaseMesh.setPivotPoint(Vector3.Zero());
+		this.scoreUI = gameScoreInterface(0, 0);
+		this.camera = createCamera(this.scene, this.canvas);
+		const arenaMesh = createArenaMesh(this.scene, config);
+		const ballBaseMesh = createBallMesh(this.scene, config);
+		const paddleBaseMesh = createPaddleMesh(this.scene, config);
+		const wallBaseMesh = createWallMesh(this.scene, config);
 
 		const ballInstanceManager = new ThinInstanceManager(ballBaseMesh, 1000, 50, 100);
 		const paddleInstanceManager = new ThinInstanceManager(paddleBaseMesh, 100, 50, 100);
@@ -122,13 +73,14 @@ class Game {
 
 		this.ecs.addSystem(new MovementSystem());
 		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
-		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uiid));
+		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uiid, this.scoreUI));
 		this.ecs.addSystem(new ThinInstanceSystem(
 			ballInstanceManager,
 			paddleInstanceManager,
 			wallInstanceManager,
 			this.camera
 		));
+		this.ecs.addSystem(new VisualEffectSystem(this.scene));
 
 		createGameTemplate(this.ecs, config, localPaddleId);
 		this.stateManager = new StateManager(this.ecs);
