@@ -8,6 +8,8 @@ services:
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
+      # - database:/app/database
+      # - certs:/app/certs:ro
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -18,8 +20,7 @@ services:
     networks:
       - transcendence-network
     depends_on:
-      database_certs-init:
-        condition: service_completed_successfully
+      - database_certs-init
 
   auth-service:
     build:
@@ -27,8 +28,10 @@ services:
     ports:
       - "4002:4002"
     volumes:
+      # - database:/app/database
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
+      # - certs:/app/certs:ro
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -40,8 +43,7 @@ services:
     networks:
       - transcendence-network
     depends_on:
-      database_certs-init:
-        condition: service_completed_successfully
+      - database_certs-init
 
   update_user_info-service:
     build:
@@ -49,8 +51,10 @@ services:
     ports:
       - "4003:4003"
     volumes:
+      # - database:/app/database
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
+      # - certs:/app/certs:ro
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
@@ -61,8 +65,7 @@ services:
     networks:
       - transcendence-network
     depends_on:
-      database_certs-init:
-        condition: service_completed_successfully
+      - database_certs-init
 
   api-gateway:
     build:
@@ -70,6 +73,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      # - certs:/app/certs:ro
       - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
@@ -79,9 +83,10 @@ services:
     networks:
       - transcendence-network
     depends_on:
-      database_certs-init:
-          condition: service_completed_successfully
-
+      - auth-service
+      - register-service
+      - update_user_info-service
+      - database_certs-init
 
   docs-service:
     build:
@@ -89,6 +94,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
+      # - certs:/app/certs:ro
       - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
@@ -98,16 +104,11 @@ services:
     networks:
       - transcendence-network
     depends_on:
-      database_certs-init:
-        condition: service_completed_successfully
-      api-gateway:
-        condition: service_started
-      auth-service:
-        condition: service_started
-      register-service:
-        condition: service_started
-      update_user_info-service:
-        condition: service_started
+      - api-gateway
+      - auth-service
+      - register-service
+      - update_user_info-service
+      - database_certs-init
   
   database_certs-init:
     build:
@@ -121,6 +122,22 @@ services:
       - SSL_CERT=${SSL_CERT}
     networks:
       - transcendence-network
+
+
+
+volumes:
+  database:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATABASE_URL_PATH}
+  certs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATABASE_URL_PATH}
 
 networks:
   transcendence-network:
