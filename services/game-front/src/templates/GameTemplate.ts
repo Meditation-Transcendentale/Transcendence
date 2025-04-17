@@ -20,7 +20,7 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 	for (let i = 0; i < 2; i++) {
 		const paddleEntity = new Entity();
 		const posX = config.arenaSizeX / 2 / 10 * 9;
-		const x = i ? -posX : posX ;
+		const x = i ? -posX : posX;
 		const rotation_y = i % 2 ? -90 * Math.PI / 180 : 90 * Math.PI / 180;
 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.25, 0), 0));
 		if (i === localPaddleId)
@@ -62,7 +62,7 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 
 	const ballEntity = new Entity();
 	const pos = new Vector3(0, 0, 0);
-	const vel = new Vector3(Math.random(), Math.random(), 0);
+	const vel = new Vector3(5, 0, 1);
 	ballEntity.addComponent(new BallComponent(0, pos, vel));
 	ballEntity.addComponent(new TransformComponent(pos, Vector3.Zero(), new Vector3(1, 1, 1)));
 	ecs.addEntity(ballEntity);

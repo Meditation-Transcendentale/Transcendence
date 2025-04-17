@@ -1,5 +1,4 @@
 import { Engine, Scene, Vector3, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Mesh } from "@babylonjs/core";
-import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -12,6 +11,9 @@ import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
 import { getOrCreateUIID } from "./utils/getUIID.js";
 import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
 import { DebugVisualizer } from "./debug/DebugVisualizer.js";
+import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
+import { gameScoreInterface } from "./utils/displayGameInfo.js";
+import { createCamera } from "./utils/initializeGame.js";
 
 // import "@babylonjs/inspector";
 const API_BASE = "http://10.19.229.249:4000";
@@ -49,38 +51,12 @@ class Game {
 			wallWidth: 1
 		};
 
-		const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+		gameScoreInterface();
+		this.camera = createCamera(this.scene, this.canvas);
 
-		const scoreTitle = new TextBlock();
-		scoreTitle.text = "Score";
-		scoreTitle.color = "white";
-		scoreTitle.fontSize = 34;
-		scoreTitle.left = "0px";
-		scoreTitle.top = "-300px";
-		advancedTexture.addControl(scoreTitle);
-
-		const scorePipe = new TextBlock();
-		scorePipe.text = "|";
-		scorePipe.color = "white";
-		scorePipe.fontSize = 24;
-		scorePipe.left = "0px";
-		scorePipe.top = "-250px";
-		advancedTexture.addControl(scorePipe);
-
-		let scoreP1 = 0;
-		let scoreP2 = 0;
-
-		const score = new TextBlock();
-		score.text = scoreP1 + " | " + scoreP2;
-		score.color = "white";
-		score.fontSize = 24;
-		score.left = "0px";
-		score.top = "-250px";
-		advancedTexture.addControl(score);
-
-		this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 60, Vector3.Zero(), this.scene);
-		this.camera.attachControl(this.canvas, true);
-		new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
+		// this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 60, Vector3.Zero(), this.scene);
+		// this.camera.attachControl(this.canvas, true);
+		// new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
 
 		const arenaMesh = MeshBuilder.CreateBox("arenaBox", {width: config.arenaSizeX, height: config.arenaSizeZ, depth: 1}, this.scene);
 		const material = new StandardMaterial("arenaMaterial", this.scene);
@@ -129,6 +105,7 @@ class Game {
 			wallInstanceManager,
 			this.camera
 		));
+		this.ecs.addSystem(new VisualEffectSystem(this.scene));
 
 		createGameTemplate(this.ecs, config, localPaddleId);
 		this.stateManager = new StateManager(this.ecs);
