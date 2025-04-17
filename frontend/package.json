@@ -10,8 +10,5 @@
     "esbuild": "^0.19.11",
     "typescript": "^5.2.2",
     "vite": "^6.3.1"
-  },
-  "dependencies": {
-    "@babylonjs/core": "^6.37.0"
   }
 }
