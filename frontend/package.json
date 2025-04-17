@@ -2,12 +2,14 @@
   "name": "transcendence-frontend",
   "scripts": {
     "build": "tsc && esbuild src/main.ts --bundle --minify --sourcemap --outfile=dist/app.js --target=es2020",
-    "dev": "esbuild src/main.ts --bundle --sourcemap --outfile=dist/app.js --servedir=public",
+    "dev-nginx": "esbuild src/main.ts --bundle --sourcemap --outfile=dist/app.js --servedir=public",
+    "dev": "vite --host",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
     "esbuild": "^0.19.11",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^6.3.1"
   },
   "dependencies": {
     "@babylonjs/core": "^6.37.0"
