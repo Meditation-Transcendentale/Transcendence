@@ -1,5 +1,6 @@
 import { ABlock } from "../ABlock";
 import { SimpleForm } from "../customElements/SimpleForm";
+import { CustomEvents } from "../CustomEvents";
 import { createContainer } from "../utils";
 
 export class SignIn extends ABlock {
@@ -42,6 +43,6 @@ export class SignIn extends ABlock {
 		this.form.field1.value = "";
 		this.form.field2.value = "";
 
-		alert("Sign In");
+		document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
 	}
 }

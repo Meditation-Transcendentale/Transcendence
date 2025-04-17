@@ -51,7 +51,8 @@ export class Auth extends ABlock {
 
 
 	public reset() {
-		this.container.setAttribute("disable", "false");
+		this.enable();
+		this.authChoice.setAttribute("disabled", "false");
 		this.signUp.disable();
 		this.signIn.disable();
 	}
