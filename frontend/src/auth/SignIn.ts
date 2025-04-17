@@ -1,11 +1,12 @@
+import { ABlock } from "../ABlock";
 import { SimpleForm } from "../customElements/SimpleForm";
 import { createContainer } from "../utils";
 
-export class SignIn {
-	private container!: HTMLElement;
+export class SignIn extends ABlock {
 	private form!: SimpleForm;
 
 	constructor(parent: HTMLElement) {
+		super();
 		this.init();
 
 		parent.appendChild(this.container);
@@ -41,16 +42,6 @@ export class SignIn {
 		this.form.field1.value = "";
 		this.form.field2.value = "";
 
-
 		alert("Sign In");
 	}
-
-	public disable() {
-		this.container.setAttribute("disabled", "true");
-	}
-
-	public enable() {
-		this.container.setAttribute("disabled", "false");
-	}
-
 }

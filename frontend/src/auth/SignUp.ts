@@ -1,11 +1,12 @@
+import { ABlock } from "../ABlock";
 import { SimpleForm } from "../customElements/SimpleForm";
 import { createContainer } from "../utils";
 
-export class SignUp {
-	private container!: HTMLElement;
+export class SignUp extends ABlock {
 	private form!: SimpleForm;
 
 	constructor(parent: HTMLElement) {
+		super();
 		this.init();
 
 		parent.appendChild(this.container);
@@ -43,13 +44,4 @@ export class SignUp {
 
 		alert("Sign Up");
 	}
-
-	public disable() {
-		this.container.setAttribute("disabled", "true");
-	}
-
-	public enable() {
-		this.container.setAttribute("disabled", "false");
-	}
-
 }

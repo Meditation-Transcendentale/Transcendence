@@ -1,9 +1,9 @@
+import { ABlock } from "../ABlock";
 import { createContainer } from "../utils";
 import { SignIn } from "./SignIn";
 import { SignUp } from "./SignUp";
 
-export class Auth {
-	private container!: HTMLElement;
+export class Auth extends ABlock {
 
 	private signUp!: SignUp;
 	private signIn!: SignIn;
@@ -11,6 +11,7 @@ export class Auth {
 	private authChoice!: HTMLElement;
 
 	constructor(parent: HTMLElement) {
+		super();
 		this.init();
 
 		parent.appendChild(this.container);
@@ -39,16 +40,15 @@ export class Auth {
 		this.authChoice.appendChild(s);
 		this.container.appendChild(this.authChoice);
 
-
-
 		this.signUp = new SignUp(this.container);
 		this.signIn = new SignIn(this.container);
 	}
 
-	private buttonHandler(button: undefined) {
+	private buttonHandler(button: any) {
 		this.authChoice.setAttribute("disabled", "true");
 		button.enable();
 	}
+
 
 	public reset() {
 		this.container.setAttribute("disable", "false");
