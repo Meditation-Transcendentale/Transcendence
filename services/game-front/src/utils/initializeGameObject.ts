@@ -36,7 +36,7 @@ export function createBallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
 	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 1 }, scene);
 	const ballMaterial = new StandardMaterial("ballMaterial", scene);
 	ballMaterial.diffuseColor.set(1, 0, 0);
-	ballMaterial.diffuseTexture = new Texture("moi.png", scene);
+	// ballMaterial.diffuseTexture = new Texture("moi.png", scene);
 	ballMesh.setEnabled(true);
 	ballMesh.setPivotPoint(Vector3.Zero());
 	ballMesh.material = ballMaterial;

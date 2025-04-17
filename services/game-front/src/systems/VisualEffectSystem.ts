@@ -34,7 +34,7 @@ export class VisualEffectSystem extends System {
 				
 				let particleSystem = new ParticleSystem("particles", 200, this.scene);
 				let position = transform.position.clone();
-				position.set(position.x + ball.velocity.x * (deltaTime / 1000), 0.5, position.z + ball.velocity.z * (deltaTime / 1000));
+				position.set(position.x + (ball.velocity.x * 4) * (deltaTime / 1000), 0.5, position.z + (ball.velocity.z * 4) * (deltaTime / 1000));
 				particleSystem.emitter = position;
 				
 				//Texture of each particle
@@ -43,9 +43,9 @@ export class VisualEffectSystem extends System {
 				// Where the particles come from
 
 				// Colors of all particles
-				particleSystem.color1 = new Color4(0.7, 0.8, 1.0, 1.0);
-				particleSystem.color2 = new Color4(0.2, 0.5, 1.0, 1.0);
-				particleSystem.colorDead = new Color4(0, 0, 0.2, 1.0);
+				particleSystem.color1 = new Color4(0.58, 0.1, 0.1, 1.0);
+				particleSystem.color2 = new Color4(0.75, 0.2, 0.2, 1.0);
+				particleSystem.colorDead = new Color4(0.2, 0, 0.0, 1.0);
 
 				// Size of each particle (random between...
 				particleSystem.minSize = 0.01;

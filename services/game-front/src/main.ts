@@ -14,7 +14,7 @@ import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate
 import { DebugVisualizer } from "./debug/DebugVisualizer.js";
 import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
-import { createArenaMesh, createBallMesh, createCamera, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
+import { createArenaMesh, createBallMesh, createCamera, createPaddleMesh, createWallMesh } from "./utils/initializeGameObject.js";
 
 // import "@babylonjs/inspector";
 const API_BASE = "http://10.19.229.249:4000";

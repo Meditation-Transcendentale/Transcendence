@@ -62,7 +62,7 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 
 	const ballEntity = new Entity();
 	const pos = new Vector3(0, 0, 0);
-	const vel = new Vector3(5, Math.random(), 0);
+	const vel = new Vector3(5, 0, 0);
 	ballEntity.addComponent(new BallComponent(0, pos, vel));
 	ballEntity.addComponent(new TransformComponent(pos, Vector3.Zero(), new Vector3(1, 1, 1)));
 	ecs.addEntity(ballEntity);
