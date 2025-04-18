@@ -1,5 +1,6 @@
-import { handleErrors } from "../../shared/handleErrors.mjs";
-import { statusCode } from "../../shared/returnValues.mjs";
+import { parse } from "path";
+import handleErrors from "../../shared/handleErrors.mjs";
+import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { nc, jc } from "./index.js";
 
 const playerStatsSchema = {
@@ -26,19 +27,22 @@ function getBestWinStreak(matches) {
 	return bestStreak;
 }
 
+
 export default async function statsRoutes(app) {
 
-	app.get('/player/:playerId', { schema: playerStatsSchema }, handleErrors(async (req, res) => {
+	app.get('/stats/player/:playerId', { schema: playerStatsSchema },  handleErrors(async (req, res) => {
 		
 		const playerId = req.params.playerId;
 
+		// check if playerId is valid
+
+		
 		const response = await nc.request(`stats.getPlayerStats`, jc.encode(playerId), { timeout: 1000 });
 
-		const result = jc.decode(response.data);
-		if (!result.success) {
-			throw { status: result.status, message: result.message };
-		}
-		const playerStats = result.data;
+		const playerStats = jc.decode(response.data);
+		console.log("Player stats:", playerStats);
+
+
 
 		res.code(statusCode.SUCCESS).send({ playerStats: { 
 			classic: {
@@ -71,9 +75,13 @@ export default async function statsRoutes(app) {
 				kills: playerStats.io.reduce((acc, match) => acc + match.kills, 0),
 				avg_kills: Number((playerStats.io.reduce((acc, match) => acc + match.kills, 0) / playerStats.io.length || 0).toFixed(2)),
 				best_kills: playerStats.io.reduce((acc, match) => Math.max(acc, match.kills), 0) },
-			classic_history: playerStats.classic,
-			br_history: playerStats.br,
-			io_history: playerStats.io
 		}});
+	}));
+
+	app.get('/stats/player/:playerId/history', handleErrors(async (req, res) => {
+		
+
+
+
 	}));
 }
