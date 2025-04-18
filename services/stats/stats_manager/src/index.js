@@ -1,9 +1,9 @@
 import Fastify from "fastify";
 import dotenv from "dotenv";
 import fs from "fs";
-import { connect, StringCodec } from "nats";
+import { connect, JSONCodec } from "nats";
 
-import { statusCode, returnMessages } from "./returnValues.js";
+import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import handleGameFinished from "./natsHandler.js";
 import statsRoutes from "./statsRoutes.js";
 
@@ -28,13 +28,13 @@ const verifyApiKey = (req, res, done) => {
 app.addHook('onRequest', verifyApiKey);
 
 const nc = await connect({ servers: process.env.NATS_URL });
-const sc = StringCodec();
+const jc = JSONCodec();
 
 (async () => {
 
 	const sub = nc.subscribe("game.finished");
 	for await (const msg of sub) {
-		const data = JSON.parse(sc.decode(msg.data));
+		const data = JSON.parse(jc.decode(msg.data));
 		handleGameFinished(data);
 	}
 })();
@@ -52,4 +52,4 @@ const start = async () => {
 
 start();
 
-export { nc, sc };
+export { nc, jc };

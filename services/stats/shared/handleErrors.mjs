@@ -1,4 +1,4 @@
-import { statusCode, returnMessages } from "./returnValues.js";
+import { statusCode, returnMessages } from "./returnValues.mjs";
 
 const handleErrors = (fn) => async (req, res) => {
 	try {

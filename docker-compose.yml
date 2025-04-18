@@ -1,5 +1,4 @@
 
-
 services:
   register-service:
     build: 
@@ -7,17 +6,20 @@ services:
     ports:
       - "4001:4001"
     volumes:
-      - database:/app/database
-      - certs:/app/certs:ro
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRETKEY=${JWT_SECRETKEY}
+      - DATABASE_URL=${DATABASE_URL}
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
     networks:
       - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
 
   auth-service:
     build:
@@ -25,8 +27,8 @@ services:
     ports:
       - "4002:4002"
     volumes:
-      - database:/app/database
-      - certs:/app/certs:ro
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -37,6 +39,9 @@ services:
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
     networks:
       - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
 
   update_user_info-service:
     build:
@@ -44,34 +49,20 @@ services:
     ports:
       - "4003:4003"
     volumes:
-      - database:/app/database
-      - certs:/app/certs:ro
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=${DATABASE_URL}
       - SSL_KEY=${SSL_KEY}
+      - DATABASE_URL=${DATABASE_URL}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     networks:
       - transcendence-network
-    
-  stats-service:
-    build:
-      context: ./services/stats
-    ports:
-      - "6000:6000"
-    volumes:
-      - database:/app/database
-      - certs:/app/certs:ro
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=${DATABASE_URL}
-      - SSL_KEY=${SSL_KEY}
-      - SSL_CERT=${SSL_CERT}
-      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
-    networks:
-      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
 
   api-gateway:
     build:
@@ -79,7 +70,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - certs:/app/certs:ro
+      - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
@@ -88,9 +79,9 @@ services:
     networks:
       - transcendence-network
     depends_on:
-      - auth-service
-      - register-service
-      - update_user_info-service
+      database_certs-init:
+          condition: service_completed_successfully
+
 
   docs-service:
     build:
@@ -98,7 +89,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - certs:/app/certs:ro
+      - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
@@ -107,26 +98,29 @@ services:
     networks:
       - transcendence-network
     depends_on:
-      - api-gateway
-      - auth-service
-      - register-service
-      - update_user_info-service
-
-
-
-volumes:
-  database:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${DATABASE_URL_PATH}
-  certs:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${DATABASE_URL_PATH}
+      database_certs-init:
+        condition: service_completed_successfully
+      api-gateway:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      register-service:
+        condition: service_started
+      update_user_info-service:
+        condition: service_started
+  
+  database_certs-init:
+    build:
+      context: ./database_certs-init
+    volumes:
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs
+    environment:
+      - NODE_ENV=development
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+    networks:
+      - transcendence-network
 
 networks:
   transcendence-network:
