@@ -20,11 +20,17 @@ const nats = await connect({ servers: process.env.NATS_URL });
 	const sub = nats.subscribe("stats.getPlayerStats");
 	for await (const msg of sub) {
 		const playerId = jc.decode(msg.data);
-		console.log("Received request for player stats:", playerId);
-		// const playerStats = statService.getPlayerStatsClassicMode(playerId);
-		const test = JSON.stringify(statService.test());
-		console.log("users:", test);
-		// nats.publish(msg.reply, sc.encode(JSON.stringify(playerStats)));
-		nats.publish(msg.reply, jc.encode(test));
+		console.log("Received request for player stats:", playerId, "type :", typeof playerId);
+		
+		const playerStats = {
+			classic: statService.getPlayerStatsClassicMode(playerId),
+			br: statService.getPlayerStatsBRMode(playerId),
+			io: statService.getPlayerStatsIOMode(playerId)
+		};
+		console.log("Player stats:", playerStats);
+
+
+		nats.publish(msg.reply, jc.encode(playerStats));
+
 	}
 })();
