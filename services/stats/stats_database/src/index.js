@@ -12,20 +12,18 @@ const nats = await connect({ servers: process.env.NATS_URL });
 
 	const sub = nats.subscribe("stats.getPlayerStats");
 	for await (const msg of sub) {
-		try {
-			const playerId = jc.decode(msg.data);
-			statService.isUserIdExisting(playerId);
-			const playerStats = {
-				classic: statService.getPlayerStatsClassicMode(playerId),
-				br: statService.getPlayerStatsBRMode(playerId),
-				io: statService.getPlayerStatsIOMode(playerId)
-			};
-			nats.publish(msg.reply, jc.encode({ success: true, data: playerStats }));
-		} catch (error) {
-			const status = error.status || 500;
-			const message = error.message || "Internal Server Error";
-			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
-		}
-	}
+		const playerId = jc.decode(msg.data);
+		console.log("Received request for player stats:", playerId, "type :", typeof playerId);
+		
+		const playerStats = {
+			classic: statService.getPlayerStatsClassicMode(playerId),
+			br: statService.getPlayerStatsBRMode(playerId),
+			io: statService.getPlayerStatsIOMode(playerId)
+		};
+		console.log("Player stats:", playerStats);
 
-}))();
+
+		nats.publish(msg.reply, jc.encode(playerStats));
+
+	}
+})();
