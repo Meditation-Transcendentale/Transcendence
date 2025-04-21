@@ -1,6 +1,7 @@
 import { ABlock } from "../ABlock";
 import { SimpleForm } from "../customElements/SimpleForm";
 import { CustomEvents } from "../CustomEvents";
+import { loginRequest, registerRequest } from "../requests";
 import { createContainer } from "../utils";
 
 export class SignIn extends ABlock {
@@ -35,14 +36,37 @@ export class SignIn extends ABlock {
 		this.container.appendChild(this.form);
 
 		this.disable()
-
 	}
 
-	private submitHandler(ev: Event) {
-		ev.preventDefault();
+	public reset() {
 		this.form.field1.value = "";
 		this.form.field2.value = "";
+	}
 
+
+	private async submitHandler(ev: Event) {
+		ev.preventDefault();
+		const body = JSON.stringify({
+			"username": this.form.field1.value,
+			"password": this.form.field2.value
+		});
+
+		await registerRequest(this.form.field1.value, this.form.field2.value)
+			.then((response) => { this.responseHandler(response as JSON) })
+			.catch((error) => { console.log(error) })
+
+		this.reset();
 		document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
+	}
+
+	private async responseHandler(data: JSON) {
+		console.log(data.message);
+
+		await loginRequest(this.form.field1.value, this.form.field2.value)
+			.then(response => console.log(response))
+			.catch(error => console.log(error));
+
+		console.log(document.cookie);
+
 	}
 }
