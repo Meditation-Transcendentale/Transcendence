@@ -1,0 +1,130 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Stats service Documentation",
+		"version": "1.0.0",
+		"description": "Documentation for the Stats Service in the API."
+	},
+	"components": {
+		"securitySchemes": {
+			"ApiKey": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "x-api-key",
+				"description" : "API Key required to access the endpoints."
+			}
+		},
+        "schemas": {
+            "PlayerStats": {
+                "type": "object",
+                "properties": {
+                    "classic": { "$ref": "#/components/schemas/StatsModeClassic" },
+                    "br": { "$ref": "#/components/schemas/StatsModeBRIO" },
+                    "io": { "$ref": "#/components/schemas/StatsModeBRIO" },
+                    "classic_history": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/MatchClassic" }
+                    },
+                    "br_history": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/MatchBRIO" }
+                    },
+                    "io_history": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/MatchBRIO" }
+                    }
+                }
+            },
+            "StatsModeClassic": {
+                "type": "object",
+                "properties": {
+                    "game_played": { "type": "integer" },
+                    "wins": { "type": "integer" },
+                    "losses": { "type": "integer" },
+                    "win_rate": { "type": "number", "format": "float" },
+                    "best_win_streak": { "type": "integer" },
+                    "goals_scored": { "type": "integer" },
+                    "goals_conceded": { "type": "integer" },
+                    "avg_goals_scored": { "type": "number", "format": "float" },
+                    "avg_goals_conceded": { "type": "number", "format": "float" }
+                }
+            },
+            "StatsModeBRIO": {
+                "type": "object",
+                "properties": {
+                    "game_played": { "type": "integer" },
+                    "wins": { "type": "integer" },
+                    "win_rate": { "type": "number", "format": "float" },
+                    "best_win_streak": { "type": "integer" },
+                    "avg_placement": { "type": "number", "format": "float" },
+                    "best_placement": { "type": "integer" },
+                    "kills": { "type": "integer" },
+                    "avg_kills": { "type": "number", "format": "float" },
+                    "best_kills": { "type": "integer" }
+                }
+            },
+            "MatchClassic": {
+                "type": "object",
+                "properties": {
+                    "is_winner": { "type": "boolean" },
+                    "goals_scored": { "type": "integer" },
+                    "goals_conceded": { "type": "integer" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                }
+            },
+            "MatchBRIO": {
+                "type": "object",
+                "properties": {
+                    "is_winner": { "type": "boolean" },
+                    "placement": { "type": "integer" },
+                    "kills": { "type": "integer" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                }
+            }
+        }
+	},
+	"security": [
+		{
+			"ApiKey": []
+		}
+	],
+	"paths": {
+        "/stats/player/:playerId": {
+            "get": {
+                "summary": "Get player stats",
+                "tags": ["Stats"],
+                "description": "Retrieve the stats of a specific player.",
+                "parameters": [
+                    {
+                        "name": "playerId",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the player whose stats are to be retrieved.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Player stats retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PlayerStats"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Player not found."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+
+                }
+            }
+        }
+    }
+}

@@ -27,20 +27,21 @@ services:
 
   statsDatabase:
     build: 
-      context: ./services/stats/statsDatabase
-      container_name: statsDatabase
-      ports:
-        - "6001:6001"
-      volumes:
-        - certs:/app/certs:ro
-        - database:/app/database
-        - shared:/app/shared
-      environment:
-        - NODE_ENV=development
-        - DATABASE_URL=${DATABASE_URL}
-        - NATS_URL=${NATS_URL}
-      networks:
-        - transcendence-network
+      context: ./services/stats/stats_database
+    container_name: stats_database
+    volumes:
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs:ro
+      - shared:/app/shared
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - NATS_URL=${NATS_URL}
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
 
 volumes:
   shared:

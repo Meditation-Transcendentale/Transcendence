@@ -8,5 +8,11 @@
   },
   "author": "",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "nats": "^2.29.3",
+	  "dotenv": "^16.5.0"
+  }
 }
+

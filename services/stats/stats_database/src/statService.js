@@ -20,10 +20,6 @@ const getPlayerStatsBRIOModeStmt = database.prepare(`
 `);
 const isUserIdExistingStmt = database.prepare(`SELECT * FROM users WHERE id = ?`);
 
-
-
-
-
 const statService = {
 	getPlayerStatsClassicMode: (playerId) => {
 		const playerStatsClassic = getPlayerStatsClassicModeStmt.all(playerId);
