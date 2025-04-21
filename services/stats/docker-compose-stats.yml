@@ -1,0 +1,60 @@
+services:
+  nats:
+    image: nats:latest
+    container_name: nats
+    ports:
+      - "6002:6002"
+    volumes:
+      - ./services/stats/nats-server.conf:/nats-server.conf:ro
+    command: ["-c", "/nats-server.conf"]
+    networks:
+      - transcendence-network
+  
+  stats_manager:
+    build: 
+      context: ./services/stats/stats_manager
+    container_name: stats_manager
+    ports:
+      - "6000:6000"
+    volumes:
+      - shared:/app/shared
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs:ro
+    environment:
+      - NODE_ENV=development
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - NATS_URL=${NATS_URL}
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+
+  stats_database:
+    build: 
+      context: ./services/stats/stats_database
+    container_name: stats_database
+    volumes:
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs:ro
+      - shared:/app/shared
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - NATS_URL=${NATS_URL}
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+
+volumes:
+  shared:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/stats/shared
+  

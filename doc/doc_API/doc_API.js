@@ -30,6 +30,7 @@ const apiGatewayDocs = JSON.parse(fs.readFileSync("./docs_json/api-gateway.json"
 const authDocs = JSON.parse(fs.readFileSync("./docs_json/auth-service.json", "utf8"));
 const updateUserInfoDocs = JSON.parse(fs.readFileSync("./docs_json/update_user_info-service.json", "utf8"));
 const registerDocs = JSON.parse(fs.readFileSync("./docs_json/register-service.json", "utf8"));
+const statsDocs = JSON.parse(fs.readFileSync("./docs_json/stats.json", "utf8"));
 
 const mergedDocs = {
 	openapi: "3.0.0",
@@ -42,22 +43,25 @@ const mergedDocs = {
 		...apiGatewayDocs.paths,
 		...authDocs.paths,
 		...updateUserInfoDocs.paths,
-		...registerDocs.paths
+		...registerDocs.paths,
+		...statsDocs.paths
   	},
   	components: {
 
 		...apiGatewayDocs.components,
 		...authDocs.components,
 		...updateUserInfoDocs.components,
-		...registerDocs.components
+		...registerDocs.components,
+		...statsDocs.components
   	},
   	security: {
 
 		...apiGatewayDocs.security,
 		...authDocs.security,
 		...updateUserInfoDocs.security,
-		...registerDocs.security
-	} 
+		...registerDocs.security,
+		...statsDocs.security
+  	}
 };
 
 
