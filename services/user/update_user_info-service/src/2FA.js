@@ -3,9 +3,9 @@ import QRCode from 'qrcode';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 
-import userService from "./userService.js";
-import { statusCode, returnMessages } from "./returnValues.js";
-import handleErrors from "./handleErrors.js";
+// import userService from "./userService.js";
+import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { handleErrorsValid, handleErrors } from "../../shared/handleErrors.mjs";
 
 dotenv.config({ path: "../../../.env" });
 
@@ -62,7 +62,7 @@ const twoFARoutes = (app) => {
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.TWO_FA_ENABLED, qrCode });
 	}));
 
-	app.post('/verify-2fa', handleErrors(async (req, res) => {
+	app.post('/verify-2fa', handleErrorsValid(async (req, res) => {
 
 		const user = userService.getUserFromHeader(req);
 

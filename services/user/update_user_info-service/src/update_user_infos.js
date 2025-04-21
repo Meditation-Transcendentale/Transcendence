@@ -6,10 +6,9 @@ import axios from "axios";
 import https from "https";
 
 import { twoFARoutes } from "./2FA.js";
-import addFriendRoute from "./friendship.js";
-import { statusCode, returnMessages } from "./returnValues.js";
-import handleErrors from "./handleErrors.js";
-import userService from "./userService.js";
+import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { handleErrors } from "../../shared/handleErrors.mjs";
+// import userService from "./userService.js";
 
 dotenv.config({ path: "../../../../.env" });
 
@@ -109,7 +108,7 @@ app.patch('/password', handleErrors(async (req, res) => {
 
 }));
 
-addFriendRoute(app);
+// addFriendRoute(app);
 twoFARoutes(app);
 
 const start = async () => {

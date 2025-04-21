@@ -8,9 +8,9 @@ import { OAuth2Client } from 'google-auth-library';
 import https from 'https';
 import axios from 'axios';
 
-import { statusCode, returnMessages } from "./returnValues.js";
-import handleErrors from "./handleErrors.js";
-import userService from "./userService.js";
+import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { handleErrors } from "../../shared/handleErrors.mjs";
+// import userService from "./userService.js";
 
 dotenv.config({ path: "../../../../.env" });
 
@@ -145,8 +145,6 @@ app.post('/logout', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_OUT });
 
 }));
-
-
 
 const start = async () => {
 	try {

@@ -107,6 +107,22 @@ app.register(fastifyHttpProxy, {
 });
 
 app.register(fastifyHttpProxy, {
+	upstream: 'https://friends-service:4004',
+	prefix: '/friends',
+	http2: false,
+	preHandler: verifyJWT,
+	replyOptions: {
+		rewriteRequestHeaders: (req, headers) => {
+			if (req.user) {
+				headers['user'] = JSON.stringify(req.user);
+			}
+			headers['x-api-key'] = process.env.API_GATEWAY_KEY;
+			return headers;
+		}
+	}
+});
+
+app.register(fastifyHttpProxy, {
 	upstream: 'https://stats_manager:6000',
 	prefix: '/stats',
 	http2: false,

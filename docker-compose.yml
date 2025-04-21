@@ -67,6 +67,46 @@ services:
       database_certs-init:
         condition: service_completed_successfully
 
+  friends-service:
+    build:
+      context: ./services/user/friends-service
+    ports:
+      - "4004:4004"
+    volumes:
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs:ro
+      - user_shared:/app/shared
+    environment:
+      - NODE_ENV=development
+      - SSL_KEY=${SSL_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+
+  user-database:
+    build: 
+      context: ./services/user/user_database
+    container_name: user_database
+    volumes:
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs:ro
+      - user_shared:/app/shared
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - NATS_URL=${NATS_URL}
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+
   api-gateway:
     build:
       context: ./gateway
@@ -132,7 +172,6 @@ volumes:
       type: none
       o: bind
       device: ./services/user/shared
-
 
 networks:
   transcendence-network:

@@ -1,10 +1,13 @@
 import Database from 'better-sqlite3';
-import { statusCode, returnMessages } from "./returnValues.js";
+import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 
 const database = new Database(process.env.DATABASE_URL, {fileMustExist: true });
 database.pragma("journal_mode=WAL");
 
 const getUserByUsernameStmt = database.prepare("SELECT * FROM users WHERE username = ?");
+const addGoogleUserStmt = database.prepare("INSERT INTO users (google_id, username, email, avatar_path) VALUES (?, ?, ?, ?)");
+const checkUsernameAvailabilityStmt = database.prepare("SELECT * FROM users WHERE username = ?");
+const registerUserStmt = database.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
 const getUserByIdStmt = database.prepare("SELECT * FROM users WHERE id = ?");
 const addFriendRequestStmt = database.prepare("INSERT INTO friendslist (user_id_1, user_id_2) VALUES (?, ?)");
 const getFriendshipByIdStmt = database.prepare("SELECT * FROM friendslist WHERE id = ?");
@@ -30,6 +33,18 @@ const userService = {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
 		}
 		return user;
+	},
+	addGoogleUser: (googleId, username, email, avatarPath) => {
+		addGoogleUserStmt.run(googleId, username, email, avatarPath);
+	},
+	checkUsernameAvailability: (username) => {
+		const user = checkUsernameAvailabilityStmt.get(username);
+		if (user) {
+			throw { status: statusCode.CONFLICT, message: returnMessages.USERNAME_ALREADY_USED };
+		}
+	},
+	registerUser: (username, hashedPassword) => {
+		registerUserStmt.run(username, hashedPassword);
 	},
 	getUserFromId: (id) => {
 		const user = getUserByIdStmt.get(id);

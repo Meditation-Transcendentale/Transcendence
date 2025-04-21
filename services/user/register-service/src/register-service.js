@@ -3,9 +3,9 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import fs from 'fs';
 
-import handleErrors from './handleErrors.js';
-import userService from './userService.js';
-import { statusCode, returnMessages } from "./returnValues.js";
+// import userService from './userService.js';
+import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { handleErrors } from "../../shared/handleErrors.mjs";
 
 dotenv.config({path: "../../../../.env"});
 
