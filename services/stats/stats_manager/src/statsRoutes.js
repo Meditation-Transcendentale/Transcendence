@@ -28,7 +28,7 @@ function getBestWinStreak(matches) {
 
 export default async function statsRoutes(app) {
 
-	app.get('/stats/player/:playerId', { schema: playerStatsSchema },  handleErrors(async (req, res) => {
+	app.get('/player/:playerId', { schema: playerStatsSchema }, handleErrors(async (req, res) => {
 		
 		const playerId = req.params.playerId;
 

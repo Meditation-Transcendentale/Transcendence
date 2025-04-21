@@ -36,8 +36,6 @@ services:
     build: 
       context: ./services/stats/stats_database
     container_name: stats_database
-    # ports:
-    #   - "6001:6001"
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
