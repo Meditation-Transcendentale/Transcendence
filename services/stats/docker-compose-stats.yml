@@ -17,7 +17,7 @@ services:
     ports:
       - "6000:6000"
     volumes:
-      - shared:/app/shared
+      - stats_shared:/app/shared
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
     environment:
@@ -39,7 +39,7 @@ services:
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
-      - shared:/app/shared
+      - stats_shared:/app/shared
     environment:
       - NODE_ENV=development
       - DATABASE_URL=${DATABASE_URL}
@@ -51,7 +51,7 @@ services:
         condition: service_completed_successfully
 
 volumes:
-  shared:
+  stats_shared:
     driver: local
     driver_opts:
       type: none

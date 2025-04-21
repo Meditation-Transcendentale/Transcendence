@@ -8,6 +8,7 @@ services:
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
+      - user_shared:/app/shared
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -29,6 +30,7 @@ services:
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
+      - user_shared:/app/shared
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -51,6 +53,7 @@ services:
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
+      - user_shared:/app/shared
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
@@ -121,6 +124,15 @@ services:
       - SSL_CERT=${SSL_CERT}
     networks:
       - transcendence-network
+
+volumes:
+  user_shared:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/user/shared
+
 
 networks:
   transcendence-network:
