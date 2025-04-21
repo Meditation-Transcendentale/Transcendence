@@ -24,8 +24,6 @@ const statService = {
 	getPlayerStatsClassicMode: (playerId) => {
 		const playerStatsClassic = getPlayerStatsClassicModeStmt.all(playerId);
 		return playerStatsClassic;
-		const playerStatsClassic = getPlayerStatsClassicModeStmt.all(playerId);
-		return playerStatsClassic;
 	},
 	getPlayerStatsBRMode: (playerId) => {
 		const playerStatsBR = getPlayerStatsBRIOModeStmt.all(playerId, 'br');

@@ -8,13 +8,6 @@ dotenv.config({ path: "../../../.env" });
 const jc = JSONCodec();
 const nats = await connect({ servers: process.env.NATS_URL });
 
-// nats.subscribe("stats.getPlayerStats", async (msg) => {
-// 	const playerId = sc.decode(msg.data);
-// 	console.log("Received request for player stats:", playerId);
-// 	const playerStats = statService.getPlayerStatsClassicMode(playerId);
-// 	nats.publish(msg.reply, sc.encode(JSON.stringify(playerStats)));
-// });
-
 (handleErrorsNats(async () => {
 
 	const sub = nats.subscribe("stats.getPlayerStats");
@@ -34,5 +27,4 @@ const nats = await connect({ servers: process.env.NATS_URL });
 			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
 		}
 	}
-	
 }))();

@@ -11,3 +11,5 @@ CREATE TABLE IF NOT EXISTS match_stats (
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	UNIQUE (match_id, user_id)
 );
+CREATE INDEX IF NOT EXISTS idx_match_stats_match_id ON match_stats(match_id);
+CREATE INDEX IF NOT EXISTS idx_match_stats_user ON match_stats(user_id);
