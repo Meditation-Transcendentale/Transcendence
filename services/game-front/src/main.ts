@@ -1,5 +1,4 @@
-import { Engine, Scene, Vector3, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Mesh } from "@babylonjs/core";
-import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
+import { Engine, Scene, Vector3, ArcRotateCamera} from "@babylonjs/core";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -9,9 +8,12 @@ import { ThinInstanceSystem } from "./systems/ThinInstanceSystem.js";
 import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
-import { getOrCreateUIID } from "./utils/getUIID.js";
+import { getOrCreateUUID } from "./utils/getUUID.js";
 import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
 import { DebugVisualizer } from "./debug/DebugVisualizer.js";
+import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
+import { gameScoreInterface } from "./utils/displayGameInfo.js";
+import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
 
 const API_BASE = "http://10.19.225.151:4000";
 // const API_BASE = "http://localhost:4000";
@@ -28,7 +30,8 @@ class Game {
 	private debugVisualizer!: DebugVisualizer;
 	private gameId;
 	private canvas;
-	private paddleId: any;
+	private paddleId : any;
+	private scoreUI: any;
 
 	constructor(canvas: any, gameId: any) {
 		this.canvas = canvas;
@@ -49,95 +52,61 @@ class Game {
 			wallWidth: 1
 		};
 
-		const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+		// create scene component
+		this.scoreUI = gameScoreInterface(0, 0);
+		this.camera = createCamera(this.scene, this.canvas);
 
-		const scoreTitle = new TextBlock();
-		scoreTitle.text = "Score";
-		scoreTitle.color = "white";
-		scoreTitle.fontSize = 34;
-		scoreTitle.left = "0px";
-		scoreTitle.top = "-300px";
-		advancedTexture.addControl(scoreTitle);
+		const baseMeshes = this.createBaseMeshes(config);
+		const instanceManagers = this.createInstanceManagers(baseMeshes);
 
-		const scorePipe = new TextBlock();
-		scorePipe.text = "|";
-		scorePipe.color = "white";
-		scorePipe.fontSize = 24;
-		scorePipe.left = "0px";
-		scorePipe.top = "-250px";
-		advancedTexture.addControl(scorePipe);
-
-		let scoreP1 = 0;
-		let scoreP2 = 0;
-
-		const score = new TextBlock();
-		score.text = scoreP1 + " | " + scoreP2;
-		score.color = "white";
-		score.fontSize = 24;
-		score.left = "0px";
-		score.top = "-250px";
-		advancedTexture.addControl(score);
-
-		this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 60, Vector3.Zero(), this.scene);
-		this.camera.attachControl(this.canvas, true);
-		new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
-
-		const arenaMesh = MeshBuilder.CreateBox("arenaBox", { width: config.arenaSizeX, height: config.arenaSizeZ, depth: 1 }, this.scene);
-		const material = new StandardMaterial("arenaMaterial", this.scene);
-		material.diffuseColor.set(0, 0, 0);
-		arenaMesh.rotation.x = Math.PI / 2;
-		arenaMesh.position.y = -0.5;
-		arenaMesh.material = material;
-
-		const ballBaseMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 1 }, this.scene);
-
-		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
-		//ballMaterial.diffuseColor.set(1, 0, 0);
-		ballMaterial.diffuseTexture = new Texture("moi.png", this.scene);
-		ballBaseMesh.setEnabled(true);
-		ballBaseMesh.setPivotPoint(Vector3.Zero());
-		ballBaseMesh.material = ballMaterial;
-
-		const paddleBaseMesh = MeshBuilder.CreateBox("paddleBase", { width: 3, height: 0.4, depth: 0.4 }, this.scene);
-		paddleBaseMesh.setEnabled(true);
-		paddleBaseMesh.setPivotPoint(Vector3.Zero());
-
-		const wallBaseMesh = MeshBuilder.CreateBox("wallBase", { width: config.wallWidth, height: 1, depth: 20 }, this.scene);
-		const wallMaterial = new StandardMaterial("arenaMaterial", this.scene);
-		wallMaterial.diffuseColor.set(1, 0, 0);
-		wallBaseMesh.material = wallMaterial;
-		wallBaseMesh.setEnabled(true);
-		wallBaseMesh.setPivotPoint(Vector3.Zero());
-
-		const ballInstanceManager = new ThinInstanceManager(ballBaseMesh, 1000, 50, 100);
-		const paddleInstanceManager = new ThinInstanceManager(paddleBaseMesh, 100, 50, 100);
-		const wallInstanceManager = new ThinInstanceManager(wallBaseMesh, 100, 50, 100);
-
-		this.ecs = new ECSManager();
-		const uiid = getOrCreateUIID();
-		const wsUrl = `ws://10.19.225.151:3000?uuid=${encodeURIComponent(uiid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		const uuid = getOrCreateUUID();
+		const wsUrl = `ws://10.19.229.249:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		// const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uiid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
-		this.ecs.addSystem(new MovementSystem());
-		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
-		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uiid));
-		this.ecs.addSystem(new ThinInstanceSystem(
-			ballInstanceManager,
-			paddleInstanceManager,
-			wallInstanceManager,
-			this.camera
-		));
+		this.initECS(config, instanceManagers, uuid);
 
-		localPaddleId = await this.waitForWelcome();
-		createGameTemplate(this.ecs, config, localPaddleId);
 		this.stateManager = new StateManager(this.ecs);
 		this.stateManager.update();
 
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
 		});
+	}
+
+	private createInstanceManagers(baseMeshes: any){
+		return {
+			ball: new ThinInstanceManager(baseMeshes.ball, 1, 50, 100),
+			paddle: new ThinInstanceManager(baseMeshes.paddle, 2, 50, 100),
+			wall: new ThinInstanceManager(baseMeshes.wall, 4, 50, 100)
+		}
+	}
+
+	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string){
+		this.ecs = new ECSManager();
+		this.ecs.addSystem(new MovementSystem());
+		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
+		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid, this.scoreUI));
+		this.ecs.addSystem(new ThinInstanceSystem(
+			instanceManagers.ball,
+			instanceManagers.paddle,
+			instanceManagers.wall,
+			this.camera
+		));
+		this.ecs.addSystem(new VisualEffectSystem(this.scene));
+
+		localPaddleId = await this.waitForWelcome();
+		createGameTemplate(this.ecs, config, localPaddleId);
+	}
+
+	private createBaseMeshes(config: GameTemplateConfig){
+		return {
+			arena: createArenaMesh(this.scene, config),
+			ball: createBallMesh(this.scene, config),
+			paddle: createPaddleMesh(this.scene, config),
+			wall: createWallMesh(this.scene, config)
+		}
 	}
 
 	waitForWelcome() {
