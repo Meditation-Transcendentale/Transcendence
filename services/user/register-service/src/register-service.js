@@ -2,10 +2,12 @@ import Fastify from 'fastify';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import fs from 'fs';
+import { connect, JSONCodec } from 'nats';
 
 // import userService from './userService.js';
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
+import { natsRequest } from '../../shared/natsRequest.mjs';
 
 dotenv.config({path: "../../../../.env"});
 
@@ -38,10 +40,13 @@ const verifyApiKey = (req, res, done) => {
 
 app.addHook('onRequest', verifyApiKey);
 
+const nats = await connect({ servers: process.env.NATS_URL });
+const jc = JSONCodec();
+
 const USERNAME_REGEX = /^[a-zA-Z0-9]{3,20}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
-app.post('/', {schema: registerSchema},  handleErrors(async (req, res) => {
+app.post('/', {schema: registerSchema}, handleErrors(async (req, res) => {
 	
 	const { username, password } = req.body;
 
@@ -53,11 +58,13 @@ app.post('/', {schema: registerSchema},  handleErrors(async (req, res) => {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_INVALID };
 	}
 
-	userService.checkUsernameAvailability(username);
+	// userService.checkUsernameAvailability(username);
+	natsRequest(nats, jc, 'user.checkUsernameAvailability', { username });
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 
-	userService.registerUser(username, hashedPassword);
+	// userService.registerUser(username, hashedPassword);
+	natsRequest(nats, jc, 'user.registerUser', { username, hashedPassword });
 
 	res.code(statusCode.CREATED).send({ message: returnMessages.USER_CREATED });
 }));

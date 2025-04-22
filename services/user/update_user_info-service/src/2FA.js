@@ -2,12 +2,17 @@ import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import { connect, JSONCodec } from 'nats';
 
 // import userService from "./userService.js";
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrorsValid, handleErrors } from "../../shared/handleErrors.mjs";
+import { natsRequest } from '../../shared/natsRequest.mjs';
 
 dotenv.config({ path: "../../../.env" });
+
+const nats = await connect({ servers: process.env.NATS_URL });
+const jc = JSONCodec();
 
 function generateSecret() {
 	return encrypt(speakeasy.generateSecret( { length: 20 } ).base32);
@@ -44,7 +49,8 @@ function decrypt(text) {
 const twoFARoutes = (app) => {
 	app.post('/enable-2fa', handleErrors(async (req, res) => {
 
-		const user = userService.getUserFromHeader(req);
+		// const user = userService.getUserFromHeader(req);
+		const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 			
 		if (user.two_fa_enabled) {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_ALREADY_ENABLED };
@@ -54,7 +60,8 @@ const twoFARoutes = (app) => {
 
 		// console.log(secret, user.id);
 
-		userService.enable2FA(secret, user.id);
+		// userService.enable2FA(secret, user.id);
+		natsRequest(nats, jc, 'user.enable2FA', { secret, userId: user.id });
 
 		const qrCode = await generateQRCode(secret, user.username);
 			// console.log(qrCode);
@@ -64,7 +71,8 @@ const twoFARoutes = (app) => {
 
 	app.post('/verify-2fa', handleErrorsValid(async (req, res) => {
 
-		const user = userService.getUserFromHeader(req);
+		// const user = userService.getUserFromHeader(req);
+		const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 
 		if (!user.two_fa_enabled) {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_NOT_ENABLED, valid: false };

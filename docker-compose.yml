@@ -16,6 +16,7 @@ services:
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - NATS_URL=${NATS_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -39,6 +40,7 @@ services:
       - SSL_CERT=${SSL_CERT}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - NATS_URL=${NATS_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -61,6 +63,7 @@ services:
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - NATS_URL=${NATS_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -83,6 +86,7 @@ services:
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - NATS_URL=${NATS_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -91,7 +95,7 @@ services:
 
   user-database:
     build: 
-      context: ./services/user/user_database
+      context: ./services/user/user-database
     container_name: user_database
     volumes:
       - ./shared/db:/app/data
