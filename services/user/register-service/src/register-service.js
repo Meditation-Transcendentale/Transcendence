@@ -59,12 +59,12 @@ app.post('/', {schema: registerSchema}, handleErrors(async (req, res) => {
 	}
 
 	// userService.checkUsernameAvailability(username);
-	natsRequest(nats, jc, 'user.checkUsernameAvailability', { username });
+	await natsRequest(nats, jc, 'user.checkUsernameAvailability', { username });
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 
 	// userService.registerUser(username, hashedPassword);
-	natsRequest(nats, jc, 'user.registerUser', { username, hashedPassword });
+	await natsRequest(nats, jc, 'user.registerUser', { username, hashedPassword });
 
 	res.code(statusCode.CREATED).send({ message: returnMessages.USER_CREATED });
 }));

@@ -8,7 +8,9 @@ dotenv.config({ path: "../../../.env" });
 const jc = JSONCodec();
 const nats = await connect({ servers: process.env.NATS_URL });
 
-(handleErrorsNats(async () => {
+const errorWrapper = handleErrorsNats(nats, jc);
+
+(errorWrapper(async () => {
 
 	const sub1 = nats.subscribe("user.getUserFromUsername");
 	for await (const msg of sub1) {

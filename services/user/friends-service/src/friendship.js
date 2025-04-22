@@ -31,14 +31,14 @@ app.addHook('onRequest', verifyApiKey);
 const nats = await connect({ servers: process.env.NATS_URL });
 const jc = JSONCodec();
 
-function checkFriendshipStatus(user, friend) {
+async function checkFriendshipStatus(user, friend) {
 
 	// const friendship = userService.isFriendshipExisting(user.id, friend.id);
 	// const isBlocked = userService.isBlocked(user.id, friend.id);
 	// const isBlockedBy = userService.isBlocked(friend.id, user.id);
-	const friendship = natsRequest(nats, jc, 'user.isFriendshipExisting', { userId1: user.id, userId2: friend.id });
-	const isBlocked = natsRequest(nats, jc, 'user.isBlocked', { userId: user.id, blockedUserId: friend.id });
-	const isBlockedBy = natsRequest(nats, jc, 'user.isBlocked', { userId: friend.id, blockedUserId: user.id });
+	const friendship = await natsRequest(nats, jc, 'user.isFriendshipExisting', { userId1: user.id, userId2: friend.id });
+	const isBlocked = await natsRequest(nats, jc, 'user.isBlocked', { userId: user.id, blockedUserId: friend.id });
+	const isBlockedBy = await natsRequest(nats, jc, 'user.isBlocked', { userId: friend.id, blockedUserId: user.id });
 
 
 	if (friendship) {
@@ -61,7 +61,7 @@ function checkFriendshipStatus(user, friend) {
 app.post('/add-friend', handleErrors(async (req, res) => {
 
 	// const user = userService.getUserFromHeader(req);
-	const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 
 	const addedPlayerUsername = req.body.addedPlayerUsername;
 
@@ -70,7 +70,7 @@ app.post('/add-friend', handleErrors(async (req, res) => {
 	}
 
 	// const friend = userService.getUserFromUsername(addedPlayerUsername);
-	const friend = natsRequest(nats, jc, 'user.getUserFromUsername', { username: addedPlayerUsername });
+	const friend = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: addedPlayerUsername });
 
 	if (user.id === friend.id) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_FRIEND_REQUEST };
@@ -78,7 +78,7 @@ app.post('/add-friend', handleErrors(async (req, res) => {
 	checkFriendshipStatus(user, friend);
 
 	// userService.addFriendRequest(user.id, friend.id);
-	natsRequest(nats, jc, 'user.addFriendRequest', { userId: user.id, friendId: friend.id });
+	await natsRequest(nats, jc, 'user.addFriendRequest', { userId: user.id, friendId: friend.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_SENT });
 }));
@@ -86,7 +86,7 @@ app.post('/add-friend', handleErrors(async (req, res) => {
 app.post('/accept-friend', handleErrors(async (req, res) => {
 	
 	// const user = userService.getUserFromHeader(req);
-	const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 
 	const requestFrom = req.body.requestFrom;
 	if (!requestFrom) {
@@ -96,16 +96,16 @@ app.post('/accept-friend', handleErrors(async (req, res) => {
 	}
 
 	// const friend = userService.getUserFromUsername(requestFrom);
-	const friend = natsRequest(nats, jc, 'user.getUserFromUsername', { username: requestFrom });
+	const friend = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: requestFrom });
 
 	// const friendship = userService.getFriendshipFromUser1Username(user.id, friend.id);
-	const friendship = natsRequest(nats, jc, 'user.getFriendshipFromUser1Username', { userId: user.id, friendId: friend.id });
+	const friendship = await natsRequest(nats, jc, 'user.getFriendshipFromUser1Username', { userId: user.id, friendId: friend.id });
 	if (friendship.status !== 'pending') {
 		throw { status : statusCode.NOT_FOUND, message: returnMessages.FRIEND_REQUEST_NOT_FOUND };
 	}
 
 	// userService.acceptFriendRequest(friendship.id);
-	natsRequest(nats, jc, 'user.acceptFriendRequest', { friendshipId: friendship.id });
+	await natsRequest(nats, jc, 'user.acceptFriendRequest', { friendshipId: friendship.id });
 	
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_ACCEPTED });
 }));
@@ -113,7 +113,7 @@ app.post('/accept-friend', handleErrors(async (req, res) => {
 app.delete('/decline-friend', handleErrors(async (req, res) => {
 
 	// const user = userService.getUserFromHeader(req);
-	const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 
 	const requestFrom = req.body.requestFrom;
 	if (!requestFrom) {
@@ -123,16 +123,16 @@ app.delete('/decline-friend', handleErrors(async (req, res) => {
 	}
 
 	// const friend = userService.getUserFromUsername(requestFrom);
-	const friend = natsRequest(nats, jc, 'user.getUserFromUsername', { username: requestFrom });
+	const friend = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: requestFrom });
 
 	// const friendship = userService.getFriendshipFromUser1Username(user.id, friend.id);
-	const friendship = natsRequest(nats, jc, 'user.getFriendshipFromUser1Username', { userId: user.id, friendId: friend.id });
+	const friendship = await natsRequest(nats, jc, 'user.getFriendshipFromUser1Username', { userId: user.id, friendId: friend.id });
 	if (friendship.status !== 'pending') {
 		throw { status : statusCode.NOT_FOUND, message: returnMessages.FRIEND_REQUEST_NOT_FOUND };
 	}
 
 	// userService.declineFriendRequest(friendship.id);
-	natsRequest(nats, jc, 'user.declineFriendRequest', { friendshipId: friendship.id });
+	await natsRequest(nats, jc, 'user.declineFriendRequest', { friendshipId: friendship.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_DECLINED });
 }));
@@ -140,10 +140,10 @@ app.delete('/decline-friend', handleErrors(async (req, res) => {
 app.get('/friend-requests', handleErrors(async (req, res) => {
 
 	// const user = userService.getUserFromHeader(req);
-	const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 
 	// const friendsRequests = userService.getFriendsRequests(user.id);
-	const friendsRequests = natsRequest(nats, jc, 'user.getFriendsRequests', { userId: user.id });
+	const friendsRequests = await natsRequest(nats, jc, 'user.getFriendsRequests', { userId: user.id });
 
 	res.code(statusCode.SUCCESS).send({ friendsRequests });
 }));
@@ -151,7 +151,7 @@ app.get('/friend-requests', handleErrors(async (req, res) => {
 app.delete('/delete-friends', handleErrors(async (req, res) => {
 
 	// const user = userService.getUserFromHeader(req);
-	const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 
 	const friendName = req.body.friendName;
 	if (!friendName) {
@@ -161,16 +161,16 @@ app.delete('/delete-friends', handleErrors(async (req, res) => {
 	}
 
 	// const friend = userService.getUserFromUsername(friendName);
-	const friend = natsRequest(nats, jc, 'user.getUserFromUsername', { username: friendName });
+	const friend = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: friendName });
 
 	// const friendship = await userService.isFriendshipExisting(user.id, friend.id);
-	const friendship = natsRequest(nats, jc, 'user.isFriendshipExisting', { userId1: user.id, userId2: friend.id });
+	const friendship = await natsRequest(nats, jc, 'user.isFriendshipExisting', { userId1: user.id, userId2: friend.id });
 	if (!friendship || friendship.status !== 'accepted') {
 		throw { status : statusCode.NOT_FOUND, message: returnMessages.FRIENDSHIP_NOT_FOUND };
 	}
 
 	// userService.deleteFriendship(friendship.id);
-	natsRequest(nats, jc, 'user.deleteFriendship', { friendshipId: friendship.id });
+	await natsRequest(nats, jc, 'user.deleteFriendship', { friendshipId: friendship.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_DELETED });
 }));
@@ -178,7 +178,7 @@ app.delete('/delete-friends', handleErrors(async (req, res) => {
 app.post('/block-user', handleErrors(async (req, res) => {
 	
 	// const user = userService.getUserFromHeader(req);
-	const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 
 	const blockedUserName = req.body.blockedUserName;
 	if (!blockedUserName) {
@@ -186,19 +186,19 @@ app.post('/block-user', handleErrors(async (req, res) => {
 	}
 
 	// const blockedUser = userService.getUserFromUsername(blockedUserName);
-	const blockedUser = natsRequest(nats, jc, 'user.getUserFromUsername', { username: blockedUserName });
+	const blockedUser = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: blockedUserName });
 	if (user.id === blockedUser.id) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_BLOCK_REQUEST };
 	}
 
 	// const isBlocked = await userService.isBlocked(user.id, blockedUser.id);
-	const isBlocked = natsRequest(nats, jc, 'user.isBlocked', { userId: user.id, blockedUserId: blockedUser.id });
+	const isBlocked = await natsRequest(nats, jc, 'user.isBlocked', { userId: user.id, blockedUserId: blockedUser.id });
 	if (isBlocked) {
 		throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_BLOCKED };
 	}
 	
 	// userService.blockUser(user.id, blockedUser.id);
-	natsRequest(nats, jc, 'user.blockUser', { userId: user.id, blockedUserId: blockedUser.id });
+	await natsRequest(nats, jc, 'user.blockUser', { userId: user.id, blockedUserId: blockedUser.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.USER_BLOCKED_SUCCESS });
 
@@ -207,7 +207,7 @@ app.post('/block-user', handleErrors(async (req, res) => {
 app.delete('/unblock-user', handleErrors(async (req, res) => {
 
 	// const user = userService.getUserFromHeader(req);
-	const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 
 	const blockedUserName = req.body.blockedUserName;
 	if (!blockedUserName) {
@@ -215,18 +215,18 @@ app.delete('/unblock-user', handleErrors(async (req, res) => {
 	}
 
 	// const blockedUser = userService.getUserFromUsername(blockedUserName);
-	const blockedUser = natsRequest(nats, jc, 'user.getUserFromUsername', { username: blockedUserName });
+	const blockedUser = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: blockedUserName });
 	if (user.id === blockedUser.id) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_UNBLOCK_REQUEST };
 	}
 
 	// const isBlocked = await userService.isBlocked(user.id, blockedUser.id);
-	const isBlocked = natsRequest(nats, jc, 'user.isBlocked', { userId: user.id, blockedUserId: blockedUser.id });
+	const isBlocked = await natsRequest(nats, jc, 'user.isBlocked', { userId: user.id, blockedUserId: blockedUser.id });
 	if (!isBlocked) {
 		throw { status : statusCode.NOT_FOUND, message: returnMessages.NOT_BLOCKED };
 	}
 	// userService.unblockUser(user.id, blockedUser.id);
-	natsRequest(nats, jc, 'user.unblockUser', { userId: user.id, blockedUserId: blockedUser.id });
+	await natsRequest(nats, jc, 'user.unblockUser', { userId: user.id, blockedUserId: blockedUser.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.USER_UNBLOCKED });
 }));
@@ -234,10 +234,10 @@ app.delete('/unblock-user', handleErrors(async (req, res) => {
 app.get('/blocked-users', handleErrors(async (req, res) => {
 
 	// const user = userService.getUserFromHeader(req);
-	const user = natsRequest(nats, jc, 'user.getUserFromHeader', { req });
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { req });
 
 	// const blockedUsers = userService.getBlockedUsers(user.id);
-	const blockedUsers = natsRequest(nats, jc, 'user.getBlockedUsers', { userId: user.id });
+	const blockedUsers = await natsRequest(nats, jc, 'user.getBlockedUsers', { userId: user.id });
 
 	res.code(statusCode.SUCCESS).send({ blockedUsers });
 }));

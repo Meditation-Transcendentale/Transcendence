@@ -57,7 +57,8 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 	const { username, password, token } = req.body;
 
 	// const user = userService.getUserFromUsername(username);
-	const user = natsRequest(nats, jc, 'user.getUserFromUsername', { username });
+	const user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username });
+	console.log(user);
 		
 	const isPasswordValid = await bcrypt.compare(password, user.password);
 	if (!isPasswordValid) {
