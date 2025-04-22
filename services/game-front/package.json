@@ -6,12 +6,15 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-	  "vite": "^4.0.0",
+    "@types/node": "^22.14.1",
     "esbuild": "^0.19.11",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^4.0.0"
   },
   "dependencies": {
     "@babylonjs/core": "^8.0.0",
-	"@babylonjs/gui": "8.2.0"
+    "@babylonjs/gui": "8.2.0",
+    "@babylonjs/inspector": "^8.3.0",
+    "buffer": "^6.0.3"
   }
 }
