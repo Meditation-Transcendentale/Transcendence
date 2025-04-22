@@ -1,29 +1,32 @@
-/*
-	* ball data
-	*
-	* ID
-	* Position X
-	* Position Y
-	* Velocity X
-	* Velocity Y
-	*
-	* paddle data
-	* 
-	* ID
-	* Offset
-	* isConnected
-*/
-const SCALE = 10;
+const SCALE = 100;
+
+/**
+ * Convert a floating‑point number to a fixed‑point integer.
+ * @param {number} num  The float to convert
+ * @returns {number}    The value multiplied by SCALE and rounded
+ */
+
 function floatToFixed(num) {
-	// if (isNaN(num)) {
-	// 	console.warn("Invalid numeric value in floatToFixed:", num);
-	// }
 	return Math.round(num * SCALE);
 }
+
+/**
+ * Convert a fixed‑point integer back to float.
+ * @param {number} fixed  The fixed‑point value
+ * @returns {number}      The value divided by SCALE
+ */
 function fixedToFloat(fixed) {
 	return fixed / SCALE;
 }
 
+/**
+ * Encode the core game‑state into a binary Buffer for minimal transport.
+ * @param {number} gameId         Unique game identifier
+ * @param {number} tick           Tick counter
+ * @param {Array<{id: number, x: number, y: number, vx: number, vy: number}>} balls
+ * @param {Array<{id: number, offset: number, isConnected: boolean}>} paddles
+ * @returns {Buffer}              Packed binary message
+ */
 export function encodeStateUpdate(gameId, tick, balls, paddles) {
 	const messageType = 1;
 	const ballCount = balls.length;
@@ -54,7 +57,7 @@ export function encodeStateUpdate(gameId, tick, balls, paddles) {
 	buffer.writeUInt16LE(ballCount, offset);
 	offset += 2;
 
-	// Write each ball update
+	// Write each ball entry
 	for (const ball of balls) {
 		buffer.writeUInt16LE(ball.id, offset);
 		offset += 2;
@@ -62,7 +65,6 @@ export function encodeStateUpdate(gameId, tick, balls, paddles) {
 		offset += 2;
 		buffer.writeInt16LE(floatToFixed(ball.y), offset);
 		offset += 2;
-		// console.log(ball.vx, ball.vx * 100);
 		buffer.writeInt16LE(floatToFixed(ball.vx), offset);
 		offset += 2;
 		buffer.writeInt16LE(floatToFixed(ball.vy), offset);
@@ -73,12 +75,11 @@ export function encodeStateUpdate(gameId, tick, balls, paddles) {
 	buffer.writeUInt16LE(paddleCount, offset);
 	offset += 2;
 
-	// Write each paddle update
+	// Write each paddle entry 
 	for (const paddle of paddles) {
 		buffer.writeUInt16LE(paddle.id, offset);
 		offset += 2;
 		const paddleOffsetVal = floatToFixed(paddle.offset);
-		// console.log("here", paddle.offset);
 		buffer.writeInt16LE(paddleOffsetVal, offset);
 		offset += 2;
 		buffer.writeInt16LE(floatToFixed(paddle.isConnected), offset);
@@ -88,6 +89,12 @@ export function encodeStateUpdate(gameId, tick, balls, paddles) {
 	return buffer;
 }
 
+/**
+ * Decode a binary state‑update Buffer back into JS objects.
+ * @param {Buffer} buffer
+ * @returns {{gameId: number, tick: number, balls: Array, paddles: Array}}
+ * @throws {Error} if the messageType byte is not 1
+ */
 export function decodeStateUpdate(buffer) {
 	let offset = 0;
 	const messageType = buffer.readUInt8(offset);
@@ -134,16 +141,3 @@ export function decodeStateUpdate(buffer) {
 
 	return { gameId, tick, balls, paddles };
 }
-
-// ws.binaryType = 'arraybuffer';
-// ws.onmessage = (event) => {
-//   const arrayBuffer = event.data;
-//   // Convert ArrayBuffer to Buffer (if using a bundler or appropriate polyfill)
-//   const buffer = Buffer.from(new Uint8Array(arrayBuffer));
-//
-//   // Decode the state update message.
-//   const { balls, paddles } = decodeStateUpdate(buffer);
-//   console.log("Balls:", balls);
-//   console.log("Paddles:", paddles);
-// };
-//

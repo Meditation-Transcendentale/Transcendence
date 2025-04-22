@@ -1,10 +1,19 @@
 
 export const config = {
 	SERVER_PORT: 8080,  // Server-specific configuration
-	WALL_WIDTH: 7,
-	WALL_HEIGHT: 2,
-	PADDLE_WIDTH: 1,
-	PADDLE_HEIGHT: 0.2,
 	BALL_RADIUS: 0.5,
-	MAX_OFFSET: 2.94
+	MAX_OFFSET: 2.94,
+	numberOfBalls: 1,
+	wallWidth: 30,
+	scaleFactor: 1,
+	ballSize: 0.5,
+	paddleHeight: 0.4,
+	paddleWidth: 3,
+	arenaHeight: 20,
+	arenaWidth: 30,
+	wallHeight: 1,
+	paddleSpeed: 1,
+	ballSpeed: 1,
+	paddleOffsetRatio: 0.9
+
 };
