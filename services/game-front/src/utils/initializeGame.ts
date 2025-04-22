@@ -1,7 +1,6 @@
 import { Engine, Scene, Vector3, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Mesh } from "@babylonjs/core";
 import { GameTemplateConfig } from "../templates/GameTemplate";
 
-
 export function createCamera(scene: Scene, canvas: any): ArcRotateCamera {
 	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 60, Vector3.Zero(), scene);
 	camera.attachControl(canvas, true);

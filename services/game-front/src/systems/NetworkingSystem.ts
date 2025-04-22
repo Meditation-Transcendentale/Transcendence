@@ -92,6 +92,9 @@ export class NetworkingSystem extends System {
 				const scoreP2 = msg.score.player2;
 				this.scoreUI.update(scoreP1, scoreP2);
 			}
+			if (msg.type === "winUpdate") {
+				
+			}
 		});
 	}
 }
