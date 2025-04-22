@@ -1,7 +1,7 @@
 import { ABlock } from "../ABlock";
 import { SimpleForm } from "../customElements/SimpleForm";
 import { CustomEvents } from "../CustomEvents";
-import { loginRequest, registerRequest } from "../requests";
+import { AuthResponse, loginRequest, registerRequest } from "../requests";
 import { createContainer } from "../utils";
 
 export class SignIn extends ABlock {
@@ -51,24 +51,35 @@ export class SignIn extends ABlock {
 		await registerRequest(this.form.field1.value, this.form.field2.value)
 			.then((response) => { this.responseHandler(response) })
 			.catch((error) => {
-				//document.getElementById("error")?.dispatchEvent(new CustomEvent("err", { detail: error }));
+				console.log('Error: ', error);
 			})
 
 	}
 
-	private async responseHandler(data: string) {
-		console.log(data);
 
-		await loginRequest(this.form.field1.value, this.form.field2.value)
-			.then(response => {
-				this.reset();
-
-				document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
-			})
-			.catch(error => {
-				//document.getElementById("error")?.dispatchEvent(new CustomEvent("err", { detail: error }));
-
-			});
+	private async responseHandler(response: AuthResponse) {
+		document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: response }));
+		console.log(response);
+		if (response.ok) {
+			await loginRequest(this.form.field1.value, this.form.field2.value)
+				.then((response) => {
+					document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: response }));
+					console.log(response);
+					if (response.ok) {
+						this.success();
+						return;
+					}
+				})
+				.catch((error) => console.log("Error: ", error));
+			return;
+		}
+		return;
 	}
+
+	private success() {
+		this.reset();
+		document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
+	}
+
 
 }

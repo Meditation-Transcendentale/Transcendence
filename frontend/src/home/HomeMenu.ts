@@ -66,8 +66,13 @@ export class HomeMenu extends ABlock {
 
 	private async quitHandler() {
 		await logoutRequest()
-			.then((resp) => {
-				document.getElementById("ui")?.dispatchEvent(CustomEvents.quit);
+			.then((response) => {
+				document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: response }));
+				console.log(response);
+				if (response.ok) {
+					document.getElementById("ui")?.dispatchEvent(CustomEvents.quit);
+					return;
+				}
 
 			})
 			.catch((err) => console.log(err));

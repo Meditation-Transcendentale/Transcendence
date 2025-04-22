@@ -2,7 +2,7 @@ import { ABlock } from "../ABlock";
 import { createContainer } from "../utils";
 import { HomeMenu } from "./HomeMenu";
 
-export class Home extends ABlock {
+export default class Home extends ABlock {
 
 	private menu!: HomeMenu;
 
@@ -25,3 +25,4 @@ export class Home extends ABlock {
 		this.enable();
 	}
 }
+

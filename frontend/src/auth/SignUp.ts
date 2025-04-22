@@ -1,7 +1,7 @@
 import { ABlock } from "../ABlock";
 import { SimpleForm } from "../customElements/SimpleForm";
 import { CustomEvents } from "../CustomEvents";
-import { loginRequest } from "../requests";
+import { AuthResponse, loginRequest } from "../requests";
 import { createContainer } from "../utils";
 
 export class SignUp extends ABlock {
@@ -50,13 +50,32 @@ export class SignUp extends ABlock {
 		ev.preventDefault();
 
 		const dum = await loginRequest(this.form.field1.value, this.form.field2.value)
-			.then(response => {
-				this.reset()
-				document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
+			.then((response) => {
+				this.responseHandler(response);
 			}
 			)
 			.catch(error => {
-				//document.getElementById("error")?.dispatchEvent(new CustomEvent("err", { detail: error }));
+				console.log("ERROR: fetch login");
 			});
+	}
+
+	private responseHandler(response: AuthResponse) {
+		document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: response }));
+		console.log(response);
+		if (response.ok) {
+			this.success();
+			return;
+		}
+
+		if (response.status === 400 && response.message === "2FA token is required") {
+			console.log("handle 2FA");
+		}
+
+		return;
+	}
+
+	private success() {
+		this.reset();
+		document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
 	}
 }

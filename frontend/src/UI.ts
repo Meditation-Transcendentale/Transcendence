@@ -2,14 +2,14 @@ import { Auth } from "./auth/Auth";
 import { SimpleForm } from "./customElements/SimpleForm";
 import { CustomEvents } from "./CustomEvents";
 import { Status } from "./Status";
-import { Home } from "./home/Home";
+//import { Home } from "./home/Home";
 import { createContainer } from "./utils";
 
 export class UI {
 	private ui: HTMLElement;
 
 	private auth: Auth;
-	private home: Home;
+	private home!: any;
 	private error: Status;
 
 	constructor() {
@@ -24,13 +24,16 @@ export class UI {
 
 		this.error = new Status(this.ui);
 		this.auth = new Auth(this.ui);
-		this.home = new Home(this.ui);
+		//this.home = new Home(this.ui);
 
 	}
 
-	private successfullAuth() {
+	private async successfullAuth() {
+		const home = await import("./home/Home");
+		this.home = new home.default(this.ui);
 		this.auth.disable();
 		this.home.reset();
+
 	}
 
 	private quit() {

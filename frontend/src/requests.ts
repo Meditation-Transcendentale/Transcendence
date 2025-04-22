@@ -1,4 +1,11 @@
-export async function registerRequest(username: string, password: string): Promise<string> {
+export type AuthResponse = {
+	message: string,
+	status: number,
+	ok: boolean,
+}
+
+
+export async function registerRequest(username: string, password: string): Promise<AuthResponse> {
 	const response = await fetch("https://localhost:3000/register", {
 		method: 'POST',
 		headers: {
@@ -12,14 +19,15 @@ export async function registerRequest(username: string, password: string): Promi
 	});
 	const data = await response.json();
 
-	document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: { msg: data.message, ok: response.ok } }));
-	if (response.ok) {
-		return data.message;
-	}
-	throw (data.message);
+	const final: AuthResponse = {
+		message: data.message,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
 }
 
-export async function loginRequest(username: string, password: string): Promise<string> {
+export async function loginRequest(username: string, password: string): Promise<AuthResponse> {
 	const response = await fetch("https://localhost:3000/auth/login", {
 		method: 'POST',
 		headers: {
@@ -36,15 +44,16 @@ export async function loginRequest(username: string, password: string): Promise<
 
 	const data = await response.json();
 
-	document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: { msg: data.message, ok: response.ok } }));
-	if (response.ok) {
-		return data.message;
-	}
-	throw (data.message);
+	const final: AuthResponse = {
+		message: data.message,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
 }
 
 
-export async function logoutRequest(): Promise<String> {
+export async function logoutRequest(): Promise<AuthResponse> {
 	const response = await fetch("https://localhost:3000/auth/logout", {
 		method: 'POST',
 		headers: {
@@ -57,10 +66,10 @@ export async function logoutRequest(): Promise<String> {
 
 	const data = await response.json();
 
-	document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: { msg: data.message, ok: response.ok } }));
-	if (response.ok) {
-		return data.message;
-	}
-	throw (data.message);
-
+	const final: AuthResponse = {
+		message: data.message,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
 }

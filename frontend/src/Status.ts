@@ -1,10 +1,6 @@
 import { ABlock } from "./ABlock";
 import { createContainer } from "./utils";
 
-interface statusMsg {
-	msg: string;
-	ok: boolean;
-}
 
 export class Status extends ABlock {
 
@@ -23,7 +19,7 @@ export class Status extends ABlock {
 
 		this.container.addEventListener("status", (ev) => {
 			this.container.setAttribute("ok", ev.detail.ok);
-			this.container.innerHTML = ev.detail.msg;
+			this.container.innerHTML = ev.detail.message;
 		})
 	}
 
