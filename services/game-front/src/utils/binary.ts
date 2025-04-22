@@ -1,12 +1,12 @@
 const SCALE = 100;
-function floatToFixed(num) {
+function floatToFixed(num: number) {
 	return Math.round(num * SCALE);
 }
-function fixedToFloat(fixed) {
+function fixedToFloat(fixed: number) {
 	return fixed / SCALE;
 }
 
-export function encodeStateUpdate(gameId, tick, balls, paddles) {
+export function encodeStateUpdate(gameId: number, tick: number, balls: any, paddles: any) {
 	const messageType = 1;
 	const ballCount = balls.length;
 	const paddleCount = paddles.length;
@@ -68,7 +68,7 @@ export function encodeStateUpdate(gameId, tick, balls, paddles) {
 	return buffer;
 }
 
-export function decodeStateUpdate(buffer) {
+export function decodeStateUpdate(buffer: any) {
 	let offset = 0;
 	const messageType = buffer.readUInt8(offset);
 	offset += 1;
@@ -112,5 +112,5 @@ export function decodeStateUpdate(buffer) {
 		paddles.push({ id, offset: paddleOffsetVal, isConnected });
 	}
 
-	return { gameId, tick, balls, paddles };
+	return { type: "stateUpdate", gameId, tick, balls, paddles };
 }

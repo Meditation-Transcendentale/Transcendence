@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node --inspect=0.0.0.0:9229 src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "vitest"
+    "test": "vitest",
+	"debug:ascii": "node debug/debug-client.js",
+  "debug:blessed": "node debug/debug-client-blessed.js"
   },
   "dependencies": {
     "dotenv": "^16.0.3",
@@ -15,6 +17,7 @@
   "devDependencies": {
     "@types/node": "^22.14.0",
     "nodemon": "^2.0.22",
+	"blessed": "^0.1.0",
     "vitest": "^1.0.0"
   }
 }

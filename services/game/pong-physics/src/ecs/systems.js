@@ -5,8 +5,8 @@ export function movementSystem(entityManager, dt) {
 		const vel = entity.getComponent('velocity');
 		pos.x += vel.x * dt;
 		pos.y += vel.y * dt;
-		if (Math.abs(vel.x) < 0.01) vel.x = 0;
-		if (Math.abs(vel.y) < 0.01) vel.y = 0;
+		// if (Math.abs(vel.x) < 0.01) vel.x = 0;
+		// if (Math.abs(vel.y) < 0.01) vel.y = 0;
 	}
 }
 

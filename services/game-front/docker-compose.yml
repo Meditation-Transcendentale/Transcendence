@@ -10,16 +10,32 @@
 #       timeout: 10s
 #       retries: 3
 #
+# services:
+#   game-front:
+#     build:
+#       context: ./
+#       dockerfile: Dockerfile.dev
+#     ports:
+#       - "8080:5173"  # Map host port 8080 to container port 5173
+#     volumes:
+#       - ./src:/app/src
+#       - ./package.json:/app/package.json
+#     restart: always
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:5173"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
 services:
   game-front:
     build:
       context: ./
       dockerfile: Dockerfile.dev
     ports:
-      - "8080:5173"  # Map host port 8080 to container port 5173
+      - "8080:5173"   # Map host port 8080 to container port 5173
     volumes:
-      - .:/app
-      - /app/node_modules 
+      - .:/app:delegated
+      - /app/node_modules  # Use anonymous volume for node_modules
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5173"]

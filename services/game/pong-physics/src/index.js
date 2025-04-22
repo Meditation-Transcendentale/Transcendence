@@ -2,19 +2,29 @@
 import { connect, JSONCodec } from 'nats';
 import dotenv from 'dotenv';
 dotenv.config();
-
 import { Physics } from './Physics.js';
 import { decodeStateUpdate, encodeStateUpdate } from './binary.js';
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'pong-physics';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 const jc = JSONCodec();
-
 const endedGames = new Set();
+
+/**
+ * Start the Pong‐physics service:
+ *  1. Connect to NATS
+ *  2. Subscribe to end, input, and tick subjects
+ *  3. Dispatch messages into the Physics engine
+ */
 
 async function start() {
 	const nc = await connect({ servers: NATS_URL });
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
+
+	/**
+	   * Handle game end events by tearing down state
+	   * @param {import('nats').Msg} msg
+	   */
 
 	const endSub = nc.subscribe('game.pong.end');
 	(async () => {
@@ -25,6 +35,11 @@ async function start() {
 			console.log(`[${SERVICE_NAME}] Stopped processing for game ${gameId}`);
 		}
 	})();
+
+	/**
+	  * Handle incoming player inputs immediately
+	  * @param {import('nats').Msg} msg
+	  */
 
 	const inputSub = nc.subscribe('game.pong.input');
 	(async () => {
@@ -44,6 +59,11 @@ async function start() {
 		}
 	})();
 
+	/**
+	   * Process each tick: run physics and publish new state
+	   * @param {import('nats').Msg} msg
+	   */
+
 	const sub = nc.subscribe('game.pong.tick');
 	for await (const msg of sub) {
 		const data = jc.decode(msg.data);
@@ -55,7 +75,6 @@ async function start() {
 
 		const result = Physics.processTick(data);
 		const buffer = encodeStateUpdate(result.gameId, result.tick, result.balls, result.paddles);
-		const temp = decodeStateUpdate(buffer);
 		nc.publish('game.state', buffer);
 	}
 }

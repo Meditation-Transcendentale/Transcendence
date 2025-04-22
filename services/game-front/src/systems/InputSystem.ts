@@ -40,11 +40,11 @@ export class InputSystem extends System {
 			let offsetChange = 0;
 			let move = false;
 			if (this.inputManager.isKeyPressed("KeyA")) {
-				offsetChange += 0.1;
+				offsetChange += 0.4;
 				move = true;
 			}
 			if (this.inputManager.isKeyPressed("KeyD")) {
-				offsetChange -= 0.1;
+				offsetChange -= 0.4;
 				move = true;
 			}
 			paddle.offset = Scalar.Clamp(paddle.offset, -this.MAX_OFFSET, this.MAX_OFFSET);
