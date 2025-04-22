@@ -1,4 +1,4 @@
-const SCALE = 10;
+const SCALE = 100;
 function floatToFixed(num) {
 	return Math.round(num * SCALE);
 }

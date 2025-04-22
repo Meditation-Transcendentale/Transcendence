@@ -4,12 +4,24 @@ import { movementSystem } from './ecs/systems.js';
 import {
 	updateAABB,
 	computeCircleBoxMTV,
-	resolveCircleCircleCollision
 } from './utils/collisionUtils.js';
-import { encodeStateUpdate } from './binary.js';
+
+/**
+ * Core physics service: manages multiple Game instances and steps them.
+ */
 
 export const Physics = {
 	games: new Map(),
+
+	/**
+	   * Run one tick of physics for a game.
+	   * @param {Object} params
+	   * @param {string} params.gameId
+	   * @param {number} params.tick
+	   * @param {Object} params.state
+	   * @param {Array}  params.inputs
+	   * @returns {{ gameId: string, tick: number, balls: Array, paddles: Array }}
+	   */
 
 	processTick({ gameId, tick, state, inputs }) {
 		if (!this.games.has(gameId)) {
@@ -18,7 +30,7 @@ export const Physics = {
 		}
 		const game = this.games.get(gameId);
 		const em = game.entityManager;
-		const subSteps = 5;
+		const subSteps = 20;
 		const dt = 1 / 60 / subSteps;
 
 		for (let i = 0, ilen = inputs.length; i < ilen; i++) {
@@ -54,8 +66,6 @@ export const Physics = {
 			for (let i = 0, len = ballEntities.length; i < len; i++) {
 				const ball = ballEntities[i];
 				const ballVel = ball.getComponent('velocity');
-				if (Math.abs(ballVel.x) < 0.01) ballVel.x = 0;
-				if (Math.abs(ballVel.y) < 0.01) ballVel.y = 0;
 			}
 
 			for (let i = 0, len = ballEntities.length; i < len; i++) {
@@ -138,31 +148,6 @@ export const Physics = {
 					}
 				}
 			}
-
-			const balls = ballEntities;
-			const ballIndexMap = new Map();
-			for (let i = 0, len = balls.length; i < len; i++) {
-				ballIndexMap.set(balls[i], i);
-			}
-			for (let i = 0, len = balls.length; i < len; i++) {
-				const ball = balls[i];
-				const ballCollider = ball.getComponent('collider');
-				if (ballCollider.type !== 'circle') continue;
-				const posA = ball.getComponent('position');
-				const velA = ball.getComponent('velocity');
-				const potentialColliders = tree.query(ballCollider.aabb);
-				for (let j = 0, jLen = potentialColliders.length; j < jLen; j++) {
-					const candidate = potentialColliders[j];
-					if (candidate === ball) continue;
-					if (!candidate.hasComponent('ball')) continue;
-					if (ballIndexMap.get(candidate) <= ballIndexMap.get(ball)) continue;
-					const candidateCollider = candidate.getComponent('collider');
-					if (candidateCollider.type !== 'circle') continue;
-					const posB = candidate.getComponent('position');
-					const velB = candidate.getComponent('velocity');
-					resolveCircleCircleCollision(posA, ballCollider, velA, posB, candidateCollider, velB, 1);
-				}
-			}
 		}
 
 		const tempstate = game.getState();
@@ -174,6 +159,12 @@ export const Physics = {
 		};
 	},
 
+	/**
+  * Handle inputs that should be applied immediately (no waiting for next tick).
+  * @param {Object} payload
+  * @param {string} payload.gameId
+  * @param {Array<{playerId: number, input: {type: string}}>} [payload.inputs]
+  */
 	handleImmediateInput({ gameId, inputs = [] }) {
 		const game = this.games.get(gameId);
 		if (!game) {
@@ -195,10 +186,10 @@ export const Physics = {
 		}
 	},
 
-	getSerializedSize(obj) {
-		return Buffer.byteLength(JSON.stringify(obj), 'utf8');
-	},
-
+	/**
+  * Remove a game from memory (when it ends).
+  * @param {string} gameId
+  */
 	removeGame(gameId) {
 		if (this.games.has(gameId)) {
 			this.games.delete(gameId);

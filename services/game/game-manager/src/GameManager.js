@@ -12,19 +12,6 @@ export class GameManager {
 
 	start() {
 		console.log('[game-manager] Ready to manage games');
-
-		// this.nc.subscribe('game.state', {
-		// 	callback: (err, msg) => {
-		// 		if (err) return console.error('NATS error:', err);
-		// 		try {
-		// 			// const data = jc.decode(msg.data);
-		// 			this.handlePhysicsResult(msg);
-		// 		} catch (err) {
-		// 			console.error('[game-manager] Failed to decode message:', err);
-		// 			console.error('Raw message:', msg.data.toString());
-		// 		}
-		// 	}
-		// });
 	}
 
 	handleInput({ type, gameId, playerId, input, tick }) {
@@ -32,7 +19,7 @@ export class GameManager {
 		if (!game) return;
 
 		if (type === 'disableWall' || type === 'enableWall' || type === 'newPlayerConnected') {
-			this.nc.publish(`game.pongBR.input`, JSON.stringify({
+			this.nc.publish(`game.pong.input`, JSON.stringify({
 				gameId,
 				inputs: [{ playerId, type }]
 			}));

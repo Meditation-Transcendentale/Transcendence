@@ -1,5 +1,14 @@
 // AABBTree.js
+
+/**
+ * A node in the dynamic AABB tree.
+ * @class
+ */
 class AABBNode {
+	/**
+  * @param {object} entity  Game entity
+  * @param {{x:number,y:number,width:number,height:number}} aabb  Bounding box
+  */
 	constructor(entity, aabb) {
 		this.entity = entity;
 		this.aabb = { x: aabb.x, y: aabb.y, width: aabb.width, height: aabb.height };
@@ -8,22 +17,35 @@ class AABBNode {
 		this.right = null;
 	}
 
+	/** @returns {boolean} True if this node has no children */
 	isLeaf() {
 		return this.left === null && this.right === null;
 	}
 }
 
+/**
+ * Dynamic AABB Tree for broad‑phase collision queries.
+ * @class
+ */
 class AABBTree {
 	constructor() {
+		/** @type {?AABBNode} */
 		this.root = null;
+		/** @type {Map<object,AABBNode>} */
 		this.entityToNode = new Map();
 	}
 
+	/**
+  * Insert or update an entity’s AABB.
+  * @param {object} entity
+  * @param {{x:number,y:number,width:number,height:number}} aabb
+  */
 	insert(entity, aabb) {
 		const leaf = new AABBNode(entity, aabb);
 		this.entityToNode.set(entity, leaf);
 		this.insertLeaf(leaf);
 	}
+
 	insertLeaf(leaf) {
 		if (this.root === null) {
 			this.root = leaf;
@@ -122,6 +144,11 @@ class AABBTree {
 		return aabb.width * aabb.height;
 	}
 
+	/**
+   * Query for entities whose AABBs intersect the given box.
+   * @param {{x:number,y:number,width:number,height:number}} queryAABB
+   * @returns {object[]} Array of matched entities
+   */
 	query(queryAABB) {
 		const results = [];
 		if (this.root === null) return results;
@@ -181,6 +208,11 @@ class AABBTree {
 		}
 	}
 
+	/**
+   * Update an entity’s AABB (reinsert if it no longer fits).
+   * @param {object} entity
+   * @param {{x:number,y:number,width:number,height:number}} newAABB
+   */
 	updateEntity(entity, newAABB) {
 		const node = this.entityToNode.get(entity);
 		if (!node) return;
@@ -191,6 +223,12 @@ class AABBTree {
 		this.insert(entity, newAABB);
 	}
 
+	/**
+  * Check if `inner` is fully contained within `outer`.
+  * @param {{x:number,y:number,width:number,height:number}} outer
+  * @param {{x:number,y:number,width:number,height:number}} inner
+  * @returns {boolean}
+  */
 	contains(outer, inner) {
 		return (inner.x >= outer.x &&
 			inner.y >= outer.y &&
@@ -198,6 +236,7 @@ class AABBTree {
 			inner.y + inner.height <= outer.y + outer.height);
 	}
 
+	/** Remove all entities and reset the tree */
 	clear() {
 		this.root = null;
 		this.entityToNode.clear();
