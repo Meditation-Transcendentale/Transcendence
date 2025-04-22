@@ -1,6 +1,7 @@
 import { Auth } from "./auth/Auth";
 import { SimpleForm } from "./customElements/SimpleForm";
 import { CustomEvents } from "./CustomEvents";
+import { Status } from "./Status";
 import { Home } from "./home/Home";
 import { createContainer } from "./utils";
 
@@ -9,6 +10,7 @@ export class UI {
 
 	private auth: Auth;
 	private home: Home;
+	private error: Status;
 
 	constructor() {
 		this.initCustomElements();
@@ -20,6 +22,7 @@ export class UI {
 		this.ui.addEventListener("auth", () => { this.successfullAuth() });
 		this.ui.addEventListener("quit", () => { this.quit() });
 
+		this.error = new Status(this.ui);
 		this.auth = new Auth(this.ui);
 		this.home = new Home(this.ui);
 

@@ -1,5 +1,6 @@
 import { ABlock } from "../ABlock";
 import { CustomEvents } from "../CustomEvents";
+import { logoutRequest } from "../requests";
 import { createContainer } from "../utils";
 
 export class HomeMenu extends ABlock {
@@ -52,7 +53,7 @@ export class HomeMenu extends ABlock {
 		this.quit.setAttribute("type", "button");
 		this.quit.setAttribute("value", "quit");
 		this.quit.addEventListener("click", () => {
-			document.getElementById("ui")?.dispatchEvent(CustomEvents.quit);
+			this.quitHandler();
 		});
 
 
@@ -61,5 +62,15 @@ export class HomeMenu extends ABlock {
 		this.container.appendChild(this.play);
 		this.container.appendChild(this.stats);
 		this.container.appendChild(this.quit);
+	}
+
+	private async quitHandler() {
+		await logoutRequest()
+			.then((resp) => {
+				document.getElementById("ui")?.dispatchEvent(CustomEvents.quit);
+
+			})
+			.catch((err) => console.log(err));
+
 	}
 }

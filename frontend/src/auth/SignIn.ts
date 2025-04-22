@@ -41,32 +41,34 @@ export class SignIn extends ABlock {
 	public reset() {
 		this.form.field1.value = "";
 		this.form.field2.value = "";
+		this.disable();
 	}
 
 
 	private async submitHandler(ev: Event) {
 		ev.preventDefault();
-		const body = JSON.stringify({
-			"username": this.form.field1.value,
-			"password": this.form.field2.value
-		});
 
 		await registerRequest(this.form.field1.value, this.form.field2.value)
-			.then((response) => { this.responseHandler(response as JSON) })
-			.catch((error) => { console.log(error) })
+			.then((response) => { this.responseHandler(response) })
+			.catch((error) => {
+				//document.getElementById("error")?.dispatchEvent(new CustomEvent("err", { detail: error }));
+			})
 
-		this.reset();
-		document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
 	}
 
-	private async responseHandler(data: JSON) {
-		console.log(data.message);
+	private async responseHandler(data: string) {
+		console.log(data);
 
 		await loginRequest(this.form.field1.value, this.form.field2.value)
-			.then(response => console.log(response))
-			.catch(error => console.log(error));
+			.then(response => {
+				this.reset();
 
-		console.log(document.cookie);
+				document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
+			})
+			.catch(error => {
+				//document.getElementById("error")?.dispatchEvent(new CustomEvent("err", { detail: error }));
 
+			});
 	}
+
 }

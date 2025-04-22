@@ -8,3 +8,11 @@ html, body {
 div[disabled="true"] {
 	display: none;
 }
+
+#status[ok="false"] {
+	background-color: #bf382e;
+}
+
+#status[ok="true"] {
+	background-color: #67b320;
+}

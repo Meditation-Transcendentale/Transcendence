@@ -1,6 +1,7 @@
 import { ABlock } from "../ABlock";
 import { SimpleForm } from "../customElements/SimpleForm";
 import { CustomEvents } from "../CustomEvents";
+import { loginRequest } from "../requests";
 import { createContainer } from "../utils";
 
 export class SignUp extends ABlock {
@@ -38,11 +39,24 @@ export class SignUp extends ABlock {
 
 	}
 
-	private submitHandler(ev: Event) {
-		ev.preventDefault();
+	public reset() {
 		this.form.field1.value = "";
 		this.form.field2.value = "";
+		this.disable();
+	}
 
-		document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
+
+	private async submitHandler(ev: Event) {
+		ev.preventDefault();
+
+		const dum = await loginRequest(this.form.field1.value, this.form.field2.value)
+			.then(response => {
+				this.reset()
+				document.getElementById("ui")?.dispatchEvent(CustomEvents.auth);
+			}
+			)
+			.catch(error => {
+				//document.getElementById("error")?.dispatchEvent(new CustomEvent("err", { detail: error }));
+			});
 	}
 }
