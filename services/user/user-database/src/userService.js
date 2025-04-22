@@ -53,8 +53,8 @@ const userService = {
 		}
 		return user;
 	},
-	getUserFromHeader: (req) => {
-		const userHeader = req.headers['user'];
+	getUserFromHeader: (headers) => {
+		const userHeader = headers['user'];
 		if (!userHeader) {
 			throw { status : statusCode.BAD_REQUEST, message: returnMessages.UNAUTHORIZED };
 		}

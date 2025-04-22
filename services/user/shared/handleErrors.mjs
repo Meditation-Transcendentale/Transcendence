@@ -23,7 +23,7 @@ const handleErrors = (fn) => async (req, res) => {
 	}
 };
 
-const handleErrorsNats = (nats, jc) => (fn) => async (msg) => {
+const handleErrorsNats = (fn) => async (msg) => {
 	try {
 		await fn(msg);
 	} catch (error) {

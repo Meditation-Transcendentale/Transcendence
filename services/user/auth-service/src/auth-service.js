@@ -12,7 +12,6 @@ import { connect, JSONCodec } from 'nats';
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors, handleErrorsValid } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
-// import userService from "./userService.js";
 
 dotenv.config({ path: "../../../../.env" });
 
@@ -56,9 +55,7 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 
 	const { username, password, token } = req.body;
 
-	// const user = userService.getUserFromUsername(username);
-	const user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username });
-	console.log(user);
+	const user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 		
 	const isPasswordValid = await bcrypt.compare(password, user.password);
 	if (!isPasswordValid) {
@@ -85,7 +82,7 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 	}
 
 	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
-	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
+	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_IN });
 }));
@@ -109,18 +106,15 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 	const { sub: google_id, email, name: username, picture: avatar_path } = payload;
 
-	// let user = userService.getUserFromUsername(username);
-	let user = natsRequest(nats, jc, 'user.getUserFromUsername', { username });
+	let user = natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	if (!user) {
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
-		// userService.addGoogleUser(google_id, username, email, avatar_path);
 		natsRequest(nats, jc, 'user.addGoogleUser', { google_id, username, email, avatar_path });
-		// user = userService.getUserFromUsername(username);
-		user = natsRequest(nats, jc, 'user.getUserFromUsername', { username });
+		user = natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
 
 	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
-	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
+	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.code(retCode).send({ message: retMessage});
 

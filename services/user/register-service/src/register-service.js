@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import { connect, JSONCodec } from 'nats';
 
-// import userService from './userService.js';
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
@@ -58,12 +57,10 @@ app.post('/', {schema: registerSchema}, handleErrors(async (req, res) => {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_INVALID };
 	}
 
-	// userService.checkUsernameAvailability(username);
-	await natsRequest(nats, jc, 'user.checkUsernameAvailability', { username });
-
+	await natsRequest(nats, jc, "user.checkUsernameAvailability", { username });
+	
 	const hashedPassword = await bcrypt.hash(password, 10);
 
-	// userService.registerUser(username, hashedPassword);
 	await natsRequest(nats, jc, 'user.registerUser', { username, hashedPassword });
 
 	res.code(statusCode.CREATED).send({ message: returnMessages.USER_CREATED });

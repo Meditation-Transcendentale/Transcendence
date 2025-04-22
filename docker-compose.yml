@@ -12,7 +12,6 @@ services:
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
-      - DATABASE_URL=${DATABASE_URL}
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
@@ -22,6 +21,8 @@ services:
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
+      user-database:
+        condition: service_started
 
   auth-service:
     build:
@@ -35,7 +36,6 @@ services:
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
-      - DATABASE_URL=${DATABASE_URL}
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
@@ -46,6 +46,8 @@ services:
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
+      user-database:
+        condition: service_started
 
   update_user_info-service:
     build:
@@ -59,7 +61,6 @@ services:
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
-      - DATABASE_URL=${DATABASE_URL}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
@@ -69,6 +70,8 @@ services:
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
+      user-database:
+        condition: service_started
 
   friends-service:
     build:
@@ -82,7 +85,6 @@ services:
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
-      - DATABASE_URL=${DATABASE_URL}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
@@ -92,6 +94,8 @@ services:
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
+      user-database:
+        condition: service_started
 
   user-database:
     build: 
