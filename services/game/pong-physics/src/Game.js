@@ -61,18 +61,20 @@ export class Game {
 		}
 
 		for (let i = 0; i < 2; i++) {
-			let x, y, rotation, wallWidth;
+			let x, y, rotation, wallWidth, isGoal;
 
 			if (i % 2 === 0) {
 				x = 0;
 				y = (config.arenaHeight / 2 + config.wallHeight / 2) * config.scaleFactor;
 				rotation = 0;
 				wallWidth = config.arenaWidth * config.scaleFactor;
+				isGoal = false;
 			} else {
 				x = (config.arenaWidth / 2 + config.wallHeight) * config.scaleFactor;
 				y = 0;
 				rotation = 90 * Math.PI / 180;
 				wallWidth = config.arenaHeight * config.scaleFactor;
+				isGoal = true;
 			}
 
 			const wallEntity1 = this.entityManager.createEntity();
@@ -83,6 +85,7 @@ export class Game {
 					rotation: rotation,
 					isActive: true,
 					wallWidth: wallWidth,
+					isGoal: isGoal,
 					dirty: true
 				})
 				.addComponent('collider', BoxCollider(wallWidth, config.wallHeight, rotation));
@@ -96,6 +99,7 @@ export class Game {
 					rotation: rotation,
 					isActive: true,
 					wallWidth: wallWidth,
+					isGoal: isGoal,
 					dirty: true
 				})
 				.addComponent('collider', BoxCollider(wallWidth, config.wallHeight, rotation));

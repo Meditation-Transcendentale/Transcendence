@@ -84,8 +84,14 @@ export const Physics = {
 					if (otherCollider.type === 'box' && other.getComponent('wall')) {
 						const wallPos = other.getComponent('position');
 						const wall = other.getComponent('wall');
+
 						// if (wall.isActive === true) {
 						const { mtv, penetration } = computeCircleBoxMTV(ballPos, ballCollider, wallPos, otherCollider);
+						if (wall.isGoal === true && penetration > 0) {
+							ballPos.x = 0;
+							ballPos.y = 0;
+							break;
+						}
 						if (penetration > 0) {
 							weightedMTVx += mtv.x * penetration;
 							weightedMTVy += mtv.y * penetration;

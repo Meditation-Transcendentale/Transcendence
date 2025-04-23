@@ -1,4 +1,4 @@
-import { Engine, Scene, Vector3, ArcRotateCamera} from "@babylonjs/core";
+import { Engine, Scene, Vector3, ArcRotateCamera } from "@babylonjs/core";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -15,7 +15,7 @@ import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
 
-const API_BASE = "http://10.19.225.151:4000";
+const API_BASE = "http://10.19.225.59:4000";
 // const API_BASE = "http://localhost:4000";
 export let localPaddleId: any = null;
 let engine: any;
@@ -30,7 +30,7 @@ class Game {
 	private debugVisualizer!: DebugVisualizer;
 	private gameId;
 	private canvas;
-	private paddleId : any;
+	private paddleId: any;
 	private scoreUI: any;
 
 	constructor(canvas: any, gameId: any) {
@@ -43,8 +43,6 @@ class Game {
 		this.engine = new Engine(this.canvas, true);
 		engine = this.engine;
 		this.scene = new Scene(this.engine);
-		// localPaddleId = await this.waitForWelcome();
-		localPaddleId = 0;
 		const config = {
 			numberOfBalls: 1,
 			arenaSizeX: 30,
@@ -60,11 +58,12 @@ class Game {
 		const instanceManagers = this.createInstanceManagers(baseMeshes);
 
 		const uuid = getOrCreateUUID();
-		const wsUrl = `ws://10.19.229.249:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		const wsUrl = `ws://10.19.225.59:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		// const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uiid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
+		localPaddleId = await this.waitForWelcome();
 		this.initECS(config, instanceManagers, uuid);
 
 		this.stateManager = new StateManager(this.ecs);
@@ -75,7 +74,7 @@ class Game {
 		});
 	}
 
-	private createInstanceManagers(baseMeshes: any){
+	private createInstanceManagers(baseMeshes: any) {
 		return {
 			ball: new ThinInstanceManager(baseMeshes.ball, 1, 50, 100),
 			paddle: new ThinInstanceManager(baseMeshes.paddle, 2, 50, 100),
@@ -83,7 +82,7 @@ class Game {
 		}
 	}
 
-	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string){
+	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
 		this.ecs = new ECSManager();
 		this.ecs.addSystem(new MovementSystem());
 		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
@@ -94,13 +93,12 @@ class Game {
 			instanceManagers.wall,
 			this.camera
 		));
-		this.ecs.addSystem(new VisualEffectSystem(this.scene));
+		// this.ecs.addSystem(new VisualEffectSystem(this.scene));
 
-		localPaddleId = await this.waitForWelcome();
 		createGameTemplate(this.ecs, config, localPaddleId);
 	}
 
-	private createBaseMeshes(config: GameTemplateConfig){
+	private createBaseMeshes(config: GameTemplateConfig) {
 		return {
 			arena: createArenaMesh(this.scene, config),
 			ball: createBallMesh(this.scene, config),
@@ -139,37 +137,12 @@ class Game {
 			}, { once: true });
 		});
 	}
-	// waitForWelcome() {
-	// 	return new Promise((resolve) => {
-	// 		this.wsManager.socket.addEventListener("message", (event) => {
-	// 			const data = JSON.parse(event.data);
-	// 			if (data.type === "welcome") {
-	// 				console.log("Received welcome:", data);
-	// 				this.paddleId = data.paddleId;
-	//
-	// 				this.wsManager.socket.send(JSON.stringify({
-	// 					type: "registerGame",
-	// 					data: { gameId: this.gameId }
-	// 				}));
-	// 				resolve(data.paddleId);
-	// 			}
-	// 		});
-	// 	});
-	// }
 }
 
-// window.addEventListener("DOMContentLoaded", () => {
-// 	const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-// 	if (!canvas) {
-// 		console.error("Canvas not found");
-// 		return;
-// 	}
-// 	const game = new Game(canvas, "test-game-id");
-// 	game.start();
-// });
 window.addEventListener("resize", () => {
 	engine.resize();
 });
+
 window.addEventListener("DOMContentLoaded", () => {
 	const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement | null;
 	const createBtn = document.getElementById("createBtn") as HTMLButtonElement | null;
