@@ -61,7 +61,56 @@ export async function logoutRequest(): Promise<AuthResponse> {
 			'Content-Type': 'application/json'
 		},
 		credentials: 'include',
-		body: JSON.stringify({ accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." })
+		body: JSON.stringify({ accessToken: "" })
+	});
+
+	const data = await response.json();
+
+	const final: AuthResponse = {
+		message: data.message,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
+}
+
+export async function updateInfoRequest(username: string, avatar: string): Promise<AuthResponse> {
+	const response = await fetch("https://localhost:3000/update-info", {
+		method: 'PATCH',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		credentials: 'include',
+		body: JSON.stringify({
+			username: username,
+			avatar: avatar
+		})
+	});
+
+	const data = await response.json();
+
+	const final: AuthResponse = {
+		message: data.message,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
+}
+
+export async function updatePasswordRequest(password: string, newPassword: string): Promise<AuthResponse> {
+	const response = await fetch("https://localhost:3000/update-info/password", {
+		method: 'PATCH',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		credentials: 'include',
+		body: JSON.stringify({
+			password: password,
+			newPassword: newPassword,
+			token: ""
+		})
 	});
 
 	const data = await response.json();

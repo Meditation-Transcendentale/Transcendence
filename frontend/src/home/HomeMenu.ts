@@ -26,7 +26,7 @@ export class HomeMenu extends ABlock {
 		this.info.setAttribute("type", "button");
 		this.info.setAttribute("value", "Info");
 		this.info.addEventListener("click", () => {
-			alert("info");
+			document.getElementById("info-container")?.dispatchEvent(CustomEvents.enable)
 		});
 
 		this.play = document.createElement("input");

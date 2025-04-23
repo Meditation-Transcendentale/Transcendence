@@ -13,7 +13,7 @@ import https from "https";
 
 dotenv.config({ path: "../../.env" });
 
-const app = fastify({ 
+const app = fastify({
 	logger: true,
 	https: {
 		key: fs.readFileSync(process.env.SSL_KEY),
@@ -36,7 +36,7 @@ app.register(fastifyRateLimit, {
 });
 
 app.register(fastifyCORS, {
-	origin: ['http://172.17.0.1:8080', 'http://localhost:8080'],
+	origin: ['http://172.17.0.1:8080', 'http://localhost:8080', "http://192.168.1.84:8080"],
 	methods: ['GET', 'POST', 'PATCH', 'DELETE'],
 	allowedHeaders: ['Content-Type'],
 	credentials: true
@@ -48,7 +48,7 @@ app.setErrorHandler((error, req, res) => {
 });
 
 const verifyJWT = async (req, res) => {
-		
+
 	const token = req.cookies.accessToken;
 	if (!token) {
 		return res.code(401).send({ message: 'No token provided' });
@@ -57,8 +57,8 @@ const verifyJWT = async (req, res) => {
 	const agent = new https.Agent({
 		rejectUnauthorized: false
 	});
-	
-	const response = await axios.post('https://auth-service:4002/auth', { token }, {headers: {'x-api-key':process.env.API_GATEWAY_KEY}, httpsAgent: agent });
+
+	const response = await axios.post('https://auth-service:4002/auth', { token }, { headers: { 'x-api-key': process.env.API_GATEWAY_KEY }, httpsAgent: agent });
 	const data = response.data;
 
 	if (!data.valid) {
