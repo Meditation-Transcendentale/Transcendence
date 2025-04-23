@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS users (
 	two_fa_secret TEXT,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS idx_users_id ON users (id);
+CREATE INDEX IF NOT EXISTS idx_users_id ON users(id);

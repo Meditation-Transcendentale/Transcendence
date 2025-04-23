@@ -11,6 +11,7 @@ down:
 	if [ -d ./shared ]; then \
         rm -rf ./shared; \
     fi
+	docker volume rm -f $(docker volume ls)
 
 re:
 	if [ -d ./shared ]; then \

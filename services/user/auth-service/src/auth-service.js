@@ -7,10 +7,11 @@ import bcrypt from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
 import https from 'https';
 import axios from 'axios';
+import { connect, JSONCodec } from 'nats';
 
-import { statusCode, returnMessages } from "./returnValues.js";
-import handleErrors from "./handleErrors.js";
-import userService from "./userService.js";
+import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { handleErrors, handleErrorsValid } from "../../shared/handleErrors.mjs";
+import { natsRequest } from '../../shared/natsRequest.mjs';
 
 dotenv.config({ path: "../../../../.env" });
 
@@ -23,6 +24,9 @@ const app = fastify({
 });
 
 app.register(fastifyCookie);
+
+const nats = await connect({ servers: process.env.NATS_URL });
+const jc = JSONCodec();
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -51,7 +55,7 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 
 	const { username, password, token } = req.body;
 
-	const user = userService.getUserFromUsername(username);
+	const user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 		
 	const isPasswordValid = await bcrypt.compare(password, user.password);
 	if (!isPasswordValid) {
@@ -78,7 +82,7 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 	}
 
 	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
-	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
+	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_IN });
 }));
@@ -102,36 +106,34 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 	const { sub: google_id, email, name: username, picture: avatar_path } = payload;
 
-		
-	let user = userService.getUserFromUsername(username);
+	let user = natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	if (!user) {
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
-		userService.addGoogleUser(google_id, username, email, avatar_path);
-		user = userService.getUserFromUsername(username);
+		natsRequest(nats, jc, 'user.addGoogleUser', { google_id, username, email, avatar_path });
+		user = natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
 
 	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
-	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
+	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.code(retCode).send({ message: retMessage});
 
 }));
 
-app.post('/auth', async (req, res) => {
+app.post('/auth', handleErrorsValid(async (req, res) => {
 
 	const { token } = req.body;
 
 	if (!token) {
-
-		return res.code(400).send({ valid: false, message: 'No token provided' });
+		return res.code(statusCode.BAD_REQUEST).send({ valid: false, message: returnMessages.MISSING_TOKEN });
 	}
 	try {
 		const decodedToken = jwt.verify(token, process.env.JWT_SECRETKEY);
-		return res.code(200).send({ valid: true, user: decodedToken });
+		return res.code(statusCode.SUCCESS).send({ valid: true, user: decodedToken });
 	} catch (error) {
-		return res.code(401).send({ valid: false, message: 'Invalid token' });
+		return res.code(statusCode.UNAUTHORIZED).send({ valid: false, message: returnMessages.INVALID_TOKEN });
 	}
-});
+}));
 
 app.post('/logout', handleErrors(async (req, res) => {
 
@@ -145,8 +147,6 @@ app.post('/logout', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_OUT });
 
 }));
-
-
 
 const start = async () => {
 	try {
