@@ -10,11 +10,11 @@ export class HomeMenu extends ABlock {
 	private quit!: HTMLElement;
 
 	constructor(parent: HTMLElement) {
-		super();
+		super(parent);
 		this.init();
-		this.disable();
 
-		parent.appendChild(this.container);
+		this.enable();
+
 	}
 
 	private init() {
@@ -26,7 +26,8 @@ export class HomeMenu extends ABlock {
 		this.info.setAttribute("type", "button");
 		this.info.setAttribute("value", "Info");
 		this.info.addEventListener("click", () => {
-			document.getElementById("info-container")?.dispatchEvent(CustomEvents.enable)
+			document.getElementById("home-container")?.dispatchEvent(CustomEvents.info);
+
 		});
 
 		this.play = document.createElement("input");
@@ -35,7 +36,7 @@ export class HomeMenu extends ABlock {
 		this.play.setAttribute("type", "button");
 		this.play.setAttribute("value", "Play");
 		this.play.addEventListener("click", () => {
-			alert("play");
+			alert('play');
 		});
 
 		this.stats = document.createElement("input");
@@ -44,7 +45,7 @@ export class HomeMenu extends ABlock {
 		this.stats.setAttribute("type", "button");
 		this.stats.setAttribute("value", "Stats");
 		this.stats.addEventListener("click", () => {
-			alert("stats");
+			document.getElementById("home-container")?.dispatchEvent(CustomEvents.stats);
 		});
 
 		this.quit = document.createElement("input");
@@ -70,6 +71,7 @@ export class HomeMenu extends ABlock {
 				document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: response }));
 				console.log(response);
 				if (response.ok) {
+					sessionStorage.clear();
 					document.getElementById("ui")?.dispatchEvent(CustomEvents.quit);
 					return;
 				}

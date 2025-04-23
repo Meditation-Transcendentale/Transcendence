@@ -8,10 +8,9 @@ export class SignIn extends ABlock {
 	private form!: SimpleForm;
 
 	constructor(parent: HTMLElement) {
-		super();
+		super(parent);
 		this.init();
 
-		parent.appendChild(this.container);
 	}
 
 	private init() {
@@ -35,7 +34,6 @@ export class SignIn extends ABlock {
 
 		this.container.appendChild(this.form);
 
-		this.disable()
 	}
 
 	public reset() {
@@ -66,6 +64,7 @@ export class SignIn extends ABlock {
 					document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: response }));
 					console.log(response);
 					if (response.ok) {
+						sessionStorage.setItem("username", this.form.field1.value);
 						this.success();
 						return;
 					}

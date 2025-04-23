@@ -19,21 +19,28 @@ export class UI {
 		this.ui = createContainer("ui", "");
 		document.body.appendChild(this.ui);
 
+		console.log(sessionStorage.getItem("username"));
+
 		this.ui.addEventListener("auth", () => { this.successfullAuth() });
 		this.ui.addEventListener("quit", () => { this.quit() });
 
 		this.error = new Status(this.ui);
 		this.auth = new Auth(this.ui);
+		this.home = null;
+
+		this.auth.enable();
 		//this.home = new Home(this.ui);
 
 	}
 
 	private async successfullAuth() {
-		const home = await import("./home/Home");
-		this.home = new home.default(this.ui);
-		this.auth.disable();
-		this.home.reset();
+		if (this.home === null) {
+			const home = await import("./home/Home");
+			this.home = new home.default(this.ui);
+			this.auth.disable();
+		}
 
+		this.home.reset();
 	}
 
 	private quit() {

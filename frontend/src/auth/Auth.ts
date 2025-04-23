@@ -11,7 +11,7 @@ export class Auth extends ABlock {
 	private authChoice!: HTMLElement;
 
 	constructor(parent: HTMLElement) {
-		super();
+		super(parent);
 		this.init();
 
 		parent.appendChild(this.container);

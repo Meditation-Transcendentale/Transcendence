@@ -5,7 +5,7 @@ import { createContainer } from "./utils";
 export class Status extends ABlock {
 
 	constructor(parent: HTMLElement) {
-		super();
+		super(parent);
 
 		this.init();
 

@@ -10,11 +10,9 @@ export class Info extends ABlock {
 
 
 	constructor(parent: HTMLElement) {
-		super();
+		super(parent);
 
 		this.init();
-		this.disable();
-		parent.appendChild(this.container);
 	}
 
 	private init() {
@@ -22,6 +20,10 @@ export class Info extends ABlock {
 		this.container.addEventListener("enable", () => {
 			this.enable();
 		})
+		this.container.addEventListener("disable", () => {
+			this.disable();
+		})
+
 		this.initUpdateInfo();
 		this.initUpdatePassword();
 
