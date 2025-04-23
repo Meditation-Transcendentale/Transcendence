@@ -19,7 +19,7 @@ export class UI {
 		this.ui = createContainer("ui", "");
 		document.body.appendChild(this.ui);
 
-		console.log(sessionStorage.getItem("username"));
+		console.log("Session Username:", sessionStorage.getItem("username"));
 
 		this.ui.addEventListener("auth", () => { this.successfullAuth() });
 		this.ui.addEventListener("quit", () => { this.quit() });

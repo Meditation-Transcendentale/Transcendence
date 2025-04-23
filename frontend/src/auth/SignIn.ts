@@ -65,6 +65,7 @@ export class SignIn extends ABlock {
 					console.log(response);
 					if (response.ok) {
 						sessionStorage.setItem("username", this.form.field1.value);
+						sessionStorage.setItem("2FA", "false");
 						this.success();
 						return;
 					}

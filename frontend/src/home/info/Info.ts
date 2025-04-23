@@ -7,6 +7,7 @@ import { createContainer } from "../../utils";
 export class Info extends ABlock {
 	private updateInfo!: SimpleForm;
 	private updatePassword!: SimpleForm;
+	private update2FA!: HTMLElement;
 
 
 	constructor(parent: HTMLElement) {
@@ -29,6 +30,9 @@ export class Info extends ABlock {
 
 		this.container.appendChild(this.updateInfo);
 		this.container.appendChild(this.updatePassword);
+
+		this.initUpdate2FA();
+
 	}
 
 	private initUpdateInfo() {
@@ -63,18 +67,38 @@ export class Info extends ABlock {
 		this.updatePassword.setAttribute("class", "update-password form");
 
 		this.updatePassword.field1.id = "update-password-old";
-		this.updatePassword.field1.setAttribute("class", "update-password username-input");
+		this.updatePassword.field1.setAttribute("class", "update-password old-password-input");
 		this.updatePassword.field1.setAttribute("type", "password");
-		this.updatePassword.field1.setAttribute("placeholder", "New Password")
+		this.updatePassword.field1.setAttribute("placeholder", "Old Password")
+		this.updatePassword.field1.setAttribute("autocomplete", "new-password");
 
 		this.updatePassword.field2.id = "update-Password-avatar";
 		this.updatePassword.field2.setAttribute("type", "password");
-		this.updatePassword.field2.setAttribute("class", "update-password avatar-input");
-		this.updatePassword.field2.setAttribute("placeholder", "Old Password")
+		this.updatePassword.field2.setAttribute("class", "update-password new-password-input");
+		this.updatePassword.field2.setAttribute("placeholder", "New Password")
+		this.updatePassword.field2.setAttribute("autocomplete", "new-password");
 
 		this.updatePassword.submitButton.id = "update-password-form-button";
 		this.updatePassword.submitButton.setAttribute("class", "password button");
 		this.updatePassword.submitButton.setAttribute("value", "Update Pasword");
+
+
+	}
+
+	private initUpdate2FA() {
+		this.update2FA = document.createElement("input");
+		this.update2FA.setAttribute("type", "checkbox");
+		if (sessionStorage.getItem("2FA") == "true") {
+			this.update2FA.setAttribute("checked", "");
+		}
+		this.update2FA.addEventListener("click", () => {
+			sessionStorage.setItem("2FA", sessionStorage.getItem("2FA") === "false");
+			console.log("2FA handler")
+		})
+		const la = document.createElement("label");
+		la.innerHTML = "Enable 2FA";
+		this.container.appendChild(this.update2FA);
+		this.container.appendChild(la);
 
 
 	}
