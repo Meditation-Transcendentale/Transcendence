@@ -39,7 +39,6 @@ export class Stats extends ABlock {
 		})
 
 		this.menu = createContainer("stats-menu", "stats menu");
-
 		this.pongBtn = document.createElement("input");
 		this.pongBtn.setAttribute("type", "button");
 		this.pongBtn.setAttribute("value", "Classic");

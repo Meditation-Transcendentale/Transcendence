@@ -5,7 +5,7 @@ export type AuthResponse = {
 }
 
 export type statsResponse = {
-	message: {},
+	json: {},
 	status: number,
 	ok: boolean
 }
@@ -17,7 +17,7 @@ export type twoFAResponse = {
 }
 
 export type friendlistResponse = {
-	message: {},
+	json: {},
 	status: number,
 	ok: boolean
 }
@@ -197,6 +197,21 @@ export async function verify2FARequest(): Promise<twoFAResponse> {
 	return final;
 }
 
-// export async function friendlistRequest(): Promise<friendlistResponse> {
-// 	const response = await fetch("https://localhost:3000/friends/friendlist")
-// }
+export async function friendlistRequest(username: string): Promise<friendlistResponse> {
+	const response = await fetch("https://localhost:3000/friends/friendlist", {
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+		},
+		credentials: 'include',
+	});
+
+	const data = await response.json();
+
+	const final: friendlistResponse = {
+		json: data,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
+}

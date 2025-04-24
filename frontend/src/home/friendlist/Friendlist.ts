@@ -1,6 +1,7 @@
 import { ABlock } from "../../ABlock";
 import { SimpleForm } from "../../customElements/SimpleForm";
 import { CustomEvents } from "../../CustomEvents";
+import { friendlistRequest } from "../../requests";
 import { createContainer } from "../../utils";
 
 export class Friendlist extends ABlock {
@@ -28,7 +29,22 @@ export class Friendlist extends ABlock {
 
     private initFriendList(){
         this.friendList = document.createElement("table")
-        // this.updateFriendList = document.createElement("input");
-        // this.updateFriendList.setAttribute("type", "text");       
+        const response = friendlistRequest(sessionStorage.getItem("username"))
+            .then((resp) => {
+                if (resp.ok) {
+                    console.log(resp.json.friendlist);
+                    // this.parseFriendlistJson(resp.json.friendlist);
+                    resp.json.friendlist.forEach(object => {
+                        const tr = document.createElement("tr")
+                        const td = document.createElement("td");
+                        td.innerHTML = object.friend_username;
+                        tr.appendChild(td);
+                        this.friendList.appendChild(tr);
+                    });
+                    return;
+                }
+                throw resp;
+            }).catch((err) => console.log(err));     
     }
 }
+
