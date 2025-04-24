@@ -30,8 +30,7 @@ export class UI {
 		this.auth = new Auth(this.ui);
 		this.home = new Home(this.ui);
 
-
-
+		this.auth.enable();
 
 		//router set routes at init + default callback -> to ui function
 		//at first ui handle if auth / home + auth / home direct
