@@ -15,8 +15,8 @@ import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
 
-const API_BASE = "http://10.19.225.59:4000";
-// const API_BASE = "http://localhost:4000";
+// const API_BASE = "http://10.19.225.59:4000";
+const API_BASE = "http://localhost:4000";
 export let localPaddleId: any = null;
 let engine: any;
 class Game {
@@ -42,6 +42,7 @@ class Game {
 		console.log("start");
 		this.engine = new Engine(this.canvas, true);
 		engine = this.engine;
+
 		this.scene = new Scene(this.engine);
 		const config = {
 			numberOfBalls: 1,
@@ -58,8 +59,8 @@ class Game {
 		const instanceManagers = this.createInstanceManagers(baseMeshes);
 
 		const uuid = getOrCreateUUID();
-		const wsUrl = `ws://10.19.225.59:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		// const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uiid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		// const wsUrl = `ws://10.19.225.59:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
@@ -72,6 +73,7 @@ class Game {
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
 		});
+
 	}
 
 	private createInstanceManagers(baseMeshes: any) {
@@ -93,7 +95,7 @@ class Game {
 			instanceManagers.wall,
 			this.camera
 		));
-		// this.ecs.addSystem(new VisualEffectSystem(this.scene));
+		this.ecs.addSystem(new VisualEffectSystem(this.scene));
 
 		createGameTemplate(this.ecs, config, localPaddleId);
 	}
@@ -106,6 +108,7 @@ class Game {
 			wall: createWallMesh(this.scene, config)
 		}
 	}
+
 
 	waitForWelcome() {
 		return new Promise((resolve) => {
@@ -139,8 +142,12 @@ class Game {
 	}
 }
 
+let resizeTimeout: number;
 window.addEventListener("resize", () => {
-	engine.resize();
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        engine.resize();
+    }, 100); // délai pour limiter les appels trop fréquents
 });
 
 window.addEventListener("DOMContentLoaded", () => {
