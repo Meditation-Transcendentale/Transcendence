@@ -1,14 +1,29 @@
 INSERT INTO users (username, password) VALUES
-('testuser', 'testpassword'), 
-('testuser2', 'testpassword2'),
-('testuser3', 'testpassword3'),
-('testuser4', 'testpassword4'),
-('testuser5', 'testpassword5'),
-('testuser6', 'testpassword6'),
-('testuser7', 'testpassword7'),
-('testuser8', 'testpassword8'),
-('testuser9', 'testpassword9'),
-('testuser10', 'testpassword10');
+('Erwan', '$2b$10$Uc69qES.4SxjLZ/n80cuK.mWh07PASEJsg.vaNXTumEmwna4RQDbq'), 
+('testuser', '$2b$10$SBpa5R/AjUxQ59NqBFk63uoacN9sXpLJh1qAx.9iJm77gwN5rNBJK'),
+('testuser2', '$2b$10$dOKf/xT8HIi0/nhvHNBxdOte2NU0eMQ1BevevypGTzv/uKMJFFHNC'),
+('testuser3', '$2b$10$wAwFWDmSpZ5GbIthOs4F4eIiMl6M635dozcYKLTvtFU0a7HuI4Wgm'),
+('testuser4', '$2b$10$636fEfipxB.AgMWPP.BBH.TWr.4NetpVCWBcXp91wm8fKi8E74dem'),
+('testuser5', '$2b$10$4nrR98a7OGBWmXag08FDLOn4qRwI9G6O4btQzAaABXcKuuC2wHlEW'),
+('testuser6', '$2b$10$QSGEE1xhYhuQ4jcADyAOyOQBdNyGhesXv2CYEHl/18QOu/omFb4Wq'),
+('testuser7', '$2b$10$Bll7YJNdaK5BuHfsxlHuJuIPEkKxRyFQWVupJd8KpG3FKwifu97QS'),
+('testuser8', '$2b$10$6P7Rc1XhgOjuk1m3a6Zg8eU/sljCk/oZgsyz9vCXmhOtWIghcVdme'),
+('testuser9', '$2b$10$oFE0z0rq4/NaNfPC1hAoGOniaONJm5WZh4BPYNC1R9xX60.qtAV0y'),
+('testuser10', '$2b$10$gE77Xee6p0.8dSZtLxt4Pup7AfYYJhAOSHC6rkaV.Gu0a8GFGIOV6');
+
+
+--  ('Password1', '$2b$10$Uc69qES.4SxjLZ/n80cuK.mWh07PASEJsg.vaNXTumEmwna4RQDbq'),
+-- ('testpassword', '$2b$10$SBpa5R/AjUxQ59NqBFk63uoacN9sXpLJh1qAx.9iJm77gwN5rNBJK'),
+-- ('testpassword2', '$2b$10$dOKf/xT8HIi0/nhvHNBxdOte2NU0eMQ1BevevypGTzv/uKMJFFHNC'),
+-- ('testpassword3', '$2b$10$wAwFWDmSpZ5GbIthOs4F4eIiMl6M635dozcYKLTvtFU0a7HuI4Wgm'),
+-- ('testpassword4', '$2b$10$636fEfipxB.AgMWPP.BBH.TWr.4NetpVCWBcXp91wm8fKi8E74dem'),
+-- ('testpassword5', '$2b$10$4nrR98a7OGBWmXag08FDLOn4qRwI9G6O4btQzAaABXcKuuC2wHlEW'),
+-- ('testpassword6', '$2b$10$QSGEE1xhYhuQ4jcADyAOyOQBdNyGhesXv2CYEHl/18QOu/omFb4Wq'),
+-- ('testpassword7', '$2b$10$Bll7YJNdaK5BuHfsxlHuJuIPEkKxRyFQWVupJd8KpG3FKwifu97QS'),
+-- ('testpassword8', '$2b$10$6P7Rc1XhgOjuk1m3a6Zg8eU/sljCk/oZgsyz9vCXmhOtWIghcVdme'),
+-- ('testpassword9', '$2b$10$oFE0z0rq4/NaNfPC1hAoGOniaONJm5WZh4BPYNC1R9xX60.qtAV0y'),
+-- ('testpassword10', '$2b$10$gE77Xee6p0.8dSZtLxt4Pup7AfYYJhAOSHC6rkaV.Gu0a8GFGIOV6'),
+
 
 INSERT INTO match (game_mode, winner_id, total_players) VALUES 
 ('classic', 1, 2), ('classic', 2, 2), ('classic', 3, 2),
@@ -59,6 +74,48 @@ INSERT INTO match_stats (match_id, user_id, is_winner, goals_scored, goals_conce
 (11, 2, 0, 2, 5, NULL, NULL),
 (12, 1, 1, 5, 2, NULL, NULL), 
 (12, 2, 0, 2, 5, NULL, NULL);
+
+INSERT INTO friendslist (user_id_1, user_id_2, status) VALUES 
+(1, 2, 'accepted'), 
+(1, 3, 'pending'), 
+(1, 4, 'accepted'), 
+(1, 5, 'pending'), 
+(1, 6, 'accepted'), 
+(2, 3, 'accepted'),
+(2, 4, 'accepted'),
+(2, 5, 'pending'),
+(2, 7, 'pending'),
+(2, 8, 'pending'),
+(2, 9, 'accepted'),
+(2, 10, 'accepted'),
+(3, 4, 'pending'),
+(3, 5, 'pending'),
+(3, 6, 'accepted'),
+(3, 7, 'pending'),
+(3, 8, 'accepted'),
+(3, 9, 'pending'),
+(4, 5, 'accepted'),
+(4, 6, 'pending'),
+(4, 7, 'accepted'),
+(4, 8, 'pending'),
+(4, 9, 'accepted'),
+(4, 10, 'pending'),
+(5, 6, 'accepted'),
+(5, 7, 'pending'),
+(5, 8, 'accepted'),
+(5, 9, 'pending'),
+(5, 10, 'accepted'),
+(6, 7, 'pending'),
+(6, 8, 'accepted'),
+(7, 1, 'pending'),
+(8, 1, 'pending'),
+(9, 1, 'pending'),
+(10, 1, 'pending');
+
+INSERT INTO blocked_users (blocker_id, blocked_id) VALUES 
+(1, 9), 
+(6, 2),
+(3, 10);
 
 
 
