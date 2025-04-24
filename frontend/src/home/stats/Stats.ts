@@ -1,4 +1,5 @@
 import { ABlock } from "../../ABlock";
+import { statsRequest } from "../../requests";
 import { createContainer } from "../../utils";
 import { BRStats } from "./BRStats";
 import { ClassicStats } from "./ClassicStats";
@@ -72,5 +73,21 @@ export class Stats extends ABlock {
 
 		this.container.appendChild(this.menu);
 
+	}
+
+	private enable() {
+
+
+		const response = statsRequest(sessionStorage.getItem("username"))
+			.then((resp) => {
+				if (resp.ok) {
+					this.classic.populate(resp.json.classic);
+					return;
+				}
+				throw resp;
+			}).catch((err) => console.log(err));
+
+
+		super.enable();
 	}
 }

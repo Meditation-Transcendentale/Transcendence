@@ -1,7 +1,7 @@
 import { ABlock } from "../../ABlock";
 import { SimpleForm } from "../../customElements/SimpleForm";
 import { CustomEvents } from "../../CustomEvents";
-import { updateInfoRequest, updatePasswordRequest } from "../../requests";
+import { updateInfoRequest, updatePasswordRequest, verify2FARequest } from "../../requests";
 import { createContainer } from "../../utils";
 
 export class Info extends ABlock {
@@ -92,8 +92,13 @@ export class Info extends ABlock {
 			this.update2FA.setAttribute("checked", "");
 		}
 		this.update2FA.addEventListener("click", () => {
-			sessionStorage.setItem("2FA", sessionStorage.getItem("2FA") === "false");
-			console.log("2FA handler")
+			const status = sessionStorage.getItem("2FA") === "false";
+			sessionStorage.setItem("2FA", status);
+			if (status) {
+				console.log("Enable 2FA handle");
+			} else {
+				verify2FARequest();
+			}
 		})
 		const la = document.createElement("label");
 		la.innerHTML = "Enable 2FA";

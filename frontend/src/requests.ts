@@ -4,6 +4,17 @@ export type AuthResponse = {
 	ok: boolean,
 }
 
+export type statsResponse = {
+	message: {},
+	status: number,
+	ok: boolean
+}
+
+export type twoFAResponse = {
+	message: {},
+	status: number,
+	ok: boolean
+}
 
 export async function registerRequest(username: string, password: string): Promise<AuthResponse> {
 	const response = await fetch("https://localhost:3000/register", {
@@ -58,10 +69,8 @@ export async function logoutRequest(): Promise<AuthResponse> {
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
-			'Content-Type': 'application/json'
 		},
 		credentials: 'include',
-		body: JSON.stringify({ accessToken: "" })
 	});
 
 	const data = await response.json();
@@ -122,3 +131,63 @@ export async function updatePasswordRequest(password: string, newPassword: strin
 	};
 	return final;
 }
+
+export async function statsRequest(username: string): Promise<statsResponse> {
+	const response = await fetch("https://localhost:3000/stats/player/:" + username, {
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+		},
+		credentials: 'include',
+	});
+
+	const data = await response.json();
+
+	const final: statsResponse = {
+		json: data,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
+}
+
+export async function enable2FARequest(): Promise<twoFAResponse> {
+	const response = await fetch("https://localhost:3000/update-info/enable-2fa", {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+		},
+		credentials: 'include',
+	});
+
+	const data = await response.json();
+
+	const final: AuthResponse = {
+		message: data,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
+}
+
+export async function verify2FARequest(): Promise<twoFAResponse> {
+	const response = await fetch("https://localhost:3000/update-info/verify-2fa", {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+		},
+		credentials: 'include',
+	});
+
+	const data = await response.json();
+
+	const final: AuthResponse = {
+		message: data,
+		status: response.status,
+		ok: response.ok
+	};
+	console.log(final);
+	return final;
+}
+
+
