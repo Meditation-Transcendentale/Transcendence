@@ -27,5 +27,4 @@ const nats = await connect({ servers: process.env.NATS_URL });
 			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
 		}
 	}
-
 }))();
