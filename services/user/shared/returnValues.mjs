@@ -42,11 +42,21 @@ const returnMessages = {
 	NEW_PASSWORD_REQUIRED: 'New password is required',
 	BAD_PASSWORD: 'Invalid password',
 	MISSING_TOKEN: 'Token is required',
+	INVALID_TOKEN: 'Invalid token',
 	TWO_FA_ALREADY_ENABLED: '2FA is already enabled',
 	TWO_FA_ENABLED: '2FA is enabled',
 	TWO_FA_NOT_ENABLED: '2FA is not enabled',
 	TWO_FA_VERIFIED: '2FA verified',
 	INVALID_CODE: 'Invalid code',
+	LOGGED_IN: 'Logged in successfully',
+	GOOGLE_LOGGED_IN: 'Logged in with Google successfully',
+	GOOGLE_CREATED_LOGGED_IN: 'Registered and logged in with Google successfully',
+	LOGGED_OUT: 'Logged out successfully',
+	USERNAME_ALREADY_USED: 'Username is already in use',
+	USERNAME_PASSWORD_REQUIRED: 'Username and password are required',
+	USERNAME_INVALID: 'Username must be between 3 and 20 characters',
+	PASSWORD_INVALID: 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number',
+	USER_CREATED: 'User registered successfully',
 
 }
 

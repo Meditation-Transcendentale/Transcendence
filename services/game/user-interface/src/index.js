@@ -69,7 +69,6 @@ async function start() {
 							playerId: paddleId,
 							input: data
 						}));
-						// console.log(data);
 					}
 				}
 

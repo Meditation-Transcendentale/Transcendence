@@ -2,6 +2,12 @@
 
 const EPSILON = 0.01;
 
+/**
+ * Update a collider’s AABB based on its world position.
+ * @param {{x:number,y:number}} position
+ * @param {object} collider
+ * @param {'circle'|'box'} collider.type
+ */
 export function updateAABB(position, collider) {
 	if (collider.type === 'circle') {
 		const r = collider.radius;
@@ -38,6 +44,16 @@ export function updateAABB(position, collider) {
 	}
 }
 
+/**
+ * Attempt to resolve a circle‐box collision in place.
+ * @param {{x:number,y:number}} ballPos
+ * @param {{radius:number}} ballCollider
+ * @param {{x:number,y:number}} ballVelocity
+ * @param {{x:number,y:number}} wallPos
+ * @param {object} wallCollider
+ * @param {number} [restitution=1]
+ * @returns {boolean} True if collision was handled
+ */
 export function resolveCircleBoxCollision(ballPos, ballCollider, ballVelocity, wallPos, wallCollider, restitution = 1) {
 	const wx = wallPos.x + (wallCollider.offsetX || 0);
 	const wy = wallPos.y + (wallCollider.offsetY || 0);
@@ -55,7 +71,7 @@ export function resolveCircleBoxCollision(ballPos, ballCollider, ballVelocity, w
 	const clampedX = Math.max(-halfW, Math.min(localX, halfW));
 	const clampedY = Math.max(-halfH, Math.min(localY, halfH));
 
-	const invCos = wallCollider.cos;       // cos(-theta)
+	const invCos = -wallCollider.cos;       // cos(-theta)
 	const invSin = -wallCollider.sin;        // sin(-theta)
 	const closestX = wx + clampedX * invCos - clampedY * invSin;
 	const closestY = wy + clampedX * invSin + clampedY * invCos;
@@ -92,6 +108,14 @@ export function resolveCircleBoxCollision(ballPos, ballCollider, ballVelocity, w
 	return true;
 }
 
+/**
+ * Compute and apply the minimum‐translation‐vector for circle‐box collisions.
+ * @param {{x:number,y:number}} ballPos
+ * @param {{radius:number}} ballCollider
+ * @param {{x:number,y:number}} wallPos
+ * @param {object} wallCollider
+ * @returns {{mtv:{x:number,y:number}, penetration:number}}
+ */
 export function computeCircleBoxMTV(ballPos, ballCollider, wallPos, wallCollider) {
 	const wx = wallPos.x + (wallCollider.offsetX || 0);
 	const wy = wallPos.y + (wallCollider.offsetY || 0);
@@ -140,37 +164,37 @@ export function computeCircleBoxMTV(ballPos, ballCollider, wallPos, wallCollider
 	return { mtv: { x: normalX * penetration, y: normalY * penetration }, penetration };
 }
 
-export function resolveCircleCircleCollision(posA, colliderA, velA, posB, colliderB, velB, restitution = 1) {
-	const dx = posB.x - posA.x;
-	const dy = posB.y - posA.y;
-	const distance = Math.hypot(dx, dy);
-	const sumRadii = colliderA.radius + colliderB.radius;
-
-	if (distance >= sumRadii || distance === 0) {
-		return false;
-	}
-
-	const penetration = sumRadii - distance;
-	const normalX = dx / distance;
-	const normalY = dy / distance;
-
-	posA.x -= normalX * (penetration / 2);
-	posA.y -= normalY * (penetration / 2);
-	posB.x += normalX * (penetration / 2);
-	posB.y += normalY * (penetration / 2);
-
-	const relVelX = velB.x - velA.x;
-	const relVelY = velB.y - velA.y;
-	const velAlongNormal = relVelX * normalX + relVelY * normalY;
-
-	if (velAlongNormal > 0) return false;
-
-	const impulse = -(1 + restitution) * velAlongNormal / 2;
-	velA.x -= impulse * normalX;
-	velA.y -= impulse * normalY;
-	velB.x += impulse * normalX;
-	velB.y += impulse * normalY;
-
-	return true;
-}
+// export function resolveCircleCircleCollision(posA, colliderA, velA, posB, colliderB, velB, restitution = 1) {
+// 	const dx = posB.x - posA.x;
+// 	const dy = posB.y - posA.y;
+// 	const distance = Math.hypot(dx, dy);
+// 	const sumRadii = colliderA.radius + colliderB.radius;
+//
+// 	if (distance >= sumRadii || distance === 0) {
+// 		return false;
+// 	}
+//
+// 	const penetration = sumRadii - distance;
+// 	const normalX = dx / distance;
+// 	const normalY = dy / distance;
+//
+// 	posA.x -= normalX * (penetration / 2);
+// 	posA.y -= normalY * (penetration / 2);
+// 	posB.x += normalX * (penetration / 2);
+// 	posB.y += normalY * (penetration / 2);
+//
+// 	const relVelX = velB.x - velA.x;
+// 	const relVelY = velB.y - velA.y;
+// 	const velAlongNormal = relVelX * normalX + relVelY * normalY;
+//
+// 	if (velAlongNormal > 0) return false;
+//
+// 	const impulse = -(1 + restitution) * velAlongNormal / 2;
+// 	velA.x -= impulse * normalX;
+// 	velA.y -= impulse * normalY;
+// 	velB.x += impulse * normalX;
+// 	velB.y += impulse * normalY;
+//
+// 	return true;
+// }
 

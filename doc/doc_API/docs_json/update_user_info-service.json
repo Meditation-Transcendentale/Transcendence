@@ -221,10 +221,10 @@
                 }
             }
         },
-        "/update-info/add-friend": {
+        "/friends/add-friend": {
             "post": {
                 "summary": "Send friend request",
-                "tags": ["Update Infos"],
+                "tags": ["Friends"],
                 "description": "Send a friend request to another user.",
                 "parameters": [
                     {
@@ -313,10 +313,10 @@
                 }
             }
         },
-        "/update-info/accept-friend": {
+        "/friends/accept-friend": {
             "post": {
                 "summary": "Accept friend request",
-                "tags": ["Update Infos"],
+                "tags": ["Friends"],
                 "description": "Accept a friend request from another user.",
                 "parameters": [
                     {
@@ -405,10 +405,10 @@
                 }
             }
         },
-        "/update-info/decline-friend": {
+        "/friends/decline-friend": {
             "delete": {
                 "summary": "Decline friend request",
-                "tags": ["Update Infos"],
+                "tags": ["Friends"],
                 "description": "Decline a friend request from another user.",
                 "parameters": [
                     {
@@ -497,10 +497,10 @@
                 }
             }
         },
-        "/update-info/friend-requests": {
+        "/friends/friend-requests": {
             "get": {
                 "summary": "Get friend requests list",
-                "tags": ["Update Infos"],
+                "tags": ["Friends"],
                 "description": "Get friend requests list for the user.",
                 "parameters": [
                     {
@@ -582,10 +582,10 @@
                 }
             }
         },
-        "/update-info/delete-friends": {
+        "/friends/delete-friends": {
             "delete": {
                 "summary": "Delete friend from friends list",
-                "tags": ["Update Infos"],
+                "tags": ["Friends"],
                 "description": "Delete friend from friends list.",
                 "parameters": [
                     {
@@ -674,10 +674,10 @@
                 }
             }
         },
-		"/update-info/block-user": {
+		"/friends/block-user": {
 			"post": {
 				"summary": "Block user",
-				"tags": ["Update Infos"],
+				"tags": ["Friends"],
 				"description": "Block a user.",
 				"parameters": [
 					{
@@ -779,10 +779,10 @@
 				}
 			}
 		},
-        "/update-info/unblock-user": {
+        "/friends/unblock-user": {
             "delete": {
 				"summary": "Unblock user",
-				"tags": ["Update Infos"],
+				"tags": ["Friends"],
 				"description": "Unblock a user.",
 				"parameters": [
 					{
@@ -884,10 +884,10 @@
 				}
 			}
 		},
-        "/update-info/blocked-users": {
+        "/friends/blocked-users": {
             "get": {
                 "summary": "Get blocked users list",
-                "tags": ["Update Infos"],
+                "tags": ["Friends"],
                 "description": "Get blocked users list for the user.",
                 "parameters": [
                     {

@@ -4,100 +4,115 @@ import { Position, Velocity, CircleCollider, BoxCollider } from './ecs/component
 import { movementSystem } from './ecs/systems.js';
 import { config } from './utils/config.js';
 
+/**
+ * Represents a single Pong game’s state and logic.
+ */
+
 export class Game {
+	/**
+  * @param {string} gameId
+  * @param {Object} initialState
+  * @param {Array}  initialState.balls   Array of ball descriptors
+  * @param {Object} [initialState.options]
+  */
 	constructor(gameId, initialState) {
 		this.gameId = gameId;
 		this.entityManager = createEntityManager();
 		this.paddleEntities = {};
 		this.wallEntities = {};
-		this.pillarEntities = {};
+		this.state = initialState;
 		this.options = initialState.options || {};
 		this.players = this.options.players || [];
-		this.arenaRadius = this.calculateArenaRadius(this.options.maxPlayers || this.players.length || 2);
 
 		this.init();
 	}
 
-	calculateArenaRadius(numPlayers) {
-		const playerWidth = 7;
-		const centralAngleDeg = 360 / numPlayers;
-		const halfCentralAngleRad = (centralAngleDeg / 2) * Math.PI / 180;
-		return playerWidth / (2 * Math.sin(halfCentralAngleRad));
-	}
-
+	/** Initialize entities: one ball, two paddles, and four walls */
 	init() {
-		const ballCount = this.options.ballCount || 1;
-		for (let i = 0; i < ballCount; i++) {
-			const circleRadius = 50;
-			const r = Math.sqrt(Math.random()) * circleRadius;
-			const theta = Math.random() * 2 * Math.PI;
-			const x = r * Math.cos(theta);
-			const y = r * Math.sin(theta);
-			const ballEntity = this.entityManager.createEntity();
-			ballEntity
-				.addComponent('position', Position(x, y))
-				.addComponent('velocity', Velocity(0, 25))
-				.addComponent('ball', { id: i, radius: config.BALL_RADIUS })
-				.addComponent('collider', CircleCollider(config.BALL_RADIUS));
-		}
+		const balls = this.state.balls;
+		const ball = balls[0];
+		const ballEntity = this.entityManager.createEntity();
+		ballEntity
+			.addComponent('position', Position(ball.x, ball.y))
+			.addComponent('velocity', Velocity(ball.vx, ball.vy))
+			.addComponent('ball', { id: 0, radius: config.BALL_RADIUS })
+			.addComponent('collider', CircleCollider(config.BALL_RADIUS));
 
-		const maxPlayers = this.options.maxPlayers || this.players.length || 2;
-
-		for (let i = 0; i < 100; i++) {
-			const angle = (2 * Math.PI / maxPlayers) * i;
-			const x = this.arenaRadius * Math.cos(angle);
-			const y = this.arenaRadius * Math.sin(angle);
-			const rotationY = -(angle + Math.PI / 2);
-
-			const wallEntity = this.entityManager.createEntity();
-			wallEntity
-				.addComponent('position', Position(x, y))
-				.addComponent('wall', { id: i, rotation: rotationY, isActive: true, dirty: true })
-				.addComponent('collider', BoxCollider(config.WALL_WIDTH, config.WALL_HEIGHT, rotationY));
-
-			this.wallEntities[i] = wallEntity;
+		for (let i = 0; i < 2; i++) {
+			const offset = (config.arenaWidth / 2 * config.paddleOffsetRatio) * config.scaleFactor;
+			const x = (i === 0 ? 1 : -1) * offset;
+			const y = 0;
+			const rotation_y = (i === 0 ? 90 : -90) * Math.PI / 180;
 
 			const paddleEntity = this.entityManager.createEntity();
 			paddleEntity
 				.addComponent('position', Position(x, y))
 				.addComponent('paddle', {
 					id: i,
-					speed: config.PADDLE_SPEED,
+					speed: config.paddleSpeed,
 					offset: 0,
 					maxOffset: config.MAX_OFFSET,
 					isConnected: !!this.players[i],
 					dirty: true
 				})
-				.addComponent('collider', BoxCollider(config.PADDLE_WIDTH, config.PADDLE_HEIGHT, rotationY));
+				.addComponent('collider', BoxCollider(config.paddleWidth, config.paddleHeight, rotation_y));
 
 			this.paddleEntities[i] = paddleEntity;
+		}
 
-			if (this.players[i]) {
-				wallEntity.getComponent('wall').isActive = false;
-				wallEntity.getComponent('wall').dirty = true;
+		for (let i = 0; i < 2; i++) {
+			let x, y, rotation, wallWidth, isGoal;
+
+			if (i % 2 === 0) {
+				x = 0;
+				y = (config.arenaHeight / 2 + config.wallHeight / 2) * config.scaleFactor;
+				rotation = 0;
+				wallWidth = config.arenaWidth * config.scaleFactor;
+				isGoal = false;
+			} else {
+				x = (config.arenaWidth / 2 + config.wallHeight) * config.scaleFactor;
+				y = 0;
+				rotation = 90 * Math.PI / 180;
+				wallWidth = config.arenaHeight * config.scaleFactor;
+				isGoal = true;
 			}
-		}
-		const zoneAngleWidth = (2 * Math.PI) / maxPlayers;
-		for (let i = 0; i < maxPlayers; i++) {
-			const angle = (2 * Math.PI / maxPlayers) * i;
-			const leftAngle = angle - zoneAngleWidth / 2;
-			const x = this.arenaRadius * Math.cos(leftAngle);
-			const y = this.arenaRadius * Math.sin(leftAngle);
-			const rotation = -(leftAngle + (Math.PI / 2));
 
-			const pillarEntity = this.entityManager.createEntity();
-			pillarEntity
+			const wallEntity1 = this.entityManager.createEntity();
+			wallEntity1
 				.addComponent('position', Position(x, y))
-				.addComponent('pillar', {
+				.addComponent('wall', {
 					id: i,
-					rotation: rotation
+					rotation: rotation,
+					isActive: true,
+					wallWidth: wallWidth,
+					isGoal: isGoal,
+					dirty: true
 				})
-				.addComponent('collider', BoxCollider(0.2, 0.2, rotation));
-			this.pillarEntities[i] = pillarEntity;
-		}
+				.addComponent('collider', BoxCollider(wallWidth, config.wallHeight, rotation));
+			this.wallEntities[i] = (wallEntity1);
 
+			const wallEntity2 = this.entityManager.createEntity();
+			wallEntity2
+				.addComponent('position', Position(-x, -y))
+				.addComponent('wall', {
+					id: i,
+					rotation: rotation,
+					isActive: true,
+					wallWidth: wallWidth,
+					isGoal: isGoal,
+					dirty: true
+				})
+				.addComponent('collider', BoxCollider(wallWidth, config.wallHeight, rotation));
+			this.wallEntities[i] = (wallEntity2);
+		}
 	}
 
+	/**
+	   * Advance the game by one frame.
+	   * @param {number} tick             The current tick index
+	   * @param {Array<{playerId: number, input: Object}>} [inputs]
+	   * @returns {{ balls: Array, paddles: Array }}
+	   */
 	update(tick, inputs) {
 		for (const { playerId, input } of inputs || []) {
 			this.updatePaddleInput(playerId, input);
@@ -106,6 +121,11 @@ export class Game {
 		return this.getState();
 	}
 
+	/**
+   * Apply a single paddle move.
+   * @param {number} playerId
+   * @param {{offset: number, x: number, y: number}} input
+   */
 	updatePaddleInput(playerId, input) {
 		const paddleEntity = this.paddleEntities[playerId];
 		if (!paddleEntity) return;
@@ -180,6 +200,7 @@ export class Game {
 		const factor = Math.pow(10, decimals);
 		return Math.round(n * factor) / factor;
 	}
+
 	getState() {
 		function round(n, decimals = 2) {
 			const factor = Math.pow(10, decimals);

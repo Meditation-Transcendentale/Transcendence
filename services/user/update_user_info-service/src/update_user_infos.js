@@ -4,12 +4,12 @@ import fs from "fs";
 import bcrypt from "bcrypt";
 import axios from "axios";
 import https from "https";
+import { connect, JSONCodec } from "nats";
 
 import { twoFARoutes } from "./2FA.js";
-import addFriendRoute from "./friendship.js";
-import { statusCode, returnMessages } from "./returnValues.js";
-import handleErrors from "./handleErrors.js";
-import userService from "./userService.js";
+import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { handleErrors } from "../../shared/handleErrors.mjs";
+import { natsRequest } from "../../shared/natsRequest.mjs";
 
 dotenv.config({ path: "../../../../.env" });
 
@@ -31,9 +31,12 @@ const verifyApiKey = (req, res, done) => {
 
 app.addHook('onRequest', verifyApiKey);
 
+const nats = await connect({ servers: process.env.NATS_URL });
+const jc = JSONCodec();
+
 app.patch('/', handleErrors(async (req, res) => {
 
-	const user = userService.getUserFromHeader(req);
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 		
 	if (!req.body) {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.NOTHING_TO_UPDATE };
@@ -42,11 +45,11 @@ app.patch('/', handleErrors(async (req, res) => {
 	const { username, avatar,} = req.body;
 
 	if (username) {
-		userService.updateUsername(username, user.id);
+		await natsRequest(nats, jc, 'user.updateUsername', { username, userId: user.id });
 	}
 
 	if (avatar) {
-		userService.updateAvatar(avatar, user.id);
+		await natsRequest(nats, jc, 'user.updateAvatar', { avatar, userId: user.id });
 	}
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.INFO_UPDATED });
@@ -57,7 +60,7 @@ const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
 app.patch('/password', handleErrors(async (req, res) => {
 
-	const user = userService.getUserFromHeader(req);
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
 	if (!req.body) {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.NOTHING_TO_UPDATE };
@@ -103,13 +106,12 @@ app.patch('/password', handleErrors(async (req, res) => {
 
 	const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-	userService.updatePassword(hashedPassword, user.id);
+	await natsRequest(nats, jc, 'user.updatePassword', { hashedPassword, userId: user.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.PASSWORD_UPDATED });
 
 }));
 
-addFriendRoute(app);
 twoFARoutes(app);
 
 const start = async () => {
