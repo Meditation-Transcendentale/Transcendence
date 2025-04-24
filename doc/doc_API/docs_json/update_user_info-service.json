@@ -527,15 +527,18 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "id": { "type": "integer", "example": "67890" },
-                                            "user_id_1": { "type": "string", "example": "67890" },
-                                            "user_id_2": { "type": "string", "example": "12345" },
-                                            "status": { "type": "string", "example": "pending" },
-                                            "created_at": { "type": "string", "format": "date-time", "example": "2024-03-01T12:34:56Z" }
+                                    "type": "object",
+                                    "properties": {
+                                        "friendsRequests": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": { "type": "integer", "example": 67890 },
+                                                    "sender_username": { "type": "string", "example": "User12" },
+                                                    "receiver_username": { "type": "string", "example": "User123" }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -914,14 +917,105 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "id": { "type": "integer", "example": "67890" },
-                                            "blocker_id": { "type": "integer", "example": "67890" },
-                                            "blocked_id": { "type": "integer", "example": "12345" },
-                                            "created_at": { "type": "string", "format": "date-time", "example": "2024-03-01T12:34:56Z" }
+                                    "type": "object",
+                                    "properties": {
+                                        "blockedUsers": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": { "type": "integer", "example": "67890" },
+                                                    "blocker_username": { "type": "string", "example": "User1233" },
+                                                    "blocked_username": { "type": "string", "example": "User1235" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Unauthorized" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/friends/friendlist": {
+            "get": {
+                "summary": "Get user friendlist",
+                "tags": ["Friends"],
+                "description": "Get friendlist for the user.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users friendlist get returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "friendlist": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": { "type": "integer", "example": "67890" },
+                                                    "friend_username": { "type": "string", "example": "User1233" }
+                                                }
+                                            }
                                         }
                                     }
                                 }

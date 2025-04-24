@@ -45,22 +45,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful update",
+                        "description": "Successfully retrieved user information",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
                                     "properties": {
-                                        "userInfo": {
-											"type": "object",
-											"properties": {
-												"username": { "type": "string", "description": "The username of the user"},
-												"two_fa_enabled": { "type": "boolean", "description": "Indicates if two-factor authentication is enabled" },
-												"avatar_path": { "type": "string", "description": "The path to the user's avatar image" }
-											},
-											"required": ["username", "two_fa_enabled", "avatar_path"]
-										}
-                                    }
+                                        "userInfo" : {
+                                            "type": "object",
+                                            "properties": {
+                                                "username": { "type": "string", "example": "User1234"},
+                                                "two_fa_enabled": { "type": "boolean", "example": true },
+                                                "avatar_path": { "type": "string", "format": "uri", "example": "path" }
+                                            }
+                                        }
+									}
                                 }
                             }
                         }
