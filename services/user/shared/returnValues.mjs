@@ -47,6 +47,7 @@ const returnMessages = {
 	TWO_FA_ENABLED: '2FA is enabled',
 	TWO_FA_NOT_ENABLED: '2FA is not enabled',
 	TWO_FA_VERIFIED: '2FA verified',
+	TWO_FA_DISABLED: '2FA disabled',
 	INVALID_CODE: 'Invalid code',
 	LOGGED_IN: 'Logged in successfully',
 	GOOGLE_LOGGED_IN: 'Logged in with Google successfully',
@@ -57,6 +58,7 @@ const returnMessages = {
 	USERNAME_INVALID: 'Username must be between 3 and 20 characters',
 	PASSWORD_INVALID: 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number',
 	USER_CREATED: 'User registered successfully',
+	FRIENDLIST_NOT_FOUND: 'Friendlist is empty',
 
 }
 

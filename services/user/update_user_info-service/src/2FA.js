@@ -2,6 +2,7 @@ import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import bcrypt from "bcrypt";
 import { connect, JSONCodec } from 'nats';
 
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
@@ -54,6 +55,16 @@ const twoFARoutes = (app) => {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_ALREADY_ENABLED };
 		}
 
+		const password  = req.body.password;
+		if (!password) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_REQUIRED };
+		}
+
+		const isPasswordValid = await bcrypt.compare(password, user.password);
+		if (!isPasswordValid) {
+			throw { status: statusCode.UNAUTHORIZED, message: returnMessages.BAD_PASSWORD };
+		}
+
 		const secret = generateSecret();
 
 		// console.log(secret, user.id);
@@ -90,6 +101,29 @@ const twoFARoutes = (app) => {
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.TWO_FA_VERIFIED, valid: true });
 
+	}));
+
+	app.delete('/disable-2fa', handleErrors(async (req, res) => {
+
+		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
+
+		if (!user.two_fa_enabled) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_NOT_ENABLED };
+		}
+		
+		const password = req.body.password;
+		if (!password) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_REQUIRED };
+		}
+
+		const isPasswordValid = await bcrypt.compare(password, user.password);
+		if (!isPasswordValid) {
+			throw { status: statusCode.UNAUTHORIZED, message: returnMessages.BAD_PASSWORD };
+		}
+
+		await natsRequest(nats, jc, 'user.disable2FA', { userId: user.id });
+
+		res.code(statusCode.SUCCESS).send({ message: returnMessages.TWO_FA_DISABLED });
 	}));
 }
 

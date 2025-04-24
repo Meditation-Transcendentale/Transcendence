@@ -52,7 +52,9 @@
                                 "minProperties": 1,
                                 "properties": {
                                     "username": { "type": "string", "example": "user123" },
-                                    "avatar": { "type": "string", "format": "uri", "example": "https://example.com/avatar.png" }
+                                    "avatar": { "type": "string", "format": "uri", "example": "https://example.com/avatar.png" },
+									"password": { "type": "string", "format": "password", "example": "Password123" },
+									"token": { "type": "string", "example": "448448" }
                                 }
                             }
                         }
@@ -146,7 +148,7 @@
                                 "properties": {
                                     "password": { "type": "string", "format": "password", "example": "password123" },
                                     "newPassword": { "type": "string", "format": "password", "example": "newpassword123" },
-                                    "token": { "type": "string", "example": "2FA token if enabled" }
+                                    "token": { "type": "string", "example": "148484" }
                                 }
                             }
                         }
@@ -990,6 +992,20 @@
                         "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["password"],
+                                "properties": {
+                                    "password": { "type": "string", "format": "password", "example": "Password1234" }
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "2FA enabled.",
@@ -1142,6 +1158,98 @@
                     }
                 }
             }
-        }
+        },
+		"/update-info/disable-2fa": {
+			"delete": {
+				"summary": "Disable 2FA for user",
+                "tags": ["Update Infos"],
+                "description": "Disable 2FA for user.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["password"],
+                                "properties": {
+                                    "password": { "type": "string", "format": "password", "example": "Password1234" }
+                                }
+                            }
+                        }
+                    }
+                },
+				"responses": {
+					"200": {
+						"description": "2FA disabled.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "2FA disabled." }
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "2FA not enabled" }
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "User not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "User not found." }
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "Server error." }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
     }
 }

@@ -131,6 +131,15 @@ app.get('/friend-requests', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ friendsRequests });
 }));
 
+app.get('/friendlist', handleErrors(async (req, res) => {
+
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
+
+	const friendlist = await natsRequest(nats, jc, 'user.getFriendlist', { userId: user.id });
+
+	res.code(statusCode.SUCCESS).send({ friendlist });
+}));
+
 app.delete('/delete-friends', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });

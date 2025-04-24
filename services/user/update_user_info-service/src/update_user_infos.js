@@ -34,6 +34,35 @@ app.addHook('onRequest', verifyApiKey);
 const nats = await connect({ servers: process.env.NATS_URL });
 const jc = JSONCodec();
 
+const agent = new https.Agent({
+	rejectUnauthorized: false
+});
+
+const USERNAME_REGEX = /^[a-zA-Z0-9]{3,20}$/;
+
+async function checkPassword2FA(user, password, token) {
+
+	if (user.two_fa_enabled == true) {
+		if (!token) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
+		}
+
+		try {
+			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
+			if (response.data.valid == false) {
+				throw { status: statusCode.UNAUTHORIZED, message: response.data.message };
+			}
+		} catch (error) {
+			throw { status: statusCode.UNAUTHORIZED, message: error.response.data.message };
+		}
+	} else {
+		const isPasswordValid = await bcrypt.compare(password, user.password);
+		if (!isPasswordValid) {
+			throw { status: statusCode.UNAUTHORIZED, message: returnMessages.BAD_PASSWORD };
+		}
+	}
+}
+
 app.patch('/', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
@@ -42,9 +71,12 @@ app.patch('/', handleErrors(async (req, res) => {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.NOTHING_TO_UPDATE };
 	}
 
-	const { username, avatar,} = req.body;
+	const { username, avatar, password, token } = req.body;
 
-	if (username) {
+	if (username && USERNAME_REGEX.test(username) === false) {
+		throw { status: statusCode.BAD_REQUEST, message: returnMessages.USERNAME_INVALID };
+	} else {
+		await checkPassword2FA(user, password, token);
 		await natsRequest(nats, jc, 'user.updateUsername', { username, userId: user.id });
 	}
 
@@ -87,9 +119,6 @@ app.patch('/password', handleErrors(async (req, res) => {
 
 	if (user.two_fa_enabled) {
 
-		const agent = new https.Agent({
-			rejectUnauthorized: false
-		});
 		if (!token) {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
 		}
