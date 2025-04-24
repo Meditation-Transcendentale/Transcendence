@@ -16,6 +16,13 @@ export type twoFAResponse = {
 	ok: boolean
 }
 
+export type friendlistResponse = {
+	message: {},
+	status: number,
+	ok: boolean
+}
+
+
 export async function registerRequest(username: string, password: string): Promise<AuthResponse> {
 	const response = await fetch("https://localhost:3000/register", {
 		method: 'POST',
@@ -190,4 +197,6 @@ export async function verify2FARequest(): Promise<twoFAResponse> {
 	return final;
 }
 
-
+// export async function friendlistRequest(): Promise<friendlistResponse> {
+// 	const response = await fetch("https://localhost:3000/friends/friendlist")
+// }
