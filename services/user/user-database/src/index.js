@@ -132,6 +132,21 @@ handleErrorsNats(async () => {
 			const { secret, userId } = jc.decode(msg.data);
 			userService.enable2FA(secret, userId);
 			nats.publish(msg.reply, jc.encode({ success: true }));
-		})
+		}),
+		handleNatsSubscription("user.disable2FA", async (msg) => {
+			const { userId } = jc.decode(msg.data);
+			userService.disable2FA(userId);
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
+		handleNatsSubscription("user.getUserInfo", async (msg) => {
+			const { userId } = jc.decode(msg.data);
+			const userInfo = userService.getUserInfo(userId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: userInfo }));
+		}),
+		handleNatsSubscription("user.getFriendlist", async (msg) => {
+			const { userId } = jc.decode(msg.data);
+			const friendlist = userService.getFriendlist(userId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: friendlist }));
+		}),
 	]);
 })();

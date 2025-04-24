@@ -14,7 +14,7 @@ const getFriendshipByIdStmt = database.prepare("SELECT * FROM friendslist WHERE 
 const getFriendshipByUser1UsernameStmt = database.prepare("SELECT * FROM friendslist WHERE user_id_1 = ? AND user_id_2 = ?");
 const acceptFriendRequestStmt = database.prepare("UPDATE friendslist SET status = 'accepted' WHERE id = ?");
 const declineFriendRequestStmt = database.prepare("DELETE FROM friendslist WHERE id = ?");
-const getFriendsRequestsStmt = database.prepare("SELECT * FROM friendslist WHERE user_id_2 = ?");
+const getFriendsRequestsStmt = database.prepare("SELECT * FROM friendslist WHERE user_id_2 = ? AND status = 'pending'");
 const isFriendshipExistingStmt = database.prepare("SELECT * FROM friendslist WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)");
 const deleteFriendshipStmt = database.prepare("DELETE FROM friendslist WHERE id = ?");
 const blockUserStmt = database.prepare("INSERT INTO blocked_users (blocker_id, blocked_id) VALUES (?, ?)");
@@ -25,6 +25,9 @@ const updateUsernameStmt = database.prepare("UPDATE users SET username = ? WHERE
 const updateAvatarStmt = database.prepare("UPDATE users SET avatar_path = ? WHERE id = ?");
 const updatePasswordStmt = database.prepare("UPDATE users SET password = ? WHERE id = ?");
 const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_fa_enabled = ? WHERE id = ?");
+const getUserInfoStmt = database.prepare("SELECT username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
+const getFriendlistStmt = database.prepare("SELECT  * FROM friendslist WHERE (user_id_1 = ? OR user_id_2 = ?) AND status = 'accepted'" );
+
 
 const userService = {
 	getUserFromUsername: (username) => {
@@ -127,6 +130,23 @@ const userService = {
 	},
 	enable2FA: (secret, userId) => {
 		enable2FAStmt.run(JSON.stringify(secret), 1, userId);
+	},
+	disable2FA: (userId) => {
+		enable2FAStmt.run(null, 0, userId);
+	},
+	getUserInfo: (userId) => {
+		const userInfo = getUserInfoStmt.get(userId);
+		if (!userInfo) {
+			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
+		}
+		return userInfo;
+	},
+	getFriendlist: (userId) => {
+		const friendlist = getFriendlistStmt.all(userId, userId);
+		if (friendlist.length === 0) {
+			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIENDLIST_NOT_FOUND };
+		}
+		return friendlist;
 	}
 };
 

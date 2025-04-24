@@ -1,0 +1,98 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Get Info service Documentation",
+		"version": "1.0.0",
+		"description": "Documentation for the Get Info Service in the API."
+	},
+	"components": {
+		"securitySchemes": {
+			"ApiKey": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "x-api-key",
+				"description" : "API Key required to access the endpoints."
+			}
+		}
+	},
+	"security": [
+		{
+			"ApiKey": []
+		}
+	],
+	"paths": {
+        "/info/me": {
+            "get": {
+                "summary": "Retrieve User Information",
+                "tags": ["Get Info"],
+                "description": "Retrieve User Information",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string", "example": "12345" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful update",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "userInfo": {
+											"type": "object",
+											"properties": {
+												"username": { "type": "string", "description": "The username of the user"},
+												"two_fa_enabled": { "type": "boolean", "description": "Indicates if two-factor authentication is enabled" },
+												"avatar_path": { "type": "string", "description": "The path to the user's avatar image" }
+											},
+											"required": ["username", "two_fa_enabled", "avatar_path"]
+										}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+	}
+}

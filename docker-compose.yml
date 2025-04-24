@@ -3,6 +3,7 @@ services:
   register-service:
     build: 
       context: ./services/user/register-service
+    container_name: register_service
     ports:
       - "4001:4001"
     volumes:
@@ -27,6 +28,7 @@ services:
   auth-service:
     build:
       context: ./services/user/auth-service
+    container_name: auth_service
     ports:
       - "4002:4002"
     volumes:
@@ -52,6 +54,7 @@ services:
   update_user_info-service:
     build:
       context: ./services/user/update_user_info-service
+    container_name: update_user_info_service
     ports:
       - "4003:4003"
     volumes:
@@ -76,8 +79,34 @@ services:
   friends-service:
     build:
       context: ./services/user/friends-service
+    container_name: friends_service
     ports:
       - "4004:4004"
+    volumes:
+      - ./shared/db:/app/data
+      - ./shared/certs:/app/certs:ro
+      - user_shared:/app/shared
+    environment:
+      - NODE_ENV=development
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - NATS_URL=${NATS_URL}
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+      user-database:
+        condition: service_started
+
+  get-info-service:
+    build:
+      context: ./services/user/get-info-service
+    container_name: get_info_service
+    ports:
+      - "4005:4005"
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
@@ -118,6 +147,7 @@ services:
   api-gateway:
     build:
       context: ./gateway
+    container_name: api_gateway
     ports:
       - "3000:3000"
     volumes:
@@ -137,6 +167,7 @@ services:
   docs-service:
     build:
       context: ./doc/doc_API
+    container_name: docs_service
     ports:
       - "3001:3001"
     volumes:
@@ -163,6 +194,7 @@ services:
   database_certs-init:
     build:
       context: ./database_certs-init
+    container_name: database_certs_init
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs
