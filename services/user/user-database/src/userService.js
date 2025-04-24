@@ -14,19 +14,42 @@ const getFriendshipByIdStmt = database.prepare("SELECT * FROM friendslist WHERE 
 const getFriendshipByUser1UsernameStmt = database.prepare("SELECT * FROM friendslist WHERE user_id_1 = ? AND user_id_2 = ?");
 const acceptFriendRequestStmt = database.prepare("UPDATE friendslist SET status = 'accepted' WHERE id = ?");
 const declineFriendRequestStmt = database.prepare("DELETE FROM friendslist WHERE id = ?");
-const getFriendsRequestsStmt = database.prepare("SELECT * FROM friendslist WHERE user_id_2 = ? AND status = 'pending'");
 const isFriendshipExistingStmt = database.prepare("SELECT * FROM friendslist WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)");
 const deleteFriendshipStmt = database.prepare("DELETE FROM friendslist WHERE id = ?");
 const blockUserStmt = database.prepare("INSERT INTO blocked_users (blocker_id, blocked_id) VALUES (?, ?)");
 const isBlockedStmt = database.prepare("SELECT * FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?");
 const unblockUserStmt = database.prepare("DELETE FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?");
-const getBlockedUsersStmt = database.prepare("SELECT * FROM blocked_users WHERE blocker_id = ?");
 const updateUsernameStmt = database.prepare("UPDATE users SET username = ? WHERE id = ?");
 const updateAvatarStmt = database.prepare("UPDATE users SET avatar_path = ? WHERE id = ?");
 const updatePasswordStmt = database.prepare("UPDATE users SET password = ? WHERE id = ?");
 const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_fa_enabled = ? WHERE id = ?");
 const getUserInfoStmt = database.prepare("SELECT username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
-const getFriendlistStmt = database.prepare("SELECT  * FROM friendslist WHERE (user_id_1 = ? OR user_id_2 = ?) AND status = 'accepted'" );
+const getBlockedUsersStmt = database.prepare(`
+	SELECT bu.id, u1.username AS blocker_username, u2.username AS blocked_username 
+	FROM blocked_users bu
+	JOIN users u1 ON bu.blocker_id = u1.id
+	JOIN users u2 ON bu.blocked_id = u2.id
+	WHERE bu.blocker_id = ?`);
+const getFriendsRequestsStmt = database.prepare(`
+	SELECT f.id, u1.username AS sender_username, u2.username AS receiver_username
+	FROM friendslist f
+	JOIN users u1 ON f.user_id_1 = u1.id
+	JOIN users u2 ON f.user_id_2 = u2.id
+	WHERE f.user_id_2 = ? 
+		AND status = 'pending'`);
+const getFriendlistStmt = database.prepare(`
+	SELECT 
+		f.id, 
+		CASE 
+			WHEN f.user_id_1 = ? THEN u2.username
+			ELSE u1.username
+		END AS friend_username
+	FROM friendslist f
+	JOIN users u1 ON f.user_id_1 = u1.id
+	JOIN users u2 ON f.user_id_2 = u2.id
+	WHERE (f.user_id_1 = ? OR f.user_id_2 = ?) 
+		AND status = 'accepted'`
+);
 
 
 const userService = {
@@ -142,7 +165,7 @@ const userService = {
 		return userInfo;
 	},
 	getFriendlist: (userId) => {
-		const friendlist = getFriendlistStmt.all(userId, userId);
+		const friendlist = getFriendlistStmt.all(userId, userId, userId);
 		if (friendlist.length === 0) {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIENDLIST_NOT_FOUND };
 		}
