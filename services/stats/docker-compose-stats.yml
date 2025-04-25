@@ -14,8 +14,6 @@ services:
     build: 
       context: ./services/stats/stats_manager
     container_name: stats_manager
-    ports:
-      - "6000:6000"
     volumes:
       - stats_shared:/app/shared
       - ./shared/db:/app/data
