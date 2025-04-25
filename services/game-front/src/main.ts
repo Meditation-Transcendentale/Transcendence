@@ -64,7 +64,8 @@ class Game {
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
-		localPaddleId = await this.waitForWelcome();
+		// localPaddleId = await this.waitForWelcome();
+		localPaddleId = await this.waitForRegistration();
 		this.initECS(config, instanceManagers, uuid);
 
 		this.stateManager = new StateManager(this.ecs);
@@ -107,6 +108,40 @@ class Game {
 			paddle: createPaddleMesh(this.scene, config),
 			wall: createWallMesh(this.scene, config)
 		}
+	}
+	private waitForRegistration(): Promise<number> {
+		return new Promise((resolve, reject) => {
+			const socket = this.wsManager.socket;
+
+			socket.addEventListener("message", (event) => {
+				let data: any;
+				if (typeof event.data === "string") {
+					try {
+						data = JSON.parse(event.data);
+					} catch {
+						return;
+					}
+				} else {
+					return;
+				}
+
+				if (data.type === "welcome") {
+					console.log("Got welcome (session):", data);
+					socket.send(JSON.stringify({
+						type: "registerGame",
+						data: { gameId: this.gameId }
+					}));
+				}
+
+				else if (data.type === "registered") {
+					console.log("Registered into game:", data);
+					this.paddleId = data.paddleId;
+					resolve(data.paddleId);
+				}
+			}, { once: false });
+
+			setTimeout(() => reject(new Error("Timed out waiting for registration")), 5000);
+		});
 	}
 
 

@@ -40,24 +40,42 @@ async function start() {
 	  * Handle incoming player inputs immediately
 	  * @param {import('nats').Msg} msg
 	  */
-
 	const inputSub = nc.subscribe('game.pong.input');
 	(async () => {
 		for await (const msg of inputSub) {
-			console.log(`[${SERVICE_NAME}] Received input message`);
+			// console.log(`[${SERVICE_NAME}] Received input message`);
 			const { gameId, inputs } = jc.decode(msg.data);
+
 			if (endedGames.has(gameId)) continue;
 
-			for (const { playerId, type } of inputs) {
+			for (const entry of inputs) {
+				const playerId = entry.playerId;
+				const actualInput = entry.input ?? { type: entry.type };
+
 				Physics.handleImmediateInput({
 					gameId,
-					inputs: [
-						{ playerId, input: { type } }
-					]
+					inputs: [{ playerId, input: actualInput }]
 				});
 			}
 		}
 	})();
+	// const inputSub = nc.subscribe('game.pong.input');
+	// (async () => {
+	// 	for await (const msg of inputSub) {
+	// 		console.log(`[${SERVICE_NAME}] Received input message`);
+	// 		const { gameId, inputs } = jc.decode(msg.data);
+	// 		if (endedGames.has(gameId)) continue;
+	//
+	// 		for (const { playerId, type } of inputs) {
+	// 			Physics.handleImmediateInput({
+	// 				gameId,
+	// 				inputs: [
+	// 					{ playerId, input: { type } }
+	// 				]
+	// 			});
+	// 		}
+	// 	}
+	// })();
 
 	/**
 	   * Process each tick: run physics and publish new state
@@ -73,9 +91,16 @@ async function start() {
 			continue;
 		}
 
-		const result = Physics.processTick(data);
-		const buffer = encodeStateUpdate(result.gameId, result.tick, result.balls, result.paddles);
+		// const result = Physics.processTick(data);
+		const { gameId, tick, balls, paddles, events } = Physics.processTick(data);
+		const buffer = encodeStateUpdate(gameId, tick, balls, paddles);
+		// const buffer = encodeStateUpdate(result.gameId, result.tick, result.balls, result.paddles);
 		nc.publish('game.state', buffer);
+		if (events && events.length) {
+			for (const ev of events) {
+				nc.publish('game.pong.events', jc.encode(ev));
+			}
+		}
 	}
 }
 

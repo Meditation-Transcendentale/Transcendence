@@ -16,7 +16,7 @@ const jc = JSONCodec();
 
 const fastify = Fastify();
 let nc;
-const gameManager = new GameManager();
+const gameManager = new GameManager(nc);
 
 await fastify.register(cors, {
 	origin: true // or origin: 'http://localhost:3000' to lock it down
@@ -87,6 +87,14 @@ async function start() {
 		}
 	})();
 
+	const events = nc.subscribe('game.pong.events');
+	(async () => {
+		for await (const msg of events) {
+			const ev = jc.decode(msg.data);
+			if (ev.type === 'goal')
+				gameManager._onGoal(ev);
+		}
+	})();
 	fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
 		if (err) {
 			console.error(err);

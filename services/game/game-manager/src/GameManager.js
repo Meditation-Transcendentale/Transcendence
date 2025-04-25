@@ -1,12 +1,12 @@
 // services/game/game-manager/src/GameManager.js
-import { decodeStateUpdate } from './binary.js';
+import { decodeRaw, encodeFull } from './binary.js';
 import { Game } from './Game.js';
 import { JSONCodec } from 'nats';
 const jc = JSONCodec();
 
 export class GameManager {
-	constructor() {
-		this.nc = null;
+	constructor(nc) {
+		this.nc = nc;
 		this.games = new Map(); // gameId -> { type, state, inputs, tick, interval }
 	}
 
@@ -32,15 +32,31 @@ export class GameManager {
 		}
 		game.inputs[currentTick].push({ playerId, type, input });
 	}
+
 	handlePhysicsResult(buffer) {
-		const state = decodeStateUpdate(buffer);
-		const game = this.games.get(state.gameId);
-		if (!game) return;
-		game.state = state;
+		const phys = decodeRaw(buffer);
 
-		this.nc.publish(game.options.stateTopic, buffer);
+		const match = this.games.get(phys.gameId);
+		if (!match) return;
+
+		match.state = {
+			tick: phys.tick,
+			balls: phys.balls,
+			paddles: phys.paddles
+		};
+
+		const out = encodeFull(
+			phys.gameId,
+			phys.tick,
+			phys.balls,
+			phys.paddles,
+			match.score,
+			match.isPaused,
+			match.isGameOver
+		);
+
+		this.nc.publish(match.options.stateTopic, out);
 	}
-
 	createMatch(options = {}) {
 		const gameInstance = new Game(options);
 		const gameId = gameInstance.getState().gameId;
@@ -53,9 +69,14 @@ export class GameManager {
 			inputs: {},
 			options,
 			status: 'created',
-			interval: null
+			interval: null,
+			score: { 0: 0, 1: 0 },
+			isPaused: false,
+			isGameOver: false
 		};
-
+		Object.keys(match.state.paddles).forEach(pid => {
+			match.score[pid] = 0;
+		});
 		this.games.set(gameId, match);
 		console.log(`[game-manager] Created ${match.type} match ${gameId}`);
 		return gameId;
@@ -99,5 +120,48 @@ export class GameManager {
 		gameLoop();
 		console.log(`[game-manager] Launched match ${gameId}`);
 		return true;
+	}
+
+	/**
+ * Invoked when physics reports a goal.
+ * @param {{gameId: string, playerId: number}} ev
+ */
+	_onGoal({ gameId, playerId }) {
+		const match = this.games.get(gameId);
+		if (!match || match.isPaused || match.isGameOver) return;
+
+		match.score[playerId]++;
+		const winScore = match.options.winScore || 5;
+		console.log(match.score);
+		if (match.score[playerId] >= winScore) {
+			match.isGameOver = true;
+			match.status = 'ended';
+			this.nc.publish(
+				`game.${match.type}.end`,
+				jc.encode({ gameId, winner: playerId })
+			);
+			return;
+		}
+
+		this.nc.publish(
+			`game.${match.type}.input`,
+			JSON.stringify({
+				gameId,
+				inputs: [{ playerId: null, input: { type: 'resetBall' } }]
+			})
+		);
+
+		match.isPaused = true;
+
+		setTimeout(() => {
+			match.isPaused = false;
+			this.nc.publish(
+				`game.${match.type}.input`,
+				JSON.stringify({
+					gameId,
+					inputs: [{ playerId: null, input: { type: 'serve' } }]
+				})
+			);
+		}, match.options.pauseMs || 1000);
 	}
 }
