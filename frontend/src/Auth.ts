@@ -1,6 +1,15 @@
 class Auth {
+
+	private loaded: boolean;
 	constructor() {
 		console.log("Auth loaded successfully");
+		this.loaded = false;
+	}
+
+	public init() {
+		if (this.loaded == true) {
+			return;
+		}
 
 		document.getElementById("login")?.addEventListener("submit", (ev) => {
 			ev.preventDefault();
@@ -15,6 +24,7 @@ class Auth {
 			document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/register" } }));
 		})
 
+		this.loaded = true;
 
 	}
 
@@ -58,8 +68,7 @@ class Auth {
 
 }
 
-const auth = new Auth();
-
+export default Auth;
 
 
 

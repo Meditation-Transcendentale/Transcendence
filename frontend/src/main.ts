@@ -17,9 +17,10 @@ async function init() {
 		});
 
 		const data = await response.json();
+		console.log(response);
 
 		const final = {
-			message: data.message,
+			message: data,
 			status: response.status,
 			ok: response.ok
 		};
@@ -35,9 +36,6 @@ async function init() {
 	} else {
 		router.nav("/auth");
 	}
-
-
-
 }
 
 window.addEventListener("DOMContentLoaded", () => { init() })

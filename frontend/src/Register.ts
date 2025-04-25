@@ -1,7 +1,15 @@
 class Register {
+	private loaded: boolean;
+
 	constructor() {
 		console.log("Register loaded successfully");
+		this.loaded = false;
+	}
 
+	public init() {
+		if (this.loaded == true) {
+			return;
+		}
 		document.getElementById("register")?.addEventListener("submit", (ev) => {
 			ev.preventDefault();
 			this.registerRequest(document.getElementById("register-username").value, document.getElementById("register-password").value)
@@ -9,6 +17,7 @@ class Register {
 				.catch((error) => console.log(error));
 		});
 
+		this.loaded = true;
 	}
 
 	private registerResponse(response: any) {
@@ -90,7 +99,6 @@ class Register {
 }
 
 
-const register = new Register();
-
+export default Register;
 
 
