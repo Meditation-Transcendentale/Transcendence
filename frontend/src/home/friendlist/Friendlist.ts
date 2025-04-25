@@ -32,19 +32,40 @@ export class Friendlist extends ABlock {
         const response = friendlistRequest(sessionStorage.getItem("username"))
             .then((resp) => {
                 if (resp.ok) {
-                    console.log(resp.json.friendlist);
-                    // this.parseFriendlistJson(resp.json.friendlist);
-                    resp.json.friendlist.forEach(object => {
-                        const tr = document.createElement("tr")
-                        const td = document.createElement("td");
-                        td.innerHTML = object.friend_username;
-                        tr.appendChild(td);
-                        this.friendList.appendChild(tr);
-                    });
+                    // console.log(resp.json.friendlist);  
+                    // resp.json.friendlist.forEach(object => {
+                    //     const tr = document.createElement("tr")
+                    //     const td = document.createElement("td");
+                    //     let removeBtn = document.createElement("input");
+                    //     let blockBtn = document.createElement("input");
+                    //     let statBtn = document.createElement("input");
+                    //     blockBtn.setAttribute("type", "button");
+                    //     blockBtn.setAttribute("value", "Add");
+                    //     blockBtn.addEventListener("click", () => {
+                            
+                    //     })
+                    //     removeBtn.setAttribute("type", "button");
+                    //     removeBtn.setAttribute("value", "Remove");
+                    //     statBtn.setAttribute("type", "button");
+                    //     statBtn.setAttribute("value", "Stats");
+                    //     td.innerHTML = object.friend_username;
+                    //     tr.appendChild(td);
+                    //     tr.appendChild(removeBtn);
+                    //     tr.appendChild(blockBtn);
+                    //     tr.appendChild(statBtn);
+                    //     this.friendList.appendChild(tr);
+                    // });
                     return;
                 }
                 throw resp;
             }).catch((err) => console.log(err));     
+        response.json.friendlist.forEach(object => {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.innerHTML = object.friend_username;
+            tr.appendChild(td);
+            this.friendList.appendChild(tr);
+        })
     }
 }
 

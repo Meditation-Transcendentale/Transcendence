@@ -22,6 +22,12 @@ export type friendlistResponse = {
 	ok: boolean
 }
 
+export type friendRequestResponse = {
+	message: string,
+	status: number,
+	ok: boolean,
+}
+
 
 export async function registerRequest(username: string, password: string): Promise<AuthResponse> {
 	const response = await fetch("https://localhost:3000/register", {
@@ -210,6 +216,55 @@ export async function friendlistRequest(username: string): Promise<friendlistRes
 
 	const final: friendlistResponse = {
 		json: data,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
+}
+
+export async function addFriendRequest(username: string, addedUsername: string): Promise<friendRequestResponse> 
+{
+	const response = await fetch("https://localhost:3000/friends/add-friend", {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+		},
+		credentials: 'include',
+		body: JSON.stringify({
+			addedPlayerUsername: addedUsername,
+		})
+	});
+	
+	
+	const data = await response.json();
+	
+	const final: AuthResponse = {
+		message: data.message,
+		status: response.status,
+		ok: response.ok
+	};
+	return final;
+}
+
+export async function deleteFriendRequest(username: string, deletedUsername: string): Promise<friendRequestResponse> 
+{
+	const response = await fetch("https://localhost:3000/friends/delete-friends", { //change to delete-friend on next merge
+		method: 'DELETE',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+		},
+		credentials: 'include',
+		body: JSON.stringify({
+			friendName: deletedUsername,
+		})
+	});
+	
+	const data = await response.json();
+	
+	const final: AuthResponse = {
+		message: data.message,
 		status: response.status,
 		ok: response.ok
 	};
