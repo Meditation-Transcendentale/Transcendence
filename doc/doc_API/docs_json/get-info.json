@@ -34,13 +34,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "responses": {

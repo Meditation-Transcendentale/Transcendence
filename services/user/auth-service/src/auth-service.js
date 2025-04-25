@@ -81,7 +81,7 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 		}
 	}
 
-	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_IN });
@@ -112,7 +112,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
 
-	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.code(retCode).send({ message: retMessage});
