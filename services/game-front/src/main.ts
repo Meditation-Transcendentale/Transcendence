@@ -15,8 +15,8 @@ import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
 
-// const API_BASE = "http://10.19.225.59:4000";
-const API_BASE = "http://localhost:4000";
+const API_BASE = "http://10.19.225.59:4000";
+// const API_BASE = "http://localhost:4000";
 export let localPaddleId: any = null;
 let engine: any;
 class Game {
@@ -59,8 +59,8 @@ class Game {
 		const instanceManagers = this.createInstanceManagers(baseMeshes);
 
 		const uuid = getOrCreateUUID();
-		// const wsUrl = `ws://10.19.225.59:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		const wsUrl = `ws://10.19.225.59:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		// const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
@@ -179,10 +179,10 @@ class Game {
 
 let resizeTimeout: number;
 window.addEventListener("resize", () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        engine.resize();
-    }, 100); // délai pour limiter les appels trop fréquents
+	clearTimeout(resizeTimeout);
+	resizeTimeout = setTimeout(() => {
+		engine.resize();
+	}, 100); // délai pour limiter les appels trop fréquents
 });
 
 window.addEventListener("DOMContentLoaded", () => {
