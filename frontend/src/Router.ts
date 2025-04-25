@@ -1,3 +1,4 @@
+import { meRequest } from "./checkMe";
 
 
 
@@ -65,7 +66,7 @@ class Router {
 
 			case "/home": {
 				console.log("there");
-				this.loadInMain("/home");
+				this.loadInMain("/home")
 				break;
 			}
 
@@ -76,7 +77,8 @@ class Router {
 			}
 
 			default: {
-				page = null;
+				alert("404")
+				this.loadInMain("/home");
 				break;
 			}
 		}
@@ -87,7 +89,20 @@ class Router {
 	}
 
 	private async loadInMain(route: string) {
+		const reponse = await meRequest("no-cache")
+			.then((response) => {
+				if (route == "/auth" || route == "/register") { route = "/home" }
+			})
+			.catch((error) => {
+				console.log("catch ME");
+				if (route != "/auth" && route != "/register") { route = "/auth"; }
+
+			});
+		console.log('MAIN', route);
+
+
 		const detail = this.routes[route];
+
 
 		this.mainContainer.innerHTML = "";
 		if (detail.html.data == null) {
@@ -121,6 +136,8 @@ class Router {
 			console.log("eee");
 			this.loadInMain("/home").then(() => {
 				this.loadInHome(route);
+			}).catch((error) => {
+				console.log(error);
 			});
 			return;
 		}

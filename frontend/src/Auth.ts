@@ -60,6 +60,9 @@ class Auth {
 		if (response.ok == false) {
 			throw response;
 		}
+		document.getElementById("login-username").value = "";
+		document.getElementById("login-password").value = "";
+
 
 		document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home" } }))
 

@@ -17,6 +17,13 @@ class Register {
 				.catch((error) => console.log(error));
 		});
 
+		document.getElementById("auth")?.addEventListener("click", (ev) => {
+			ev.preventDefault();
+			document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/auth" } }));
+		})
+
+
+
 		this.loaded = true;
 	}
 
@@ -40,6 +47,8 @@ class Register {
 			throw response;
 		}
 
+		document.getElementById("register-username").value = "";
+		document.getElementById("register-password").value = "";
 		document.getElementById("main-container")?.dispatchEvent(new CustomEvent('nav', { detail: { path: "/home" } }))
 	}
 

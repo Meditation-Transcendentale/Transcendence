@@ -20,6 +20,7 @@ class Home {
 		document.querySelectorAll("a").forEach((link) => {
 			link.addEventListener("click", (e) => {
 				e.preventDefault();
+				console.log(link.hash);
 				document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: link.hash.substring(1) } }));
 			})
 		})
