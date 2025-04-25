@@ -6,7 +6,7 @@ import { TransformComponent } from "../components/TransformComponent.js";
 
 export class VisualEffectSystem extends System {
 	private scene!: Scene;
-	private isTabFocused: boolean = true; 
+	private isTabFocused: boolean = true;
 
 	constructor(scene: Scene) {
 		super();
@@ -26,9 +26,9 @@ export class VisualEffectSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
-		if (!this.isTabFocused) {
-			return;
-		}
+		// if (!this.isTabFocused) {
+		// 	return;
+		// }
 
 		for (const entity of entities) {
 			if (
@@ -47,12 +47,12 @@ export class VisualEffectSystem extends System {
 					(Math.random() - 0.5) * spread,
 					(Math.random() - 0.5) * spread
 				);
-				
+
 				let particleSystem = new ParticleSystem("particles", 200, this.scene);
 				let position = transform.position.clone();
 				position.set(position.x + (ball.velocity.x * 4) * (deltaTime / 1000), 0.5, position.z + (ball.velocity.z * 4) * (deltaTime / 1000));
 				particleSystem.emitter = position;
-				
+
 				//Texture of each particle
 				particleSystem.particleTexture = new Texture("textures/Shard_Alpha.png", this.scene);
 
@@ -95,6 +95,6 @@ export class VisualEffectSystem extends System {
 				// ball.destroy = true;
 			}
 		}
-		
+
 	}
 }
