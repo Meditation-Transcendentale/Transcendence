@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "game.create payload",
+  "type": "object",
+  "required": ["mode", "players", "options"],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["pong", "pongBR", "pongIO"]
+    },
+    "players": {
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" }
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "map": { "type": "string" },
+        "maxScore": { "type": "integer" }
+      },
+      "required": ["map", "maxScore"]
+    }
+  }
+}

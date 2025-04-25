@@ -1,0 +1,8 @@
+services:
+  docs:
+    build: .
+    ports:
+      - "5009:5009"
+    volumes:
+      - ./docs:/docs/docs
+

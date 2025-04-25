@@ -1,0 +1,62 @@
+// docs/schemas/lobby-list.response.json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "lobbies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id","mode","maxPlayers","players","status","visibility"],
+        "properties": {
+          "id":        { "type": "string" },
+          "mode": {
+            "type": "string",
+            "enum": ["pong","pongBR","pongIO"]
+          },
+          "maxPlayers": { "type": "integer" },
+          "players": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "status": {
+            "type": "string",
+            "enum": ["waiting","ready","started"]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": ["public","private"],
+            "description": "Whether the lobby is visible in public listings"
+          }
+        },
+        // Enforce mode-specific constraints:
+        "allOf": [
+          {
+            "if": {
+              "properties": { "mode": { "const": "pong" } }
+            },
+            "then": {
+              "properties": {
+                "maxPlayers": { "minimum": 1, "maximum": 2 }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "mode": { "enum": ["pongBR","pongIO"] }
+              }
+            },
+            "then": {
+              "properties": {
+                "maxPlayers": { "minimum": 1, "maximum": 100 }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": ["lobbies"]
+}
+
