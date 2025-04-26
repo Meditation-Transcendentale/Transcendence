@@ -6,9 +6,12 @@ body {
 	overflow: hidden;
 }
 
-div[disabled="true"] {
+div[disabled=true],
+input[display=false] {
 	display: none;
 }
+
+
 
 
 

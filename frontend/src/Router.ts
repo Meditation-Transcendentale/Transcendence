@@ -5,8 +5,11 @@ import { meRequest } from "./checkMe";
 class Router {
 	private mainContainer: HTMLElement;
 	private routes: {};
+	private initRoute: string;
 
 	constructor() {
+		this.initRoute = null;
+
 		this.routes = {
 			"/": {
 				html: { path: "/auth", data: null },
@@ -27,105 +30,118 @@ class Router {
 			"/home/info": {
 				html: { path: "/info", data: null },
 				script: { path: "./Info", data: null }
+			},
+			"/home/stats": {
+				html: { path: "/stats", data: null },
+				script: { path: "./Stats", data: null }
 			}
 		};
 
 		this.mainContainer = document.getElementById("main-container") as HTMLElement;
 		this.mainContainer.addEventListener("nav", (ev) => {
+			if (ev.detail.return) { this.nav(this.initRoute) }
 			this.nav(ev.detail.path);
 		})
 
 		window.addEventListener("popstate", (ev) => {
-			console.log(ev.state.route);
+			console.log("Popstate  event");
+			this.nav(ev.state.path, false);
 		});
 		console.log(this.routes);
 
 	}
 
 
-	public async nav(path: string) {
-		let page = null;
-		let script = null;
+	public async nav(path: string, history = true) {
+		if (this.initRoute == null) { this.initRoute = path }
 
 		console.log("nav request: ", path);
 
 		switch (path) {
 			case "/": {
-				this.loadInMain("/auth");
+				this.loadInMain("/home", history);
 				break;
 			}
 			case "/auth": {
-
-				this.loadInMain("/auth");
+				this.loadInMain("/auth", history);
 				break;
 			}
 			case "/register": {
-
-				this.loadInMain("/register");
+				this.loadInMain("/register", history);
 				break;
 			}
 
 			case "/home": {
 				console.log("there");
-				this.loadInMain("/home")
+				this.loadInMain("/home", history)
 				break;
 			}
 
 			case "/home/info": {
 				console.log("hear");
-				this.loadInHome("/home/info");
+				this.loadInHome("/home/info", history);
 				break;
+			}
+			case "/home/stats": {
+				this.loadInHome("/home/stats", history);
+				break
 			}
 
 
 			default: {
 				alert("404")
 				path = "/home";
-				this.loadInMain("/home");
+				this.loadInMain("/home", history);
 				break;
 			}
 		}
-
-
-		window.history.pushState("", "", path)
-
 	}
 
+	//add correct route to url
+	//?add reload listener
+	//add back listener
+	//
 
-	private async loadInMain(route: string) {
+	private async loadInMain(route: string, history = true, child = false) {
 		console.log("load in main :", route);
-		console.log(this.routes[route]);
 		route = await this.isLogedIn()
-			.then(() => { return (route == "/auth" || route == "/register") ? "/home" : route; })
+			.then(() => {
+				return (route == "/auth" || route == "/register") ? "/home" : route;
+			})
 			.catch(() => { return (route != '/register') ? "/auth" : route })
-
 		this.routes[route].script.data = await this.getScript(this.routes[route].script);
 		this.routes[route].html.data = await this.getHtml(this.routes[route].html);
 
-		document.getElementById("main-container").innerHTML = "";
+		try {
+			document.getElementById("main-container").removeChild(document.getElementById("main-container")?.firstChild);
+		} catch (err) { console.log(err) }
+
 		document.getElementById("main-container").appendChild(this.routes[route].html.data);
 		this.routes[route].script.data.init();
 		this.routes[route].script.data.reset();
-		if (route == "/auth") { throw ("aaaaaaaaa") };
+		if (child && route == "/auth") { throw ("aaaaaaaaa") };
+		if (!child && history) { window.history.pushState({ path: route }, "", route) };
 	}
 
-	private async loadInHome(route: string) {
+	private async loadInHome(route: string, history = true) {
 		console.log("load in home :", route);
 		if (!document.getElementById("home")) {
-			this.loadInMain("/home")
-				.catch(() => console.log("Not logged In"))
-				.then(() => this.loadInHome(route))
+			this.loadInMain("/home", false, true)
+				.then(() => { this.loadInHome(route) })
 				.catch(() => console.log("Not logged In"));
-
 			return;
 		}
 
 		this.routes[route].script.data = await this.getScript(this.routes[route].script);
 		this.routes[route].html.data = await this.getHtml(this.routes[route].html);
 
+		try {
+			document.getElementById("home-container").removeChild(document.getElementById("home-container")?.firstChild);
+		} catch (err) { console.log(err) }
 		document.getElementById("home-container").appendChild(this.routes[route].html.data);
 		this.routes[route].script.data.init();
 		this.routes[route].script.data.reset();
+		if (history) { window.history.pushState({ path: route }, "", route) };
 
 	}
 

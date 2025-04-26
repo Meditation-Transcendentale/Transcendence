@@ -67,7 +67,7 @@ class Auth {
 		document.getElementById("login-password").value = "";
 
 
-		document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home" } }))
+		document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home", return: true } }))
 
 	}
 

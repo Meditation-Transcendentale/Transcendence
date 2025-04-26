@@ -12,12 +12,13 @@ class Register {
 		}
 		document.getElementById("register")?.addEventListener("submit", (ev) => {
 			ev.preventDefault();
+			console.log("Register submit");
 			this.registerRequest(document.getElementById("register-username").value, document.getElementById("register-password").value)
 				.then((response) => { this.registerResponse(response) })
 				.catch((error) => console.log(error));
 		});
 
-		document.getElementById("auth")?.addEventListener("click", (ev) => {
+		document.getElementById("login")?.addEventListener("click", (ev) => {
 			ev.preventDefault();
 			document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/auth" } }));
 		})
@@ -27,9 +28,7 @@ class Register {
 		this.loaded = true;
 	}
 
-	public reset() {
-
-	}
+	public reset() { }
 
 	private registerResponse(response: any) {
 		document.getElementById("status")?.setAttribute("ok", response.ok);

@@ -40,10 +40,9 @@ class UpdateInfo {
 	private setupValidationPopup(callback: any, callbackParams: any, askPassword = true) {
 		const need2fa = false;
 
-		if (need2fa) {
-			this.validationPassword.setAttribute("disable", "true");
-			this.validation2FA.setAttribute("disable", "false")
-		}
+		this.validationPassword.setAttribute("display", !need2fa);
+		this.validation2FA.setAttribute("display", need2fa);
+
 
 		// this.validationSubmit.removeEventListener("click");
 		if (!need2fa && !askPassword) {
