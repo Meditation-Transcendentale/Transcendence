@@ -27,6 +27,10 @@ class Register {
 		this.loaded = true;
 	}
 
+	public reset() {
+
+	}
+
 	private registerResponse(response: any) {
 		document.getElementById("status")?.setAttribute("ok", response.ok);
 		document.getElementById('status').value = response.message;

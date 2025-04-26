@@ -38,6 +38,7 @@ class Router {
 		window.addEventListener("popstate", (ev) => {
 			console.log(ev.state.route);
 		});
+		console.log(this.routes);
 
 	}
 
@@ -76,8 +77,10 @@ class Router {
 				break;
 			}
 
+
 			default: {
 				alert("404")
+				path = "/home";
 				this.loadInMain("/home");
 				break;
 			}
@@ -88,116 +91,86 @@ class Router {
 
 	}
 
+
 	private async loadInMain(route: string) {
-		const reponse = await meRequest("no-cache")
-			.then((response) => {
-				if (route == "/auth" || route == "/register") { route = "/home" }
-			})
-			.catch((error) => {
-				console.log("catch ME");
-				if (route != "/auth" && route != "/register") { route = "/auth"; }
+		console.log("load in main :", route);
+		console.log(this.routes[route]);
+		route = await this.isLogedIn()
+			.then(() => { return (route == "/auth" || route == "/register") ? "/home" : route; })
+			.catch(() => { return (route != '/register') ? "/auth" : route })
 
-			});
-		console.log('MAIN', route);
+		this.routes[route].script.data = await this.getScript(this.routes[route].script);
+		this.routes[route].html.data = await this.getHtml(this.routes[route].html);
 
-
-		const detail = this.routes[route];
-
-
-		this.mainContainer.innerHTML = "";
-		if (detail.html.data == null) {
-			const url = "http://localhost:8080/html" + detail.html.path + ".html";
-			console.log("Getting ", url);
-			fetch(url, { redirect: "error" })
-				.then((response) => {
-					response.text().then((text) => {
-						const div = document.createElement("div");
-						div.innerHTML = text;
-						detail.html.data = div;
-						import(detail.script.path)
-							.then((script) => {
-								detail.script.data = new script.default();
-								this.mainContainer.appendChild(detail.html.data);
-								detail.script.data.init();
-							})
-					})
-				})
-		} else {
-			console.log("eee");
-			console.log(detail);
-			this.mainContainer.appendChild(detail.html.data);
-			detail.script.data.init();
-		}
+		document.getElementById("main-container").innerHTML = "";
+		document.getElementById("main-container").appendChild(this.routes[route].html.data);
+		this.routes[route].script.data.init();
+		this.routes[route].script.data.reset();
+		if (route == "/auth") { throw ("aaaaaaaaa") };
 	}
 
 	private async loadInHome(route: string) {
-		console.log("aaaaa");
+		console.log("load in home :", route);
 		if (!document.getElementById("home")) {
-			console.log("eee");
-			this.loadInMain("/home").then(() => {
-				this.loadInHome(route);
-			}).catch((error) => {
-				console.log(error);
-			});
+			this.loadInMain("/home")
+				.catch(() => console.log("Not logged In"))
+				.then(() => this.loadInHome(route))
+				.catch(() => console.log("Not logged In"));
+
 			return;
 		}
 
-		console.log("ee");
-		const detail = this.routes[route];
+		this.routes[route].script.data = await this.getScript(this.routes[route].script);
+		this.routes[route].html.data = await this.getHtml(this.routes[route].html);
 
-		document.getElementById("home-container").innerHTML = "";
-		if (detail.html.data == null) {
-			const url = "http://localhost:8080/html" + detail.html.path + ".html";
+		document.getElementById("home-container").appendChild(this.routes[route].html.data);
+		this.routes[route].script.data.init();
+		this.routes[route].script.data.reset();
+
+	}
+
+
+	private async isLogedIn() {
+		return new Promise((resolve, reject) => {
+			console.log("in is logIn");
+			meRequest("no-cache")
+				.then((response) => {
+					if (response.ok) { resolve(true) }
+					reject(false);
+				})
+				.catch(() => reject(false));
+		})
+	}
+
+	private async getHtml(html: { path: string, data: string }) {
+		return new Promise((resolve, reject) => {
+			if (html.data != null) {
+				return resolve(html.data);
+			}
+
+			const url = "http://localhost:8080/html" + html.path + ".html";
 			console.log("Getting ", url);
 			fetch(url, { redirect: "error" })
 				.then((response) => {
-					response.text().then((text) => {
-						const div = document.createElement("div");
-						div.innerHTML = text;
-						detail.html.data = div;
-						import(detail.script.path)
-							.then((script) => {
-								detail.script.data = new script.default();
-								document.getElementById("home-container").appendChild(detail.html.data);
-								detail.script.data.init();
-							})
-					})
+					if (!response.ok) { return reject(response); }
+					return response.text();
 				})
-		} else {
-			console.log("eee");
-			console.log(detail);
-			document.getElementById("home-container").appendChild(detail.html.data);
-			detail.script.data.init();
-		}
+				.then((text) => {
+					const div = document.createElement("div");
+					div.innerHTML = text;
+					return resolve(div);
+				})
+		})
 	}
 
-	private async getHtml(route: string) {
-		const detail = this.routes[route].html;
-
-		if (detail.data != null) {
-			return detail.data;
+	private async getScript(script: { path: string, data: {} }) {
+		if (script.data !== null && script.data !== undefined) {
+			console.log("data Empty");
+			return script.data;
 		}
-
-		const url = "http://localhost:8080/html" + detail.path + ".html";
-		console.log("Getting ", url);
-		const response = await fetch(url, { redirect: "error" });
-		const page = await response.text();
-
-		return page;
-	}
-
-	private async getScript(route: string) {
-		console.log("getting route: ", route);
-		const detail = this.routes[route].script;
-
-		if (detail.data != null) {
-			return detail.data;
-		}
-		console.log("Importing ", detail.path);
-		const script = await import(detail.path);
-
-		detail.data = new script.default();
-		return detail.data;
+		const im = await import(script.path);
+		const obj = new im.default();
+		return obj;
 	}
 }
 

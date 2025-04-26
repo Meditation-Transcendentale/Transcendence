@@ -78,7 +78,7 @@ class UpdateInfo {
 		document.getElementById("info")?.appendChild(this.validationPopup);
 	}
 
-	private init() {
+	public init() {
 		document.getElementById("update-info-submit")?.addEventListener('click', (e) => {
 			e.preventDefault();
 			this.setupValidationPopup(this.updateInfoRequest, {
@@ -98,6 +98,10 @@ class UpdateInfo {
 				token: ""
 			}, false)
 		})
+	}
+
+	public reset() {
+
 	}
 
 	private async updatePasswordRequest(body: { password: string, newPassword: string, token: string }) {

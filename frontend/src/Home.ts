@@ -28,6 +28,10 @@ class Home {
 		this.loaded = true;
 	}
 
+	public reset() {
+		document.getElementById("home-container").innerHTML = "";
+	}
+
 	private logoutResponse(response: string) {
 		document.getElementById("status")?.setAttribute("ok", response.ok);
 		document.getElementById('status').value = response.message;

@@ -25,6 +25,9 @@ class Auth {
 		})
 
 		this.loaded = true;
+	}
+
+	public reset() {
 
 	}
 
