@@ -1,6 +1,8 @@
 class Auth {
-
 	private loaded: boolean;
+	private twofaPopup!: HTMLElement;
+	private twofaSubmit!: HTMLElement;
+
 	constructor() {
 		console.log("Auth loaded successfully");
 		this.loaded = false;
@@ -24,6 +26,21 @@ class Auth {
 			document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/register" } }));
 		})
 
+		document.getElementById("login-2fa-submit")?.addEventListener("click", (e) => {
+			this.loginRequest(
+				document.getElementById("login-username").value,
+				document.getElementById("login-password").value,
+				document.getElementById("login-2fa-token").value)
+				.then((response) => { this.loginResponse(response) })
+				.catch((error) => console.log(error));
+		});
+
+		document.getElementById("auth")?.addEventListener("click", (e) => {
+			document.getElementById("login-username")?.removeAttribute("disabled");
+			document.getElementById("login-password")?.removeAttribute("disabled");
+			document.getElementById("login-2fa")?.setAttribute("disabled", "true");
+		})
+
 		this.loaded = true;
 	}
 
@@ -31,7 +48,7 @@ class Auth {
 
 	}
 
-	private async loginRequest(username: string, password: string) {
+	private async loginRequest(username: string, password: string, token = "") {
 		const response = await fetch("https://localhost:3000/auth/login", {
 			method: 'POST',
 			headers: {
@@ -41,7 +58,8 @@ class Auth {
 			credentials: 'include',
 			body: JSON.stringify({
 				username: username,
-				password: password
+				password: password,
+				token: token
 			})
 		});
 
@@ -60,6 +78,11 @@ class Auth {
 		document.getElementById("status")?.setAttribute("ok", response.ok);
 		document.getElementById('status').value = response.message;
 
+		if (response.status == 400) {
+			document.getElementById("login-2fa").setAttribute("disabled", "false");
+			document.getElementById("login-username").setAttribute("disabled", "");
+			document.getElementById("login-password").setAttribute("disabled", "");
+		}
 		if (response.ok == false) {
 			throw response;
 		}

@@ -1,3 +1,5 @@
+import { meRequest } from "./checkMe";
+
 class UpdateInfo {
 	private loaded: boolean;
 
@@ -9,43 +11,18 @@ class UpdateInfo {
 	constructor() {
 		console.log("Update Info successfull import");
 
-		this.createValidationPopup();
 		this.loaded = false;
 	}
 
-	private createValidationPopup() {
-		this.validationPopup = document.createElement("div");
-		this.validationPopup.id = "update-info-validation-popup";
+	private async setupValidationPopup(callback: any, callbackParams: any, askPassword = true) {
 
-		this.validation2FA = document.createElement("input");
-		this.validation2FA.id = "validation-popup-2fa";
-		this.validation2FA.setAttribute("type", "text");
-		this.validation2FA.setAttribute("placeholder", "2FA Code");
+		const response = await meRequest();
+		const need2fa = response.message.userInfo.two_fa_enabled;
 
-		this.validationPassword = document.createElement("input");
-		this.validationPassword.id = "validation-popup-2fa";
-		this.validationPassword.setAttribute("type", "password");
-		this.validationPassword.setAttribute("placeholder", "Password");
+		document.getElementById("validation-password").setAttribute("display", need2fa == 0);
+		document.getElementById("validation-2fa").setAttribute("display", need2fa != 0);
 
-		this.validationSubmit = document.createElement("input");
-		this.validationSubmit.id = "validation-popup-2fa";
-		this.validationSubmit.setAttribute("type", "button");
-		this.validationSubmit.setAttribute("value", "Submit");
-
-		this.validationPopup.appendChild(this.validation2FA);
-		this.validationPopup.appendChild(this.validationPassword);
-		this.validationPopup.appendChild(this.validationSubmit);
-	}
-
-	private setupValidationPopup(callback: any, callbackParams: any, askPassword = true) {
-		const need2fa = false;
-
-		this.validationPassword.setAttribute("display", !need2fa);
-		this.validation2FA.setAttribute("display", need2fa);
-
-
-		// this.validationSubmit.removeEventListener("click");
-		if (!need2fa && !askPassword) {
+		if (need2fa == 0 && !askPassword) {
 			callback(callbackParams)
 				.then((response) => {
 					this.success(response);
@@ -56,30 +33,28 @@ class UpdateInfo {
 			return;
 		}
 
-		this.validationSubmit.addEventListener('click', (e) => {
-			if (need2fa) {
-				callbackParams.token = this.validation2FA.value;
+		document.getElementById("validation-submit").addEventListener('click', (e) => {
+			if (need2fa != 0) {
+				callbackParams.token = document.getElementById("validation-2fa").value;
 			} else {
-				callbackParams.password = this.validationPassword.value;
+				callbackParams.password = document.getElementById("validation-password").value;
 			}
 			callback(callbackParams)
 				.then((response) => {
 					this.success(response);
-					this.validationPopup.remove();
 				})
 				.catch((error) => {
 					console.log(error);
 				})
-			// document.getElementById("info")?.removeChild(this.validationPopup);
-			this.validationPopup.remove();
-		}, { once: true });
-
-		document.getElementById("info")?.appendChild(this.validationPopup);
+			document.getElementById("validation-popup")?.setAttribute("disabled", "true");
+		}, { once: true }); //OUIIIIII once true du bonheur!!!!!!
+		document.getElementById("validation-popup")?.setAttribute("disabled", "false")
 	}
 
 	public init() {
 		document.getElementById("update-info-submit")?.addEventListener('click', (e) => {
 			e.preventDefault();
+			console.log(e);
 			this.setupValidationPopup(this.updateInfoRequest, {
 				username: document.getElementById("update-info-username")?.value,
 				avatar: document.getElementById("update-info-avatar")?.value,
@@ -149,8 +124,8 @@ class UpdateInfo {
 		document.getElementById("status")?.setAttribute("ok", response.ok);
 		document.getElementById('status').value = response.message;
 
-		this.validation2FA.value = "";
-		this.validationPassword.value = "";
+		document.getElementById("validation-2fa").value = "";
+		document.getElementById("validation-password").value = "";
 		document.getElementById("update-password-old").value = "";
 		document.getElementById("update-password-new").value = "";
 		document.getElementById("update-info-username").value = "";
