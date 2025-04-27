@@ -4,6 +4,23 @@ services:
     ports:
       - "4222:4222"
 
+  lobby-manager:
+    build:
+      context: ./services/lobby-manager
+    volumes:
+      - ./lobby-manager/src:/app/src
+      - ./lobby-manager/test:/app/test
+      - ./lobby-manager/package.json:/app/package.json
+      - ./lobby-manager/.env.example:/app/.env
+    depends_on:
+      - nats
+    command: npm run dev
+    environment:
+      - NATS_URL=nats://nats:4222
+      - PORT=3000
+    ports:
+      - "${3000}:3000"
+
   game-manager:
     build: ./game-manager
     volumes:
