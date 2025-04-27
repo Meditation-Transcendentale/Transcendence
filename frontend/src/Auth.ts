@@ -13,6 +13,13 @@ class Auth {
 			return;
 		}
 
+		// gapi.load("auth2", () => {
+		// 	gapi.auth2.init({ client_id: "532264983031-05k4fba7tc2f005dtrk1qqo8aug3bpd2.apps.googleusercontent.com" })
+		// 		.then(() => {
+		// 			gapi.signin2.render();
+		// 		}, console.log("error"));
+		// })
+
 		document.getElementById("login")?.addEventListener("submit", (ev) => {
 			ev.preventDefault();
 			this.loginRequest(document.getElementById("login-username").value, document.getElementById("login-password").value)
@@ -40,6 +47,7 @@ class Auth {
 			document.getElementById("login-password")?.removeAttribute("disabled");
 			document.getElementById("login-2fa")?.setAttribute("disabled", "true");
 		})
+
 
 		this.loaded = true;
 	}

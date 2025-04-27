@@ -14,7 +14,8 @@ class UpdateInfo {
 		this.loaded = false;
 	}
 
-	private async setupValidationPopup(callback: any, callbackParams: any, askPassword = true) {
+	private async setupValidationPopup(callback: any, callbackParams: any, callResponseHandler: any, askPassword = true) {
+
 
 		const response = await meRequest();
 		const need2fa = response.message.userInfo.two_fa_enabled;
@@ -25,13 +26,14 @@ class UpdateInfo {
 		if (need2fa == 0 && !askPassword) {
 			callback(callbackParams)
 				.then((response) => {
-					this.success(response);
+					callResponseHandler(response);
 				})
 				.catch((error) => {
 					console.log(error);
 				})
 			return;
 		}
+
 
 		document.getElementById("validation-submit").addEventListener('click', (e) => {
 			if (need2fa != 0) {
@@ -41,13 +43,16 @@ class UpdateInfo {
 			}
 			callback(callbackParams)
 				.then((response) => {
-					this.success(response);
+
+					callResponseHandler(response);
 				})
 				.catch((error) => {
 					console.log(error);
 				})
+			document.body.classList.toggle("modal-open");
 			document.getElementById("validation-popup")?.setAttribute("disabled", "true");
 		}, { once: true }); //OUIIIIII once true du bonheur!!!!!!
+		document.body.classList.toggle("modal-open");
 		document.getElementById("validation-popup")?.setAttribute("disabled", "false")
 	}
 
@@ -60,7 +65,7 @@ class UpdateInfo {
 				avatar: document.getElementById("update-info-avatar")?.value,
 				password: "",
 				token: ""
-			}, true);
+			}, this.success, true);
 		});
 
 
@@ -70,12 +75,24 @@ class UpdateInfo {
 				password: document.getElementById("update-password-old")?.value,
 				newPassword: document.getElementById("update-password-new")?.value,
 				token: ""
-			}, false)
+			}, this.success, false)
 		})
+
+		document.getElementById("enable-2fa")?.addEventListener("click", (e) => {
+			this.setupValidationPopup(
+				document.getElementById('enable-2fa').checked == 1 ? this.enable2faRequest : this.disable2faRequest,
+				{},
+				this.show,
+				true
+			);
+		});
 	}
 
 	public reset() {
-
+		meRequest("no-cache")
+			.then((response) => {
+				document.getElementById("enable-2fa").checked = response.message.userInfo.two_fa_enabled = 0;
+			})
 	}
 
 	private async updatePasswordRequest(body: { password: string, newPassword: string, token: string }) {
@@ -118,6 +135,18 @@ class UpdateInfo {
 			ok: response.ok
 		};
 		return final;
+	}
+
+	private async enable2faRequest() {
+		console.log("enable 2fa");
+	}
+
+	private async disable2faRequest() {
+		console.log("disable 2fa");
+	}
+
+	private show() {
+		console.log("show");
 	}
 
 	private success(response: any) {
