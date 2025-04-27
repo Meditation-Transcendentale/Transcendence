@@ -109,7 +109,7 @@ class Router {
 
 	private async loadInMain(route: string, history = true, child = false) {
 		console.log("load in main :", route);
-		route = await this.isLogedIn()
+		route = await meRequest()
 			.then(() => {
 				return (route == "/auth" || route == "/register") ? "/home" : route;
 			})
