@@ -1,10 +1,17 @@
 import { meRequest } from "./checkMe";
 
 class Stats {
+	private loaded: boolean;
 	constructor() {
+		this.loaded = false;
 	}
 
 	public async init(playerName?: string) {
+		if (this.loaded) {
+			return;
+		}
+
+
 		if (!playerName) {
 			const response = await meRequest();
 			playerName = await response.message.username;
@@ -39,6 +46,7 @@ class Stats {
 		});
 
 
+		this.loaded = true;
 	}
 
 	public async reset(playerName?: string) {

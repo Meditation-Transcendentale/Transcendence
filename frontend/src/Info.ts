@@ -41,9 +41,9 @@ class UpdateInfo {
 			} else {
 				callbackParams.password = document.getElementById("validation-password").value;
 			}
+			console.log("Callback");
 			callback(callbackParams)
 				.then((response) => {
-
 					callResponseHandler(response);
 				})
 				.catch((error) => {
@@ -117,6 +117,7 @@ class UpdateInfo {
 	}
 
 	private async updateInfoRequest(body: { username: string, avatar: string, password: string, token: string }) {
+		console.log("Update Info Request");
 		const response = await fetch("https://localhost:3000/update-info", {
 			method: 'PATCH',
 			headers: {
@@ -150,6 +151,7 @@ class UpdateInfo {
 	}
 
 	private success(response: any) {
+		console.log("Update Info Success");
 		document.getElementById("status")?.setAttribute("ok", response.ok);
 		document.getElementById('status').value = response.message;
 

@@ -37,9 +37,14 @@ class Router {
 			}
 		};
 
+		console.log("Router INIT");
+
 		this.mainContainer = document.getElementById("main-container") as HTMLElement;
 		this.mainContainer.addEventListener("nav", (ev) => {
-			if (ev.detail.return) { this.nav(this.initRoute) }
+			if (ev.detail.return) {
+				this.nav(this.initRoute);
+				return;
+			}
 			this.nav(ev.detail.path);
 		})
 
@@ -181,7 +186,7 @@ class Router {
 
 	private async getScript(script: { path: string, data: {} }) {
 		if (script.data !== null && script.data !== undefined) {
-			console.log("data Empty");
+			console.log("Script Empty");
 			return script.data;
 		}
 		const im = await import(script.path);

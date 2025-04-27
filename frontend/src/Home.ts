@@ -11,6 +11,8 @@ class Home {
 			return;
 		}
 
+		console.log("HOME INIT");
+
 		document.getElementById("quit")?.addEventListener("click", (e) => {
 			this.logoutRequest()
 				.then((response) => { this.logoutResponse(response) })
@@ -40,7 +42,8 @@ class Home {
 			throw response;
 		}
 
-		document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/auth" } }))
+		window.location.reload()
+		// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/auth" } }))
 
 
 	}
