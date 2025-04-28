@@ -54,11 +54,11 @@ async function checkFriendshipStatus(user, friend) {
 	}
 }
 
-app.post('/add-friend', handleErrors(async (req, res) => {
+app.post('/add', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
 
-	const addedPlayerUsername = req.body.addedPlayerUsername;
+	const addedPlayerUsername = req.body.inputUsername;
 
 	if (!addedPlayerUsername) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
@@ -76,11 +76,11 @@ app.post('/add-friend', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_SENT });
 }));
 
-app.post('/accept-friend', handleErrors(async (req, res) => {
+app.post('/accept', handleErrors(async (req, res) => {
 	
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const requestFrom = req.body.requestFrom;
+	const requestFrom = req.body.inputUsername;
 	if (!requestFrom) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
 	} else if (user.username === requestFrom) {
@@ -99,11 +99,11 @@ app.post('/accept-friend', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_ACCEPTED });
 }));
 
-app.delete('/decline-friend', handleErrors(async (req, res) => {
+app.delete('/decline', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const requestFrom = req.body.requestFrom;
+	const requestFrom = req.body.inputUsername;
 	if (!requestFrom) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
 	} else if (user.username === requestFrom) {
@@ -122,7 +122,7 @@ app.delete('/decline-friend', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_DECLINED });
 }));
 
-app.get('/friend-requests', handleErrors(async (req, res) => {
+app.get('/get/requests', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
@@ -131,7 +131,7 @@ app.get('/friend-requests', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ friendsRequests });
 }));
 
-app.get('/friendlist', handleErrors(async (req, res) => {
+app.get('/get/friendlist', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
@@ -140,11 +140,11 @@ app.get('/friendlist', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ friendlist });
 }));
 
-app.delete('/delete-friends', handleErrors(async (req, res) => {
+app.delete('/delete', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const friendName = req.body.friendName;
+	const friendName = req.body.inputUsername;
 	if (!friendName) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
 	} else if (user.username === friendName) {
@@ -163,11 +163,11 @@ app.delete('/delete-friends', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_DELETED });
 }));
 
-app.post('/block-user', handleErrors(async (req, res) => {
+app.post('/block', handleErrors(async (req, res) => {
 	
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const blockedUserName = req.body.blockedUserName;
+	const blockedUserName = req.body.inputUsername;
 	if (!blockedUserName) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
 	}
@@ -188,11 +188,11 @@ app.post('/block-user', handleErrors(async (req, res) => {
 
 }));
 
-app.delete('/unblock-user', handleErrors(async (req, res) => {
+app.delete('/unblock', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const blockedUserName = req.body.blockedUserName;
+	const blockedUserName = req.body.inputUsername;
 	if (!blockedUserName) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
 	}
@@ -211,7 +211,7 @@ app.delete('/unblock-user', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.USER_UNBLOCKED });
 }));
 
-app.get('/blocked-users', handleErrors(async (req, res) => {
+app.get('/get/blocked', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
