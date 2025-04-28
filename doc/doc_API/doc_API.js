@@ -80,7 +80,6 @@ app.get('/docs', async (req, res) => {
 // https://localhost:3000/docs/documentation/
 
 
-
 const start = async () => {
 	try {
 		await app.listen({ port: 3001, host: '0.0.0.0' });
