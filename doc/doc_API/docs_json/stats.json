@@ -89,7 +89,7 @@
 		}
 	],
 	"paths": {
-        "/stats/player/:playerId": {
+        "/stats/player/:playerId/:mode": {
             "get": {
                 "summary": "Get player stats",
                 "tags": ["Stats"],
@@ -102,6 +102,16 @@
                         "description": "The ID of the player whose stats are to be retrieved.",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "mode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The game mode for which to retrieve stats (e.g., classic, br, io).",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["classic", "br", "io"]
                         }
                     },
                     {
