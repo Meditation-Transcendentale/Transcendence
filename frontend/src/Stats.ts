@@ -25,7 +25,9 @@ class Stats {
 		document.getElementById("stats-username").innerHTML = playerName;
 		document.getElementById("classic-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
-			this.statsRequest(playerName, "classic")
+			this.statsRequest(
+				document.getElementById("stats-username")?.innerHTML,
+				"classic")
 				.then((response) => {
 					this.parseResponse(response);
 				})
@@ -34,21 +36,24 @@ class Stats {
 		});
 		document.getElementById("br-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
-			// this.statsRequest(playerName, "br")
-			// 	.then((response) => {
-			// 		this.parseResponse(response);
-			// 	})
-			// 	.catch((error) => { console.log(error) });
-			console.log("Stats Handler");
+			this.statsRequest(
+				document.getElementById("stats-username")?.innerHTML,
+				"br")
+				.then((response) => {
+					this.parseResponse(response);
+				})
+				.catch((error) => { console.log(error) });
 		});
 		document.getElementById("io-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
-			// this.statsRequest(playerName, "io")
-			// 	.then((response) => {
-			// 		this.parseResponse(response);
-			// 	})
-			// 	.catch((error) => { console.log(error) });
-			console.log("Stats Handler");
+			this.statsRequest(
+				document.getElementById("stats-username")?.innerHTML,
+				"io")
+				.then((response) => {
+					this.parseResponse(response);
+				})
+				.catch((error) => { console.log(error) });
+
 		});
 
 
@@ -56,17 +61,20 @@ class Stats {
 	}
 
 	public async reset(playerName?: string) {
-		if (!playerName) {
+		if (playerName == null || playerName == undefined) {
 			meRequest()
 				.then((json) => {
+					console.log("ee");
 					playerName = json.userInfo.username;
+					document.getElementById("stats-username").innerHTML = playerName;
 				})
 				.catch(() => {
 					meReject();
 					return;
 				})
+		} else {
+			document.getElementById("stats-username").innerHTML = playerName;
 		}
-		document.getElementById("stats-username").innerHTML = playerName;
 	}
 
 	private async statsRequest(username: string, mode: string) {
@@ -90,15 +98,27 @@ class Stats {
 	}
 
 	private parseResponse(response: any) {
-		console.log(response);
-		const obj = JSON.parse(response);
-		console.log(obj);
+		const obj = response.message.playerStats;
 
-		//let text = "<table id='stats-table'>"
-		//for (let x in obj) {
-		//	text += "<tr><td>" + x.name + "</td><td>" + x.value + "</td></tr>";
-		//}
-		//document.getElementById("stats-container").innerHTML = text;
+		let text = "<table id='stats-table'>";
+		for (let x in obj.stats) {
+			text += "<tr><td>" + this.cleanString(x) + "</td><td>" + obj.stats[x] + "</td></tr>";
+		}
+		text += "</table>";
+		text += "<ul id='stats-history'>"
+		for (let x in obj.history) {
+			text += "<li>";
+			for (let y in obj.history[x]) {
+				text += " " + this.cleanString(y) + " " + x[y];
+			}
+			text += "</li>";
+
+		}
+		document.getElementById("stats-container").innerHTML = text;
+	}
+
+	private cleanString(str: string) {
+		return str.replace(/_/g, " ");
 	}
 }
 
