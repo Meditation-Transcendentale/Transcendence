@@ -119,28 +119,28 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 }));
 
-app.post('/42', handleErrors(async (req, res) => {
+// app.post('/42', handleErrors(async (req, res) => {
 
-	if(req.query.state !== req.session.state) {
-		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
-	}
+// 	if(req.query.state !== req.session.state) {
+// 		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
+// 	}
 
-	const response = await axios.post(
-		'https://api.intra.42.fr/oauth/token',
-		new URLSearchParams({
-			grant_type: 'authorization_code',
-			client_id: process.env.CLIENT_UID,
-			client_secret: process.env.CLIENT_SECRET,
-			code: req.query.code,
-			redirect_uri: 'https://localhost:3000/auth/42'
-		}),
-		{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
-	);
+// 	const response = await axios.post(
+// 		'https://api.intra.42.fr/oauth/token',
+// 		new URLSearchParams({
+// 			grant_type: 'authorization_code',
+// 			client_id: process.env.CLIENT_UID,
+// 			client_secret: process.env.CLIENT_SECRET,
+// 			code: req.query.code,
+// 			redirect_uri: 'https://localhost:3000/auth/42'
+// 		}),
+// 		{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
+// 	);
 
 	
 
 
-}));
+// }));
 
 app.post('/auth', handleErrorsValid(async (req, res) => {
 
