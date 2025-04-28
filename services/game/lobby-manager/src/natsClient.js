@@ -6,6 +6,7 @@ let nc;
 export default {
 	async connect(url) {
 		nc = await connect({ servers: url });
+		return nc;
 	},
 	publish(subject, payload) {
 		const data = typeof payload === 'string'
@@ -22,4 +23,8 @@ export default {
 			}
 		})();
 	},
+
+	async close() {
+		if (nc) await nc.close()
+	}
 };

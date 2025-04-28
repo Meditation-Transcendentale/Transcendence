@@ -1,10 +1,10 @@
 export default {
-	PORT: 3000,
+	PORT: 5001,
 	HEARTBEAT_INTERVAL: 30_000,
-	NATS_URL: "nats://localhost:4222",
+	NATS_URL: "nats://nats:4222",
 	MAX_PLAYERS: {
-		pong: { local: 2, ia: 1, online: 2 },
-		pongBR: { default: 2 },
-		pongIO: { default: 4 },
+		pong: { local: 1, ia: 1, online: 2 },
+		pongBR: { default: 100 },
+		pongIO: { default: 20 },
 	},
 }

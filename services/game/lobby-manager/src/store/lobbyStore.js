@@ -6,7 +6,7 @@ import config from '../config.js';
 class LobbyStore {
 	constructor() {
 		this.lobbies = new Map();
-		setInterval(() => this.cleanup(), config.HEARTBEAT_INTERVAL);
+		this._cleanupInterval = setInterval(() => this.cleanup(), config.HEARTBEAT_INTERVAL);
 	}
 
 	createLobby(params) {
@@ -29,6 +29,7 @@ class LobbyStore {
 		for (const [id, lobby] of this.lobbies) {
 			// remove lobby if empty or owner timed out
 			if (lobby.players.size === 0) {
+				console.log(`lobby ${id} delete`)
 				this.deleteLobby(id);
 			} else {
 				const owner = [...lobby.players.values()][0];
@@ -38,6 +39,11 @@ class LobbyStore {
 			}
 		}
 	}
+
+	shutdown() {
+		clearInterval(this._cleanupInterval)
+	}
+
 }
 
 export default new LobbyStore();

@@ -4,7 +4,10 @@ export default class Lobby {
 		this.id = id;
 		this.mode = mode;
 		this.map = map;
-		this.submode = submode;
+		if (mode != 'pong')
+			this.submode = "none";
+		else
+			this.submode = submode;
 		this.maxPlayers = maxPlayers;
 		this.players = new Map(); // userId -> { isReady, lastSeen }
 		this.createdAt = Date.now();

@@ -1,69 +1,93 @@
-// ==== ws/wsServer.js ====
-import * as lobbyService from '../services/lobbyService.js';
-import config from '../config.js';
-import WebSocket from 'ws';
+// services/lobby-manager/src/ws/wsServer.js
 
-const lobbySockets = new Map(); // lobbyId -> Set<ws>
+import * as lobbyService from '../services/lobbyService.js'
 
-export default {
-	attach(wss) {
-		// heartbeat pings
-		setInterval(() => {
-			wss.clients.forEach(ws => {
-				if (!ws.isAlive) return ws.terminate();
-				ws.isAlive = false;
-				ws.ping();
-			});
-		}, config.HEARTBEAT_INTERVAL);
+const lobbySockets = new Map()  // lobbyId → Set<ws>
 
-		wss.on('connection', (ws, req) => {
-			const params = new URL(req.url, `http://${req.headers.host}`).searchParams;
-			const lobbyId = params.get('lobbyId');
-			const userId = req.headers['x-user-id'];
+export function attach(wss, natsClient) {
+	// Heartbeat loop (unchanged)
+	const interval = setInterval(() => {
+		wss.clients.forEach(ws => {
+			if (!ws.isAlive) return ws.terminate()
+			ws.isAlive = false
+			ws.ping()
+		})
+	}, 30_000)
 
-			ws.lobbyId = lobbyId;
-			ws.userId = userId;
-			ws.isAlive = true;
+	wss.on('connection', (ws, req) => {
+		const params = new URL(req.url, `http://${req.headers.host}`).searchParams
+		ws.lobbyId = params.get('lobbyId')
+		ws.userId = params.get('userId')
+		ws.isAlive = true
 
-			if (!lobbySockets.has(lobbyId)) lobbySockets.set(lobbyId, new Set());
-			lobbySockets.get(lobbyId).add(ws);
+		// Join lobby group
+		if (!lobbySockets.has(ws.lobbyId)) lobbySockets.set(ws.lobbyId, new Set())
+		lobbySockets.get(ws.lobbyId).add(ws)
 
-			ws.on('pong', () => { ws.isAlive = true });
+		ws.on('pong', () => { ws.isAlive = true })
 
-			ws.on('message', data => {
-				const msg = JSON.parse(data);
-				let state;
+		ws.on('message', data => {
+			let msg
+			try { msg = JSON.parse(data) }
+			catch { return ws.send(JSON.stringify({ type: 'error', message: 'invalid JSON' })) }
+
+			try {
+				let state
 				switch (msg.type) {
 					case 'join':
-						state = lobbyService.join(lobbyId, userId);
-						broadcast(lobbyId, { type: 'lobby.update', ...state });
-						break;
+						state = lobbyService.join(msg.lobbyId, msg.userId)
+						broadcast(ws.lobbyId, { type: 'lobby.update', ...state })
+						natsClient.publish('lobby.join', msg)
+						break
 
 					case 'ready':
-						state = lobbyService.ready(lobbyId, userId);
-						broadcast(lobbyId, { type: 'lobby.update', ...state });
-						break;
+						state = lobbyService.ready(msg.lobbyId, msg.userId)
+						broadcast(ws.lobbyId, { type: 'lobby.update', ...state })
+
+						// ← NEW: once allReady, broadcast a 'start' message
+						if (state.status === 'starting') {
+							broadcast(ws.lobbyId, {
+								type: 'start',
+								gameId: ws.lobbyId,
+								settings: { /* your default settings or state.settings */ }
+							})
+							// also notify Game Manager
+							natsClient.publish('game.create', {
+								lobbyId: msg.lobbyId,
+								players: state.players,
+								settings: {}
+							})
+						}
+						break
 
 					case 'heartbeat':
-						lobbyService.heartbeat(lobbyId, userId);
-						break;
-				}
-			});
+						lobbyService.heartbeat(msg.lobbyId, msg.userId)
+						break
 
-			ws.on('close', () => {
-				lobbySockets.get(lobbyId)?.delete(ws);
-				lobbyService.leave(lobbyId, userId);
-				const newState = lobbyService.getState(lobbyId);
-				broadcast(lobbyId, { type: 'lobby.update', ...newState });
-			});
-		});
-	}
-};
+					default:
+						throw new Error(`Unknown message type: ${msg.type}`)
+				}
+			} catch (err) {
+				ws.send(JSON.stringify({ type: 'error', message: err.message }))
+			}
+		})
+
+		ws.on('close', () => {
+			lobbySockets.get(ws.lobbyId)?.delete(ws)
+			lobbyService.leave(ws.lobbyId, ws.userId)
+			const newState = lobbyService.getState(ws.lobbyId)
+			broadcast(ws.lobbyId, { type: 'lobby.update', ...newState })
+		})
+	})
+
+	wss.on('close', () => clearInterval(interval))
+}
 
 function broadcast(lobbyId, msg) {
-	const conns = lobbySockets.get(lobbyId) || [];
-	const data = JSON.stringify(msg);
-	for (const client of conns) {
-		if (client.readyState === WebSocket.OPEN) client.send(data);
+	const clients = lobbySockets.get(lobbyId) || []
+	const data = JSON.stringify(msg)
+	for (const client of clients) {
+		if (client.readyState === client.OPEN) client.send(data)
 	}
 }
+

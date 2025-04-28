@@ -1,5 +1,3 @@
-import { test, expect } from 'vitest'
-
-test('sanity check', () => {
-  expect(true).toBe(true)
+test('basic sanity test', () => {
+	expect(true).toBe(true)
 })
