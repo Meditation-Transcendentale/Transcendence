@@ -6,9 +6,10 @@ const playerStatsSchema = {
 	params: {
 		type: 'object',
 		properties: {
-			playerId: { type: 'string' }
+			username: { type: 'string' },
+			mode: { type: 'string', enum: ['classic', 'br', 'io'] }
 		},
-		required: ['playerId'],
+		required: ['username', 'mode'],
 	}
 };
 
@@ -52,9 +53,16 @@ function calculateStats(playerStats, mode) {
 
 export default async function statsRoutes(app) {
 
-	app.get('/player/:playerId/:mode', { schema: playerStatsSchema }, handleErrors(async (req, res) => {
+	app.get('/player/:username/:mode', { schema: playerStatsSchema }, handleErrors(async (req, res) => {
 		
-		const { playerId, mode } = req.params;
+		const { username, mode } = req.params;
+
+		const user = await nc.request('user.getUserFromUsername', jc.encode({username}), { timeout: 1000 });
+		const userResult = jc.decode(user.data);
+		if (!userResult.success) {
+			throw { status: userResult.status, message: userResult.message };
+		}
+		const playerId = userResult.data.id;
 
 		if (!['classic', 'br', 'io'].includes(mode)) {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.BAD_REQUEST };
