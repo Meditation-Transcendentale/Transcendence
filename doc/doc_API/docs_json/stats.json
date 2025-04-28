@@ -15,20 +15,30 @@
 			}
 		},
         "schemas": {
-            "PlayerStats": {
+            "PlayerStatsClasssic": {
                 "type": "object",
                 "properties": {
                     "classic": { "$ref": "#/components/schemas/StatsModeClassic" },
-                    "br": { "$ref": "#/components/schemas/StatsModeBRIO" },
-                    "io": { "$ref": "#/components/schemas/StatsModeBRIO" },
                     "classic_history": {
                     "type": "array",
                     "items": { "$ref": "#/components/schemas/MatchClassic" }
-                    },
+                    }
+                }
+            },
+            "PlayerStatsBR": {
+                "type": "object",
+                "properties": {
+                    "br": { "$ref": "#/components/schemas/StatsModeBRIO" },
                     "br_history": {
                     "type": "array",
                     "items": { "$ref": "#/components/schemas/MatchBRIO" }
-                    },
+                    }
+                }
+            },
+            "PlayerStatsIO": {
+                "type": "object",
+                "properties": {
+                    "io": { "$ref": "#/components/schemas/StatsModeBRIO" },
                     "io_history": {
                     "type": "array",
                     "items": { "$ref": "#/components/schemas/MatchBRIO" }
@@ -136,7 +146,11 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PlayerStats"
+                                    "oneOf": [
+                                        { "$ref": "#/components/schemas/PlayerStatsClasssic" },
+                                        { "$ref": "#/components/schemas/PlayerStatsBR" },
+                                        { "$ref": "#/components/schemas/PlayerStatsIO" }
+                                    ]
                                 }
                             }
                         }
