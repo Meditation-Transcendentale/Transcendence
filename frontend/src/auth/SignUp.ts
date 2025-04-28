@@ -47,6 +47,7 @@ export class SignUp extends ABlock {
 	private async submitHandler(ev: Event) {
 		ev.preventDefault();
 
+		console.log(this.form.field1.value, this.form.field2.value);
 		const dum = await loginRequest(this.form.field1.value, this.form.field2.value)
 			.then((response) => {
 				this.responseHandler(response);
@@ -59,7 +60,6 @@ export class SignUp extends ABlock {
 
 	private responseHandler(response: AuthResponse) {
 		document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: response }));
-		console.log(response);
 		if (response.ok) {
 			sessionStorage.setItem("username", this.form.field1.value);
 			sessionStorage.setItem("2FA", "false");

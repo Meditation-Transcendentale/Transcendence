@@ -1,11 +1,14 @@
 import { ABlock } from "../../ABlock";
 import { SimpleForm } from "../../customElements/SimpleForm";
 import { CustomEvents } from "../../CustomEvents";
-import { deleteFriendRequest, friendlistRequest } from "../../requests";
+import { deleteFriend_Request, friendlist_Request, addFriend_Request, Friend} from "../../requests";
 import { createContainer } from "../../utils";
 
+
+
 export class Friendlist extends ABlock {
-    private friendList!: HTMLElement;
+
+    private friendList: HTMLTableElement | null = null;
 
 
 	constructor(parent: HTMLElement) {
@@ -15,56 +18,62 @@ export class Friendlist extends ABlock {
 	}
 
     private init(){
-        this.container = createContainer("friendlist-container", "friendlist")
-        this.container.addEventListener("enable", () => {
-            this.enable();
-        })
-        this.container.addEventListener("disable", () => {
-            this.disable();
-        })
+        this.container = createContainer("friendlist-container", "friendlist");
+        this.container.addEventListener("enable", () => this.enable());
+        this.container.addEventListener("disable", () => this.disable());
     }
-    
 
-    private enable() {
-        this.friendList = document.createElement("table")
-        const response = friendlistRequest(sessionStorage.getItem("username"))
-        .then((resp) => {
-            if (resp.ok) {
-                console.log(resp.json.friendlist);  
-                resp.json.friendlist.forEach(object => {
-                    const tr = document.createElement("tr")
-                    const td = document.createElement("td");
-                    let removeBtn = document.createElement("input");
-                    let blockBtn = document.createElement("input");
-                    let statBtn = document.createElement("input");
-                    removeBtn.setAttribute("type", "button");
-                    removeBtn.setAttribute("value", "Remove");
-                    removeBtn.addEventListener("click", () => {
-                        const responseDelete = 
-                    })
-                    blockBtn.setAttribute("type", "button");
-                    blockBtn.setAttribute("value", "Block");
-                    blockBtn.addEventListener("click", () => {
-                    
-                    })
-                    statBtn.setAttribute("type", "button");
-                    statBtn.setAttribute("value", "Stats");
-                    statBtn.addEventListener("click", () => {
-                    
-                    })
-                    td.innerHTML = object.friend_username;
-                    tr.appendChild(td);
-                    tr.appendChild(removeBtn);
-                    tr.appendChild(blockBtn);
-                    tr.appendChild(statBtn);
-                    this.friendList.appendChild(tr);
-                });
-                this.container.appendChild(this.friendList)     
+    private async enable() {
+        this.container.innerHTML = '';
+        this.friendList = document.createElement("table");
+        try {
+            console.log("error?");
+            const resp = await friendlist_Request();
+            console.log(resp);
+            if (resp.status === 404) {
+                console.log("error?");
+                const noFriendMessage = document.createElement("p");
+                noFriendMessage.innerText = "You have no friends 😢";
+                this.container.appendChild(noFriendMessage);
                 return;
             }
-            throw resp;
-        }).catch((err) => console.log(err));     
+            if (resp.ok) {
+                const data = resp.json;
+                (data.friendlist as Friend[]).forEach((friend) => {
+                    const tr = document.createElement("tr");
+                    const td = document.createElement("td");
+                    td.innerText = friend.friend_username;
+                    tr.appendChild(td);
+
+                    tr.appendChild(this.createButton("Remove", async () => {
+                        await deleteFriend_Request(friend.friend_username);
+                    }));
+                    tr.appendChild(this.createButton("Block", async () => {
+                        //
+                    }));
+                    tr.appendChild(this.createButton("Stats", async () => {
+                        // await deleteFriend_Request(friend.friend_username);
+                    }));
+                    this.friendList!.appendChild(tr);
+                });
+                if (this.friendList){
+                    this.container.appendChild(this.friendList);
+                }
+            } else {
+                throw new Error("Failed to fetch friendlist");
+            }
+        } catch (err) {
+            console.log(err);
+        }
         super.enable();
+    }
+
+    private createButton(label: string, onClick: () => void): HTMLInputElement {
+        const btn = document.createElement("input");
+        btn.type = "button";
+        btn.value = label;
+        btn.addEventListener("click", onClick);
+        return btn;
     }
 }
 

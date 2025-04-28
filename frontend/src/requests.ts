@@ -1,3 +1,8 @@
+export interface Friend {
+	id : number;
+	friend_username: string;
+}
+
 export type AuthResponse = {
 	message: string,
 	status: number,
@@ -17,7 +22,9 @@ export type twoFAResponse = {
 }
 
 export type friendlistResponse = {
-	json: {},
+	json: {
+		friendlist: Friend[];
+	},
 	status: number,
 	ok: boolean
 }
@@ -52,6 +59,7 @@ export async function registerRequest(username: string, password: string): Promi
 }
 
 export async function loginRequest(username: string, password: string): Promise<AuthResponse> {
+	console.log(".");
 	const response = await fetch("https://localhost:3000/auth/login", {
 		method: 'POST',
 		headers: {
@@ -64,8 +72,9 @@ export async function loginRequest(username: string, password: string): Promise<
 			password: password
 		})
 	});
-
-
+	
+	console.log("f");
+	
 	const data = await response.json();
 
 	const final: AuthResponse = {
@@ -203,8 +212,8 @@ export async function verify2FARequest(): Promise<twoFAResponse> {
 	return final;
 }
 
-export async function friendlistRequest(username: string): Promise<friendlistResponse> {
-	const response = await fetch("https://localhost:3000/friends/friendlist", {
+export async function friendlist_Request(): Promise<friendlistResponse> {
+	const response = await fetch("https://localhost:3000/friends/get/friendlist", {
 		method: 'GET',
 		headers: {
 			'Accept': 'application/json',
@@ -222,7 +231,7 @@ export async function friendlistRequest(username: string): Promise<friendlistRes
 	return final;
 }
 
-export async function addFriendRequest(username: string, addedUsername: string): Promise<friendRequestResponse> 
+export async function addFriend_Request(addedUsername: string): Promise<friendRequestResponse> 
 {
 	const response = await fetch("https://localhost:3000/friends/add-friend", {
 		method: 'POST',
@@ -232,14 +241,14 @@ export async function addFriendRequest(username: string, addedUsername: string):
 		},
 		credentials: 'include',
 		body: JSON.stringify({
-			addedPlayerUsername: addedUsername,
+			inputUsername: addedUsername,
 		})
 	});
 	
 	
 	const data = await response.json();
 	
-	const final: AuthResponse = {
+	const final: friendRequestResponse = {
 		message: data.message,
 		status: response.status,
 		ok: response.ok
@@ -247,9 +256,9 @@ export async function addFriendRequest(username: string, addedUsername: string):
 	return final;
 }
 
-export async function deleteFriendRequest(username: string, deletedUsername: string): Promise<friendRequestResponse> 
+export async function deleteFriend_Request(deletedUsername: string): Promise<friendRequestResponse> 
 {
-	const response = await fetch("https://localhost:3000/friends/delete-friends", { //change to delete-friend on next merge
+	const response = await fetch("https://localhost:3000/friends/delete", { 
 		method: 'DELETE',
 		headers: {
 			'Accept': 'application/json',
@@ -257,16 +266,17 @@ export async function deleteFriendRequest(username: string, deletedUsername: str
 		},
 		credentials: 'include',
 		body: JSON.stringify({
-			friendName: deletedUsername,
+			inputUsername: deletedUsername,
 		})
 	});
 	
 	const data = await response.json();
 	
-	const final: AuthResponse = {
+	const final: friendRequestResponse = {
 		message: data.message,
 		status: response.status,
 		ok: response.ok
 	};
+	console.log(final);
 	return final;
 }
