@@ -8,23 +8,63 @@ dotenv.config({ path: "../../../.env" });
 const jc = JSONCodec();
 const nats = await connect({ servers: process.env.NATS_URL });
 
-(handleErrorsNats(async () => {
-
-	const sub = nats.subscribe("stats.getPlayerStats");
+async function handleNatsSubscription(subject, handler) {
+	const sub = nats.subscribe(subject);
 	for await (const msg of sub) {
 		try {
-			const playerId = jc.decode(msg.data);
-			statService.isUserIdExisting(playerId);
-			const playerStats = {
-				classic: statService.getPlayerStatsClassicMode(playerId),
-				br: statService.getPlayerStatsBRMode(playerId),
-				io: statService.getPlayerStatsIOMode(playerId)
-			};
-			nats.publish(msg.reply, jc.encode({ success: true, data: playerStats }));
+			await handler(msg);
 		} catch (error) {
 			const status = error.status || 500;
 			const message = error.message || "Internal Server Error";
 			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
 		}
 	}
-}))();
+}
+
+handleErrorsNats(async () => {
+	await Promise.all([
+		handleNatsSubscription("stats.getPlayerStats.classic", async (msg) => {
+			const playerId = jc.decode(msg.data);
+			statService.isUserIdExisting(playerId);
+			const playerStats = statService.getPlayerStatsClassicMode(playerId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: playerStats }));
+		}),
+		handleNatsSubscription("stats.getPlayerStats.br", async (msg) => {
+			const playerId = jc.decode(msg.data);
+			statService.isUserIdExisting(playerId);
+			const playerStats = statService.getPlayerStatsBRMode(playerId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: playerStats }));
+		}),
+		handleNatsSubscription("stats.getPlayerStats.io", async (msg) => {
+			const playerId = jc.decode(msg.data);
+			statService.isUserIdExisting(playerId);
+			const playerStats = statService.getPlayerStatsIOMode(playerId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: playerStats }));
+		})
+	]);
+})();
+
+
+
+
+
+// (handleErrorsNats(async () => {
+
+// 	const sub = nats.subscribe("stats.getPlayerStats");
+// 	for await (const msg of sub) {
+// 		try {
+// 			const playerId = jc.decode(msg.data);
+// 			statService.isUserIdExisting(playerId);
+// 			const playerStats = {
+// 				classic: statService.getPlayerStatsClassicMode(playerId),
+// 				br: statService.getPlayerStatsBRMode(playerId),
+// 				io: statService.getPlayerStatsIOMode(playerId)
+// 			};
+// 			nats.publish(msg.reply, jc.encode({ success: true, data: playerStats }));
+// 		} catch (error) {
+// 			const status = error.status || 500;
+// 			const message = error.message || "Internal Server Error";
+// 			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
+// 		}
+// 	}
+// }))();
