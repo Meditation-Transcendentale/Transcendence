@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { connect, JSONCodec } from 'nats';
+import { v4 as uuidv4 } from 'uuid';
 
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
@@ -60,8 +61,9 @@ app.post('/', {schema: registerSchema}, handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, "user.checkUsernameAvailability", { username });
 	
 	const hashedPassword = await bcrypt.hash(password, 10);
+	const uuid = uuidv4();
 
-	await natsRequest(nats, jc, 'user.registerUser', { username, hashedPassword });
+	await natsRequest(nats, jc, 'user.registerUser', { uuid, username, hashedPassword });
 
 	res.code(statusCode.CREATED).send({ message: returnMessages.USER_CREATED });
 }));

@@ -39,13 +39,18 @@ handleErrorsNats(async () => {
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("user.registerUser", async (msg) => {
-			const { username, hashedPassword } = jc.decode(msg.data);
-			userService.registerUser(username, hashedPassword);
+			const { uuid, username, hashedPassword } = jc.decode(msg.data);
+			userService.registerUser(uuid, username, hashedPassword);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("user.getUserFromId", async (msg) => {
 			const { id } = jc.decode(msg.data);
 			const user = userService.getUserFromId(id);
+			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
+		}),
+		handleNatsSubscription("user.getUserFromUUID", async (msg) => {
+			const { uuid } = jc.decode(msg.data);
+			const user = userService.getUserFromUUID(uuid);
 			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
 		}),
 		handleNatsSubscription("user.getUserFromHeader", async (msg) => {

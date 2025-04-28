@@ -109,8 +109,8 @@ export class Game {
 		state.balls.push({
 			x: 0,
 			y: 0,
-			vx: 35,
-			vy: 35
+			vx: 25,
+			vy: 25
 		});
 
 		return state;
@@ -139,7 +139,7 @@ export class Game {
 				x,
 				y,
 				vx: 0,
-				vy: 25
+				vy: 90
 			});
 		}
 

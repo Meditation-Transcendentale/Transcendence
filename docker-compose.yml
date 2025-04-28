@@ -4,8 +4,6 @@ services:
     build: 
       context: ./services/user/register-service
     container_name: register_service
-    ports:
-      - "4001:4001"
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
@@ -29,8 +27,6 @@ services:
     build:
       context: ./services/user/auth-service
     container_name: auth_service
-    ports:
-      - "4002:4002"
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
@@ -55,8 +51,6 @@ services:
     build:
       context: ./services/user/update_user_info-service
     container_name: update_user_info_service
-    ports:
-      - "4003:4003"
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
@@ -80,8 +74,6 @@ services:
     build:
       context: ./services/user/friends-service
     container_name: friends_service
-    ports:
-      - "4004:4004"
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
@@ -105,8 +97,6 @@ services:
     build:
       context: ./services/user/get-info-service
     container_name: get_info_service
-    ports:
-      - "4005:4005"
     volumes:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro

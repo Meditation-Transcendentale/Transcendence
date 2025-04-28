@@ -9,7 +9,7 @@ import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
 import { decodeStateUpdate } from "../utils/binary.js";
 import { Buffer } from 'buffer';
-export let localPaddleId: number | null = null;
+export let localPaddleId: number | 0;
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -45,47 +45,71 @@ export class NetworkingSystem extends System {
 			else {
 				msg = rawMsg;
 			}
-			if (msg.type === "stateUpdate") {
-				if (Array.isArray(msg.balls)) {
-					msg.balls.forEach((ballState: any) => {
-						const { id, x, y, vx, vy } = ballState;
-						const entity = entities.find(e => {
-							const ball = e.getComponent(BallComponent);
-							return ball && ball.id === id;
-						});
-						if (entity && entity.hasComponent(BallComponent)) {
-							const ball = entity.getComponent(BallComponent)!;
-							ball.position.set(x, 0.5, y);
-							ball.velocity.set(vx, 0, vy);
-						}
-					});
-				}
-				if (msg.paddles) {
-					for (const key of Object.keys(msg.paddles)) {
-						const paddleState = msg.paddles[key];
-						const entity = entities.find(e => {
-							const paddle = e.getComponent(PaddleComponent);
-							return paddle && paddle.id === paddleState.id;
-						});
-						if (!entity) continue;
-						const input = entity.getComponent(InputComponent);
-						if (input && input.isLocal) {
-							continue;
-						}
-						if (entity.hasComponent(PaddleComponent) && entity.hasComponent(TransformComponent)) {
-							const paddle = entity.getComponent(PaddleComponent)!;
-							paddle.offset = paddleState.offset;
-							const transform = entity.getComponent(TransformComponent)!;
-							const rotationMatrix = Matrix.RotationYawPitchRoll(
-								transform.rotation.y,
-								transform.rotation.x,
-								transform.rotation.z
-							);
-							const localRight = Vector3.TransformCoordinates(new Vector3(1, 0, 0), rotationMatrix);
-							transform.position.copyFrom(transform.basePosition.add(localRight.scale(paddle.offset)));
-						}
-					}
-				}
+			if (msg.type === "registered") {
+				// Server has told us our paddleId for this game
+				localPaddleId = msg.paddleId;
+				console.log("Local paddleId set to:", localPaddleId);
+				// We can now early return, until binary frames start coming in
+				return;
+			}
+			if (msg.balls && msg.paddles) {
+				msg.balls.forEach((b: any) => {
+					const e = entities.find(e =>
+						e.hasComponent(BallComponent) &&
+						e.getComponent(BallComponent)!.id === b.id
+					);
+					if (!e) return;
+					const ball = e.getComponent(BallComponent)!;
+					ball.position.set(b.x, 0.5, b.y);
+					ball.velocity.set(b.vx, 0, b.vy);
+				});
+
+				msg.paddles.forEach((pState: any) => {
+					const e = entities.find(e =>
+						e.hasComponent(PaddleComponent) &&
+						e.getComponent(PaddleComponent)!.id === pState.id
+					);
+					if (!e || e.getComponent(InputComponent)?.isLocal) return;
+
+					const paddle = e.getComponent(PaddleComponent)!;
+					paddle.offset = pState.offset;
+
+					const tf = e.getComponent(TransformComponent)!;
+					const rotMat = Matrix.RotationYawPitchRoll(
+						tf.rotation.y,
+						tf.rotation.x,
+						tf.rotation.z
+					);
+					const localRight = Vector3.TransformCoordinates(
+						new Vector3(1, 0, 0),
+						rotMat
+					);
+					tf.position.copyFrom(
+						tf.basePosition.add(localRight.scale(paddle.offset))
+					);
+				});
+
+			}
+			// 3) update scoreboard UI
+			if (msg.score) {
+				const myScore = msg.score[localPaddleId] || 0;
+				const otherId = Object.keys(msg.score)
+					.map(id => Number(id))
+					.find(id => id !== localPaddleId)!;
+				const theirScore = msg.score[otherId] || 0;
+				console.log(myScore, theirScore);
+				this.scoreUI.update(myScore, theirScore);
+			}
+
+			// 4) show/hide “paused” overlay on goal
+			if (msg.isPaused) {
+				// pause timer on
+			} else {
+				// pause timer off
+			}
+
+			if (msg.isGameOver) {
+				// pick winner by highest score
 			}
 
 			if (msg.type === "welcome") {
@@ -107,82 +131,14 @@ export class NetworkingSystem extends System {
 					ball.velocity.set(msg.vx, 0, msg.vy);
 				}
 			}
-			if (msg.type === "scoreUpdate") {
-				const scoreP1 = msg.score.player1;
-				const scoreP2 = msg.score.player2;
-				this.scoreUI.update(scoreP1, scoreP2);
-			}
+			// if (msg.type === "scoreUpdate") {
+			// 	const scoreP1 = msg.score.player1;
+			// 	const scoreP2 = msg.score.player2;
+			// 	this.scoreUI.update(scoreP1, scoreP2);
+			// }
 			if (msg.type === "winUpdate") {
-				
+
 			}
 		});
 	}
 }
-// update(entities: Entity[], deltaTime: number): void {
-// 	const messages = this.wsManager.getMessages();
-// 	messages.forEach(msg => {
-// 		if (msg.type === "stateUpdate" && msg.state) {
-// 			// console.log(msg.state);
-// 			if (Array.isArray(msg.state.balls)) {
-// 				msg.state.balls.forEach((ballState: any) => {
-// 					const [id, x, y, vx, vy] = ballState;
-// 					const entity = entities.find(e => {
-// 						const ball = e.getComponent(BallComponent);
-// 						return ball && ball.id === id;
-// 					});
-// 					if (entity && entity.hasComponent(BallComponent)) {
-// 						const ball = entity.getComponent(BallComponent)!;
-// 						ball.position.set(x, 0.5, y);
-// 						ball.velocity.set(vx, 0, vy);
-// 					}
-// 				});
-// 			}
-// 			if (msg.state.paddles) {
-// 				for (const key of Object.keys(msg.state.paddles)) {
-// 					const paddleState = msg.state.paddles[key];
-// 					const entity = entities.find(e => {
-// 						const paddle = e.getComponent(PaddleComponent);
-// 						return paddle && paddle.id === paddleState.id;
-// 					});
-//
-// 					if (!entity) continue;
-// 					const input = entity.getComponent(InputComponent);
-// 					if (input && input.isLocal) {
-// 						continue;
-// 					}
-// 					if (entity.hasComponent(PaddleComponent) && entity.hasComponent(TransformComponent)) {
-// 						const paddle = entity.getComponent(PaddleComponent)!;
-// 						paddle.offset = paddleState.offset;
-// 						const transform = entity.getComponent(TransformComponent)!;
-// 						const rotationMatrix = Matrix.RotationYawPitchRoll(
-// 							transform.rotation.y,
-// 							transform.rotation.x,
-// 							transform.rotation.z
-// 						);
-// 						const localRight = Vector3.TransformCoordinates(new Vector3(1, 0, 0), rotationMatrix);
-// 						transform.position.copyFrom(transform.basePosition.add(localRight.scale(paddle.offset)));
-// 					}
-// 				}
-// 			}
-// 		}
-// 		if (msg.type === "welcome") {
-// 			console.log("Received welcome:", msg);
-// 			if (msg.uiid === this.uiid) {
-// 				localPaddleId = msg.paddleId;
-// 				console.log("Local paddleId set to:", msg.paddleId);
-// 			}
-// 		}
-// 		if (msg.type === "updateBall") {
-// 			const entity = entities.find(e => {
-// 				const ball = e.getComponent(BallComponent);
-// 				return ball && ball.id === msg.ballId;
-// 			});
-// 			if (entity && entity.hasComponent(BallComponent)) {
-// 				const ball = entity.getComponent(BallComponent)!;
-// 				ball.position.set(msg.x, 0.5, msg.y);
-// 				ball.velocity.set(msg.vx, 0, msg.vy);
-// 			}
-// 		}
-// 	});
-// }
-//}

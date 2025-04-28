@@ -42,6 +42,7 @@ class Game {
 		console.log("start");
 		this.engine = new Engine(this.canvas, true);
 		engine = this.engine;
+
 		this.scene = new Scene(this.engine);
 		const config = {
 			numberOfBalls: 1,
@@ -59,11 +60,12 @@ class Game {
 
 		const uuid = getOrCreateUUID();
 		const wsUrl = `ws://10.19.225.59:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		// const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uiid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		// const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
-		localPaddleId = await this.waitForWelcome();
+		// localPaddleId = await this.waitForWelcome();
+		localPaddleId = await this.waitForRegistration();
 		this.initECS(config, instanceManagers, uuid);
 
 		this.stateManager = new StateManager(this.ecs);
@@ -72,6 +74,7 @@ class Game {
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
 		});
+
 	}
 
 	private createInstanceManagers(baseMeshes: any) {
@@ -93,7 +96,7 @@ class Game {
 			instanceManagers.wall,
 			this.camera
 		));
-		// this.ecs.addSystem(new VisualEffectSystem(this.scene));
+		this.ecs.addSystem(new VisualEffectSystem(this.scene));
 
 		createGameTemplate(this.ecs, config, localPaddleId);
 	}
@@ -106,6 +109,41 @@ class Game {
 			wall: createWallMesh(this.scene, config)
 		}
 	}
+	private waitForRegistration(): Promise<number> {
+		return new Promise((resolve, reject) => {
+			const socket = this.wsManager.socket;
+
+			socket.addEventListener("message", (event) => {
+				let data: any;
+				if (typeof event.data === "string") {
+					try {
+						data = JSON.parse(event.data);
+					} catch {
+						return;
+					}
+				} else {
+					return;
+				}
+
+				if (data.type === "welcome") {
+					console.log("Got welcome (session):", data);
+					socket.send(JSON.stringify({
+						type: "registerGame",
+						data: { gameId: this.gameId }
+					}));
+				}
+
+				else if (data.type === "registered") {
+					console.log("Registered into game:", data);
+					this.paddleId = data.paddleId;
+					resolve(data.paddleId);
+				}
+			}, { once: false });
+
+			setTimeout(() => reject(new Error("Timed out waiting for registration")), 5000);
+		});
+	}
+
 
 	waitForWelcome() {
 		return new Promise((resolve) => {
@@ -139,8 +177,12 @@ class Game {
 	}
 }
 
+let resizeTimeout: number;
 window.addEventListener("resize", () => {
-	engine.resize();
+	clearTimeout(resizeTimeout);
+	resizeTimeout = setTimeout(() => {
+		engine.resize();
+	}, 100); // délai pour limiter les appels trop fréquents
 });
 
 window.addEventListener("DOMContentLoaded", () => {

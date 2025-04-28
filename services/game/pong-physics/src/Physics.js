@@ -28,6 +28,7 @@ export const Physics = {
 			console.log(`[physics] Initializing new game ${gameId}`);
 			this.games.set(gameId, new Game(gameId, state));
 		}
+		let events = [];
 		const game = this.games.get(gameId);
 		const em = game.entityManager;
 		const subSteps = 20;
@@ -85,11 +86,13 @@ export const Physics = {
 						const wallPos = other.getComponent('position');
 						const wall = other.getComponent('wall');
 
-						// if (wall.isActive === true) {
 						const { mtv, penetration } = computeCircleBoxMTV(ballPos, ballCollider, wallPos, otherCollider);
 						if (wall.isGoal === true && penetration > 0) {
-							ballPos.x = 0;
-							ballPos.y = 0;
+							let scorer = wall.id === 0
+								? 1  // right paddle component id
+								: 0; // left paddle component id
+							scorer = ballPos.x > 0 ? 0 : 1;
+							events.push({ type: 'goal', gameId, playerId: scorer });
 							break;
 						}
 						if (penetration > 0) {
@@ -97,7 +100,6 @@ export const Physics = {
 							weightedMTVy += mtv.y * penetration;
 							totalPenetration += penetration;
 						}
-						// }
 					}
 				}
 				if (totalPenetration > 0) {
@@ -161,7 +163,8 @@ export const Physics = {
 			gameId,
 			tick,
 			balls: tempstate.balls,
-			paddles: tempstate.paddles
+			paddles: tempstate.paddles,
+			events
 		};
 	},
 
@@ -178,16 +181,22 @@ export const Physics = {
 			return;
 		}
 
-		console.log('Immediate inputs received:', inputs);
+		// console.log('Immediate inputs received:', inputs);
 		for (let i = 0, len = inputs.length; i < len; i++) {
 			const { playerId, input } = inputs[i];
-			console.log('Processing input:', playerId, input);
+			// console.log('Processing input:', playerId, input);
 			if (input.type === 'disableWall') {
 				game.setWallOff(playerId);
 			} else if (input.type === 'enableWall') {
 				game.setWallOn(playerId);
 			} else if (input.type === 'newPlayerConnected') {
 				game.markAllEntitiesDirty();
+			}
+			else if (input.type === 'resetBall') {
+				game.resetBall();
+			}
+			else if (input.type === 'serve') {
+				game.launchBall();
 			}
 		}
 	},

@@ -1,4 +1,4 @@
-// services/game/pongBR-physics/src/Game.js
+// services/game/pong-physics/src/Game.js
 import { createEntityManager } from './ecs/ecs.js';
 import { Position, Velocity, CircleCollider, BoxCollider } from './ecs/components.js';
 import { movementSystem } from './ecs/systems.js';
@@ -25,6 +25,7 @@ export class Game {
 		this.players = this.options.players || [];
 
 		this.init();
+		this.launchBall();
 	}
 
 	/** Initialize entities: one ball, two paddles, and four walls */
@@ -251,6 +252,28 @@ export class Game {
 			const paddle = entity.getComponent('paddle');
 			paddle.dirty = true;
 		});
+	}
+	resetBall() {
+		const ball = this.entityManager
+			.getEntitiesWithComponents(['ball'])[0];
+		const pos = ball.getComponent('position');
+		pos.x = 0;
+		pos.y = 0;
+		const vel = ball.getComponent('velocity');
+		vel.x = 0;
+		vel.y = 0;
+	}
+
+	launchBall() {
+		const ball = this.entityManager.getEntitiesWithComponents(['ball'])[0];
+		const pos = ball.getComponent('position');
+		pos.x = 0; pos.y = 0;
+		const vel = ball.getComponent('velocity');
+		const speed = this.options.initialBallSpeed || 20;
+		const angle = (Math.random() * Math.PI / 2) - (Math.PI / 4);
+		const dir = Math.random() < 0.5 ? -1 : 1;
+		vel.x = Math.cos(angle) * speed * dir;
+		vel.y = Math.sin(angle) * speed;
 	}
 
 }

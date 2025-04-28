@@ -34,13 +34,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "requestBody": {
@@ -129,13 +129,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "requestBody": {
@@ -223,7 +223,7 @@
                 }
             }
         },
-        "/friends/add-friend": {
+        "/friends/add": {
             "post": {
                 "summary": "Send friend request",
                 "tags": ["Friends"],
@@ -236,13 +236,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "requestBody": {
@@ -251,9 +251,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["addedPlayerUsername"],
+                                "required": ["inputUsername"],
                                 "properties": {
-                                    "addedPlayerUsername": { "type": "string", "example": "user1234" }
+                                    "inputUsername": { "type": "string", "example": "user1234" }
                                 }
                             }
                         }
@@ -315,7 +315,7 @@
                 }
             }
         },
-        "/friends/accept-friend": {
+        "/friends/accept": {
             "post": {
                 "summary": "Accept friend request",
                 "tags": ["Friends"],
@@ -328,13 +328,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "requestBody": {
@@ -343,9 +343,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["requestFrom"],
+                                "required": ["inputUsername"],
                                 "properties": {
-                                    "requestFrom": { "type": "string", "example": "user1234" }
+                                    "inputUsername": { "type": "string", "example": "user1234" }
                                 }
                             }
                         }
@@ -407,7 +407,7 @@
                 }
             }
         },
-        "/friends/decline-friend": {
+        "/friends/decline": {
             "delete": {
                 "summary": "Decline friend request",
                 "tags": ["Friends"],
@@ -420,13 +420,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "requestBody": {
@@ -435,9 +435,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["requestFrom"],
+                                "required": ["inputUsername"],
                                 "properties": {
-                                    "requestFrom": { "type": "string", "example": "user1243" }
+                                    "inputUsername": { "type": "string", "example": "user1243" }
                                 }
                             }
                         }
@@ -499,7 +499,7 @@
                 }
             }
         },
-        "/friends/friend-requests": {
+        "/friends/get/requests": {
             "get": {
                 "summary": "Get friend requests list",
                 "tags": ["Friends"],
@@ -512,13 +512,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "responses": {
@@ -587,7 +587,7 @@
                 }
             }
         },
-        "/friends/delete-friends": {
+        "/friends/delete": {
             "delete": {
                 "summary": "Delete friend from friends list",
                 "tags": ["Friends"],
@@ -600,13 +600,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "requestBody": {
@@ -615,9 +615,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": ["friendName"],
+                                "required": ["inputUsername"],
                                 "properties": {
-                                    "friendName": { "type": "string", "example": "user1243" }
+                                    "inputUsername": { "type": "string", "example": "user1243" }
                                 }
                             }
                         }
@@ -679,7 +679,7 @@
                 }
             }
         },
-		"/friends/block-user": {
+		"/friends/block": {
 			"post": {
 				"summary": "Block user",
 				"tags": ["Friends"],
@@ -692,13 +692,13 @@
 						"schema": {
 							"type": "object",
 							"properties": {
-								"id": { "type": "string", "example": "12345" },
+								"uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
 								"role": { "type": "string", "example": "user" },
 								"iat": { "type": "integer", "example": "1700000000" },
 								"exp": { "type": "integer", "example": "1700036000" }
 							}
 						},
-						"description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+						"description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
 					}
 				],
 				"requestBody": {
@@ -707,9 +707,9 @@
 						"application/json": {
 							"schema": {
 								"type": "object",
-								"required": ["blockedUserName"],
+								"required": ["inputUsername"],
 								"properties": {
-									"blockedUserName": { "type": "string", 	"example":"user123" }
+									"inputUsername": { "type": "string", 	"example":"user123" }
 								}
 							}
 						}
@@ -784,7 +784,7 @@
 				}
 			}
 		},
-        "/friends/unblock-user": {
+        "/friends/unblock": {
             "delete": {
 				"summary": "Unblock user",
 				"tags": ["Friends"],
@@ -797,13 +797,13 @@
 						"schema": {
 							"type": "object",
 							"properties": {
-								"id": { "type": "string", "example": "12345" },
+								"uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
 								"role": { "type": "string", "example": "user" },
 								"iat": { "type": "integer", "example": "1700000000" },
 								"exp": { "type": "integer", "example": "1700036000" }
 							}
 						},
-						"description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+						"description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
 					}
 				],
 				"requestBody": {
@@ -812,9 +812,9 @@
 						"application/json": {
 							"schema": {
 								"type": "object",
-								"required": ["blockedUserName"],
+								"required": ["inputUsername"],
 								"properties": {
-									"blockedUserName": { "type": "string", 	"example":"user123" }
+									"inputUsername": { "type": "string", 	"example":"user123" }
 								}
 							}
 						}
@@ -889,7 +889,7 @@
 				}
 			}
 		},
-        "/friends/blocked-users": {
+        "/friends/get/blocked": {
             "get": {
                 "summary": "Get blocked users list",
                 "tags": ["Friends"],
@@ -902,13 +902,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "responses": {
@@ -977,7 +977,7 @@
                 }
             }
         },
-        "/friends/friendlist": {
+        "/friends/get/friendlist": {
             "get": {
                 "summary": "Get user friendlist",
                 "tags": ["Friends"],
@@ -990,13 +990,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "responses": {
@@ -1077,13 +1077,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "requestBody": {
@@ -1170,13 +1170,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "requestBody": {
@@ -1266,13 +1266,13 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "id": { "type": "string", "example": "12345" },
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
                                 "role": { "type": "string", "example": "user" },
                                 "iat": { "type": "integer", "example": "1700000000" },
                                 "exp": { "type": "integer", "example": "1700036000" }
                             }
                         },
-                        "description": "Encoded user information including ID, role, issued-at (`iat`), and expiration (`exp`)."
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
                     }
                 ],
                 "requestBody": {
