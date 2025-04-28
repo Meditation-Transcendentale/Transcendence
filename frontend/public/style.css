@@ -6,8 +6,18 @@ body {
 	overflow: hidden;
 }
 
-div[disabled="true"] {
+div[disabled=true],
+input[display=false] {
 	display: none;
+}
+
+
+body.modal-open {
+	pointer-events: none;
+}
+
+body.modal-open .popup {
+	pointer-events: auto;
 }
 
 
