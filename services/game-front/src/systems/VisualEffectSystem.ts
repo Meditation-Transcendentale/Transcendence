@@ -90,9 +90,10 @@ export class VisualEffectSystem extends System {
 				// Start the particle system
 				particleSystem.start();
 
-				// transform.scale = new Vector3(0, 0, 0);
-				// ball.velocity = new Vector3(0, 0, 0);
-				// ball.destroy = true;
+				setTimeout(() => {
+					particleSystem.particleTexture.dispose();
+					particleSystem.dispose();
+				}, 2000);
 			}
 		}
 
