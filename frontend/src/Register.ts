@@ -2,7 +2,6 @@ class Register {
 	private loaded: boolean;
 
 	constructor() {
-		console.log("Register loaded successfully");
 		this.loaded = false;
 	}
 
@@ -12,10 +11,12 @@ class Register {
 		}
 		document.getElementById("register")?.addEventListener("submit", (ev) => {
 			ev.preventDefault();
-			console.log("Register submit");
-			this.registerRequest(document.getElementById("register-username").value, document.getElementById("register-password").value)
-				.then((response) => { this.registerResponse(response) })
-				.catch((error) => console.log(error));
+			this.registerRequest(
+				document.getElementById("register-username")?.value,
+				document.getElementById("register-password")?.value
+			)
+				.then((json) => this.registerResolve(json))
+				.catch((error) => { this.requestReject(error) });
 		});
 
 		document.getElementById("login")?.addEventListener("click", (ev) => {
@@ -30,29 +31,30 @@ class Register {
 
 	public reset() { }
 
-	private registerResponse(response: any) {
-		document.getElementById("status")?.setAttribute("ok", response.ok);
-		document.getElementById('status').value = response.message;
+	private registerResolve(json: JSON) {
+		document.getElementById("status")?.dispatchEvent(
+			new CustomEvent("status", { detail: { ok: true, json: json.message } }));
 
-		if (response.ok == false) {
-			throw response;
-		}
-
-		this.loginRequest(document.getElementById("register-username").value, document.getElementById("register-password").value)
-			.then((response) => { this.loginResponse(response) })
+		this.loginRequest(
+			document.getElementById("register-username")?.value,
+			document.getElementById("register-password")?.value)
+			.then((json) => { this.loginResolve(json) });
 	}
 
-	private loginResponse(response: any) {
-		document.getElementById("status")?.setAttribute("ok", response.ok);
-		document.getElementById('status').value = response.message;
+	private loginResolve(json: JSON) {
+		document.getElementById("status")?.dispatchEvent(
+			new CustomEvent("status", { detail: { ok: true, json: json.message } }));
+		document.getElementById("register-username")?.setAttribute("value", "");
+		document.getElementById("register-password")?.setAttribute("value", "");
+		document.getElementById("main-container")?.dispatchEvent(new CustomEvent('nav', { detail: { path: "/home", return: true } }))
+	}
 
-		if (response.ok == false) {
-			throw response;
-		}
-
-		document.getElementById("register-username").value = "";
-		document.getElementById("register-password").value = "";
-		document.getElementById("main-container")?.dispatchEvent(new CustomEvent('nav', { detail: { path: "/home" } }))
+	private requestReject(response: Response) {
+		response.json()
+			.then((json) => {
+				document.getElementById("status")?.dispatchEvent(
+					new CustomEvent("status", { detail: { ok: response.ok, json: json.message } }));
+			})
 	}
 
 	private async registerRequest(username: string, password: string) {
@@ -60,25 +62,21 @@ class Register {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			credentials: 'include',
 			body: JSON.stringify({
 				username: username,
-				password: password
+				password: password,
 			})
-		});
 
+		})
+		if (!response.ok) {
+			return Promise.reject(response);
+		}
 
-		const data = await response.json();
-
-		const final = {
-			message: data.message,
-			status: response.status,
-			ok: response.ok
-		};
-		return final;
-	};
+		return response.json();
+	}
 
 
 
@@ -87,26 +85,21 @@ class Register {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			credentials: 'include',
 			body: JSON.stringify({
 				username: username,
-				password: password
+				password: password,
 			})
-		});
 
+		})
+		if (!response.ok) {
+			return Promise.reject(response);
+		}
 
-		const data = await response.json();
-
-		const final = {
-			message: data.message,
-			status: response.status,
-			ok: response.ok
-		};
-		return final;
-	};
-
+		return response.json();
+	}
 
 }
 

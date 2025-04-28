@@ -37,8 +37,6 @@ class Router {
 			}
 		};
 
-		console.log("Router INIT");
-
 		this.mainContainer = document.getElementById("main-container") as HTMLElement;
 		this.mainContainer.addEventListener("nav", (ev) => {
 			if (ev.detail.return) {
@@ -49,10 +47,8 @@ class Router {
 		})
 
 		window.addEventListener("popstate", (ev) => {
-			console.log("Popstate  event");
 			this.nav(ev.state.path, false);
 		});
-		console.log(this.routes);
 
 	}
 
@@ -60,7 +56,7 @@ class Router {
 	public async nav(path: string, history = true) {
 		if (this.initRoute == null) { this.initRoute = path }
 
-		console.log("nav request: ", path);
+		console.log("%c Navigating to %s", "color: white; background-color: blue", path);
 
 		switch (path) {
 			case "/": {
@@ -77,13 +73,11 @@ class Router {
 			}
 
 			case "/home": {
-				console.log("there");
 				this.loadInMain("/home", history)
 				break;
 			}
 
 			case "/home/info": {
-				console.log("hear");
 				this.loadInHome("/home/info", history);
 				break;
 			}
@@ -102,24 +96,19 @@ class Router {
 		}
 	}
 
-	//add correct route to url
-	//?add reload listener
-	//add back listener
-	//
-
 	private async loadInMain(route: string, history = true, child = false) {
-		console.log("load in main :", route);
-		route = await meRequest()
+		route = await meRequest("no-cache")
 			.then(() => {
 				return (route == "/auth" || route == "/register") ? "/home" : route;
 			})
 			.catch(() => { return (route != '/register') ? "/auth" : route })
+		console.log("%c Loading: %s", "color: white; background-color: green", route)
 		this.routes[route].script.data = await this.getScript(this.routes[route].script);
 		this.routes[route].html.data = await this.getHtml(this.routes[route].html);
 
 		try {
 			document.getElementById("main-container").removeChild(document.getElementById("main-container")?.firstChild);
-		} catch (err) { console.log(err) }
+		} catch (err) { }
 
 		document.getElementById("main-container").appendChild(this.routes[route].html.data);
 		this.routes[route].script.data.init();
@@ -129,20 +118,20 @@ class Router {
 	}
 
 	private async loadInHome(route: string, history = true) {
-		console.log("load in home :", route);
 		if (!document.getElementById("home")) {
 			this.loadInMain("/home", false, true)
 				.then(() => { this.loadInHome(route) })
-				.catch(() => console.log("Not logged In"));
+				.catch(() => console.log("%c Not logged in redirected to /auth", "color: white; background-color: red"));
 			return;
 		}
+		console.log("%c Loading: %s", "color: white; background-color: green", route)
 
 		this.routes[route].script.data = await this.getScript(this.routes[route].script);
 		this.routes[route].html.data = await this.getHtml(this.routes[route].html);
 
 		try {
 			document.getElementById("home-container").removeChild(document.getElementById("home-container")?.firstChild);
-		} catch (err) { console.log(err) }
+		} catch (err) { }
 		document.getElementById("home-container").appendChild(this.routes[route].html.data);
 		this.routes[route].script.data.init();
 		this.routes[route].script.data.reset();
@@ -151,26 +140,15 @@ class Router {
 	}
 
 
-	private async isLogedIn() {
-		return new Promise((resolve, reject) => {
-			console.log("in is logIn");
-			meRequest("no-cache")
-				.then((response) => {
-					if (response.ok) { resolve(true) }
-					reject(false);
-				})
-				.catch(() => reject(false));
-		})
-	}
-
 	private async getHtml(html: { path: string, data: string }) {
 		return new Promise((resolve, reject) => {
 			if (html.data != null) {
+				console.log("%c %s already fetched", "color: black; background-color: pink", html.path);
 				return resolve(html.data);
 			}
 
+			console.log("%c Fetching %s", "color: black; background-color: plum", html.path);
 			const url = "http://localhost:8080/html" + html.path + ".html";
-			console.log("Getting ", url);
 			fetch(url, { redirect: "error" })
 				.then((response) => {
 					if (!response.ok) { return reject(response); }
@@ -186,10 +164,11 @@ class Router {
 
 	private async getScript(script: { path: string, data: {} }) {
 		if (script.data !== null && script.data !== undefined) {
-			console.log("Script Empty");
+			console.log("%c %s already imported", "color: black; background-color: palegoldenrod", script.path);
 			return script.data;
 		}
-		const im = await import(script.path);
+		console.log("%c Importing %s", "color: black; background-color: orange", script.path);
+		const im = await import(/* @vite-ignore */ script.path);
 		const obj = new im.default();
 		return obj;
 	}

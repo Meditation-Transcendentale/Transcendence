@@ -37,3 +37,9 @@ export async function meRequest(cache: string = "default") {
 
 	return response.json();
 }
+
+export async function meReject() {
+	document.getElementById("status")?.dispatchEvent(
+		new CustomEvent("status", { detail: { ok: false, json: "Not Logged In" } }))
+	setTimeout(() => { window.location.reload() }, 500);
+}

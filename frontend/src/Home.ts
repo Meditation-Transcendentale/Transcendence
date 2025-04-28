@@ -2,7 +2,6 @@ class Home {
 	private loaded: boolean;
 
 	constructor() {
-		console.log("Home successfully loaded");
 		this.loaded = false;
 	}
 
@@ -11,18 +10,15 @@ class Home {
 			return;
 		}
 
-		console.log("HOME INIT");
-
 		document.getElementById("quit")?.addEventListener("click", (e) => {
 			this.logoutRequest()
-				.then((response) => { this.logoutResponse(response) })
-				.catch((error) => console.log(error));
+				.then((json) => { this.logoutResponse(json, true) })
+				.catch((json) => { this.logoutResponse(json, false) });
 		});
 
 		document.querySelectorAll("a").forEach((link) => {
 			link.addEventListener("click", (e) => {
 				e.preventDefault();
-				console.log(link.hash);
 				document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: link.hash.substring(1) } }));
 			})
 		})
@@ -34,15 +30,13 @@ class Home {
 		document.getElementById("home-container").innerHTML = "";
 	}
 
-	private logoutResponse(response: string) {
-		document.getElementById("status")?.setAttribute("ok", response.ok);
-		document.getElementById('status').value = response.message;
+	private logoutResponse(json: JSON, ok: boolean) {
+		document.getElementById("status")?.dispatchEvent(
+			new CustomEvent("status", { detail: { ok: ok, json: json.message } })
+		)
 
-		if (response.ok == false) {
-			throw response;
-		}
 
-		window.location.reload()
+		setTimeout(() => { window.location.reload() }, 300);
 		// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/auth" } }))
 
 
@@ -55,16 +49,12 @@ class Home {
 				'Accept': 'application/json',
 			},
 			credentials: 'include',
-		});
+		})
+		if (!response.ok) {
+			return Promise.reject(response.json());
+		}
 
-		const data = await response.json();
-
-		const final = {
-			message: data.message,
-			status: response.status,
-			ok: response.ok
-		};
-		return final;
+		return response.json();
 	}
 }
 

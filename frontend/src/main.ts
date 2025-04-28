@@ -26,12 +26,15 @@ async function init() {
 	// 	};
 	// 	return final;
 	// };
+	//
+	document.getElementById("status")?.addEventListener("status", (e) => {
+		document.getElementById("status").setAttribute("ok", e.detail.ok);
+		document.getElementById('status').innerHTML = e.detail.json;
+	})
+
 	const router = new Router();
 
-	console.log(window.location.pathname);
 	router.nav(window.location.pathname)
-
-
 	// const response = await checkMe();
 	// console.log(response);
 	//

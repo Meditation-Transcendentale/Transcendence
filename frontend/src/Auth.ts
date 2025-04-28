@@ -4,7 +4,6 @@ class Auth {
 	private twofaSubmit!: HTMLElement;
 
 	constructor() {
-		console.log("Auth loaded successfully");
 		this.loaded = false;
 	}
 
@@ -17,14 +16,14 @@ class Auth {
 		// 	gapi.auth2.init({ client_id: "532264983031-05k4fba7tc2f005dtrk1qqo8aug3bpd2.apps.googleusercontent.com" })
 		// 		.then(() => {
 		// 			gapi.signin2.render();
-		// 		}, console.log("error"));
+		// 		}, eonsole.log("error"));
 		// })
 
 		document.getElementById("login")?.addEventListener("submit", (ev) => {
 			ev.preventDefault();
 			this.loginRequest(document.getElementById("login-username").value, document.getElementById("login-password").value)
-				.then((response) => { this.loginResponse(response) })
-				.catch((error) => console.log(error));
+				.then((response) => { this.loginResolve(response) })
+				.catch((error) => { this.loginReject(error) });
 		});
 
 
@@ -38,22 +37,17 @@ class Auth {
 				document.getElementById("login-username").value,
 				document.getElementById("login-password").value,
 				document.getElementById("login-2fa-token").value)
-				.then((response) => { this.loginResponse(response) })
-				.catch((error) => console.log(error));
+				.then((response) => { this.loginResolve(response) })
+				.catch((error) => { this.loginReject(error) });
 		});
-
-		document.getElementById("auth")?.addEventListener("click", (e) => {
-			document.getElementById("login-username")?.removeAttribute("disabled");
-			document.getElementById("login-password")?.removeAttribute("disabled");
-			document.getElementById("login-2fa")?.setAttribute("disabled", "true");
-		})
-
 
 		this.loaded = true;
 	}
 
 	public reset() {
-
+		document.getElementById("login-username").value = "";
+		document.getElementById("login-password").value = "";
+		document.getElementById("login-2fa-token").value = "";
 	}
 
 	private async loginRequest(username: string, password: string, token = "") {
@@ -61,7 +55,7 @@ class Auth {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			credentials: 'include',
 			body: JSON.stringify({
@@ -69,40 +63,31 @@ class Auth {
 				password: password,
 				token: token
 			})
-		});
 
-
-		const data = await response.json();
-
-		const final = {
-			message: data.message,
-			status: response.status,
-			ok: response.ok
-		};
-		return final;
-	};
-
-	private loginResponse(response: any) {
-		document.getElementById("status")?.setAttribute("ok", response.ok);
-		document.getElementById('status').value = response.message;
-
-		if (response.status == 400) {
-			document.getElementById("login-2fa").setAttribute("disabled", "false");
-			document.getElementById("login-username").setAttribute("disabled", "");
-			document.getElementById("login-password").setAttribute("disabled", "");
+		})
+		if (!response.ok) {
+			return Promise.reject(response);
 		}
-		if (response.ok == false) {
-			throw response;
-		}
-		document.getElementById("login-username").value = "";
-		document.getElementById("login-password").value = "";
 
-
-		document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home", return: true } }))
-
+		return response.json();
 	}
 
 
+	private loginResolve(json: JSON) {
+		document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: { ok: true, json: json.message } }));
+		document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home", return: true } }));
+	}
+
+	private loginReject(response: Response) {
+		response.json()
+			.then((json) => {
+				document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: { ok: response.ok, json: json.message } }))
+			});
+		if (response.status == 400) {
+			document.getElementById("login-2fa")?.setAttribute("disabled", "false");
+		}
+		console.log(response);
+	}
 }
 
 export default Auth;

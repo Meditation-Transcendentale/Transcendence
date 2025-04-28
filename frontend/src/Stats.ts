@@ -1,4 +1,4 @@
-import { meRequest } from "./checkMe";
+import { meReject, meRequest } from "./checkMe";
 
 class Stats {
 	private loaded: boolean;
@@ -13,8 +13,14 @@ class Stats {
 
 
 		if (!playerName) {
-			const response = await meRequest();
-			playerName = await response.message.username;
+			meRequest()
+				.then((json) => {
+					playerName = json.userInfo.username;
+				})
+				.catch(() => {
+					meReject();
+					return;
+				})
 		}
 		document.getElementById("stats-username").innerHTML = playerName;
 		document.getElementById("classic-menu")?.addEventListener("click", (e) => {
@@ -51,8 +57,14 @@ class Stats {
 
 	public async reset(playerName?: string) {
 		if (!playerName) {
-			const response = await meRequest();
-			playerName = await response.message.username;
+			meRequest()
+				.then((json) => {
+					playerName = json.userInfo.username;
+				})
+				.catch(() => {
+					meReject();
+					return;
+				})
 		}
 		document.getElementById("stats-username").innerHTML = playerName;
 	}
