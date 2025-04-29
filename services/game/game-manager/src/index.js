@@ -1,26 +1,15 @@
-// services/game/game-manager/src/index.js
-import Fastify from 'fastify';
-import cors from '@fastify/cors';
+import natsClient from './natsClient.js';
 import { connect, JSONCodec } from 'nats';
 import { loadTemplates, getTemplate } from './templateService.js';
 import { GameManager } from './GameManager.js';
 import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
 dotenv.config();
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'game-manager';
-const PORT = process.env.PORT || 4000;
+// const PORT = process.env.PORT || 4000;
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 const jc = JSONCodec();
 
-const fastify = Fastify();
-let nc;
-const gameManager = new GameManager(nc);
-
-await fastify.register(cors, {
-	origin: true // or origin: 'http://localhost:3000' to lock it down
-});
 
 fastify.post('/match', async (request, reply) => {
 	try {
@@ -63,12 +52,11 @@ fastify.post('/match/:id/launch', async (req, reply) => {
 });
 
 async function start() {
-	nc = await connect({ servers: NATS_URL });
+	let nc = await natsClient.connect(config.NATS_URL)
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
 
-	const __dirname = path.dirname(fileURLToPath(import.meta.url));
-	loadTemplates(path.join(__dirname, './template'));
-	gameManager.nc = nc;
+	const gameManager = new GameManager(nc);
+	loadTemplates();
 	gameManager.start();
 
 	const sub = nc.subscribe('game.state');
@@ -95,13 +83,6 @@ async function start() {
 				gameManager._onGoal(ev);
 		}
 	})();
-	fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
-		if (err) {
-			console.error(err);
-			process.exit(1);
-		}
-		console.log(`[${SERVICE_NAME}] HTTP API running at ${address}`);
-	});
 }
 
 start();

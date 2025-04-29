@@ -1,4 +1,11 @@
 // services/game/game-manager/src/binary.js
+import { flatbuffers } from 'flatbuffers';
+import {
+	FullState,
+	Ball,
+	Paddle,
+	ScoreEntry
+} from 'serialization-game';
 
 const SCALE = 100;
 
@@ -145,4 +152,73 @@ export function encodeFull(
 	}
 
 	return buf;
+}
+// 1) BUILD / ENCODE
+export function makeFullessage(
+	gameId,
+	tick,
+	balls,
+	paddles,
+	isPaused,
+	isGameOver,
+	scores,
+) {
+	const builder = new flatbuffers.Builder(1024);
+
+	// Balls
+	const ballOffs = balls.map(b =>
+		Ball.createBall(builder, b.id, b.x, b.y, b.vx, b.vy)
+	);
+	const ballsVec = FullcreateBallsVector(builder, ballOffs);
+
+	// Paddles
+	const paddleOffs = paddles.map(p =>
+		Paddle.createPaddle(builder, p.id, p.offset, p.isConnected)
+	);
+	const paddlesVec = FullcreatePaddlesVector(builder, paddleOffs);
+
+	// Scores
+	const scoreOffs = scores.map(s =>
+		ScoreEntry.createScoreEntry(builder, s.playerId, s.score)
+	);
+	const scoresVec = FullcreateScoresVector(builder, scoreOffs);
+
+	// Fulltable
+	FullstartFullbuilderState();
+	FulladdGameId(builder, gameId);
+	FulladdTick(builder, tick);
+	FulladdBalls(builder, ballsVec);
+	FulladdPaddles(builder, paddlesVec);
+	FulladdIsPaused(builder, isPaused);
+	FulladdIsGameOver(builder, isGameOver);
+	FulladdScores(builder, scoresVec);
+	const root = FullendFullbuilderState();
+
+	builder.finish(root);
+	return builder.asUint8Array();
+}
+
+// 2) PARSE / DECODE
+export function parseFullessage(buffer) {
+	const bb = new flatbuffers.ByteBuffer(buffer);
+	const msg = FullgetRootAsFull(bb);
+
+	return {
+		gameId: msg.gameId(),
+		tick: msg.tick(),
+		isPaused: msg.isPaused(),
+		isGameOver: msg.isGameOver(),
+		balls: Array.from({ length: msg.ballsLength() }, (_, i) => {
+			const b = msg.balls(i);
+			return { id: b.id(), x: b.x(), y: b.y(), vx: b.vx(), vy: b.vy() };
+		}),
+		paddles: Array.from({ length: msg.paddlesLength() }, (_, i) => {
+			const p = msg.paddles(i);
+			return { id: p.id(), offset: p.offset(), isConnected: p.isConnected() };
+		}),
+		scores: Array.from({ length: msg.scoresLength() }, (_, i) => {
+			const s = msg.scores(i);
+			return { playerId: s.playerid(), score: s.score() };
+		})
+	};
 }

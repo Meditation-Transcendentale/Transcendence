@@ -126,7 +126,7 @@ async function start() {
 			const { mapping, pool } = ensureGamePools(gameId);
 			mapping.delete(sessionId);
 			pool.push(paddleId);
-			pool.sort(); 
+			pool.sort();
 
 
 			nc.publish('game.input', jc.encode({

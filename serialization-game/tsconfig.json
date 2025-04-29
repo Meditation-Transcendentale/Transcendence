@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "outDir": "build/js",
+    "declaration": true,
+    "declarationDir": "build/types",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "src/index.ts",
+    "src/generated/**/*.ts"
+  ]
+}
