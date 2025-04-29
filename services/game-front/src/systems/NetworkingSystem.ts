@@ -46,10 +46,8 @@ export class NetworkingSystem extends System {
 				msg = rawMsg;
 			}
 			if (msg.type === "registered") {
-				// Server has told us our paddleId for this game
 				localPaddleId = msg.paddleId;
 				console.log("Local paddleId set to:", localPaddleId);
-				// We can now early return, until binary frames start coming in
 				return;
 			}
 			if (msg.balls && msg.paddles) {
