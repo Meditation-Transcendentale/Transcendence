@@ -81,12 +81,11 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 		}
 	}
 
-	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_IN });
 }));
-
 
 app.post('/auth-google', handleErrors(async (req, res) => {
 	
@@ -106,19 +105,42 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 	const { sub: google_id, email, name: username, picture: avatar_path } = payload;
 
-	let user = natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+	let user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	if (!user) {
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
-		natsRequest(nats, jc, 'user.addGoogleUser', { google_id, username, email, avatar_path });
-		user = natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+		await natsRequest(nats, jc, 'user.addGoogleUser', { google_id, username, email, avatar_path });
+		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
 
-	const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.code(retCode).send({ message: retMessage});
 
 }));
+
+// app.post('/42', handleErrors(async (req, res) => {
+
+// 	if(req.query.state !== req.session.state) {
+// 		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
+// 	}
+
+// 	const response = await axios.post(
+// 		'https://api.intra.42.fr/oauth/token',
+// 		new URLSearchParams({
+// 			grant_type: 'authorization_code',
+// 			client_id: process.env.CLIENT_UID,
+// 			client_secret: process.env.CLIENT_SECRET,
+// 			code: req.query.code,
+// 			redirect_uri: 'https://localhost:3000/auth/42'
+// 		}),
+// 		{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
+// 	);
+
+
+
+
+// }));
 
 app.post('/auth', handleErrorsValid(async (req, res) => {
 

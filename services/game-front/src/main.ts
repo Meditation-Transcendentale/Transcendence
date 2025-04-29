@@ -32,6 +32,8 @@ class Game {
 	private canvas;
 	private paddleId: any;
 	private scoreUI: any;
+	private baseMeshes: any;
+	private instanceManagers: any;
 
 	constructor(canvas: any, gameId: any) {
 		this.canvas = canvas;
@@ -55,8 +57,8 @@ class Game {
 		this.scoreUI = gameScoreInterface(0, 0);
 		this.camera = createCamera(this.scene, this.canvas);
 
-		const baseMeshes = this.createBaseMeshes(config);
-		const instanceManagers = this.createInstanceManagers(baseMeshes);
+		this.baseMeshes = this.createBaseMeshes(config);
+		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
 		const uuid = getOrCreateUUID();
 		// const wsUrl = `ws://10.19.225.59:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
@@ -66,7 +68,7 @@ class Game {
 
 		// localPaddleId = await this.waitForWelcome();
 		localPaddleId = await this.waitForRegistration();
-		this.initECS(config, instanceManagers, uuid);
+		this.initECS(config, this.instanceManagers, uuid);
 
 		this.stateManager = new StateManager(this.ecs);
 		this.stateManager.update();
@@ -175,6 +177,33 @@ class Game {
 			}, { once: true });
 		});
 	}
+
+	dispose() {
+		this.baseMeshes.arena.material.dispose();
+		this.baseMeshes.arena.dispose();
+		this.baseMeshes.ball.material.dispose();
+		this.baseMeshes.ball.dispose();
+		this.baseMeshes.paddle.dispose();
+		this.baseMeshes.wall.material.dispose();
+		this.baseMeshes.wall.dispose();
+		this.camera.dispose();
+		this.engine.clear();
+		this.engine?.stopRenderLoop();
+		if (this.wsManager?.socket) {
+			this.wsManager.socket.removeEventListener('message', this.wsManager.socketListener);
+			this.wsManager.socket.close();
+		}
+		this.scene?.dispose();
+		this.engine?.dispose();
+		if (this.scoreUI?.dispose) {
+			this.scoreUI.dispose();
+		} else if (this.scoreUI?.parentNode) {
+			this.scoreUI.parentNode.removeChild(this.scoreUI);
+		}
+
+		clearTimeout(resizeTimeout);
+		this.engine.dispose();
+	}
 }
 
 let resizeTimeout: number;
@@ -191,10 +220,11 @@ window.addEventListener("DOMContentLoaded", () => {
 	const launchBtn = document.getElementById("launchBtn") as HTMLButtonElement | null;
 	const connectBtn = document.getElementById("connectBtn") as HTMLButtonElement | null;
 	const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement | null;
+	const quitBtn = document.getElementById("quitBtn") as HTMLButtonElement | null;
 	const gameIdInput = document.getElementById("gameIdInput") as HTMLInputElement | null;
 	const statusBadge = document.getElementById("statusBadge") as HTMLElement | null;
 
-	if (!canvas || !createBtn || !launchBtn || !connectBtn || !stopBtn || !gameIdInput || !statusBadge) {
+	if (!canvas || !createBtn || !launchBtn || !connectBtn || !stopBtn || !quitBtn || !gameIdInput || !statusBadge) {
 		throw new Error("One or more required DOM elements not found");
 	}
 
@@ -212,6 +242,8 @@ window.addEventListener("DOMContentLoaded", () => {
 		launchBtn!.disabled = !valid;
 		connectBtn!.disabled = !valid;
 		stopBtn!.disabled = !valid;
+		quitBtn!.disabled = !valid;
+		
 	}
 
 	gameIdInput.addEventListener("input", updateButtons);
@@ -275,6 +307,15 @@ window.addEventListener("DOMContentLoaded", () => {
 		}
 		setStatus("Stopped", "gray");
 	};
+
+	quitBtn.onclick = async () => {
+		const id = gameIdInput.value.trim();
+		if (!id || !gameInstance) return;
+		gameInstance.dispose();
+		gameInstance = null;
+
+		setStatus("Quit", "black");
+	}
 
 	setStatus("Idle", "black");
 	updateButtons();

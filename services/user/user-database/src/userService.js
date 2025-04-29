@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { get } from 'http';
 
 const database = new Database(process.env.DATABASE_URL, {fileMustExist: true });
 database.pragma("journal_mode=WAL");
@@ -7,7 +8,7 @@ database.pragma("journal_mode=WAL");
 const getUserByUsernameStmt = database.prepare("SELECT * FROM users WHERE username = ?");
 const addGoogleUserStmt = database.prepare("INSERT INTO users (google_id, username, email, avatar_path) VALUES (?, ?, ?, ?)");
 const checkUsernameAvailabilityStmt = database.prepare("SELECT * FROM users WHERE username = ?");
-const registerUserStmt = database.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+const registerUserStmt = database.prepare("INSERT INTO users (uuid, username, password) VALUES (?, ?, ?)");
 const getUserByIdStmt = database.prepare("SELECT * FROM users WHERE id = ?");
 const addFriendRequestStmt = database.prepare("INSERT INTO friendslist (user_id_1, user_id_2) VALUES (?, ?)");
 const getFriendshipByIdStmt = database.prepare("SELECT * FROM friendslist WHERE id = ?");
@@ -23,7 +24,8 @@ const updateUsernameStmt = database.prepare("UPDATE users SET username = ? WHERE
 const updateAvatarStmt = database.prepare("UPDATE users SET avatar_path = ? WHERE id = ?");
 const updatePasswordStmt = database.prepare("UPDATE users SET password = ? WHERE id = ?");
 const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_fa_enabled = ? WHERE id = ?");
-const getUserInfoStmt = database.prepare("SELECT username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
+const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
+const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getBlockedUsersStmt = database.prepare(`
 	SELECT bu.id, u1.username AS blocker_username, u2.username AS blocked_username 
 	FROM blocked_users bu
@@ -69,11 +71,18 @@ const userService = {
 			throw { status: statusCode.CONFLICT, message: returnMessages.USERNAME_ALREADY_USED };
 		}
 	},
-	registerUser: (username, hashedPassword) => {
-		registerUserStmt.run(username, hashedPassword);
+	registerUser: (uuid, username, hashedPassword) => {
+		registerUserStmt.run(uuid, username, hashedPassword);
 	},
 	getUserFromId: (id) => {
 		const user = getUserByIdStmt.get(id);
+		if (!user) {
+			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
+		}
+		return user;
+	},
+	getUserFromUUID: (uuid) => {
+		const user = getUserFromUUIDStmt.get(uuid);
 		if (!user) {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
 		}
@@ -85,7 +94,7 @@ const userService = {
 			throw { status : statusCode.BAD_REQUEST, message: returnMessages.UNAUTHORIZED };
 		}
 		const userToken = JSON.parse(userHeader);
-		const user = userService.getUserFromId(userToken.id);
+		const user = userService.getUserFromUUID(userToken.uuid);
 		return user;
 	},
 	addFriendRequest: (userId, friendId) => {

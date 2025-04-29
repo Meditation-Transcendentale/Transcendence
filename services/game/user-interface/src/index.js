@@ -31,6 +31,7 @@ const playerGames = new Map();   // sessionId => { gameId, paddleId }
 
 async function start() {
 	const nc = await connect({ servers: NATS_URL });
+	const jc = JSONCodec();
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
 
 	const wss = new WebSocketServer({ port: PORT });
@@ -127,6 +128,7 @@ async function start() {
 			pool.push(paddleId);
 			pool.sort(); 
 
+
 			nc.publish('game.input', jc.encode({
 				type: 'enableWall',
 				gameId,
@@ -136,8 +138,37 @@ async function start() {
 	});
 
 	const sub = nc.subscribe('game.update');
+	const endSub = nc.subscribe('game.*.end');
+
+	; (async () => {
+		for await (const msg of endSub) {
+			const { gameId, winner } = jc.decode(msg.data);
+			const paddles = gamePlayers.get(gameId) || new Set();
+			for (const pid of paddles) {
+				const ws = [...clients.values()].find(
+					ws =>
+						ws.paddleId === pid &&
+						playerGames.get(ws.sessionId)?.gameId === gameId
+				);
+				if (ws?.readyState === WebSocketServer.OPEN) {
+					ws.send(JSON.stringify({
+						type: 'gameEnd',
+						gameId,
+						winner
+					}));
+				}
+			}
+		}
+	})();
+
 	for await (const msg of sub) {
-		const { gameId } = decodeStateUpdate(msg.data);
+		console.log(
+			`[UI] got msg.subject=${msg.subject} ` +
+			`msg.data.length=${msg.data.length}`
+		);
+		const { gameId, score } = decodeStateUpdate(msg.data);
+		console.log('[UI] decoded scoreCount=', Object.keys(score).length,
+			'entries=', score);
 		const paddles = gamePlayers.get(gameId) || new Set();
 		for (const pid of paddles) {
 			const ws = [...clients.values()]
@@ -151,4 +182,3 @@ async function start() {
 }
 
 start();
-

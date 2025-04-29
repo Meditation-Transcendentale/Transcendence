@@ -1,15 +1,15 @@
-INSERT INTO users (username, password) VALUES
-('Erwan', '$2b$10$Uc69qES.4SxjLZ/n80cuK.mWh07PASEJsg.vaNXTumEmwna4RQDbq'), 
-('testuser', '$2b$10$SBpa5R/AjUxQ59NqBFk63uoacN9sXpLJh1qAx.9iJm77gwN5rNBJK'),
-('testuser2', '$2b$10$dOKf/xT8HIi0/nhvHNBxdOte2NU0eMQ1BevevypGTzv/uKMJFFHNC'),
-('testuser3', '$2b$10$wAwFWDmSpZ5GbIthOs4F4eIiMl6M635dozcYKLTvtFU0a7HuI4Wgm'),
-('testuser4', '$2b$10$636fEfipxB.AgMWPP.BBH.TWr.4NetpVCWBcXp91wm8fKi8E74dem'),
-('testuser5', '$2b$10$4nrR98a7OGBWmXag08FDLOn4qRwI9G6O4btQzAaABXcKuuC2wHlEW'),
-('testuser6', '$2b$10$QSGEE1xhYhuQ4jcADyAOyOQBdNyGhesXv2CYEHl/18QOu/omFb4Wq'),
-('testuser7', '$2b$10$Bll7YJNdaK5BuHfsxlHuJuIPEkKxRyFQWVupJd8KpG3FKwifu97QS'),
-('testuser8', '$2b$10$6P7Rc1XhgOjuk1m3a6Zg8eU/sljCk/oZgsyz9vCXmhOtWIghcVdme'),
-('testuser9', '$2b$10$oFE0z0rq4/NaNfPC1hAoGOniaONJm5WZh4BPYNC1R9xX60.qtAV0y'),
-('testuser10', '$2b$10$gE77Xee6p0.8dSZtLxt4Pup7AfYYJhAOSHC6rkaV.Gu0a8GFGIOV6');
+INSERT INTO users (uuid, username, password) VALUES
+('c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f', 'Erwan', '$2b$10$Uc69qES.4SxjLZ/n80cuK.mWh07PASEJsg.vaNXTumEmwna4RQDbq'), 
+('2f4d6b8c-9e1f-4a2b-8c3d-7e6f5a4b3c2d', 'testuser', '$2b$10$SBpa5R/AjUxQ59NqBFk63uoacN9sXpLJh1qAx.9iJm77gwN5rNBJK'),
+('3e5f7a9b-2c1d-4e6f-8a7b-9c0d1e2f3a4b', 'testuser2', '$2b$10$dOKf/xT8HIi0/nhvHNBxdOte2NU0eMQ1BevevypGTzv/uKMJFFHNC'),
+('4a6c8e0f-1b2d-3c4e-5f6a-7b8c9d0e1f2a', 'testuser3', '$2b$10$wAwFWDmSpZ5GbIthOs4F4eIiMl6M635dozcYKLTvtFU0a7HuI4Wgm'),
+('5b7d9f1a-2c3e-4d5f-6a7b-8c9d0e1f2a3b', 'testuser4', '$2b$10$636fEfipxB.AgMWPP.BBH.TWr.4NetpVCWBcXp91wm8fKi8E74dem'),
+('6c8e0f2b-3d4f-5a6c-7b8d-9e0f1a2b3c4d', 'testuser5', '$2b$10$4nrR98a7OGBWmXag08FDLOn4qRwI9G6O4btQzAaABXcKuuC2wHlEW'),
+('7d9f1a3c-4e5f-6b7d-8c9e-0f1a2b3c4d5e', 'testuser6', '$2b$10$QSGEE1xhYhuQ4jcADyAOyOQBdNyGhesXv2CYEHl/18QOu/omFb4Wq'),
+('8e0f2b4d-5f6a-7c8e-9d0f-1a2b3c4d5e6f', 'testuser7', '$2b$10$Bll7YJNdaK5BuHfsxlHuJuIPEkKxRyFQWVupJd8KpG3FKwifu97QS'),
+('9f1a3c5e-6b7d-8e0f-9a1b-2c3d4e5f6a7b', 'testuser8', '$2b$10$6P7Rc1XhgOjuk1m3a6Zg8eU/sljCk/oZgsyz9vCXmhOtWIghcVdme'),
+('a0b2c4d6-7e8f-9a1b-2c3d-4e5f6a7b8c9d', 'testuser9', '$2b$10$oFE0z0rq4/NaNfPC1hAoGOniaONJm5WZh4BPYNC1R9xX60.qtAV0y'),
+('b1c3d5e7-8f9a-1b2c-3d4e-5f6a7b8c9d0e', 'testuser10', '$2b$10$gE77Xee6p0.8dSZtLxt4Pup7AfYYJhAOSHC6rkaV.Gu0a8GFGIOV6');
 
 
 --  ('Password1', '$2b$10$Uc69qES.4SxjLZ/n80cuK.mWh07PASEJsg.vaNXTumEmwna4RQDbq'),

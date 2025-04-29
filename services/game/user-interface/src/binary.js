@@ -39,7 +39,7 @@ export function decodeStateUpdate(buffer) {
 	const gameId = buffer.readUInt32LE(off); off += 4;
 	const tick = buffer.readUInt32LE(off); off += 4;
 
-	// balls
+	// ── balls ─────────────────────────────────────────────────────────
 	const ballCount = buffer.readUInt16LE(off); off += 2;
 	const balls = [];
 	for (let i = 0; i < ballCount; i++) {
@@ -51,7 +51,7 @@ export function decodeStateUpdate(buffer) {
 		balls.push({ id, x, y, vx, vy });
 	}
 
-	// paddles
+	// ── paddles ───────────────────────────────────────────────────────
 	const paddleCount = buffer.readUInt16LE(off); off += 2;
 	const paddles = [];
 	for (let i = 0; i < paddleCount; i++) {
@@ -62,11 +62,11 @@ export function decodeStateUpdate(buffer) {
 		paddles.push({ id, offset: offsetVal, isConnected });
 	}
 
-	// flags
+	// ── flags ──────────────────────────────────────────────────────────
 	const isPaused = !!buffer.readUInt8(off); off += 1;
 	const isGameOver = !!buffer.readUInt8(off); off += 1;
 
-	// score table
+	// ── score table ──────────────────────────────────────────────────
 	const scoreCount = buffer.readUInt16LE(off); off += 2;
 	const score = {};
 	for (let i = 0; i < scoreCount; i++) {
