@@ -86,7 +86,7 @@ class Stats {
 			ok: response.ok
 		};
 		return final;
-	}
+	}	
 
 	private parseResponse(response: any) {
 		const obj = JSON.parse(response.message.stats);

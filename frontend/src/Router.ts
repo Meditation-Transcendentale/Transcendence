@@ -34,6 +34,10 @@ class Router {
 			"/home/stats": {
 				html: { path: "/stats", data: null },
 				script: { path: "./Stats", data: null }
+			},
+			"/home/friendlist": {
+				html: { path: "/friendlist", data: null },
+				script: { path: "./Friendlist", data: null }
 			}
 		};
 
@@ -85,6 +89,10 @@ class Router {
 				this.loadInHome("/home/stats", history);
 				break
 			}
+			case "/home/friendlist": {
+				this.loadInHome("/home/friendlist", history);
+				break
+			}
 
 
 			default: {
@@ -133,6 +141,7 @@ class Router {
 			document.getElementById("home-container").removeChild(document.getElementById("home-container")?.firstChild);
 		} catch (err) { }
 		document.getElementById("home-container").appendChild(this.routes[route].html.data);
+		console.log(this.routes[route]);
 		this.routes[route].script.data.init();
 		this.routes[route].script.data.reset();
 		if (history) { window.history.pushState({ path: route }, "", route) };
