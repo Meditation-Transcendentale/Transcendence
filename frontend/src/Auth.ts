@@ -1,3 +1,5 @@
+import Router from "./Router";
+
 class Auth {
 	private loaded: boolean;
 	private twofaPopup!: HTMLElement;
@@ -29,7 +31,7 @@ class Auth {
 
 		document.getElementById("register")?.addEventListener("click", (ev) => {
 			ev.preventDefault();
-			document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/register" } }));
+			Router.nav("/register");
 		})
 
 		document.getElementById("login-2fa-submit")?.addEventListener("click", (e) => {
@@ -75,7 +77,8 @@ class Auth {
 
 	private loginResolve(json: JSON) {
 		document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: { ok: true, json: json.message } }));
-		document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home", return: true } }));
+		// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home", return: true } }));
+		Router.nav("", true);
 	}
 
 	private loginReject(response: Response) {

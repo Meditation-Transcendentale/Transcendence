@@ -1,4 +1,5 @@
 import { meReject, meRequest } from "./checkMe";
+import Router from "./Router";
 
 class Home {
 	private loaded: boolean;
@@ -20,16 +21,18 @@ class Home {
 
 		document.getElementById("info-home")?.addEventListener("click", (e) => {
 			e.preventDefault();
-			document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/info" } }));
+			// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/info" } }));
+			Router.nav("/home/info");
 		});
 
 		document.getElementById("stats-home")?.addEventListener("click", (e) => {
 			e.preventDefault();
 			meRequest()
 				.then((json) => {
-					document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/stats/?u=" + json.userInfo.username } }))
+					Router.nav("/home/stats?u=" + json.userInfo.username);
+					// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/stats?u=" + json.userInfo.username } }))
 				})
-				.catch(() => meReject())
+				.catch((error) => { if (error.status == 401) { meReject() } })
 		})
 
 		this.loaded = true;

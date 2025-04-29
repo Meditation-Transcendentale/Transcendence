@@ -1,3 +1,5 @@
+import Router from "./Router";
+
 class Register {
 	private loaded: boolean;
 
@@ -21,7 +23,7 @@ class Register {
 
 		document.getElementById("login")?.addEventListener("click", (ev) => {
 			ev.preventDefault();
-			document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/auth" } }));
+			Router.nav("/auth");
 		})
 
 
@@ -46,7 +48,7 @@ class Register {
 			new CustomEvent("status", { detail: { ok: true, json: json.message } }));
 		document.getElementById("register-username")?.setAttribute("value", "");
 		document.getElementById("register-password")?.setAttribute("value", "");
-		document.getElementById("main-container")?.dispatchEvent(new CustomEvent('nav', { detail: { path: "/home", return: true } }))
+		Router.nav("/home", true);
 	}
 
 	private requestReject(response: Response) {

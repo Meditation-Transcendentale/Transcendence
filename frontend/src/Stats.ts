@@ -12,28 +12,17 @@ class Stats {
 		}
 
 
-		if (!playerName) {
-			meRequest()
-				.then((json) => {
-					playerName = json.userInfo.username;
-				})
-				.catch(() => {
-					meReject();
-					return;
-				})
-		}
-		document.getElementById("stats-username").innerHTML = playerName;
 		document.getElementById("classic-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
 			this.statsRequest(
-				"Erwan",
+				document.getElementById("stats-username")?.innerHTML,
 				"classic")
 				.then((response) => {
 					this.parseResponse(response);
 				})
-				.catch((error) => { console.log(error) });
-			//console.log("Stats Handler");
+				.catch((error) => { if (error.status == 401) { meReject() } });
 		});
+
 		document.getElementById("br-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
 			this.statsRequest(
@@ -42,8 +31,9 @@ class Stats {
 				.then((response) => {
 					this.parseResponse(response);
 				})
-				.catch((error) => { console.log(error) });
+				.catch((error) => { if (error.status == 401) { meReject() } });
 		});
+
 		document.getElementById("io-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
 			this.statsRequest(
@@ -52,7 +42,7 @@ class Stats {
 				.then((response) => {
 					this.parseResponse(response);
 				})
-				.catch((error) => { console.log(error) });
+				.catch((error) => { if (error.status == 401) { meReject() } });
 
 		});
 
@@ -62,12 +52,23 @@ class Stats {
 
 	public async reset(params: URLSearchParams) {
 		document.getElementById("stats-username").innerHTML = params.get("u");
+		document.getElementById("stats-container").innerHTML = "";
 		if (params.get("m")) {
-			document.getElementById(params.get("m") + "-menu")?.dispatchEvent(new Event("click"));
+			this.statsRequest(
+				params.get("u"),
+				params.get("m"),
+				false)
+				.then((response) => {
+					this.parseResponse(response);
+				})
+				.catch((error) => { });
 		}
 	}
 
-	private async statsRequest(username: string, mode: string) {
+	private async statsRequest(username: string, mode: string, history = true) {
+		if (history) {
+			window.history.pushState("", "", "/home/stats?u=" + username + "&m=" + mode)
+		};
 		const response = await fetch("https://localhost:3000/stats/player/" + username + "/" + mode, {
 			method: 'GET',
 			headers: {
@@ -76,19 +77,15 @@ class Stats {
 			},
 			credentials: 'include',
 		});
+		if (!response.ok) {
+			return Promise.reject(response);
+		}
 
-		const data = await response.json();
-
-		const final = {
-			message: data,
-			status: response.status,
-			ok: response.ok
-		};
-		return final;
+		return response.json();
 	}
 
 	private parseResponse(response: any) {
-		const obj = response.message.playerStats;
+		const obj = response.playerStats;
 
 		let text = "<table id='stats-table'>";
 		for (let x in obj.stats) {

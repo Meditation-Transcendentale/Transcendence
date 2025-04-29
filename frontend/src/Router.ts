@@ -1,39 +1,45 @@
-import { meRequest } from "./checkMe";
+import { meReject, meRequest } from "./checkMe";
 
 
 
-class Router {
+class RouterC {
 	private mainContainer: HTMLElement;
 	private routes: {};
-	private initRoute: string;
+	private location: string;
+
+	private oldUrl!: string;
+	private first = true;
 
 	constructor() {
 		this.initRoute = null;
+		this.location = "http://localhost:8080";
+		this.oldUrl = null;
 
 		this.routes = {
-			"/": {
-				html: { path: "/auth", data: null },
-				script: { path: "./auth", data: null }
-			},
 			"/auth": {
 				html: { path: "/auth", data: null },
-				script: { path: "./Auth", data: null }
+				script: { path: "./Auth", data: null },
+				callback: (url: URL) => { this.loadInMain(url) }
 			},
 			"/register": {
 				html: { path: "/register", data: null },
-				script: { path: "./Register", data: null }
+				script: { path: "./Register", data: null },
+				callback: (url: URL) => { this.loadInMain(url) }
 			},
 			"/home": {
 				html: { path: "/home", data: null },
-				script: { path: "./Home", data: null }
+				script: { path: "./Home", data: null },
+				callback: (url: URL) => { this.loadInMain(url) }
 			},
 			"/home/info": {
 				html: { path: "/info", data: null },
-				script: { path: "./Info", data: null }
+				script: { path: "./Info", data: null },
+				callback: (url: URL) => { this.loadInHome(url) }
 			},
 			"/home/stats": {
 				html: { path: "/stats", data: null },
-				script: { path: "./Stats", data: null }
+				script: { path: "./Stats", data: null },
+				callback: (url: URL) => { this.loadInHome(url) }
 			}
 		};
 
@@ -47,105 +53,91 @@ class Router {
 		})
 
 		window.addEventListener("popstate", (ev) => {
-			this.nav(ev.state.path, false);
+			console.log(ev);
+			// this.nav(ev.state.path, false);
+			this.nav(window.location.href.substring(window.location.origin.length), false, false)
 		});
 
 	}
 
-
-	public async nav(path: string, history = true) {
+	public async nav(path: string, restore = false, history = true) {
 		if (this.initRoute == null) { this.initRoute = path }
 
-		console.log("%c Navigating to %s", "color: white; background-color: blue", path);
-		// const params = new URLSearchParams(path);
-		// const url = new URL(path);
-		const url = new URL(window.location.protocol + window.location.host + path);
-		path = url.pathname;
+		const url = new URL(
+			restore ? this.oldUrl : this.location + path);
 
-		console.log(path);
-
-		switch (path) {
-			case "/": {
-				this.loadInMain("/home", history);
-				break;
-			}
-			case "/auth": {
-				this.loadInMain("/auth", history);
-				break;
-			}
-			case "/register": {
-				this.loadInMain("/register", history);
-				break;
-			}
-
-			case "/home": {
-				this.loadInMain("/home", history)
-				break;
-			}
-
-			case "/home/info": {
-				this.loadInHome("/home/info", history);
-				break;
-			}
-			case "/home/stats/": {
-				this.loadInHome("/home/stats", history, url.searchParams);
-				break
-			}
-			default: {
-				alert("404")
-				path = "/home";
-				this.loadInMain("/home", history);
-				break;
-			}
+		if (this.routes[url.pathname] == undefined) {
+			alert("404" + url.pathname);
+			url.pathname = "/home";
+			url.search = "";
 		}
+
+		await meRequest("no-cache")
+			.then(() => {
+				if (url.pathname == "/auth" || url.pathname == "/register") {
+					url.pathname = "/home";
+					url.search = "";
+				}
+				this.oldUrl = url.href;
+			})
+			.catch(() => {
+				this.oldUrl = url.href;
+				if (url.pathname != "/auth" && url.pathname != "/register") {
+					url.pathname = "/auth";
+					url.search = "";
+					if (!this.first) {
+						meReject();
+						throw ("aaa");
+					};
+					console.log("%c Not logged in redirected to /auth", "color: white; background-color: red")
+				}
+			})
+
+
+		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
+
+		this.first = false;
+		this.routes[url.pathname].callback(url);
+		if (history) {
+			console.log("History");
+			window.history.pushState("", "", url.pathname + url.search)
+		}
+		// window.history.pushState(g
+
 	}
 
-	private async loadInMain(route: string, history = true, child = false) {
-		route = await meRequest("no-cache")
-			.then(() => {
-				return (route == "/auth" || route == "/register") ? "/home" : route;
-			})
-			.catch(() => { return (route != '/register') ? "/auth" : route })
-		console.log("%c Loading: %s", "color: white; background-color: green", route)
-		this.routes[route].script.data = await this.getScript(this.routes[route].script);
-		this.routes[route].html.data = await this.getHtml(this.routes[route].html);
+	private async loadInMain(url: URL, history = true, child = false) {
+		console.log("%c Loading: %s", "color: white; background-color: green", url.pathname)
+		this.routes[url.pathname].script.data = await this.getScript(this.routes[url.pathname].script);
+		this.routes[url.pathname].html.data = await this.getHtml(this.routes[url.pathname].html);
 
 		try {
 			document.getElementById("main-container").removeChild(document.getElementById("main-container")?.firstChild);
 		} catch (err) { }
 
-		document.getElementById("main-container").appendChild(this.routes[route].html.data);
-		this.routes[route].script.data.init();
-		this.routes[route].script.data.reset();
-		if (child && route == "/auth") { throw ("aaaaaaaaa") };
-		if (!child && history) { window.history.pushState({ path: route }, "", route) };
+		document.getElementById("main-container").appendChild(this.routes[url.pathname].html.data);
+		this.routes[url.pathname].script.data.init();
+		this.routes[url.pathname].script.data.reset();
 	}
 
-	private async loadInHome(route: string, history = true, params?: URLSearchParams | string) {
+	private async loadInHome(url: URL, history = true) {
 		if (!document.getElementById("home")) {
-			this.loadInMain("/home", false, true)
-				.then(() => { this.loadInHome(route) })
+			this.loadInMain(new URL(this.location + "/home"), false, true)
+				.then(() => { this.loadInHome(url) })
 				.catch(() => console.log("%c Not logged in redirected to /auth", "color: white; background-color: red"));
 			return;
 		}
-		console.log("%c Loading: %s", "color: white; background-color: green", route)
+		console.log("%c Loading: %s", "color: white; background-color: green", url.pathname)
 
-		this.routes[route].script.data = await this.getScript(this.routes[route].script);
-		this.routes[route].html.data = await this.getHtml(this.routes[route].html);
+		this.routes[url.pathname].script.data = await this.getScript(this.routes[url.pathname].script);
+		this.routes[url.pathname].html.data = await this.getHtml(this.routes[url.pathname].html);
 
 		try {
 			document.getElementById("home-container").removeChild(document.getElementById("home-container")?.firstChild);
 		} catch (err) { }
-		document.getElementById("home-container").appendChild(this.routes[route].html.data);
-		this.routes[route].script.data.init();
-		this.routes[route].script.data.reset(params);
-		if (history) {
-			window.history.pushState(
-				{ path: route + (params !== undefined ? "/?" + params.toString() : "") },
-				"",
-				route + (params !== undefined ? "/?" + params.toString() : ""))
-		};
-
+		document.getElementById("home-container").appendChild(this.routes[url.pathname].html.data);
+		this.routes[url.pathname].script.data.init();
+		this.routes[url.pathname].script.data.reset(url.searchParams);
 	}
 
 
@@ -182,6 +174,6 @@ class Router {
 		return obj;
 	}
 }
+const Router = new RouterC();
 
 export default Router;
-
