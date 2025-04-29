@@ -101,6 +101,7 @@ handleErrorsNats(async () => {
 		handleNatsSubscription("user.blockUser", async (msg) => {
 			const { userId, blockedUserId } = jc.decode(msg.data);
 			userService.blockUser(userId, blockedUserId);
+			userService.deleteFriendshipByUserId(userId, blockedUserId, blockedUserId, userId);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("user.isBlocked", async (msg) => {

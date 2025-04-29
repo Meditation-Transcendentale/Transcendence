@@ -76,7 +76,7 @@ export default async function statsRoutes(app) {
 		}
 		const playerStats = result.data;
 
-
+		
 		res.code(statusCode.SUCCESS).send({ playerStats: {
 			[mode]: calculateStats(playerStats, mode),
 			[`${mode}_history`]: playerStats
