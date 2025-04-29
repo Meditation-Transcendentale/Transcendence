@@ -87,13 +87,17 @@ export function encodeFull(
 	const messageType = 1;
 	const ballCount = balls.length;
 	const paddleCount = paddles.length;
-	const scoreEntries = Object.entries(score);
+
+	const scoreEntries = Object.entries(score)
+		.filter(([pid]) => pid !== 'undefined')
+		.map(([pid, sc]) => [Number(pid), sc])
+		.sort((a, b) => a[0] - b[0]);
+
 	const scoreCount = scoreEntries.length;
 
-	// size calculations
 	const headerSize = 1 + 4 + 4;
 	const ballSectionSize = 2 + ballCount * (2 + 2 + 2 + 2 + 2);
-	const paddleSectionSize = 2 + paddleCount * (2 + 2 + 2);
+	const paddleSectionSize = 2 + paddleCount * (2 + 2 + 1 + 1);
 	const flagsSize = 1 + 1;
 	const scoreSectionSize = 2 + scoreCount * (2 + 2);
 	const totalSize = headerSize
@@ -105,12 +109,12 @@ export function encodeFull(
 	const buf = Buffer.alloc(totalSize);
 	let off = 0;
 
-	// header
+	// ─── HEADER ─────────────────────────────────────────────────────
 	buf.writeUInt8(messageType, off); off += 1;
 	buf.writeUInt32LE(gameId, off); off += 4;
 	buf.writeUInt32LE(tick, off); off += 4;
 
-	// balls
+	// ─── BALLS ──────────────────────────────────────────────────────
 	buf.writeUInt16LE(ballCount, off); off += 2;
 	for (const b of balls) {
 		buf.writeUInt16LE(b.id, off); off += 2;
@@ -120,7 +124,7 @@ export function encodeFull(
 		buf.writeInt16LE(floatToFixed(b.vy), off); off += 2;
 	}
 
-	// paddles
+	// ─── PADDLES ────────────────────────────────────────────────────
 	buf.writeUInt16LE(paddleCount, off); off += 2;
 	for (const p of paddles) {
 		buf.writeUInt16LE(p.id, off); off += 2;
@@ -129,17 +133,16 @@ export function encodeFull(
 		buf.writeUInt8(0, off); off += 1; // padding
 	}
 
-	// flags
+	// ─── FLAGS ──────────────────────────────────────────────────────
 	buf.writeUInt8(isPaused ? 1 : 0, off); off += 1;
 	buf.writeUInt8(isGameOver ? 1 : 0, off); off += 1;
 
-	// score table
+	// ─── SCORE TABLE ────────────────────────────────────────────────
 	buf.writeUInt16LE(scoreCount, off); off += 2;
 	for (const [pid, sc] of scoreEntries) {
-		buf.writeUInt16LE(Number(pid), off); off += 2;
+		buf.writeUInt16LE(pid, off); off += 2;
 		buf.writeUInt16LE(sc, off); off += 2;
 	}
 
 	return buf;
 }
-

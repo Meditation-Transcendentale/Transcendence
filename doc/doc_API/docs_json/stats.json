@@ -15,23 +15,33 @@
 			}
 		},
         "schemas": {
-            "PlayerStats": {
+            "PlayerStatsClasssic": {
                 "type": "object",
                 "properties": {
                     "classic": { "$ref": "#/components/schemas/StatsModeClassic" },
-                    "br": { "$ref": "#/components/schemas/StatsModeBRIO" },
-                    "io": { "$ref": "#/components/schemas/StatsModeBRIO" },
                     "classic_history": {
-                    "type": "array",
-                    "items": { "$ref": "#/components/schemas/MatchClassic" }
-                    },
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/MatchClassic" }
+                    }
+                }
+            },
+            "PlayerStatsBR": {
+                "type": "object",
+                "properties": {
+                    "br": { "$ref": "#/components/schemas/StatsModeBRIO" },
                     "br_history": {
-                    "type": "array",
-                    "items": { "$ref": "#/components/schemas/MatchBRIO" }
-                    },
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/MatchBRIO" }
+                    }
+                }
+            },
+            "PlayerStatsIO": {
+                "type": "object",
+                "properties": {
+                    "io": { "$ref": "#/components/schemas/StatsModeBRIO" },
                     "io_history": {
-                    "type": "array",
-                    "items": { "$ref": "#/components/schemas/MatchBRIO" }
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/MatchBRIO" }
                     }
                 }
             },
@@ -89,19 +99,29 @@
 		}
 	],
 	"paths": {
-        "/stats/player/:playerId": {
+        "/stats/player/:username/:mode": {
             "get": {
                 "summary": "Get player stats",
                 "tags": ["Stats"],
                 "description": "Retrieve the stats of a specific player.",
                 "parameters": [
                     {
-                        "name": "playerId",
+                        "name": "username",
                         "in": "path",
                         "required": true,
-                        "description": "The ID of the player whose stats are to be retrieved.",
+                        "description": "The username of the player whose stats are to be retrieved.",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "mode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The game mode for which to retrieve stats (e.g., classic, br, io).",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["classic", "br", "io"]
                         }
                     },
                     {
@@ -126,7 +146,11 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PlayerStats"
+                                    "oneOf": [
+                                        { "$ref": "#/components/schemas/PlayerStatsClasssic" },
+                                        { "$ref": "#/components/schemas/PlayerStatsBR" },
+                                        { "$ref": "#/components/schemas/PlayerStatsIO" }
+                                    ]
                                 }
                             }
                         }

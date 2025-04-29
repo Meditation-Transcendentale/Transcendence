@@ -44,6 +44,7 @@ export class GameManager {
 			balls: phys.balls,
 			paddles: phys.paddles
 		};
+		// console.log(match.score)
 
 		const out = encodeFull(
 			phys.gameId,
@@ -54,9 +55,14 @@ export class GameManager {
 			match.isPaused,
 			match.isGameOver
 		);
-
+		console.log(
+			`[GM] encodeFull → gameId=${phys.gameId} ` +
+			`out.length=${out.length} ` +
+			`match.score=${JSON.stringify(match.score)}`
+		);
 		this.nc.publish(match.options.stateTopic, out);
 	}
+
 	createMatch(options = {}) {
 		const gameInstance = new Game(options);
 		const gameId = gameInstance.getState().gameId;
@@ -101,7 +107,6 @@ export class GameManager {
 		const tickRate = 1000 / (match.options.tickRate || 60);
 
 		const gameLoop = () => {
-			if (match.status !== 'running') return;
 			const startTime = Date.now();
 			match.tick++;
 			const inputs = match.inputs[match.tick] || [];
@@ -112,6 +117,7 @@ export class GameManager {
 				inputs
 			}));
 
+			if (match.status !== 'running') return;
 			const elapsed = Date.now() - startTime;
 			const delay = Math.max(0, tickRate - elapsed);
 			setTimeout(gameLoop, delay);
@@ -131,8 +137,31 @@ export class GameManager {
 		if (!match || match.isPaused || match.isGameOver) return;
 
 		match.score[playerId]++;
+		match.isPaused = true;
+
+		const { tick, balls, paddles } = match.state;
+		const updateBuf = encodeFull(
+			gameId,
+			tick,
+			balls,
+			paddles,
+			match.score,
+			match.isPaused,
+			match.isGameOver
+		);
+		this.nc.publish(match.options.stateTopic, updateBuf);
+
+		// 4) tell physics to reset the ball
+		this.nc.publish(
+			`game.${match.type}.input`,
+			JSON.stringify({
+				gameId,
+				inputs: [{ playerId: null, input: { type: 'resetBall' } }]
+			})
+		);
+
+		// 5) handle win‐condition
 		const winScore = match.options.winScore || 5;
-		console.log(match.score);
 		if (match.score[playerId] >= winScore) {
 			match.isGameOver = true;
 			match.status = 'ended';
@@ -143,16 +172,7 @@ export class GameManager {
 			return;
 		}
 
-		this.nc.publish(
-			`game.${match.type}.input`,
-			JSON.stringify({
-				gameId,
-				inputs: [{ playerId: null, input: { type: 'resetBall' } }]
-			})
-		);
-
-		match.isPaused = true;
-
+		// 6) schedule the serve after your pause
 		setTimeout(() => {
 			match.isPaused = false;
 			this.nc.publish(

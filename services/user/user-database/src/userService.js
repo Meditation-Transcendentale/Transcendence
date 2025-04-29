@@ -1,6 +1,5 @@
 import Database from 'better-sqlite3';
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
-import { get } from 'http';
 
 const database = new Database(process.env.DATABASE_URL, {fileMustExist: true });
 database.pragma("journal_mode=WAL");
@@ -17,6 +16,7 @@ const acceptFriendRequestStmt = database.prepare("UPDATE friendslist SET status 
 const declineFriendRequestStmt = database.prepare("DELETE FROM friendslist WHERE id = ?");
 const isFriendshipExistingStmt = database.prepare("SELECT * FROM friendslist WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)");
 const deleteFriendshipStmt = database.prepare("DELETE FROM friendslist WHERE id = ?");
+const deleteFriendshipByUserIdStmt = database.prepare("DELETE FROM friendslist WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)");
 const blockUserStmt = database.prepare("INSERT INTO blocked_users (blocker_id, blocked_id) VALUES (?, ?)");
 const isBlockedStmt = database.prepare("SELECT * FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?");
 const unblockUserStmt = database.prepare("DELETE FROM blocked_users WHERE blocker_id = ? AND blocked_id = ?");
@@ -133,6 +133,9 @@ const userService = {
 	},
 	deleteFriendship: (friendshipId) => {
 		deleteFriendshipStmt.run(friendshipId);
+	},
+	deleteFriendshipByUserId: (userId1, userId2) => {
+		deleteFriendshipByUserIdStmt.run(userId1, userId2, userId2, userId1);
 	},
 	blockUser: (userId, blockedUserId) => {
 		blockUserStmt.run(userId, blockedUserId);

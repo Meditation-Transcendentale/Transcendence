@@ -9,18 +9,24 @@ import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
 import { decodeStateUpdate } from "../utils/binary.js";
 import { Buffer } from 'buffer';
+import { gameEndUI } from "../utils/displayGameInfo.js";
 export let localPaddleId: number | 0;
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
-	private uiid: string;
+	private uuid: string;
 	private scoreUI: any;
+	private myScore: number;
+	private opponentScore: number;
 
-	constructor(wsManager: WebSocketManager, uiid: string, scoreUI: any) {
+
+	constructor(wsManager: WebSocketManager, uuid: string, scoreUI: any) {
 		super();
 		this.wsManager = wsManager;
-		this.uiid = uiid;
+		this.uuid = uuid;
 		this.scoreUI = scoreUI;
+		this.myScore = 0;
+		this.opponentScore = 0;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -46,10 +52,7 @@ export class NetworkingSystem extends System {
 				msg = rawMsg;
 			}
 			if (msg.type === "registered") {
-				// Server has told us our paddleId for this game
 				localPaddleId = msg.paddleId;
-				console.log("Local paddleId set to:", localPaddleId);
-				// We can now early return, until binary frames start coming in
 				return;
 			}
 			if (msg.balls && msg.paddles) {
@@ -97,7 +100,7 @@ export class NetworkingSystem extends System {
 					.map(id => Number(id))
 					.find(id => id !== localPaddleId)!;
 				const theirScore = msg.score[otherId] || 0;
-				console.log(myScore, theirScore);
+				// console.log(myScore, theirScore);
 				this.scoreUI.update(myScore, theirScore);
 			}
 
@@ -109,12 +112,14 @@ export class NetworkingSystem extends System {
 			}
 
 			if (msg.isGameOver) {
+				console.log("GameOver");
 				// pick winner by highest score
+				gameEndUI(this.myScore < this.opponentScore);
 			}
 
 			if (msg.type === "welcome") {
 				console.log("Received welcome:", msg);
-				if (msg.uiid === this.uiid) {
+				if (msg.uuid === this.uuid) {
 					localPaddleId = msg.paddleId;
 					console.log("Local paddleId set to:", msg.paddleId);
 				}

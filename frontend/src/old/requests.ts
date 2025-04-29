@@ -163,7 +163,7 @@ export async function statsRequest(username: string): Promise<statsResponse> {
 	const data = await response.json();
 
 	const final: statsResponse = {
-		json: data,
+		message: data,
 		status: response.status,
 		ok: response.ok
 	};
