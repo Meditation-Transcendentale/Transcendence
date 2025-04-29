@@ -57,6 +57,12 @@ class Router {
 		if (this.initRoute == null) { this.initRoute = path }
 
 		console.log("%c Navigating to %s", "color: white; background-color: blue", path);
+		// const params = new URLSearchParams(path);
+		// const url = new URL(path);
+		const url = new URL(window.location.protocol + window.location.host + path);
+		path = url.pathname;
+
+		console.log(path);
 
 		switch (path) {
 			case "/": {
@@ -81,12 +87,10 @@ class Router {
 				this.loadInHome("/home/info", history);
 				break;
 			}
-			case "/home/stats": {
-				this.loadInHome("/home/stats", history);
+			case "/home/stats/": {
+				this.loadInHome("/home/stats", history, url.searchParams);
 				break
 			}
-
-
 			default: {
 				alert("404")
 				path = "/home";
@@ -117,7 +121,7 @@ class Router {
 		if (!child && history) { window.history.pushState({ path: route }, "", route) };
 	}
 
-	private async loadInHome(route: string, history = true) {
+	private async loadInHome(route: string, history = true, params?: URLSearchParams | string) {
 		if (!document.getElementById("home")) {
 			this.loadInMain("/home", false, true)
 				.then(() => { this.loadInHome(route) })
@@ -134,8 +138,13 @@ class Router {
 		} catch (err) { }
 		document.getElementById("home-container").appendChild(this.routes[route].html.data);
 		this.routes[route].script.data.init();
-		this.routes[route].script.data.reset();
-		if (history) { window.history.pushState({ path: route }, "", route) };
+		this.routes[route].script.data.reset(params);
+		if (history) {
+			window.history.pushState(
+				{ path: route + (params !== undefined ? "/?" + params.toString() : "") },
+				"",
+				route + (params !== undefined ? "/?" + params.toString() : ""))
+		};
 
 	}
 

@@ -1,3 +1,5 @@
+import { meReject, meRequest } from "./checkMe";
+
 class Home {
 	private loaded: boolean;
 
@@ -16,11 +18,18 @@ class Home {
 				.catch((json) => { this.logoutResponse(json, false) });
 		});
 
-		document.querySelectorAll("a").forEach((link) => {
-			link.addEventListener("click", (e) => {
-				e.preventDefault();
-				document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: link.hash.substring(1) } }));
-			})
+		document.getElementById("info-home")?.addEventListener("click", (e) => {
+			e.preventDefault();
+			document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/info" } }));
+		});
+
+		document.getElementById("stats-home")?.addEventListener("click", (e) => {
+			e.preventDefault();
+			meRequest()
+				.then((json) => {
+					document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/stats/?u=" + json.userInfo.username } }))
+				})
+				.catch(() => meReject())
 		})
 
 		this.loaded = true;

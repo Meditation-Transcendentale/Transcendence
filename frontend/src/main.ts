@@ -35,14 +35,13 @@ async function init() {
 	const router = new Router();
 
 	router.nav(window.location.pathname)
-	// const response = await checkMe();
-	// console.log(response);
+
+	// console.log(document.location.search);
+	// const p = new URLSearchParams(document.location.search);
+	// const u = new URL(document.location);
+	// console.log(u.pathname);
 	//
-	// if (response.ok) {
-	// 	router.nav("/home");
-	// } else {
-	// 	router.nav("/auth");
-	// }
+	// console.log(p.get("u"), p.get("m"))
 }
 
 window.addEventListener("DOMContentLoaded", () => { init() })

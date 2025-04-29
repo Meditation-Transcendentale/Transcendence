@@ -26,7 +26,7 @@ class Stats {
 		document.getElementById("classic-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
 			this.statsRequest(
-				document.getElementById("stats-username")?.innerHTML,
+				"Erwan",
 				"classic")
 				.then((response) => {
 					this.parseResponse(response);
@@ -60,20 +60,10 @@ class Stats {
 		this.loaded = true;
 	}
 
-	public async reset(playerName?: string) {
-		if (playerName == null || playerName == undefined) {
-			meRequest()
-				.then((json) => {
-					console.log("ee");
-					playerName = json.userInfo.username;
-					document.getElementById("stats-username").innerHTML = playerName;
-				})
-				.catch(() => {
-					meReject();
-					return;
-				})
-		} else {
-			document.getElementById("stats-username").innerHTML = playerName;
+	public async reset(params: URLSearchParams) {
+		document.getElementById("stats-username").innerHTML = params.get("u");
+		if (params.get("m")) {
+			document.getElementById(params.get("m") + "-menu")?.dispatchEvent(new Event("click"));
 		}
 	}
 
@@ -107,9 +97,10 @@ class Stats {
 		text += "</table>";
 		text += "<ul id='stats-history'>"
 		for (let x in obj.history) {
-			text += "<li>";
+			text += `<li class="history" is_winner="${obj.history[x].is_winner}">`;
 			for (let y in obj.history[x]) {
-				text += " " + this.cleanString(y) + " " + x[y];
+				if (y == "is_winner") { continue };
+				text += " " + this.cleanString(y) + " " + obj.history[x][y];
 			}
 			text += "</li>";
 
