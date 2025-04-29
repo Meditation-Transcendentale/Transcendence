@@ -1,6 +1,5 @@
 import Database from 'better-sqlite3';
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
-import { get } from 'http';
 
 const database = new Database(process.env.DATABASE_URL, {fileMustExist: true });
 database.pragma("journal_mode=WAL");
