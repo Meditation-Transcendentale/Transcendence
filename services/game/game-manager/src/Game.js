@@ -14,6 +14,7 @@ const config = {
 	ballSpeed: 1,
 	paddleOffsetRatio: 0.9
 };
+
 // services/game/game-manager/src/Game.js
 export class Game {
 	constructor(options = {}) {
@@ -300,9 +301,6 @@ export class Game {
 		this.state = newState;
 	}
 
-	// generateGameId() {
-	// 	return 'game-' + Math.random().toString(36).substr(2, 9);
-	// }
 	createGameId() {
 		return generateGameId();
 	}

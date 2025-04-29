@@ -1,4 +1,16 @@
 mode: pong
+tickRate: 60
+ballCount: 1
+maxPlayers: 2 # maybe need to delete
+physicsTopic: game.pong.tick
+stateTopic: game.update
+inputTopic: game.input
+duration: 300       
+winCondition: lastAlive 
+map: classic
+
+# SCALES
+
 scaleFactor: 1
 ballSize: 0.5
 paddleHeight: 
@@ -22,3 +34,4 @@ paddleOffsetRatio: 0.9
 # rotation_y = i % 2 ? 0 : 90 * Math.PI / 180
 #
 # const wallWidth = i % 2 ? arenaWidth * scaleFactor : arenaHeight * scaleFactor;
+
