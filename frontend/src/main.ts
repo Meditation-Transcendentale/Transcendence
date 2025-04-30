@@ -27,22 +27,27 @@ async function init() {
 	// 	return final;
 	// };
 	//
+	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
+
 	document.getElementById("status")?.addEventListener("status", (e) => {
 		document.getElementById("status").setAttribute("ok", e.detail.ok);
 		document.getElementById('status').innerHTML = e.detail.json;
 	})
 
-	const router = new Router();
 
-	router.nav(window.location.pathname)
-	// const response = await checkMe();
-	// console.log(response);
+	Router.nav(window.location.href.substring(window.location.origin.length))
+
+	// console.log(document.location.search);
+	// const p = new URLSearchParams(document.location.search);
+	// const u = new URL(document.location);
+	// console.log(0, document.location.hostname);
+	// console.log(1, u.pathname);
+	// console.log(2, u);
 	//
-	// if (response.ok) {
-	// 	router.nav("/home");
-	// } else {
-	// 	router.nav("/auth");
-	// }
+	// console.log(3, p.get("u"), p.get("m"))
+	//
+	// const r = { t: 2 };
+
 }
 
 window.addEventListener("DOMContentLoaded", () => { init() })
