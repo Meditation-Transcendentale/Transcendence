@@ -81,20 +81,8 @@ class Stats {
 			return Promise.reject(response);
 		}
 
-<<<<<<< HEAD
-		const data = await response.json();
-
-		const final = {
-			message: data,
-			status: response.status,
-			ok: response.ok
-		};
-		return final;
-	}	
-=======
 		return response.json();
 	}
->>>>>>> main
 
 	private parseResponse(response: any) {
 		const obj = response.playerStats;
