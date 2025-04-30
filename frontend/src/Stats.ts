@@ -12,72 +12,76 @@ class Stats {
 		}
 
 
-		if (!playerName) {
-			meRequest()
-				.then((json) => {
-					playerName = json.userInfo.username;
-				})
-				.catch(() => {
-					meReject();
-					return;
-				})
-		}
-		document.getElementById("stats-username").innerHTML = playerName;
 		document.getElementById("classic-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
-			// this.statsRequest(playerName, "classic")
-			// 	.then((response) => {
-			// 		this.parseResponse(response);
-			// 	})
-			// 	.catch((error) => { console.log(error) });
-			console.log("Stats Handler");
+			this.statsRequest(
+				document.getElementById("stats-username")?.innerHTML,
+				"classic")
+				.then((response) => {
+					this.parseResponse(response);
+				})
+				.catch((error) => { if (error.status == 401) { meReject() } });
 		});
+
 		document.getElementById("br-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
-			// this.statsRequest(playerName, "br")
-			// 	.then((response) => {
-			// 		this.parseResponse(response);
-			// 	})
-			// 	.catch((error) => { console.log(error) });
-			console.log("Stats Handler");
+			this.statsRequest(
+				document.getElementById("stats-username")?.innerHTML,
+				"br")
+				.then((response) => {
+					this.parseResponse(response);
+				})
+				.catch((error) => { if (error.status == 401) { meReject() } });
 		});
+
 		document.getElementById("io-menu")?.addEventListener("click", (e) => {
 			document.getElementById("stats-container").innerHTML = "";
-			// this.statsRequest(playerName, "io")
-			// 	.then((response) => {
-			// 		this.parseResponse(response);
-			// 	})
-			// 	.catch((error) => { console.log(error) });
-			console.log("Stats Handler");
+			this.statsRequest(
+				document.getElementById("stats-username")?.innerHTML,
+				"io")
+				.then((response) => {
+					this.parseResponse(response);
+				})
+				.catch((error) => { if (error.status == 401) { meReject() } });
+
 		});
 
 
 		this.loaded = true;
 	}
 
-	public async reset(playerName?: string) {
-		if (!playerName) {
-			meRequest()
-				.then((json) => {
-					playerName = json.userInfo.username;
+	public async reset(params: URLSearchParams) {
+		document.getElementById("stats-username").innerHTML = params.get("u");
+		document.getElementById("stats-container").innerHTML = "";
+		if (params.get("m")) {
+			this.statsRequest(
+				params.get("u"),
+				params.get("m"),
+				false)
+				.then((response) => {
+					this.parseResponse(response);
 				})
-				.catch(() => {
-					meReject();
-					return;
-				})
+				.catch((error) => { });
 		}
-		document.getElementById("stats-username").innerHTML = playerName;
 	}
 
-	private async statsRequest(username: string, mode: string) {
-		const response = await fetch("https://localhost:3000/stats/player/" + mode + "/:" + username, {
+	private async statsRequest(username: string, mode: string, history = true) {
+		if (history) {
+			window.history.pushState("", "", "/home/stats?u=" + username + "&m=" + mode)
+		};
+		const response = await fetch("https://localhost:3000/stats/player/" + username + "/" + mode, {
 			method: 'GET',
 			headers: {
 				'Accept': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			credentials: 'include',
 		});
+		if (!response.ok) {
+			return Promise.reject(response);
+		}
 
+<<<<<<< HEAD
 		const data = await response.json();
 
 		const final = {
@@ -87,15 +91,34 @@ class Stats {
 		};
 		return final;
 	}	
+=======
+		return response.json();
+	}
+>>>>>>> main
 
 	private parseResponse(response: any) {
-		const obj = JSON.parse(response.message.stats);
+		const obj = response.playerStats;
 
-		let text = "<table id='stats-table'>"
-		for (let x in obj) {
-			text += "<tr><td>" + x.name + "</td><td>" + x.value + "</td></tr>";
+		let text = "<table id='stats-table'>";
+		for (let x in obj.stats) {
+			text += "<tr><td>" + this.cleanString(x) + "</td><td>" + obj.stats[x] + "</td></tr>";
+		}
+		text += "</table>";
+		text += "<ul id='stats-history'>"
+		for (let x in obj.history) {
+			text += `<li class="history" is_winner="${obj.history[x].is_winner}">`;
+			for (let y in obj.history[x]) {
+				if (y == "is_winner") { continue };
+				text += " " + this.cleanString(y) + " " + obj.history[x][y];
+			}
+			text += "</li>";
+
 		}
 		document.getElementById("stats-container").innerHTML = text;
+	}
+
+	private cleanString(str: string) {
+		return str.replace(/_/g, " ");
 	}
 }
 

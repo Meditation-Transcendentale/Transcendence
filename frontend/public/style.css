@@ -21,6 +21,15 @@ body.modal-open .popup {
 }
 
 
+.history[is_winner="0"] {
+	background-color: red;
+	color: white;
+}
+
+.history[is_winner="1"] {
+	background-color: lime;
+}
+
 
 
 #status[ok="false"] {

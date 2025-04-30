@@ -1,4 +1,4 @@
-import { Engine, Scene, Vector3, ArcRotateCamera } from "@babylonjs/core";
+import { Engine, Scene, Color4, ArcRotateCamera } from "@babylonjs/core";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -15,15 +15,19 @@ import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
 
+
 // const API_BASE = "http://10.19.225.59:4000";
 const API_BASE = "http://localhost:4000";
+export const global = {
+	endUI: null as any
+}
 export let localPaddleId: any = null;
 let engine: any;
 class Game {
 	private engine!: Engine;
 	private scene!: Scene;
 	private ecs!: ECSManager;
-	private stateManager!: StateManager;
+	public stateManager!: StateManager;
 	private wsManager!: WebSocketManager;
 	private inputManager!: InputManager;
 	private camera!: ArcRotateCamera;
@@ -114,8 +118,7 @@ class Game {
 	private waitForRegistration(): Promise<number> {
 		return new Promise((resolve, reject) => {
 			const socket = this.wsManager.socket;
-
-			socket.addEventListener("message", (event) => {
+			const listener = (event: MessageEvent) => {
 				let data: any;
 				if (typeof event.data === "string") {
 					try {
@@ -138,11 +141,20 @@ class Game {
 				else if (data.type === "registered") {
 					console.log("Registered into game:", data);
 					this.paddleId = data.paddleId;
+					socket.removeEventListener("message", listener);
+					clearTimeout(timeout);
 					resolve(data.paddleId);
 				}
-			}, { once: false });
+			}
 
-			setTimeout(() => reject(new Error("Timed out waiting for registration")), 5000);
+			socket.addEventListener("message", listener);
+
+			const timeout = setTimeout(() => {
+				this.wsManager.socket.removeEventListener("message", listener);
+				reject(new Error("Timed out waiting for welcome"));
+			}, 5000)
+
+			// setTimeout(() => reject(new Error("Timed out waiting for registration")), 5000);
 		});
 	}
 
@@ -187,20 +199,22 @@ class Game {
 		this.baseMeshes.wall.material.dispose();
 		this.baseMeshes.wall.dispose();
 		this.camera.dispose();
-		this.engine.clear();
-		this.engine?.stopRenderLoop();
+		this.engine.clear(new Color4(1, 1, 1, 1), true, true);
+		this.engine.stopRenderLoop();
 		if (this.wsManager?.socket) {
-			this.wsManager.socket.removeEventListener('message', this.wsManager.socketListener);
+			// this.wsManager.socket.removeEventListener('message', this.wsManager.socketListener);
 			this.wsManager.socket.close();
 		}
+		// this.scene.onBeforeRenderObservable.clear();
+		// this.scene.onBPointerObservable.clear();
 		this.scene?.dispose();
 		this.engine?.dispose();
+		global.endUI?.dispose();
 		if (this.scoreUI?.dispose) {
 			this.scoreUI.dispose();
 		} else if (this.scoreUI?.parentNode) {
 			this.scoreUI.parentNode.removeChild(this.scoreUI);
 		}
-
 		clearTimeout(resizeTimeout);
 		this.engine.dispose();
 	}
@@ -311,9 +325,10 @@ window.addEventListener("DOMContentLoaded", () => {
 	quitBtn.onclick = async () => {
 		const id = gameIdInput.value.trim();
 		if (!id || !gameInstance) return;
+		gameInstance.stateManager.setter(false);
 		gameInstance.dispose();
 		gameInstance = null;
-
+		console.log("QUIT");
 		setStatus("Quit", "black");
 	}
 

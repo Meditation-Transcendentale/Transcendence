@@ -10,6 +10,7 @@ import { WebSocketManager } from "../network/WebSocketManager.js";
 import { decodeStateUpdate } from "../utils/binary.js";
 import { Buffer } from 'buffer';
 import { gameEndUI } from "../utils/displayGameInfo.js";
+import { global } from "../main";
 export let localPaddleId: number | 0;
 
 export class NetworkingSystem extends System {
@@ -18,6 +19,7 @@ export class NetworkingSystem extends System {
 	private scoreUI: any;
 	private myScore: number;
 	private opponentScore: number;
+	// private endUI = globalEndUI;
 
 
 	constructor(wsManager: WebSocketManager, uuid: string, scoreUI: any) {
@@ -114,7 +116,7 @@ export class NetworkingSystem extends System {
 			if (msg.isGameOver) {
 				console.log("GameOver");
 				// pick winner by highest score
-				gameEndUI(this.myScore < this.opponentScore);
+				global.endUI = gameEndUI(this.myScore < this.opponentScore);
 			}
 
 			if (msg.type === "welcome") {
