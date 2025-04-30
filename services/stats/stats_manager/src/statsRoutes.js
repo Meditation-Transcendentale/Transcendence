@@ -76,12 +76,12 @@ export default async function statsRoutes(app) {
 		}
 		const playerStats = result.data;
 
-
 		res.code(statusCode.SUCCESS).send({
 			playerStats: {
 				['stats']: calculateStats(playerStats, mode),
 				[`history`]: playerStats
 			}
 		});
+
 	}));
 }

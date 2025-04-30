@@ -128,6 +128,7 @@ app.get('/get/requests', handleErrors(async (req, res) => {
 
 	const friendsRequests = await natsRequest(nats, jc, 'user.getFriendsRequests', { userId: user.id });
 
+	res.header('Cache-Control', 'no-store');
 	res.code(statusCode.SUCCESS).send({ friendsRequests });
 }));
 
@@ -137,6 +138,7 @@ app.get('/get/friendlist', handleErrors(async (req, res) => {
 
 	const friendlist = await natsRequest(nats, jc, 'user.getFriendlist', { userId: user.id });
 
+	res.header('Cache-Control', 'no-store');
 	res.code(statusCode.SUCCESS).send({ friendlist });
 }));
 
@@ -217,6 +219,7 @@ app.get('/get/blocked', handleErrors(async (req, res) => {
 
 	const blockedUsers = await natsRequest(nats, jc, 'user.getBlockedUsers', { userId: user.id });
 
+	res.header('Cache-Control', 'no-store');
 	res.code(statusCode.SUCCESS).send({ blockedUsers });
 }));
 

@@ -1,4 +1,4 @@
-import { Engine, Scene, Vector3, ArcRotateCamera } from "@babylonjs/core";
+import { Engine, Scene, Color4, ArcRotateCamera } from "@babylonjs/core";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -15,15 +15,19 @@ import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
 
-const API_BASE = "http://10.19.225.59:4000";
-// const API_BASE = "http://localhost:4000";
+
+// const API_BASE = "http://10.19.225.59:4000";
+const API_BASE = "http://localhost:4000";
+export const global = {
+	endUI: null as any
+}
 export let localPaddleId: any = null;
 let engine: any;
 class Game {
 	private engine!: Engine;
 	private scene!: Scene;
 	private ecs!: ECSManager;
-	private stateManager!: StateManager;
+	public stateManager!: StateManager;
 	private wsManager!: WebSocketManager;
 	private inputManager!: InputManager;
 	private camera!: ArcRotateCamera;
@@ -32,6 +36,8 @@ class Game {
 	private canvas;
 	private paddleId: any;
 	private scoreUI: any;
+	private baseMeshes: any;
+	private instanceManagers: any;
 
 	constructor(canvas: any, gameId: any) {
 		this.canvas = canvas;
@@ -55,18 +61,18 @@ class Game {
 		this.scoreUI = gameScoreInterface(0, 0);
 		this.camera = createCamera(this.scene, this.canvas);
 
-		const baseMeshes = this.createBaseMeshes(config);
-		const instanceManagers = this.createInstanceManagers(baseMeshes);
+		this.baseMeshes = this.createBaseMeshes(config);
+		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
 		const uuid = getOrCreateUUID();
-		const wsUrl = `ws://10.19.225.59:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		// const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		// const wsUrl = `ws://10.19.225.59:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
 		// localPaddleId = await this.waitForWelcome();
 		localPaddleId = await this.waitForRegistration();
-		this.initECS(config, instanceManagers, uuid);
+		this.initECS(config, this.instanceManagers, uuid);
 
 		this.stateManager = new StateManager(this.ecs);
 		this.stateManager.update();
@@ -112,8 +118,7 @@ class Game {
 	private waitForRegistration(): Promise<number> {
 		return new Promise((resolve, reject) => {
 			const socket = this.wsManager.socket;
-
-			socket.addEventListener("message", (event) => {
+			const listener = (event: MessageEvent) => {
 				let data: any;
 				if (typeof event.data === "string") {
 					try {
@@ -136,11 +141,20 @@ class Game {
 				else if (data.type === "registered") {
 					console.log("Registered into game:", data);
 					this.paddleId = data.paddleId;
+					socket.removeEventListener("message", listener);
+					clearTimeout(timeout);
 					resolve(data.paddleId);
 				}
-			}, { once: false });
+			}
 
-			setTimeout(() => reject(new Error("Timed out waiting for registration")), 5000);
+			socket.addEventListener("message", listener);
+
+			const timeout = setTimeout(() => {
+				this.wsManager.socket.removeEventListener("message", listener);
+				reject(new Error("Timed out waiting for welcome"));
+			}, 5000)
+
+			// setTimeout(() => reject(new Error("Timed out waiting for registration")), 5000);
 		});
 	}
 
@@ -175,6 +189,35 @@ class Game {
 			}, { once: true });
 		});
 	}
+
+	dispose() {
+		this.baseMeshes.arena.material.dispose();
+		this.baseMeshes.arena.dispose();
+		this.baseMeshes.ball.material.dispose();
+		this.baseMeshes.ball.dispose();
+		this.baseMeshes.paddle.dispose();
+		this.baseMeshes.wall.material.dispose();
+		this.baseMeshes.wall.dispose();
+		this.camera.dispose();
+		this.engine.clear(new Color4(1, 1, 1, 1), true, true);
+		this.engine.stopRenderLoop();
+		if (this.wsManager?.socket) {
+			// this.wsManager.socket.removeEventListener('message', this.wsManager.socketListener);
+			this.wsManager.socket.close();
+		}
+		// this.scene.onBeforeRenderObservable.clear();
+		// this.scene.onBPointerObservable.clear();
+		this.scene?.dispose();
+		this.engine?.dispose();
+		global.endUI?.dispose();
+		if (this.scoreUI?.dispose) {
+			this.scoreUI.dispose();
+		} else if (this.scoreUI?.parentNode) {
+			this.scoreUI.parentNode.removeChild(this.scoreUI);
+		}
+		clearTimeout(resizeTimeout);
+		this.engine.dispose();
+	}
 }
 
 let resizeTimeout: number;
@@ -191,10 +234,11 @@ window.addEventListener("DOMContentLoaded", () => {
 	const launchBtn = document.getElementById("launchBtn") as HTMLButtonElement | null;
 	const connectBtn = document.getElementById("connectBtn") as HTMLButtonElement | null;
 	const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement | null;
+	const quitBtn = document.getElementById("quitBtn") as HTMLButtonElement | null;
 	const gameIdInput = document.getElementById("gameIdInput") as HTMLInputElement | null;
 	const statusBadge = document.getElementById("statusBadge") as HTMLElement | null;
 
-	if (!canvas || !createBtn || !launchBtn || !connectBtn || !stopBtn || !gameIdInput || !statusBadge) {
+	if (!canvas || !createBtn || !launchBtn || !connectBtn || !stopBtn || !quitBtn || !gameIdInput || !statusBadge) {
 		throw new Error("One or more required DOM elements not found");
 	}
 
@@ -212,6 +256,8 @@ window.addEventListener("DOMContentLoaded", () => {
 		launchBtn!.disabled = !valid;
 		connectBtn!.disabled = !valid;
 		stopBtn!.disabled = !valid;
+		quitBtn!.disabled = !valid;
+		
 	}
 
 	gameIdInput.addEventListener("input", updateButtons);
@@ -275,6 +321,16 @@ window.addEventListener("DOMContentLoaded", () => {
 		}
 		setStatus("Stopped", "gray");
 	};
+
+	quitBtn.onclick = async () => {
+		const id = gameIdInput.value.trim();
+		if (!id || !gameInstance) return;
+		gameInstance.stateManager.setter(false);
+		gameInstance.dispose();
+		gameInstance = null;
+		console.log("QUIT");
+		setStatus("Quit", "black");
+	}
 
 	setStatus("Idle", "black");
 	updateButtons();
