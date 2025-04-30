@@ -39,6 +39,12 @@ app.get('/me', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send( {userInfo: userInfo});
 }));
 
+app.get('/:username', handleErrors(async (req, res) => {
+	
+	const user = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: req.params.username } );
+
+	res.code(statusCode.SUCCESS).send({ user });
+}));
 
 const start = async () => {
 	try {

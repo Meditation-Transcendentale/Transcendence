@@ -154,5 +154,10 @@ handleErrorsNats(async () => {
 			const friendlist = userService.getFriendlist(userId);
 			nats.publish(msg.reply, jc.encode({ success: true, data: friendlist }));
 		}),
+		handleNatsSubscription("user.getUserForFriendResearch", async (msg) => {
+			const { username } = jc.decode(msg.data);
+			const user = userService.getUserForFriendResearch(username);
+			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
+		})
 	]);
 })();

@@ -119,28 +119,46 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 }));
 
-// app.post('/42', handleErrors(async (req, res) => {
+let cached42Token = { token: null, expires_at: 0 };
 
-// 	if(req.query.state !== req.session.state) {
-// 		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
-// 	}
+async function get42accessToken() {
 
-// 	const response = await axios.post(
-// 		'https://api.intra.42.fr/oauth/token',
-// 		new URLSearchParams({
-// 			grant_type: 'authorization_code',
-// 			client_id: process.env.CLIENT_UID,
-// 			client_secret: process.env.CLIENT_SECRET,
-// 			code: req.query.code,
-// 			redirect_uri: 'https://localhost:3000/auth/42'
-// 		}),
-// 		{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
-// 	);
+	const now = Date.now();
+	if (cached42Token.token && now < cached42Token.expires_at - 10000) {
+		return cached42Token.token;
+	}
 
+	const response = await axios.post(
+		'https://api.intra.42.fr/oauth/token',
+		new URLSearchParams({
+			grant_type: 'client_credentials',
+			client_id: process.env.CLIENT_UID,
+			client_secret: process.env.CLIENT_SECRET
+		}),
+		{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
+	);
 
+	cached42Token.token = response.data.access_token;
+	cached42Token.expires_at = now + response.data.expires_in * 1000;
+	return cached42Token.token;
 
+}
 
-// }));
+app.post('/42', handleErrors(async (req, res) => {
+
+	if (req.query.state !== req.session.state) {
+		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
+	}
+
+	const token42 = await get42accessToken();
+	const response = await axios.get(`https://api.intra.42.fr/v2/me`, {
+		headers: {
+			Authorization: `Bearer ${token42}`
+		}
+	});
+	
+
+}));
 
 app.post('/auth', handleErrorsValid(async (req, res) => {
 

@@ -91,6 +91,69 @@
                     }
                 }
             }
-        }
+        },
+		"/info/:username": {
+			"get": {
+				"summary": "Retrieve User Information by Username",
+				"tags": ["Get Info"],
+				"description": "Retrieve User Information by Username",
+				"parameters": [
+					{
+						"name": "username",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"example": "User1234"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved user information",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"user": {
+											"type": "object",
+											"properties": {
+												"username": { "type": "string", "example": "User1234"}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+				}
+			}
+		}
 	}
 }
