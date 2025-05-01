@@ -1,0 +1,63 @@
+// Core shared definitions
+include "core.fbs";        // your enums/unions for Mode, Option, PlayerInput, etc.
+// Domain + state
+include "common.fbs";
+include "state.fbs";
+
+namespace PongMessaging;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Request/Response and Pub/Sub message bodies
+// ─────────────────────────────────────────────────────────────────────────────
+
+table MatchCreateRequest {
+  mode:    Mode;
+  options: [Option];
+}
+
+table MatchCreateResponse {
+  gameid: string;
+}
+
+table PhysicsRequest {
+  gameid:    string;
+  laststate: Game.FullState;
+  inputs:    [PlayerInput];
+}
+
+table StateUpdate {
+  gameid:   string;
+  newstate: Game.FullState;
+}
+
+table MatchInput {
+  gameid: string;
+  inputs: [PlayerInput];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Union of all message body types
+// ─────────────────────────────────────────────────────────────────────────────
+
+union Body {
+  MatchCreateRequest,
+  MatchCreateResponse,
+  PhysicsRequest,
+  StateUpdate,
+  MatchInput
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Envelope for every NATS message
+// ─────────────────────────────────────────────────────────────────────────────
+
+table MessageEnvelope {
+  version:       string;    // e.g. "1.0.0"
+  timestamp:     ulong;     // UNIX epoch millis
+  correlationid: string;    // UUID
+  bodytype:     Body;
+  body:          Body;
+}
+
+root_type MessageEnvelope;
+

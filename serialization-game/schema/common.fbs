@@ -1,6 +1,6 @@
-namespace Game; 
-// A single ball’s state
+namespace Game;
 
+// A single ball’s state
 table Ball {
   id:         ushort;  // 16-bit unsigned
   x:          short;   // 16-bit signed (fixed-point)
@@ -21,3 +21,4 @@ table ScoreEntry {
   playerid:   ushort;  // 16-bit unsigned
   score:      ushort;  // 16-bit unsigned
 }
+

@@ -1,7 +1,7 @@
 include "common.fbs";
 namespace Game;
 
-// The full game-state message
+// The full game‐state message
 table FullState {
   gameid:     uint;             // 32-bit unsigned
   tick:       uint;             // 32-bit unsigned
@@ -12,4 +12,5 @@ table FullState {
   scores:     [ScoreEntry];     // vector of ScoreEntry
 }
 
-root_type FullState;
+// We don’t emit FullState directly on NATS; it’s wrapped by MessageEnvelope.
+

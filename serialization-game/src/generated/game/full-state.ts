@@ -150,14 +150,6 @@ static endFullState(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 }
 
-static finishFullStateBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
-  builder.finish(offset);
-}
-
-static finishSizePrefixedFullStateBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
-  builder.finish(offset, undefined, true);
-}
-
 static createFullState(builder:flatbuffers.Builder, gameid:number, tick:number, ballsOffset:flatbuffers.Offset, paddlesOffset:flatbuffers.Offset, ispaused:boolean, isgameover:boolean, scoresOffset:flatbuffers.Offset):flatbuffers.Offset {
   FullState.startFullState(builder);
   FullState.addGameid(builder, gameid);

@@ -55,11 +55,6 @@ export class GameManager {
 			match.isPaused,
 			match.isGameOver
 		);
-		console.log(
-			`[GM] encodeFull → gameId=${phys.gameId} ` +
-			`out.length=${out.length} ` +
-			`match.score=${JSON.stringify(match.score)}`
-		);
 		this.nc.publish(match.options.stateTopic, out);
 	}
 
