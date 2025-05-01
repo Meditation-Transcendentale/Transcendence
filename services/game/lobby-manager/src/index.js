@@ -3,7 +3,7 @@
 import { buildApp } from './app.js'
 import { WebSocketServer } from 'ws'
 import config from './config.js'
-import wsServer from './ws/wsServer.js'
+import * as wsServer from './ws/wsServer.js'
 import natsClient from './natsClient.js'
 
 async function start() {

@@ -2,6 +2,7 @@
 import lobbyStore from '../store/lobbyStore.js';
 import natsClient from '../natsClient.js';
 import config from '../config.js';
+import { requestNewMatch } from './natsRequests.js';
 
 export function createLobby({ mode, map, submode }) {
 	const caps = config.MAX_PLAYERS[mode] || {};
@@ -32,7 +33,7 @@ export async function ready(lobbyId, userId) {
 			lobby.setGameId(gameId);
 			state.gameId = gameId;
 		} catch (err) {
-			throw new Error(`Failed to create game: ${err.message}`);
+			console.error(`Failed to create game: ${err.message}`);
 		}
 	}
 	return state;

@@ -10,7 +10,7 @@ import lobbyStore from './store/lobbyStore.js'
 import * as lobbyService from './services/lobbyService.js'
 
 export async function buildApp() {
-	const app = Fastify({ logger: false })
+	const app = Fastify({ logger: true })
 
 	app.decorate('lobbyStore', lobbyStore)
 	app.decorate('lobbyService', lobbyService)
