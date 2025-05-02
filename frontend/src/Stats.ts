@@ -1,4 +1,5 @@
 import { meReject, meRequest } from "./checkMe";
+import { Utils } from "./Utils";
 
 class Stats {
 	private loaded: boolean;
@@ -53,6 +54,7 @@ class Stats {
 	public async reset(params: URLSearchParams) {
 		document.getElementById("stats-username").innerHTML = params.get("u");
 		document.getElementById("stats-container").innerHTML = "";
+		document.getElementById("stats-history").innerHTML = "";
 		if (params.get("m")) {
 			this.statsRequest(
 				params.get("u"),
@@ -86,15 +88,22 @@ class Stats {
 
 	private parseResponse(response: any) {
 		const obj = response.playerStats;
+		const stats = document.getElementById("stats-container");
+		const history = document.getElementById("stats-history");
+		stats!.remove();
+		history!.remove();
 
-		let text = "<table id='stats-table'>";
+		let text = `<table id='stats-table' delay="">`;
 		for (let x in obj.stats) {
-			text += "<tr><td>" + this.cleanString(x) + "</td><td>" + obj.stats[x] + "</td></tr>";
+			text += `<tr><td delay="" style="--delay: ${Utils.getRandom()}s;">` + this.cleanString(x);
+			text += `</td><td delay="" style="---delay: ${Utils.getRandom()}s;">` + obj.stats[x] + "</td></tr>";
 		}
 		text += "</table>";
-		text += "<ul id='stats-history'>"
+		stats!.innerHTML = text;
+		text = `<ul id='stats-history-list' delay="">`
 		for (let x in obj.history) {
-			text += `<li class="history" is_winner="${obj.history[x].is_winner}">`;
+			text += `<li class="history" is_winner="${obj.history[x].is_winner}"`;
+			text += ` delay="" style="--delay: ${Utils.getRandom()}s;">`;
 			for (let y in obj.history[x]) {
 				if (y == "is_winner") { continue };
 				text += " " + this.cleanString(y) + " " + obj.history[x][y];
@@ -102,7 +111,9 @@ class Stats {
 			text += "</li>";
 
 		}
-		document.getElementById("stats-container").innerHTML = text;
+		history!.innerHTML = text;
+		document.getElementById("stats")?.appendChild(stats as HTMLElement);
+		document.getElementById("stats")?.appendChild(history as HTMLElement);
 	}
 
 	private cleanString(str: string) {

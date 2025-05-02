@@ -14,6 +14,7 @@ class Home {
 		}
 
 		document.getElementById("quit")?.addEventListener("click", (e) => {
+			e.preventDefault();
 			this.logoutRequest()
 				.then((json) => { this.logoutResponse(json, true) })
 				.catch((json) => { this.logoutResponse(json, false) });

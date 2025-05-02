@@ -1,4 +1,5 @@
 import { meReject, meRequest } from "./checkMe";
+import { Utils } from "./Utils";
 
 
 
@@ -53,7 +54,7 @@ class RouterC {
 		})
 
 		window.addEventListener("popstate", (ev) => {
-			console.log(ev);
+			//console.log(ev);
 			// this.nav(ev.state.path, false);
 			this.nav(window.location.href.substring(window.location.origin.length), false, false)
 		});
@@ -99,7 +100,6 @@ class RouterC {
 		this.first = false;
 		this.routes[url.pathname].callback(url);
 		if (history) {
-			console.log("History");
 			window.history.pushState("", "", url.pathname + url.search)
 		}
 		// window.history.pushState(g
@@ -141,10 +141,11 @@ class RouterC {
 	}
 
 
-	private async getHtml(html: { path: string, data: string }) {
+	private async getHtml(html: { path: string, data: HTMLElement }) {
 		return new Promise((resolve, reject) => {
 			if (html.data != null) {
 				console.log("%c %s already fetched", "color: black; background-color: pink", html.path);
+				this.addDelay(html.data);
 				return resolve(html.data);
 			}
 
@@ -158,6 +159,7 @@ class RouterC {
 				.then((text) => {
 					const div = document.createElement("div");
 					div.innerHTML = text;
+					this.addDelay(div);
 					return resolve(div);
 				})
 		})
@@ -172,6 +174,16 @@ class RouterC {
 		const im = await import(/* @vite-ignore */ script.path);
 		const obj = new im.default();
 		return obj;
+	}
+
+	private addDelay(e: HTMLElement) {
+		e.childNodes.forEach((c) => {
+			if (c instanceof HTMLElement) {
+				this.addDelay(c);
+				c.style.setProperty("--delay", Utils.getRandom() + "s");
+				c.setAttribute("delay", "")
+			}
+		})
 	}
 }
 const Router = new RouterC();
