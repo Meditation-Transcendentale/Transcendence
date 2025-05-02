@@ -14,7 +14,6 @@ class Stats {
 
 
 		document.getElementById("classic-menu")?.addEventListener("click", (e) => {
-			document.getElementById("stats-container").innerHTML = "";
 			this.statsRequest(
 				document.getElementById("stats-username")?.innerHTML,
 				"classic")
@@ -25,7 +24,6 @@ class Stats {
 		});
 
 		document.getElementById("br-menu")?.addEventListener("click", (e) => {
-			document.getElementById("stats-container").innerHTML = "";
 			this.statsRequest(
 				document.getElementById("stats-username")?.innerHTML,
 				"br")
@@ -36,7 +34,7 @@ class Stats {
 		});
 
 		document.getElementById("io-menu")?.addEventListener("click", (e) => {
-			document.getElementById("stats-container").innerHTML = "";
+
 			this.statsRequest(
 				document.getElementById("stats-username")?.innerHTML,
 				"io")
@@ -53,18 +51,17 @@ class Stats {
 
 	public async reset(params: URLSearchParams) {
 		document.getElementById("stats-username").innerHTML = params.get("u");
-		document.getElementById("stats-container").innerHTML = "";
+		document.getElementById("stats-table").innerHTML = "";
 		document.getElementById("stats-history").innerHTML = "";
-		if (params.get("m")) {
-			this.statsRequest(
-				params.get("u"),
-				params.get("m"),
-				false)
-				.then((response) => {
-					this.parseResponse(response);
-				})
-				.catch((error) => { });
-		}
+		if (!params.get("m")) { params.set("m", "classic") }
+		this.statsRequest(
+			params.get("u"),
+			params.get("m"),
+			false)
+			.then((response) => {
+				this.parseResponse(response);
+			})
+			.catch((error) => { });
 	}
 
 	private async statsRequest(username: string, mode: string, history = true) {
@@ -88,12 +85,12 @@ class Stats {
 
 	private parseResponse(response: any) {
 		const obj = response.playerStats;
-		const stats = document.getElementById("stats-container");
+		const stats = document.getElementById("stats-table");
 		const history = document.getElementById("stats-history");
 		stats!.remove();
 		history!.remove();
 
-		let text = `<table id='stats-table' delay="">`;
+		let text = `<table>`;
 		for (let x in obj.stats) {
 			text += `<tr><td delay="" style="--delay: ${Utils.getRandom()}s;">` + this.cleanString(x);
 			text += `</td><td delay="" style="---delay: ${Utils.getRandom()}s;">` + obj.stats[x] + "</td></tr>";
@@ -112,8 +109,8 @@ class Stats {
 
 		}
 		history!.innerHTML = text;
-		document.getElementById("stats")?.appendChild(stats as HTMLElement);
-		document.getElementById("stats")?.appendChild(history as HTMLElement);
+		document.getElementById("stats-container")!.appendChild(stats as HTMLElement);
+		document.getElementById("stats-container")!.appendChild(history as HTMLElement);
 	}
 
 	private cleanString(str: string) {
