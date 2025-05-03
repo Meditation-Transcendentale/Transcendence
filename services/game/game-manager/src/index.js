@@ -2,13 +2,13 @@ import natsClient from './natsClient.js';
 import { connect, JSONCodec } from 'nats';
 import { loadTemplates, getTemplate } from './templateService.js';
 import { GameManager } from './GameManager.js';
+import { startGameManager } from './services/gameManagerNats.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'game-manager';
 // const PORT = process.env.PORT || 4000;
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
-const jc = JSONCodec();
 
 
 // fastify.post('/match', async (request, reply) => {
@@ -52,17 +52,18 @@ const jc = JSONCodec();
 // });
 
 async function start() {
-	let nc = await natsClient.connect(NATS_URL)
-	console.log(`[${SERVICE_NAME}] connected to NATS`);
+	startGameManager('nats://nats:4222')
+		.catch(err => {
+			console.error('Failed to start Game Manager:', err);
+			process.exit(1);
+		});
 
-	const gameManager = new GameManager(nc);
 	loadTemplates();
 	gameManager.start();
 
 	const sub = nc.subscribe('game.state');
 	(async () => {
 		for await (const msg of sub) {
-			// const data = jc.decode(msg.data);
 			gameManager.handlePhysicsResult(msg.data);
 		}
 	})();
