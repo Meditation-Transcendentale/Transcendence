@@ -67,6 +67,8 @@ message PhysicsRequest {
 message PhysicsResponse {
   FullState newState = 1;
   string    error    = 2;                  // optional error
+  bool      goalScored = 3;    // true if a goal happened this tick
+  string    scorerId   = 4;    // which player scored
 }
 
 // ─── State Broadcast (game-manager → ui-service) ─────────────────────────────

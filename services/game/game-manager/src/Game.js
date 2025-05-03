@@ -38,18 +38,6 @@ export class Game {
 		this.existingGameIds = new Set();
 	}
 
-	// Paddle for i = 0 && i = 1
-	// paddleX = (arenaWidth / 2  * paddleOffsetRatio * ((i == 1) * -1 + (i == 0) * 1)) * scaleFactor
-	// rotation_y = i % 2 ? -90 * Math.PI / 180 : 90 * Math.PI / 180
-	//
-	// Wall for i = 0 && i = 1
-	//
-	// x = i % 2 ? (config.arenaWidth / 2) * scaleFactor: 0
-	// y = i % 2 ? 0 : ( config.arenaHeight/ 2 + config.wallWidth / 2 ) * scaleFactor
-	// rotation_y = i % 2 ? 0 : 90 * Math.PI / 180
-	//
-	// const wallWidth = i % 2 ? arenaWidth * scaleFactor : arenaHeight * scaleFactor;
-
 	initializeStatePong() {
 		const state = {
 			gameId: this.createGameId(),
