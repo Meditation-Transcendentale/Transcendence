@@ -76,6 +76,13 @@ message StateUpdate {
   FullState state = 1;
 }
 
+// ─── State Broadcast (game-manager → ui-service) ─────────────────────────────
+message MatchSetup {
+  string mode                   = 1;            // "pong", "pongio", or "pongbr"
+  string gameId                 = 2;            // "pong", "pongio", or "pongbr"
+  repeated string players       = 3;            // user IDs
+  map<string,string> options    = 4;           // any key/value overrides
+}
 // ─── Player Inputs (ui-service → game-manager) ───────────────────────────────
 message MatchInput {
   string               gameId = 1;
