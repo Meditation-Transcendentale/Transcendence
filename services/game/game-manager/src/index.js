@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { loadTemplates } from './templateService.js';
-import { GameManager } from './services/game/game-manager/src/GameManager.js';
+import { GameManager } from './GameManager.js';
 
 loadTemplates();
 
