@@ -3,7 +3,10 @@ import { connect, JSONCodec } from 'nats';
 import dotenv from 'dotenv';
 dotenv.config();
 import { Physics } from './Physics.js';
-import { decodeStateUpdate, encodeStateUpdate } from './binary.js';
+import {
+	decodePhysicsRequest,
+	encodePhysicsResponse,
+} from './message.js';
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'pong-physics';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
@@ -59,48 +62,51 @@ async function start() {
 			}
 		}
 	})();
-	// const inputSub = nc.subscribe('game.pong.input');
-	// (async () => {
-	// 	for await (const msg of inputSub) {
-	// 		console.log(`[${SERVICE_NAME}] Received input message`);
-	// 		const { gameId, inputs } = jc.decode(msg.data);
-	// 		if (endedGames.has(gameId)) continue;
-	//
-	// 		for (const { playerId, type } of inputs) {
-	// 			Physics.handleImmediateInput({
-	// 				gameId,
-	// 				inputs: [
-	// 					{ playerId, input: { type } }
-	// 				]
-	// 			});
-	// 		}
-	// 	}
-	// })();
 
 	/**
 	   * Process each tick: run physics and publish new state
 	   * @param {import('nats').Msg} msg
 	   */
 
-	const sub = nc.subscribe('game.pong.tick');
+	// message FullState {
+	//   uint32            gameId     = 1;
+	//   uint32            tick       = 2;
+	//   repeated Ball     balls      = 3;
+	//   repeated Paddle   paddles    = 4;
+	//   bool              isPaused   = 5;
+	//   bool              isGameOver = 6;
+	//   repeated ScoreEntry scores   = 7;
+	// }
+	// message PhysicsResponse {
+	//   FullState newState = 1;
+	//   string    error    = 2;                  // optional error
+	//   bool      goalScored = 3;    // true if a goal happened this tick
+	//   string    scorerId   = 4;    // which player scored
+	// }
+	// 							events.push({ type: 'goal', gameId, playerId: scorer });
+
+	const sub = nc.subscribe('games.*.*.physics.request');
 	for await (const msg of sub) {
-		const data = jc.decode(msg.data);
+		const data = decodePhysicsRequest(msg.data);
 
 		if (endedGames.has(data.gameId)) {
 			console.log(`[${SERVICE_NAME}] Ignoring tick ${data.tick} for ended game ${data.gameId}`);
 			continue;
 		}
 
-		// const result = Physics.processTick(data);
 		const { gameId, tick, balls, paddles, events } = Physics.processTick(data);
-		const buffer = encodeStateUpdate(gameId, tick, balls, paddles);
-		// const buffer = encodeStateUpdate(result.gameId, result.tick, result.balls, result.paddles);
-		nc.publish('game.state', buffer);
+		let scorerId = null;
+		let goalScored = false;
 		if (events && events.length) {
 			for (const ev of events) {
-				nc.publish('game.pong.events', jc.encode(ev));
+				if (ev.type === 'goal') {
+					goalScored = true;
+					scorerId = ev.playerId;
+				}
 			}
 		}
+		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, isPaused: data.isPaused, isGameOver: data.isGameOver, scores: data.scores }, "", goalScored, scorerId);
+		msg.respond(buffer);
 	}
 }
 

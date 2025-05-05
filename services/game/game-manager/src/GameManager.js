@@ -69,9 +69,10 @@ export class GameManager {
 
 		try {
 			const req = decodeMatchCreateRequest(msg.data);
+			const players = req.players;
 			gameId = this.createMatch({
 				mode,
-				players: req.players,
+				players: players,
 				options: req.options
 			});
 		} catch (err) {
@@ -80,11 +81,11 @@ export class GameManager {
 
 		const respBuf = encodeMatchCreateResponse({ gameId, error });
 		msg.respond(respBuf);
+		this.nc.publish(`games.${mode}.match.setup`, JSON.stringify({ gameId, players }));
 	}
 
 	// match.start (pub/sub)
 	async _onMatchStart(msg) {
-		// messages here are just JSON: { gameId }
 		const { gameId } = jc.decode(msg.data);
 
 		if (!this.launchMatch(gameId)) {
