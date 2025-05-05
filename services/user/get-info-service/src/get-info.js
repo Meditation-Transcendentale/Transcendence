@@ -46,6 +46,16 @@ app.get('/:username', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ user });
 }));
 
+app.get('/status', handleErrors(async (req, res) => {
+
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
+
+	const status = await natsRequest(nats, jc, 'user.getUserStatus', { userId: user.id } );
+
+	res.code(statusCode.SUCCESS).send({ status: status.status });
+
+}));
+
 const start = async () => {
 	try {
 		await app.listen({ port: 4005, host: '0.0.0.0' });

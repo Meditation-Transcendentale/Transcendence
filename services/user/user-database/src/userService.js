@@ -27,6 +27,7 @@ const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_
 const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
 const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getUserForFriendResearchStmt = database.prepare("SELECT username FROM users WHERE username = ?");
+const getUserStatusStmt = database.prepare("SELECT status FROM active_user WHERE user_id = ?");
 const getBlockedUsersStmt = database.prepare(`
 	SELECT bu.id, u1.username AS blocker_username, u2.username AS blocked_username 
 	FROM blocked_users bu
@@ -190,6 +191,13 @@ const userService = {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
 		}
 		return user;
+	},
+	getUserStatus: (userId) => {
+		const status = getUserStatusStmt.get(userId);
+		if (!status) {
+			throw { status: statusCode.NOT_FOUND, message: returnMessages.PLAYER_INACTIVE };
+		}
+		return status;
 	}
 };
 

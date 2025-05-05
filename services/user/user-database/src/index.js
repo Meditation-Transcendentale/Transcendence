@@ -158,6 +158,11 @@ handleErrorsNats(async () => {
 			const { username } = jc.decode(msg.data);
 			const user = userService.getUserForFriendResearch(username);
 			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
+		}),
+		handleNatsSubscription("user.getUserStatus", async (msg) => {
+			const { userId } = jc.decode(msg.data);
+			const status = userService.getUserStatus(userId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: status }));
 		})
 	]);
 })();

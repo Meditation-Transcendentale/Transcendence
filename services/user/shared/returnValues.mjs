@@ -59,6 +59,8 @@ const returnMessages = {
 	PASSWORD_INVALID: 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number',
 	USER_CREATED: 'User registered successfully',
 	FRIENDLIST_NOT_FOUND: 'Friendlist is empty',
+	INTRA42_LOGGED_IN: 'Logged in with Intra42 successfully',
+	PLAYER_INACTIVE: 'Player not in a lobby or a game',
 
 }
 

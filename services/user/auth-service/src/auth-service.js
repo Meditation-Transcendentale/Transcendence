@@ -121,42 +121,64 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 let cached42Token = { token: null, expires_at: 0 };
 
-async function get42accessToken() {
+async function get42accessToken(code) {
 
+
+	console.log('code:', code);
+	console.log('CLIENT_UID:', process.env.FT_API_UID);
+	console.log('CLIENT_SECRET:', process.env.FT_API_SECRET);
 	const now = Date.now();
 	if (cached42Token.token && now < cached42Token.expires_at - 10000) {
 		return cached42Token.token;
 	}
 
-	const response = await axios.post(
-		'https://api.intra.42.fr/oauth/token',
-		new URLSearchParams({
-			grant_type: 'client_credentials',
-			client_id: process.env.CLIENT_UID,
-			client_secret: process.env.CLIENT_SECRET
-		}),
-		{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
-	);
+	try {
+		const response = await axios.post(
+			'https://api.intra.42.fr/oauth/token',
+			new URLSearchParams({
+				grant_type: 'client_credentials',
+				client_id: process.env.FT_API_UID,
+				client_secret: process.env.FT_API_SECRET,
+				code: code
+			}),
+			{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
+		);
+		console.log('response:', response.data);
+		cached42Token.token = response.data.access_token;
+		cached42Token.expires_at = now + response.data.expires_in * 1000;
+		return cached42Token.token;
+	} catch (error) {
+		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
+	}
 
-	cached42Token.token = response.data.access_token;
-	cached42Token.expires_at = now + response.data.expires_in * 1000;
-	return cached42Token.token;
 
 }
 
 app.post('/42', handleErrors(async (req, res) => {
 
-	if (req.query.state !== req.session.state) {
-		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
+	// if (req.query.state !== req.session.state) {
+	// 	throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
+	// }
+
+	const { token42 } = await get42accessToken(req.body.code);
+	console.log('token42:', token42);
+	try {
+		const response = await axios.get(`https://api.intra.42.fr/v2/me`, {
+			headers: {
+				Authorization: `Bearer ${token42}`
+			}
+		});
+		console.log(response);
+	} catch (error) {
+		if (error.response) {
+			throw { status: error.response.status, message: error.response};
+		} else {
+			throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
+		}
 	}
 
-	const token42 = await get42accessToken();
-	const response = await axios.get(`https://api.intra.42.fr/v2/me`, {
-		headers: {
-			Authorization: `Bearer ${token42}`
-		}
-	});
 	
+	res.code(statusCode.SUCCESS).send({ message: returnMessages.INTRA42_LOGGED_IN});
 
 }));
 

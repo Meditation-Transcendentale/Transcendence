@@ -37,6 +37,8 @@ services:
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - FT_API_UID=${FT_API_UID}
+      - FT_API_SECRET=${FT_API_SECRET}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
     networks:
