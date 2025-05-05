@@ -40,7 +40,7 @@ class RouterC {
 				html: { path: "/stats", data: null },
 				script: { path: "./Stats", data: null },
 				callback: (url: URL) => { this.loadInHome(url) }
-			}
+			},
 			"/home/friendlist": {
 				html: { path: "/friendlist", data: null },
 				script: { path: "./Friendlist", data: null },

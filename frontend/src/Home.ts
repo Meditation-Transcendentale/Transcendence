@@ -33,7 +33,13 @@ class Home {
 					// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/stats?u=" + json.userInfo.username } }))
 				})
 				.catch((error) => { if (error.status == 401) { meReject() } })
-		})
+		});
+
+		document.getElementById("friendlist-home")?.addEventListener("click", (e) => {
+			e.preventDefault();
+			// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/info" } }));
+			Router.nav("/home/friendlist");
+		});
 
 		this.loaded = true;
 	}
