@@ -68,14 +68,14 @@ export class ClassicStats extends ABlock {
 	}
 
 	public populate(stats: JSON) {
-		document.getElementById("classic-game-played").innerHTML = stats.game_played;
-		document.getElementById("classic-wins").innerHTML = stats.wins;
-		document.getElementById("classic-losses").innerHTML = stats.losses;
-		document.getElementById("classic-win-rate").innerHTML = stats.win_rate;
-		document.getElementById("classic-best-win-streak").innerHTML = stats.best_win_streak;
-		document.getElementById("classic-goals_scored").innerHTML = stats.goals_scored;
-		document.getElementById("classic-goals-conceded").innerHTML = stats.goals_conceded;
-		document.getElementById("classic-avg-goals-scored").innerHTML = stats.avg_goals_scored;
-		document.getElementById("classic-avg-goals-conceded").innerHTML = stats.avg_goals_conceded;
+		document.getElementById("classic-game-played-value").innerHTML = stats.game_played;
+		document.getElementById("classic-wins-value").innerHTML = stats.wins;
+		document.getElementById("classic-losses-value").innerHTML = stats.losses;
+		document.getElementById("classic-win-rate-value").innerHTML = stats.win_rate;
+		document.getElementById("classic-best-win-streak-value").innerHTML = stats.best_win_streak;
+		document.getElementById("classic-goals_scored-value").innerHTML = stats.goals_scored;
+		document.getElementById("classic-goals-conceded-value").innerHTML = stats.goals_conceded;
+		document.getElementById("classic-avg-goals-scored-value").innerHTML = stats.avg_goals_scored;
+		document.getElementById("classic-avg-goals-conceded-value").innerHTML = stats.avg_goals_conceded;
 	}
 }

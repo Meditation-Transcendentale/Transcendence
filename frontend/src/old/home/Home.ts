@@ -1,5 +1,6 @@
 import { ABlock } from "../ABlock";
 import { createContainer } from "../utils";
+import { Friendlist } from "./friendlist/Friendlist";
 import { HomeMenu } from "./HomeMenu";
 import { Info } from "./info/Info";
 import { Stats } from "./stats/Stats";
@@ -10,6 +11,7 @@ export default class Home extends ABlock {
 
 	private info!: Info;
 	private stats!: Stats;
+	private friendlist!: Friendlist;
 
 	constructor(parent: HTMLElement) {
 		super(parent);
@@ -21,22 +23,31 @@ export default class Home extends ABlock {
 		this.container = createContainer("home-container", "home");
 		this.container.addEventListener("info", () => {
 			this.stats.disable();
+			this.friendlist.disable();
 			this.info.enable();
 		});
 		this.container.addEventListener("stats", () => {
 			this.info.disable();
+			this.friendlist.disable();
 			this.stats.enable();
-		})
+		});
+		this.container.addEventListener("friendlist", () => {
+			this.info.disable();
+			this.stats.disable();
+			this.friendlist.enable();
+		});
 
 		this.menu = new HomeMenu(this.container);
 		this.info = new Info(this.container);
 		this.stats = new Stats(this.container);
+		this.friendlist = new Friendlist(this.container)
 	}
 
 	public reset() {
 		this.enable();
 		this.info.disable();
 		this.stats.disable();
+		this.friendlist.disable();
 	}
 }
 
