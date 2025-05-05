@@ -5,7 +5,8 @@ const database = new Database(process.env.DATABASE_URL, {fileMustExist: true });
 database.pragma("journal_mode=WAL");
 
 const getUserByUsernameStmt = database.prepare("SELECT * FROM users WHERE username = ?");
-const addGoogleUserStmt = database.prepare("INSERT INTO users (google_id, username, email, avatar_path) VALUES (?, ?, ?, ?)");
+const addGoogleUserStmt = database.prepare("INSERT INTO users (uuid, provider, google_id, username, avatar_path) VALUES (?, ?, ?, ?, ?)");
+const add42UserStmt = database.prepare("INSERT INTO users (uuid, provider, username, avatar_path) VALUES (?, ?, ?, ?)");
 const checkUsernameAvailabilityStmt = database.prepare("SELECT * FROM users WHERE username = ?");
 const registerUserStmt = database.prepare("INSERT INTO users (uuid, username, password) VALUES (?, ?, ?)");
 const getUserByIdStmt = database.prepare("SELECT * FROM users WHERE id = ?");
@@ -64,8 +65,16 @@ const userService = {
 		}
 		return user;
 	},
-	addGoogleUser: (googleId, username, email, avatarPath) => {
-		addGoogleUserStmt.run(googleId, username, email, avatarPath);
+	checkUserExists: (username) => {
+		const user = getUserByUsernameStmt.get(username);
+		if (!user) return false;
+		return true;
+	},
+	addGoogleUser: (uuid, googleId, username, avatarPath) => {
+		addGoogleUserStmt.run(uuid, 'google', googleId, username, avatarPath);
+	},
+	add42User: (uuid, username, avatarPath) => {
+		add42UserStmt.run(uuid, '42', username, avatarPath);
 	},
 	checkUsernameAvailability: (username) => {
 		const user = checkUsernameAvailabilityStmt.get(username);

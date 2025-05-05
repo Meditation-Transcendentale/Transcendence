@@ -8,6 +8,7 @@ import { OAuth2Client } from 'google-auth-library';
 import https from 'https';
 import axios from 'axios';
 import { connect, JSONCodec } from 'nats';
+import { v4 as uuidv4 } from 'uuid';
 
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors, handleErrorsValid } from "../../shared/handleErrors.mjs";
@@ -103,12 +104,13 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 	
 	const payload = ticket.getPayload();
 
-	const { sub: google_id, email, name: username, picture: avatar_path } = payload;
+	const { sub: google_id, name: username, picture: avatar_path } = payload;
 
-	let user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
 	if (!user) {
+		const uuid = uuidv4();
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
-		await natsRequest(nats, jc, 'user.addGoogleUser', { google_id, username, email, avatar_path });
+		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatar_path });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
 
@@ -149,24 +151,34 @@ async function get42accessToken(code) {
 }
 
 app.get('/42', handleErrors(async (req, res) => {
-
-	const code = req.query.code;
+	
 	const { token42 } = await get42accessToken(req.query.code);
+	let response;
 
 	try {
-		const response = await axios.get(`https://api.intra.42.fr/v2/me`, {
+		response = await axios.get(`https://api.intra.42.fr/v2/me`, {
 			headers: {
 				Authorization: `Bearer ${token42}`
 			}
 		});
-		const { login: username, email, image_url: avatar_path } = response.data;
-		// add user to database
-
 	} catch (error) {
-		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
+		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
 	}
-	res.code(statusCode.SUCCESS).send({ message: returnMessages.INTRA42_LOGGED_IN});
 
+	const username = response.data.login;
+	const avatar_path = response.data.image.link;
+
+	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
+	if (!user) {
+		const uuid = uuidv4();
+		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatar_path });
+		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+	}
+
+	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+
+	res.code(statusCode.SUCCESS).send({ message: returnMessages.INTRA42_LOGGED_IN});
 }));
 
 app.post('/auth', handleErrorsValid(async (req, res) => {
