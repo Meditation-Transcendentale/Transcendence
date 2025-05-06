@@ -14,6 +14,7 @@ class Home {
 		}
 
 		document.getElementById("quit")?.addEventListener("click", (e) => {
+			e.preventDefault();
 			this.logoutRequest()
 				.then((json) => { this.logoutResponse(json, true) })
 				.catch((json) => { this.logoutResponse(json, false) });
@@ -24,6 +25,13 @@ class Home {
 			// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/info" } }));
 			Router.nav("/home/info");
 		});
+
+		document.getElementById("lobby-home")?.addEventListener("click", (e) => {
+			e.preventDefault();
+			// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/info" } }));
+			Router.nav("/home/lobby");
+		});
+
 
 		document.getElementById("stats-home")?.addEventListener("click", (e) => {
 			e.preventDefault();

@@ -30,8 +30,19 @@ async function init() {
 	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
 
 	document.getElementById("status")?.addEventListener("status", (e) => {
-		document.getElementById("status").setAttribute("ok", e.detail.ok);
-		document.getElementById('status').innerHTML = e.detail.json;
+		document.getElementById("status")!.setAttribute("ok", e.detail.ok);
+		document.getElementById('status')!.innerHTML = e.detail.json;
+		document.getElementById("status")?.animate(
+			[
+				{ opacity: 0 },
+				{ opacity: 1 },
+				{ opacity: 0 }
+			], {
+			duration: 3000,
+			iterations: 1,
+			easing: "ease-out"
+		});
+
 	})
 
 
