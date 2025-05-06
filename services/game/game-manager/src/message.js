@@ -818,6 +818,125 @@ function _decodeStateUpdate(bb) {
   return message;
 }
 
+export function encodeMatchSetup(message) {
+  let bb = popByteBuffer();
+  _encodeMatchSetup(message, bb);
+  return toUint8Array(bb);
+}
+
+function _encodeMatchSetup(message, bb) {
+  // optional string mode = 1;
+  let $mode = message.mode;
+  if ($mode !== undefined) {
+    writeVarint32(bb, 10);
+    writeString(bb, $mode);
+  }
+
+  // optional string gameId = 2;
+  let $gameId = message.gameId;
+  if ($gameId !== undefined) {
+    writeVarint32(bb, 18);
+    writeString(bb, $gameId);
+  }
+
+  // repeated string players = 3;
+  let array$players = message.players;
+  if (array$players !== undefined) {
+    for (let value of array$players) {
+      writeVarint32(bb, 26);
+      writeString(bb, value);
+    }
+  }
+
+  // optional map<string, string> options = 4;
+  let map$options = message.options;
+  if (map$options !== undefined) {
+    for (let key in map$options) {
+      let nested = popByteBuffer();
+      let value = map$options[key];
+      writeVarint32(nested, 10);
+      writeString(nested, key);
+      writeVarint32(nested, 18);
+      writeString(nested, value);
+      writeVarint32(bb, 34);
+      writeVarint32(bb, nested.offset);
+      writeByteBuffer(bb, nested);
+      pushByteBuffer(nested);
+    }
+  }
+}
+
+export function decodeMatchSetup(binary) {
+  return _decodeMatchSetup(wrapByteBuffer(binary));
+}
+
+function _decodeMatchSetup(bb) {
+  let message = {};
+
+  end_of_message: while (!isAtEnd(bb)) {
+    let tag = readVarint32(bb);
+
+    switch (tag >>> 3) {
+      case 0:
+        break end_of_message;
+
+      // optional string mode = 1;
+      case 1: {
+        message.mode = readString(bb, readVarint32(bb));
+        break;
+      }
+
+      // optional string gameId = 2;
+      case 2: {
+        message.gameId = readString(bb, readVarint32(bb));
+        break;
+      }
+
+      // repeated string players = 3;
+      case 3: {
+        let values = message.players || (message.players = []);
+        values.push(readString(bb, readVarint32(bb)));
+        break;
+      }
+
+      // optional map<string, string> options = 4;
+      case 4: {
+        let values = message.options || (message.options = {});
+        let outerLimit = pushTemporaryLength(bb);
+        let key;
+        let value;
+        end_of_entry: while (!isAtEnd(bb)) {
+          let tag = readVarint32(bb);
+          switch (tag >>> 3) {
+            case 0:
+              break end_of_entry;
+            case 1: {
+              key = readString(bb, readVarint32(bb));
+              break;
+            }
+            case 2: {
+              value = readString(bb, readVarint32(bb));
+              break;
+            }
+            default:
+              skipUnknownField(bb, tag & 7);
+          }
+        }
+        if (key === undefined || value === undefined)
+          throw new Error("Invalid data for map: options");
+        values[key] = value;
+        bb.limit = outerLimit;
+        break;
+      }
+
+      default:
+        skipUnknownField(bb, tag & 7);
+    }
+  }
+
+  return message;
+}
+
 export function encodeMatchInput(message) {
   let bb = popByteBuffer();
   _encodeMatchInput(message, bb);

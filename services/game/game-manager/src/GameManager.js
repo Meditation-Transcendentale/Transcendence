@@ -7,7 +7,8 @@ import {
 	decodeMatchInput,
 	encodePhysicsRequest,
 	decodePhysicsResponse,
-	encodeStateUpdate
+	encodeStateUpdate,
+	encodeMatchSetup
 } from './message.js';
 import { JSONCodec } from 'nats';
 const jc = JSONCodec();
@@ -69,19 +70,20 @@ export class GameManager {
 
 		try {
 			const req = decodeMatchCreateRequest(msg.data);
+			console.log(req);
 			const players = req.players;
 			gameId = this.createMatch({
 				mode,
 				players: players,
 				options: req.options
 			});
+			this.nc.publish(`games.${mode}.match.setup`, encodeMatchSetup({ mode, gameId, players: players }));
 		} catch (err) {
 			error = err.message;
 		}
 
 		const respBuf = encodeMatchCreateResponse({ gameId, error });
 		msg.respond(respBuf);
-		this.nc.publish(`games.${mode}.match.setup`, JSON.stringify({ gameId, players }));
 	}
 
 	// match.start (pub/sub)

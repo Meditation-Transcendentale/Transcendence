@@ -9,9 +9,9 @@ export default async function registerHandlers() {
 	const sm = new SessionManager();
 
 	natsInterface.subscribeMatchSetup((buf, msg) => {
-		const { gameId, players: allowedUserIds } = decodeMatchSetup(buf);
+		const req = decodeMatchSetup(buf);
 		const mode = msg.subject.split('.')[1];
-		sm.setMatchSetup(gameId, allowedUserIds, mode);
+		sm.setMatchSetup(req.gameId, req.allowedUserIds, mode);
 	});
 
 	sm.on('gameReady', ({ gameId, mode }) => {
