@@ -13,6 +13,12 @@ export default async function lobbyRoutes(fastify, opts) {
 		reply.code(201).send(state)
 	})
 
+	// test route
+	// fastify.post('/test', async (request, reply) => {
+	// 	const state = fastify.lobbyService.createLobby(request.body)
+	// 	reply.code(201).send(state)
+	// })
+
 	// Get lobby by ID
 	fastify.get('/:id', async (request, reply) => {
 		const lobby = fastify.lobbyStore.getLobby(request.params.id)
@@ -22,4 +28,3 @@ export default async function lobbyRoutes(fastify, opts) {
 		return lobby.getState()
 	})
 }
-

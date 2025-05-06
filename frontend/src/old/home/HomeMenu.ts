@@ -7,6 +7,7 @@ export class HomeMenu extends ABlock {
 	private info!: HTMLElement;
 	private play!: HTMLElement;
 	private stats!: HTMLElement;
+	private friendlist!: HTMLElement
 	private quit!: HTMLElement;
 
 	constructor(parent: HTMLElement) {
@@ -47,6 +48,15 @@ export class HomeMenu extends ABlock {
 		this.stats.addEventListener("click", () => {
 			document.getElementById("home-container")?.dispatchEvent(CustomEvents.stats);
 		});
+		
+		this.friendlist = document.createElement("input");
+		this.friendlist.id = "home-menu-friendlist";
+		this.friendlist.setAttribute("class", "home-menu friendlist");
+		this.friendlist.setAttribute("type", "button");
+		this.friendlist.setAttribute("value", "Friendlist");
+		this.friendlist.addEventListener("click", () => {
+			document.getElementById("home-container")?.dispatchEvent(CustomEvents.friendlist);
+		});
 
 		this.quit = document.createElement("input");
 		this.quit.id = "home-menu-quit";
@@ -62,6 +72,7 @@ export class HomeMenu extends ABlock {
 		this.container.appendChild(this.info);
 		this.container.appendChild(this.play);
 		this.container.appendChild(this.stats);
+		this.container.appendChild(this.friendlist);
 		this.container.appendChild(this.quit);
 	}
 

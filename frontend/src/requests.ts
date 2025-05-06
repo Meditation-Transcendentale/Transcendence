@@ -1,4 +1,4 @@
-import { Friend } from "./home/friendlist/Friendlist"
+import { Friend } from "./Friendlist"
 
 export type AuthResponse = {
 	message: string,
@@ -163,7 +163,7 @@ export async function statsRequest(username: string): Promise<statsResponse> {
 	const data = await response.json();
 
 	const final: statsResponse = {
-		message: data,
+		json: data,
 		status: response.status,
 		ok: response.ok
 	};
@@ -254,53 +254,5 @@ export async function addFriend_Request(addedUsername: string): Promise<friend_R
 	return final;
 }
 
-export async function deleteFriend_Request(deletedUsername: string): Promise<friend_RequestResponse> 
-{
-	const response = await fetch("https://localhost:3000/friends/delete", { 
-		method: 'DELETE',
-		headers: {
-			'Accept': 'application/json',
-			'Content-Type': 'application/json',
-		},
-		credentials: 'include',
-		body: JSON.stringify({
-			inputUsername: deletedUsername,
-		})
-	});
-	
-	const data = await response.json();
-	
-	const final: friend_RequestResponse = {
-		message: data.message,	
-		status: response.status,
-		ok: response.ok
-	};
-	console.log(final);
-	return final;
-}
 
-export async function blockUser_Request(blockedUsername: string): Promise<friend_RequestResponse> 
-{
-	const response = await fetch("https://localhost:3000/friends/block", { 
-		method: 'POST',
-		headers: {
-			'Accept': 'application/json',
-			'Content-Type': 'application/json',
-		},
-		credentials: 'include',
-		body: JSON.stringify({
-			inputUsername: blockedUsername,
-		})
-	});
-	
-	const data = await response.json();
-	
-	const final: friend_RequestResponse = {
-		message: data.message,
-		status: response.status,
-		ok: response.ok
-	};
-	console.log(final);
-	return final;
-}
 

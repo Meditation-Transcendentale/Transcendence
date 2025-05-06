@@ -45,6 +45,11 @@ class RouterC {
 			"/home/lobby": {
 				html: { path: "/lobby", data: null },
 				script: { path: "./Lobby", data: null },
+        callback: (url: URL) => { this.loadInHome(url) }
+			},
+			"/home/friendlist": {
+				html: { path: "/friendlist", data: null },
+				script: { path: "./Friendlist", data: null },
 				callback: (url: URL) => { this.loadInHome(url) }
 			}
 

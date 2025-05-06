@@ -18,7 +18,8 @@
     ]
   },
   "dependencies": {
-    "nats": "^2.0.0"
+    "nats": "^2.0.0",
+    "protobufjs": "^7.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",

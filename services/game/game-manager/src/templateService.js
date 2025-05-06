@@ -4,7 +4,7 @@ import yaml from 'js-yaml';
 
 const templates = new Map();
 
-export function loadTemplates(dir = './template') {
+export function loadTemplates(dir = 'src/config/games/') {
 	const files = fs.readdirSync(dir);
 	files.forEach(file => {
 		if (file.endsWith('.yaml') || file.endsWith('.yml')) {

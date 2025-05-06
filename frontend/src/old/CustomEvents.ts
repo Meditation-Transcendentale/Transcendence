@@ -6,6 +6,7 @@ export class CustomEvents {
 	public static info: Event;
 	public static stats: Event;
 	public static play: Event;
+	public static friendlist: Event;
 
 
 	public static build() {
@@ -15,6 +16,7 @@ export class CustomEvents {
 		CustomEvents.disable = new Event("disable");
 		CustomEvents.info = new Event("info");
 		CustomEvents.stats = new Event("stats");
+		CustomEvents.friendlist = new Event("friendlist");
 		CustomEvents.play = new Event("play");
 
 	}

@@ -39,7 +39,6 @@ export class Stats extends ABlock {
 		})
 
 		this.menu = createContainer("stats-menu", "stats menu");
-
 		this.pongBtn = document.createElement("input");
 		this.pongBtn.setAttribute("type", "button");
 		this.pongBtn.setAttribute("value", "Classic");
@@ -77,10 +76,10 @@ export class Stats extends ABlock {
 
 	private enable() {
 
-
+		
 		const response = statsRequest(sessionStorage.getItem("username"))
-			.then((resp) => {
-				if (resp.ok) {
+		.then((resp) => {
+			if (resp.ok) {
 					this.classic.populate(resp.json.classic);
 					return;
 				}
