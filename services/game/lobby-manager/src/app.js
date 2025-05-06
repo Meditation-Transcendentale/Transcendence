@@ -8,9 +8,9 @@ import natsClient from './natsClient.js'
 import lobbyRoutes from './routes/lobbyRoutes.js'
 import lobbyStore from './store/lobbyStore.js'
 import * as lobbyService from './services/lobbyService.js'
-
+// TODO add https
 export async function buildApp() {
-	const app = Fastify({ logger: false })
+	const app = Fastify({ logger: true })
 
 	app.decorate('lobbyStore', lobbyStore)
 	app.decorate('lobbyService', lobbyService)

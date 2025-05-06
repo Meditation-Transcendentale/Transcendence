@@ -1,0 +1,29 @@
+{
+  "name": "transcendence",
+  "version": "1.0.0",
+  "description": "Welcome to the **Transcendence** project! This repository is a full-stack multiplayer game platform built with a microservice architecture using **Docker**, **Node.js**, **NATS**, and **Babylon.js** for the 3D frontend.",
+  "private": true,
+  "workspaces": [
+    "serialization-game",
+    "frontend",
+    "gateway",
+    "services/game-front",
+    "services/game/*",
+    "services/stats/*",
+    "services/user/*"
+  ],
+  "directories": {
+    "doc": "doc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Meditation-Transcendentale/Transcendence.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Meditation-Transcendentale/Transcendence/issues"
+  },
+  "homepage": "https://github.com/Meditation-Transcendentale/Transcendence#readme"
+}

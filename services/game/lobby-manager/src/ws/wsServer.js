@@ -5,7 +5,6 @@ import * as lobbyService from '../services/lobbyService.js'
 const lobbySockets = new Map()  // lobbyId → Set<ws>
 
 export function attach(wss, natsClient) {
-	// Heartbeat loop (unchanged)
 	const interval = setInterval(() => {
 		wss.clients.forEach(ws => {
 			if (!ws.isAlive) return ws.terminate()
@@ -26,7 +25,7 @@ export function attach(wss, natsClient) {
 
 		ws.on('pong', () => { ws.isAlive = true })
 
-		ws.on('message', data => {
+		ws.on('message', async data => {
 			let msg
 			try { msg = JSON.parse(data) }
 			catch { return ws.send(JSON.stringify({ type: 'error', message: 'invalid JSON' })) }
@@ -37,26 +36,17 @@ export function attach(wss, natsClient) {
 					case 'join':
 						state = lobbyService.join(msg.lobbyId, msg.userId)
 						broadcast(ws.lobbyId, { type: 'lobby.update', ...state })
-						natsClient.publish('lobby.join', msg)
 						break
 
 					case 'ready':
 						state = lobbyService.ready(msg.lobbyId, msg.userId)
 						broadcast(ws.lobbyId, { type: 'lobby.update', ...state })
-
-						// ← NEW: once allReady, broadcast a 'start' message
 						if (state.status === 'starting') {
 							broadcast(ws.lobbyId, {
 								type: 'start',
-								gameId: ws.lobbyId,
-								settings: { /* your default settings or state.settings */ }
-							})
-							// also notify Game Manager
-							natsClient.publish('game.create', {
-								lobbyId: msg.lobbyId,
-								players: state.players,
+								gameId: state.gameId,
 								settings: {}
-							})
+							});
 						}
 						break
 

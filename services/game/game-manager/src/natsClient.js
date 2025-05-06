@@ -1,16 +1,16 @@
-// ==== services/natsClient.js ====
+// services/natsClient.js
 import { connect, StringCodec } from 'nats';
 const sc = StringCodec();
 let nc;
 
 export default {
-	/** Connect once at startup */
+	/** Call once at startup */
 	async connect(url) {
 		nc = await connect({ servers: url });
 		return nc;
 	},
 
-	/** Publish JSON or string as before */
+	/** Publish JSON or string */
 	publish(subject, payload) {
 		const data = typeof payload === 'string'
 			? sc.encode(payload)
@@ -18,7 +18,7 @@ export default {
 		nc.publish(subject, data);
 	},
 
-	/** Subscribe JSON as before */
+	/** Simple JSON subscription */
 	subscribe(subject, handler) {
 		const sub = nc.subscribe(subject);
 		(async () => {
@@ -30,8 +30,7 @@ export default {
 	},
 
 	/**
-	 * New: generic request that accepts either a Uint8Array (binary)
-	 * or string/object (will be JSON-encoded), and returns the raw Msg.
+	 * Binary request/reply helper.
 	 */
 	async request(subject, payload, opts = {}) {
 		let data;
@@ -42,8 +41,19 @@ export default {
 		} else {
 			data = sc.encode(JSON.stringify(payload));
 		}
-		// opts can include `{ timeout: 2000 }`, etc.
 		return await nc.request(subject, data, opts);
+	},
+
+	/**
+	 * Raw subscription: hands you the Uint8Array and the Msg,
+	 */
+	subscribeRaw(subject, handler) {
+		const sub = nc.subscribe(subject);
+		(async () => {
+			for await (const msg of sub) {
+				handler(msg.data, msg);
+			}
+		})();
 	},
 
 	async close() {
