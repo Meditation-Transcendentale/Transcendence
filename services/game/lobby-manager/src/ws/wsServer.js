@@ -31,15 +31,15 @@ export function attach(wss, natsClient) {
 			catch { return ws.send(JSON.stringify({ type: 'error', message: 'invalid JSON' })) }
 
 			try {
-				let state
+				let state;
 				switch (msg.type) {
 					case 'join':
-						state = lobbyService.join(msg.lobbyId, msg.userId)
+						state = await lobbyService.join(msg.lobbyId, msg.userId)
 						broadcast(ws.lobbyId, { type: 'lobby.update', ...state })
 						break
 
 					case 'ready':
-						state = lobbyService.ready(msg.lobbyId, msg.userId)
+						state = await lobbyService.ready(msg.lobbyId, msg.userId)
 						broadcast(ws.lobbyId, { type: 'lobby.update', ...state })
 						if (state.status === 'starting') {
 							broadcast(ws.lobbyId, {
