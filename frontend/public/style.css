@@ -200,6 +200,15 @@ body.modal-open .popup {
 }
 
 
+#log {
+      width: 100%; height: 300px;
+      background: #f4f4f4; padding: 10px;
+      overflow-y: auto; white-space: pre-wrap;
+      border: 1px solid #ccc;
+	font-size: 12px;
+    }
+
+
 /* #status { */
 /* 	opacity: 1; */
 /* 	transition: opacity 2s; */
