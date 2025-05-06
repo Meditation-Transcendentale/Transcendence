@@ -41,7 +41,14 @@ class RouterC {
 				html: { path: "/stats", data: null },
 				script: { path: "./Stats", data: null },
 				callback: (url: URL) => { this.loadInHome(url) }
+			},
+			"/home/lobby": {
+				html: { path: "/lobby", data: null },
+				script: { path: "./Lobby", data: null },
+				callback: (url: URL) => { this.loadInHome(url) }
 			}
+
+
 		};
 
 		this.mainContainer = document.getElementById("main-container") as HTMLElement;

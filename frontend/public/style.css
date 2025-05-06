@@ -18,7 +18,7 @@ body {
 	
 	@starting-style {
 		opacity: 0;
-		filter: blur(2px)
+		filter: blur(1px)
 	}
 }
 
@@ -126,7 +126,8 @@ body {
 
 
 div[disabled=true],
-input[display=false] {
+input[display=false],
+select[display=false]{
 	display: none;
 }
 
