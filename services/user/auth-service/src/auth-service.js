@@ -8,6 +8,7 @@ import { OAuth2Client } from 'google-auth-library';
 import https from 'https';
 import axios from 'axios';
 import { connect, JSONCodec } from 'nats';
+import { v4 as uuidv4 } from 'uuid';
 
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors, handleErrorsValid } from "../../shared/handleErrors.mjs";
@@ -103,12 +104,13 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 	
 	const payload = ticket.getPayload();
 
-	const { sub: google_id, email, name: username, picture: avatar_path } = payload;
+	const { sub: google_id, name: username, picture: avatar_path } = payload;
 
-	let user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
 	if (!user) {
+		const uuid = uuidv4();
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
-		await natsRequest(nats, jc, 'user.addGoogleUser', { google_id, username, email, avatar_path });
+		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatar_path });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
 
@@ -121,43 +123,64 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 let cached42Token = { token: null, expires_at: 0 };
 
-async function get42accessToken() {
+async function get42accessToken(code) {
 
+	console.log('42 code:', cached42Token);
 	const now = Date.now();
 	if (cached42Token.token && now < cached42Token.expires_at - 10000) {
-		return cached42Token.token;
+		return { token42: cached42Token.token};
 	}
 
-	const response = await axios.post(
-		'https://api.intra.42.fr/oauth/token',
-		new URLSearchParams({
-			grant_type: 'client_credentials',
-			client_id: process.env.CLIENT_UID,
-			client_secret: process.env.CLIENT_SECRET
-		}),
-		{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
-	);
-
-	cached42Token.token = response.data.access_token;
-	cached42Token.expires_at = now + response.data.expires_in * 1000;
-	return cached42Token.token;
-
+	try {
+		const response = await axios.post(
+			'https://api.intra.42.fr/oauth/token',
+			new URLSearchParams({
+				grant_type: 'authorization_code',
+				client_id: process.env.FT_API_UID,
+				client_secret: process.env.FT_API_SECRET,
+				code: code,
+				redirect_uri: 'https://localhost:3000/auth/42'
+			}),
+			{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
+		);
+		cached42Token.token = response.data.access_token;
+		cached42Token.expires_at = now + response.data.expires_in * 1000;
+		return { token42: cached42Token.token};
+	} catch (error) {
+		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
+	}
 }
 
-app.post('/42', handleErrors(async (req, res) => {
+app.get('/42', handleErrors(async (req, res) => {
+	
+	const { token42 } = await get42accessToken(req.query.code);
+	console.log('42 token:', token42);
+	let response;
 
-	if (req.query.state !== req.session.state) {
+	try {
+		response = await axios.get(`https://api.intra.42.fr/v2/me`, {
+			headers: {
+				Authorization: `Bearer ${token42}`
+			}
+		});
+	} catch (error) {
 		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
 	}
 
-	const token42 = await get42accessToken();
-	const response = await axios.get(`https://api.intra.42.fr/v2/me`, {
-		headers: {
-			Authorization: `Bearer ${token42}`
-		}
-	});
-	
+	const username = response.data.login;
+	const avatar_path = response.data.image.link;
 
+	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
+	if (!user) {
+		const uuid = uuidv4();
+		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatar_path });
+		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+	}
+
+	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+
+	res.code(statusCode.SUCCESS).send({ message: returnMessages.INTRA42_LOGGED_IN});
 }));
 
 app.post('/auth', handleErrorsValid(async (req, res) => {
