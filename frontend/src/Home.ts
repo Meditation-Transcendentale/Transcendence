@@ -74,6 +74,7 @@ class Home {
 
 		return response.json();
 	}
+
 }
 
 export default Home;

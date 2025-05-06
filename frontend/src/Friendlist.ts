@@ -7,6 +7,12 @@ export interface Friend {
 	friend_username: string;
 }
 
+export interface FriendRequest {
+	id: number,
+	sender_username: string,
+	receiver_username: string
+}
+
 class Friendlist {
 	private friendList: HTMLTableElement | null = null;
 
@@ -20,31 +26,8 @@ class Friendlist {
 			return;
 		}
 		try {
-			const result = document.getElementById("result-container");
-			const search_button = document.getElementById("search-button");
-			const value_search = document.getElementById("search-input");
-			const resp_table = document.createElement("table");
-			result!.appendChild(resp_table);
-
-			search_button!.addEventListener("click", async () => {
-				resp_table.innerHTML = '';
-				const resp = await this.searchUser_Request(value_search!.value as string);
-				for(let user in resp.message) {
-					const tr = document.createElement("tr");
-					const td = document.createElement("td");
-		
-					td.innerText = resp.message[user].username;
-					console.log(resp.message[user].username);
-					tr.appendChild(td);
-					tr.appendChild(this.createButton("Add", () => this.addFriend_Request(resp.message[user].username), false));
-					tr.appendChild(this.createButton("Block", () => this.blockUser_Request(resp.message[user].username), false));
-					tr.appendChild(this.createButton("Stats", () => {
-						Router.nav("/home/stats?u=" + resp.message[user].username);
-					}, false));
-					tr.appendChild(this.createButton("Watch", () => {/* w.e */ }, false));
-					resp_table!.appendChild(tr);
-				};
-			});
+			this.renderSearchUser();
+			this.initFriendRequests();
 		} catch (err) {
 			console.log (err)
 		}
@@ -68,6 +51,64 @@ class Friendlist {
 		}
 	}
 
+
+	private initFriendRequests(){
+		const result = document.getElementById("friendrequests-container");
+		const friendrequests_button = document.getElementById("friendrequests-button");
+		const resp_table = document.createElement("table");
+		result!.appendChild(resp_table);
+		friendrequests_button!.addEventListener("click", async () => {
+			resp_table.innerHTML = '';
+			const resp = await this.getFriendRequests_Request();
+			const requestList : FriendRequest[] = resp.message.friendsRequests;
+			requestList.forEach(request => {
+				const tr = document.createElement("tr");
+				const td = document.createElement("td");
+	
+				td.innerText = request.sender_username;
+	
+				tr.appendChild(td);
+				tr.appendChild(this.createButton("Accept", () => this.acceptFriendRequest_Request(request.sender_username), true));
+				tr.appendChild(this.createButton("Decline", () => this.declineFriendRequest_Request(request.sender_username), true));
+				tr.appendChild(this.createButton("Block", () => this.blockUser_Request(request.sender_username), true));
+				tr.appendChild(this.createButton("Stats", () => {
+					Router.nav("/home/stats?u=" + request.sender_username);
+				}, true));
+				tr.appendChild(this.createButton("Watch", () => {/* w.e */ }, true));
+				resp_table!.appendChild(tr);
+			});
+		})
+	}
+
+
+	private renderSearchUser() {
+		const result = document.getElementById("result-container");
+		const search_button = document.getElementById("search-button");
+		const value_search = document.getElementById("search-input");
+		const resp_table = document.createElement("table");
+		result!.appendChild(resp_table);
+
+		search_button!.addEventListener("click", async () => {
+			resp_table.innerHTML = '';
+			const resp = await this.searchUser_Request(value_search!.value as string);
+			for(let user in resp.message) {
+				const tr = document.createElement("tr");
+				const td = document.createElement("td");
+	
+				td.innerText = resp.message[user].username;
+				console.log(resp.message[user].username);	
+				tr.appendChild(td);
+				tr.appendChild(this.createButton("Add", () => this.addFriend_Request(resp.message[user].username), false));
+				tr.appendChild(this.createButton("Block", () => this.blockUser_Request(resp.message[user].username), false));
+				tr.appendChild(this.createButton("Stats", () => {
+					Router.nav("/home/stats?u=" + resp.message[user].username);
+				}, false));
+				tr.appendChild(this.createButton("Watch", () => {/* w.e */ }, false));
+				resp_table!.appendChild(tr);
+			};
+		});
+	}
+
 	private renderFriendList(friendlist: Friend[]) {
 		const container = document.getElementById("friendlist-container");
 		if (this.friendList){
@@ -80,7 +121,7 @@ class Friendlist {
 			const td = document.createElement("td");
 
 			td.innerText = friend.friend_username;
-
+			console.log(friend.friend_username);
 			tr.appendChild(td);
 			tr.appendChild(this.createButton("Remove", () => this.deleteFriend_Request(friend.friend_username), true));
 			tr.appendChild(this.createButton("Block", () => this.blockUser_Request(friend.friend_username), true));
@@ -122,6 +163,52 @@ class Friendlist {
 			ok: response.ok
 		};
 		console.log (final);
+		return final;
+	}
+	
+	private async acceptFriendRequest_Request(acceptedUsername: string) {
+		const response = await fetch("https://localhost:3000/friends/accept", { 
+			method: 'POST',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+			body: JSON.stringify({
+				inputUsername: acceptedUsername,
+			})
+		});
+		const data = await response.json();
+		
+		const final = {
+			message: data.message,	
+			status: response.status,
+			ok: response.ok
+		};
+		console.log(final);
+		return final;
+	}
+
+	private async declineFriendRequest_Request(declinedUsername: string) {
+		const response = await fetch("https://localhost:3000/friends/decline", { 
+			method: 'DELETE',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+			body: JSON.stringify({
+				inputUsername: declinedUsername,
+			})
+		});
+		const data = await response.json();
+		
+		const final = {
+			message: data.message,	
+			status: response.status,
+			ok: response.ok
+		};
+		console.log(final);
 		return final;
 	}
 
@@ -217,71 +304,25 @@ class Friendlist {
 		console.log(final);
 		return final;
 	}
+
+	private async getFriendRequests_Request() {
+		const response = await fetch("https://localhost:3000/friends/get/requests", {
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+			},
+			credentials: 'include',
+		});
+
+		const data = await response.json();
+
+		const final = {
+			message: data,
+			status: response.status,
+			ok: response.ok
+		};
+		console.log (final);
+		return final;
+	}
 }
 export default Friendlist;
-
-// private async enable() {
-// 	this.container.innerHTML = '';
-
-// 	this.renderSearchBar();
-	
-
-// 	super.enable();
-// }
-
-// private renderSearchBar() {
-// 	const wrapper = document.createElement("div");
-// 	const input = document.createElement("input");
-// 	const button = document.createElement("input");
-// 	const resultContainer = document.createElement("div");
-
-// 	input.type = "text";
-// 	input.placeholder = "Search user...";
-// 	input.style.marginRight = "10px";
-
-// 	button.type = "button";
-// 	button.value = "Search";
-
-// 	button.addEventListener("click", () => this.handleUserSearch(input.value.trim(), resultContainer));
-// 	input.addEventListener("keypress", (e) => {
-// 		if (e.key === "Enter") button.click();
-// 	});
-
-// 	wrapper.appendChild(input);
-// 	wrapper.appendChild(button);
-// 	this.container.appendChild(wrapper);
-// 	this.container.appendChild(resultContainer);
-// }
-
-// private async handleUserSearch(query: string, resultContainer: HTMLElement) {
-// 	resultContainer.innerHTML = '';
-// 	if (!query) return;
-
-// 	try {
-// 		const user = await addFriend_Request(query); //create searchUser_Request
-// 		if (!user) {
-// 			resultContainer.innerText = "User not found 😕";
-// 			return;
-// 		}
-
-// 		const userBox = document.createElement("div"); 
-// 		userBox.innerText = user.message;
-
-// 		// userBox.appendChild(this.createButton("Add", () => addFriend_Request(user.username)));
-// 		// userBox.appendChild(this.createButton("Block", () => { /* Block logic */ }));
-// 		// userBox.appendChild(this.createButton("Stats", () => { /* Stats logic */ }));
-
-// 		resultContainer.appendChild(userBox);
-// 	} catch (err) {
-// 		console.error(err);
-// 		resultContainer.innerText = "Error searching user.";
-// 	}
-// }
-
-
-
-// private disable() {
-// 	this.container.innerHTML = '';
-// 	this.friendList = null;
-// 	super.disable();
-// }
