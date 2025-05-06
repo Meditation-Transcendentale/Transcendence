@@ -12,6 +12,7 @@ class LobbyStore {
 	createLobby(params) {
 		const id = uuid();
 		const lobby = new Lobby({ id, ...params });
+		console.log(params);
 		this.lobbies.set(id, lobby);
 		return lobby;
 	}

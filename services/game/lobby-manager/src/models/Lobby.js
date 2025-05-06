@@ -57,7 +57,7 @@ export default class Lobby {
 			slotsRemaining: this.maxPlayers - players.length,
 			players,
 			ready,
-			status,
+			status: status,
 		};
 	}
 };

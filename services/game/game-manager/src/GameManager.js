@@ -4,6 +4,7 @@ import { Game } from './Game.js';
 import {
 	decodeMatchCreateRequest,
 	encodeMatchCreateResponse,
+	decodeMatchCreateResponse,
 	decodeMatchInput,
 	encodePhysicsRequest,
 	decodePhysicsResponse,
@@ -27,12 +28,16 @@ export class GameManager {
 		this.nc = await natsClient.connect(natsUrl);
 
 		// Subscribe to "games.*.match.create" (req/rep)
-		const subCreate = this.nc.subscribe('games.*.match.create');
-		(async () => {
-			for await (const msg of subCreate) {
-				await this._onMatchCreate(msg);
-			}
-		})();
+		const subCreate = this.nc.subscribe('games.*.match.create', {
+			callback: (_err, msg) => {
+				this._onMatchCreate(msg);
+			},
+		});
+		// (async () => {
+		// 	for await (const msg of subCreate) {
+		// 		await this._onMatchCreate(msg);
+		// 	}
+		// })();
 
 		// Subscribe to "games.*.match.start" (req/rep)
 		const subStart = this.nc.subscribe('games.*.*.match.start');
@@ -79,11 +84,23 @@ export class GameManager {
 			});
 			this.nc.publish(`games.${mode}.match.setup`, encodeMatchSetup({ mode, gameId, players: players }));
 		} catch (err) {
+			console.log(err.message);
 			error = err.message;
 		}
-
-		const respBuf = encodeMatchCreateResponse({ gameId, error });
-		msg.respond(respBuf);
+		console.log(gameId);
+		const respBuf = encodeMatchCreateResponse({ gameId: gameId.toString(), error: error });
+		const test = decodeMatchCreateResponse(respBuf);
+		console.log(test);
+		if (msg.reply) {
+			try {
+				await msg.respond(respBuf);
+				console.log('✅ responded to', msg.reply);
+			} catch (respondErr) {
+				console.error('❌ failed to respond:', respondErr);
+			}
+		} else {
+			console.warn('⚠️ incoming request had no reply subject; cannot respond.');
+		}
 	}
 
 	// match.start (pub/sub)
