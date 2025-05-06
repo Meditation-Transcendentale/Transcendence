@@ -61,6 +61,8 @@ const returnMessages = {
 	FRIENDLIST_NOT_FOUND: 'Friendlist is empty',
 	INTRA42_LOGGED_IN: 'Logged in with Intra42 successfully',
 	PLAYER_INACTIVE: 'Player not in a lobby or a game',
+	SELF_RESEARCH: 'You cannot search for yourself',
+	CANT_ENABLE_2FA: 'You cannot enable 2FA for this account',
 
 }
 

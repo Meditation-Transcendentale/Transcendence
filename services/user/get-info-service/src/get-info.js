@@ -40,6 +40,12 @@ app.get('/me', handleErrors(async (req, res) => {
 }));
 
 app.get('/:username', handleErrors(async (req, res) => {
+
+	const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
+
+	if (asker.username === req.params.username) {
+		return res.code(statusCode.BAD_REQUEST).send({ message: returnMessages.SELF_RESEARCH });
+	}
 	
 	const user = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: req.params.username } );
 

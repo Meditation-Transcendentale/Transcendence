@@ -67,8 +67,7 @@ const userService = {
 	},
 	checkUserExists: (username) => {
 		const user = getUserByUsernameStmt.get(username);
-		if (!user) return false;
-		return true;
+		return user;
 	},
 	addGoogleUser: (uuid, googleId, username, avatarPath) => {
 		addGoogleUserStmt.run(uuid, 'google', googleId, username, avatarPath);

@@ -125,9 +125,10 @@ let cached42Token = { token: null, expires_at: 0 };
 
 async function get42accessToken(code) {
 
+	console.log('42 code:', cached42Token);
 	const now = Date.now();
 	if (cached42Token.token && now < cached42Token.expires_at - 10000) {
-		return cached42Token.token;
+		return { token42: cached42Token.token};
 	}
 
 	try {
@@ -153,6 +154,7 @@ async function get42accessToken(code) {
 app.get('/42', handleErrors(async (req, res) => {
 	
 	const { token42 } = await get42accessToken(req.query.code);
+	console.log('42 token:', token42);
 	let response;
 
 	try {
