@@ -2,13 +2,15 @@ import fastify from "fastify";
 import fs from "fs";
 import dotenv from "dotenv";
 import fastifyHttpProxy from "@fastify/http-proxy";
-import fastifyCookie from "fastify-cookie";
+import fastifyCookie from "@fastify/cookie";
+import fastifyCsrf   from '@fastify/csrf-protection';
 import fastifyCaching from "@fastify/caching";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyCompress from "@fastify/compress";
 import fastifyCORS from "@fastify/cors";
 import axios from "axios";
 import https from "https";
+import path from "path";
 
 
 dotenv.config({ path: "../../.env" });
@@ -22,6 +24,21 @@ const app = fastify({
 });
 
 app.register(fastifyCookie);
+app.register(fastifyCsrf, {
+	cookieName: '_csrf',
+	cookieOpts: {
+		httpOnly: true,
+		secure: false,
+		sameSite: 'lax',
+		path: '/'
+	},
+	header: 'x-csrf-token'
+});
+
+app.get('/get/csrf-token', async (req, res) => {
+	const csrfToken = await res.generateCsrf();
+	return { csrfToken: csrfToken };
+});
 
 app.register(fastifyCompress);
 
@@ -38,13 +55,13 @@ app.register(fastifyRateLimit, {
 app.register(fastifyCORS, {
 	origin: ['http://localhost:8081', 'http://172.19.0.2:8081', 'http://172.17.0.1:8080', 'http://localhost:8080', "http://192.168.1.84:8080"],
 	methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-	allowedHeaders: ['Content-Type'],
+	allowedHeaders: ['Content-Type', '_csrf'],
 	credentials: true
 });
 
 app.setErrorHandler((error, req, res) => {
 	app.log.error(error);
-	return res.code(500).send({ message: 'Server Error' });
+	return res.code(error.statusCode).send({ message: error.message });
 });
 
 const verifyJWT = async (req, res) => {
@@ -67,6 +84,17 @@ const verifyJWT = async (req, res) => {
 	req.user = data.user;
 };
 
+const verifyCsrf = (req, res, done) => {
+	if (['GET','HEAD','OPTIONS'].includes(req.method)) {
+		return done();
+	}
+	console.log(req.headers);
+	const response = app.csrfProtection(req, res, done);
+	console.log(response);
+	return response;
+	// return app.csrfProtection(req, res, done);
+};
+
 const addApiKeyHeader = (req, headers) => {
 	headers['x-api-key'] = process.env.API_GATEWAY_KEY;
 	return headers;
@@ -76,6 +104,7 @@ app.register(fastifyHttpProxy, {
 	upstream: 'https://register-service:4001',
 	prefix: '/register',
 	http2: false,
+	onRequest: verifyCsrf,
 	replyOptions: {
 		rewriteRequestHeaders: addApiKeyHeader
 	}
@@ -85,6 +114,7 @@ app.register(fastifyHttpProxy, {
 	upstream: 'https://auth-service:4002',
 	prefix: '/auth',
 	http2: false,
+	preHandler: verifyCsrf,
 	replyOptions: {
 		rewriteRequestHeaders: addApiKeyHeader
 	}
@@ -94,6 +124,7 @@ app.register(fastifyHttpProxy, {
 	upstream: 'https://update_user_info-service:4003',
 	prefix: '/update-info',
 	http2: false,
+	onRequest: verifyCsrf,
 	preHandler: verifyJWT,
 	replyOptions: {
 		rewriteRequestHeaders: (req, headers) => {
@@ -110,6 +141,7 @@ app.register(fastifyHttpProxy, {
 	upstream: 'https://friends-service:4004',
 	prefix: '/friends',
 	http2: false,
+	onRequest: verifyCsrf,
 	preHandler: verifyJWT,
 	replyOptions: {
 		rewriteRequestHeaders: (req, headers) => {
@@ -126,6 +158,7 @@ app.register(fastifyHttpProxy, {
 	upstream: 'https://get-info-service:4005',
 	prefix: '/info',
 	http2: false,
+	onRequest: verifyCsrf,
 	preHandler: verifyJWT,
 	replyOptions: {
 		rewriteRequestHeaders: (req, headers) => {
@@ -142,6 +175,7 @@ app.register(fastifyHttpProxy, {
 	upstream: 'https://stats_manager:6000',
 	prefix: '/stats',
 	http2: false,
+	onRequest: verifyCsrf,
 	preHandler: verifyJWT,
 	replyOptions: {
 		rewriteRequestHeaders: (req, headers) => {

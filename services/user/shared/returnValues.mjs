@@ -60,6 +60,7 @@ const returnMessages = {
 	USER_CREATED: 'User registered successfully',
 	FRIENDLIST_NOT_FOUND: 'Friendlist is empty',
 	INTRA42_LOGGED_IN: 'Logged in with Intra42 successfully',
+	INTRA42_CREATED_LOGGED_IN: 'Registered and logged in with 42 Intra successfully',
 	PLAYER_INACTIVE: 'Player not in a lobby or a game',
 	SELF_RESEARCH: 'You cannot search for yourself',
 	CANT_ENABLE_2FA: 'You cannot enable 2FA for this account',

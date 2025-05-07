@@ -2,7 +2,7 @@ import fastify from 'fastify';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import fastifyCookie from 'fastify-cookie';
+import fastifyCookie from '@fastify/cookie';
 import bcrypt from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
 import https from 'https';
@@ -91,7 +91,7 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 app.post('/auth-google', handleErrors(async (req, res) => {
 	
 	const { token } = req.body;
-	let retCode = statusCode.SUCCESS, retMessage = returnMessages.LOGGED_IN;
+	let retCode = statusCode.SUCCESS, retMessage = returnMessages.GOOGLE_LOGGED_IN;
 
 	if (!token) {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
@@ -125,7 +125,6 @@ let cached42Token = { token: null, expires_at: 0 };
 
 async function get42accessToken(code) {
 
-	console.log('42 code:', cached42Token);
 	const now = Date.now();
 	if (cached42Token.token && now < cached42Token.expires_at - 10000) {
 		return { token42: cached42Token.token};
@@ -154,7 +153,7 @@ async function get42accessToken(code) {
 app.get('/42', handleErrors(async (req, res) => {
 	
 	const { token42 } = await get42accessToken(req.query.code);
-	console.log('42 token:', token42);
+	let retCode = statusCode.SUCCESS, retMessage = returnMessages.INTRA42_LOGGED_IN;
 	let response;
 
 	try {
@@ -173,6 +172,7 @@ app.get('/42', handleErrors(async (req, res) => {
 	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
 	if (!user) {
 		const uuid = uuidv4();
+		retCode = statusCode.CREATED, retMessage = returnMessages.INTRA42_CREATED_LOGGED_IN;
 		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatar_path });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
@@ -180,7 +180,7 @@ app.get('/42', handleErrors(async (req, res) => {
 	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
-	res.code(statusCode.SUCCESS).send({ message: returnMessages.INTRA42_LOGGED_IN});
+	res.code(retCode).send({ message: retMessage });
 }));
 
 app.post('/auth', handleErrorsValid(async (req, res) => {

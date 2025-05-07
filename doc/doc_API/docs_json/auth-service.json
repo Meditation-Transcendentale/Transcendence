@@ -259,6 +259,99 @@
 				}
 			}
 		},
+		"/auth/42": {
+			"get": {
+				"summary": "Authenticate with 42 Intra",
+				"tags": ["Auth"],
+				"description": "Authenticate with 42 Intra to get an access token.",
+				"parameters": [
+					{
+						"name": "code",
+						"in": "query",
+						"description": "Authorization code from 42 Intra",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"example": "42_intra_code"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful login",
+						"headers": {
+							"Set-Cookie": {
+								"description": "JWT Token stored in a cookie",
+								"schema": {
+									"type": "string"
+								}
+							}
+						},
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Logged in successfully"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Authorization code is required"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized (Invalid code)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "42 Intra authorization failed"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+										  "type":"string",
+										  "example":"Server error"
+									    }
+								    }
+							    }
+						    }
+					    }
+				    }
+				}
+			}
+		},
 		"/auth/logout": {
 			"post": {
 				"summary": "Logout from the API",
