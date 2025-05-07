@@ -33,10 +33,11 @@ services:
     environment:
       - SERVICE_NAME=game-manager
       - NATS_URL=nats://nats:4222
+      - PORT=5003
     depends_on:
       - nats
     ports:
-      - "3001:3001"
+      - "5003:5003"
 
   user-interface:
     build: ./user-interface
@@ -47,7 +48,7 @@ services:
       - ./user-interface/.env.example:/app/.env
     command: npm run start
     ports:
-    - "9229:9229"
+    - "5004:5004"
     restart: unless-stopped
     environment:
       - SERVICE_NAME=user-interface
