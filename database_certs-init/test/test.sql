@@ -117,5 +117,11 @@ INSERT INTO blocked_users (blocker_id, blocked_id) VALUES
 (6, 2),
 (3, 10);
 
-
+INSERT INTO active_user (user_id, status) VALUES 
+(1, 'in_lobby'), 
+(2, 'in_game'), 
+(4, 'in_game'), 
+(5, 'in_lobby'), 
+(7, 'in_lobby'), 
+(10, 'in_game');
 

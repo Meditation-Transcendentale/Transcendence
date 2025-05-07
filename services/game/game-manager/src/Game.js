@@ -33,7 +33,7 @@ export class Game {
 				this.state = this.initializeStatePongIO();
 				break;
 			default:
-				conole.log(`Game init can't find game mode: ${this.mode}`);
+				console.log(`Game init can't find game mode: ${this.mode}`);
 		}
 		this.existingGameIds = new Set();
 	}

@@ -30,7 +30,6 @@ export async function ready(lobbyId, userId) {
 				state.players,
 				{}
 			);
-			//lobby.setGameId(gameId);
 			state.gameId = gameId;
 		} catch (err) {
 			console.error(`Failed to create game: ${err.message}`);

@@ -54,6 +54,9 @@ const twoFARoutes = (app) => {
 		if (user.two_fa_enabled) {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_ALREADY_ENABLED };
 		}
+		if (user.provider !== 'local') {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.CANT_ENABLE_2FA };
+		}
 
 		const password  = req.body.password;
 		if (!password) {
