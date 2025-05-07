@@ -19,7 +19,7 @@ export default async function registerHandlers() {
 	});
 
 	const wsApp = startWsServer({
-		port: Number(process.env.PORT) || 3000,
+		port: 5004,
 		onOpen: sm.handleOpen.bind(sm),
 		onMessage: sm.handleMessage.bind(sm),
 		onClose: sm.handleClose.bind(sm)
