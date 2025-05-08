@@ -26,10 +26,10 @@ class Home {
 			Router.nav("/home/info");
 		});
 
-		document.getElementById("lobby-home")?.addEventListener("click", (e) => {
+		document.getElementById("play-home")?.addEventListener("click", (e) => {
 			e.preventDefault();
 			// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/info" } }));
-			Router.nav("/home/lobby");
+			Router.nav("/home/play");
 		});
 
 

@@ -1,47 +1,4 @@
 <div id="lobby" class="instant">
-
-	<label>
-	API Base URL:
-		<input type="text" id="apiBase" value="http://10.19.225.59:5001" size="30">
-	</label><br/>
-	<label>
-	WS URL:
-		<input type="text" id="wsUrl" value="ws://10.19.225.59:5001/lobbies" size="30">
-	</label><br/>
-
-	<select id="lobby-mod">
-		<option id="pong-mod" value="pong">Pong</option>
-		<option id="br-mod" value="br">BR</option>
-		<option id="io-mod" value="io">IO</option>
-	</select>
-	<select id="lobby-map">
-		<option id="default-map" value="default">Default Map</option>
-	</select>
-	<select id="lobby-submod" >
-		<option id="local-mod" value="local">Local</option>
-		<option id="ia-mod" value="ia">IA</option>
-		<option id="online-mod" value="online">VS</option>
-		</select><br/>
-	<input type="button" id="lobby-create" value="Create Lobby"></input>
-	<div id="lobby-result">Lobby ID: <em>not created yet</em></div>
-
-	<section>
-	    <h2>2. WebSocket Client</h2>
-	    <div class="controls">
-		<button id="connectBtn" disabled>Connect WS</button>
-		<button id="disconnectBtn" disabled>Disconnect WS</button>
-		<span id="connection-status" style="margin-left:1em;color:gray;">Disconnected</span>
-	    </div>
-
-	    <div class="controls">
-	      <button id="joinBtn" disabled>Join Lobby</button>
-	      <button id="readyBtn" disabled>Ready</button>
-	      <button id="heartbeatBtn" disabled>Heartbeat</button>
-	    </div>
-	</section>
-
-	<section>
-	    <h2>3. Logs</h2>
-	    <div id="log"></div>
-	</section>
+<input type="button" id="lobby-ready" value="Ready" disabled/>
+<input type="button" id="lobby-quit" value="Quit"/>
 </div>
