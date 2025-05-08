@@ -6,9 +6,10 @@ import { Utils } from "./Utils";
 class RouterC {
 	private mainContainer: HTMLElement;
 	private routes: {};
-	private location: string;
+	private location: string | null;
 
-	private oldUrl!: string;
+	private oldUrl!: string | null;
+	private initRoute!: string | null;
 	private first = true;
 
 	constructor() {
@@ -81,8 +82,6 @@ class RouterC {
 
 
 		window.addEventListener("popstate", (ev) => {
-			//console.log(ev);
-			// this.nav(ev.state.path, false);
 			this.nav(window.location.href.substring(window.location.origin.length), false, false)
 		});
 

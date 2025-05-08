@@ -48,7 +48,7 @@ class Register {
 			new CustomEvent("status", { detail: { ok: true, json: json.message } }));
 		document.getElementById("register-username")?.setAttribute("value", "");
 		document.getElementById("register-password")?.setAttribute("value", "");
-		Router.nav("/home", true);
+		Router.nav("/home/play", true);
 	}
 
 	private requestReject(response: Response) {
