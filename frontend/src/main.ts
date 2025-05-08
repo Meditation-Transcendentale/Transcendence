@@ -36,6 +36,7 @@ async function init() {
 			[
 				{ opacity: 0 },
 				{ opacity: 1 },
+				{ opacity: 1 },
 				{ opacity: 0 }
 			], {
 			duration: 3000,

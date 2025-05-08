@@ -32,6 +32,11 @@ class RouterC {
 				script: { path: "./Home", data: null },
 				callback: (url: URL) => { this.loadInMain(url) }
 			},
+			"/game": {
+				html: { path: "/game", data: null },
+				script: { path: "./Game", data: null },
+				callback: (url: URL) => { this.loadInMain(url) }
+			},
 			"/home/info": {
 				html: { path: "/info", data: null },
 				script: { path: "./Info", data: null },
@@ -45,14 +50,23 @@ class RouterC {
 			"/home/lobby": {
 				html: { path: "/lobby", data: null },
 				script: { path: "./Lobby", data: null },
-        callback: (url: URL) => { this.loadInHome(url) }
+				callback: (url: URL) => { this.loadInHome(url) }
 			},
 			"/home/friendlist": {
 				html: { path: "/friendlist", data: null },
 				script: { path: "./Friendlist", data: null },
 				callback: (url: URL) => { this.loadInHome(url) }
+			},
+			"/home/play": {
+				html: { path: "/play", data: null },
+				script: { path: "./Play", data: null },
+				callback: (url: URL) => { this.loadInHome(url) }
+			},
+			"/": {
+				html: { path: "/play", data: null },
+				script: { path: "./Play", data: null },
+				callback: (url: URL) => { this.loadInHome(url) }
 			}
-
 
 		};
 
@@ -64,6 +78,7 @@ class RouterC {
 			}
 			this.nav(ev.detail.path);
 		})
+
 
 		window.addEventListener("popstate", (ev) => {
 			//console.log(ev);
@@ -129,7 +144,7 @@ class RouterC {
 
 		document.getElementById("main-container").appendChild(this.routes[url.pathname].html.data);
 		this.routes[url.pathname].script.data.init();
-		this.routes[url.pathname].script.data.reset();
+		this.routes[url.pathname].script.data.reset(url.searchParams);
 	}
 
 	private async loadInHome(url: URL, history = true) {
