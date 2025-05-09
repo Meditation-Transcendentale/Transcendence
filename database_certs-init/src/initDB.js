@@ -12,6 +12,7 @@ schemas.forEach((file) => {
 	database.exec(sql);
 });
 
+//database.exec(test);
 database.exec(test);	
 
 console.log('Database initialized successfully!');

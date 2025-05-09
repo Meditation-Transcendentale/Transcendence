@@ -28,9 +28,19 @@ handleErrorsNats(async () => {
 			const user = userService.getUserFromUsername(username);
 			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
 		}),
+		handleNatsSubscription("user.checkUserExists", async (msg) => {
+			const { username } = jc.decode(msg.data);
+			const userExists = userService.checkUserExists(username);
+			nats.publish(msg.reply, jc.encode({ success: true, data: userExists }));
+		}),
 		handleNatsSubscription("user.addGoogleUser", async (msg) => {
-			const { googleId, username, email, avatarPath } = jc.decode(msg.data);
-			userService.addGoogleUser(googleId, username, email, avatarPath);
+			const { uuid, googleId, username, avatar_path } = jc.decode(msg.data);
+			userService.addGoogleUser(uuid, googleId, username, avatar_path);
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
+		handleNatsSubscription("user.add42User", async (msg) => {
+			const { uuid, username, avatar_path } = jc.decode(msg.data);
+			userService.add42User(uuid, username, avatar_path);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("user.checkUsernameAvailability", async (msg) => {
@@ -158,6 +168,11 @@ handleErrorsNats(async () => {
 			const { username } = jc.decode(msg.data);
 			const user = userService.getUserForFriendResearch(username);
 			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
+		}),
+		handleNatsSubscription("user.getUserStatus", async (msg) => {
+			const { userId } = jc.decode(msg.data);
+			const status = userService.getUserStatus(userId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: status }));
 		})
 	]);
 })();

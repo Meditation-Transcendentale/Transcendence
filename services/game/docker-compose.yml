@@ -4,29 +4,67 @@ services:
     ports:
       - "4222:4222"
 
+  lobby-manager:
+    build:
+      context: ./lobby-manager
+    volumes:
+      - ./lobby-manager/src:/app/src
+      # - ./lobby-manager/test:/app/test
+      - ./lobby-manager/package.json:/app/package.json
+      - ./lobby-manager/.env.example:/app/.env
+    depends_on:
+      - nats
+    command: npm run dev
+    environment:
+      - NATS_URL=nats://nats:4222
+      - PORT=5001
+    ports:
+      - "5001:5001"
+
   game-manager:
     build: ./game-manager
+    volumes:
+      - ./game-manager/src:/app/src
+      - ./game-manager/test:/app/test
+      - ./game-manager/package.json:/app/package.json
+      - ./game-manager/.env.example:/app/.env
+    command: npm run dev
+    restart: unless-stopped
     environment:
       - SERVICE_NAME=game-manager
       - NATS_URL=nats://nats:4222
+      - PORT=5003
     depends_on:
       - nats
     ports:
-      - "4000:4000"
-      - "3001:3001"
+      - "5003:5003"
 
   user-interface:
     build: ./user-interface
+    volumes:
+      - ./user-interface/src:/app/src
+      - ./user-interface/test:/app/test
+      - ./user-interface/package.json:/app/package.json
+      - ./user-interface/.env.example:/app/.env
+    command: npm run start
+    ports:
+    - "5004:5004"
+    restart: unless-stopped
     environment:
       - SERVICE_NAME=user-interface
       - NATS_URL=nats://nats:4222
     depends_on:
       - nats
-    ports:
-      - "3000:3000"
 
   pong-physics:
     build: ./pong-physics
+    volumes:
+      - ./pong-physics/src:/app/src
+      - ./pong-physics/test:/app/test
+      - ./pong-physics/package.json:/app/package.json
+      - ./pong-physics/.env.example:/app/.env
+    command: npm run dev
+    restart: unless-stopped
     environment:
       - SERVICE_NAME=pong-physics
       - NATS_URL=nats://nats:4222
@@ -35,6 +73,16 @@ services:
 
   pongbr-physics:
     build: ./pongBR-physics
+    volumes:
+      # - ./profiler-logs:/app/profiler-logs
+      - ./pongBR-physics/src:/app/src
+      - ./pongBR-physics/test:/app/test
+      - ./pongBR-physics/package.json:/app/package.json
+      - ./pongBR-physics/.env.example:/app/.env
+    command: npm run dev
+    # ports:
+    # - "9229:9229"
+    restart: unless-stopped
     environment:
       - SERVICE_NAME=pongBR-physics
       - NATS_URL=nats://nats:4222
@@ -43,6 +91,13 @@ services:
 
   pongio-physics:
     build: ./pongIO-physics
+    volumes:
+      - ./pongIO-physics/src:/app/src
+      - ./pongIO-physics/test:/app/test
+      - ./pongIO-physics/package.json:/app/package.json
+      - ./pongIO-physics/.env.example:/app/.env
+    command: npm run dev
+    restart: unless-stopped
     environment:
       - SERVICE_NAME=pongIO-physics
       - NATS_URL=nats://nats:4222
@@ -51,6 +106,13 @@ services:
 
   ai:
     build: ./ai
+    volumes:
+      - ./ai/src:/app/src
+      - ./ai/test:/app/test
+      - ./ai/package.json:/app/package.json
+      - ./ai/.env.example:/app/.env
+    command: npm run dev
+    restart: unless-stopped
     environment:
       - SERVICE_NAME=ai
       - NATS_URL=nats://nats:4222

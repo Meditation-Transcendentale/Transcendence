@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS users (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	uuid TEXT NOT NULL UNIQUE,
+	provider TEXT NOT NULL CHECK (provider IN ('local', 'google', '42')) DEFAULT 'local',
 	google_id TEXT NULL UNIQUE,
 	username TEXT NOT NULL UNIQUE,
-	email TEXT UNIQUE,
 	password TEXT NULL,
 	avatar_path TEXT,
 	role TEXT NOT NULL CHECK (role IN ('user', 'admin')) DEFAULT 'user',

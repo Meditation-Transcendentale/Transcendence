@@ -1,8 +1,8 @@
-mode: pong
+mode: pongBR
 tickRate: 60
-ballCount: 1
-maxPlayers: 2 
-physicsTopic: game.pong.tick
+ballCount: 200
+maxPlayers: 100
+physicsTopic: game.pongBR.tick
 stateTopic: game.update
 inputTopic: game.input
 duration: 300       

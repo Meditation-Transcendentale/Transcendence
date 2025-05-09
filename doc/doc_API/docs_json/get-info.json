@@ -154,6 +154,71 @@
                     }
 				}
 			}
+		},
+		"/info/status": {
+			"get": {
+				"summary": "Retrieve User in game Status",
+				"tags": ["Get Info"],
+				"description": "Retrieve User in game Status",
+				"parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved User in game status",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": { "type": "string", "example": "in_lobby" }
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Player is not in a game or a lobby",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "Player is not in a game or a lobby" }
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "Server error." }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
