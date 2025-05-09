@@ -68,13 +68,13 @@ class Friendlist {
 				td.innerText = request.sender_username;
 	
 				tr.appendChild(td);
-				tr.appendChild(this.createButton("Accept", () => this.acceptFriendRequest_Request(request.sender_username), true));
-				tr.appendChild(this.createButton("Decline", () => this.declineFriendRequest_Request(request.sender_username), true));
-				tr.appendChild(this.createButton("Block", () => this.blockUser_Request(request.sender_username), true));
+				tr.appendChild(this.createButton("Accept", () => this.acceptFriendRequest_Request(request.sender_username).then(() => this.reset()), true));
+				tr.appendChild(this.createButton("Decline", () => this.declineFriendRequest_Request(request.sender_username).then(() => this.reset()), true));
+				tr.appendChild(this.createButton("Block", () => this.blockUser_Request(request.sender_username).then(() => this.reset()), true));
 				tr.appendChild(this.createButton("Stats", () => {
 					Router.nav("/home/stats?u=" + request.sender_username);
 				}, true));
-				tr.appendChild(this.createButton("Watch", () => {/* w.e */ }, true));
+				tr.appendChild(this.createButton("Watch", () => {/* w.e */ }, false));
 				resp_table!.appendChild(tr);
 			});
 		})
@@ -128,7 +128,7 @@ class Friendlist {
 			tr.appendChild(this.createButton("Stats", () => {
 				Router.nav("/home/stats?u=" + friend.friend_username);
 			}, true));
-			tr.appendChild(this.createButton("Watch", () => {/* w.e */ }, true));
+			tr.appendChild(this.createButton("Watch", () => {/* w.e */ }, false));
 			this.friendList!.appendChild(tr);
 		});
 		container!.appendChild(this.friendList);
@@ -290,9 +290,6 @@ class Friendlist {
 				'Accept': 'application/json',
 			},
 			credentials: 'include'
-			// body: JSON.stringify({
-			// 	inputUsername: searchedUsername,
-			// })
 		})
 		const data = await response.json();
 		
