@@ -26,7 +26,18 @@ class Register {
 			Router.nav("/auth");
 		})
 
-
+		const c1 = document.getElementById("rtc") as HTMLElement;
+		const rt = document.getElementById("rr") as HTMLElement;
+		rt.addEventListener("mousemove", (ev) => {
+			const {
+				top,
+				left,
+				width,
+				height
+			} = rt.getBoundingClientRect();
+			c1.style.left = `${ev.clientX}px`;
+			c1.style.top = `${ev.clientY}px`;
+		})
 
 		this.loaded = true;
 	}
