@@ -9,8 +9,7 @@ import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
 import { decodeStateUpdate } from "../utils/binary.js";
 import { Buffer } from 'buffer';
-import { gameEndUI } from "../utils/displayGameInfo.js";
-import { global } from "../main";
+import { UIComponent } from "../components/UIComponent.js";
 export let localPaddleId: number | 0;
 
 export class NetworkingSystem extends System {
@@ -26,7 +25,7 @@ export class NetworkingSystem extends System {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
-		this.scoreUI = scoreUI;
+		// this.scoreUI = scoreUI;
 		this.myScore = 0;
 		this.opponentScore = 0;
 	}
@@ -102,8 +101,14 @@ export class NetworkingSystem extends System {
 					.map(id => Number(id))
 					.find(id => id !== localPaddleId)!;
 				const theirScore = msg.score[otherId] || 0;
-				// console.log(myScore, theirScore);
-				this.scoreUI.update(myScore, theirScore);
+				console.log("score received");
+				entities.forEach((entity: Entity) => {
+					if (entity.hasComponent(UIComponent)){
+						const ui = entity.getComponent(UIComponent);
+						ui!.score.y = myScore;
+						ui!.score.x = theirScore;
+					}
+				});
 			}
 
 			// 4) show/hide “paused” overlay on goal
@@ -113,11 +118,11 @@ export class NetworkingSystem extends System {
 				// pause timer off
 			}
 
-			if (msg.isGameOver) {
-				console.log("GameOver");
-				// pick winner by highest score
-				global.endUI = gameEndUI(this.myScore < this.opponentScore);
-			}
+			// if (msg.type === "gameEnd") {
+			// 	console.log("GameOver");
+			// 	// pick winner by highest score
+			// 	global.endUI = gameEndUI(this.myScore < this.opponentScore);
+			// }
 
 			if (msg.type === "welcome") {
 				console.log("Received welcome:", msg);
@@ -138,11 +143,6 @@ export class NetworkingSystem extends System {
 					ball.velocity.set(msg.vx, 0, msg.vy);
 				}
 			}
-			// if (msg.type === "scoreUpdate") {
-			// 	const scoreP1 = msg.score.player1;
-			// 	const scoreP2 = msg.score.player2;
-			// 	this.scoreUI.update(scoreP1, scoreP2);
-			// }
 			if (msg.type === "winUpdate") {
 
 			}
