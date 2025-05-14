@@ -68,7 +68,7 @@ class Stats {
 		if (history) {
 			window.history.pushState("", "", "/home/stats?u=" + username + "&m=" + mode)
 		};
-		const response = await fetch("https://localhost:3000/stats/player/" + username + "/" + mode, {
+		const response = await fetch(`https://${window.location.hostname}:3000/stats/player/` + username + "/" + mode, {
 			method: 'GET',
 			headers: {
 				'Accept': 'application/json',

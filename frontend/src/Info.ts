@@ -110,7 +110,7 @@ class UpdateInfo {
 	}
 
 	private async updateInfoRequest(body: { username: string, avatar: string, password: string, token: string }) {
-		const response = await fetch("https://localhost:3000/update-info", {
+		const response = await fetch(`https://${window.location.hostname}:3000/update-info`, {
 			method: 'PATCH',
 			headers: {
 				'Accept': 'application/json',
@@ -127,7 +127,7 @@ class UpdateInfo {
 	}
 
 	private async updatePasswordRequest(body: { password: string, newPassword: string, token: string }) {
-		const response = await fetch("https://localhost:3000/update-info/password", {
+		const response = await fetch(`https://${window.location.hostname}:3000/update-info/password`, {
 			method: 'PATCH',
 			headers: {
 				'Accept': 'application/json',
@@ -144,7 +144,7 @@ class UpdateInfo {
 	}
 
 	private async enable2faRequest(body: { password: string }) {
-		const response = await fetch("https://localhost:3000/update-info/enable-2fa", {
+		const response = await fetch(`https://${window.location.hostname}:3000/update-info/enable-2fa`, {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
@@ -161,7 +161,7 @@ class UpdateInfo {
 	}
 
 	private async disable2faRequest(body: { password: string }) {
-		const response = await fetch("https://localhost:3000/update-info/disable-2fa", {
+		const response = await fetch(`https://${window.location.hostname}:3000/update-info/disable-2fa`, {
 			method: 'DELETE',
 			headers: {
 				'Accept': 'application/json',

@@ -14,7 +14,7 @@ class RouterC {
 
 	constructor() {
 		this.initRoute = null;
-		this.location = "http://localhost:8080";
+		this.location = `http://${window.location.hostname}:8080`;
 		this.oldUrl = null;
 
 		this.routes = {
@@ -176,7 +176,7 @@ class RouterC {
 			}
 
 			console.log("%c Fetching %s", "color: black; background-color: plum", html.path);
-			const url = "http://localhost:8080/html" + html.path + ".html";
+			const url = `http://${window.location.hostname}:8080/html` + html.path + ".html";
 			fetch(url, { redirect: "error" })
 				.then((response) => {
 					if (!response.ok) { return reject(response); }
