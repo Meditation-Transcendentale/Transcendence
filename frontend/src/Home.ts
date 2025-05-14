@@ -69,7 +69,7 @@ class Home {
 	}
 
 	private async logoutRequest() {
-		const response = await fetch("https://localhost:3000/auth/logout", {
+		const response = await fetch(`https://${window.location.hostname}:3000/auth/logout`, {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',

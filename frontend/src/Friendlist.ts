@@ -105,7 +105,7 @@ class Friendlist {
 	}
 
 	private async friendlist_Request() {
-		const response = await fetch("https://localhost:3000/friends/get/friendlist", {
+		const response = await fetch(`https://${window.location.hostname}:3000/friends/get/friendlist`, {
 			method: 'GET',
 			headers: {
 				'Accept': 'application/json',
@@ -126,7 +126,7 @@ class Friendlist {
 	}
 
 	private async deleteFriend_Request(deletedUsername: string) {
-		const response = await fetch("https://localhost:3000/friends/delete", { 
+		const response = await fetch(`https://${window.location.hostname}:3000/friends/delete`, { 
 			method: 'DELETE',
 			headers: {
 				'Accept': 'application/json',
@@ -149,7 +149,7 @@ class Friendlist {
 	}
 
 	private async addFriend_Request(addedUsername: string) {
-		const response = await fetch("https://localhost:3000/friends/add", { 
+		const response = await fetch(`https://${window.location.hostname}:3000/friends/add`, { 
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
@@ -172,7 +172,7 @@ class Friendlist {
 	}
 
 	private async blockUser_Request(blockedUsername: string) {
-		const response = await fetch("https://localhost:3000/friends/block", { 
+		const response = await fetch(`https://${window.location.hostname}:3000/friends/block`, { 
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
@@ -196,7 +196,7 @@ class Friendlist {
 	}
 
 	private async searchUser_Request(searchedUsername: string) {
-		const response = await fetch("https://localhost:3000/info/" + searchedUsername, {
+		const response = await fetch(`https://${window.location.hostname}:3000/info/` + searchedUsername, {
 			method: 'GET',
 			cache: 'no-store',
 			headers: {

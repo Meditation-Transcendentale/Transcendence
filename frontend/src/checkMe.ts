@@ -1,5 +1,5 @@
 // export async function meRequest(cache: string = "default") {
-// 	const response = await fetch("https://localhost:3000/info/me", {
+// 	const response = await fetch(`https://${window.location.hostname}:3000/info/me`, {
 // 		method: 'GET',
 // 		cache: cache,
 // 		headers: {
@@ -23,7 +23,7 @@
 // };
 
 export async function meRequest(cache: string = "default") {
-	const response = await fetch("https://localhost:3000/info/me", {
+	const response = await fetch(`https://${window.location.hostname}:3000/info/me`, {
 		method: 'GET',
 		cache: cache,
 		headers: {

@@ -19,7 +19,7 @@ import { Inspector } from '@babylonjs/inspector';
 
 
 const API_BASE = "http://10.19.225.59:4000";
-//const API_BASE = "http://localhost:4000";
+//const API_BASE = `http://${window.location.hostname}:4000`;
 export const global = {
 	endUI: null as any
 }

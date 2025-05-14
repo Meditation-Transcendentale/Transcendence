@@ -8,7 +8,7 @@ import Router from "./Router";
 
 async function init() {
 	// const checkMe = async function meRequest() {
-	// 	const response = await fetch("https://localhost:3000/info/me", {
+	// 	const response = await fetch(`https://${window.location.hostname}:3000/info/me`, {
 	// 		method: 'GET',
 	// 		headers: {
 	// 			'Accept': 'application/json',
