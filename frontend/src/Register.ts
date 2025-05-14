@@ -11,8 +11,7 @@ class Register {
 		if (this.loaded == true) {
 			return;
 		}
-		document.getElementById("register")?.addEventListener("submit", (ev) => {
-			ev.preventDefault();
+		document.getElementById("register-submit")?.addEventListener("click", (ev) => {
 			this.registerRequest(
 				document.getElementById("register-username")?.value,
 				document.getElementById("register-password")?.value
