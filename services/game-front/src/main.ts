@@ -1,4 +1,4 @@
-import { Engine, Scene, Color4, ArcRotateCamera } from "@babylonjs/core";
+import { Engine, Scene, Color4, ArcRotateCamera, GlowLayer } from "@babylonjs/core";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -12,8 +12,10 @@ import { getOrCreateUUID } from "./utils/getUUID.js";
 import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
 import { DebugVisualizer } from "./debug/DebugVisualizer.js";
 import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
+import { UISystem } from "./systems/UISystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
+import { Inspector } from '@babylonjs/inspector';
 
 
 // const API_BASE = "http://10.19.225.59:4000";
@@ -38,6 +40,7 @@ class Game {
 	private scoreUI: any;
 	private baseMeshes: any;
 	private instanceManagers: any;
+	private glowLayer: any;
 
 	constructor(canvas: any, gameId: any) {
 		this.canvas = canvas;
@@ -48,7 +51,7 @@ class Game {
 		console.log("start");
 		this.engine = new Engine(this.canvas, true);
 		engine = this.engine;
-
+		
 		this.scene = new Scene(this.engine);
 		const config = {
 			numberOfBalls: 1,
@@ -56,12 +59,15 @@ class Game {
 			arenaSizeZ: 20,
 			wallWidth: 1
 		};
+		// Inspector.Show(this.scene, {});
 
-		// create scene component
-		this.scoreUI = gameScoreInterface(0, 0);
+		this.glowLayer = new GlowLayer("glow", this.scene);
+		this.glowLayer.intensity = 0.3;
 		this.camera = createCamera(this.scene, this.canvas);
 
 		this.baseMeshes = this.createBaseMeshes(config);
+		this.glowLayer.addIncludedOnlyMesh(this.baseMeshes.wall);
+		this.glowLayer.excludeMeshes = true;
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
 		const uuid = getOrCreateUUID();
@@ -103,6 +109,7 @@ class Game {
 			this.camera
 		));
 		this.ecs.addSystem(new VisualEffectSystem(this.scene));
+		this.ecs.addSystem(new UISystem(this.scene));
 
 		createGameTemplate(this.ecs, config, localPaddleId);
 	}
@@ -224,7 +231,8 @@ let resizeTimeout: number;
 window.addEventListener("resize", () => {
 	clearTimeout(resizeTimeout);
 	resizeTimeout = setTimeout(() => {
-		engine.resize();
+		if (engine)
+			engine.resize();
 	}, 100); // délai pour limiter les appels trop fréquents
 });
 
@@ -241,7 +249,8 @@ window.addEventListener("DOMContentLoaded", () => {
 	if (!canvas || !createBtn || !launchBtn || !connectBtn || !stopBtn || !quitBtn || !gameIdInput || !statusBadge) {
 		throw new Error("One or more required DOM elements not found");
 	}
-
+	// if (canvas.style.filter == "")
+	// 	canvas.style.filter = "blur(5px)";
 	let gameId = "";
 	let gameInstance: any = null;
 
