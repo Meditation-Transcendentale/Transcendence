@@ -1,7 +1,10 @@
 import Router from "./Router";
+import { Pong } from "./pong/Pong";
+
 
 export default class Game {
 	private loaded: boolean;
+	private pong: Pong | null;
 
 	constructor() {
 		this.loaded = false;
@@ -9,8 +12,8 @@ export default class Game {
 
 	public init() {
 		if (this.loaded) { return };
-
-
+		Pong.INIT();
+		this.pong = null;
 		this.loaded = true;
 	}
 
@@ -20,6 +23,10 @@ export default class Game {
 			return;
 		}
 		console.log(params);
+		if (!this.pong != null) {
+			this.pong = new Pong(document.getElementById("canvas") as HTMLElement, params.get("id"));
+			this.pong.start();
+		}
 	}
 
 	private errorOnLoad() {

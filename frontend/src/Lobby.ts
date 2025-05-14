@@ -18,6 +18,8 @@ class Lobby {
 	private submod: string | null;
 	private map: string | null;
 
+	private gameIP = "10.19.225.59";
+
 	constructor() {
 		this.id = null;
 		this.ws = null;
@@ -57,7 +59,7 @@ class Lobby {
 			const json = await meRequest()
 				.catch(() => meReject());
 			this.uuid = json.userInfo.uuid;
-			const url = `ws://localhost:5001/lobbies?lobbyId=${encodeURIComponent(this.id)}&userId=${encodeURIComponent(this.uuid)}`;
+			const url = `ws://${this.gameIP}:5001/lobbies?lobbyId=${encodeURIComponent(this.id)}&userId=${encodeURIComponent(this.uuid)}`;
 
 			this.ws = new WebSocket(url);
 			this.setupWs();
