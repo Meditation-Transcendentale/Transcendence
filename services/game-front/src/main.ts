@@ -257,7 +257,7 @@ window.addEventListener("DOMContentLoaded", () => {
 		connectBtn!.disabled = !valid;
 		stopBtn!.disabled = !valid;
 		quitBtn!.disabled = !valid;
-		
+
 	}
 
 	gameIdInput.addEventListener("input", updateButtons);

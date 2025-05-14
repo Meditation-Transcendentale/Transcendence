@@ -7,10 +7,9 @@ import { BallComponent } from "../components/BallComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
-import { decodeStateUpdate } from "../utils/binary.js";
-import { Buffer } from 'buffer';
 import { gameEndUI } from "../utils/displayGameInfo.js";
 import { global } from "../main";
+import { decodeWsMessage } from "../utils/message.js";
 export let localPaddleId: number | 0;
 
 export class NetworkingSystem extends System {
@@ -32,33 +31,24 @@ export class NetworkingSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
-		const rawMessages = this.wsManager.getMessages();
+		const messages = this.wsManager.getMessages();
 
-		rawMessages.forEach((rawMsg: any) => {
-			let msg: any;
-			if (typeof rawMsg === 'string') {
-				try {
-					msg = JSON.parse(rawMsg);
-				} catch (e) {
-					console.error("Error parsing JSON message:", e);
-					return;
-				}
-			}
-			else if (rawMsg instanceof ArrayBuffer) {
-				msg = decodeStateUpdate(Buffer.from(new Uint8Array(rawMsg)));
-			}
-			else if (Buffer.isBuffer(rawMsg)) {
-				msg = decodeStateUpdate(rawMsg);
-			}
-			else {
-				msg = rawMsg;
-			}
-			if (msg.type === "registered") {
-				localPaddleId = msg.paddleId;
+		messages.forEach((raw: ArrayBuffer) => {
+
+			let event;
+			try {
+				event = decodeWsMessage(new Uint8Array(raw));
+			} catch (err) {
+				console.error("Failed to decode GameEvent:", err);
 				return;
 			}
-			if (msg.balls && msg.paddles) {
-				msg.balls.forEach((b: any) => {
+
+			// === GameState tick (binary state snapshot) ===
+			if (event.state) {
+				const state = event.state;
+
+				// 1. Ball updates
+				state.balls.forEach((b: any) => {
 					const e = entities.find(e =>
 						e.hasComponent(BallComponent) &&
 						e.getComponent(BallComponent)!.id === b.id
@@ -69,15 +59,16 @@ export class NetworkingSystem extends System {
 					ball.velocity.set(b.vx, 0, b.vy);
 				});
 
-				msg.paddles.forEach((pState: any) => {
+				// 2. Paddle updates
+				state.paddles.forEach((p: any) => {
 					const e = entities.find(e =>
 						e.hasComponent(PaddleComponent) &&
-						e.getComponent(PaddleComponent)!.id === pState.id
+						e.getComponent(PaddleComponent)!.id === p.id
 					);
 					if (!e || e.getComponent(InputComponent)?.isLocal) return;
 
 					const paddle = e.getComponent(PaddleComponent)!;
-					paddle.offset = pState.offset;
+					paddle.offset = p.offset;
 
 					const tf = e.getComponent(TransformComponent)!;
 					const rotMat = Matrix.RotationYawPitchRoll(
@@ -94,57 +85,21 @@ export class NetworkingSystem extends System {
 					);
 				});
 
-			}
-			// 3) update scoreboard UI
-			if (msg.score) {
-				const myScore = msg.score[localPaddleId] || 0;
-				const otherId = Object.keys(msg.score)
-					.map(id => Number(id))
-					.find(id => id !== localPaddleId)!;
-				const theirScore = msg.score[otherId] || 0;
-				// console.log(myScore, theirScore);
-				this.scoreUI.update(myScore, theirScore);
-			}
-
-			// 4) show/hide “paused” overlay on goal
-			if (msg.isPaused) {
-				// pause timer on
-			} else {
-				// pause timer off
+				// 3. Score update
+				if (state.scores && localPaddleId !== undefined) {
+					const myScore = state.scores[localPaddleId] || 0;
+					const otherId = Object.keys(state.scores)
+						.map(id => Number(id))
+						.find(id => id !== localPaddleId)!;
+					const theirScore = state.scores[otherId] || 0;
+					this.scoreUI.update(myScore, theirScore);
+				}
 			}
 
-			if (msg.isGameOver) {
-				console.log("GameOver");
-				// pick winner by highest score
+			// === GameEnd ===
+			if (event.gameOver) {
+				console.log("Game Over event received");
 				global.endUI = gameEndUI(this.myScore < this.opponentScore);
-			}
-
-			if (msg.type === "welcome") {
-				console.log("Received welcome:", msg);
-				if (msg.uuid === this.uuid) {
-					localPaddleId = msg.paddleId;
-					console.log("Local paddleId set to:", msg.paddleId);
-				}
-			}
-
-			if (msg.type === "updateBall") {
-				const entity = entities.find(e => {
-					const ball = e.getComponent(BallComponent);
-					return ball && ball.id === msg.ballId;
-				});
-				if (entity && entity.hasComponent(BallComponent)) {
-					const ball = entity.getComponent(BallComponent)!;
-					ball.position.set(msg.x, 0.5, msg.y);
-					ball.velocity.set(msg.vx, 0, msg.vy);
-				}
-			}
-			// if (msg.type === "scoreUpdate") {
-			// 	const scoreP1 = msg.score.player1;
-			// 	const scoreP2 = msg.score.player2;
-			// 	this.scoreUI.update(scoreP1, scoreP2);
-			// }
-			if (msg.type === "winUpdate") {
-
 			}
 		});
 	}

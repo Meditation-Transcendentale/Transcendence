@@ -1,0 +1,13 @@
+{
+  "name": "@pong/proto",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/pong_pb.js",
+  "types": "./src/pong_pb.d.ts",
+  "exports": {
+    ".": {
+      "import": "./src/pong_pb.js",
+      "types": "./src/pong_pb.d.ts"
+    }
+  }
+}
