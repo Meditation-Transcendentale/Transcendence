@@ -113,13 +113,6 @@ function _encodePaddle(message, bb) {
     writeVarint32(bb, 16);
     writeVarint64(bb, intToLong($offset));
   }
-
-  // optional bool isConnected = 3;
-  let $isConnected = message.isConnected;
-  if ($isConnected !== undefined) {
-    writeVarint32(bb, 24);
-    writeByte(bb, $isConnected ? 1 : 0);
-  }
 }
 
 export function decodePaddle(binary) {
@@ -145,12 +138,6 @@ function _decodePaddle(bb) {
       // optional int32 offset = 2;
       case 2: {
         message.offset = readVarint32(bb);
-        break;
-      }
-
-      // optional bool isConnected = 3;
-      case 3: {
-        message.isConnected = !!readByte(bb);
         break;
       }
 
@@ -818,6 +805,125 @@ function _decodeStateUpdate(bb) {
   return message;
 }
 
+export function encodeMatchSetup(message) {
+  let bb = popByteBuffer();
+  _encodeMatchSetup(message, bb);
+  return toUint8Array(bb);
+}
+
+function _encodeMatchSetup(message, bb) {
+  // optional string mode = 1;
+  let $mode = message.mode;
+  if ($mode !== undefined) {
+    writeVarint32(bb, 10);
+    writeString(bb, $mode);
+  }
+
+  // optional string gameId = 2;
+  let $gameId = message.gameId;
+  if ($gameId !== undefined) {
+    writeVarint32(bb, 18);
+    writeString(bb, $gameId);
+  }
+
+  // repeated string players = 3;
+  let array$players = message.players;
+  if (array$players !== undefined) {
+    for (let value of array$players) {
+      writeVarint32(bb, 26);
+      writeString(bb, value);
+    }
+  }
+
+  // optional map<string, string> options = 4;
+  let map$options = message.options;
+  if (map$options !== undefined) {
+    for (let key in map$options) {
+      let nested = popByteBuffer();
+      let value = map$options[key];
+      writeVarint32(nested, 10);
+      writeString(nested, key);
+      writeVarint32(nested, 18);
+      writeString(nested, value);
+      writeVarint32(bb, 34);
+      writeVarint32(bb, nested.offset);
+      writeByteBuffer(bb, nested);
+      pushByteBuffer(nested);
+    }
+  }
+}
+
+export function decodeMatchSetup(binary) {
+  return _decodeMatchSetup(wrapByteBuffer(binary));
+}
+
+function _decodeMatchSetup(bb) {
+  let message = {};
+
+  end_of_message: while (!isAtEnd(bb)) {
+    let tag = readVarint32(bb);
+
+    switch (tag >>> 3) {
+      case 0:
+        break end_of_message;
+
+      // optional string mode = 1;
+      case 1: {
+        message.mode = readString(bb, readVarint32(bb));
+        break;
+      }
+
+      // optional string gameId = 2;
+      case 2: {
+        message.gameId = readString(bb, readVarint32(bb));
+        break;
+      }
+
+      // repeated string players = 3;
+      case 3: {
+        let values = message.players || (message.players = []);
+        values.push(readString(bb, readVarint32(bb)));
+        break;
+      }
+
+      // optional map<string, string> options = 4;
+      case 4: {
+        let values = message.options || (message.options = {});
+        let outerLimit = pushTemporaryLength(bb);
+        let key;
+        let value;
+        end_of_entry: while (!isAtEnd(bb)) {
+          let tag = readVarint32(bb);
+          switch (tag >>> 3) {
+            case 0:
+              break end_of_entry;
+            case 1: {
+              key = readString(bb, readVarint32(bb));
+              break;
+            }
+            case 2: {
+              value = readString(bb, readVarint32(bb));
+              break;
+            }
+            default:
+              skipUnknownField(bb, tag & 7);
+          }
+        }
+        if (key === undefined || value === undefined)
+          throw new Error("Invalid data for map: options");
+        values[key] = value;
+        bb.limit = outerLimit;
+        break;
+      }
+
+      default:
+        skipUnknownField(bb, tag & 7);
+    }
+  }
+
+  return message;
+}
+
 export function encodeMatchInput(message) {
   let bb = popByteBuffer();
   _encodeMatchInput(message, bb);
@@ -871,6 +977,263 @@ function _decodeMatchInput(bb) {
         let limit = pushTemporaryLength(bb);
         let values = message.inputs || (message.inputs = []);
         values.push(_decodePlayerInput(bb));
+        bb.limit = limit;
+        break;
+      }
+
+      default:
+        skipUnknownField(bb, tag & 7);
+    }
+  }
+
+  return message;
+}
+
+export function encodeGameOver(message) {
+  let bb = popByteBuffer();
+  _encodeGameOver(message, bb);
+  return toUint8Array(bb);
+}
+
+function _encodeGameOver(message, bb) {
+  // optional uint32 winnerId = 1;
+  let $winnerId = message.winnerId;
+  if ($winnerId !== undefined) {
+    writeVarint32(bb, 8);
+    writeVarint32(bb, $winnerId);
+  }
+
+  // repeated ScoreEntry finalScores = 2;
+  let array$finalScores = message.finalScores;
+  if (array$finalScores !== undefined) {
+    for (let value of array$finalScores) {
+      writeVarint32(bb, 18);
+      let nested = popByteBuffer();
+      _encodeScoreEntry(value, nested);
+      writeVarint32(bb, nested.limit);
+      writeByteBuffer(bb, nested);
+      pushByteBuffer(nested);
+    }
+  }
+}
+
+export function decodeGameOver(binary) {
+  return _decodeGameOver(wrapByteBuffer(binary));
+}
+
+function _decodeGameOver(bb) {
+  let message = {};
+
+  end_of_message: while (!isAtEnd(bb)) {
+    let tag = readVarint32(bb);
+
+    switch (tag >>> 3) {
+      case 0:
+        break end_of_message;
+
+      // optional uint32 winnerId = 1;
+      case 1: {
+        message.winnerId = readVarint32(bb) >>> 0;
+        break;
+      }
+
+      // repeated ScoreEntry finalScores = 2;
+      case 2: {
+        let limit = pushTemporaryLength(bb);
+        let values = message.finalScores || (message.finalScores = []);
+        values.push(_decodeScoreEntry(bb));
+        bb.limit = limit;
+        break;
+      }
+
+      default:
+        skipUnknownField(bb, tag & 7);
+    }
+  }
+
+  return message;
+}
+
+export function encodeGamePaused(message) {
+  let bb = popByteBuffer();
+  _encodeGamePaused(message, bb);
+  return toUint8Array(bb);
+}
+
+function _encodeGamePaused(message, bb) {
+  // optional string reason = 1;
+  let $reason = message.reason;
+  if ($reason !== undefined) {
+    writeVarint32(bb, 10);
+    writeString(bb, $reason);
+  }
+}
+
+export function decodeGamePaused(binary) {
+  return _decodeGamePaused(wrapByteBuffer(binary));
+}
+
+function _decodeGamePaused(bb) {
+  let message = {};
+
+  end_of_message: while (!isAtEnd(bb)) {
+    let tag = readVarint32(bb);
+
+    switch (tag >>> 3) {
+      case 0:
+        break end_of_message;
+
+      // optional string reason = 1;
+      case 1: {
+        message.reason = readString(bb, readVarint32(bb));
+        break;
+      }
+
+      default:
+        skipUnknownField(bb, tag & 7);
+    }
+  }
+
+  return message;
+}
+
+export function encodeGameReset(message) {
+  let bb = popByteBuffer();
+  _encodeGameReset(message, bb);
+  return toUint8Array(bb);
+}
+
+function _encodeGameReset(message, bb) {
+  // optional string reason = 1;
+  let $reason = message.reason;
+  if ($reason !== undefined) {
+    writeVarint32(bb, 10);
+    writeString(bb, $reason);
+  }
+}
+
+export function decodeGameReset(binary) {
+  return _decodeGameReset(wrapByteBuffer(binary));
+}
+
+function _decodeGameReset(bb) {
+  let message = {};
+
+  end_of_message: while (!isAtEnd(bb)) {
+    let tag = readVarint32(bb);
+
+    switch (tag >>> 3) {
+      case 0:
+        break end_of_message;
+
+      // optional string reason = 1;
+      case 1: {
+        message.reason = readString(bb, readVarint32(bb));
+        break;
+      }
+
+      default:
+        skipUnknownField(bb, tag & 7);
+    }
+  }
+
+  return message;
+}
+
+export function encodeWsMessage(message) {
+  let bb = popByteBuffer();
+  _encodeWsMessage(message, bb);
+  return toUint8Array(bb);
+}
+
+function _encodeWsMessage(message, bb) {
+  // optional FullState state = 1;
+  let $state = message.state;
+  if ($state !== undefined) {
+    writeVarint32(bb, 10);
+    let nested = popByteBuffer();
+    _encodeFullState($state, nested);
+    writeVarint32(bb, nested.limit);
+    writeByteBuffer(bb, nested);
+    pushByteBuffer(nested);
+  }
+
+  // optional GameOver gameOver = 2;
+  let $gameOver = message.gameOver;
+  if ($gameOver !== undefined) {
+    writeVarint32(bb, 18);
+    let nested = popByteBuffer();
+    _encodeGameOver($gameOver, nested);
+    writeVarint32(bb, nested.limit);
+    writeByteBuffer(bb, nested);
+    pushByteBuffer(nested);
+  }
+
+  // optional GamePaused gamePaused = 3;
+  let $gamePaused = message.gamePaused;
+  if ($gamePaused !== undefined) {
+    writeVarint32(bb, 26);
+    let nested = popByteBuffer();
+    _encodeGamePaused($gamePaused, nested);
+    writeVarint32(bb, nested.limit);
+    writeByteBuffer(bb, nested);
+    pushByteBuffer(nested);
+  }
+
+  // optional GameReset gameReset = 4;
+  let $gameReset = message.gameReset;
+  if ($gameReset !== undefined) {
+    writeVarint32(bb, 34);
+    let nested = popByteBuffer();
+    _encodeGameReset($gameReset, nested);
+    writeVarint32(bb, nested.limit);
+    writeByteBuffer(bb, nested);
+    pushByteBuffer(nested);
+  }
+}
+
+export function decodeWsMessage(binary) {
+  return _decodeWsMessage(wrapByteBuffer(binary));
+}
+
+function _decodeWsMessage(bb) {
+  let message = {};
+
+  end_of_message: while (!isAtEnd(bb)) {
+    let tag = readVarint32(bb);
+
+    switch (tag >>> 3) {
+      case 0:
+        break end_of_message;
+
+      // optional FullState state = 1;
+      case 1: {
+        let limit = pushTemporaryLength(bb);
+        message.state = _decodeFullState(bb);
+        bb.limit = limit;
+        break;
+      }
+
+      // optional GameOver gameOver = 2;
+      case 2: {
+        let limit = pushTemporaryLength(bb);
+        message.gameOver = _decodeGameOver(bb);
+        bb.limit = limit;
+        break;
+      }
+
+      // optional GamePaused gamePaused = 3;
+      case 3: {
+        let limit = pushTemporaryLength(bb);
+        message.gamePaused = _decodeGamePaused(bb);
+        bb.limit = limit;
+        break;
+      }
+
+      // optional GameReset gameReset = 4;
+      case 4: {
+        let limit = pushTemporaryLength(bb);
+        message.gameReset = _decodeGameReset(bb);
         bb.limit = limit;
         break;
       }
