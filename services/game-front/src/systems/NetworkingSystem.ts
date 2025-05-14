@@ -10,6 +10,7 @@ import { WebSocketManager } from "../network/WebSocketManager.js";
 import { gameEndUI } from "../utils/displayGameInfo.js";
 import { global } from "../main";
 import { decodeWsMessage } from "../utils/message.js";
+import { UIComponent } from "../components/UIComponent.js";
 export let localPaddleId: number | 0;
 
 export class NetworkingSystem extends System {
@@ -25,7 +26,7 @@ export class NetworkingSystem extends System {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
-		this.scoreUI = scoreUI;
+		// this.scoreUI = scoreUI;
 		this.myScore = 0;
 		this.opponentScore = 0;
 	}
@@ -100,6 +101,7 @@ export class NetworkingSystem extends System {
 			if (event.gameOver) {
 				console.log("Game Over event received");
 				global.endUI = gameEndUI(this.myScore < this.opponentScore);
+
 			}
 		});
 	}
