@@ -4,7 +4,7 @@
   "description": "Welcome to the **Transcendence** project! This repository is a full-stack multiplayer game platform built with a microservice architecture using **Docker**, **Node.js**, **NATS**, and **Babylon.js** for the 3D frontend.",
   "private": true,
   "workspaces": [
-    "serialization-game",
+    "packages/*",
     "frontend",
     "gateway",
     "services/game-front",

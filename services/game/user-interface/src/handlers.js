@@ -1,5 +1,5 @@
 // handlers.js
-import { decodeMatchSetup, decodeStateUpdate } from './message.js';
+import { decodeMatchSetup, decodeStateUpdate, encodeWsMessage } from './message.js';
 import SessionManager from './sessionManager.js';
 import natsInterface from './natsInterface.js';
 import { startWsServer } from './wsServer.js';
@@ -37,9 +37,10 @@ export default async function registerHandlers() {
 
 	natsInterface.subscribeStateUpdates((buf) => {
 		const { state } = decodeStateUpdate(buf);
+		const msg = encodeWsMessage({ state: state });
 		for (const sessionId of sm.getSessions(state.gameId)) {
 			const info = sm.getSessionInfo(sessionId);
-			if (info) info.ws.send(buf, /* isBinary= */ true);
+			if (info) info.ws.send(msg, /* isBinary= */ true);
 		}
 	});
 
