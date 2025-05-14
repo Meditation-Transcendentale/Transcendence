@@ -88,6 +88,7 @@ async function start() {
 	const sub = nc.subscribe('games.*.*.physics.request');
 	for await (const msg of sub) {
 		const data = decodePhysicsRequest(msg.data);
+		console.log(data);
 
 		if (endedGames.has(data.gameId)) {
 			console.log(`[${SERVICE_NAME}] Ignoring tick ${data.tick} for ended game ${data.gameId}`);

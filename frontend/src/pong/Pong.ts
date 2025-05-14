@@ -42,6 +42,7 @@ export class Pong {
 	private baseMeshes: any;
 	private instanceManagers: any;
 	private glowLayer: any;
+	private uuid!: string;
 
 	constructor(canvas: any, gameId: any) {
 		this.canvas = canvas;
@@ -71,15 +72,15 @@ export class Pong {
 		this.glowLayer.excludeMeshes = true;
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
-		const uuid = getOrCreateUUID();
-		const wsUrl = `ws://10.19.225.59:5004?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		this.uuid = await getOrCreateUUID();
+		const wsUrl = `ws://10.19.225.59:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		//const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
 		// localPaddleId = await this.waitForWelcome();
 		localPaddleId = await this.waitForRegistration();
-		this.initECS(config, this.instanceManagers, uuid);
+		this.initECS(config, this.instanceManagers, this.uuid);
 
 		this.stateManager = new StateManager(this.ecs);
 		this.stateManager.update();
@@ -142,7 +143,7 @@ export class Pong {
 					console.log("Got welcome (session):", data);
 					socket.send(JSON.stringify({
 						type: "registerGame",
-						data: { gameId: this.gameId }
+						data: { gameId: this.gameId, uuid: this.uuid }
 					}));
 				}
 
@@ -157,10 +158,10 @@ export class Pong {
 
 			socket.addEventListener("message", listener);
 
-			const timeout = setTimeout(() => {
-				this.wsManager.socket.removeEventListener("message", listener);
-				reject(new Error("Timed out waiting for welcome"));
-			}, 5000)
+			// const timeout = setTimeout(() => {
+			// 	this.wsManager.socket.removeEventListener("message", listener);
+			// 	reject(new Error("Timed out waiting for welcome"));
+			// }, 5000)
 
 			// setTimeout(() => reject(new Error("Timed out waiting for registration")), 5000);
 		});

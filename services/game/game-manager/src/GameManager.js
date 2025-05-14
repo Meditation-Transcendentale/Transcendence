@@ -82,7 +82,7 @@ export class GameManager {
 				players: players,
 				options: req.options
 			});
-			this.nc.publish(`games.${mode}.match.setup`, encodeMatchSetup({ mode, gameId, players: players }));
+			this.nc.publish(`games.${mode}.match.setup`, encodeMatchSetup({ mode, gameId: gameId.toString(), players: players }));
 		} catch (err) {
 			console.log(err.message);
 			error = err.message;
@@ -152,7 +152,7 @@ export class GameManager {
 		const state = instance.getState();
 		const gameId = state.gameId;
 
-		this.games.set(gameId, {
+		this.games.set(gameId.toString(), {
 			instance,
 			mode,
 			state,
@@ -171,7 +171,8 @@ export class GameManager {
 	}
 
 	launchMatch(gameId) {
-		const match = this.games.get(gameId);
+		const match = this.games.get(gameId.toString());
+		console.log(this.games);
 		if (!match || match.status !== 'created') return false;
 
 		match.status = 'running';
@@ -261,12 +262,14 @@ export class GameManager {
 
 		try {
 			// Send PhysicsRequest over NATS req/rep
-			const reqBuf = encodePhysicsRequest({ gameId, inputs, lastState });
+			const reqBuf = encodePhysicsRequest({ gameId: gameId.toString(), inputs, lastState });
+			console.log(match.mode, gameId);
 			const respMsg = await this.nc.request(
 				`games.${match.mode}.${gameId}.physics.request`,
 				reqBuf
 			);
 			const resp = decodePhysicsResponse(respMsg.data);
+			console.log(resp);
 			if (resp.error) throw new Error(resp.error);
 
 			// Handle goal if one occurred this tick

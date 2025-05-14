@@ -21,7 +21,7 @@ export class Game {
 		this.paddleEntities = {};
 		this.wallEntities = {};
 		this.state = initialState;
-		this.options = initialState.options || {};
+		this.options = {};
 		this.players = this.options.players || [];
 
 		this.init();
@@ -30,6 +30,7 @@ export class Game {
 
 	/** Initialize entities: one ball, two paddles, and four walls */
 	init() {
+		console.log(this.state);
 		const balls = this.state.balls;
 		const ball = balls[0];
 		const ballEntity = this.entityManager.createEntity();

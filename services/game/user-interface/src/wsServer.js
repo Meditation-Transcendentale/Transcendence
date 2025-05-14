@@ -16,16 +16,33 @@ export function startWsServer({ port, onOpen, onMessage, onClose }) {
 		// TODO add option and security
 		idleTimeout: 30,       // seconds before idle sockets are closed
 		maxBackpressure: 1024, // max buffered messages per socket
+		upgrade: (res, req, context) => {
+			// parse out your ?uuid=… query param
+			const fullUrl = req.getQuery();               // e.g. "/?uuid=abcd1234"
+			console.log(fullUrl);
+			const [, rawQs] = fullUrl.split('?');       // "uuid=abcd1234"
+			const sessionId = rawQs
+				? new URLSearchParams(rawQs).get('uuid')
+				: null;
 
-		open(ws, req) {
-			onOpen(ws, req);
+			// 2) Call res.upgrade and pass it as userData:
+			res.upgrade(
+				{ sessionId },                            // <— this becomes ws.sessionId
+				req.getHeader('sec-websocket-key'),
+				req.getHeader('sec-websocket-protocol'),
+				req.getHeader('sec-websocket-extensions'),
+				context
+			);
+		},
+		open: (ws) => {
+			onOpen(ws);
 		},
 
-		message(ws, message, isBinary) {
+		message: (ws, message, isBinary) => {
 			onMessage(ws, message, isBinary);
 		},
 
-		close(ws, code, message) {
+		close: (ws, code, message) => {
 			onClose(ws, code, message);
 		}
 	}).listen(port, (token) => {

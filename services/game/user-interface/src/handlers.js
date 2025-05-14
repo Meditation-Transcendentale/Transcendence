@@ -10,8 +10,9 @@ export default async function registerHandlers() {
 
 	natsInterface.subscribeMatchSetup((buf, msg) => {
 		const req = decodeMatchSetup(buf);
+		console.log(req);
 		const mode = msg.subject.split('.')[1];
-		sm.setMatchSetup(req.gameId, req.allowedUserIds, mode);
+		sm.setMatchSetup(req.gameId, req.players, mode);
 	});
 
 	sm.on('gameReady', ({ gameId, mode }) => {

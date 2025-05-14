@@ -43,7 +43,7 @@ export class Game {
 			gameId: this.createGameId(),
 			tick: 0,
 			balls: [],
-			paddles: {},
+			paddles: [],
 			score: {},
 			walls: [],
 			mode: this.mode,
@@ -55,19 +55,11 @@ export class Game {
 			: [];
 		for (let i = 0; i < 2; i++) {
 			const posX = (config.arenaWidth / 2 * config.paddleOffsetRatio * ((i == 1) * -1 + (i == 0) * 1)) * config.scaleFactor
-			const x = i ? -posX : posX;
-			const y = 0;
-			const rotation_y = i % 2 ? -90 * Math.PI / 180 : 90 * Math.PI / 180;
-			const playerId = playerIds[i];
 
-			state.paddles[playerId] = {
-				id: playerId,
-				x,
-				y,
-				offset: 0,
-				connected: false,
-				rotation_y
-			};
+			state.paddles.push({
+				id: i,
+				offset: 0
+			});
 		}
 		for (let i = 0; i < 2; i++) {
 			let x = i % 2 ? (config.arenaWidth / 2) * config.scaleFactor : 0;

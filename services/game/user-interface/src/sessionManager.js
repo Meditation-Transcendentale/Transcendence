@@ -14,16 +14,16 @@ export default class SessionManager extends EventEmitter {
 
 	// Called when GameManager sends MatchSetup
 	setMatchSetup(gameId, allowedUserIds, mode) {
+		console.log(allowedUserIds);
 		this.allowedByGame.set(gameId, { allowedUserIds, mode });
 		this.sessionsByGame.set(gameId, new Set());
 	}
 
-	handleOpen(ws, req) {
-		const params = new URL(req.getUrl(), 'http://x').searchParams;
-		const sessionId = params.get('uuid');
-		ws.sessionId = sessionId;
+	handleOpen(ws) {
+		const sessionId = ws.sessionId;   // pulled from userData you passed in upgrade
 		this.wsBySession.set(sessionId, ws);
 		this.sessionInfo.set(sessionId, { ws });
+		console.log("welcome send !");
 		ws.send(JSON.stringify({ type: 'welcome', sessionId }));
 	}
 
@@ -35,8 +35,9 @@ export default class SessionManager extends EventEmitter {
 
 		const sessionId = ws.sessionId;
 		if (msg.type === 'registerGame') {
-			const { gameId, userId } = msg.data;
-			this.registerGame(sessionId, gameId, userId);
+			console.log(msg.data);
+			const { gameId, uuid } = msg.data;
+			this.registerGame(sessionId, gameId, uuid);
 		}
 		else if (msg.type === 'paddleUpdate') {
 			this.emit('paddleUpdate', { sessionId, data: msg.data });
@@ -64,6 +65,8 @@ export default class SessionManager extends EventEmitter {
 		const info = this.sessionInfo.get(sessionId);
 		const ws = this.wsBySession.get(sessionId);
 		const setup = this.allowedByGame.get(gameId);
+		console.log("setup")
+		console.log(setup);
 		if (!setup || !setup.allowedUserIds.includes(userId)) {
 			return ws.send(JSON.stringify({ type: 'error', message: 'Not allowed to join this game' }));
 		}
@@ -80,7 +83,7 @@ export default class SessionManager extends EventEmitter {
 
 			// once everyone in allowedUserIds has connected, emit “gameReady”
 			if (sessions.size === allowedUserIds.length) {
-				this.emit('gameReady', { gameId, mode });
+				this.emit('gameReady', { gameId: gameId.toString(), mode });
 			}
 		} else {
 			ws.send(JSON.stringify({
