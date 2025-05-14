@@ -11,8 +11,7 @@ class Register {
 		if (this.loaded == true) {
 			return;
 		}
-		document.getElementById("register")?.addEventListener("submit", (ev) => {
-			ev.preventDefault();
+		document.getElementById("register-submit")?.addEventListener("click", (ev) => {
 			this.registerRequest(
 				document.getElementById("register-username")?.value,
 				document.getElementById("register-password")?.value
@@ -26,7 +25,18 @@ class Register {
 			Router.nav("/auth");
 		})
 
-
+		const c1 = document.getElementById("rtc") as HTMLElement;
+		const rt = document.getElementById("rr") as HTMLElement;
+		rt.addEventListener("mousemove", (ev) => {
+			const {
+				top,
+				left,
+				width,
+				height
+			} = rt.getBoundingClientRect();
+			c1.style.left = `${ev.clientX}px`;
+			c1.style.top = `${ev.clientY}px`;
+		})
 
 		this.loaded = true;
 	}
@@ -48,7 +58,7 @@ class Register {
 			new CustomEvent("status", { detail: { ok: true, json: json.message } }));
 		document.getElementById("register-username")?.setAttribute("value", "");
 		document.getElementById("register-password")?.setAttribute("value", "");
-		Router.nav("/home", true);
+		Router.nav("/home/play", true);
 	}
 
 	private requestReject(response: Response) {

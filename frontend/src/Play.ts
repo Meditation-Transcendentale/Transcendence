@@ -16,6 +16,8 @@ export default class Play {
 	private loaded = false;
 	private dom: dom;
 
+	private gameIP = "10.19.225.59";
+
 	constructor() {
 	}
 
@@ -61,7 +63,7 @@ export default class Play {
 	}
 
 	private async createLobbyRequest() {
-		const response = await fetch("http://localhost:5001" + "/lobby/create", {
+		const response = await fetch(`http://${this.gameIP}:5001` + "/lobby/create", {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'

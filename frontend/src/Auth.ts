@@ -78,7 +78,7 @@ class Auth {
 	private loginResolve(json: JSON) {
 		document.getElementById("status")?.dispatchEvent(new CustomEvent("status", { detail: { ok: true, json: json.message } }));
 		// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home", return: true } }));
-		Router.nav("", true);
+		Router.nav("/home/play", true);
 	}
 
 	private loginReject(response: Response) {
