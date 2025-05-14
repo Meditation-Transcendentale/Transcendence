@@ -22,6 +22,11 @@ class RouterC {
 				script: { path: "./Auth", data: null },
 				callback: (url: URL) => { this.loadInMain(url) }
 			},
+			"/notification": {
+				html: { path: "/notification", data: null },
+				script: { path: "./Notification", data: null },
+				callback: (url: URL) => { this.loadInMain(url) }
+			},
 			"/register": {
 				html: { path: "/register", data: null },
 				script: { path: "./Register", data: null },
