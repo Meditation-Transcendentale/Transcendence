@@ -34,7 +34,7 @@ export type friend_RequestResponse = {
 
 
 export async function registerRequest(username: string, password: string): Promise<AuthResponse> {
-	const response = await fetch("https://localhost:3000/register", {
+	const response = await fetch(`https://${window.location.hostname}:3000/register`, {
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
@@ -57,7 +57,7 @@ export async function registerRequest(username: string, password: string): Promi
 
 export async function loginRequest(username: string, password: string): Promise<AuthResponse> {
 	console.log(".");
-	const response = await fetch("https://localhost:3000/auth/login", {
+	const response = await fetch(`https://${window.location.hostname}:3000/auth/login`, {
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
@@ -84,7 +84,7 @@ export async function loginRequest(username: string, password: string): Promise<
 
 
 export async function logoutRequest(): Promise<AuthResponse> {
-	const response = await fetch("https://localhost:3000/auth/logout", {
+	const response = await fetch(`https://${window.location.hostname}:3000/auth/logout`, {
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
@@ -103,7 +103,7 @@ export async function logoutRequest(): Promise<AuthResponse> {
 }
 
 export async function updateInfoRequest(username: string, avatar: string): Promise<AuthResponse> {
-	const response = await fetch("https://localhost:3000/update-info", {
+	const response = await fetch(`https://${window.location.hostname}:3000/update-info`, {
 		method: 'PATCH',
 		headers: {
 			'Accept': 'application/json',
@@ -127,7 +127,7 @@ export async function updateInfoRequest(username: string, avatar: string): Promi
 }
 
 export async function updatePasswordRequest(password: string, newPassword: string): Promise<AuthResponse> {
-	const response = await fetch("https://localhost:3000/update-info/password", {
+	const response = await fetch(`https://${window.location.hostname}:3000/update-info/password`, {
 		method: 'PATCH',
 		headers: {
 			'Accept': 'application/json',
@@ -152,7 +152,7 @@ export async function updatePasswordRequest(password: string, newPassword: strin
 }
 
 export async function statsRequest(username: string): Promise<statsResponse> {
-	const response = await fetch("https://localhost:3000/stats/player/:" + username, {
+	const response = await fetch(`https://${window.location.hostname}:3000/stats/player/:` + username, {
 		method: 'GET',
 		headers: {
 			'Accept': 'application/json',
@@ -171,7 +171,7 @@ export async function statsRequest(username: string): Promise<statsResponse> {
 }
 
 export async function enable2FARequest(): Promise<twoFAResponse> {
-	const response = await fetch("https://localhost:3000/update-info/enable-2fa", {
+	const response = await fetch(`https://${window.location.hostname}:3000/update-info/enable-2fa`, {
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
@@ -190,7 +190,7 @@ export async function enable2FARequest(): Promise<twoFAResponse> {
 }
 
 export async function verify2FARequest(): Promise<twoFAResponse> {
-	const response = await fetch("https://localhost:3000/update-info/verify-2fa", {
+	const response = await fetch(`https://${window.location.hostname}:3000/update-info/verify-2fa`, {
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',
@@ -210,7 +210,7 @@ export async function verify2FARequest(): Promise<twoFAResponse> {
 }
 
 export async function friendlist_Request(): Promise<friendlist_RequestResponse> {
-	const response = await fetch("https://localhost:3000/friends/get/friendlist", {
+	const response = await fetch(`https://${window.location.hostname}:3000/friends/get/friendlist`, {
 		method: 'GET',
 		headers: {
 			'Accept': 'application/json',
@@ -231,7 +231,7 @@ export async function friendlist_Request(): Promise<friendlist_RequestResponse> 
 
 export async function addFriend_Request(addedUsername: string): Promise<friend_RequestResponse> 
 {
-	const response = await fetch("https://localhost:3000/friends/add", {
+	const response = await fetch(`https://${window.location.hostname}:3000/friends/add`, {
 		method: 'POST',
 		headers: {
 			'Accept': 'application/json',

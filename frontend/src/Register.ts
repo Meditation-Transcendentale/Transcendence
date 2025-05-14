@@ -70,7 +70,7 @@ class Register {
 	}
 
 	private async registerRequest(username: string, password: string) {
-		const response = await fetch("https://localhost:3000/register", {
+		const response = await fetch(`https://${window.location.hostname}:3000/register`, {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
@@ -93,7 +93,7 @@ class Register {
 
 
 	private async loginRequest(username: string, password: string) {
-		const response = await fetch("https://localhost:3000/auth/login", {
+		const response = await fetch(`https://${window.location.hostname}:3000/auth/login`, {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
