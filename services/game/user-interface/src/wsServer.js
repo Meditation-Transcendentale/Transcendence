@@ -19,15 +19,15 @@ export function startWsServer({ port, onOpen, onMessage, onClose }) {
 		upgrade: (res, req, context) => {
 			// parse out your ?uuid=… query param
 			const fullUrl = req.getQuery();               // e.g. "/?uuid=abcd1234"
-			console.log(fullUrl);
-			const [, rawQs] = fullUrl.split('?');       // "uuid=abcd1234"
-			const sessionId = rawQs
-				? new URLSearchParams(rawQs).get('uuid')
-				: null;
+			const [path, rawQs] = fullUrl.split('?');       // "uuid=abcd1234"
+			const params = new URLSearchParams(rawQs);
+			const role = params.get('role');
+			const gameId = params.get('gameId');
+			const session = { sessionId: params.get('uuid'), role, gameId };
 
 			// 2) Call res.upgrade and pass it as userData:
 			res.upgrade(
-				{ sessionId },                            // <— this becomes ws.sessionId
+				session,
 				req.getHeader('sec-websocket-key'),
 				req.getHeader('sec-websocket-protocol'),
 				req.getHeader('sec-websocket-extensions'),

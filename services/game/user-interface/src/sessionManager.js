@@ -8,6 +8,7 @@ export default class SessionManager extends EventEmitter {
 		this.sessionsByGame = new Map(); // gameId → Set<sessionId>
 		this.sessionInfo = new Map(); // sessionId → { ws, gameId, userId, paddleId, mode }
 		this.wsBySession = new Map(); // sessionId → ws
+		this.spectatorByGame = new Map();
 		this.disconnectTimers = new Map();
 		this.disconnectTimeout = disconnectTimeoutMs;
 	}
@@ -20,14 +21,23 @@ export default class SessionManager extends EventEmitter {
 	}
 
 	handleOpen(ws) {
-		const sessionId = ws.sessionId;   // pulled from userData you passed in upgrade
-		this.wsBySession.set(sessionId, ws);
-		this.sessionInfo.set(sessionId, { ws });
-		console.log("welcome send !");
-		ws.send(JSON.stringify({ type: 'welcome', sessionId }));
+		const { sessionId, role, gameId } = ws;
+		ws.sessionId = sessionId;
+		ws.role = role;
+		ws.gameId = gameId;
+		if (role === 'spectator') {
+			this.spectatorsByGame
+				.get(gameId)
+				.add(ws);
+		} else {
+			this.wsBySession.set(sessionId, ws);
+			this.sessionInfo.set(sessionId, { ws, role });
+		}
+		ws.send(JSON.stringify({ type: 'welcome', sessionId, role }));
 	}
 
 	handleMessage(ws, message, isBinary) {
+		if (ws.role === 'spectator') return;
 		if (isBinary) return;
 		let msg;
 		try { msg = JSON.parse(Buffer.from(message).toString()); }

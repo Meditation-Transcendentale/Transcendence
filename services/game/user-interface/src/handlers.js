@@ -36,12 +36,31 @@ export default async function registerHandlers() {
 		);
 	});
 
+	sm.on('matchEnd', ({ gameId, winner }) => {
+		for (let sessionId of sm.getSessions(gameId)) {
+			const info = sm.getSessionInfo(sessionId);
+			if (info) {
+				info.ws.send(JSON.stringify({ type: 'gameEnd', gameId, winner }));
+				info.ws.close();
+			}
+		}
+		for (let ws of sm.spectatorsByGame.get(gameId) || []) {
+			ws.send(JSON.stringify({ type: 'gameEnd', gameId, winner }));
+			ws.close();
+		}
+		sm.cleanupGame(gameId);
+	});
+
 	natsInterface.subscribeStateUpdates((buf) => {
 		const { state } = decodeStateUpdate(buf);
 		const msg = encodeWsMessage({ state: state });
+		const spectatorSockets = sm.spectatorsByGame.get(state.gameId) || [];
 		for (const sessionId of sm.getSessions(state.gameId)) {
 			const info = sm.getSessionInfo(sessionId);
 			if (info) info.ws.send(msg, /* isBinary= */ true);
+		}
+		for (const ws of spectatorSockets) {
+			ws.send(msg, /* isBinary= */ true);
 		}
 	});
 

@@ -10,6 +10,7 @@ This document provides an overview of the server-side architecture, including se
   - Hosts the **Lobby WebSocket** for players to join, setup game, signal readiness, and detect disconnects
   - Optionally provides HTTP endpoints for lobby browsing
   - When all players are ready, publishes `game.create` with a custom lobby template
+  - When players join / leave a lobby, publishes `status.${uuid}.update`
 
 - **Matchmaking Service**  
   - Exposes HTTP POST `/matchmaking/join` & `/matchmaking/leave`
@@ -27,9 +28,15 @@ This document provides an overview of the server-side architecture, including se
   - Compute physics ticks and return via `physics.response.{mode}`
 
 - **User Interface Service**  
-  - Hosts the **Game WebSocket** for real-time gameplay (inputs + state updates)
-  - Subscribes to `state.update.{gameId}` and pushes to connected clients
-  - Publishes client inputs to `game.input.{gameId}` or directly to `physics.request.{mode}`
+  - Hosts the **Game uWebSocket.js** for real-time gameplay (inputs + state updates + event)
+  - Websocket send : `welcome`, `registered`, `error`, `stateUpdate`, `gameEnd`, `gameStart`
+  - Websocket message: `paddleUpdate`, `quit`, `spectate` 
+  - Subscribes to `game.*.*.state.update` and pushes to connected clients
+  - Subscribes to `game.*.match.setup` to prepare game and wait for players connection 
+  - Subscribes to `game.*.*.match.end` to end game and clean it 
+  - Publishes client inputs to `game.${mode}.${gameId}.match.input` 
+  - Publishes game start when all players are connected `game.${mode}.${gameId}.match.start` 
+  - Publishes client status on connection/in game / in disconnects/ to `status.${uuid}.update` 
 
 - **IA Service**  
   - Manages bot instances that connect over the Game WebSocket just like human clients
