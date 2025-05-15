@@ -50,10 +50,6 @@ export function attach(wss, natsClient) {
 						}
 						break
 
-					case 'heartbeat':
-						lobbyService.heartbeat(msg.lobbyId, msg.userId)
-						break
-
 					default:
 						throw new Error(`Unknown message type: ${msg.type}`)
 				}
