@@ -1,0 +1,16 @@
+{
+    "mode": {
+      "type": "string",
+      "enum": ["pong", "pongio", "pongbr", "tournament"],
+      "description": "Which game mode to play."
+    },
+    "map": {
+      "type": "string",
+      "description": "Which map to use"
+    },
+    "submode": {
+      "type": "string",
+      "enum": ["local", "ia", "online"],
+      "description": "Chose submode when mode is pong"
+    }
+}

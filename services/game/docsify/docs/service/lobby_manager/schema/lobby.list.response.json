@@ -1,0 +1,21 @@
+{
+    "lobbies": {
+      "type": "array",
+      "items": {
+          "id": { 
+			  "type": "string"
+		  },
+          "mode": {
+            "type": "string",
+            "enum": ["pong","pongBR","pongIO"]
+          },
+          "maxPlayers": { 
+			  "type": "integer"
+		  },
+          "players": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+        }
+      }
+}

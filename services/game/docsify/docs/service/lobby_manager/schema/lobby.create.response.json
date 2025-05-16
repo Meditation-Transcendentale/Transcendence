@@ -1,0 +1,6 @@
+{
+    "lobbyId": {
+      "type": "string",
+      "description": "newly created lobbyId"
+    }
+}
