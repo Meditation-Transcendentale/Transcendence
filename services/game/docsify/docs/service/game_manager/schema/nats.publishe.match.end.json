@@ -1,0 +1,5 @@
+// game.${mode}.${gameId}.match.end
+// mode : "ia", "local", "online", "pongbr", "pongio"
+{
+ // empty ?
+}

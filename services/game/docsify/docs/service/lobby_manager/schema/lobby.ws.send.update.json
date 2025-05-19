@@ -1,4 +1,24 @@
-			players,
-			ready,
-			status: status,
-
+{
+    "players": {
+      "type": "array",
+      "items": {
+        "type": "object",
+          "uuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Player’s unique identifier"
+          },
+          "ready": {
+            "type": "boolean",
+            "description": "Whether this player is ready"
+          }
+      }
+	},
+    "status": {
+      "type": "string",
+      "enum": [ "waiting", "starting" ]
+    },
+    "lobbyId": {
+      "type": "string",
+    },
+}

@@ -1,0 +1,10 @@
+{
+	"paddleId": {
+		"type": "number",
+		"description": "Numeric identifier of the paddle being updated"
+	},
+	"move": {
+		"type": "number",
+		"description": "Whether the paddle is moving "
+	},
+}

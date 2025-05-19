@@ -1,0 +1,6 @@
+{
+	"gameId": {
+		"type": "string",
+        "description": "Newly created game's gameId"
+	},
+}

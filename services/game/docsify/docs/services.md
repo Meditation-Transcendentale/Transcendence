@@ -5,7 +5,7 @@ WS ws://${SERVER_ADDRESS}:${SERVER_PORT}?uuid=${UUID}&lobbyId=${lobbyId}
   - Hosts the **Lobby WebSocket** for players to join, setup game, signal readiness, and detect disconnects
   - HTTP `/lobby` endpoints : `/list`, `/create`, `/:id`
   - Websocket send :  `update`(lobby.update), `start`, `error`,
-  - Websocket message: `join`, `ready`, `quit`
+  - Websocket message: `join` maybe handle on connection, `ready`, `quit`
   - When all players are ready, publishes `game.${mode}.match.create` with a custom lobby template
   - When players join / leave a lobby, publishes `user.${uuid}.status.${new_status}`
 

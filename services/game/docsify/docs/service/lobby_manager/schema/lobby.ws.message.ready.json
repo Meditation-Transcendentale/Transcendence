@@ -1,0 +1,6 @@
+// get uuid from ws
+{
+	"lobbyId": {
+		"type": "string",
+	},
+}

@@ -1,0 +1,6 @@
+{
+	"message": {
+      "type": "string",
+      "description": "Human‐readable error description"
+    },
+}

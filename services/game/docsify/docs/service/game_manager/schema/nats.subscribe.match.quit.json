@@ -1,0 +1,9 @@
+// game.${mode}.${gameId}.match.quit
+// mode : "ia", "local", "online", "pongbr", "pongio"
+{
+	"uuid": {
+		"type": "string",
+		"format": "uuid",
+		"description": "Player’s unique identifier that quit game before end"
+	},
+}
