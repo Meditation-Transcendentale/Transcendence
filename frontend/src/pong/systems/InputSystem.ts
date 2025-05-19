@@ -13,12 +13,14 @@ export class InputSystem extends System {
 	private wsManager: WebSocketManager;
 	private localPaddleId: number | null = null;
 	private readonly MAX_OFFSET: number = 8.4;
+	private move: boolean;
 
 	constructor(inputManager: InputManager, wsManager: WebSocketManager) {
 		super();
 		this.inputManager = inputManager;
 		this.wsManager = wsManager;
 		this.localPaddleId = localPaddleId;
+		this.move = false;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -38,18 +40,17 @@ export class InputSystem extends System {
 			const transform = entity.getComponent(TransformComponent)!;
 
 			let offsetChange = 0;
-			let move = false;
-			if (this.inputManager.isKeyPressed("KeyA")) {
-				offsetChange += 0.4;
-				move = true;
-			}
-			if (this.inputManager.isKeyPressed("KeyD")) {
-				offsetChange -= 0.4;
-				move = true;
+			const leftPressed = this.inputManager.isKeyPressed("KeyA");
+			const rightPressed = this.inputManager.isKeyPressed("KeyD");
+
+			this.move = leftPressed || rightPressed;
+
+			if (this.move) {
+				offsetChange = leftPressed ? 0.4 : -0.4;
 			}
 			paddle.offset = Scalar.Clamp(paddle.offset, -this.MAX_OFFSET, this.MAX_OFFSET);
 
-			if (move == true) {
+			if (this.move) {
 				paddle.offset += offsetChange;
 
 				const rotationMatrix = Matrix.RotationYawPitchRoll(
@@ -64,8 +65,7 @@ export class InputSystem extends System {
 					type: "paddleUpdate",
 					data: {
 						paddleId: localPaddleId,
-						x: transform.position.x,
-						y: transform.position.z,
+						move: this.move,
 						offset: paddle.offset,
 					}
 				});
