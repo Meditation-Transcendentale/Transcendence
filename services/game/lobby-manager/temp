@@ -1,3 +1,69 @@
+// services/lobby-manager/src/app.js
+
+import Fastify from 'fastify'
+import fastifyCors from '@fastify/cors'
+
+import config from './config.js'
+import natsClient from './natsClient.js'
+import lobbyRoutes from './routes/lobbyRoutes.js'
+import lobbyStore from './store/lobbyStore.js'
+import * as lobbyService from './services/lobbyService.js'
+// TODO add https
+export async function buildApp() {
+	const app = Fastify({ logger: true })
+
+	app.decorate('lobbyStore', lobbyStore)
+	app.decorate('lobbyService', lobbyService)
+
+	app.addHook('onClose', async () => {
+		lobbyStore.shutdown()
+		await natsClient.close()
+	})
+	await app.register(fastifyCors, { origin: '*', credentials: true })
+
+	await natsClient.connect(config.NATS_URL)
+
+	app.register(lobbyRoutes, { prefix: '/lobby' })
+
+	await app.ready()
+	return app
+}
+
+export default {
+	PORT: 5001,
+	HEARTBEAT_INTERVAL: 30_000,
+	NATS_URL: "nats://nats:4222",
+	MAX_PLAYERS: {
+		pong: { local: 1, ia: 1, online: 2 },
+		pongBR: { default: 100 },
+		pongIO: { default: 20 },
+	},
+}
+// services/lobby-manager/src/index.js
+
+import { buildApp } from './app.js'
+import { WebSocketServer } from 'ws'
+import config from './config.js'
+import * as wsServer from './ws/wsServer.js'
+import natsClient from './natsClient.js'
+
+async function start() {
+	const app = await buildApp()
+
+	const server = app.server
+
+	const wss = new WebSocketServer({ server, path: '/lobbies' })
+	wsServer.attach(wss, natsClient)
+
+	await app.listen({ port: config.PORT, host: '0.0.0.0' })
+	app.log.info(`Lobby Manager listening on port ${config.PORT}`)
+}
+
+start().catch(err => {
+	console.error('Failed to start Lobby Manager:', err)
+	process.exit(1)
+})
+
 export function encodeBall(message) {
   let bb = popByteBuffer();
   _encodeBall(message, bb);
@@ -1726,3 +1792,348 @@ function writeVarint64ZigZag(bb, value) {
     unsigned: false,
   });
 }
+// ==== services/natsClient.js ====
+import { connect, StringCodec } from 'nats';
+const sc = StringCodec();
+let nc;
+
+export default {
+	/** Connect once at startup */
+	async connect(url) {
+		nc = await connect({ servers: url });
+		return nc;
+	},
+
+	/** Publish JSON or string as before */
+	publish(subject, payload) {
+		const data = typeof payload === 'string'
+			? sc.encode(payload)
+			: sc.encode(JSON.stringify(payload));
+		nc.publish(subject, data);
+	},
+
+	/** Subscribe JSON as before */
+	subscribe(subject, handler) {
+		const sub = nc.subscribe(subject);
+		(async () => {
+			for await (const msg of sub) {
+				const str = sc.decode(msg.data);
+				handler(JSON.parse(str), msg);
+			}
+		})();
+	},
+
+	/**
+	 * New: generic request that accepts either a Uint8Array (binary)
+	 * or string/object (will be JSON-encoded), and returns the raw Msg.
+	 */
+	async request(subject, payload, opts = {}) {
+		let data;
+		if (payload instanceof Uint8Array) {
+			data = payload;
+		} else if (typeof payload === 'string') {
+			data = sc.encode(payload);
+		} else {
+			data = sc.encode(JSON.stringify(payload));
+		}
+		// opts can include `{ timeout: 2000 }`, etc.
+		return await nc.request(subject, data, opts);
+	},
+
+	async close() {
+		if (nc) await nc.close();
+	}
+};
+
+// ==== models/Lobby.js ====
+export default class Lobby {
+	constructor({ id, mode, map, submode, maxPlayers }) {
+		this.id = id;
+		this.mode = mode;
+		this.map = map;
+		if (mode != 'pong')
+			this.submode = "none";
+		else
+			this.submode = submode;
+		this.maxPlayers = maxPlayers;
+		this.players = new Map(); // userId -> { isReady, lastSeen }
+		this.createdAt = Date.now();
+	}
+
+	addPlayer(userId) {
+		if (this.players.size >= this.maxPlayers) {
+			throw new Error(`Lobby is full (max ${this.maxPlayers})`);
+		}
+		if (this.players.has(userId)) return;
+		this.players.set(userId, { isReady: false, lastSeen: Date.now() });
+	}
+
+	markReady(userId) {
+		const p = this.players.get(userId);
+		if (p) p.isReady = true;
+	}
+
+	heartbeat(userId) {
+		const p = this.players.get(userId);
+		if (p) p.lastSeen = Date.now();
+	}
+
+	removePlayer(userId) {
+		this.players.delete(userId);
+	}
+
+	allReady() {
+		return (
+			this.players.size > 0 &&
+			[...this.players.values()].every(p => p.isReady)
+		);
+	}
+
+	getState() {
+		const players = [...this.players.keys()];
+		const ready = players.filter(id => this.players.get(id).isReady);
+		const status = this.allReady() ? 'starting' : 'waiting';
+
+		return {
+			lobbyId: this.id,
+			mode: this.mode,
+			map: this.map,
+			submode: this.submode,
+			maxPlayers: this.maxPlayers,
+			currentCount: players.length,
+			slotsRemaining: this.maxPlayers - players.length,
+			players,
+			ready,
+			status: status,
+		};
+	}
+};
+// src/routes/lobbyRoutes.js
+
+export default async function lobbyRoutes(fastify, opts) {
+	// List lobbies
+	fastify.get('/list', async (request, reply) => {
+		const all = Array.from(fastify.lobbyStore.lobbies.values()).map(l => l.getState())
+		return all
+	})
+
+	// Create lobby
+	fastify.post('/create', async (request, reply) => {
+		const state = fastify.lobbyService.createLobby(request.body)
+		reply.code(201).send(state)
+	})
+
+	// Get lobby by ID
+	fastify.get('/:id', async (request, reply) => {
+		const lobby = fastify.lobbyStore.getLobby(request.params.id)
+		if (!lobby) {
+			return reply.code(404).send({ error: 'Not found' })
+		}
+		return lobby.getState()
+	})
+}
+// ==== services/lobbyService.js ====
+import lobbyStore from '../store/lobbyStore.js';
+import config from '../config.js';
+import { requestNewMatch } from './natsRequests.js';
+
+export function createLobby({ mode, map, submode }) {
+	const caps = config.MAX_PLAYERS[mode] || {};
+	const max = caps[submode] ?? caps.default ?? 2;
+	const lobby = lobbyStore.createLobby({ mode, map, submode, maxPlayers: max });
+	return lobby.getState();
+}
+
+export function join(lobbyId, userId) {
+	const lobby = lobbyStore.getLobby(lobbyId);
+	if (!lobby) throw new Error('Lobby not found');
+	lobby.addPlayer(userId);
+	return lobby.getState();
+}
+
+export async function ready(lobbyId, userId) {
+	const lobby = lobbyStore.getLobby(lobbyId);
+	if (!lobby) throw new Error('Lobby not found');
+	lobby.markReady(userId);
+	const state = lobby.getState();
+	if (lobby.allReady()) {
+		try {
+			const gameId = await requestNewMatch(
+				lobby.mode,
+				state.players,
+				{}
+			);
+			state.gameId = gameId;
+		} catch (err) {
+			console.error(`Failed to create game: ${err.message}`);
+		}
+	}
+	return state;
+}
+
+export function heartbeat(lobbyId, userId) {
+	const lobby = lobbyStore.getLobby(lobbyId);
+	if (lobby) lobby.heartbeat(userId);
+}
+
+export function leave(lobbyId, userId) {
+	const lobby = lobbyStore.getLobby(lobbyId);
+	if (lobby) lobby.removePlayer(userId);
+}
+
+export function getState(lobbyId) {
+	const lobby = lobbyStore.getLobby(lobbyId);
+	return lobby ? lobby.getState() : null;
+}
+// services/natsRequests.js
+import natsClient from '../natsClient.js';
+import * as protobuf from '../message.js';  // your generated file
+export async function requestNewMatch(mode, players = [], options = {}, opts = {}) {
+	const subject = `games.${mode}.match.create`;
+
+	// 1) Build the Protobuf request
+	const reqBuffer = protobuf.encodeMatchCreateRequest({ mode, players, options });
+	const resp1 = protobuf.decodeMatchCreateResponse(reqBuffer);
+
+	console.log(resp1);
+	// 2) Send it as a NATS req/rep
+	const msg = await natsClient.request(subject, reqBuffer, { timeout: 5_000 });
+
+	// 3) Decode the Protobuf response
+	const resp = protobuf.decodeMatchCreateResponse(msg.data);
+	console.log(resp);
+	if (resp.error && resp.error.length) {
+		throw new Error(resp.error);
+	}
+	return resp.gameId;
+}
+
+// ==== store/lobbyStore.js ====
+import Lobby from '../models/Lobby.js';
+import { v4 as uuid } from 'uuid';
+import config from '../config.js';
+
+class LobbyStore {
+	constructor() {
+		this.lobbies = new Map();
+		this._cleanupInterval = setInterval(() => this.cleanup(), config.HEARTBEAT_INTERVAL);
+	}
+
+	createLobby(params) {
+		const id = uuid();
+		const lobby = new Lobby({ id, ...params });
+		console.log(params);
+		this.lobbies.set(id, lobby);
+		return lobby;
+	}
+
+	getLobby(id) {
+		return this.lobbies.get(id);
+	}
+
+	deleteLobby(id) {
+		this.lobbies.delete(id);
+	}
+
+	cleanup() {
+		const now = Date.now();
+		for (const [id, lobby] of this.lobbies) {
+			// remove lobby if empty or owner timed out
+			if (lobby.players.size === 0) {
+				console.log(`lobby ${id} delete`)
+				this.deleteLobby(id);
+			} else {
+				const owner = [...lobby.players.values()][0];
+				if (now - owner.lastSeen > config.HEARTBEAT_INTERVAL * 2) {
+					this.deleteLobby(id);
+				}
+			}
+		}
+	}
+
+	shutdown() {
+		clearInterval(this._cleanupInterval)
+	}
+
+}
+
+export default new LobbyStore();
+// services/lobby-manager/src/ws/wsServer.js
+
+import * as lobbyService from '../services/lobbyService.js'
+
+const lobbySockets = new Map()  // lobbyId → Set<ws>
+
+export function attach(wss, natsClient) {
+	const interval = setInterval(() => {
+		wss.clients.forEach(ws => {
+			if (!ws.isAlive) return ws.terminate()
+			ws.isAlive = false
+			ws.ping()
+		})
+	}, 30_000)
+
+	wss.on('connection', (ws, req) => {
+		const params = new URL(req.url, `http://${req.headers.host}`).searchParams
+		ws.lobbyId = params.get('lobbyId')
+		ws.userId = params.get('userId')
+		ws.isAlive = true
+
+		// Join lobby group
+		if (!lobbySockets.has(ws.lobbyId)) lobbySockets.set(ws.lobbyId, new Set())
+		lobbySockets.get(ws.lobbyId).add(ws)
+
+		ws.on('pong', () => { ws.isAlive = true })
+
+		ws.on('message', async data => {
+			let msg
+			try { msg = JSON.parse(data) }
+			catch { return ws.send(JSON.stringify({ type: 'error', message: 'invalid JSON' })) }
+
+			try {
+				let state;
+				switch (msg.type) {
+					case 'join':
+						state = await lobbyService.join(msg.lobbyId, msg.userId)
+						broadcast(ws.lobbyId, { type: 'lobby.update', ...state })
+						break
+
+					case 'ready':
+						state = await lobbyService.ready(msg.lobbyId, msg.userId)
+						broadcast(ws.lobbyId, { type: 'lobby.update', ...state })
+						if (state.status === 'starting') {
+							broadcast(ws.lobbyId, {
+								type: 'start',
+								gameId: state.gameId,
+								settings: {}
+							});
+						}
+						break
+
+					default:
+						throw new Error(`Unknown message type: ${msg.type}`)
+				}
+			} catch (err) {
+				ws.send(JSON.stringify({ type: 'error', message: err.message }))
+			}
+		})
+
+		ws.on('close', () => {
+			lobbySockets.get(ws.lobbyId)?.delete(ws)
+			lobbyService.leave(ws.lobbyId, ws.userId)
+			const newState = lobbyService.getState(ws.lobbyId)
+			broadcast(ws.lobbyId, { type: 'lobby.update', ...newState })
+		})
+	})
+
+	wss.on('close', () => clearInterval(interval))
+}
+
+function broadcast(lobbyId, msg) {
+	const clients = lobbySockets.get(lobbyId) || []
+	const data = JSON.stringify(msg)
+	for (const client of clients) {
+		if (client.readyState === client.OPEN) client.send(data)
+	}
+}
+

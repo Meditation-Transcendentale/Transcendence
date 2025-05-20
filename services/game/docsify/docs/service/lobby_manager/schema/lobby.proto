@@ -58,3 +58,11 @@ message UpdateMessage {
   repeated Player players = 2;
   string status = 3; // e.g. "waiting", "starting"
 }
+
+// Envelope for *all* client→server messages
+message ClientMessage {
+  oneof payload {
+    QuitMessage quit = 1;
+    ReadyMessage ready = 2;
+  }
+}

@@ -1,0 +1,252 @@
+// src/config.js
+export default {
+	PORT: 5001,
+	HEARTBEAT_INTERVAL: 30_000,
+	NATS_URL: 'nats://nats:4222',
+	WS_PATH: '/lobbies',
+
+	MAX_PLAYERS: {
+		ia: 1,
+		online: 2,
+		local: 1,
+		pongBR: 100,
+		pongIO: 20,
+	},
+};
+// src/index.js
+import Fastify from 'fastify';
+import fastifyCors from '@fastify/cors';
+import config from './config.js';
+import natsClient from './natsClient.js';
+import { attach } from './uwsServer.js';
+import LobbyService from './lobbyService.js';
+import routes from './routes.js';
+
+async function start() {
+	await natsClient.connect(config.NATS_URL);
+	const lobbyService = new LobbyService();
+	const app = Fastify({ logger: true });
+	await app.register(fastifyCors, { origin: '*' });
+	app.decorate('lobbyService', lobbyService);
+	app.decorate('natsClient', natsClient);
+	app.addHook('onClose', async () => {
+		lobbyService.shutdown(); await natsClient.close();
+	});
+	app.register(routes);
+	const { server } = await app.listen({ port: config.PORT, host: '0.0.0.0' });
+	attach(server, config.WS_PATH, lobbyService, natsClient);
+}
+start().catch(console.error);
+// src/lobbyService.js
+import config from './config.js';
+
+// Simple Lobby model
+class Lobby {
+	constructor({ id, mode, map }) {
+		this.id = id;
+		this.mode = mode;
+		this.map = map;
+		this.maxPlayers = config.MAX_PLAYERS[mode] ?? 2;
+		this.players = new Map();  // userId -> { isReady: boolean, lastSeen: timestamp }
+		this.createdAt = Date.now();
+	}
+
+	addPlayer(userId) {
+		if (this.players.size >= this.maxPlayers) {
+			throw new Error(`Lobby is full (max ${this.maxPlayers})`);
+		}
+		if (!this.players.has(userId)) {
+			this.players.set(userId, { isReady: false, lastSeen: Date.now() });
+		}
+		else {
+			throw new Error(`Can't join lobby`);
+		}
+	}
+
+	removePlayer(userId) {
+		this.players.delete(userId);
+	}
+
+	markReady(userId) {
+		const p = this.players.get(userId);
+		if (!p) throw new Error('Player not in lobby');
+		p.isReady = true;
+	}
+
+	getState() {
+		const players = [...this.players.keys()];
+		const status = 'waiting'; // extend with 'ready' logic if needed
+		return {
+			lobbyId: this.id,
+			players,
+			status,
+		};
+	}
+}
+
+export default class LobbyService {
+	constructor() {
+		this.lobbies = new Map();
+		// Periodic cleanup of empty or stale lobbies
+		this._interval = setInterval(() => this.cleanup(), config.HEARTBEAT_INTERVAL);
+	}
+
+	// Create a new lobby and return its initial state
+	create({ mode, map }) {
+		const id = Date.now().toString();
+		const lobby = new Lobby({ id, mode, map });
+		this.lobbies.set(id, lobby);
+		return id;
+	}
+
+	// Add a player to a lobby
+	join(lobbyId, userId) {
+		const lobby = this.lobbies.get(lobbyId);
+		if (!lobby) throw new Error('Lobby not found');
+		lobby.addPlayer(userId);
+		return lobby.getState();
+	}
+
+	// Remove a player from a lobby
+	quit(lobbyId, userId) {
+		const lobby = this.lobbies.get(lobbyId);
+		if (lobby) {
+			lobby.removePlayer(userId);
+			return lobby.getState();
+		}
+		return null;
+	}
+
+	// List all current lobby states
+	list() {
+		return [...this.lobbies.values()].map(l => l.getState());
+	}
+
+	// Remove lobbies that are empty or too old
+	cleanup() {
+		const now = Date.now();
+		for (const [id, lobby] of this.lobbies) {
+			if (
+				lobby.players.size === 0 ||
+				now - lobby.createdAt > config.HEARTBEAT_INTERVAL * 2
+			) {
+				this.lobbies.delete(id);
+			}
+		}
+	}
+
+	// Stop the cleanup interval
+	shutdown() {
+		clearInterval(this._interval);
+	}
+}
+// src/natsClient.js
+import { connect } from 'nats';
+let nc;
+
+export default {
+	async connect(url) {
+		nc = await connect({ servers: url });
+		return nc;
+	},
+
+	publish(subject, uint8array) {
+		nc.publish(subject, uint8array);
+	},
+
+	subscribe(subject, handler) {
+		const sub = nc.subscribe(subject);
+		(async () => {
+			for await (const msg of sub) {
+				handler(msg.data, msg);
+			}
+		})();
+	},
+
+	async request(subject, uint8array, opts = {}) {
+		if (!nc) throw new Error('NATS client not connected');
+		const msg = await nc.request(subject, uint8array, opts);
+		return msg.data;
+	},
+
+	async close() {
+		if (nc) await nc.close();
+	}
+};
+// src/routes.js
+export default async function routes(fastify) {
+	const { lobbyService, natsClient } = fastify;
+
+	fastify.get('/lobby/list', async () => {
+		return lobbyService.list();
+	});
+
+	fastify.post('/lobby/create', async (req, reply) => {
+		const state = lobbyService.create(req.body);
+		reply.code(201).send(state);
+	});
+
+	fastify.post('/lobby/:id/join', async (req, reply) => {
+		const state = lobbyService.join(req.params.id, req.body.userId);
+		const buf = encodeJoin({ lobbyId: req.params.id, userId: req.body.userId });
+		natsClient.publish('lobby.joined', buf);
+		return state;
+	});
+
+	fastify.delete('/lobby/:id/leave', async (req, reply) => {
+		const state = lobbyService.leave(req.params.id, req.body.userId);
+		const buf = encodeLeave({ lobbyId: req.params.id, userId: req.body.userId });
+		natsClient.publish('lobby.left', buf);
+		return state;
+	});
+};
+// src/uwsServer.js
+import uWS from 'uWebSockets.js';
+import { decodeClient, encodeUpdate, encodeError } from './message.js';
+
+export function attach(server, path, lobbyService) {
+	const app = uWS.App({ server });
+
+	app.ws(path, {
+		idleTimeout: 60,
+		open: (ws, req) => {
+			ws.userData = { isAlive: true };
+			const params = new URLSearchParams(req.getQuery());
+			ws.lobbyId = params.get('lobbyId');
+			ws.userId = params.get('userId');
+
+			// Auto-join on connection and broadcast to lobby members
+			try {
+				const state = lobbyService.join(ws.lobbyId, ws.userId);
+				const buf = encodeUpdate(state);
+				ws.subscribe(ws.lobbyId);
+				app.publish(ws.lobbyId, buf, true);
+			} catch (err) {
+				ws.send(encodeError(err.message), true);
+			}
+		},
+		message: (ws, message, isBinary) => {
+			const buf = new Uint8Array(message);
+			const { payload } = decodeClient(buf);
+			let newState;
+
+			if (payload.quit) {
+				newState = lobbyService.leave(payload.quit.lobbyId, payload.quit.userId);
+			} else if (payload.ready) {
+				newState = lobbyService.ready(payload.ready.lobbyId, payload.ready.userId);
+			}
+
+			if (newState) {
+				const updateBuf = encodeUpdate(newState);
+				app.publish(ws.lobbyId, updateBuf, true);
+			}
+		},
+		close: ws => {
+			// Optional per-socket cleanup
+		}
+	})
+		.listen(server.address().port, token => {
+			if (!token) console.error('uWS failed to start');
+		});
+}
+
