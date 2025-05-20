@@ -1,7 +1,8 @@
+// http.id.response.json
 {
 	  "mode": {
 		"type": "string",
-		"enum": ["pong","pongBR","pongIO"]
+        "enum": ["local", "ia", "online", "pongbr","pongio"]
 	  },
 	  "maxPlayers": { 
 		  "type": "integer"

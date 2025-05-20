@@ -1,5 +1,7 @@
-// ws.message.paddleupdate.json
-// ws.message.paddleupdate.json
+// nats.publishe.match.input.json
+// nats.subscribe.match.input.json
+// game.${mode}.${gameId}.match.input
+// mode : "ia", "local", "online", "pongbr", "pongio"
 {
 	"paddleId": {
 		"type": "number",

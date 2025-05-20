@@ -1,3 +1,4 @@
+// http.create.response.json
 {
     "lobbyId": {
       "type": "string",

@@ -1,3 +1,4 @@
+// nats.response.matchcreate.json
 {
 	"gameId": {
 		"type": "string",

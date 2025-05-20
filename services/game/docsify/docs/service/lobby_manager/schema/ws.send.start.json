@@ -1,11 +1,14 @@
+// ws.send.start.json
 {
-    "mode": {
+    "lobbyId": {
       "type": "string",
-      "enum": ["pong", "pongio", "pongbr", ],
-      "description": "Which game mode to play."
+    },
+    "gameId": {
+      "type": "string",
     },
     "map": {
       "type": "string",
+      "enum": [],
       "description": "Which map to use"
     },
 }

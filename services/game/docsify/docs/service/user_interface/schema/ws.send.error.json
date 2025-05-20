@@ -1,3 +1,5 @@
+// ws.send.error.json
+// ws.send.error.json
 {
 	"message": {
       "type": "string",

@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package userinterface;
+
+// -----------------------------------------------------------------------------
+// Core game state messages (standalone, no imports)
+// -----------------------------------------------------------------------------
+message Ball {
+  int32 id = 1;
+  double x  = 2;
+  double y  = 3;
+  double vx = 4;
+  double vy = 5;
+}
+
+message Paddle {
+  int32  id   = 1;
+  int32  move = 2; // -1: left, 0: none, 1: right
+  bool   dead = 3; // only used in BR mode
+}
+
+message MatchState {
+  string          gameId = 1;
+  int64           tick   = 2;
+  repeated Ball   balls  = 3;
+  repeated Paddle paddles = 4;
+  repeated int32  score  = 5; // classic: per-player scores
+  repeated int32  ranks  = 6; // BR: per-player ranking
+  int32           stage  = 7; // BR: current stage identifier
+}
+
+// -----------------------------------------------------------------------------
+// Client → Server messages
+// -----------------------------------------------------------------------------
+message PaddleUpdate {
+  int32 paddleId = 1; // Numeric identifier of the paddle being updated
+  int32 move     = 2; // -1: left, 0: none, 1: right
+}
+
+message QuitMessage {
+  // empty
+}
+
+message ReadyMessage {
+  // empty
+}
+
+message SpectateMessage {
+  // empty
+}
+
+// -----------------------------------------------------------------------------
+// Server → Client messages
+// -----------------------------------------------------------------------------
+message ErrorMessage {
+  string message = 1; // human-readable error description
+}
+
+message WelcomeMessage {
+  int32 paddleId = 1; // Assigned paddle identifier for this player
+}
+
+message GameStartMessage {
+  // empty
+}
+
+message GameEndMessage {
+  repeated int32 score = 1; // Final scores per player
+}
+
+message StateMessage {
+  MatchState state = 1;
+}

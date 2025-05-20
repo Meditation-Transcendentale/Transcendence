@@ -1,3 +1,4 @@
+// ws.send.update.json
 {
     "players": {
       "type": "array",

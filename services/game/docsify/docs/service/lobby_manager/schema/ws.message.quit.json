@@ -1,3 +1,4 @@
+// ws.message.quit.json
 {
 	"uuid": {
 		"type": "string",

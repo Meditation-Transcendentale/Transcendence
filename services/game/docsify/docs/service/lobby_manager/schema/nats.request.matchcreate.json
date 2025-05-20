@@ -1,5 +1,5 @@
-// nats.publishe.match.setup.json
-// game.${mode}.${gameId}.match.setup
+// nats.request.matchcreate.json
+// game.${mode}.match.create
 // mode : "ia", "local", "online", "pongbr", "pongio"
 {
 	"players": {

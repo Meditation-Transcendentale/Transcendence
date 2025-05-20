@@ -1,3 +1,4 @@
+// nats.publishe.match.state.json
 // game.${mode}.${gameId}.match.state
 // mode : "ia", "local", "online", "pongbr", "pongio"
 // pong
