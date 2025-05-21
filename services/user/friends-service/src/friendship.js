@@ -74,6 +74,8 @@ app.post('/add', handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, 'user.addFriendRequest', { userId: user.id, friendId: friend.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_SENT });
+	
+	nats.publish(`notification.${friend.id}.friendrequested`, { senderID: user.id });
 }));
 
 app.post('/accept', handleErrors(async (req, res) => {

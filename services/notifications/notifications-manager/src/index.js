@@ -45,22 +45,40 @@ async function start() {
         `[${SERVICE_NAME}] ${userID} ${wasReconnected ? 'reconnected' : 'connected'}`
       )
 
-      if (!ws.isSubscribed) {
-        const subFriendRequest = nc.subscribe(`notification.${userID}.add`)
-        ws.isSubscribed = true
+      const socket = userSockets.get(userID)
 
-        ;(async () => {
-          for await (const msg of subFriendRequest) {
-            const data = jc.decode(msg.data)
-            const socket = userSockets.get(userID)
-            if (socket) {
-              socket.send(JSON.stringify({ type: 'notification', data }))
-            }
+      const subFriendRequest = nc.subscribe(`notification.${userID}.add`)
+
+      ;(async () => {
+        for await (const msg of subFriendRequest) {
+          const data = jc.decode(msg.data)
+          if (socket) {
+            socket.send(JSON.stringify({ type: 'notification.friendrequest', data }))
           }
-        })()
+        }
+      })()
 
-        // const 
-      }
+      const subGameInvite = nc.subscribe(`notification.${userID}.invited`)
+
+      ;(async () => {
+        for await (const msg of subGameInvite) {
+          const data = jc.decode(msg.data)
+          if (socket) {
+            socket.send(JSON.stringify({ type: 'notification.invite', data}))
+          }
+        }
+      })
+      
+      const subStatusChange = nc.subscribe(`notification.${userID}.status`)
+      
+      ;(async () => {
+        for await (const msg of subStatusChange) {
+          const data = jc.decode(msg.data)
+          if (socket) {
+            socket.send(JSON.stringify({ type}))
+          }
+        }
+      })
     },
 
     message: (ws, message, isBinary) => { //debug purpose, nothing coming from the client
