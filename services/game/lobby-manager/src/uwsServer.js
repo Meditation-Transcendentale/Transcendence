@@ -1,6 +1,6 @@
 // src/uwsServer.js
 import uWS from 'uWebSockets.js';
-import { decodeClient, encodeUpdate, encodeError } from './message.js';
+import { decodeClient, encodeUpdate, encodeError } from './proto/message.js';
 
 export function createUwsApp(path, lobbyService) {
 	const app = uWS.App();
@@ -9,7 +9,6 @@ export function createUwsApp(path, lobbyService) {
 		idleTimeout: 60,
 
 		open: (ws, req) => {
-			// mark alive
 			ws.isAlive = true;
 
 			// parse lobbyId/userId from query string
@@ -17,7 +16,9 @@ export function createUwsApp(path, lobbyService) {
 			ws.lobbyId = params.get('lobbyId');
 			ws.userId = params.get('userId');
 
-			// auto-join on connection
+			if (!sockets.has(ws.lobbyId)) sockets.set(ws.lobbyId, new Set());
+			sockets.get(ws.lobbyId).add(ws);
+
 			try {
 				const state = lobbyService.join(ws.lobbyId, ws.userId);
 				const buf = encodeUpdate(state);
@@ -32,15 +33,29 @@ export function createUwsApp(path, lobbyService) {
 			}
 		},
 
-		message: (ws, message, isBinary) => {
+		message: async (ws, message, isBinary) => {
 			const buf = new Uint8Array(message);
 			const { payload } = decodeClient(buf);
 			let newState;
 
 			if (payload.quit) {
 				newState = lobbyService.quit(payload.quit.lobbyId, payload.quit.userId);
-			} else if (payload.ready) {
-				newState = lobbyService.ready(payload.ready.lobbyId, payload.ready.userId);
+			}
+			else if (payload.ready) {
+				newState = await lobbyService.ready(payload.ready.lobbyId, ws.userId);
+				if (newState.gameId) {
+					const startMsg = encodeStart({
+						lobbyId: state.lobbyId,
+						gameId: state.gameId,
+						map: state.map
+					});
+					app.publish(ws.lobbyId, startMsg, true);
+					for (const peer of sockets.get(ws.lobbyId) || []) {
+						peer.close(1000, 'Game starting');
+					}
+					sockets.delete(ws.lobbyId);
+				}
+
 			}
 
 			if (newState) {
@@ -50,7 +65,6 @@ export function createUwsApp(path, lobbyService) {
 		},
 
 		close: (ws) => {
-			// optional: remove subscription / notify peers
 			lobbyService.quit(ws.lobbyId, ws.userId);
 		}
 	});

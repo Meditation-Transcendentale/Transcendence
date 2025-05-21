@@ -11,17 +11,12 @@ export default async function routes(fastify) {
 		reply.code(201).send(state);
 	});
 
-	fastify.post('/lobby/:id/join', async (req, reply) => {
-		const state = lobbyService.join(req.params.id, req.body.userId);
-		const buf = encodeJoin({ lobbyId: req.params.id, userId: req.body.userId });
-		natsClient.publish('lobby.joined', buf);
-		return state;
-	});
-
-	fastify.delete('/lobby/:id/leave', async (req, reply) => {
-		const state = lobbyService.leave(req.params.id, req.body.userId);
-		const buf = encodeLeave({ lobbyId: req.params.id, userId: req.body.userId });
-		natsClient.publish('lobby.left', buf);
-		return state;
+	fastify.post('/lobby/:id', async (req, reply) => {
+		try {
+			const state = lobbyService.getLobby(req.params.id);
+			return state;
+		} catch (err) {
+			reply.code(404).send({ error: err.message });
+		}
 	});
 };
