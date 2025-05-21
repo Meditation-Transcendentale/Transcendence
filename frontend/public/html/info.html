@@ -1,18 +1,15 @@
 <div id="info" class="container">
-	<form id="update-info">
-		<input id="update-info-username" type="text" placeholder="Username"/><br>
-		<input id="update-info-avatar" type="text" placeholder="Avatar"/><br>
-		<input id="update-info-submit" type="submit" value="Submit"/>
-	</form>
-	<form id="update-password">
-		<input id="update-password-old" type="password" placeholder="Old Password" autocomplete="off"/><br>
-		<input id="update-password-new" type="password" placeholder="New Password" autocomplete="off"/><br>
-		<input id="update-password-submit" type="submit" value="Submit"/>
-	</form>
-	<input id="enable-2fa" type="checkbox">Enable 2FA</input>
-	<div id="validation-popup" class="popup" disabled="true">
-		<input id="validation-2fa" type="text" placeholder="2FA"/>
-		<input id="validation-password" type="password" placeholder="Password" autocomplete="off"/>
-		<input id="validation-submit" type="button" value="Submit"/>
+	<div id="update-info">
+		<input id="info-username" type="text"/><br>
+		<img id="info-avatar" src="default_avatar.jpg" height="200" width="200">
+		<input id="info-edit" type="buttom" value="Edit"/>
+	</div>
+	<input id="update-password" type="button" value="change password">
+	<input id="update-2fa" type="checkbox">2FA</input>
+	<div id="info-popup" class="popup">
+		<input id="info-valid-password" type="password" placeholder="Password" autocomplete="off">
+		<input id="info-new-password" type="password" placeholder="New Password" autocomplete="off">
+		<input id="info-valid-2fa" type="text" placeholder="2FA TOKEN">
+		<input id="info-valid-submit" type="button" value="Submit">
 	</div>
 </div>

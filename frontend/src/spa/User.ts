@@ -1,7 +1,7 @@
 class UserC {
 	public username: string | null;
 	public uuid: string | null;
-	public twofa: boolean | null;
+	public twofa: number | null;
 	public avatar: string | null;
 
 	constructor() {

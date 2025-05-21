@@ -20,11 +20,11 @@ class Home {
 		this.div = div;
 
 		this.ref = {
-			info: document.querySelector("#home-info") as HTMLInputElement,
-			stats: document.querySelector("#home-stats") as HTMLInputElement,
-			play: document.querySelector("#home-play") as HTMLInputElement,
-			friendlist: document.querySelector("#home-friendlist") as HTMLInputElement,
-			quit: document.querySelector("#home-quit") as HTMLInputElement
+			info: div.querySelector("#home-info") as HTMLInputElement,
+			stats: div.querySelector("#home-stats") as HTMLInputElement,
+			play: div.querySelector("#home-play") as HTMLInputElement,
+			friendlist: div.querySelector("#home-friendlist") as HTMLInputElement,
+			quit: div.querySelector("#home-quit") as HTMLInputElement
 		};
 
 		this.ref.info.addEventListener("click", () => {
@@ -32,7 +32,7 @@ class Home {
 		})
 
 		this.ref.stats.addEventListener("click", () => {
-			Router.nav(`/stats?u=${User.username}`);
+			Router.nav(`/stats?u=${User.username}&m=classic`);
 		})
 
 		this.ref.play.addEventListener("click", () => {
@@ -51,7 +51,8 @@ class Home {
 	}
 
 	public load(params: URLSearchParams) {
-		meRequest();
+		meRequest()
+			.catch(() => window.location.reload());
 		this.div.innerHTML = "";
 		document.querySelector("#main-container")?.appendChild(this.div);
 	}

@@ -20,12 +20,12 @@ class Auth {
 		this.div = div;
 
 		this.htmlReference = {
-			username: document.querySelector("#login-username") as HTMLInputElement,
-			password: document.querySelector("#login-password") as HTMLInputElement,
-			login: document.querySelector("#login") as HTMLFormElement,
-			register: document.querySelector("#register") as HTMLInputElement,
-			twofaToken: document.querySelector("#login-2fa-token") as HTMLInputElement,
-			twofa: document.querySelector("#login-2fa-submit") as HTMLInputElement,
+			username: this.div.querySelector("#login-username") as HTMLInputElement,
+			password: this.div.querySelector("#login-password") as HTMLInputElement,
+			login: this.div.querySelector("#login") as HTMLFormElement,
+			register: this.div.querySelector("#register") as HTMLInputElement,
+			twofaToken: this.div.querySelector("#login-2fa-token") as HTMLInputElement,
+			twofa: this.div.querySelector("#login-2fa-submit") as HTMLInputElement,
 		};
 
 		this.htmlReference.login.addEventListener("submit", (ev) => {

@@ -55,6 +55,23 @@ export async function patchRequest(path: string, body: {}): Promise<JSON> {
 	return response.json();
 }
 
+export async function deleteRequest(path: string, body: {}): Promise<JSON> {
+	const response = await fetch(`https://${window.location.hostname}:3000/${path}`, {
+		method: 'DELETE',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		credentials: 'include',
+		body: JSON.stringify(body)
+	});
+	if (!response.ok) {
+		return Promise.reject(response);
+	}
+
+	return response.json();
+}
+
 
 export async function meRequest(cache: string = "default") {
 	const response = await fetch(`https://${window.location.hostname}:3000/info/me`, {
