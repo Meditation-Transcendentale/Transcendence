@@ -1,27 +1,10 @@
 import { generateGameId, releaseGameId } from "./generateGameId.js";
 
-const config = {
-	numberOfBalls: 1,
-	wallWidth: 30,
-	scaleFactor: 1,
-	ballSize: 0.5,
-	paddleHeight: 0.4,
-	paddleWidth: 3,
-	arenaHeight: 20,
-	arenaWidth: 30,
-	wallHeight: 1,
-	paddleSpeed: 1,
-	ballSpeed: 1,
-	paddleOffsetRatio: 0.9
-};
-
 // services/game/game-manager/src/Game.js
 export class Game {
 	constructor(options = {}) {
 		this.players = [];
-		this.options = options;
 		this.mode = options.mode || 'pong';
-		this.ballCount = options.ballCount || 1;
 		switch (this.mode) {
 			case "pong":
 				this.state = this.initializeStatePong();
@@ -35,7 +18,6 @@ export class Game {
 			default:
 				console.log(`Game init can't find game mode: ${this.mode}`);
 		}
-		this.existingGameIds = new Set();
 	}
 
 	initializeStatePong() {
@@ -45,54 +27,9 @@ export class Game {
 			balls: [],
 			paddles: [],
 			score: {},
-			walls: [],
-			mode: this.mode,
-			options: this.options
+			ranks: null,
+			stage: null,
 		};
-
-		const playerIds = this.players.length > 0
-			? this.players
-			: [];
-		for (let i = 0; i < 2; i++) {
-			const posX = (config.arenaWidth / 2 * config.paddleOffsetRatio * ((i == 1) * -1 + (i == 0) * 1)) * config.scaleFactor
-
-			state.paddles.push({
-				id: i,
-				offset: 0
-			});
-		}
-		for (let i = 0; i < 2; i++) {
-			let x = i % 2 ? (config.arenaWidth / 2) * config.scaleFactor : 0;
-			let y = i % 2 ? 0 : (config.arenaHeight / 2 + config.wallWidth / 2) * config.scaleFactor;
-			const rotation = i % 2 ? 0 : 90 * Math.PI / 180;
-			const wallWidth = i % 2 ? config.arenaWidth * config.scaleFactor : config.arenaHeight * config.scaleFactor;
-
-			state.walls.push({
-				id: i,
-				x,
-				y,
-				rotation,
-				isActive: true,
-				wallWidth
-			});
-			x *= -1;
-			y *= -1;
-			console.log(x, y);
-			state.walls.push({
-				id: i,
-				x,
-				y,
-				rotation,
-				isActive: true,
-				wallWidth
-			});
-		}
-		state.balls.push({
-			x: 0,
-			y: 0,
-			vx: 25,
-			vy: 25
-		});
 
 		return state;
 	}
@@ -110,167 +47,21 @@ export class Game {
 			options: this.options
 		};
 
-		const circleRadius = 50;
-		for (let i = 0; i < this.ballCount; i++) {
-			const r = Math.sqrt(Math.random()) * circleRadius;
-			const theta = Math.random() * 2 * Math.PI;
-			const x = r * Math.cos(theta);
-			const y = r * Math.sin(theta);
-			state.balls.push({
-				x,
-				y,
-				vx: 0,
-				vy: 90
-			});
-		}
-
-		const maxPlayers = this.options.maxPlayers || 100;
-		const playerIds = this.players.length > 0
-			? this.players
-			: [];
-
-		const arenaRadius = this.calculateArenaRadius(maxPlayers);
-
-		for (let i = 0; i < maxPlayers; i++) {
-			const angle = (2 * Math.PI / maxPlayers) * i;
-			const x = arenaRadius * Math.cos(angle);
-			const y = arenaRadius * Math.sin(angle);
-			const rotation = -(angle + Math.PI / 2);
-
-			state.walls.push({
-				id: i,
-				x,
-				y,
-				rotation,
-				isActive: true
-			});
-		}
-
-		for (let i = 0; i < maxPlayers; i++) {
-			const playerId = playerIds[i];
-			const angle = (2 * Math.PI / maxPlayers) * i;
-			const x = arenaRadius * Math.cos(angle);
-			const y = arenaRadius * Math.sin(angle);
-			const rotation = -(angle + Math.PI / 2);
-
-			state.paddles[playerId] = {
-				id: playerId,
-				x,
-				y,
-				offset: 0,
-				connected: false,
-				rotation
-			};
-
-			state.score[playerId] = 0;
-		}
-
-		const zoneAngleWidth = (2 * Math.PI) / maxPlayers;
-		for (let i = 0; i < maxPlayers; i++) {
-			const angle = (2 * Math.PI / maxPlayers) * i;
-			const leftAngle = angle - zoneAngleWidth / 2;
-			const x = arenaRadius * Math.cos(leftAngle);
-			const y = arenaRadius * Math.sin(leftAngle);
-			const rotation = -(leftAngle + (Math.PI / 2));
-			state.pillar.push({
-				id: i,
-				x,
-				y,
-				rotation,
-			});
-		}
 		return state;
 	}
+
 	initializeStatePongBR() {
 		const state = {
 			gameId: this.createGameId(),
 			tick: 0,
 			balls: [],
 			paddles: {},
-			pillar: [],
 			score: {},
-			walls: [],
-			mode: this.mode,
-			options: this.options
+			ranks: [],
+			stage: 0,
 		};
 
-		const circleRadius = 50;
-		for (let i = 0; i < this.ballCount; i++) {
-			const r = Math.sqrt(Math.random()) * circleRadius;
-			const theta = Math.random() * 2 * Math.PI;
-			const x = r * Math.cos(theta);
-			const y = r * Math.sin(theta);
-			state.balls.push({
-				x,
-				y,
-				vx: 0,
-				vy: 25
-			});
-		}
-
-		const maxPlayers = this.options.maxPlayers || 100;
-		const playerIds = this.players.length > 0
-			? this.players
-			: [];
-
-		const arenaRadius = this.calculateArenaRadius(maxPlayers);
-
-		for (let i = 0; i < maxPlayers; i++) {
-			const angle = (2 * Math.PI / maxPlayers) * i;
-			const x = arenaRadius * Math.cos(angle);
-			const y = arenaRadius * Math.sin(angle);
-			const rotation = -(angle + Math.PI / 2);
-
-			state.walls.push({
-				id: i,
-				x,
-				y,
-				rotation,
-				isActive: true
-			});
-		}
-
-		for (let i = 0; i < maxPlayers; i++) {
-			const playerId = playerIds[i];
-			const angle = (2 * Math.PI / maxPlayers) * i;
-			const x = arenaRadius * Math.cos(angle);
-			const y = arenaRadius * Math.sin(angle);
-			const rotation = -(angle + Math.PI / 2);
-
-			state.paddles[playerId] = {
-				id: playerId,
-				x,
-				y,
-				offset: 0,
-				connected: false,
-				rotation
-			};
-
-			state.score[playerId] = 0;
-		}
-
-		const zoneAngleWidth = (2 * Math.PI) / maxPlayers;
-		for (let i = 0; i < maxPlayers; i++) {
-			const angle = (2 * Math.PI / maxPlayers) * i;
-			const leftAngle = angle - zoneAngleWidth / 2;
-			const x = arenaRadius * Math.cos(leftAngle);
-			const y = arenaRadius * Math.sin(leftAngle);
-			const rotation = -(leftAngle + (Math.PI / 2));
-			state.pillar.push({
-				id: i,
-				x,
-				y,
-				rotation,
-			});
-		}
 		return state;
-	}
-
-	calculateArenaRadius(numPlayers) {
-		const playerWidth = 7;
-		const centralAngleDeg = 360 / numPlayers;
-		const halfCentralAngleRad = (centralAngleDeg / 2) * Math.PI / 180;
-		return playerWidth / (2 * Math.sin(halfCentralAngleRad));
 	}
 
 	getState() {
