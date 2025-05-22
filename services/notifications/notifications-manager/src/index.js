@@ -47,7 +47,9 @@ async function start() {
 
       const socket = userSockets.get(userID)
 
-      const subFriendRequest = nc.subscribe(`notification.${userID}.add`)
+      const subFriendRequest = nc.subscribe(`notification.${userID}.friendrequested`) //userID = the friend-requested user -> notificate it
+      const subGameInvite = nc.subscribe(`notification.${userID}.invited`) //userID = the game-invited user -> notificate it
+      const subStatusChange = nc.subscribe(`notification.${userID}.status`) //userID = the user that changed status -> notificate its friends
 
       ;(async () => {
         for await (const msg of subFriendRequest) {
@@ -58,24 +60,28 @@ async function start() {
         }
       })()
 
-      const subGameInvite = nc.subscribe(`notification.${userID}.invited`)
-
       ;(async () => {
         for await (const msg of subGameInvite) {
           const data = jc.decode(msg.data)
           if (socket) {
-            socket.send(JSON.stringify({ type: 'notification.invite', data}))
+            socket.send(JSON.stringify({ type: 'notification.invite', data }))
           }
         }
       })
       
-      const subStatusChange = nc.subscribe(`notification.${userID}.status`)
-      
       ;(async () => {
         for await (const msg of subStatusChange) {
           const data = jc.decode(msg.data)
-          if (socket) {
-            socket.send(JSON.stringify({ type}))
+          const sendingData = JSON.stringify({ type: 'notification.status', data})
+          const resp = await friendlist_Request();
+          if (resp.ok) {
+            resp.message.friendlist.forEach(friend => {
+              friendSocket = userSockets.get(friend.id)
+              friendSocket.send(sendingData)     
+            });
+          } else {
+            if (resp.status === 404) return;
+            throw new Error(`[${SERVICE_NAME}] Request failed with status ${resp.status}`);
           }
         }
       })
@@ -92,9 +98,8 @@ async function start() {
     },
 
     close: (ws, code, message) => {
-      const userID = ws.userID
-      userSockets.delete(userID)
-      console.log(`[${SERVICE_NAME}] ${userID} disconnected`)
+      userSockets.delete(ws.userID)
+      console.log(`[${SERVICE_NAME}] ${ws.userID} disconnected`)
     }
   }).listen(PORT, (token) => {
     if (token) {
@@ -103,6 +108,26 @@ async function start() {
       console.error(`[${SERVICE_NAME}] Failed to listen on port ${PORT}`)
     }
   })
+}
+
+async function friendlist_Request() {
+  const response = await fetch("https://localhost:3000/friends/get/friendlist", {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+    credentials: 'include',
+  });
+  
+  
+  const data = await response.json();
+  
+  const final = {
+    message: data,
+    status: response.status,
+    ok: response.ok
+  };
+  return final;
 }
 
 start()
