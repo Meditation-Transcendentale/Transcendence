@@ -11,6 +11,7 @@ describe('LobbyService', () => {
 
 	afterEach(() => {
 		jest.clearAllMocks();
+		svc.shutdown();
 	});
 
 	test('create → join → quit flow', () => {
@@ -26,28 +27,5 @@ describe('LobbyService', () => {
 		expect(state3.players).toEqual([]);
 	});
 
-	//test('ready() requests a game when allReady', async () => {
-	//  // Arrange
-	//  // make natsClient request resolve with a fake gameId
-	//  mockNats.request.mockResolvedValue(
-	//    /* a raw protobuf buffer matching MatchCreateResponse { gameId: 'g-123' } */
-	//    Buffer.from([/* … */]) 
-	//  );
-	//
-	//  const lobbyId = svc.create({ mode: 'pong', map: 'arena' });
-	//  svc.join(lobbyId, 'u1');
-	//
-	//  // Act
-	//  const out = await svc.ready(lobbyId, 'u1');
-	//
-	//  // Assert
-	//  expect(mockNats.request).toHaveBeenCalledWith(
-	//    `games.pong.match.create`,
-	//    expect.any(Uint8Array),
-	//    { timeout: 5000 }
-	//  );
-	//  expect(out.gameId).toBe('g-123');
-	//  expect(out.status).toBe('starting');
-	//});
 });
 

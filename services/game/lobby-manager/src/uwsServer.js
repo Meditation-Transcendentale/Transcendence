@@ -12,7 +12,13 @@ export function createUwsApp(path, lobbyService) {
 			ws.isAlive = true;
 
 			// parse lobbyId/userId from query string
-			const params = new URLSearchParams(req.getQuery());
+			let queryString = '';
+			if (typeof req.getQuery === 'function') {
+				queryString = req.getQuery();
+			} else if (typeof req.url === 'string') {
+				queryString = req.url.includes('?') ? req.url.split('?')[1] : '';
+			}
+			const params = new URLSearchParams(queryString);
 			ws.lobbyId = params.get('lobbyId');
 			ws.userId = params.get('userId');
 
