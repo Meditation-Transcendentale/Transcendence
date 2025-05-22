@@ -34,8 +34,7 @@ class Register {
 
 		this.htmlReference.login.addEventListener("click", (e) => {
 			e.preventDefault();
-			this.unload()
-				.then(() => Router.nav("/login"));
+			Router.nav("/login");
 		})
 
 	}
@@ -60,8 +59,7 @@ class Register {
 
 	private loginResolve(json: any) {
 		raiseStatus(true, json.message);
-		this.unload()
-			.then(() => Router.nav("/home", true))
+		Router.nav("/home", true);
 	}
 
 	private requestReject(resp: Response) {

@@ -32,7 +32,7 @@ class Home {
 		})
 
 		this.ref.stats.addEventListener("click", () => {
-			Router.nav(`/stats?u=${User.username}&m=classic`);
+			Router.nav(`/stats?u=${User.username}`);
 		})
 
 		this.ref.play.addEventListener("click", () => {
@@ -44,7 +44,7 @@ class Home {
 		})
 
 		this.ref.quit.addEventListener("click", () => {
-			postRequest("/auth/login", {})
+			postRequest("auth/logout", {})
 				.then((json) => { this.logoutResolve(json) })
 				.catch((resp) => { this.logoutReject(resp) })
 		})
@@ -53,7 +53,7 @@ class Home {
 	public load(params: URLSearchParams) {
 		meRequest()
 			.catch(() => window.location.reload());
-		this.div.innerHTML = "";
+		(document.querySelector("#main-container") as HTMLDivElement).innerHTML = "";
 		document.querySelector("#main-container")?.appendChild(this.div);
 	}
 

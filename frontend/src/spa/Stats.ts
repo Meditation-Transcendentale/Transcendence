@@ -29,22 +29,22 @@ class Stats {
 		}
 
 		this.ref.classic.addEventListener("click", () => {
-			window.history.pushState("", "", `/home/stats?u=${this.ref.username.innerText}&m=classic`)
-			getRequest(`/stats/player/${this.ref.username.innerText}/classic`)
+			// window.history.pushState("", "", `/stats?u=${this.ref.username.innerText}&m=classic`)
+			getRequest(`stats/player/${this.ref.username.innerText}/classic`)
 				.then((json) => { this.statsResolve(json) })
 				.catch((resp) => { this.statsReject(resp) });
 		});
 
 		this.ref.br.addEventListener("click", () => {
-			window.history.pushState("", "", `/home/stats?u=${this.ref.username.innerText}&m=br`)
-			getRequest(`/stats/player/${this.ref.username.innerText}/br`)
+			// window.history.pushState("", "", `/stats?u=${this.ref.username.innerText}&m=br`)
+			getRequest(`stats/player/${this.ref.username.innerText}/br`)
 				.then((json) => { this.statsResolve(json) })
 				.catch((resp) => { this.statsReject(resp) });
 		});
 
-		this.ref.br.addEventListener("click", () => {
-			window.history.pushState("", "", `/home/stats?u=${this.ref.username.innerText}&m=br`)
-			getRequest(`/stats/player/${this.ref.username.innerText}/br`)
+		this.ref.io.addEventListener("click", () => {
+			// window.history.pushState("", "", `/stats?u=${this.ref.username.innerText}&m=br`)
+			getRequest(`stats/player/${this.ref.username.innerText}/io`)
 				.then((json) => { this.statsResolve(json) })
 				.catch((resp) => { this.statsReject(resp) });
 		});
@@ -54,7 +54,7 @@ class Stats {
 		if (!this.checkParams(params)) { return; }
 
 		this.ref.username.innerText = params.get("u") as string;
-		getRequest(`/stats/player/${this.ref.username.innerText}/${params.get("m")}`)
+		getRequest(`stats/player/${this.ref.username.innerText}/classic`)
 			.then((json) => {
 				this.statsResolve(json);
 				document.querySelector("#home-container")?.appendChild(this.div);
@@ -68,8 +68,7 @@ class Stats {
 
 	private checkParams(params: URLSearchParams) {
 		const u = params.get("u");
-		const m = params.get("m");
-		if (!u || (m !== "classic" && m !== "br" && m !== "io")) {
+		if (!u) {
 			raiseStatus(false, "error in stats url");
 			return false;
 		}

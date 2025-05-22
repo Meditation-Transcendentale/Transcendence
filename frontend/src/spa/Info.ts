@@ -44,7 +44,7 @@ export default class Info {
 
 		this.ref.popup.remove();
 
-		this.ref.username.addEventListener("change", () => { this.ref.edit.disabled = false });
+		this.ref.username.addEventListener("input", () => { this.ref.edit.disabled = false });
 
 		this.ref.edit.addEventListener("click", () => {
 			this.setupPopup(User.twofa == 1 ? popupState.twofa : popupState.password, this.updateInfo)

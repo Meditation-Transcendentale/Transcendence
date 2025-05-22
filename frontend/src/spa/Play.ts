@@ -22,9 +22,9 @@ export default class Play {
 			mod: div.querySelector("#play-mod") as HTMLSelectElement,
 			map: div.querySelector("#play-map") as HTMLSelectElement,
 			submod: div.querySelector("#play-submod") as HTMLSelectElement,
-			create: div.querySelector("#play-create") as HTMLInputElement,
-			joinID: div.querySelector("#play-joinID") as HTMLInputElement,
-			join: div.querySelector("#play-join") as HTMLInputElement,
+			create: div.querySelector("#create-btn") as HTMLInputElement,
+			joinID: div.querySelector("#join-id") as HTMLInputElement,
+			join: div.querySelector("#join-btn") as HTMLInputElement,
 			refresh: div.querySelector("#play-refresh") as HTMLInputElement,
 			list: div.querySelector("#play-list") as HTMLDivElement
 		}
@@ -36,6 +36,10 @@ export default class Play {
 				this.ref.submod.setAttribute("disabled", "");
 			}
 		});
+
+		this.ref.joinID.addEventListener('input', () => {
+			this.ref.join.disabled = false;
+		})
 
 		this.ref.create.addEventListener("click", () => {
 			console.log(`create lobby: mod=${this.ref.mod.value == "pong" ? this.ref.submod.value : this.ref.mod.value}, map=${this.ref.map.value}`);
@@ -51,6 +55,7 @@ export default class Play {
 	}
 
 	public load(params: URLSearchParams) {
+		this.ref.join.disabled = true;
 		document.querySelector("#home-container")?.appendChild(this.div);
 	}
 

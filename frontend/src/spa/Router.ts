@@ -13,6 +13,7 @@ class RouterC {
 	private oldURL: string;
 	private initRoute: string | null;
 	private first = true;
+	private currentPage: IPage | null;
 
 	private routes: Map<string, routePage>;
 
@@ -20,57 +21,59 @@ class RouterC {
 		this.initRoute = null;
 		this.location = `http://${window.location.hostname}:8080`;
 		this.oldURL = "";
+		this.currentPage = null;
 
 		this.routes = new Map<string, routePage>;
 
 		this.routes.set("/auth", {
 			html: "/auth",
 			ts: "./Auth",
-			callback: this.loadInMain
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/register", {
 			html: "/register",
 			ts: "./Register",
-			callback: this.loadInMain
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/home", {
 			html: "/home",
 			ts: "./Home",
-			callback: this.loadInMain
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/game", {
 			html: "/game",
 			ts: "./Game",
-			callback: this.loadInMain
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/info", {
 			html: "/info",
 			ts: "./Info",
-			callback: this.loadInHome
+			callback: (url: URL) => { this.loadInHome(url) }
 		} as routePage);
 		this.routes.set("/stats", {
 			html: "/stats",
 			ts: "./Stats",
-			callback: this.loadInHome
+			callback: (url: URL) => { this.loadInHome(url) }
 		} as routePage);
 		this.routes.set("/lobby", {
 			html: "/lobby",
 			ts: "./Lobby",
-			callback: this.loadInHome
+			callback: (url: URL) => { this.loadInHome(url) }
 		} as routePage);
 		this.routes.set("/play", {
 			html: "/play",
 			ts: "./Play",
-			callback: this.loadInHome
+			callback: (url: URL) => { this.loadInHome(url) }
 		} as routePage);
 		this.routes.set("/friendlist", {
 			html: "/friendlist",
 			ts: "./Frienlist",
-			callback: this.loadInHome
+			callback: (url: URL) => { this.loadInHome(url) }
 		} as routePage);
 
 		window.addEventListener("popstate", () => {
-			this.nav(window.location.href.substring(window.location.origin.length), false, false)
+			this.currentPage?.unload()
+				.then(() => { this.nav(window.location.href.substring(window.location.origin.length), false, false) })
 		});
 	}
 
@@ -131,17 +134,20 @@ class RouterC {
 	private async loadInMain(url: URL) {
 		console.log("%c Loading: %s", "color: white; background-color: green", url.pathname)
 		const route = this.routes.get(url.pathname);
+		console.log(route);
 		if (!route?.instance) {
 			const html = await this.getHTML(route!.html);
 			const ts = await this.getTS(route!.ts);
 			route!.instance = new ts.default(html);
 		}
-		route?.instance!.load(url.searchParams);
+		await this.currentPage?.unload();
+		this.currentPage = (route?.instance as IPage);
+		this.currentPage.load(url.searchParams);
 	}
 
 	private async loadInHome(url: URL) {
 		if (!document.querySelector("#home-container")) {
-			this.loadInMain(new URL("/home"))
+			this.loadInMain(new URL(`${this.location}/home`))
 				.then(() => { this.loadInHome(url) })
 			return;
 		}
@@ -152,7 +158,11 @@ class RouterC {
 			const ts = await this.getTS(route!.ts);
 			route!.instance = new ts.default(html);
 		}
-		route?.instance!.load(url.searchParams);
+		if (this.currentPage !== this.routes.get("/home")?.instance) {
+			await this.currentPage?.unload();
+		}
+		this.currentPage = (route?.instance as IPage);
+		this.currentPage.load(url.searchParams);
 
 	}
 

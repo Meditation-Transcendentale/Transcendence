@@ -30,7 +30,7 @@ class Auth {
 
 		this.htmlReference.login.addEventListener("submit", (ev) => {
 			ev.preventDefault();
-			postRequest("/auth/login", {
+			postRequest("auth/login", {
 				username: this.htmlReference.username.value,
 				password: this.htmlReference.password.value
 			})
@@ -49,8 +49,7 @@ class Auth {
 		})
 
 		this.htmlReference.register.addEventListener("click", () => {
-			this.unload()
-				.then(() => Router.nav("/register"));
+			Router.nav("/register");
 		})
 	}
 
@@ -59,6 +58,7 @@ class Auth {
 		this.htmlReference.username.value = "";
 		this.htmlReference.password.value = "";
 		this.htmlReference.twofaToken.value = "";
+		console.log("loading auth")
 
 		document.querySelector("#main-container")?.appendChild(this.div);
 	};
@@ -69,7 +69,7 @@ class Auth {
 
 	private loginResolve(json: any) {
 		raiseStatus(true, json.message);
-		this.unload().then(() => Router.nav("/home", true));
+		Router.nav("/home", true);
 	}
 
 	private loginReject(resp: Response) {
