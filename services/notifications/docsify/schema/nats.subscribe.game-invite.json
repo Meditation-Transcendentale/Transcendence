@@ -1,0 +1,9 @@
+{
+    "senderId":{
+        "format": "uuid",
+        "type": "string"
+    },
+    "gameId":{
+        "type": "string"
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "senderId":{
+        "format": "uuid",
+        "type": "string"
+    },
+    "status":{
+            "type": "object",
+            "oneOf": [
+                {
+                    "properties": {
+                        "type": "online"
+                    },
+                    "required": ["type"]
+                },
+                {
+                    "properties": {
+                        "type": "offline",
+                        "last-connection": "date-time"
+                    },
+                    "required": ["type", "last-connection"]
+                },
+                {
+                    "properties": {
+                        "type": "in-lobby",
+                        "lobbyId": "number"
+                    },
+                    "required": ["type", "lobbyId"]
+                },
+                {
+                    "properties": {
+                        "type": "in-game",
+                        "gameId": "number"
+                    },
+                    "required": ["type", "gameId"]
+                },
+                {
+                    "properties": {
+                        "type": "away"
+                    },
+                    "required": ["type"]
+                }
+            ]
+
+    }
+}

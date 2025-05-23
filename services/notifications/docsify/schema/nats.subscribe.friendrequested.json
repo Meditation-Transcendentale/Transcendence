@@ -1,8 +1,0 @@
-// nats.subscribe.notification.add.json
-// notification.${receiverId}.friendrequested
-{
-    "senderId":{
-        "format": "uuid",
-        "type": "string"
-    }
-}

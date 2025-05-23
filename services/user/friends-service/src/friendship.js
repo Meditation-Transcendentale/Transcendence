@@ -75,7 +75,7 @@ app.post('/add', handleErrors(async (req, res) => {
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_SENT });
 	
-	nats.publish(`notification.${friend.id}.friendrequested`, { senderID: user.id });
+	nats.publish(`notification.friendrequest.${friend.id}.`, jc.encode({ senderID: user.id }));
 }));
 
 app.post('/accept', handleErrors(async (req, res) => {

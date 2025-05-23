@@ -16,7 +16,7 @@ async function start() {
   const nc = await connect({ servers: NATS_URL })
   console.log(`[${SERVICE_NAME}] connected to NATS`)
 
-  uWS.App().ws('/*', {
+  uWS.App().ws('/notification', {
     maxPayloadLength: 16 * 1024 * 1024,
     idleTimeout: 120,
 
@@ -47,44 +47,41 @@ async function start() {
 
       const socket = userSockets.get(userID)
 
-      const subFriendRequest = nc.subscribe(`notification.${userID}.friendrequested`) //userID = the friend-requested user -> notificate it
-      const subGameInvite = nc.subscribe(`notification.${userID}.invited`) //userID = the game-invited user -> notificate it
-      const subStatusChange = nc.subscribe(`notification.${userID}.status`) //userID = the user that changed status -> notificate its friends
-
-      ;(async () => {
-        for await (const msg of subFriendRequest) {
+      const subFriendRequest = nc.subscribe(`notification.friendrequest.${userID}`, {
+        callback: (msg) => {
           const data = jc.decode(msg.data)
           if (socket) {
             socket.send(JSON.stringify({ type: 'notification.friendrequest', data }))
           }
         }
-      })()
+      }); //userID = the friend-requested user -> notificate it
 
-      ;(async () => {
-        for await (const msg of subGameInvite) {
+      const subGameInvite = nc.subscribe(`notification.game-invite.${userID}`, {
+        callback: (msg) => {
           const data = jc.decode(msg.data)
           if (socket) {
             socket.send(JSON.stringify({ type: 'notification.invite', data }))
           }
         }
-      })
+      }) //userID = the game-invited user -> notificate it
       
-      ;(async () => {
-        for await (const msg of subStatusChange) {
+      const subStatusChange = nc.subscribe(`notification.status.${userID}`, {
+        callback: async (msg) => {
           const data = jc.decode(msg.data)
           const sendingData = JSON.stringify({ type: 'notification.status', data})
           const resp = await friendlist_Request();
           if (resp.ok) {
             resp.message.friendlist.forEach(friend => {
               friendSocket = userSockets.get(friend.id)
-              friendSocket.send(sendingData)     
+              if (friendSocket) friendSocket.send(sendingData)
             });
           } else {
             if (resp.status === 404) return;
             throw new Error(`[${SERVICE_NAME}] Request failed with status ${resp.status}`);
           }
         }
-      })
+      }); //userID = the user that changed status -> notificate its friends
+
     },
 
     message: (ws, message, isBinary) => { //debug purpose, nothing coming from the client
@@ -118,8 +115,7 @@ async function friendlist_Request() {
     },
     credentials: 'include',
   });
-  
-  
+
   const data = await response.json();
   
   const final = {
