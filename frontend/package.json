@@ -7,13 +7,17 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@types/node": "^22.14.1",
-    "esbuild": "^0.19.11",
-    "typescript": "^5.2.2",
-    "vite": "^6.3.3",
     "@babylonjs/core": "^8.0.0",
     "@babylonjs/gui": "8.2.0",
     "@babylonjs/inspector": "^8.3.0",
-    "buffer": "^6.0.3"
+    "@types/node": "^22.14.1",
+    "buffer": "^6.0.3",
+    "esbuild": "^0.19.11",
+    "protobufjs": "^7.5.0",
+    "typescript": "^5.2.2",
+    "vite": "^6.3.3"
+  },
+  "dependencies": {
+    "transcendence-frontend": "file:"
   }
 }
