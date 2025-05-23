@@ -6,7 +6,13 @@ export class Game {
 		this.players = players;
 		this.mode = mode;
 		switch (this.mode) {
-			case "pong":
+			case "local":
+				this.state = this.initializeStatePong();
+				break;
+			case "ia":
+				this.state = this.initializeStatePong();
+				break;
+			case "online":
 				this.state = this.initializeStatePong();
 				break;
 			case "pongBR":

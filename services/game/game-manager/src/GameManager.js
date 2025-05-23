@@ -29,8 +29,7 @@ export class GameManager {
 		(async () => {
 			for await (const msg of subCreate) {
 				const [, mode] = msg.subject.split('.');
-				const request = decodeMatchCreateRequest(msg.data);
-				await this._onMatchCreate(mode, request);
+				await this._onMatchCreate(mode, msg);
 			}
 		})();
 
@@ -68,9 +67,9 @@ export class GameManager {
 	// ─── NATS Handlers ──────────────────────────────────────────────
 
 	/** Handle a match.create request */
-	async _onMatchCreate(mode, request) {
+	async _onMatchCreate(mode, msg) {
 		let gameId = '', error = '';
-
+		const request = decodeMatchCreateRequest(msg.data);
 		try {
 			const players = request.players;
 			gameId = this.createMatch({
@@ -82,16 +81,13 @@ export class GameManager {
 			console.log(err.message);
 			error = err.message;
 		}
-		const respBuf = encodeMatchCreateResponse({ gameId: gameId.toString() });
+		console.log('📬 replying on', msg.reply);
 		if (msg.reply) {
-			try {
-				await msg.respond(respBuf);
-				console.log('✅ responded to', msg.reply);
-			} catch (respondErr) {
-				console.error('❌ failed to respond:', respondErr);
-			}
+			const respBuf = encodeMatchCreateResponse({ gameId: gameId.toString() });
+			msg.respond(respBuf);  // in nats.js v2 this is sync/void
+			console.log('✅ replied with gameId=', gameId);
 		} else {
-			console.warn('⚠️ incoming request had no reply subject; cannot respond.');
+			console.warn('⚠️ no reply subject; request() will time out.');
 		}
 	}
 
@@ -127,7 +123,7 @@ export class GameManager {
 	// ─── Public API ─────────────────────────────────────────────────
 
 	createMatch({ mode, players }) {
-		const instance = new Game({ mode, players });
+		const instance = new Game(mode, players);
 		const state = instance.getState();
 		const gameId = state.gameId;
 

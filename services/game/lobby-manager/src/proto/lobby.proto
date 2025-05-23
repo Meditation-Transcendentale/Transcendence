@@ -66,3 +66,14 @@ message ClientMessage {
     ReadyMessage ready = 2;
   }
 }
+
+// -----------------------------------------------------------------------------
+// Envelope for *all* server→client messages
+// -----------------------------------------------------------------------------
+message ServerMessage {
+  oneof payload {
+    StartMessage start = 1;
+    UpdateMessage update = 2;
+    ErrorMessage error = 3;
+  }
+}

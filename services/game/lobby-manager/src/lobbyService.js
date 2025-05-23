@@ -110,10 +110,11 @@ export default class LobbyService {
 			try {
 				const replyBuf = await natsClient.request(
 					`games.${lobby.mode}.match.create`,
-					reqBuf,
-					{ timeout: 5_000 }
+					reqBuf, {}
 				)
+				console.log('raw reply hex:', Buffer.from(replyBuf).toString('hex'));
 				const resp = decodeMatchCreateResponse(replyBuf)
+				console.log('decoded resp:', resp);
 				lobby.gameId = resp.gameId
 				state.gameId = resp.gameId
 			} catch (err) {

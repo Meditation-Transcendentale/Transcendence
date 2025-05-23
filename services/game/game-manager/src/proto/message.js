@@ -38,7 +38,7 @@ export function encodeMatchCreateRequest({ players }) {
 	return MatchCreateRequest.encode(msg).finish();
 }
 export function encodeMatchCreateResponse({ gameId }) {
-	const msg = MatchCreateResponse.encode({ gameId });
+	const msg = MatchCreateResponse.create({ gameId });
 	return MatchCreateResponse.encode(msg).finish();
 }
 
