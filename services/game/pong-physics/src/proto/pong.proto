@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package gamemanager;
+package pongphysics;
 
 import "google/protobuf/empty.proto";
 
@@ -60,30 +60,10 @@ message PhysicsResponse {
 }
 
 // -----------------------------------------------------------------------------
-// NATS request → game.${mode}.match.create
-// -----------------------------------------------------------------------------
-message MatchCreateRequest {
-  repeated string players = 1; // array of player UUIDs
-}
-
-message MatchCreateResponse {
-  string gameId = 1; // newly created game’s ID
-}
-
-// -----------------------------------------------------------------------------
 // Match lifecycle messages
 // -----------------------------------------------------------------------------
 message MatchEnd {}
 
-message MatchSetup {
-  repeated string players = 1; // player UUIDs
-}
-
-message MatchInput {
-  int32 paddleId = 1;
-  int32 move = 2;
-}
-
-message MatchQuit { string uuid = 1; }
-
 message MatchStart {}
+
+

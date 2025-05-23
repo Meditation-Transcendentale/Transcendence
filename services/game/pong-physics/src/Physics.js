@@ -26,20 +26,13 @@ export const Physics = {
 	processTick({ gameId, lastState }) {
 		if (!this.games.has(gameId)) {
 			console.log(`[physics] Initializing new game ${gameId}`);
-			this.games.set(gameId, new Game(gameId, lastState));
+			this.games.set(gameId, new Game(gameId));
 		}
 		let events = [];
 		const game = this.games.get(gameId);
 		const em = game.entityManager;
 		const subSteps = 20;
 		const dt = 1 / 60 / subSteps;
-
-		// for (let i = 0, ilen = inputs.length; i < ilen; i++) {
-		// 	const { playerId, input, type } = inputs[i];
-		// 	if (type === 'paddleUpdate') {
-		// 		game.updatePaddleInput(playerId, input);
-		// 	}
-		// }
 
 		const collidableEntities = em.getEntitiesWithComponents(['position', 'collider']);
 		const tree = new AABBTree();

@@ -2,9 +2,9 @@ import { generateGameId, releaseGameId } from "./generateGameId.js";
 
 // services/game/game-manager/src/Game.js
 export class Game {
-	constructor(options = {}) {
-		this.players = [];
-		this.mode = options.mode || 'pong';
+	constructor(mode, players) {
+		this.players = players;
+		this.mode = mode;
 		switch (this.mode) {
 			case "pong":
 				this.state = this.initializeStatePong();

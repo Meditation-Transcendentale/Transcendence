@@ -15,12 +15,11 @@ export class Game {
   * @param {Array}  initialState.balls   Array of ball descriptors
   * @param {Object} [initialState.options]
   */
-	constructor(gameId, initialState) {
+	constructor(gameId) {
 		this.gameId = gameId;
 		this.entityManager = createEntityManager();
 		this.paddleEntities = {};
 		this.wallEntities = {};
-		this.state = initialState;
 		this.options = {};
 		this.players = this.options.players || [];
 
@@ -30,13 +29,10 @@ export class Game {
 
 	/** Initialize entities: one ball, two paddles, and four walls */
 	init() {
-		console.log(this.state);
-		const balls = this.state.balls;
-		const ball = balls[0];
 		const ballEntity = this.entityManager.createEntity();
 		ballEntity
-			.addComponent('position', Position(ball.x, ball.y))
-			.addComponent('velocity', Velocity(ball.vx, ball.vy))
+			.addComponent('position', Position(0, 0))
+			.addComponent('velocity', Velocity(5, 2))
 			.addComponent('ball', { id: 0, radius: config.BALL_RADIUS })
 			.addComponent('collider', CircleCollider(config.BALL_RADIUS));
 

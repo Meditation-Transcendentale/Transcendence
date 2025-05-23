@@ -11,7 +11,7 @@ export default async function routes(fastify) {
 		reply.code(201).send(state);
 	});
 
-	fastify.post('/lobby/:id', async (req, reply) => {
+	fastify.get('/lobby/:id', async (req, reply) => {
 		try {
 			const state = lobbyService.getLobby(req.params.id);
 			return state;

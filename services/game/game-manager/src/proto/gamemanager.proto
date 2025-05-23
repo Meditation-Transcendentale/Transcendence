@@ -87,3 +87,4 @@ message MatchInput {
 message MatchQuit { string uuid = 1; }
 
 message MatchStart {}
+

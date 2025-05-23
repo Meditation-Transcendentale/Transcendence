@@ -31,9 +31,9 @@ WS ws://${SERVER_ADDRESS}:${SERVER_PORT}?uuid=${UUID}&lobbyId=${lobbyId}
   - Request nats `game.${mode}.${gameId}.physics.request` request new tick to proper physic service and await result
 
 - **Physics Services** (×3: `pong`, `pongBR`, `pongIO`)  
-  - Listen on `physics.request.{mode}`
+  - Listen on `games.${mode}.${gameId}.physics.request`
   - Subscribes to `game.*.*.match.end` to end game and clean it 
-  - Compute physics ticks and return via `physics.response.{mode}`
+  - Compute physics ticks and return via `games.${mode}.${gameId}.physics.response`
 
 - **User Interface Service**  
 

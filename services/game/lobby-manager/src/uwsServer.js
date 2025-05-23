@@ -1,26 +1,38 @@
 // src/uwsServer.js
 import uWS from 'uWebSockets.js';
-import { decodeClient, encodeUpdate, encodeError } from './proto/message.js';
+import {
+	decodeClient,
+	encodeUpdate,
+	encodeError,
+	encodeStart
+} from './proto/message.js';
+
+const sockets = new Map(); // lobbyId → Set<ws>
 
 export function createUwsApp(path, lobbyService) {
 	const app = uWS.App();
 
 	app.ws(path, {
 		idleTimeout: 60,
+		upgrade: (res, req, context) => {
+			// parse out your ?uuid=… query param
+			const fullUrl = req.getQuery();               // e.g. "/?uuid=abcd1234"
+			const [path, rawQs] = fullUrl.split('?');       // "uuid=abcd1234"
+			const params = new URLSearchParams(rawQs);
+			const lobbyId = params.get('lobbyId');
+			const session = { userId: params.get('uuid'), lobbyId };
 
-		open: (ws, req) => {
+			// 2) Call res.upgrade and pass it as userData:
+			res.upgrade(
+				session,
+				req.getHeader('sec-websocket-key'),
+				req.getHeader('sec-websocket-protocol'),
+				req.getHeader('sec-websocket-extensions'),
+				context
+			);
+		},
+		open: (ws) => {
 			ws.isAlive = true;
-
-			// parse lobbyId/userId from query string
-			let queryString = '';
-			if (typeof req.getQuery === 'function') {
-				queryString = req.getQuery();
-			} else if (typeof req.url === 'string') {
-				queryString = req.url.includes('?') ? req.url.split('?')[1] : '';
-			}
-			const params = new URLSearchParams(queryString);
-			ws.lobbyId = params.get('lobbyId');
-			ws.userId = params.get('userId');
 
 			if (!sockets.has(ws.lobbyId)) sockets.set(ws.lobbyId, new Set());
 			sockets.get(ws.lobbyId).add(ws);
@@ -29,10 +41,7 @@ export function createUwsApp(path, lobbyService) {
 				const state = lobbyService.join(ws.lobbyId, ws.userId);
 				const buf = encodeUpdate(state);
 
-				// subscribe this socket to lobby topic
 				ws.subscribe(ws.lobbyId);
-
-				// broadcast initial state to lobby
 				app.publish(ws.lobbyId, buf, true);
 			} catch (err) {
 				ws.send(encodeError(err.message), true);
@@ -46,22 +55,25 @@ export function createUwsApp(path, lobbyService) {
 
 			if (payload.quit) {
 				newState = lobbyService.quit(payload.quit.lobbyId, payload.quit.userId);
-			}
-			else if (payload.ready) {
-				newState = await lobbyService.ready(payload.ready.lobbyId, ws.userId);
+
+			} else if (payload.ready) {
+				newState = await lobbyService.ready(ws.lobbyId, ws.userId);
+
+				// start the game when gameId appears
 				if (newState.gameId) {
 					const startMsg = encodeStart({
-						lobbyId: state.lobbyId,
-						gameId: state.gameId,
-						map: state.map
+						lobbyId: newState.lobbyId,
+						gameId: newState.gameId,
+						map: newState.map
 					});
 					app.publish(ws.lobbyId, startMsg, true);
+
+					// close all sockets for this lobby
 					for (const peer of sockets.get(ws.lobbyId) || []) {
 						peer.close(1000, 'Game starting');
 					}
 					sockets.delete(ws.lobbyId);
 				}
-
 			}
 
 			if (newState) {
@@ -71,9 +83,11 @@ export function createUwsApp(path, lobbyService) {
 		},
 
 		close: (ws) => {
+			sockets.get(ws.lobbyId)?.delete(ws);
 			lobbyService.quit(ws.lobbyId, ws.userId);
 		}
 	});
 
 	return app;
 }
+

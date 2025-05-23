@@ -4,15 +4,12 @@ import { Game } from './Game.js';
 import {
 	decodeMatchCreateRequest,
 	encodeMatchCreateResponse,
-	decodeMatchCreateResponse,
 	decodeMatchInput,
 	encodePhysicsRequest,
 	decodePhysicsResponse,
 	encodeStateUpdate,
 	encodeMatchSetup
-} from './message.js';
-import { JSONCodec } from 'nats';
-const jc = JSONCodec();
+} from './proto/message.js';
 
 export class GameManager {
 	constructor(nc) {
@@ -28,22 +25,21 @@ export class GameManager {
 		this.nc = await natsClient.connect(natsUrl);
 
 		// Subscribe to "games.*.match.create" (req/rep)
-		const subCreate = this.nc.subscribe('games.*.match.create', {
-			callback: (_err, msg) => {
-				this._onMatchCreate(msg);
-			},
-		});
-		// (async () => {
-		// 	for await (const msg of subCreate) {
-		// 		await this._onMatchCreate(msg);
-		// 	}
-		// })();
+		const subCreate = this.nc.subscribe('games.*.match.create');
+		(async () => {
+			for await (const msg of subCreate) {
+				const [, mode] = msg.subject.split('.');
+				const request = decodeMatchCreateRequest(msg.data);
+				await this._onMatchCreate(mode, request);
+			}
+		})();
 
 		// Subscribe to "games.*.match.start" (req/rep)
 		const subStart = this.nc.subscribe('games.*.*.match.start');
 		(async () => {
 			for await (const msg of subStart) {
-				await this._onMatchStart(msg);
+				const [, , gameId] = msg.subject.split('.');
+				await this._onMatchStart(gameId);
 			}
 		})();
 
@@ -51,7 +47,8 @@ export class GameManager {
 		const subEnd = this.nc.subscribe('games.*.*.match.end');
 		(async () => {
 			for await (const msg of subEnd) {
-				await this._onMatchEnd(msg);
+				const [, , gameId] = msg.subject.split('.');
+				await this._onMatchEnd(gameId);
 			}
 		})();
 
@@ -59,7 +56,9 @@ export class GameManager {
 		const subInput = this.nc.subscribe('games.*.*.match.input');
 		(async () => {
 			for await (const msg of subInput) {
-				this._onMatchInput(msg);
+				const [, , gameId] = msg.subject.split('.');
+				const request = decodeMatchInput(msg.data);
+				this._onMatchInput(gameId, request);
 			}
 		})();
 
@@ -69,28 +68,21 @@ export class GameManager {
 	// ─── NATS Handlers ──────────────────────────────────────────────
 
 	/** Handle a match.create request */
-	async _onMatchCreate(msg) {
-		const [, mode] = msg.subject.split('.');
+	async _onMatchCreate(mode, request) {
 		let gameId = '', error = '';
 
 		try {
-			const req = decodeMatchCreateRequest(msg.data);
-			console.log(req);
-			const players = req.players;
+			const players = request.players;
 			gameId = this.createMatch({
 				mode,
 				players: players,
-				options: req.options
 			});
-			this.nc.publish(`games.${mode}.match.setup`, encodeMatchSetup({ mode, gameId: gameId.toString(), players: players }));
+			this.nc.publish(`games.${mode}.${gameId}.match.setup`, encodeMatchSetup({ players: players }));
 		} catch (err) {
 			console.log(err.message);
 			error = err.message;
 		}
-		console.log(gameId);
-		const respBuf = encodeMatchCreateResponse({ gameId: gameId.toString(), error: error });
-		const test = decodeMatchCreateResponse(respBuf);
-		console.log(test);
+		const respBuf = encodeMatchCreateResponse({ gameId: gameId.toString() });
 		if (msg.reply) {
 			try {
 				await msg.respond(respBuf);
@@ -104,51 +96,38 @@ export class GameManager {
 	}
 
 	// match.start (pub/sub)
-	async _onMatchStart(msg) {
-		const { gameId } = jc.decode(msg.data);
-
+	async _onMatchStart(gameId) {
 		if (!this.launchMatch(gameId)) {
 			console.warn(`[GameManager] could not launch match ${gameId}`);
 		}
 	}
 
 	// match.end (pub/sub)
-	async _onMatchEnd(msg) {
-		const { gameId } = jc.decode(msg.data);
-
+	async _onMatchEnd(gameId) {
 		if (!this.endMatch(gameId)) {
 			console.warn(`[GameManager] could not end match ${gameId}`);
 		}
 	}
 
 	/** Handle incoming player inputs */
-	_onMatchInput(msg) {
-		const [, , gameId] = msg.subject.split('.');
-		let req;
-		try {
-			req = decodeMatchInput(msg.data);
-		} catch {
-			return;
-		}
-
+	_onMatchInput(gameId, request) {
 		const match = this.games.get(gameId);
-		if (!match) return;
+		if (!match || match.status !== 'running') return;
 
 		// queue inputs for next tick
-		for (const pi of req.inputs) {
+		for (const pi of request.inputs) {
 			this.handleInput({
 				gameId,
-				playerId: pi.playerId,
-				input: pi,
+				paddleId: pi.paddleId,
+				move: pi.move,
 			});
 		}
 	}
 
 	// ─── Public API ─────────────────────────────────────────────────
 
-	createMatch({ mode, players, options = {} }) {
-		const instance = new Game({ mode, ...options });
-		instance.players = players;
+	createMatch({ mode, players }) {
+		const instance = new Game({ mode, players });
 		const state = instance.getState();
 		const gameId = state.gameId;
 
@@ -158,7 +137,6 @@ export class GameManager {
 			state,
 			inputs: {},       // tick → PlayerInput[]
 			tick: 0,
-			options,
 			status: 'created',
 			interval: null,
 			isPaused: false,
@@ -172,7 +150,6 @@ export class GameManager {
 
 	launchMatch(gameId) {
 		const match = this.games.get(gameId.toString());
-		console.log(this.games);
 		if (!match || match.status !== 'created') return false;
 
 		match.status = 'running';
@@ -185,21 +162,17 @@ export class GameManager {
 		return true;
 	}
 
-	handleInput({ gameId, playerId, input, tick }) {
+	handleInput({ gameId, paddleId, move }) {
 		const match = this.games.get(gameId);
-		if (!match || match.status !== 'running') return;
-
-		const targetTick = Number.isInteger(tick)
-			? tick
-			: match.tick + 1;
+		const targetTick = match.tick + 1;
 
 		if (!match.inputs[targetTick]) {
 			match.inputs[targetTick] = [];
 		}
 
 		match.inputs[targetTick].push({
-			playerId,
-			...input
+			paddleId,
+			move,
 		});
 	}
 
@@ -214,11 +187,7 @@ export class GameManager {
 
 		match.status = 'ended';
 
-		this.nc.publish(
-			`games.${match.mode}.${gameId}.match.end`,
-			JSON.stringify({ gameId })
-		);
-
+		this.nc.publish(`games.${match.mode}.${gameId}.match.end`, null);
 		this.games.delete(gameId);
 
 		console.log(`[GameManager] Ended match ${gameId}`);
@@ -262,20 +231,17 @@ export class GameManager {
 
 		try {
 			// Send PhysicsRequest over NATS req/rep
-			const reqBuf = encodePhysicsRequest({ gameId: gameId.toString(), inputs, lastState });
-			console.log(match.mode, gameId);
-			const respMsg = await this.nc.request(
-				`games.${match.mode}.${gameId}.physics.request`,
-				reqBuf
-			);
+			const reqBuf = encodePhysicsRequest({ gameId: gameId.toString(), tick: match.tick, input: inputs, stage: lastState.stage });
+			const respMsg = await this.nc.request(`games.${match.mode}.${gameId}.physics.request`, reqBuf);
 			const resp = decodePhysicsResponse(respMsg.data);
-			console.log(resp);
-			if (resp.error) throw new Error(resp.error);
 
 			// Handle goal if one occurred this tick
-			const newState = resp.newState;
-			if (resp.goalScored) {
-				newState.scores[resp.scorerId] = (newState.scores[resp.scorerId] || 0) + 1;
+			const newState = lastState;
+			newState.tick = resp.tick;
+			newState.balls = resp.balls;
+			newState.paddles = resp.paddles;
+			if (resp.goal) {
+				newState.scores[resp.goal.scorerId] = (newState.scores[resp.scorerId] || 0) + 1;
 
 				match.isPaused = true;
 				const pauseMs = match.options.pauseMs || 1000;
@@ -283,7 +249,7 @@ export class GameManager {
 				const pauseTicks = Math.ceil(pauseMs / tickMs);
 				match.resumeTick = match.tick + pauseTicks;
 				match.pendingServe = true;
-				if (newState.scores[resp.scorerId] >= (match.options.winScore || Infinity)) {
+				if (newState.scores[resp.goal.scorerId] >= (match.options.winScore || Infinity)) {
 					newState.isGameOver = true;
 				}
 			}
@@ -291,10 +257,10 @@ export class GameManager {
 			match.state = newState;
 			delete match.inputs[match.tick];
 
-			const updBuf = encodeStateUpdate({ state: newState });
+			const buf = encodeStateUpdate({ state: newState });
 			this.nc.publish(
-				`games.${match.mode}.${gameId}.state.update`,
-				updBuf
+				`games.${match.mode}.${gameId}.match.state`,
+				buf
 			);
 			if (match.state.isGameOver) {
 				this.endMatch(gameId);
