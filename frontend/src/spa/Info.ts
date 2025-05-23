@@ -47,11 +47,11 @@ export default class Info {
 		this.ref.username.addEventListener("input", () => { this.ref.edit.disabled = false });
 
 		this.ref.edit.addEventListener("click", () => {
-			this.setupPopup(User.twofa == 1 ? popupState.twofa : popupState.password, this.updateInfo)
+			this.setupPopup(User.twofa == 1 ? popupState.twofa : popupState.password, () => { this.updateInfo() })
 		})
 
 		this.ref.password.addEventListener("click", () => {
-			this.setupPopup(User.twofa == 1 ? popupState.changePass2fa : popupState.changePass, this.updatePassword)
+			this.setupPopup(User.twofa == 1 ? popupState.changePass2fa : popupState.changePass, () => { this.updatePassword() })
 		})
 
 		this.ref.twofa.addEventListener("click", () => {
@@ -65,7 +65,7 @@ export default class Info {
 		this.ref.popup.remove();
 		this.ref.username.placeholder = User.username as string;
 		this.ref.edit.disabled = true;
-		this.ref.avatar.src = (User.avatar ? User.avatar : "default_avatr.jpg");
+		this.ref.avatar.src = (User.avatar ? User.avatar : "default_avatar.jpg");
 		this.ref.twofa.checked = (User.twofa as number) != 0;
 
 		document.querySelector("#home-container")?.appendChild(this.div);

@@ -40,14 +40,14 @@ class Home {
 		})
 
 		this.ref.friendlist.addEventListener("click", () => {
-			Router.nav("friendlist");
+			Router.nav("/friendlist");
 		})
 
 		this.ref.quit.addEventListener("click", () => {
 			postRequest("auth/logout", {})
 				.then((json) => { this.logoutResolve(json) })
 				.catch((resp) => { this.logoutReject(resp) })
-		})
+		});
 	}
 
 	public load(params: URLSearchParams) {

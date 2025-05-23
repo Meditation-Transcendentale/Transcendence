@@ -24,7 +24,7 @@ class Register {
 		};
 
 		this.htmlReference.register.addEventListener("click", () => {
-			postRequest("/register", {
+			postRequest("register", {
 				username: this.htmlReference.username.value,
 				password: this.htmlReference.password.value
 			})
@@ -49,7 +49,7 @@ class Register {
 
 	private registerResolve(json: any) {
 		raiseStatus(true, json.message);
-		postRequest("/auth/login", {
+		postRequest("auth/login", {
 			username: this.htmlReference.username.value,
 			password: this.htmlReference.password.value
 		})

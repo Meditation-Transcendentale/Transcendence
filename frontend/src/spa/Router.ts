@@ -67,7 +67,7 @@ class RouterC {
 		} as routePage);
 		this.routes.set("/friendlist", {
 			html: "/friendlist",
-			ts: "./Frienlist",
+			ts: "./Friendlist",
 			callback: (url: URL) => { this.loadInHome(url) }
 		} as routePage);
 
