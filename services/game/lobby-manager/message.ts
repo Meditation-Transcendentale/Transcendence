@@ -3,14 +3,14 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import * as protobuf from 'protobufjs/minimal';
 
-// emulate __dirname in ESM + TS
+// Emulate __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load the proto definitions
+// Load and parse the `.proto` file
 const root = protobuf.loadSync(resolve(__dirname, 'lobby.proto'));
 
-// Lookup each message type
+// Look up each message type
 const UserStatusType = root.lookupType('lobby.UserStatus');
 const QuitMessageType = root.lookupType('lobby.QuitMessage');
 const ReadyMessageType = root.lookupType('lobby.ReadyMessage');
@@ -20,7 +20,7 @@ const PlayerType = root.lookupType('lobby.Player');
 const UpdateMessageType = root.lookupType('lobby.UpdateMessage');
 const ClientMessageType = root.lookupType('lobby.ClientMessage');
 
-// TypeScript interfaces matching your .proto
+// TypeScript interfaces matching your .proto definitions
 export interface UserStatus { uuid: string; lobbyId: string; status: string; }
 export interface QuitMessage { uuid: string; lobbyId: string; }
 export interface ReadyMessage { lobbyId: string; }
@@ -32,12 +32,21 @@ export interface UpdateMessage {
 	players: Player[];
 	status: string;
 }
-// ClientMessage has a oneof payload:
+
+// Discriminated union for client→server
 export type ClientMessage =
 	| { quit: QuitMessage; ready?: undefined }
 	| { ready: ReadyMessage; quit?: undefined };
 
-// Encode / decode helpers
+// Discriminated union for server→client
+export type ServerMessage =
+	| { type: 'error'; payload: ErrorMessage }
+	| { type: 'start'; payload: StartMessage }
+	| { type: 'update'; payload: UpdateMessage };
+
+// -----------------------------------------------------------------------------
+// Client→server encode/decode
+// -----------------------------------------------------------------------------
 export function encodeUserStatus(msg: UserStatus): Uint8Array {
 	return UserStatusType.encode(UserStatusType.create(msg)).finish();
 }
@@ -59,6 +68,19 @@ export function decodeReadyMessage(buf: Uint8Array): ReadyMessage {
 	return ReadyMessageType.toObject(ReadyMessageType.decode(buf)) as ReadyMessage;
 }
 
+export function encodeClientMessage(msg: ClientMessage): Uint8Array {
+	return ClientMessageType.encode(ClientMessageType.create(msg)).finish();
+}
+export function decodeClientMessage(buf: Uint8Array): ClientMessage {
+	return ClientMessageType.toObject(
+		ClientMessageType.decode(buf),
+		{ enums: String }
+	) as ClientMessage;
+}
+
+// -----------------------------------------------------------------------------
+// Server→client encode/decode
+// -----------------------------------------------------------------------------
 export function encodeErrorMessage(msg: ErrorMessage): Uint8Array {
 	return ErrorMessageType.encode(ErrorMessageType.create(msg)).finish();
 }
@@ -80,15 +102,32 @@ export function decodeUpdateMessage(buf: Uint8Array): UpdateMessage {
 	return UpdateMessageType.toObject(UpdateMessageType.decode(buf)) as UpdateMessage;
 }
 
-export function encodeClientMessage(msg: ClientMessage): Uint8Array {
-	// ClientMessageType.create accepts one of the payload keys
-	return ClientMessageType.encode(ClientMessageType.create(msg)).finish();
-}
-export function decodeClientMessage(buf: Uint8Array): ClientMessage {
-	// toObject() returns { quit?: {...}, ready?: {...} }
-	return ClientMessageType.toObject(
-		ClientMessageType.decode(buf),
-		{ enums: String }
-	) as ClientMessage;
+// -----------------------------------------------------------------------------
+// Combined server‐message decoder
+// -----------------------------------------------------------------------------
+export function decodeServerMessage(buf: Uint8Array): ServerMessage {
+	// Try ErrorMessage
+	try {
+		const err = decodeErrorMessage(buf);
+		if (typeof err.message === 'string') {
+			return { type: 'error', payload: err };
+		}
+	} catch { /**/ }
+
+	// Try StartMessage
+	try {
+		const start = decodeStartMessage(buf);
+		if (start.lobbyId && start.gameId) {
+			return { type: 'start', payload: start };
+		}
+	} catch { /**/ }
+
+	// Fallback to UpdateMessage
+	const update = decodeUpdateMessage(buf);
+	if (update.lobbyId && Array.isArray(update.players)) {
+		return { type: 'update', payload: update };
+	}
+
+	throw new Error('Unknown server message format');
 }
 
