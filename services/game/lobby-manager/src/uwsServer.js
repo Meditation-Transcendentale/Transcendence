@@ -18,10 +18,9 @@ export function createUwsApp(path, lobbyService) {
 			// parse out your ?uuid=… query param
 			const fullUrl = req.getQuery();               // e.g. "/?uuid=abcd1234"
 			const [path, rawQs] = fullUrl.split('?');       // "uuid=abcd1234"
-			const params = new URLSearchParams(rawQs);
+			const params = new URLSearchParams(path);
 			const lobbyId = params.get('lobbyId');
 			const session = { userId: params.get('uuid'), lobbyId };
-
 			// 2) Call res.upgrade and pass it as userData:
 			res.upgrade(
 				session,
@@ -44,7 +43,7 @@ export function createUwsApp(path, lobbyService) {
 				ws.subscribe(ws.lobbyId);
 				app.publish(ws.lobbyId, buf, true);
 			} catch (err) {
-				ws.send(encodeError(err.message), true);
+				//ws.send(encodeError(err.message), true);
 			}
 		},
 
