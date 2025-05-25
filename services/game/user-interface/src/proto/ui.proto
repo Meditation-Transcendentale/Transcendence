@@ -1,0 +1,111 @@
+// src/ui.proto
+syntax = "proto3";
+package userinterface;
+
+// -----------------------------------------------------------------------------
+// Core game state messages
+// -----------------------------------------------------------------------------
+message Ball {
+  int32 id = 1;
+  double x  = 2;
+  double y  = 3;
+  double vx = 4;
+  double vy = 5;
+}
+
+message Paddle {
+  int32  id   = 1;
+  int32  move = 2; // -1: left, 0: none, 1: right
+  bool   dead = 3; // only used in BR mode
+}
+
+message MatchState {
+  string          gameId   = 1;
+  int64           tick     = 2;
+  repeated Ball   balls    = 3;
+  repeated Paddle paddles  = 4;
+  repeated int32  score    = 5;
+  repeated int32  ranks    = 6;
+  int32           stage    = 7;
+}
+
+// -----------------------------------------------------------------------------
+// Client → Server messages
+// -----------------------------------------------------------------------------
+message PaddleUpdate {
+  int32 paddleId = 1;
+  int32 move     = 2;
+}
+
+message QuitMessage {}
+message ReadyMessage {}
+message SpectateMessage {}
+
+// -----------------------------------------------------------------------------
+// Client → Server envelope
+// -----------------------------------------------------------------------------
+message ClientMessage {
+  oneof payload {
+    PaddleUpdate    paddleUpdate    = 1;
+    QuitMessage     quit             = 2;
+    ReadyMessage    ready            = 3;
+    SpectateMessage spectate         = 4;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Server → Client messages
+// -----------------------------------------------------------------------------
+message ErrorMessage {
+  string message = 1;
+}
+
+message WelcomeMessage {
+  int32 paddleId = 1;
+}
+
+message GameStartMessage {}
+message GameEndMessage {
+  repeated int32 score = 1;
+}
+
+message StateMessage {
+  MatchState state = 1;
+}
+
+// -----------------------------------------------------------------------------
+// Server → Client envelope
+// -----------------------------------------------------------------------------
+message ServerMessage {
+  oneof payload {
+    ErrorMessage       error   = 1;
+    WelcomeMessage     welcome = 2;
+    GameStartMessage   start   = 3;
+    StateMessage       state   = 4;
+    GameEndMessage     end     = 5;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Match lifecycle messages (NATS)
+// -----------------------------------------------------------------------------
+message MatchSetup {
+  repeated string players = 1; // player UUIDs
+}
+
+message MatchStart {
+}
+
+message MatchInput {
+  int32  paddleId = 1;
+  int32  move     = 2;
+}
+
+message MatchQuit {
+  string uuid   = 1;
+}
+
+message MatchEnd {
+  int32  winner = 1;
+}
+
