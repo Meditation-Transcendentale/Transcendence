@@ -14,7 +14,7 @@ import {
 	encodeGameStartMessage,
 	encodeGameEndMessage,
 	// WS ← NATS state update
-} from './message.js';
+} from './proto/message.js';
 
 export default class UIService {
 	constructor() {
@@ -44,6 +44,7 @@ export default class UIService {
 			const { players } = decodeMatchSetup(data);
 			this.allowedByGame.set(gameId, { players, mode });
 			this.games.set(gameId, new Set());
+			console.log(`User Interface: New game setup ${gameId}`);
 		});
 
 		// // 2) MatchStart → broadcast GameStartMessage

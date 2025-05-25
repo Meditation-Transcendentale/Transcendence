@@ -71,3 +71,12 @@ message GameEndMessage {
 message StateMessage {
   MatchState state = 1;
 }
+
+message ClientMessage {
+  oneof payload {
+    PaddleUpdate    paddleUpdate    = 1;
+    QuitMessage     quit             = 2;
+    ReadyMessage    ready            = 3;
+    SpectateMessage spectate         = 4;
+  }
+}

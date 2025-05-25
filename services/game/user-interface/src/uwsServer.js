@@ -1,6 +1,6 @@
 // src/uwsServer.js
 import { App } from 'uWebSockets.js';
-import { decodeClientMessage } from './message.js';
+import { decodeClientMessage } from './proto/message.js';
 
 export function startWsServer({ port, handlers }) {
 	const app = App().ws('/*', {
