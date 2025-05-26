@@ -176,9 +176,19 @@ export function decodeUpdateMessage(buf: Uint8Array): UpdateMessage {
 // Combined server‐message decoder
 // -----------------------------------------------------------------------------
 export function decodeServerMessage(buf: Uint8Array): ServerMessage {
-	return ServerMessageType.toObject(
+	const decoded = ServerMessageType.toObject(
 		ServerMessageType.decode(buf),
 		{ enums: String }
 	) as ServerMessage;
+
+	if ('error' in decoded && decoded.error) {
+		return { error: decoded.error };
+	} else if ('start' in decoded && decoded.start) {
+		return { start: decoded.start };
+	} else if ('update' in decoded && decoded.update) {
+		return { update: decoded.update };
+	} else {
+		throw new Error('Received an unknown ServerMessage payload.');
+	}
 }
 

@@ -57,6 +57,7 @@ message UpdateMessage {
   string lobbyId = 1;
   repeated Player players = 2;
   string status = 3; // e.g. "waiting", "starting"
+  string mode = 4; // e.g. "waiting", "starting"
 }
 
 // Envelope for *all* client→server messages
