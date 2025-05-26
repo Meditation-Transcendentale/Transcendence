@@ -1,4 +1,4 @@
-import { decodeClientMessage, decodeServerMessage, encodeReadyMessage } from "../encode/lobbyMessage";
+import { decodeClientMessage, decodeServerMessage, encodeClientMessage, encodeReadyMessage } from "../encode/lobbyMessage";
 import Router from "./Router";
 import { User } from "./User";
 
@@ -39,7 +39,7 @@ export default class Lobby {
 		};
 
 		this.ref.ready.addEventListener("click", () => {
-			this.ws?.send(encodeReadyMessage({ lobbyId: this.id as string }));
+			this.ws?.send(encodeClientMessage({ ready: { lobbyId: this.id as string } }));
 		})
 
 		this.ref.quit.addEventListener("click", () => {
