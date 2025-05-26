@@ -1,6 +1,7 @@
 import { getRequest, postRequest } from "./requests";
 import Router from "./Router";
 import { User } from "./User";
+import { createButton } from "./utils";
 
 
 interface playHtmlReference {
@@ -65,8 +66,8 @@ export default class Play {
 		this.ref.refresh.addEventListener("click", () => {
 			console.log("refresh lobby list")
 			this.getRequest(`lobby/list`)
-				.then((json) => { this.createResolve(json) })
-				.catch((resp) => { this.createReject(resp) });
+				.then((json) => { this.listResolve(json) })
+				.catch((resp) => { this.listReject(resp) });
 		})
 	}
 
@@ -135,8 +136,20 @@ export default class Play {
 		}
 	}
 
-	private listResolve(json: any) {
+	private listResolve(json: Array<Object>) {
 		console.log(json);
+		const div = document.createElement("div");
+		json.forEach((elem: any) => {
+			let e = document.createElement("div");
+			e.innerText = elem.gameId ? elem.gameId : elem.lobbyId;
+			e.appendChild(createButton("Join", (btn: HTMLInputElement) => {
+				Router.nav(`/lobby?id=${elem.lobbyId}`, false, false);
+			}))
+			div.appendChild(e);
+		})
+
+		this.ref.list.innerHTML = '';
+		this.ref.list.appendChild(div);
 	}
 
 	private listReject(resp: Response) {
