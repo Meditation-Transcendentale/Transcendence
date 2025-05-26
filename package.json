@@ -27,6 +27,8 @@
   },
   "homepage": "https://github.com/Meditation-Transcendentale/Transcendence#readme",
   "dependencies": {
-    "uwebsockets": "^3.0.2"
+    "uwebsockets": "^3.0.2",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.52.0",
+    "uws": "^200.0.0"
   }
 }

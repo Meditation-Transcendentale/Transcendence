@@ -1,6 +1,18 @@
 import { meReject, meRequest } from "./checkMe";
 import Router from "./Router";
 
+
+export function getOrCreateUUID(): string {
+    let uuid = 'uuid-' + Math.random().toString(36).substring(2, 11);
+    //let uiid = localStorage.getItem('uiid');
+    //if (!uiid) {
+    //	uiid = 'uiid-' + Math.random().toString(36).substring(2, 11);
+    //	//localStorage.setItem('uiid', uiid);
+    //}
+    return uuid;
+}
+
+
 class Home {
 	private loaded: boolean;
 
@@ -29,7 +41,7 @@ class Home {
 		document.getElementById("play-home")?.addEventListener("click", (e) => {
 			e.preventDefault();
 			// document.getElementById("main-container")?.dispatchEvent(new CustomEvent("nav", { detail: { path: "/home/info" } }));
-			Router.nav("/home/play");
+			Router.nav("/home/play");	
 		});
 
 
@@ -50,7 +62,7 @@ class Home {
 		});
 
 		this.loaded = true;
-	}
+	}	
 
 	public reset() {
 		document.getElementById("home-container").innerHTML = "";

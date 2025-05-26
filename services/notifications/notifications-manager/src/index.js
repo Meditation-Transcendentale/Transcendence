@@ -50,6 +50,7 @@ async function start() {
       const subFriendRequest = nc.subscribe(`notification.friendrequest.${userID}`, {
         callback: (msg) => {
           const data = jc.decode(msg.data)
+          console.log(`new subfriend request: ${data}`)
           if (socket) {
             socket.send(JSON.stringify({ type: 'notification.friendrequest', data }))
           }
@@ -59,6 +60,7 @@ async function start() {
       const subGameInvite = nc.subscribe(`notification.game-invite.${userID}`, {
         callback: (msg) => {
           const data = jc.decode(msg.data)
+          console.log(`new game invite: ${data}`)
           if (socket) {
             socket.send(JSON.stringify({ type: 'notification.invite', data }))
           }
@@ -68,6 +70,7 @@ async function start() {
       const subStatusChange = nc.subscribe(`notification.status.${userID}`, {
         callback: async (msg) => {
           const data = jc.decode(msg.data)
+          console.log(`new status request: ${data}`)
           const sendingData = JSON.stringify({ type: 'notification.status', data})
           const resp = await friendlist_Request();
           if (resp.ok) {
@@ -81,6 +84,16 @@ async function start() {
           }
         }
       }); //userID = the user that changed status -> notificate its friends
+
+      const subFriendAccepted = nc.subscribe(`notification.friendaccepted.${userID}`, {
+        callback: (msg) => {
+          const data = jc.decode(msg.data)
+          console.log(`new subfriendrequestaccepted: ${data}`)
+          if (socket) {
+            socket.send(JSON.stringify({ type: 'notification.friendaccepted', data }))
+          }
+        }
+      }); //userID = the friend-requester that got accepted user -> notificate it
 
     },
 

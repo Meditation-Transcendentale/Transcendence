@@ -59,7 +59,7 @@ app.post('/add', handleErrors(async (req, res) => {
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
 
 	const addedPlayerUsername = req.body.inputUsername;
-
+	
 	if (!addedPlayerUsername) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
 	}
@@ -99,6 +99,9 @@ app.post('/accept', handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, 'user.acceptFriendRequest', { friendshipId: friendship.id });
 	
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_ACCEPTED });
+
+	console.log(`HELLO ${friend.id}`)
+	nats.publish(`notification.friendaccepted.${friend.id}.`, jc.encode({ accepterID: user.id }));
 }));
 
 app.delete('/decline', handleErrors(async (req, res) => {

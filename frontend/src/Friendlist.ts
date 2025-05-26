@@ -91,21 +91,29 @@ class Friendlist {
 		search_button!.addEventListener("click", async () => {
 			resp_table.innerHTML = '';
 			const resp = await this.searchUser_Request(value_search!.value as string);
-			for(let user in resp.message) {
-				const tr = document.createElement("tr");
-				const td = document.createElement("td");
-	
-				td.innerText = resp.message[user].username;
-				console.log(resp.message[user].username);	
-				tr.appendChild(td);
-				tr.appendChild(this.createButton("Add", () => this.addFriend_Request(resp.message[user].username), false));
-				tr.appendChild(this.createButton("Block", () => this.blockUser_Request(resp.message[user].username), false));
-				tr.appendChild(this.createButton("Stats", () => {
-					Router.nav("/home/stats?u=" + resp.message[user].username);
-				}, false));
-				tr.appendChild(this.createButton("Watch", () => {/* w.e */ }, false));
-				resp_table!.appendChild(tr);
-			};
+			if (resp.status === 404){
+				console.log("user doesn't exist");
+				return;
+			}
+			if (resp.ok) {
+				for(let user in resp.message) {
+					const tr = document.createElement("tr");
+					const td = document.createElement("td");
+		
+					td.innerText = resp.message[user].username;
+					console.log(resp.message[user].username);	
+					tr.appendChild(td);
+					tr.appendChild(this.createButton("Add", () => this.addFriend_Request(resp.message[user].username), false));
+					tr.appendChild(this.createButton("Block", () => this.blockUser_Request(resp.message[user].username), false));
+					tr.appendChild(this.createButton("Stats", () => {
+						Router.nav("/home/stats?u=" + resp.message[user].username);
+					}, false));
+					tr.appendChild(this.createButton("Watch", () => {/* w.e */ }, false));
+					resp_table!.appendChild(tr);
+				};
+			} else {
+				throw new Error(`Request failed with status ${resp.status}`);
+			}
 		});
 	}
 
@@ -189,6 +197,29 @@ class Friendlist {
 		return final;
 	}
 
+	private async addFriend_Request(addedUsername: string) {
+		const response = await fetch("https://localhost:3000/friends/add", { 
+			method: 'POST',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+			body: JSON.stringify({
+				inputUsername: addedUsername,
+			})
+		});
+		const data = await response.json();
+		
+		const final = {
+			message: data.message,	
+			status: response.status,
+			ok: response.ok
+		};
+		console.log(final);
+		return final;
+	}
+
 	private async declineFriendRequest_Request(declinedUsername: string) {
 		const response = await fetch("https://localhost:3000/friends/decline", { 
 			method: 'DELETE',
@@ -235,28 +266,6 @@ class Friendlist {
 		return final;
 	}
 
-	private async addFriend_Request(addedUsername: string) {
-		const response = await fetch("https://localhost:3000/friends/add", { 
-			method: 'POST',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-			},
-			credentials: 'include',
-			body: JSON.stringify({
-				inputUsername: addedUsername,
-			})
-		});
-		const data = await response.json();
-		
-		const final = {
-			message: data.message,	
-			status: response.status,
-			ok: response.ok
-		};
-		console.log(final);
-		return final;
-	}
 
 	private async blockUser_Request(blockedUsername: string) {
 		const response = await fetch("https://localhost:3000/friends/block", { 

@@ -13,7 +13,7 @@ services:
       - ./notifications-manager/.env.example:/app/.env
     depends_on:
       - nats
-    command: npm run
+    command: npm run dev
     environment:
       - NATS_URL=nats://nats:4222
       - PORT=7001
