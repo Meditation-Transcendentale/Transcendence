@@ -1,7 +1,10 @@
-* Home
-* Service Overview
-* HTTP Endpoints
-* WebSocket Endpoints
-* NATS Subjects
-* Typical Flows
-* Schemas
+* [Home](#/)
+* [Service Overview](#/services.md)
+* [Lobby Manager](#/service/lobby_manager/lobby_manager) 
+* [Matchmaking](#/service/matchmaking/matchmaking) 
+* [Tournament](#/service/tournament/tournament) 
+* [Game Manager](#/service/game_manager/game_manager) 
+* [User Interface](#/service/user_interface/user_interface) 
+* [Pong Physics](#/service/pong_physics/pong_physics) 
+* [PongBR Physics](#/service/pongbr_physics/pongbr_physics) 
+* [PongIO Physics](#/service/pongio_physics/pongio_physics) 

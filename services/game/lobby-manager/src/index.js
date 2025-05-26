@@ -1,25 +1,34 @@
-// services/lobby-manager/src/index.js
-
-import { buildApp } from './app.js'
-import { WebSocketServer } from 'ws'
-import config from './config.js'
-import * as wsServer from './ws/wsServer.js'
-import natsClient from './natsClient.js'
+// src/index.js
+import Fastify from 'fastify';
+import fastifyCors from '@fastify/cors';
+import config from './config.js';
+import natsClient from './natsClient.js';
+import { createUwsApp } from './uwsServer.js';  // <-- changed
+import LobbyService from './lobbyService.js';
+import routes from './routes.js';
 
 async function start() {
-	const app = await buildApp()
+	await natsClient.connect(config.NATS_URL);
+	const lobbyService = new LobbyService();
 
-	const server = app.server
+	const app = Fastify({ logger: true });
+	await app.register(fastifyCors, { origin: '*' });
+	app.decorate('lobbyService', lobbyService);
+	app.decorate('natsClient', natsClient);
+	app.addHook('onClose', async () => {
+		lobbyService.shutdown();
+		await natsClient.close();
+	});
+	app.register(routes);
+	await app.listen({ port: config.PORT, host: '0.0.0.0' });
+	app.log.info(`HTTP API listening on ${config.PORT}`);
 
-	const wss = new WebSocketServer({ server, path: '/lobbies' })
-	wsServer.attach(wss, natsClient)
-
-	await app.listen({ port: config.PORT, host: '0.0.0.0' })
-	app.log.info(`Lobby Manager listening on port ${config.PORT}`)
+	const uwsApp = createUwsApp(config.WS_PATH, lobbyService);
+	uwsApp.listen(config.WS_PORT, token => {
+		if (!token) console.error('uWS failed to start');
+		else console.log(`uWS WebSocket listening on ${config.WS_PORT}`);
+	});
 }
 
-start().catch(err => {
-	console.error('Failed to start Lobby Manager:', err)
-	process.exit(1)
-})
+start().catch(console.error);
 

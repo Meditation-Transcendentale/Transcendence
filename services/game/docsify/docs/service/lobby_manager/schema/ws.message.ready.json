@@ -1,0 +1,7 @@
+// ws.message.ready.json
+// get uuid from ws
+{
+	"lobbyId": {
+		"type": "string",
+	},
+}

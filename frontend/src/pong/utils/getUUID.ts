@@ -1,9 +1,8 @@
-export function getOrCreateUUID(): string {
-    let uuid = 'uuid-' + Math.random().toString(36).substring(2, 11);
-    //let uiid = localStorage.getItem('uiid');
-    //if (!uiid) {
-    //	uiid = 'uiid-' + Math.random().toString(36).substring(2, 11);
-    //	//localStorage.setItem('uiid', uiid);
-    //}
-    return uuid;
+import { meReject, meRequest } from "../../checkMe";
+
+export async function getOrCreateUUID(): string {
+	const json = await meRequest()
+		.catch(() => meReject());
+	const uuid = json.userInfo.uuid;
+	return uuid;
 }

@@ -1,0 +1,72 @@
+// nats.subscribe.match.state.json
+// nats.publishe.match.state.json
+// game.${mode}.${gameId}.match.state
+// mode : "ia", "local", "online", "pongbr", "pongio"
+// pong
+{
+    "gameId": {
+      "type": "string",
+    },
+    "tick": {
+      "type": "number",
+    },
+    "ball": {
+      "type": {
+			"id": "number",
+			"x": "number",
+			"y": "number",
+			"vx": "number",
+			"vy": "number",
+		}
+    },
+    "paddles": {
+	  "type" : "array",
+      "items": {
+			"id": "number",
+			"move": "number",
+		}
+    },
+    "score": {
+      "type": "array",
+	  	"items": "number",
+    },
+}
+
+// pongbr
+{
+    "gameId": {
+      "type": "string",
+    },
+    "tick": {
+      "type": "number",
+    },
+    "ball": {
+	  "type" : "array",
+      "items": {
+			"id": "number",
+			"x": "number",
+			"y": "number",
+			"vx": "number",
+			"vy": "number",
+		}
+    },
+    "paddles": {
+	  "type" : "array",
+      "items": {
+			"id": "number",
+			"move": "number", // left : -1 , 0 : nothing, 1: right
+			"dead": "bool",
+		}
+    },
+    "ranks": {
+      "type": "array",
+	  	"items": "number",
+    },
+    "stage": {
+      "type": "number",
+    },
+}
+
+// pongio
+{
+}

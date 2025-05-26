@@ -203,6 +203,7 @@ class RouterC {
 	}
 
 	private addDelay(e: HTMLElement) {
+		return;
 		e.childNodes.forEach((c) => {
 			if (c instanceof HTMLElement) {
 				this.addDelay(c);

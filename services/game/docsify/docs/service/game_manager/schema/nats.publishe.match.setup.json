@@ -1,0 +1,12 @@
+// nats.publishe.match.setup.json
+// game.${mode}.${gameId}.match.setup
+// mode : "ia", "local", "online", "pongbr", "pongio"
+{
+	"players": {
+		"type": "array",
+        "items": { 
+			"format": "uuid",
+			"type": "string"
+		}
+	},
+}

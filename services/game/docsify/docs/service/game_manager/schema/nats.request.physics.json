@@ -1,0 +1,114 @@
+// nats.request.physics.json
+// game.${mode}.${gameId}.physics.request
+
+// pong request
+
+{
+	"gameId": {
+		"type": "string",
+	},
+	"tick": {
+		"type": "number",
+	},
+	"input": {
+		"type": "array",
+		"items": {
+			"paddleId": {
+				"type": "number",
+				"description": "Numeric identifier of the paddle being updated"
+			},
+			"move": {
+				"type": "number",
+				"description": "Whether the paddle is moving "
+			},
+		}
+	},
+}
+
+// pong response 
+
+{
+	"gameId": {
+		"type": "string",
+	},
+	"tick": {
+		"type": "number",
+	},
+    "ball": {
+      "type": {
+			"id": "number",
+			"x": "number",
+			"y": "number",
+			"vx": "number",
+			"vy": "number",
+		}
+    },
+    "paddles": {
+	  "type" : "array",
+      "items": {
+			"id": "number",
+			"move": "number",
+		}
+    },
+    "goal": {
+	  	"scorerId": "number",
+    },
+}
+
+// pongbr request
+{
+    "gameId": {
+      "type": "string",
+    },
+    "tick": {
+      "type": "number",
+    },
+	"input": {
+		"type": "array",
+		"items": {
+			"paddleId": {
+				"type": "number",
+				"description": "Numeric identifier of the paddle being updated"
+			},
+			"move": {
+				"type": "number",
+				"description": "Whether the paddle is moving "
+			},
+		}
+	},
+    "stage": {
+      "type": "number",
+    },
+}
+
+// pongbr response 
+
+{
+	"gameId": {
+		"type": "string",
+	},
+	"tick": {
+		"type": "number",
+	},
+    "balls": {
+      "type": "array",
+	  "items": {
+			"id": "number",
+			"x": "number",
+			"y": "number",
+			"vx": "number",
+			"vy": "number",
+		}
+    },
+    "paddles": {
+	  "type" : "array",
+      "items": {
+			"id": "number",
+			"move": "number",
+			"dead": "bool",
+		}
+    },
+}
+// pongio
+{
+}

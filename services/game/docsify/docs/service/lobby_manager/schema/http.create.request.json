@@ -1,0 +1,12 @@
+// http.create.request.json
+{
+    "mode": {
+      "type": "string",
+      "enum": ["local", "ia", "online", "pongio", "pongbr", ],
+      "description": "Which game mode to play."
+    },
+    "map": {
+      "type": "string",
+      "description": "Which map to use"
+    },
+}

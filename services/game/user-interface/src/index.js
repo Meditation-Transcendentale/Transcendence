@@ -1,17 +1,7 @@
-// index.js
-import dotenv from 'dotenv';
-dotenv.config();
+// src/index.js
+import UIService from './uiService.js';
 
-import registerHandlers from './handlers.js';
-
-async function main() {
-	try {
-		await registerHandlers();
-		console.log('[UI] server up and running');
-	} catch (err) {
-		console.error('[UI] failed to start:', err);
-		process.exit(1);
-	}
-}
-
-main();
+new UIService().start().catch(err => {
+	console.error('[UIService] start failed:', err);
+	process.exit(1);
+});

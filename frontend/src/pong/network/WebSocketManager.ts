@@ -3,6 +3,7 @@ export class WebSocketManager {
 	private messageQueue: any[] = [];
 
 	constructor(url: string) {
+		console.log("websocket connection..");
 		this.socket = new WebSocket(url);
 		this.socket.binaryType = 'arraybuffer'; // set binary mode
 		this.socket.onopen = () => console.log("Connected to server");

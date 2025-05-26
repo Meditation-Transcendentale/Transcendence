@@ -1,0 +1,22 @@
+// http.list.response.json
+{
+    "lobbies": {
+      "type": "array",
+      "items": {
+          "id": { 
+			  "type": "string"
+		  },
+          "mode": {
+            "type": "string",
+            "enum": ["local", "ia", "online", "pongbr","pongio"]
+          },
+          "maxPlayers": { 
+			  "type": "integer"
+		  },
+          "players": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+        }
+      }
+}

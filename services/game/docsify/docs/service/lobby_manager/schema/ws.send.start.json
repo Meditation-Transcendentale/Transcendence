@@ -1,0 +1,14 @@
+// ws.send.start.json
+{
+    "lobbyId": {
+      "type": "string",
+    },
+    "gameId": {
+      "type": "string",
+    },
+    "map": {
+      "type": "string",
+      "enum": [],
+      "description": "Which map to use"
+    },
+}

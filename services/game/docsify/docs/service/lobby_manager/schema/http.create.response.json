@@ -1,0 +1,7 @@
+// http.create.response.json
+{
+    "lobbyId": {
+      "type": "string",
+      "description": "newly created lobbyId"
+    }
+}
