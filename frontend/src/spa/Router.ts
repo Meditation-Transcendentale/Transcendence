@@ -1,4 +1,4 @@
-import { meReject, meRequest } from "../checkMe";
+import { meReject, meRequest } from "./requests";
 
 type routePage = {
 	html: string,
