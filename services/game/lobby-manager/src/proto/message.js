@@ -80,7 +80,6 @@ export function decodeUpdateMessage(buffer) {
  *   { update: { lobbyId, players, status } }
  */
 export function encodeServerMessage(payload) {
-	// payload must be an object with exactly one of: error, start, update
 	const msg = ServerMessage.create(payload);
 	return ServerMessage.encode(msg).finish();
 }

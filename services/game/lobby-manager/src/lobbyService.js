@@ -26,7 +26,7 @@ class Lobby {
 		if (this.players.has(userId)) {
 			throw new Error(`Player already in lobby`)
 		}
-		this.players.set(userId, { isReady: false, lastSeen: Date.now() })
+		this.players.set(userId, { isReady: false })
 	}
 
 	removePlayer(userId) {
@@ -47,14 +47,16 @@ class Lobby {
 	}
 
 	getState() {
-		const players = [...this.players.keys()]
 		const status = this.allReady() ? 'starting' : 'waiting'
 		return {
 			lobbyId: this.id,
-			mode: this.mode,
 			map: this.map,
-			players,
+			players: [...this.players.entries()].map(([uuid, { isReady }]) => ({
+				uuid,
+				ready: isReady,
+			})),
 			status,
+			mode: this.mode,
 			gameId: this.gameId
 		}
 	}
@@ -96,6 +98,7 @@ export default class LobbyService {
 	 */
 
 	async ready(lobbyId, userId) {
+		console.log("HERE");
 		const lobby = this.lobbies.get(lobbyId)
 		if (!lobby) throw new Error('Lobby not found')
 
@@ -104,7 +107,7 @@ export default class LobbyService {
 
 		if (lobby.allReady()) {
 			const reqBuf = encodeMatchCreateRequest({
-				players: state.players,
+				players: [...lobby.players.keys()],
 			})
 
 			try {
