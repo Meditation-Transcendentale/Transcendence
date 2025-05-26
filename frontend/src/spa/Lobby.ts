@@ -83,7 +83,7 @@ export default class Lobby {
 		}
 
 		this.ws.onmessage = (msg) => {
-			const payload = decodeServerMessage(new Uint8Array(msg.data));
+			const payload = decodeServerMessage(new Uint8Array(msg.data)) as any;
 			console.log(payload);
 			if ('error' in payload) {
 				this.id = null;
@@ -102,7 +102,7 @@ export default class Lobby {
 				console.log("Everyone is ready");
 				const gameId = payload.start.gameId;
 				const map = payload.start.map;
-				Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mod}&map=${this.map}&submod=${this.submod}`));
+				Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mod}&map=${this.map}`));
 				this.ws?.close();
 			}
 		}

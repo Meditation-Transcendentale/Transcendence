@@ -1,5 +1,4 @@
 import { meReject, meRequest } from "../checkMe";
-import { IPage } from "./IPage";
 
 type routePage = {
 	html: string,
@@ -7,6 +6,11 @@ type routePage = {
 	callback: (url: URL) => void
 	instance?: IPage,
 };
+
+interface IPage {
+	load(params: URLSearchParams): void;
+	unload(): Promise<any>;
+}
 
 class RouterC {
 	private location: string | null;
@@ -70,6 +74,12 @@ class RouterC {
 			ts: "./Friendlist",
 			callback: (url: URL) => { this.loadInHome(url) }
 		} as routePage);
+		this.routes.set("/game", {
+			html: "/game",
+			ts: "./Game",
+			callback: (url: URL) => { this.loadInMain(url) }
+		} as routePage);
+
 
 		window.addEventListener("popstate", () => {
 			this.currentPage?.unload()
