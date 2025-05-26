@@ -56,3 +56,11 @@ message ClientMessage {
     ReadyMessage ready = 2;
   }
 }
+message ServerMessage {
+  oneof payload {
+    StartMessage start = 1;
+    UpdateMessage update = 2;
+    ErrorMessage error = 3;
+  }
+}
+

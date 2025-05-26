@@ -83,8 +83,10 @@ export default class Lobby {
 		}
 
 		this.ws.onmessage = (msg) => {
-			const payload = decodeServerMessage(new Uint8Array(msg.data)) as any;
-			console.log(payload);
+			const buf = new Uint8Array(msg.data as ArrayBuffer);
+			const payload = decodeServerMessage(buf);
+			console.log('Raw message data:', new Uint8Array(msg.data));
+			console.log('Decoded payload:', payload);
 			if ('error' in payload) {
 				this.id = null;
 				this.ws?.close();

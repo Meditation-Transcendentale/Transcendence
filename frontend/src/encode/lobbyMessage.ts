@@ -51,6 +51,7 @@ message UpdateMessage {
   string lobbyId = 1;
   repeated Player players = 2;
   string status = 3; // e.g. "waiting", "starting"
+  string mode = 4;
 }
 
 // Envelope for *all* client→server messages
@@ -63,9 +64,9 @@ message ClientMessage {
 
 message ServerMessage {
   oneof payload {
-    ErrorMessage error = 1;
-    StartMessage start = 2;
-    UpdateMessage update = 3;
+    StartMessage start = 1;
+    UpdateMessage update = 2;
+    ErrorMessage error = 3;
   }
 }
 
@@ -111,10 +112,6 @@ export type ServerMessage =
 	| { start: StartMessage; error?: undefined; update?: undefined }
 	| { update: UpdateMessage; start?: undefined; error?: undefined };
 
-//export type ServerMessage =
-//	| { type: 'error'; payload: ErrorMessage }
-//	| { type: 'start'; payload: StartMessage }
-//	| { type: 'update'; payload: UpdateMessage };
 //
 // -----------------------------------------------------------------------------
 // Client→server encode/decode
@@ -178,17 +175,17 @@ export function decodeUpdateMessage(buf: Uint8Array): UpdateMessage {
 export function decodeServerMessage(buf: Uint8Array): ServerMessage {
 	const decoded = ServerMessageType.toObject(
 		ServerMessageType.decode(buf),
-		{ enums: String }
-	) as ServerMessage;
+		{ enums: String, defaults: false }
+	);
 
-	if ('error' in decoded && decoded.error) {
+	if (decoded.error && decoded.error.message) {
 		return { error: decoded.error };
-	} else if ('start' in decoded && decoded.start) {
+	} else if (decoded.start && decoded.start.gameId) {
 		return { start: decoded.start };
-	} else if ('update' in decoded && decoded.update) {
+	} else if (decoded.update && decoded.update.players) {
 		return { update: decoded.update };
-	} else {
-		throw new Error('Received an unknown ServerMessage payload.');
 	}
+
+	throw new Error('Received an unknown ServerMessage payload.');
 }
 
