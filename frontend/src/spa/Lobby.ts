@@ -22,6 +22,7 @@ export default class Lobby {
 	private ref: lobbyHtmlReference;
 	private ws: WebSocket | null;
 	private id: string | null;
+	private mode: string | null;
 	private state: lobbyState;
 
 	private gameIP = "10.19.220.253";
@@ -30,6 +31,7 @@ export default class Lobby {
 		this.div = div;
 		this.ws = null;
 		this.id = null;
+		this.mode = null;
 		this.state = lobbyState.none;
 
 		this.ref = {
@@ -40,6 +42,7 @@ export default class Lobby {
 
 		this.ref.ready.addEventListener("click", () => {
 			this.ws?.send(encodeClientMessage({ ready: { lobbyId: this.id as string } }));
+			console.log("je suis la")
 		})
 
 		this.ref.quit.addEventListener("click", () => {
@@ -80,8 +83,28 @@ export default class Lobby {
 		}
 
 		this.ws.onmessage = (msg) => {
-			console.log(msg);
-			console.log("MESSAGE", decodeServerMessage(new Uint8Array(msg.data)))
+			const payload = decodeServerMessage(new Uint8Array(msg.data));
+			console.log(payload);
+			if ('error' in payload) {
+				this.id = null;
+				this.ws?.close();
+				this.ws = null;
+				this.state = 0;
+				Router.nav("/home/play");
+				return;
+			}
+
+			if ('update' in payload) {
+				console.log(`Update :${payload}`);
+			}
+
+			if ('start' in payload) {
+				console.log("Everyone is ready");
+				const gameId = payload.start.gameId;
+				const map = payload.start.map;
+				Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mod}&map=${this.map}&submod=${this.submod}`));
+				this.ws?.close();
+			}
 		}
 
 		this.ws.onclose = () => {
