@@ -1,0 +1,11 @@
+// ws.message.quit.json
+{
+	"uuid": {
+		"type": "string",
+		"format": "uuid",
+		"description": "Player’s unique identifier"
+	},
+	"lobbyId": {
+		"type": "string",
+	},
+}

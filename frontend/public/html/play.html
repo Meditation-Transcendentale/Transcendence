@@ -1,25 +1,30 @@
 <div id="play" class="instant">
 	<div id="play-create" class="instant">
 		<label>Create</label><br/>
-		<select id="lobby-mod">
+		<select id="play-mod">
 			<option id="pong-mod" value="pong">Pong</option>
 			<option id="br-mod" value="br">BR</option>
 			<option id="io-mod" value="io">IO</option>
 		</select>
-		<select id="lobby-map">
+		<select id="play-map">
 			<option id="default-map" value="default">Default Map</option>
 		</select>
-		<select id="lobby-submod" >
+		<select id="play-submod" >
 			<option id="local-mod" value="local">Local</option>
 			<option id="ia-mod" value="ia">IA</option>
-			<option id="online-mod" value="online">VS</option>
+			<option id="online-mod" value="online">Online</option>
 		</select><br/>
-		<input type="button" id="create-button" value="Create Lobby"></input>
+		<input type="button" id="create-btn" value="Create Lobby"></input>
 	</div><br/>
 
 	<div id="play-join" class="instant">
 		<label>Join</label><br/>
-		<input type="text" id="join-input" placeholder="lobby id"/>
-		<input type="button" id="join-button" value="Join"/>
+		<input type="text" id="join-id" placeholder="lobby id"/>
+		<input type="button" id="join-btn" value="Join"/>
 	</div>
+
+	<input id="play-refresh" type="button" value="Refresh">
+	<div id="play-list">
+	</div>
+
 </div>

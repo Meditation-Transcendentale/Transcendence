@@ -1,16 +1,15 @@
 // services/game/pong-physics/src/index.js
-import { connect, JSONCodec } from 'nats';
+import { connect } from 'nats';
 import dotenv from 'dotenv';
 dotenv.config();
 import { Physics } from './Physics.js';
 import {
 	decodePhysicsRequest,
 	encodePhysicsResponse,
-} from './message.js';
+} from './proto/message.js';
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'pong-physics';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
-const jc = JSONCodec();
 const endedGames = new Set();
 
 /**
@@ -29,39 +28,39 @@ async function start() {
 	   * @param {import('nats').Msg} msg
 	   */
 
-	const endSub = nc.subscribe('game.pong.end');
+	const endSub = nc.subscribe('game.pong.*.match.end');
 	(async () => {
 		for await (const msg of endSub) {
-			const { gameId } = jc.decode(msg.data);
+			const [, , gameId] = msg.subject.split('.');
 			endedGames.add(gameId);
 			Physics.removeGame(gameId);
 			console.log(`[${SERVICE_NAME}] Stopped processing for game ${gameId}`);
 		}
 	})();
 
-	/**
-	  * Handle incoming player inputs immediately
-	  * @param {import('nats').Msg} msg
-	  */
-	const inputSub = nc.subscribe('game.pong.input');
-	(async () => {
-		for await (const msg of inputSub) {
-			// console.log(`[${SERVICE_NAME}] Received input message`);
-			const { gameId, inputs } = jc.decode(msg.data);
-
-			if (endedGames.has(gameId)) continue;
-
-			for (const entry of inputs) {
-				const playerId = entry.playerId;
-				const actualInput = entry.input ?? { type: entry.type };
-
-				Physics.handleImmediateInput({
-					gameId,
-					inputs: [{ playerId, input: actualInput }]
-				});
-			}
-		}
-	})();
+	// /**
+	//   * Handle incoming player inputs immediately
+	//   * @param {import('nats').Msg} msg
+	//   */
+	// const inputSub = nc.subscribe('game.pong.input');
+	// (async () => {
+	// 	for await (const msg of inputSub) {
+	// 		// console.log(`[${SERVICE_NAME}] Received input message`);
+	// 		const { gameId, inputs } = jc.decode(msg.data);
+	//
+	// 		if (endedGames.has(gameId)) continue;
+	//
+	// 		for (const entry of inputs) {
+	// 			const playerId = entry.playerId;
+	// 			const actualInput = entry.input ?? { type: entry.type };
+	//
+	// 			Physics.handleImmediateInput({
+	// 				gameId,
+	// 				inputs: [{ playerId, input: actualInput }]
+	// 			});
+	// 		}
+	// 	}
+	// })();
 
 	/**
 	   * Process each tick: run physics and publish new state
@@ -85,9 +84,10 @@ async function start() {
 	// }
 	// 							events.push({ type: 'goal', gameId, playerId: scorer });
 
-	const sub = nc.subscribe('games.*.*.physics.request');
+	const sub = nc.subscribe('games.pong.*.physics.request');
 	for await (const msg of sub) {
 		const data = decodePhysicsRequest(msg.data);
+		console.log(data);
 
 		if (endedGames.has(data.gameId)) {
 			console.log(`[${SERVICE_NAME}] Ignoring tick ${data.tick} for ended game ${data.gameId}`);
@@ -105,7 +105,10 @@ async function start() {
 				}
 			}
 		}
-		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, isPaused: data.isPaused, isGameOver: data.isGameOver, scores: data.scores }, "", goalScored, scorerId);
+		const goal = null;
+		if (scorerId)
+			goal = { scorerId };
+		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal });
 		msg.respond(buffer);
 	}
 }

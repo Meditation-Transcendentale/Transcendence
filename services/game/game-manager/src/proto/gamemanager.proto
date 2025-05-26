@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package gamemanager;
+
+import "google/protobuf/empty.proto";
+
+// -----------------------------------------------------------------------------
+// Shared messages
+// -----------------------------------------------------------------------------
+message Ball {
+  int32 id = 1;
+  int32 x = 2;
+  int32 y = 3;
+  int32 vx = 4;
+  int32 vy = 5;
+}
+
+message Paddle {
+  int32 id = 1;
+  int32 move = 2; // -1: left, 0: none, 1: right
+  bool dead = 3;  // used in battle royale mode, false otherwise
+}
+
+message PaddleInput {
+  int32 id = 1;
+  int32 move = 2;
+}
+
+message Goal { int32 scorerId = 1; }
+
+// -----------------------------------------------------------------------------
+// Unified state message for all game modes
+// -----------------------------------------------------------------------------
+message MatchState {
+  string gameId = 1;
+  int64 tick = 2;
+  repeated Ball balls = 3; // one ball for classic, multiple for BR
+  repeated Paddle paddles = 4;
+  repeated int32 score = 5; // classic: scores per player
+  repeated int32 ranks = 6; // BR mode: ranking per player
+  int32 stage = 7;          // BR: current stage; others: ignored
+}
+
+// -----------------------------------------------------------------------------
+// Unified physics request/response messages
+// -----------------------------------------------------------------------------
+message PhysicsRequest {
+  string gameId = 1;
+  int64 tick = 2;
+  repeated PaddleInput input = 3;
+  int32 stage = 4; // BR mode stage; others: ignored
+}
+
+message PhysicsResponse {
+  string gameId = 1;
+  int64 tick = 2;
+  repeated Ball balls = 3;
+  repeated Paddle paddles = 4;
+  Goal goal = 5; // classic mode goal event; empty otherwise
+}
+
+// -----------------------------------------------------------------------------
+// NATS request → game.${mode}.match.create
+// -----------------------------------------------------------------------------
+message MatchCreateRequest {
+  repeated string players = 1; // array of player UUIDs
+}
+
+message MatchCreateResponse {
+  string gameId = 1; // newly created game’s ID
+}
+
+// -----------------------------------------------------------------------------
+// Match lifecycle messages
+// -----------------------------------------------------------------------------
+message MatchEnd {}
+
+message MatchSetup {
+  repeated string players = 1; // player UUIDs
+}
+
+message MatchInput {
+  int32 paddleId = 1;
+  int32 move = 2;
+}
+
+message MatchQuit { string uuid = 1; }
+
+message MatchStart {}
+

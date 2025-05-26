@@ -1,0 +1,6 @@
+// ws.send.gameend.json
+// ws.send.gameend.json
+{
+	"score": {
+		"type": "array",
+}

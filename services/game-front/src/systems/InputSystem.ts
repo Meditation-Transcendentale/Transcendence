@@ -13,12 +13,14 @@ export class InputSystem extends System {
 	private wsManager: WebSocketManager;
 	private localPaddleId: number | null = null;
 	private readonly MAX_OFFSET: number = 8.4;
+	private move: boolean;
 
 	constructor(inputManager: InputManager, wsManager: WebSocketManager) {
 		super();
 		this.inputManager = inputManager;
 		this.wsManager = wsManager;
 		this.localPaddleId = localPaddleId;
+		this.move = false;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {

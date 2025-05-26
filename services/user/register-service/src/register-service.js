@@ -9,9 +9,9 @@ import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
 
-dotenv.config({path: "../../../../.env"});
+dotenv.config({ path: "../../../../.env" });
 
-const app = Fastify({ 
+const app = Fastify({
 	logger: true,
 	https: {
 		key: fs.readFileSync(process.env.SSL_KEY),
@@ -46,20 +46,20 @@ const jc = JSONCodec();
 const USERNAME_REGEX = /^[a-zA-Z0-9]{3,20}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
-app.post('/', {schema: registerSchema}, handleErrors(async (req, res) => {
-	
+app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
+
 	const { username, password } = req.body;
 
 	if (USERNAME_REGEX.test(username) === false) {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.USERNAME_INVALID };
 	}
 
-	if (PASSWORD_REGEX.test(password)	=== false) {
+	if (PASSWORD_REGEX.test(password) === false) {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_INVALID };
 	}
 
 	await natsRequest(nats, jc, "user.checkUsernameAvailability", { username });
-	
+
 	const hashedPassword = await bcrypt.hash(password, 10);
 	const uuid = uuidv4();
 

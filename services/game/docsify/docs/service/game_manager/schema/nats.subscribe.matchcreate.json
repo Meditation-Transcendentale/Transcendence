@@ -1,0 +1,12 @@
+// nats.subscribe.matchcreate.json
+// game.${mode}.match.create
+// mode : "ia", "local", "online", "pongbr", "pongio"
+{
+	"players": {
+		"type": "array",
+        "items": { 
+			"format": "uuid",
+			"type": "string"
+		}
+	},
+}

@@ -1,0 +1,58 @@
+syntax = "proto4";
+
+package lobby;
+
+// -----------------------------------------------------------------------------
+// NATS publish: user.${uuid}.status
+// (fill in the exact fields you need here)
+// -----------------------------------------------------------------------------
+message UserStatus {
+  string uuid = 1;    // the user's UUID
+  string lobbyId = 2; // which lobby they’re in
+  string status = 3;  // e.g. "joined", "left", etc.
+}
+
+// -----------------------------------------------------------------------------
+// WebSocket messages: client → server
+// -----------------------------------------------------------------------------
+message QuitMessage {
+  string uuid = 1;    // player’s UUID
+  string lobbyId = 2; // lobby to quit
+}
+
+message ReadyMessage {
+  string lobbyId = 1; // player toggles ready in this lobby
+}
+
+// -----------------------------------------------------------------------------
+// WebSocket messages: server → client
+// -----------------------------------------------------------------------------
+message ErrorMessage {
+  string message = 1; // human‐readable error
+}
+
+message StartMessage {
+  string lobbyId = 1;
+  string gameId = 2;
+  string map = 3; // which map to use
+}
+
+message Player {
+  string uuid = 1;
+  bool ready = 2;
+}
+
+message UpdateMessage {
+  string lobbyId = 1;
+  repeated Player players = 2;
+  string status = 3; // e.g. "waiting", "starting"
+  string mode = 4; // e.g. "waiting", "starting"
+}
+
+// Envelope for *all* client→server messages
+message ClientMessage {
+  oneof payload {
+    QuitMessage quit = 1;
+    ReadyMessage ready = 2;
+  }
+}

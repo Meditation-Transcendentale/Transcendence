@@ -4,37 +4,6 @@ This document provides an overview of the server-side architecture, including se
 
 ---
 
-## 1. Service Overview
-
-- **Lobby Manager Service**  
-  - Hosts the **Lobby WebSocket** for players to join, setup game, signal readiness, and detect disconnects
-  - Optionally provides HTTP endpoints for lobby browsing
-  - When all players are ready, publishes `game.create` with a custom lobby template
-
-- **Matchmaking Service**  
-  - Exposes HTTP POST `/matchmaking/join` & `/matchmaking/leave`
-  - Manages fixed‐mode queues in memory
-  - When enough players match, publishes `game.create` with fixed game template
-
-- **Game Manager Service**  
-  - Authoritative game-state controller
-  - Subscribes to `game.create` events to spin up new games
-  - Publishes state deltas on `state.update.{gameId}`
-  - Forwards player inputs to physics services via `physics.request.{mode}`
-
-- **Physics Services** (×3: `pong`, `pongBR`, `pongIO`)  
-  - Listen on `physics.request.{mode}`
-  - Compute physics ticks and return via `physics.response.{mode}`
-
-- **User Interface Service**  
-  - Hosts the **Game WebSocket** for real-time gameplay (inputs + state updates)
-  - Subscribes to `state.update.{gameId}` and pushes to connected clients
-  - Publishes client inputs to `game.input.{gameId}` or directly to `physics.request.{mode}`
-
-- **IA Service**  
-  - Manages bot instances that connect over the Game WebSocket just like human clients
-
----
 
 ## 2. HTTP Endpoints
 

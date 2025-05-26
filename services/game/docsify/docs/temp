@@ -1,0 +1,137 @@
+{
+    "mode": {
+      "type": "string",
+      "enum": ["pong", "pongio", "pongbr", ],
+      "description": "Which game mode to play."
+    },
+    "map": {
+      "type": "string",
+      "description": "Which map to use"
+    },
+}
+{
+    "lobbyId": {
+      "type": "string",
+      "description": "newly created lobbyId"
+    }
+}
+{
+	_empty body
+}
+{
+	  "mode": {
+		"type": "string",
+		"enum": ["pong","pongBR","pongIO"]
+	  },
+	  "maxPlayers": { 
+		  "type": "integer"
+	  },
+	  "players": {
+		"type": "array",
+		"items": { "type": "string" }
+	  },
+}
+{
+	_empty body
+}
+{
+    "lobbies": {
+      "type": "array",
+      "items": {
+          "id": { 
+			  "type": "string"
+		  },
+          "mode": {
+            "type": "string",
+            "enum": ["pong","pongBR","pongIO"]
+          },
+          "maxPlayers": { 
+			  "type": "integer"
+		  },
+          "players": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+        }
+      }
+}
+// user.${uuid}.status
+{
+	// a voir
+}
+// game.${mode}.match.create
+// mode : "ia", "local", "online", "pongbr", "pongio"
+{
+	"players": {
+		"type": "array",
+        "items": { 
+			"format": "uuid",
+			"type": "string"
+		}
+	},
+}
+{
+	"gameId": {
+		"type": "string",
+        "description": "Newly created game's gameId"
+	},
+}
+{
+	"uuid": {
+		"type": "string",
+		"format": "uuid",
+		"description": "Player’s unique identifier"
+	},
+	"lobbyId": {
+		"type": "string",
+	},
+}
+// get uuid from ws
+{
+	"lobbyId": {
+		"type": "string",
+	},
+}
+{
+	"message": {
+      "type": "string",
+      "description": "Human‐readable error description"
+    },
+}
+{
+    "lobbyId": {
+      "type": "string",
+    },
+    "gameId": {
+      "type": "string",
+    },
+    "map": {
+      "type": "string",
+      "enum": [],
+      "description": "Which map to use"
+    },
+}
+{
+    "players": {
+      "type": "array",
+      "items": {
+        "type": "object",
+          "uuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Player’s unique identifier"
+          },
+          "ready": {
+            "type": "boolean",
+            "description": "Whether this player is ready"
+          }
+      }
+	},
+    "status": {
+      "type": "string",
+      "enum": [ "waiting", "starting" ]
+    },
+    "lobbyId": {
+      "type": "string",
+    },
+}
