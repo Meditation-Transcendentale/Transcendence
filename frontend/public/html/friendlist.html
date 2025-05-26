@@ -1,10 +1,14 @@
-<div id="friendlist">
-	<div id="fl-search">
-		<input id="fl-search-input" type="text" placeholder="Search username..."/>
-		<div id="fl-search-result"></div>
+<div id="friendlist" class="window resize">
+	<link rel="stylesheet" type="text/css" href="/friendlist.css">
+	<div class="header drag"></div>
+	<div class="content">
+		<div id="fl-search">
+			<input id="fl-search-input" type="text" placeholder="Search username..."/>
+			<div id="fl-search-result"></div>
+		</div>
+		<input id="fl-friends-btn" class="collapsible" type="button" value='Friends'>
+		<div id="fl-friends" class="list"></div><br/>
+		<input id="fl-pending-btn" class="collapsible" type="button" value="Pending">
+		<div id="fl-pending" class="list"></div>
 	</div>
-	<input id="fl-friends-btn" class="collapsible" type="button" value='Friends'>
-	<div id="fl-friends" class="content"></div><br/>
-	<input id="fl-pending-btn" class="collapsible" type="button" value="Pending">
-	<div id="fl-pending" class="content"></div>
 </div>

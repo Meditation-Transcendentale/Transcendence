@@ -1,7 +1,7 @@
 import { meReject, meRequest } from "./checkMe";
 import { deleteRequest, getRequest, postRequest } from "./requests";
 import Router from "./Router";
-import { createButton } from "./utils";
+import { createButton, setDraggable } from "./utils";
 
 
 interface Friend {
@@ -54,6 +54,8 @@ export default class Friendlist {
 					.catch((resp) => { this.searchReject(resp) })
 			}
 		})
+
+		setDraggable(this.div.querySelector(".window") as HTMLDivElement);
 	}
 
 
@@ -76,6 +78,7 @@ export default class Friendlist {
 		frienlist.forEach((friend: any) => {
 			let user = document.createElement("div");
 			user.innerText = friend.friend_username;
+			user.className = "list-element";
 			user.appendChild(createButton("Stats", () => { Router.nav(`/stats?u=${friend.friend_username}`) }));
 			user.appendChild(createButton("Remove", (btn: HTMLInputElement) => {
 				deleteRequest(`friends/delete`, { inputUsername: friend.friend_username })

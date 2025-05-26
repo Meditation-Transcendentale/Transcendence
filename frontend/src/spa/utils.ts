@@ -25,3 +25,24 @@ export function createButton(value: string, onClick: (btn: HTMLInputElement) => 
 	return btn;
 }
 
+
+
+export function setDraggable(win: HTMLElement) {
+	const drag = win.querySelector(".drag");
+	if (!drag) { return };
+	drag.addEventListener('mousedown', (e: any) => {
+		var offsetX = e.clientX - parseInt(window.getComputedStyle(win).left);
+		var offsetY = e.clientY - parseInt(window.getComputedStyle(win).top);
+
+		function mouseMoveHandler(e: any) {
+			win.style.top = (e.clientY - offsetY) + 'px';
+			win.style.left = (e.clientX - offsetX) + 'px';
+		}
+		function reset() {
+			window.removeEventListener('mousemove', mouseMoveHandler);
+			window.removeEventListener('mouseup', reset);
+		}
+		window.addEventListener('mousemove', mouseMoveHandler);
+		window.addEventListener('mouseup', reset);
+	});
+}
