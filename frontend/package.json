@@ -18,6 +18,7 @@
     "vite": "^6.3.3"
   },
   "dependencies": {
+    "perlin-noise-3d": "^0.5.4",
     "transcendence-frontend": "file:"
   }
 }
