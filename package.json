@@ -27,6 +27,8 @@
   },
   "homepage": "https://github.com/Meditation-Transcendentale/Transcendence#readme",
   "dependencies": {
+    "@fastify/cors": "^11.0.1",
+    "fastify-cors": "^6.0.3",
     "uwebsockets": "^3.0.2",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.52.0",
     "uws": "^200.0.0"

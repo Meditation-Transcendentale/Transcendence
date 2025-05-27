@@ -1,30 +1,42 @@
 import dotenv from 'dotenv'
-import uWS from 'uWebSockets.js'
+import Fastify from 'fastify'
+import fastifyCors from '@fastify/cors';
 import { connect, JSONCodec } from 'nats'
+import uWS from 'uWebSockets.js'
 import { v4 as uuidv4 } from 'uuid'
+import config from './config.js';
 
-dotenv.config()
+dotenv.config({ path: "../../../../.env"})
 
-const PORT = parseInt(process.env.PORT, 10) || 3000
-const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222'
+
 const SERVICE_NAME = 'notifications'
-const jc = JSONCodec()
 
 const userSockets = new Map()
 
 async function start() {
-  const nc = await connect({ servers: NATS_URL })
+  
+  const nc = await connect({ servers: process.env.NATS_URL })
+  console.log(`connected to ${nc.getServer()}`);
   console.log(`[${SERVICE_NAME}] connected to NATS`)
+  const jc = JSONCodec()
+  
+  const app = Fastify({ logger: true });
+  await app.register(fastifyCors, { origin: '*' });
+  
+  await app.listen({ port: config.PORT, host: '0.0.0.0' });
+	app.log.info(`HTTP API listening on ${config.PORT}`);
+  
 
-  uWS.App().ws('/notification', {
-    maxPayloadLength: 16 * 1024 * 1024,
+  
+  
+  uWS.App().ws(config.WS_PATH, {
     idleTimeout: 120,
 
     upgrade: (res, req, context) => {
       const query = req.getQuery()
       const params = new URLSearchParams(query)
       const uuid = params.get('uuid') || uuidv4()
-
+      
       res.upgrade(
         { uuid },
         req.getHeader('sec-websocket-key'),
@@ -33,68 +45,94 @@ async function start() {
         context
       )
     },
-
+    
     open: async (ws) => {
-      const userID = ws.uuid
-      ws.userID = userID
-
-      const wasReconnected = userSockets.has(userID)
-      userSockets.set(userID, ws)
+      const wasReconnected = userSockets.has(ws.uuid)
+      
+      if (!wasReconnected)
+        userSockets.set(ws.uuid, ws);
 
       console.log(
-        `[${SERVICE_NAME}] ${userID} ${wasReconnected ? 'reconnected' : 'connected'}`
+        `[${SERVICE_NAME}] ${ws.uuid} ${wasReconnected ? 'reconnected' : 'connected'}`
       )
-
-      const socket = userSockets.get(userID)
-
-      const subFriendRequest = nc.subscribe(`notification.friendrequest.${userID}`, {
-        callback: (msg) => {
-          const data = jc.decode(msg.data)
-          console.log(`new subfriend request: ${data}`)
-          if (socket) {
-            socket.send(JSON.stringify({ type: 'notification.friendrequest', data }))
-          }
-        }
-      }); //userID = the friend-requested user -> notificate it
-
-      const subGameInvite = nc.subscribe(`notification.game-invite.${userID}`, {
-        callback: (msg) => {
-          const data = jc.decode(msg.data)
-          console.log(`new game invite: ${data}`)
-          if (socket) {
-            socket.send(JSON.stringify({ type: 'notification.invite', data }))
-          }
-        }
-      }) //userID = the game-invited user -> notificate it
       
-      const subStatusChange = nc.subscribe(`notification.status.${userID}`, {
-        callback: async (msg) => {
-          const data = jc.decode(msg.data)
-          console.log(`new status request: ${data}`)
-          const sendingData = JSON.stringify({ type: 'notification.status', data})
-          const resp = await friendlist_Request();
-          if (resp.ok) {
-            resp.message.friendlist.forEach(friend => {
-              friendSocket = userSockets.get(friend.id)
-              if (friendSocket) friendSocket.send(sendingData)
-            });
-          } else {
-            if (resp.status === 404) return;
-            throw new Error(`[${SERVICE_NAME}] Request failed with status ${resp.status}`);
+      const subFriendAccepted = nc.subscribe(`notification.friendaccepted.${ws.uuid}`, {
+        callback: (err, msg) => {
+          if (err) {
+            console.error("Subscription error:", err);
+            return;
           }
-        }
-      }); //userID = the user that changed status -> notificate its friends
+          try {
+            const data = jc.decode(msg.data);
+            console.log("new friend request accepted:", data);
+            if (userSockets.has(ws.uuid))
+            {
+              const client = userSockets.get(ws.uuid);
+              client.send(jc.encode({ type: 'notification.friendaccepted', data }));
+            }
+            } catch (e) {
+              console.error("Failed to process message:", e);
+            }
+          },
+        });
 
-      const subFriendAccepted = nc.subscribe(`notification.friendaccepted.${userID}`, {
-        callback: (msg) => {
-          const data = jc.decode(msg.data)
-          console.log(`new subfriendrequestaccepted: ${data}`)
-          if (socket) {
-            socket.send(JSON.stringify({ type: 'notification.friendaccepted', data }))
-          }
-        }
-      }); //userID = the friend-requester that got accepted user -> notificate it
+        const subFriendRequest = nc.subscribe(`notification.friendrequest.${ws.uuid}`, {
+          callback: (err, msg) => {
+            if (err) {
+              console.error("Subscription error:", err);
+              return;
+            }
+            try {
+              const data = jc.decode(msg.data);
+              console.log("new friend request:", data);
+              if (userSockets.has(ws.uuid))
+              {
+                const client = userSockets.get(ws.uuid);
+                client.send(jc.encode({ type: 'notification.friendrequest', data }));
+              }
+              } catch (e) {
+                console.error("Failed to process message:", e);
+              }
+            },
+          }); //userID = the friend-requested user -> notificate it
 
+      // const subGameInvite = nc.subscribe(`notification.game-invite.${userID}`, {
+      //   callback: (msg) => {
+      //     const data = jc.decode(msg.data)
+      //     console.log(`new game invite: ${data}`)
+      //     if (socket) {
+      //       socket.send(JSON.stringify({ type: 'notification.invite', data }))
+      //     }
+      //   }
+      // }) //userID = the game-invited user -> notificate it
+      
+      // const subStatusChange = nc.subscribe(`notification.status.${userID}`, {
+      //   callback: async (msg) => {
+      //     const data = jc.decode(msg.data)
+      //     console.log(`new status request: ${data}`)
+      //     const sendingData = JSON.stringify({ type: 'notification.status', data})
+      //     const resp = await friendlist_Request();
+      //     if (resp.ok) {
+      //       resp.message.friendlist.forEach(friend => {
+      //         friendSocket = userSockets.get(friend.id)
+      //         if (friendSocket) friendSocket.send(sendingData)
+      //       });
+      //     } else {
+      //       if (resp.status === 404) return;
+      //       throw new Error(`[${SERVICE_NAME}] Request failed with status ${resp.status}`);
+      //     }
+      //   }
+      // }); //userID = the user that changed status -> notificate its friends
+
+      // const subFriendAccepted = nc.subscribe(`notification.friendaccepted.${userID}`, {
+      //   callback: (msg) => {
+      //     const data = jc.decode(msg.data)
+      //     console.log(`new subfriendrequestaccepted: ${data}`)
+      //     if (socket) {
+      //       socket.send(jc.encode({ type: 'notification.friendaccepted', data }))
+      //     }
+      //   }
+      // }); //userID = the friend-requester that got accepted user -> notificate it
     },
 
     message: (ws, message, isBinary) => { //debug purpose, nothing coming from the client
@@ -111,11 +149,11 @@ async function start() {
       userSockets.delete(ws.userID)
       console.log(`[${SERVICE_NAME}] ${ws.userID} disconnected`)
     }
-  }).listen(PORT, (token) => {
+  }).listen(config.WS_PORT, '0.0.0.0', (token) => {
     if (token) {
-      console.log(`[${SERVICE_NAME}] WebSocket server running on port ${PORT}`)
+      console.log(`[${SERVICE_NAME}] WebSocket server running on port ${config.WS_PORT}`)
     } else {
-      console.error(`[${SERVICE_NAME}] Failed to listen on port ${PORT}`)
+      console.error(`[${SERVICE_NAME}] Failed to listen on port ${config.WS_PORT}`)
     }
   })
 }

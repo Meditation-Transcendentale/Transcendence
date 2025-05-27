@@ -1,9 +1,4 @@
 services:
-  nats:
-    image: nats:latest
-    ports:
-      - "4222:4222"
-
   notifications-manager:
     build:
       context: ./notifications-manager
@@ -11,11 +6,12 @@ services:
       - ./notifications-manager/src:/app/src
       - ./notifications-manager/package.json:/app/package.json
       - ./notifications-manager/.env.example:/app/.env
-    depends_on:
-      - nats
     command: npm run dev
-    environment:
-      - NATS_URL=nats://nats:4222
-      - PORT=7001
     ports:
       - "7001:7001"
+      - "7011:7011"
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
