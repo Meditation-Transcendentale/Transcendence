@@ -4,6 +4,7 @@ import {
 	DirectionalLight,
 	Engine,
 	HemisphericLight,
+	Matrix,
 	Scene,
 	Vector3
 } from "@babylonjs/core";
@@ -17,6 +18,12 @@ export class Environment {
 	private camera!: ArcRotateCamera;
 
 	private cubeCluster!: CubeCluster;
+	private lastTime: number;
+	private deltaTime: number;
+	private frame: number;
+
+
+	private play: HTMLElement;
 
 
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
@@ -41,6 +48,10 @@ export class Environment {
 		});
 
 		this.cubeCluster = new CubeCluster(this.scene);
+		this.lastTime = performance.now() * 0.001;
+		this.deltaTime = 0;
+		this.play = document.querySelector("#play") as HTMLElement;
+		this.frame = 0;
 	}
 
 	public async init() {
@@ -51,14 +62,30 @@ export class Environment {
 		this.camera.inertia = 0.1;
 		this.camera.rotation.set(0, Math.PI * 1.5, 0);
 		this.camera.attachControl(this.canvas, true);
-		const l = new DirectionalLight("light", new Vector3(1, 0, 0), this.scene);
-		const hl = new HemisphericLight("hlight", new Vector3(0, 1, 0), this.scene);
-		hl.intensity = 10.5;
+		const l = new DirectionalLight("light", new Vector3(0, 1, 0), this.scene);
+		const hl = new HemisphericLight("hlight", new Vector3(1, 0, 0), this.scene);
+		hl.intensity = 0.5;
 
 	}
 
 	public render() {
+		if (!this.frame) { this.updateCss(); }
+		const time = performance.now() * 0.001;
+		this.deltaTime = time - this.lastTime;
+		this.lastTime = time;
+		this.cubeCluster.update(this.deltaTime);
 		this.scene.render();
+		this.frame += 1;
+		this.frame %= 2;
+	}
+
+	private updateCss() {
+		const proj = this.cubeCluster.getSPC();
+
+		this.play.style.top = `${proj[1] * 100}%`;
+		this.play.style.left = `${proj[0] * 100}%`;
+		this.play.style.width = `${(proj[2] - proj[0]) * 100}%`;
+		this.play.style.height = `${(proj[3] - proj[1]) * 100}%`;
 	}
 
 	private async load() {

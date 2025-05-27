@@ -14,7 +14,9 @@ body {
 	touch-action: pan-x pan-y;
 	height: 100%;
 	width: 100%;
+	--window: #8E1616;
 }
+
 
 #fps {
 	position: absolute;
@@ -28,6 +30,46 @@ body {
 	width: 60px;
 	height: 20px;
 }
+
+#w {
+	position: absolute;
+	text-align: center;
+	font-size: 16px;
+	color: white;
+	top: 10px;
+	left: 10px;
+	width: 60px;
+	height: 20px;
+}
+
+#play {
+	position: absolute;
+	border: 10px solid var(--window);
+	background-color: transparent;
+	pointer-events: none;
+	overflow: hidden;
+	transition:
+		top 0.5s,
+		left 0.5s,
+		width 0.5s 0.3s,
+		height 0.5s 0.3s;
+	transition-behavior: allow-discrete;
+	/*transform: translate(-50%, 50%);*/
+}
+
+.header {
+	width: 100%;
+	background-color: var(--window);
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	font-weight: bold;
+	font-size: 1.5em;
+	font-family: sans-serif;
+}
+
+
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -142,34 +184,4 @@ body.modal-open .popup {
 	padding-top: 20px;
 	padding-bottom: 20px;
 	font-size: 30px;
-}
-
-.window {
-	position: absolute;
-	min-width: 100px;
-	min-height: 100px;
-	z-index: 0;
-	margin: 0;
-	overflow: scroll;
-	top: 50%;
-	left: 50%;
-	border: 4px solid black;
-}
-
-.window:hover {
-	resize: both;
-	overflow: hidden;
-}
-
-.header {
-	cursor: move;
-	width: 100%;
-	height: 20px;
-	background-color: grey;
-}
-
-.content {
-	width: 100%;
-	height: 100%;
-	overflow: scroll;
 }
