@@ -14,10 +14,9 @@
                 },
                 {
                     "properties": {
-                        "type": "offline",
-                        "last-connection": "date-time"
+                        "type": "offline"
                     },
-                    "required": ["type", "last-connection"]
+                    "required": ["type"]
                 },
                 {
                     "properties": {

@@ -75,7 +75,6 @@ app.post('/add', handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, 'user.addFriendRequest', { userId: user.id, friendId: friend.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_SENT });
-	console.log(`ADD ${friend.uuid}|${user.uuid}`)
 	nats.publish(`notification.friendrequest.${friend.uuid}`, jc.encode({ senderID: user.uuid }));
 }));
 
@@ -101,8 +100,6 @@ app.post('/accept', handleErrors(async (req, res) => {
 	
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_ACCEPTED });
 	nats.publish(`notification.friendaccepted.${friend.uuid}`, jc.encode({ accepterID: user.uuid}));
-	// console.log(`PUBLISH TO:notification.friendaccepted.${friend.uuid}`)
-	// nats.publish(`notification.friendaccepted.${friend.uiid}`, jc.encode({ accepterID: user.uiid }));
 }));
 
 app.delete('/decline', handleErrors(async (req, res) => {

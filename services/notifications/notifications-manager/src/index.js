@@ -16,8 +16,6 @@ const userSockets = new Map()
 async function start() {
   
   const nc = await connect({ servers: process.env.NATS_URL })
-  console.log(`connected to ${nc.getServer()}`);
-  console.log(`[${SERVICE_NAME}] connected to NATS`)
   const jc = JSONCodec()
   
   const app = Fastify({ logger: true });
@@ -64,90 +62,120 @@ async function start() {
           }
           try {
             const data = jc.decode(msg.data);
-            console.log("new friend request accepted:", data);
             if (userSockets.has(ws.uuid))
             {
               const client = userSockets.get(ws.uuid);
               client.send(jc.encode({ type: 'notification.friendaccepted', data }));
             }
-            } catch (e) {
-              console.error("Failed to process message:", e);
+          } catch (e) {
+            console.error("Failed to process message:", e);
+          }
+        },
+      });
+
+      const subFriendRequest = nc.subscribe(`notification.friendrequest.${ws.uuid}`, {
+        callback: (err, msg) => {
+          if (err) {
+            console.error("Subscription error:", err);
+            return;
+          }
+          try {
+            const data = jc.decode(msg.data);
+            if (userSockets.has(ws.uuid))
+            {
+              const client = userSockets.get(ws.uuid);
+              client.send(jc.encode({ type: 'notification.friendrequest', data }));
             }
-          },
-        });
+          } catch (e) {
+            console.error("Failed to process message:", e);
+          }
+        },
+      });
 
-        const subFriendRequest = nc.subscribe(`notification.friendrequest.${ws.uuid}`, {
-          callback: (err, msg) => {
-            if (err) {
-              console.error("Subscription error:", err);
-              return;
+      const subGameInvite = nc.subscribe(`notification.gameinvite.${ws.uuid}`, {
+        callback: (err, msg) => {
+          if (err) {
+            console.error("Subscription error:", err);
+            return;
+          }
+          try {
+            const data = jc.decode(msg.data);
+            if (userSockets.has(ws.uuid))
+            {
+              const client = userSockets.get(ws.uuid);
+              client.send(jc.encode({ type: 'notification.invite', data }));
             }
-            try {
-              const data = jc.decode(msg.data);
-              console.log("new friend request:", data);
-              if (userSockets.has(ws.uuid))
-              {
-                const client = userSockets.get(ws.uuid);
-                client.send(jc.encode({ type: 'notification.friendrequest', data }));
-              }
-              } catch (e) {
-                console.error("Failed to process message:", e);
-              }
-            },
-          }); //userID = the friend-requested user -> notificate it
+          } catch (e) {
+            console.error("Failed to process message:", e);
+          }
+        },
+      });
 
-      // const subGameInvite = nc.subscribe(`notification.game-invite.${userID}`, {
-      //   callback: (msg) => {
-      //     const data = jc.decode(msg.data)
-      //     console.log(`new game invite: ${data}`)
-      //     if (socket) {
-      //       socket.send(JSON.stringify({ type: 'notification.invite', data }))
-      //     }
-      //   }
-      // }) //userID = the game-invited user -> notificate it
-      
-      // const subStatusChange = nc.subscribe(`notification.status.${userID}`, {
-      //   callback: async (msg) => {
-      //     const data = jc.decode(msg.data)
-      //     console.log(`new status request: ${data}`)
-      //     const sendingData = JSON.stringify({ type: 'notification.status', data})
-      //     const resp = await friendlist_Request();
-      //     if (resp.ok) {
-      //       resp.message.friendlist.forEach(friend => {
-      //         friendSocket = userSockets.get(friend.id)
-      //         if (friendSocket) friendSocket.send(sendingData)
-      //       });
-      //     } else {
-      //       if (resp.status === 404) return;
-      //       throw new Error(`[${SERVICE_NAME}] Request failed with status ${resp.status}`);
-      //     }
-      //   }
-      // }); //userID = the user that changed status -> notificate its friends
+      const subStatusUpdate = nc.subscribe(`notification.status.update.${ws.uuid}`, {
+        callback: (err, msg) => {
+          if (err) {
+            console.error("Subscription error:", err);
+            return;
+          }
+          try {
+            const data = jc.decode(msg.data);
+            console.log(`STATUS UPDATE RECEIVED ${ws.uuid} : ${Object.values(data)}`)
+            if (userSockets.has(ws.uuid))
+            {
+              const client = userSockets.get(ws.uuid);
+              client.send(jc.encode({ type: 'notification.status', data }));
+            }
+          } catch (e) {
+            console.error("Failed to process message:", e);
+          }
+        },
+      });
 
-      // const subFriendAccepted = nc.subscribe(`notification.friendaccepted.${userID}`, {
-      //   callback: (msg) => {
-      //     const data = jc.decode(msg.data)
-      //     console.log(`new subfriendrequestaccepted: ${data}`)
-      //     if (socket) {
-      //       socket.send(jc.encode({ type: 'notification.friendaccepted', data }))
-      //     }
-      //   }
-      // }); //userID = the friend-requester that got accepted user -> notificate it
+      const subStatusChange = nc.subscribe(`notification.status.change.${ws.uuid}`, {
+        callback: (err, msg) => {
+          if (err) {
+            console.error("Subscription error:", err);
+            return;
+          }
+          try {
+            const data = jc.decode(msg.data);
+            console.log(`STATUS CHANGE FROM ${ws.uuid} : ${Object.entries(data)}`)
+            const sendingData = jc.encode({ senderID: ws.uuid,  status: data });
+            (async () => {
+              const resp = await friendlist_Request();
+              if (resp.ok) {
+                resp.message.friendlist.forEach(friend => {
+                  console.log(`SENDING STATUS TO:${friend.uuid}|${Object.values(sendingData)}`)
+                  nc.publish(`notification.status.update.${friend.uuid}`, sendingData);
+                });
+              } else {
+                if (resp.status === 404) return;
+                throw new Error(`[${SERVICE_NAME}] Request failed with status ${resp.status}`);
+              }
+            })();
+          } catch (e) {
+            console.error("Failed to process message:", e);
+          }
+        },
+      });
+
+      nc.publish(`notification.status.change.${ws.uuid}`, jc.encode({ status: "online" }))
     },
-
+    
     message: (ws, message, isBinary) => { //debug purpose, nothing coming from the client
       try {
         const raw = Buffer.from(message).toString()
         const { type, data } = JSON.parse(raw)
-        console.log(`[${SERVICE_NAME}] received message from ${ws.userID}:`, { type, data })
+        console.log(`[${SERVICE_NAME}] received message from ${ws.uuid}:`, { type, data })
       } catch (err) {
         console.error(`[${SERVICE_NAME}] Error processing message`, err)
       }
     },
 
     close: (ws, code, message) => {
-      userSockets.delete(ws.userID)
-      console.log(`[${SERVICE_NAME}] ${ws.userID} disconnected`)
+      nc.publish(`notification.status.change.${ws.uuid}`, jc.encode({ properties: { type: "offline" } }))
+      userSockets.delete(ws.uuid)
+      console.log(`[${SERVICE_NAME}] ${ws.uuid} disconnected`)
     }
   }).listen(config.WS_PORT, '0.0.0.0', (token) => {
     if (token) {
