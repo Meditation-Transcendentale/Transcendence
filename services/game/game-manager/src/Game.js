@@ -32,7 +32,7 @@ export class Game {
 			tick: 0,
 			balls: [],
 			paddles: [],
-			score: {},
+			score: [],
 			ranks: null,
 			stage: null,
 		};

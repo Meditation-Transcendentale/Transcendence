@@ -84,10 +84,10 @@ async function start() {
 	// }
 	// 							events.push({ type: 'goal', gameId, playerId: scorer });
 
-	const sub = nc.subscribe('games.pong.*.physics.request');
+	const sub = nc.subscribe('games.local.*.physics.request');
 	for await (const msg of sub) {
 		const data = decodePhysicsRequest(msg.data);
-		console.log(data);
+		// console.log(data);
 
 		if (endedGames.has(data.gameId)) {
 			console.log(`[${SERVICE_NAME}] Ignoring tick ${data.tick} for ended game ${data.gameId}`);
@@ -95,6 +95,7 @@ async function start() {
 		}
 
 		const { gameId, tick, balls, paddles, events } = Physics.processTick(data);
+		// console.log(balls);
 		let scorerId = null;
 		let goalScored = false;
 		if (events && events.length) {
@@ -105,7 +106,7 @@ async function start() {
 				}
 			}
 		}
-		const goal = null;
+		let goal = null;
 		if (scorerId)
 			goal = { scorerId };
 		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal });

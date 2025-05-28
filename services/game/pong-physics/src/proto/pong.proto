@@ -18,7 +18,7 @@ message Ball {
 message Paddle {
   int32 id = 1;
   int32 move = 2; // -1: left, 0: none, 1: right
-  bool dead = 3;  // used in battle royale mode, false otherwise
+  // bool dead = 3;  // used in battle royale mode, false otherwise
 }
 
 message PaddleInput {

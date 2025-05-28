@@ -23,7 +23,13 @@ export const Physics = {
 	   * @returns {{ gameId: string, tick: number, balls: Array, paddles: Array }}
 	   */
 
-	processTick({ gameId, lastState }) {
+	// message PhysicsRequest {
+	//   string gameId = 1;
+	//   int64 tick = 2;
+	//   repeated PaddleInput input = 3;
+	//   int32 stage = 4; // BR mode stage; others: ignored
+	// }
+	processTick({ gameId, tick, input }) {
 		if (!this.games.has(gameId)) {
 			console.log(`[physics] Initializing new game ${gameId}`);
 			this.games.set(gameId, new Game(gameId));
@@ -154,7 +160,7 @@ export const Physics = {
 		const tempstate = game.getState();
 		return {
 			gameId,
-			tick,
+			tick: tick,
 			balls: tempstate.balls,
 			paddles: tempstate.paddles,
 			events

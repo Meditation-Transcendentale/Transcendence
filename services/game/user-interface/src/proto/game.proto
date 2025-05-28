@@ -1,6 +1,6 @@
 // src/ui.proto
 syntax = "proto3";
-package userinterface;
+package game;
 
 // -----------------------------------------------------------------------------
 // Core game state messages
@@ -65,6 +65,7 @@ message WelcomeMessage {
 }
 
 message GameStartMessage {}
+
 message GameEndMessage {
   repeated int32 score = 1;
 }
@@ -85,27 +86,3 @@ message ServerMessage {
     GameEndMessage     end     = 5;
   }
 }
-
-// -----------------------------------------------------------------------------
-// Match lifecycle messages (NATS)
-// -----------------------------------------------------------------------------
-message MatchSetup {
-  repeated string players = 1; // player UUIDs
-}
-
-message MatchStart {
-}
-
-message MatchInput {
-  int32  paddleId = 1;
-  int32  move     = 2;
-}
-
-message MatchQuit {
-  string uuid   = 1;
-}
-
-message MatchEnd {
-  int32  winner = 1;
-}
-

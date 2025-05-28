@@ -149,7 +149,7 @@ export class GameManager {
 		if (!match || match.status !== 'created') return false;
 
 		match.status = 'running';
-		const tickMs = 1000 / (match.options.tickRate || 60);
+		const tickMs = 1000 / 60;
 
 		match.interval = setInterval(() => {
 			this._tickMatch(gameId);
@@ -230,6 +230,7 @@ export class GameManager {
 			const reqBuf = encodePhysicsRequest({ gameId: gameId.toString(), tick: match.tick, input: inputs, stage: lastState.stage });
 			const respMsg = await this.nc.request(`games.${match.mode}.${gameId}.physics.request`, reqBuf);
 			const resp = decodePhysicsResponse(respMsg.data);
+			console.log(resp);
 
 			// Handle goal if one occurred this tick
 			const newState = lastState;
@@ -237,7 +238,7 @@ export class GameManager {
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles;
 			if (resp.goal) {
-				newState.scores[resp.goal.scorerId] = (newState.scores[resp.scorerId] || 0) + 1;
+				// newState.scores[resp.goal.scorerId] = (newState.scores[resp.scorerId] || 0) + 1;
 
 				match.isPaused = true;
 				const pauseMs = match.options.pauseMs || 1000;

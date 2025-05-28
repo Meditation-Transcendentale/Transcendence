@@ -47,6 +47,7 @@ export class Game {
 				.addComponent('position', Position(x, y))
 				.addComponent('paddle', {
 					id: i,
+					move: 0,
 					speed: config.paddleSpeed,
 					offset: 0,
 					maxOffset: config.MAX_OFFSET,
@@ -232,11 +233,10 @@ export class Game {
 			.map(key => {
 				const paddleEntity = this.paddleEntities[key];
 				const paddle = paddleEntity.getComponent('paddle');
-				if (!paddle.dirty) return null;
-				paddle.dirty = false;
-				return { id: paddle.id, offset: paddle.offset, connected: paddle.isConnected };
-			})
-			.filter(Boolean);
+				// if (!paddle.dirty) return null;
+				// paddle.dirty = false;
+				return { id: paddle.id, move: paddle.move };
+			});
 
 		return { balls, paddles };
 	}
