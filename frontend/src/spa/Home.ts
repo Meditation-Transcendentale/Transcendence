@@ -63,16 +63,16 @@ class Home {
 			console.log('Received message:', message)
 		  
 			switch (message.type) {
-			  case 'notification.friendrequest':
+			  case 'notification.friendRequest':
 				console.log('Friend request:', message.data)
 				break
-			  case 'notification.invite':
+			  case 'notification.gameInvite':
 				console.log('Game invite:', message.data)
 				break
 			  case 'notification.status':
 				console.log('Status update:', message.data)
 				break
-			  case 'notification.friendaccepted':
+			  case 'notification.friendAccept':
 				console.log('Friend accepted:', message.data)
 				break
 			  default:

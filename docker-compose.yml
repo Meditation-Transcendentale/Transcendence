@@ -156,6 +156,31 @@ services:
       database_certs-init:
           condition: service_completed_successfully
 
+  notifications-manager:
+    build:
+      context: ./services/notifications/notifications-manager
+    volumes:
+      - ./services/notifications/notifications-manager/src:/app/src
+      - ./services/notifications/notifications-manager/package.json:/app/package.json
+      - ./services/notifications/notifications-manager/.env.example:/app/.env
+    environment:
+      - NODE_ENV=development
+      - JWT_SECRETKEY=${JWT_SECRETKEY}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - NATS_URL=${NATS_URL}
+    ports:
+      - "7001:7001"
+      - "7011:7011"
+    restart: always
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+      user-database:
+        condition: service_started
+    networks:
+      - transcendence-network
 
   docs-service:
     build:
@@ -183,6 +208,7 @@ services:
         condition: service_started
       update_user_info-service:
         condition: service_started
+        
   
   database_certs-init:
     build:
