@@ -15,11 +15,10 @@ import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
-import { Inspector } from '@babylonjs/inspector';
+import * as UI from './utils/proto/message.js';
 
-
-const API_BASE = "http://10.19.225.59:4000";
-//const API_BASE = `http://${window.location.hostname}:4000`;
+// const API_BASE = "http://10.19.220.253:4000";
+const API_BASE = `http://${window.location.hostname}:4000`;
 export const global = {
 	endUI: null as any
 }
@@ -73,7 +72,7 @@ export class Pong {
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
 		this.uuid = await getOrCreateUUID();
-		const wsUrl = `ws://10.19.225.59:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		//const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
@@ -124,78 +123,47 @@ export class Pong {
 			wall: createWallMesh(this.scene, config)
 		}
 	}
+
 	private waitForRegistration(): Promise<number> {
 		return new Promise((resolve, reject) => {
 			const socket = this.wsManager.socket;
+
 			const listener = (event: MessageEvent) => {
-				let data: any;
-				if (typeof event.data === "string") {
-					try {
-						data = JSON.parse(event.data);
-					} catch {
-						return;
-					}
-				} else {
+				if (!(event.data instanceof ArrayBuffer)) {
+					console.warn('Non-binary message received, ignoring');
 					return;
 				}
 
-				if (data.type === "welcome") {
-					console.log("Got welcome (session):", data);
-					socket.send(JSON.stringify({
-						type: "registerGame",
-						data: { gameId: this.gameId, uuid: this.uuid }
-					}));
-				}
-
-				else if (data.type === "registered") {
-					console.log("Registered into game:", data);
-					this.paddleId = data.paddleId;
-					socket.removeEventListener("message", listener);
-					clearTimeout(timeout);
-					resolve(data.paddleId);
-				}
-			}
-
-			socket.addEventListener("message", listener);
-
-			// const timeout = setTimeout(() => {
-			// 	this.wsManager.socket.removeEventListener("message", listener);
-			// 	reject(new Error("Timed out waiting for welcome"));
-			// }, 5000)
-
-			// setTimeout(() => reject(new Error("Timed out waiting for registration")), 5000);
-		});
-	}
-
-
-	waitForWelcome() {
-		return new Promise((resolve) => {
-			this.wsManager.socket.addEventListener("message", (event) => {
-				let data;
-				if (typeof event.data === "string") {
-					try {
-						data = JSON.parse(event.data);
-					} catch (e) {
-						console.error("Error parsing JSON in waitForWelcome:", e);
-						return;
-					}
-				} else {
-					console.warn("Received non-string message in waitForWelcome; ignoring.");
+				// Decode the ServerMessage
+				let serverMsg: UI.game.ServerMessage;
+				let clientMsg: UI.game.ClientMessage;
+				try {
+					const buf = new Uint8Array(event.data);
+					serverMsg = UI.game.ServerMessage.decode(buf);
+				} catch (err) {
+					console.error('Failed to decode protobuf message:', err);
 					return;
 				}
 
-				if (data.type === "welcome") {
-					console.log("Received welcome:", data);
-					this.paddleId = data.paddleId;
-
-					this.wsManager.socket.send(JSON.stringify({
-						type: "registerGame",
-						data: { gameId: this.gameId }
-					}));
-
-					resolve(data.paddleId);
+				// Check for the welcome payload
+				if (serverMsg.welcome && serverMsg.welcome.paddleId != null) {
+					const paddleId = serverMsg.welcome.paddleId;
+					console.log('Received WelcomeMessage:', paddleId);
+					const readyMsg = UI.game.ClientMessage.create({ ready: {} });
+					const readyBuf = UI.game.ClientMessage.encode(readyMsg).finish();
+					socket.send(readyBuf);
+					socket.removeEventListener('message', listener);
+					resolve(paddleId);
 				}
-			}, { once: true });
+			};
+
+			socket.addEventListener('message', listener);
+
+			// Optional: timeout guard
+			setTimeout(() => {
+				socket.removeEventListener('message', listener);
+				reject(new Error('Timed out waiting for WelcomeMessage'));
+			}, 5000);
 		});
 	}
 
