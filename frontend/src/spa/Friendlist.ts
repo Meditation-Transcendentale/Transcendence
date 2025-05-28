@@ -1,6 +1,7 @@
 import { meReject, meRequest } from "./checkMe";
 import { deleteRequest, getRequest, postRequest } from "./requests";
 import Router from "./Router";
+import { createButton, setDraggable } from "./utils";
 
 
 interface Friend {
@@ -53,6 +54,8 @@ export default class Friendlist {
 					.catch((resp) => { this.searchReject(resp) })
 			}
 		})
+
+		setDraggable(this.div.querySelector(".window") as HTMLDivElement);
 	}
 
 
@@ -75,8 +78,9 @@ export default class Friendlist {
 		frienlist.forEach((friend: any) => {
 			let user = document.createElement("div");
 			user.innerText = friend.friend_username;
-			user.appendChild(this.createButton("Stats", () => { Router.nav(`/stats?u=${friend.friend_username}`) }));
-			user.appendChild(this.createButton("Remove", (btn: HTMLInputElement) => {
+			user.className = "list-element";
+			user.appendChild(createButton("Stats", () => { Router.nav(`/stats?u=${friend.friend_username}`) }));
+			user.appendChild(createButton("Remove", (btn: HTMLInputElement) => {
 				deleteRequest(`friends/delete`, { inputUsername: friend.friend_username })
 					.then(() => { btn.parentElement?.remove() })
 			}))
@@ -94,8 +98,8 @@ export default class Friendlist {
 
 		let user = document.createElement("div");
 		user.innerText = search.username;
-		user.appendChild(this.createButton("Stats", () => { Router.nav(`/stats?u=${search.username}`) }));
-		user.appendChild(this.createButton("Add", (btn: HTMLInputElement) => {
+		user.appendChild(createButton("Stats", () => { Router.nav(`/stats?u=${search.username}`) }));
+		user.appendChild(createButton("Add", (btn: HTMLInputElement) => {
 			postRequest("friends/add", { inputUsername: search.username })
 				.then(() => { div.remove(); });
 		}));
@@ -118,7 +122,7 @@ export default class Friendlist {
 		pendinglist.forEach((pending: any) => {
 			let user = document.createElement("div");
 			user.innerText = pending.sender_username;
-			user.appendChild(this.createButton("Accept", (btn: HTMLInputElement) => {
+			user.appendChild(createButton("Accept", (btn: HTMLInputElement) => {
 				postRequest(`friends/accept`, { inputUsername: pending.sender_username })
 					.then(() => { btn.parentElement?.remove() })
 			}))
@@ -128,15 +132,6 @@ export default class Friendlist {
 		this.ref.pending.appendChild(div);
 	}
 
-	private createButton(value: string, onClick: (btn: HTMLInputElement) => void): HTMLInputElement {
-		const btn = document.createElement("input");
-		btn.type = "button";
-		btn.value = value;
-		btn.addEventListener("click", () => {
-			onClick(btn);
-		});
-		return btn;
-	}
 
 
 

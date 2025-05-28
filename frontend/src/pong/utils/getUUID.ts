@@ -1,8 +1,6 @@
-import { meReject, meRequest } from "../../checkMe";
+import { User } from "../../spa/User";
 
-export async function getOrCreateUUID(): string {
-	const json = await meRequest()
-		.catch(() => meReject());
-	const uuid = json.userInfo.uuid;
-	return uuid;
+
+export function getOrCreateUUID() {
+	return User.uuid;
 }

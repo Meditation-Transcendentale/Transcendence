@@ -95,14 +95,15 @@ export default class Lobby {
 			}
 
 			if ('update' in payload) {
+				this.mode = payload.update.mod;
 				console.log(`Update :${payload}`);
 			}
 
 			if ('start' in payload) {
 				console.log("Everyone is ready");
 				const gameId = payload.start.gameId;
-				const map = payload.start.map;
-				Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mod}&map=${this.map}`));
+				const map = "default"; //payload.start.map;
+				//Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mod}&map=${this.map}`));
 				this.ws?.close();
 			}
 		}
