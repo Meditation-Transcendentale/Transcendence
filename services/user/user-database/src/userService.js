@@ -48,7 +48,11 @@ const getFriendlistStmt = database.prepare(`
 		CASE 
 			WHEN f.user_id_1 = ? THEN u2.username
 			ELSE u1.username
-		END AS friend_username
+		END AS friend_username,
+		CASE
+			WHEN f.user_id_1 = ? THEN u2.uuid
+			ELSE u1.uuid
+		END AS friend_uuid
 	FROM friendslist f
 	JOIN users u1 ON f.user_id_1 = u1.id
 	JOIN users u2 ON f.user_id_2 = u2.id
@@ -187,7 +191,7 @@ const userService = {
 		return userInfo;
 	},
 	getFriendlist: (userId) => {
-		const friendlist = getFriendlistStmt.all(userId, userId, userId);
+		const friendlist = getFriendlistStmt.all(userId, userId, userId, userId);
 		if (friendlist.length === 0) {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIENDLIST_NOT_FOUND };
 		}
