@@ -14,6 +14,11 @@ async function init() {
 	const app = new App();
 	app.init()
 		.then(() => { app.run() })
+
+	window.onbeforeunload = () => {
+		app.dispose();
+	}
 }
 window.addEventListener("DOMContentLoaded", () => { init() })
+
 

@@ -15,6 +15,7 @@ body {
 	height: 100%;
 	width: 100%;
 	--window: #8E1616;
+	--frame: #8E1616;
 }
 
 
@@ -42,10 +43,11 @@ body {
 	height: 20px;
 }
 
-#play {
+.frame {
 	position: absolute;
-	border: 10px solid var(--window);
-	background-color: transparent;
+	top: 0;
+	left: 0;
+	border: 5px solid var(--frame);
 	pointer-events: none;
 	overflow: hidden;
 	transition:
@@ -53,13 +55,42 @@ body {
 		left 0.5s,
 		width 0.5s 0.3s,
 		height 0.5s 0.3s;
-	transition-behavior: allow-discrete;
-	/*transform: translate(-50%, 50%);*/
 }
+
+.window {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 10px solid var(--window);
+	/*pointer-events: none;*/
+	overflow: hidden;
+	transition:
+		top 0.2s,
+		left 0.2s,
+		width 0.2s,
+		height 0.2s;
+
+}
+
+
+/*.window:hover {*/
+/*	background-image: url("/assets/glitch.gif");*/
+/*	background-clip: content-box;*/
+/*	background-repeat: no-repeat;*/
+/*	background-size: 100% 100%;*/
+/*	border: 10px solid rgba(0.1, 0.1, 0.1, 0.0);*/
+/*}*/
+/**/
+
+/*.window:hover>.header {*/
+/*	display: none;*/
+/*}*/
+
 
 .header {
 	width: 100%;
-	background-color: var(--window);
+
+	background-color: var(--frame);
 	pointer-events: none;
 	position: absolute;
 	top: 0;
@@ -68,8 +99,6 @@ body {
 	font-size: 1.5em;
 	font-family: sans-serif;
 }
-
-
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,

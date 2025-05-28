@@ -1,11 +1,16 @@
 import {
 	ArcRotateCamera,
+	Color3,
 	Color4,
 	DirectionalLight,
 	Engine,
+	GlowLayer,
 	HemisphericLight,
 	Matrix,
+	Mesh,
+	MeshBuilder,
 	Scene,
+	StandardMaterial,
 	Vector3
 } from "@babylonjs/core";
 import { CubeCluster } from "./CubeCluster";
@@ -22,7 +27,7 @@ export class Environment {
 	private deltaTime: number;
 	private frame: number;
 
-
+	private glow: GlowLayer;
 	private play: HTMLElement;
 
 
@@ -31,7 +36,7 @@ export class Environment {
 
 		this.scene = new Scene(engine);
 		this.scene.autoClear = true; // Color buffer
-		this.scene.clearColor = new Color4(0.02, 0., 0.1, 1);
+		this.scene.clearColor = new Color4(0.1, 0., 0.2, 1);
 
 		this.scene.setRenderingAutoClearDepthStencil(0, true);
 
@@ -47,24 +52,44 @@ export class Environment {
 			}
 		});
 
-		this.cubeCluster = new CubeCluster(this.scene);
+		this.cubeCluster = new CubeCluster("play", this.scene);
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
 		this.play = document.querySelector("#play") as HTMLElement;
 		this.frame = 0;
+
+		this.glow = new GlowLayer("glow", this.scene, {
+			mainTextureSamples: 4,
+		});
+		this.glow.intensity = 0.4;
+
 	}
 
 	public async init() {
-		await this.cubeCluster.init();
 
 		//this.camera = new FreeCamera("camera", new Vector3(20, 3, 0), this.scene);
 		this.camera = new ArcRotateCamera("camera", -Math.PI * 0.8, Math.PI * 0.4, 10, Vector3.Zero(), this.scene);
 		this.camera.inertia = 0.1;
 		this.camera.rotation.set(0, Math.PI * 1.5, 0);
 		this.camera.attachControl(this.canvas, true);
-		const l = new DirectionalLight("light", new Vector3(0, 1, 0), this.scene);
-		const hl = new HemisphericLight("hlight", new Vector3(1, 0, 0), this.scene);
-		hl.intensity = 0.5;
+		this.camera.minZ = 0.1;
+
+		//const cube = MeshBuilder.CreateBox('box', { size: 10, sideOrientation: Mesh.BACKSIDE }, this.scene);
+		//const m = new StandardMaterial('mat', this.scene);
+		//m.diffuseColor = Color3.White();
+		//m.specularColor = Color3.Black();
+		////m.cullBackFaces = false;
+		////m.backFaceCulling = false;
+		////m.twoSidedLighting = true;
+		//cube.material = m;
+		//cube.receiveShadows = true;
+
+
+
+		await this.cubeCluster.init();
+		//const l = new DirectionalLight("light", new Vector3(0, 1, 0), this.scene);
+		//const hl = new HemisphericLight("hlight", new Vector3(1, 0, 0), this.scene);
+		//hl.intensity = 0.5;
 
 	}
 
@@ -76,16 +101,11 @@ export class Environment {
 		this.cubeCluster.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
-		this.frame %= 2;
+		this.frame %= 1;
 	}
 
 	private updateCss() {
-		const proj = this.cubeCluster.getSPC();
-
-		this.play.style.top = `${proj[1] * 100}%`;
-		this.play.style.left = `${proj[0] * 100}%`;
-		this.play.style.width = `${(proj[2] - proj[0]) * 100}%`;
-		this.play.style.height = `${(proj[3] - proj[1]) * 100}%`;
+		this.cubeCluster.updateCSS();
 	}
 
 	private async load() {
@@ -94,5 +114,12 @@ export class Environment {
 
 	private initSky() {
 
+	}
+
+	public dispose() {
+		this.cubeCluster.dispose();
+		this.glow.dispose();
+		this.camera.dispose();
+		this.scene.dispose();
 	}
 }
