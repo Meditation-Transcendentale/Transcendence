@@ -48,7 +48,7 @@ async function start() {
       if (!wasReconnected)
         userSockets.set(ws.uuid, ws);
 
-      sendStatus(ws.uuid, { status: "online" });
+      sendStatus(ws.uuid, { status: "online" }, nc, jc);
       console.log(
         `[${SERVICE_NAME}] ${ws.uuid} ${wasReconnected ? 'reconnected' : 'connected'}`
       )
@@ -65,7 +65,7 @@ async function start() {
     },
 
     close: (ws, code, message) => {
-      sendStatus(ws.uuid, { status: "offline" });
+      sendStatus(ws.uuid, { status: "offline" }, nc, jc);
       userSockets.delete(ws.uuid)
       console.log(`[${SERVICE_NAME}] ${ws.uuid} disconnected`)
     }
@@ -104,7 +104,7 @@ async function start() {
               userSockets.get(uuid).send(jc.encode({ type: `notification.gameInvite`, data}));
               break;
             case `status`:
-              sendStatus(uuid, data);
+              sendStatus(uuid, data, nc, jc);
               break;
             default:
               console.error(`Received unknown event type [${eventType}] notification for ${uuid}`);
@@ -118,51 +118,65 @@ async function start() {
   console.log('[NATS] Subscribed to notification.>');
 };
 
-async function sendStatus (senderId, sendingData) {
-  const resp = await friendlist_Request();
-  console.log(`sending ${Object.entries(sendingData)} to ${senderId}`);
-  // if (resp.ok) {
-  //   resp.message.friendlist.forEach(friend => {
-  //     userSockets.get(friend.uuid).send(jc.encode({ type: `notification.status`, senderId: senderId, sendingData }));
-  //   })
-  // } else {
-  //   if (resp.status === 404) return;
-  //   throw new Error(`[${SERVICE_NAME}] Request failed with status ${resp.status}`);
-  // }
-}
-
-async function friendlist_Request() {
+async function sendStatus (senderId, sendingData, nc, jc) {
   try {
-    const response = await fetch(`https://api-gateway:3000/friends/get/friendlist`, {
-      method: 'GET',
-      headers: {  
-        'Accept': 'application/json',
-        'x-api-key': process.env.API_GATEWAY_KEY
-      },
-      credentials: 'include',
-    });
-  }
-  catch (err){
-    console.error(`${err}`);
-  }
-  // const data = await response.json();
-  
-  // const final = {
-  //   message: data,
-  //   status: response.status,
-  //   ok: response.ok
-  // };
-  return {
-    ok: true,
-    status: 200,
-    message: {
-      friendlist: [
-        { uuid: "some-uuid-1" },
-        { uuid: "some-uuid-2" }
-      ]
+    const resp = await friendlist_Request(senderId, nc, jc);
+
+    if (!resp.ok || !resp.message) {
+      console.log(`[${SERVICE_NAME}] No friends online to notify for ${senderId}`);
+      return;
+    }
+    for (const friend of resp.message) {
+      const sockets = userSockets.get(friend.friend_uuid);
+      if (!sockets) continue;
+
+      try {
+        sockets.send(jc.encode({
+          type: 'notification.status',
+          senderId,
+          sendingData
+        }));
+      } catch (e) {
+        console.warn(`[${SERVICE_NAME}] Failed to send to ${friend.friend_uuid}:`, e);
+      }
+    }
+
+  } catch (err) {
+    if (err.status === 404) {
+      console.log(`[${SERVICE_NAME}] No friend list found for ${senderId} — xd no friends.`);
+    } else {
+      console.error(`[${SERVICE_NAME}] Failed to send status:`, err);
     }
   }
-  // return (final);
+}
+
+async function friendlist_Request(uuid, nc, jc) {
+  try {
+    const userResp = await nc.request('user.getUserFromUUID', jc.encode({ uuid }));
+    const userResult = jc.decode(userResp.data);
+
+    if (!userResult.success) {
+      console.log ("user not found");
+      throw { status: userResult.status || 404, message: userResult.message || 'User not found' };
+    }
+    const friendResp = await nc.request('user.getFriendlist', jc.encode({ userId: userResult.data.id }));
+    const friendResult = jc.decode(friendResp.data);
+    if (!friendResult.success) {
+      throw { status: friendResult.status || 404, message: friendResult.message || 'No friends found' };
+    }
+    return {
+      ok: true,
+      status: 200,
+      message: friendResult.data || []
+    };
+  }
+  catch (err){
+    if (err.status) {
+      throw err;
+    }
+    console.error(`[${SERVICE_NAME}] Unexpected error in friendlist_Request:`, err);
+    throw { status: 500, message: 'Internal error while fetching friend list' };
+  }
 }
 
 start()
