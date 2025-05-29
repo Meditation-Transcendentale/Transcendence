@@ -47,7 +47,7 @@ body {
 	position: absolute;
 	top: 0;
 	left: 0;
-	border: 5px solid var(--frame);
+	border: 2px solid var(--frame);
 	pointer-events: none;
 	overflow: hidden;
 	transition:
@@ -61,15 +61,60 @@ body {
 	position: absolute;
 	top: 0;
 	left: 0;
-	border: 10px solid var(--window);
-	/*pointer-events: none;*/
+	border: 5px solid var(--window);
+	pointer-events: none;
 	overflow: hidden;
 	transition:
 		top 0.2s,
 		left 0.2s,
 		width 0.2s,
 		height 0.2s;
+	/* animation: ww 0.5s linear infinite; */
+	/* animation-timing-function: step-start; */
+	/* animation-direction: alternate; */
 
+}
+
+@keyframes ww {
+	0% {
+		transform: translate(1px, 1px);
+	}
+
+	10% {
+		transform: translate(-1px, 1px);
+	}
+
+	20% {
+		transform: translate(1px, -1px);
+	}
+
+	30% {
+		transform: translate(2px, -1px);
+	}
+
+	40% {
+		transform: translate(-2px, 1px);
+	}
+
+	50% {
+		transform: translate(0.4px, 2px);
+	}
+
+	60% {
+		transform: translate(1px, -1px);
+	}
+
+	70% {
+		transform: translate(1px, -2px);
+	}
+
+	80% {
+		transform: translate(-2px, 1px);
+	}
+
+	100% {
+		transform: translate(1px, -1px);
+	}
 }
 
 
@@ -98,6 +143,30 @@ body {
 	font-weight: bold;
 	font-size: 1.5em;
 	font-family: sans-serif;
+}
+
+.glitch {
+	/* width: 1px; */
+	width: auto;
+	font-size: 1em;
+	/* display: inline-block; */
+	overflow: hidden;
+}
+
+.gl0 {
+	font-family: sans-serif;
+}
+
+.gl1 {
+	font-family: 'Courier New', Courier, monospace;
+}
+
+.gl2 {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.gl3 {
+	font-family: monospace;
 }
 
 input:-webkit-autofill,

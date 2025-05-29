@@ -2,6 +2,7 @@ import {
 	BoundingBox,
 	Color3,
 	Light,
+	Material,
 	Matrix,
 	Mesh,
 	MeshBuilder,
@@ -10,6 +11,7 @@ import {
 	PointLight,
 	Scene,
 	ShadowGenerator,
+	StandardMaterial,
 	Texture,
 	Vector3,
 	VolumetricLightScatteringPostProcess,
@@ -39,8 +41,6 @@ interface optionsCubeCluster {
 }
 
 export class CubeCluster {
-	private boundingBox: Vector3[];
-
 	private center: Mesh;
 	private centerMaterial: PBRMaterial;
 	private orbit: Mesh;
@@ -64,7 +64,9 @@ export class CubeCluster {
 
 	private frame: HTMLDivElement;
 	private window: HTMLDivElement;
-	private hover: HTMLSpanElement;
+	private hover: HTMLDivElement;
+
+	private sub: Mesh;
 	//private vls: VolumetricLightScatteringPostProcess;
 
 	constructor(name: string, scene: Scene, options?: options) {
@@ -73,9 +75,9 @@ export class CubeCluster {
 			quantity: options?.quantity ? options.quantity : 1000,
 			maxSize: options?.maxSize ? options.maxSize : 0.5,
 			minSize: options?.minSize ? options.minSize : 0.1,
-			rotation: options?.rotation ? options.rotation : 0.05,
+			rotation: options?.rotation ? options.rotation : 0.08,
 			expendX: options?.expendX ? options.expendX : 1,
-			expendY: options?.expendY ? options.expendY : 1.5,
+			expendY: options?.expendY ? options.expendY : 1,
 			expendZ: options?.expendZ ? options.expendZ : 1,
 		}
 
@@ -87,31 +89,18 @@ export class CubeCluster {
 		pbr.specularColor = new Color3(0.7, 0.4, 0.7);
 		pbr.glossiness = 0.4;
 
-		this.boundingBox = [];
 		this.orbitBounding = [];
 		this.centerBounding = [];
 
-		this.boundingBox.push(new Vector3(this.options.radius * this.options.expendX * 0.5, this.options.radius * this.options.expendY * 0.9, this.options.radius * this.options.expendZ * 0.5));
-		this.boundingBox.push(new Vector3(this.options.radius * this.options.expendX * 0.5, -this.options.radius * this.options.expendY * 0.9, this.options.radius * this.options.expendZ * 0.5));
-		this.boundingBox.push(new Vector3(this.options.radius * this.options.expendX * 0.5, this.options.radius * this.options.expendY * 0.9, -this.options.radius * this.options.expendZ * 0.5));
-		this.boundingBox.push(new Vector3(this.options.radius * this.options.expendX * 0.5, -this.options.radius * this.options.expendY * 0.9, -this.options.radius * this.options.expendZ * 0.5));
-		this.boundingBox.push(new Vector3(-this.options.radius * this.options.expendX * 0.5, this.options.radius * this.options.expendY * 0.9, this.options.radius * this.options.expendZ * 0.5));
-		this.boundingBox.push(new Vector3(-this.options.radius * this.options.expendX * 0.5, -this.options.radius * this.options.expendY * 0.9, this.options.radius * this.options.expendZ * 0.5));
-		this.boundingBox.push(new Vector3(-this.options.radius * this.options.expendX * 0.5, this.options.radius * this.options.expendY * 0.9, -this.options.radius * this.options.expendZ * 0.5));
-		this.boundingBox.push(new Vector3(-this.options.radius * this.options.expendX * 0.5, -this.options.radius * this.options.expendY * 0.9, -this.options.radius * this.options.expendZ * 0.5));
-
-
 		this.center = MeshBuilder.CreateBox("center", { size: 1 }, scene);
 		this.orbit = MeshBuilder.CreateBox("orbit", { size: 1 }, scene);
-
 
 		this.centerMaterial = new PBRMaterial('center', scene);
 		this.centerMaterial.metallic = 1;
 		this.centerMaterial.roughness = 1.;
 		this.centerMaterial.albedoColor = new Color3(0.7, 0.5, 0.5);
-		this.centerMaterial.emissiveColor = new Color3(0.7, 0.5, 0.5);
+		this.centerMaterial.emissiveColor = new Color3(0.5, 0.3, 0.3);
 		this.center.material = this.centerMaterial;
-
 
 		this.orbitMaterial = new PBRMaterial('orbit', scene);
 		this.orbitMaterial.metallic = 1.;
@@ -136,6 +125,7 @@ export class CubeCluster {
 		this.light.falloffType = Light.FALLOFF_GLTF;
 		this.light.radius = this.options.radius * 0.2;
 		this.light.shadowMinZ = 0.1;
+		this.light.parent = this.orbit;
 
 		this.shadow = new ShadowGenerator(2048, this.light);
 		this.shadow.getShadowMap()!.renderList!.push(this.orbit);
@@ -151,28 +141,43 @@ export class CubeCluster {
 		this.frame = document.querySelector(`#${name}-frame`) as HTMLDivElement;
 		this.window = document.querySelector(`#${name}-window`) as HTMLDivElement;
 
-		this.hover = this.window.querySelector(".header")!.cloneNode(true) as HTMLSpanElement;
-		//this.hover.appendChild(this.window.querySelector(".header")!.cloneNode(false));
-
+		this.hover = this.window.querySelector(".header")!.cloneNode(true) as HTMLDivElement;
+		this.hover.className = "header glitch";
 
 		this.window.addEventListener('mouseover', () => {
 			console.log('e');
 			this.hoverEffect();
 		})
+
+		this.sub = MeshBuilder.CreateBox("sub", { size: this.options.maxSize * 0.3 }, this.scene);
+		const m = new StandardMaterial("e", this.scene);
+		m.diffuseColor = Color3.Blue();
+		m.emissiveColor = new Color3(0.01, 0.01, 0.9);
+		this.sub.material = m;
 	}
 
 	public async init() {
 		this.initCenter();
 		this.initOrbit();
 
+		const r = this.options.radius * 0.6;
+		const theta = Math.random() * Math.PI * 2;
+		const phi = (Math.random() * 0.4 + 0.3) * Math.PI;
+		this.sub.position.set(
+			r * Math.sin(phi) * Math.cos(theta),
+			r * Math.cos(phi),
+			r * Math.sin(phi) * Math.sin(theta)
+
+		)
+
 		this.update(0);
 
 		this.orbit.thinInstanceRefreshBoundingInfo(true);
 		this.center.thinInstanceRefreshBoundingInfo(true);
-		this.orbit.getBoundingInfo().boundingBox.vectors.forEach((v) => {
-			this.orbitBounding.push(new Vector3(v._x * 0.5, v._y, v._z * 0.5));
+		this.orbit.getBoundingInfo().boundingBox.vectors.forEach((v: any) => {
+			this.orbitBounding.push(new Vector3(v._x * 0.5, v._y * 0.8, v._z * 0.5));
 		});
-		this.center.getBoundingInfo().boundingBox.vectors.forEach((v) => {
+		this.center.getBoundingInfo().boundingBox.vectors.forEach((v: any) => {
 			this.centerBounding.push(new Vector3(v._x * 0.3, v._y * 0.5, v._z * 0.3));
 		});
 
@@ -181,7 +186,7 @@ export class CubeCluster {
 	public initCenter() {
 		for (let i = 0; i < this.centerMatrixes.length; i++) {
 			const r = betaLeft() * this.options.radius * 0.6;
-			const pxyz = pos(r);
+			const pxyz = orbitP(r, 10);
 			const b = (r / this.options.radius);
 			const sx = Math.max(this.options.minSize, randomBorn(b) * this.options.maxSize);
 			const sy = Math.max(this.options.minSize, randomBorn(b) * this.options.maxSize);
@@ -193,11 +198,11 @@ export class CubeCluster {
 			)
 			const matT = Matrix.Translation(
 				pxyz[0] * this.options.expendX,
-				pxyz[1] * this.options.expendY,
+				pxyz[1] * this.options.expendY * this.options.radius * 0.6,
 				pxyz[2] * this.options.expendZ
 			)
 			this.centerMatrixes[i] = matS.multiply(matT);
-			this.centerRotations[i] = Math.max(Math.random() * r * this.options.rotation, this.options.rotation * 0.1);
+			this.centerRotations[i] = Math.max(betaLeft() * (this.options.radius - r) * this.options.rotation, this.options.rotation * 0.01);
 		}
 
 	}
@@ -205,7 +210,7 @@ export class CubeCluster {
 	public initOrbit() {
 		for (let i = 0; i < this.orbitMatrixes.length; i++) {
 			const r = (betaRight() + 1) * this.options.radius * 0.5;
-			const pxyz = pos(r);
+			const pxyz = orbitP(r, 10);
 			const b = (r / this.options.radius);
 			const sx = Math.max(this.options.minSize, randomBorn(b) * this.options.maxSize);
 			const sy = Math.max(this.options.minSize, randomBorn(b) * this.options.maxSize);
@@ -217,18 +222,19 @@ export class CubeCluster {
 			)
 			const matT = Matrix.Translation(
 				pxyz[0] * this.options.expendX,
-				pxyz[1] * this.options.expendY,
+				pxyz[1] * this.options.expendY * this.options.radius,
 				pxyz[2] * this.options.expendZ
 			)
 			this.orbitMatrixes[i] = matS.multiply(matT);
-			this.orbitRotations[i] = Math.max(r * this.options.rotation, this.options.rotation * 0.1);
+			this.orbitRotations[i] = Math.max(betaRight() * r * this.options.rotation, this.options.rotation * 0.05);
 		}
 	}
 
 	public update(time: number): void {
 
 		for (let i = 0; i < this.centerMatrixes.length; i++) {
-			this.centerMatrixes[i].multiplyToRef(Matrix.RotationY(time * this.centerRotations[i] * Math.PI * 2), this.centerMatrixes[i]);
+			this.centerMatrixes[i].multiplyToRef(
+				Matrix.RotationY(time * this.centerRotations[i] * Math.PI * 2), this.centerMatrixes[i]);
 			this.centerMatrixes[i].toArray(this.centerMatrixBuffer, i * 16);
 		}
 		for (let i = 0; i < this.orbitMatrixes.length; i++) {
@@ -291,28 +297,41 @@ export class CubeCluster {
 
 	private hoverEffect() {
 		const fn = () => {
-			if (!inn || inn > 50) { return; }
+			if (!hover || inn > 50) { return; }
 			const style = window.getComputedStyle(this.window);
 			const offsetX = (Math.random() * 2 - 1) * parseInt(style.width);
 			const offsetY = (Math.random() * 1.4 - 0.2) * parseInt(style.height);
+			const widthAdd = (Math.random() * 0.3 + 0.2) * 100;
+			const height = (Math.random() * 0.5 + 0.5) * 40;
 
 			const e = this.hover.cloneNode(true) as HTMLDivElement;
+
+			e.classList.add(`gl${g % 4}`);
 
 			e.style.position = 'absolute';
 			e.style.top = `${parseInt(style.top) + offsetY}px`;
 			e.style.left = `${parseInt(style.left) + offsetX}px`;
-			e.style.width = `${parseInt(style.width)}px`;
-			//e.style.height = '20px';
+			// e.style.width = `${parseInt(style.width)}px`;
+			e.style.paddingLeft = `${widthAdd * 0.2}px`;
+			e.style.paddingRight = `${widthAdd * 0.8}px`;
 
-			//this.window.addEventListener('mouseleave', () => { e.remove() })
+			// e.style.width = `${this.hoverWidth + widthAdd}px`;
+			e.style.height = `${height}px`;
+			e.style.fontSize = `${height}px`;
+
+
+			//this.window.addEventListener('mouseleave', ()  => { e.remove() })
 			document.body.appendChild(e);
 			inn++;
-			setTimeout(() => { inn--; e.remove(); }, 500);
+			g++;
+			setTimeout(() => { inn--; e.remove(); }, 300);
 			setTimeout(() => { fn() }, 10);
 		}
 
 		let inn = 1;
-		this.window.addEventListener('mouseleave', () => { inn = 0; }, { once: true });
+		let g = 0;
+		let hover = true;
+		this.window.addEventListener('mouseleave', () => { hover = false; }, { once: true });
 		fn();
 
 	}
@@ -349,17 +368,66 @@ function randomBorn(b: number) {
 	return Math.pow(Math.random() * (1 - b), 2);
 }
 
+function randomBorn2(b: number) {
+	return Math.pow(Math.random() * (b), 2);
+}
+
 function pos(r: number): number[] {
 	const theta = Math.random() * Math.PI * 2;
-	const phi = Math.random() * Math.PI;
+	const phi = Math.random() * Math.PI * 2;
 
 	return [
 		r * Math.sin(phi) * Math.cos(theta),
 		r * Math.cos(phi),
 		r * Math.sin(phi) * Math.sin(theta)
 	]
+}
 
+function orbitP(r: number, layer: number = 10): number[] {
+	const theta = Math.random() * Math.PI * 2;
+	const phi = sinRandom(layer) * 2 - 1;
 
+	return [
+		r * Math.cos(theta) * Math.sqrt(1 - (phi * phi)),
+		phi,
+		r * Math.sin(theta) * Math.sqrt(1 - (phi * phi))
+	]
 
 }
+// function orbitP(r: number, layer: number = 10): number[] {
+// 	const theta = sinRandom(layer) * 2 - 1;
+// 	const phi = sinRandom(layer) * 2 - 1;
+//
+// 	return [
+// 		r * Math.sqrt(1 - (theta * theta)) * Math.sqrt(1 - (phi * phi)),
+// 		phi,
+// 		r * theta * Math.sqrt(1 - (phi * phi))
+// 	]
+//
+// }
+
+function sinRandom(layer: number = 10) {
+	let final = 0;
+
+	final = Math.random();
+	let u = 0, v = 0;
+	while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+	while (v === 0) v = Math.random();
+	let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+	num = num / 10.0 + 0.5; // Translate to 0 -> 1
+	// if (num > 1 || num < 0) return randn_bm() // resample between 0 and 1
+
+
+	num = num * 0.01 - 0.005;
+
+	final *= layer;
+	final = Math.round(final) / layer;
+
+	final += num;
+	// final = final * 0.8 + 0.1
+	if (final > 1 || final < 0) return sinRandom();
+	return final;
+	// return Math.min(Math.max(final + num, 0), 1);
+}
+
 

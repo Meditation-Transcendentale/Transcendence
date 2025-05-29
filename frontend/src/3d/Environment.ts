@@ -98,7 +98,7 @@ export class Environment {
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		this.cubeCluster.update(this.deltaTime);
+		this.cubeCluster.update(0);
 		this.scene.render();
 		this.frame += 1;
 		this.frame %= 1;
