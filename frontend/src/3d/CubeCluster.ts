@@ -16,6 +16,7 @@ import {
 	Vector3,
 	VolumetricLightScatteringPostProcess,
 } from "@babylonjs/core";
+import { parse } from "path";
 
 interface options {
 	radius?: number;
@@ -26,6 +27,8 @@ interface options {
 	expendX?: number;
 	expendY?: number;
 	expendZ?: number;
+	centerLayer?: number;
+	orbitLayer?: number;
 }
 
 interface optionsCubeCluster {
@@ -37,7 +40,8 @@ interface optionsCubeCluster {
 	expendX: number;
 	expendY: number;
 	expendZ: number;
-
+	centerLayer: number;
+	orbitLayer: number;
 }
 
 export class CubeCluster {
@@ -66,10 +70,13 @@ export class CubeCluster {
 	private window: HTMLDivElement;
 	private hover: HTMLDivElement;
 
+	private rot: number = 1;
+	private ontop: boolean = false;
+
 	private sub: Mesh;
 	//private vls: VolumetricLightScatteringPostProcess;
 
-	constructor(name: string, scene: Scene, options?: options) {
+	constructor(name: string, position: Vector3, scene: Scene, options?: options) {
 		this.options = {
 			radius: options?.radius ? options.radius : 2.5,
 			quantity: options?.quantity ? options.quantity : 1000,
@@ -77,8 +84,10 @@ export class CubeCluster {
 			minSize: options?.minSize ? options.minSize : 0.1,
 			rotation: options?.rotation ? options.rotation : 0.08,
 			expendX: options?.expendX ? options.expendX : 1,
-			expendY: options?.expendY ? options.expendY : 1,
+			expendY: options?.expendY ? options.expendY : 1.5,
 			expendZ: options?.expendZ ? options.expendZ : 1,
+			centerLayer: options?.centerLayer ? options.centerLayer : 10,
+			orbitLayer: options?.orbitLayer ? options.orbitLayer : 2,
 		}
 
 		this.scene = scene;
@@ -94,6 +103,8 @@ export class CubeCluster {
 
 		this.center = MeshBuilder.CreateBox("center", { size: 1 }, scene);
 		this.orbit = MeshBuilder.CreateBox("orbit", { size: 1 }, scene);
+		this.center.position = position;
+		this.orbit.parent = this.center;
 
 		this.centerMaterial = new PBRMaterial('center', scene);
 		this.centerMaterial.metallic = 1;
@@ -145,8 +156,8 @@ export class CubeCluster {
 		this.hover.className = "header glitch";
 
 		this.window.addEventListener('mouseover', () => {
-			console.log('e');
 			this.hoverEffect();
+			this.ontop = true;
 		})
 
 		this.sub = MeshBuilder.CreateBox("sub", { size: this.options.maxSize * 0.3 }, this.scene);
@@ -154,6 +165,11 @@ export class CubeCluster {
 		m.diffuseColor = Color3.Blue();
 		m.emissiveColor = new Color3(0.01, 0.01, 0.9);
 		this.sub.material = m;
+		this.sub.parent = this.center;
+		//
+		//this.orbitMaterial.disableDepthWrite = true;
+		//this.centerMaterial.disableDepthWrite = true;
+
 	}
 
 	public async init() {
@@ -161,8 +177,8 @@ export class CubeCluster {
 		this.initOrbit();
 
 		const r = this.options.radius * 0.6;
-		const theta = Math.random() * Math.PI * 2;
-		const phi = (Math.random() * 0.4 + 0.3) * Math.PI;
+		const theta = (Math.random() * 0.5 - 0.25) * Math.PI;
+		const phi = (Math.random() * 0.3 + 0.35) * Math.PI;
 		this.sub.position.set(
 			r * Math.sin(phi) * Math.cos(theta),
 			r * Math.cos(phi),
@@ -175,18 +191,18 @@ export class CubeCluster {
 		this.orbit.thinInstanceRefreshBoundingInfo(true);
 		this.center.thinInstanceRefreshBoundingInfo(true);
 		this.orbit.getBoundingInfo().boundingBox.vectors.forEach((v: any) => {
-			this.orbitBounding.push(new Vector3(v._x * 0.5, v._y * 0.8, v._z * 0.5));
+			this.orbitBounding.push(new Vector3(v._x * 0.8, v._y * 0.8, v._z * 0.8));
 		});
 		this.center.getBoundingInfo().boundingBox.vectors.forEach((v: any) => {
-			this.centerBounding.push(new Vector3(v._x * 0.3, v._y * 0.5, v._z * 0.3));
+			this.centerBounding.push(new Vector3(v._x * 0.7, v._y * 0.8, v._z * 0.7));
 		});
-
+		console.log(window.innerWidth, window.innerHeight)
 	}
 
 	public initCenter() {
 		for (let i = 0; i < this.centerMatrixes.length; i++) {
 			const r = betaLeft() * this.options.radius * 0.6;
-			const pxyz = orbitP(r, 10);
+			const pxyz = orbitP(r, this.options.centerLayer);
 			const b = (r / this.options.radius);
 			const sx = Math.max(this.options.minSize, randomBorn(b) * this.options.maxSize);
 			const sy = Math.max(this.options.minSize, randomBorn(b) * this.options.maxSize);
@@ -210,7 +226,7 @@ export class CubeCluster {
 	public initOrbit() {
 		for (let i = 0; i < this.orbitMatrixes.length; i++) {
 			const r = (betaRight() + 1) * this.options.radius * 0.5;
-			const pxyz = orbitP(r, 10);
+			const pxyz = orbitP(r, this.options.orbitLayer);
 			const b = (r / this.options.radius);
 			const sx = Math.max(this.options.minSize, randomBorn(b) * this.options.maxSize);
 			const sy = Math.max(this.options.minSize, randomBorn(b) * this.options.maxSize);
@@ -234,11 +250,11 @@ export class CubeCluster {
 
 		for (let i = 0; i < this.centerMatrixes.length; i++) {
 			this.centerMatrixes[i].multiplyToRef(
-				Matrix.RotationY(time * this.centerRotations[i] * Math.PI * 2), this.centerMatrixes[i]);
+				Matrix.RotationY(time * this.centerRotations[i] * Math.PI * 2 * this.rot * 2), this.centerMatrixes[i]);
 			this.centerMatrixes[i].toArray(this.centerMatrixBuffer, i * 16);
 		}
 		for (let i = 0; i < this.orbitMatrixes.length; i++) {
-			this.orbitMatrixes[i].multiplyToRef(Matrix.RotationY(time * this.orbitRotations[i] * Math.PI * 2), this.orbitMatrixes[i]);
+			this.orbitMatrixes[i].multiplyToRef(Matrix.RotationY(time * this.orbitRotations[i] * Math.PI * 2 / this.rot), this.orbitMatrixes[i]);
 			this.orbitMatrixes[i].toArray(this.orbitMatrixBuffer, i * 16);
 		}
 		this.center.thinInstanceSetBuffer('matrix', this.centerMatrixBuffer, 16, true);
@@ -246,7 +262,8 @@ export class CubeCluster {
 	}
 
 	public updateCSS() {
-		const id = Matrix.Identity();
+		//const id = Matrix.Identity();
+		const model = this.center.worldMatrixFromCache;
 		const scene = this.scene.getTransformMatrix();
 		const viewport = this.scene.activeCamera!.viewport;
 
@@ -259,7 +276,7 @@ export class CubeCluster {
 		for (let i = 0; i < this.orbitBounding.length; i++) {
 			const p = Vector3.Project(
 				this.orbitBounding[i],
-				id,
+				model,
 				scene,
 				viewport
 			);
@@ -280,7 +297,7 @@ export class CubeCluster {
 		for (let i = 0; i < this.centerBounding.length; i++) {
 			const p = Vector3.Project(
 				this.centerBounding[i],
-				id,
+				model,
 				scene,
 				viewport
 			);
@@ -289,49 +306,55 @@ export class CubeCluster {
 			pp[2] = Math.max(pp[2], p.x);
 			pp[3] = Math.max(pp[3], p.y);
 		}
-		this.window.style.top = `${pp[1] * 100}%`;
-		this.window.style.left = `${pp[0] * 100}%`;
-		this.window.style.width = `${(pp[2] - pp[0]) * 100}%`;
-		this.window.style.height = `${(pp[3] - pp[1]) * 100}%`;
+		this.window.style.top = `${pp[1] * 100 + (this.ontop ? Math.random() * 0.5 : 0)}%`;
+		this.window.style.left = `${pp[0] * 100 + (this.ontop ? Math.random() * 0.5 : 0)}%`;
+		this.window.style.width = `${(pp[2] - pp[0]) * 100 + (this.ontop ? Math.random() * 0.5 : 0)}%`;
+		this.window.style.height = `${(pp[3] - pp[1]) * 100 + (this.ontop ? Math.random() * 0.5 : 0)}%`;
 	}
 
 	private hoverEffect() {
 		const fn = () => {
-			if (!hover || inn > 50) { return; }
+			if (!hover || inn > 40) { return; }
 			const style = window.getComputedStyle(this.window);
-			const offsetX = (Math.random() * 2 - 1) * parseInt(style.width);
-			const offsetY = (Math.random() * 1.4 - 0.2) * parseInt(style.height);
-			const widthAdd = (Math.random() * 0.3 + 0.2) * 100;
-			const height = (Math.random() * 0.5 + 0.5) * 40;
-
 			const e = this.hover.cloneNode(true) as HTMLDivElement;
 
+			const winH = parseInt(style.height);
+			const winW = parseInt(style.width);
+			const winT = parseInt(style.top);
+			const winL = parseInt(style.left);
+
+			const height = Math.max(30, (Math.random() * 0.5 + 0.5) * 0.15 * winH);
+			const offsetX = (Math.random() - 0.3) * winW;
+			const offsetY = (Math.random() * 1.1 - 0.1) * winH;
+			const padding = (Math.random() * 0.3 + 0.2) * height * 2;
+
+			let top = Math.max(winT + offsetY, 0);
+			top = top > window.innerHeight ? window.innerHeight - height : top;
+			let left = Math.max(winL + offsetX - padding * 0.5, 0);
+			left = left > window.innerWidth ? winL : left;
 			e.classList.add(`gl${g % 4}`);
 
 			e.style.position = 'absolute';
-			e.style.top = `${parseInt(style.top) + offsetY}px`;
-			e.style.left = `${parseInt(style.left) + offsetX}px`;
-			// e.style.width = `${parseInt(style.width)}px`;
-			e.style.paddingLeft = `${widthAdd * 0.2}px`;
-			e.style.paddingRight = `${widthAdd * 0.8}px`;
+			e.style.top = `${top}px`;
+			e.style.left = `${left}px`;
+			e.style.paddingLeft = `${padding * 0.2}px`;
+			e.style.paddingRight = `${padding * 0.8}px`;
 
-			// e.style.width = `${this.hoverWidth + widthAdd}px`;
 			e.style.height = `${height}px`;
 			e.style.fontSize = `${height}px`;
 
-
-			//this.window.addEventListener('mouseleave', ()  => { e.remove() })
 			document.body.appendChild(e);
 			inn++;
 			g++;
-			setTimeout(() => { inn--; e.remove(); }, 300);
+			setTimeout(() => { inn--; e.remove(); }, 400);
 			setTimeout(() => { fn() }, 10);
 		}
 
 		let inn = 1;
 		let g = 0;
 		let hover = true;
-		this.window.addEventListener('mouseleave', () => { hover = false; }, { once: true });
+		this.rot = (Math.random() * 0.5 + 0.5) * 6;
+		this.window.addEventListener('mouseleave', () => { hover = false; this.rot = 1; this.ontop = false; }, { once: true });
 		fn();
 
 	}
@@ -418,7 +441,7 @@ function sinRandom(layer: number = 10) {
 	// if (num > 1 || num < 0) return randn_bm() // resample between 0 and 1
 
 
-	num = num * 0.01 - 0.005;
+	num = num * (0.5 / layer) - (0.25 / layer);
 
 	final *= layer;
 	final = Math.round(final) / layer;

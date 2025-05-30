@@ -22,14 +22,14 @@ export class Environment {
 
 	private camera!: ArcRotateCamera;
 
-	private cubeCluster!: CubeCluster;
 	private lastTime: number;
 	private deltaTime: number;
 	private frame: number;
 
 	private glow: GlowLayer;
-	private play: HTMLElement;
 
+	private playCluster!: CubeCluster;
+	private homeCluster!: CubeCluster;
 
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
@@ -52,10 +52,18 @@ export class Environment {
 			}
 		});
 
-		this.cubeCluster = new CubeCluster("play", this.scene);
+		this.playCluster = new CubeCluster("play", new Vector3(0, 0, 0), this.scene);
+		this.homeCluster = new CubeCluster("home", new Vector3(7, -1, 3), this.scene, {
+			radius: 1.5,
+			quantity: 100,
+			expendY: 1,
+			expendX: 1.5,
+			expendZ: 1.5,
+			centerLayer: 20,
+			orbitLayer: 10,
+		});
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
-		this.play = document.querySelector("#play") as HTMLElement;
 		this.frame = 0;
 
 		this.glow = new GlowLayer("glow", this.scene, {
@@ -86,7 +94,8 @@ export class Environment {
 
 
 
-		await this.cubeCluster.init();
+		await this.playCluster.init();
+		await this.homeCluster.init();
 		//const l = new DirectionalLight("light", new Vector3(0, 1, 0), this.scene);
 		//const hl = new HemisphericLight("hlight", new Vector3(1, 0, 0), this.scene);
 		//hl.intensity = 0.5;
@@ -98,14 +107,16 @@ export class Environment {
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		this.cubeCluster.update(0);
+		this.playCluster.update(this.deltaTime);
+		this.homeCluster.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
 		this.frame %= 1;
 	}
 
 	private updateCss() {
-		this.cubeCluster.updateCSS();
+		this.playCluster.updateCSS();
+		this.homeCluster.updateCSS();
 	}
 
 	private async load() {
@@ -117,7 +128,8 @@ export class Environment {
 	}
 
 	public dispose() {
-		this.cubeCluster.dispose();
+		this.playCluster.dispose();
+		this.homeCluster.dispose();
 		this.glow.dispose();
 		this.camera.dispose();
 		this.scene.dispose();
