@@ -51,14 +51,12 @@ class Home {
 
 		const url = `ws://localhost:7011/notification?uuid=${encodeURIComponent(User.uuid as string)}`;
 
-		const socket = new WebSocket(url);
-		socket.onopen = () => {
-			console.log('Connected to WebSocket server')
-			// Optional: send a message (for debug)
-			// socket.send(JSON.stringify({ type: 'ping', data: 'hello server' }))
+		const notificationSocket = new WebSocket(url);
+		notificationSocket.onopen = () => {
+			console.log('Connected to notificationSocket server')
 		  }
 		  
-		  socket.onmessage = (event) => {
+		  notificationSocket.onmessage = (event) => {
 			const message = JSON.parse(event.data)
 			console.log('Received message:', message)
 		  
@@ -66,25 +64,25 @@ class Home {
 			  case 'notification.friendRequest':
 				console.log('Friend request:', message.data)
 				break
+			  case 'notification.friendAccept':
+				console.log('Friend accepted:', message.data)
+				break
 			  case 'notification.gameInvite':
 				console.log('Game invite:', message.data)
 				break
 			  case 'notification.status':
 				console.log('Status update:', message.data)
 				break
-			  case 'notification.friendAccept':
-				console.log('Friend accepted:', message.data)
-				break
 			  default:
 				console.warn('Unknown message type:', message.type)
 			}
 		  }
 		  
-		  socket.onerror = (err) => {
+		  notificationSocket.onerror = (err) => {
 			console.error('WebSocket error:', err)
 		  }
 		  
-		  socket.onclose = () => {
+		  notificationSocket.onclose = () => {
 			console.log('WebSocket connection closed')
 		  }
 	}

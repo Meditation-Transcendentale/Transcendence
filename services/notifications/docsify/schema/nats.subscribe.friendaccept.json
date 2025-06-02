@@ -1,5 +1,5 @@
-// nats.publish.friendRequest.json
-// notification.${uuid}.friendRequest
+// nats.publish.friendAccept.json
+// notification.${uuid}.friendAccept
 {
     "senderId":{
         "format": "uuid",

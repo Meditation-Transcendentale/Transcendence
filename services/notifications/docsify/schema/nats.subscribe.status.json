@@ -1,8 +1,6 @@
+// nats.publish.status.json
+// notification.${uuid}.status
 {
-    "senderId":{
-        "format": "uuid",
-        "type": "string"
-    },
     "status":{
             "type": "object",
             "oneOf": [
@@ -21,22 +19,16 @@
                 {
                     "properties": {
                         "type": "in-lobby",
-                        "lobbyId": "number"
+                        "lobbyId": "string"
                     },
                     "required": ["type", "lobbyId"]
                 },
                 {
                     "properties": {
                         "type": "in-game",
-                        "gameId": "number"
+                        "gameId": "string"
                     },
                     "required": ["type", "gameId"]
-                },
-                {
-                    "properties": {
-                        "type": "away"
-                    },
-                    "required": ["type"]
                 }
             ]
     }
