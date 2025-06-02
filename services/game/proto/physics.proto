@@ -1,0 +1,29 @@
+// ----------------------------------------------------------------------
+// proto/physics.proto
+// ----------------------------------------------------------------------
+syntax = "proto3";
+
+package physics;
+
+import "shared.proto"; // Import core shared types
+
+// Unified physics request/response messages
+// (Not part of lobby or UI, but used by pong‐physics and game‐manager)
+message PhysicsRequest {
+  string        gameId = 1;
+  int64         tick   = 2;
+  repeated shared.PaddleInput input = 3;
+  int32         stage  = 4; // BR mode stage; others: ignored
+}
+
+message PhysicsResponse {
+  string       gameId  = 1;
+  int64        tick    = 2;
+  repeated shared.Ball balls   = 3;
+  repeated shared.Paddle paddles = 4;
+  shared.Goal  goal    = 5; // classic mode goal event; empty otherwise
+}
+
+message MatchStateResponse {
+  shared.MatchState state = 1;
+}

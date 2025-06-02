@@ -4,7 +4,7 @@ import natsClient from './natsClient.js'
 import {
 	encodeMatchCreateRequest,
 	decodeMatchCreateResponse
-} from './proto/message.js'
+} from './proto/helper.js'
 
 // Simple Lobby model
 class Lobby {

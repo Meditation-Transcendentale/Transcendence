@@ -2,9 +2,8 @@
 import uWS from 'uWebSockets.js';
 import {
 	decodeClientMessage,
-	decodeServerMessage,
 	encodeServerMessage
-} from './proto/message.js';
+} from './proto/helper.js';
 
 const sockets = new Map(); // lobbyId → Set<ws>
 

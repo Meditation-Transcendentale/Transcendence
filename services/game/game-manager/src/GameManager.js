@@ -8,8 +8,9 @@ import {
 	encodePhysicsRequest,
 	decodePhysicsResponse,
 	encodeStateUpdate,
-	encodeMatchSetup
-} from './proto/message.js';
+	encodeMatchSetup,
+	decodeStateUpdate
+} from './proto/helper.js';
 
 export class GameManager {
 	constructor(nc) {
@@ -230,7 +231,6 @@ export class GameManager {
 			const reqBuf = encodePhysicsRequest({ gameId: gameId.toString(), tick: match.tick, input: inputs, stage: lastState.stage });
 			const respMsg = await this.nc.request(`games.${match.mode}.${gameId}.physics.request`, reqBuf);
 			const resp = decodePhysicsResponse(respMsg.data);
-			console.log(resp);
 
 			// Handle goal if one occurred this tick
 			const newState = lastState;
@@ -238,7 +238,8 @@ export class GameManager {
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles;
 			if (resp.goal) {
-				// newState.scores[resp.goal.scorerId] = (newState.scores[resp.scorerId] || 0) + 1;
+				console.log(resp.goal);
+				newState.score[resp.goal.scorerId] = (newState.score[resp.goal.scorerId] || 0) + 1;
 
 				match.isPaused = true;
 				const pauseMs = match.options.pauseMs || 1000;
@@ -254,7 +255,15 @@ export class GameManager {
 			match.state = newState;
 			delete match.inputs[match.tick];
 
-			const buf = encodeStateUpdate({ state: newState });
+			const buf = encodeStateUpdate({
+				gameId: newState.gameId.toString(),
+				tick: newState.tick,
+				balls: newState.balls,
+				paddles: newState.paddles,
+				score: newState.score,
+				ranks: newState.ranks,
+				stage: newState.stage,
+			});
 			this.nc.publish(
 				`games.${match.mode}.${gameId}.match.state`,
 				buf

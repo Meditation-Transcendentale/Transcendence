@@ -16,7 +16,7 @@ import {
 	encodeServerMessage,
 	decodeStateMessage,
 	// WS ← NATS state update
-} from './proto/message.js';
+} from './proto/helper.js';
 
 export default class UIService {
 	constructor() {
@@ -63,11 +63,10 @@ export default class UIService {
 			(async () => {
 				for await (const m of sub) {
 					const [, , gameId] = m.subject.split('.');
-					const { matchState } = decodeStateMessage(m.data);
+					const matchState = decodeStateMessage(m.data);
 					const wsPayload = encodeServerMessage({
-						state: { state: matchState }
+						state: matchState
 					});
-					console.log('Broadcasting MatchState for', gameId, matchState);
 					this.uwsApp.publish(gameId, wsPayload, /* isBinary= */ true);
 				}
 			})();
@@ -219,9 +218,14 @@ export default class UIService {
 		// 2) if all players are ready
 		if (readySet.size === players.length) {
 			const topic = `games.${mode}.${gameId}.match.start`;
-			natsClient.publish(topic, encodeMatchStart());
+			try {
+				natsClient.publish(topic, encodeMatchStart({ gameId: gameId }));
+			}
+			catch (err) {
+				console.log(err);
+			}
 
-			const buf = encodeGameStartMessage();
+			const buf = encodeGameStartMessage({});
 			this.uwsApp.publish(gameId, buf, /* isBinary= */ true);
 
 			this.readyPlayers.delete(gameId);

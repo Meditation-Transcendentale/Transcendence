@@ -92,6 +92,7 @@ export const Physics = {
 								: 0; // left paddle component id
 							scorer = ballPos.x > 0 ? 0 : 1;
 							events.push({ type: 'goal', gameId, playerId: scorer });
+							game.resetBall();
 							break;
 						}
 						if (penetration > 0) {

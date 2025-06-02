@@ -6,7 +6,7 @@ import { Physics } from './Physics.js';
 import {
 	decodePhysicsRequest,
 	encodePhysicsResponse,
-} from './proto/message.js';
+} from './proto/helper.js';
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'pong-physics';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
@@ -28,7 +28,7 @@ async function start() {
 	   * @param {import('nats').Msg} msg
 	   */
 
-	const endSub = nc.subscribe('game.pong.*.match.end');
+	const endSub = nc.subscribe('game.local.*.match.end');
 	(async () => {
 		for await (const msg of endSub) {
 			const [, , gameId] = msg.subject.split('.');

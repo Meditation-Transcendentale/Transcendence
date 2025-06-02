@@ -256,11 +256,18 @@ export class Game {
 		const pos = ball.getComponent('position');
 		pos.x = 0;
 		pos.y = 0;
-		const vel = ball.getComponent('velocity');
-		vel.x = 0;
-		vel.y = 0;
-	}
 
+		const vel = ball.getComponent('velocity');
+		// Pick a random angle between -45° and 45° for one side, or 135° to 225° for the other
+		const speed = 10; // adjust as desired
+		const angleRange = Math.PI / 4; // 45°
+		const baseAngle = Math.random() < 0.5
+			? Math.random() * angleRange - angleRange / 2           // -22.5° … +22.5°
+			: Math.PI + (Math.random() * angleRange - angleRange / 2); // 157.5° … 202.5°
+
+		vel.x = Math.cos(baseAngle) * speed;
+		vel.y = Math.sin(baseAngle) * speed;
+	}
 	launchBall() {
 		const ball = this.entityManager.getEntitiesWithComponents(['ball'])[0];
 		const pos = ball.getComponent('position');
