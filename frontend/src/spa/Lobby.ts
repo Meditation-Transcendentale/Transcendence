@@ -1,4 +1,4 @@
-import { decodeClientMessage, decodeServerMessage, encodeClientMessage, encodeReadyMessage } from "../encode/lobbyMessage";
+import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
 import Router from "./Router";
 import { User } from "./User";
 
@@ -25,7 +25,8 @@ export default class Lobby {
 	private mode: string | null;
 	private state: lobbyState;
 
-	private gameIP = "10.19.220.253";
+	private gameIP = "10.19.219.221";
+	// private gameIP = "localhost";
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
@@ -87,7 +88,7 @@ export default class Lobby {
 			const payload = decodeServerMessage(buf);
 			console.log('Raw message data:', new Uint8Array(msg.data));
 			console.log('Decoded payload:', payload);
-			if ('error' in payload) {
+			if (payload.error != null) {
 				this.id = null;
 				this.ws?.close();
 				this.ws = null;
@@ -96,12 +97,12 @@ export default class Lobby {
 				return;
 			}
 
-			if ('update' in payload) {
+			if (payload.update != null) {
 				this.mode = payload.update.mode;
 				console.log(`Update :${payload}`);
 			}
 
-			if ('start' in payload) {
+			if (payload.start != null) {
 				console.log("Everyone is ready");
 				const gameId = payload.start.gameId;
 				const map = "default"; //payload.start.map;

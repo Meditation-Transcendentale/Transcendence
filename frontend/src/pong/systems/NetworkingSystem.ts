@@ -9,7 +9,8 @@ import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
 import { gameEndUI } from "../utils/displayGameInfo.js";
 import { global } from "../Pong";
-import * as UI from "../utils/proto/message.js";
+import { decodeServerMessage } from "../utils/proto/helper.js";
+import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
 export let localPaddleId: number | 0;
 
@@ -26,7 +27,7 @@ export class NetworkingSystem extends System {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
-		// this.scoreUI = scoreUI;
+		this.scoreUI = scoreUI;
 		this.myScore = 0;
 		this.opponentScore = 0;
 	}
@@ -35,22 +36,21 @@ export class NetworkingSystem extends System {
 		const messages = this.wsManager.getMessages();
 
 		messages.forEach((raw: ArrayBuffer) => {
-			let event;
+			let serverMsg: userinterface.ServerMessage;
 			try {
-				event = UI.game.ServerMessage.decode(new Uint8Array(raw));
+				serverMsg = decodeServerMessage(new Uint8Array(raw));
 			} catch (err) {
 				console.error("Failed to decode protobuf ServerMessage:", err);
 				return;
 			}
 
 			// === State update ===
-			if (event.state?.state) {
-				const state = event.state.state;  // MatchState
-				console.log(state);
+			if (serverMsg.state != null) {
+				const state = serverMsg.state;  // MatchState
 
 				const balls = state.balls ?? [];
 				const paddles = state.paddles ?? [];
-				const scores = state.score ?? [];
+				const score = state.score ?? [];
 				// 1. Ball updates
 				balls.forEach(b => {
 					const e = entities.find(e =>
@@ -87,20 +87,21 @@ export class NetworkingSystem extends System {
 				});
 
 				// 3. Score update
-				if (scores && localPaddleId != null) {
-					const myScore = scores[localPaddleId] ?? 0;
-					const otherId = scores
+				if (score) {
+					console.log(score);
+					const myScore = score[localPaddleId] ?? 0;
+					const otherId = score
 						.map((_, i) => i)
 						.find(i => i !== localPaddleId)!;
-					const theirScore = scores[otherId] ?? 0;
-					this.scoreUI.update(myScore, theirScore);
+					const theirScore = score[otherId] ?? 0;
+					//this.scoreUI.update(myScore, theirScore);
 				}
 			}
 
 			// === Game End ===
-			if (event.end && event.end.score) {
+			if (serverMsg.end) {
 				console.log("Received GameEndMessage");
-				const scores = event.end.score as number[];
+				const scores = serverMsg.end.score as number[];
 				const myScore = scores[localPaddleId] ?? 0;
 				const other = scores.find((_, i) => i !== localPaddleId) ?? 0;
 				global.endUI = gameEndUI(myScore < other);

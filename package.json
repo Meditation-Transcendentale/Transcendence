@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/Meditation-Transcendentale/Transcendence/issues"
   },
-  "homepage": "https://github.com/Meditation-Transcendentale/Transcendence#readme"
+  "homepage": "https://github.com/Meditation-Transcendentale/Transcendence#readme",
+  "devDependencies": {
+    "protobufjs": "^7.5.3"
+  }
 }

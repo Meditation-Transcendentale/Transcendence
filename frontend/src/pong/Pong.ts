@@ -16,6 +16,8 @@ import { UISystem } from "./systems/UISystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
 import * as UI from './utils/proto/message.js';
+import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
+import type { userinterface } from './utils/proto/message.js';
 
 // const API_BASE = "http://10.19.220.253:4000";
 const API_BASE = `http://${window.location.hostname}:4000`;
@@ -134,24 +136,26 @@ export class Pong {
 					return;
 				}
 
-				// Decode the ServerMessage
-				let serverMsg: UI.game.ServerMessage;
-				let clientMsg: UI.game.ClientMessage;
+				// Decode using the helper instead of UI.game.ServerMessage.decode
+				let serverMsg: userinterface.ServerMessage;
 				try {
 					const buf = new Uint8Array(event.data);
-					serverMsg = UI.game.ServerMessage.decode(buf);
+					serverMsg = decodeServerMessage(buf);
 				} catch (err) {
 					console.error('Failed to decode protobuf message:', err);
 					return;
 				}
 
-				// Check for the welcome payload
-				if (serverMsg.welcome && serverMsg.welcome.paddleId != null) {
+				// Check for the welcome case
+				if (serverMsg.welcome?.paddleId != null) {
 					const paddleId = serverMsg.welcome.paddleId;
 					console.log('Received WelcomeMessage:', paddleId);
-					const readyMsg = UI.game.ClientMessage.create({ ready: {} });
-					const readyBuf = UI.game.ClientMessage.encode(readyMsg).finish();
+
+					// Create and send a “ready” ClientMessage via helper
+					const readyPayload: userinterface.IClientMessage = { ready: {} };
+					const readyBuf = encodeClientMessage(readyPayload);
 					socket.send(readyBuf);
+
 					socket.removeEventListener('message', listener);
 					resolve(paddleId);
 				}
@@ -159,14 +163,13 @@ export class Pong {
 
 			socket.addEventListener('message', listener);
 
-			// Optional: timeout guard
+			// Timeout guard
 			setTimeout(() => {
 				socket.removeEventListener('message', listener);
 				reject(new Error('Timed out waiting for WelcomeMessage'));
 			}, 5000);
 		});
 	}
-
 	dispose() {
 		this.baseMeshes.arena.material.dispose();
 		this.baseMeshes.arena.dispose();

@@ -111,13 +111,13 @@ export const shared = $root.shared = (() => {
             if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
             if (message.x != null && Object.hasOwnProperty.call(message, "x"))
-                writer.uint32(/* id 2, wireType 5 =*/21).float(message.x);
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.x);
             if (message.y != null && Object.hasOwnProperty.call(message, "y"))
-                writer.uint32(/* id 3, wireType 5 =*/29).float(message.y);
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.y);
             if (message.vx != null && Object.hasOwnProperty.call(message, "vx"))
-                writer.uint32(/* id 4, wireType 5 =*/37).float(message.vx);
+                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.vx);
             if (message.vy != null && Object.hasOwnProperty.call(message, "vy"))
-                writer.uint32(/* id 5, wireType 5 =*/45).float(message.vy);
+                writer.uint32(/* id 5, wireType 0 =*/40).int32(message.vy);
             return writer;
         };
 
@@ -159,19 +159,19 @@ export const shared = $root.shared = (() => {
                         break;
                     }
                 case 2: {
-                        message.x = reader.float();
+                        message.x = reader.int32();
                         break;
                     }
                 case 3: {
-                        message.y = reader.float();
+                        message.y = reader.int32();
                         break;
                     }
                 case 4: {
-                        message.vx = reader.float();
+                        message.vx = reader.int32();
                         break;
                     }
                 case 5: {
-                        message.vy = reader.float();
+                        message.vy = reader.int32();
                         break;
                     }
                 default:
@@ -213,17 +213,17 @@ export const shared = $root.shared = (() => {
                 if (!$util.isInteger(message.id))
                     return "id: integer expected";
             if (message.x != null && message.hasOwnProperty("x"))
-                if (typeof message.x !== "number")
-                    return "x: number expected";
+                if (!$util.isInteger(message.x))
+                    return "x: integer expected";
             if (message.y != null && message.hasOwnProperty("y"))
-                if (typeof message.y !== "number")
-                    return "y: number expected";
+                if (!$util.isInteger(message.y))
+                    return "y: integer expected";
             if (message.vx != null && message.hasOwnProperty("vx"))
-                if (typeof message.vx !== "number")
-                    return "vx: number expected";
+                if (!$util.isInteger(message.vx))
+                    return "vx: integer expected";
             if (message.vy != null && message.hasOwnProperty("vy"))
-                if (typeof message.vy !== "number")
-                    return "vy: number expected";
+                if (!$util.isInteger(message.vy))
+                    return "vy: integer expected";
             return null;
         };
 
@@ -242,13 +242,13 @@ export const shared = $root.shared = (() => {
             if (object.id != null)
                 message.id = object.id | 0;
             if (object.x != null)
-                message.x = Number(object.x);
+                message.x = object.x | 0;
             if (object.y != null)
-                message.y = Number(object.y);
+                message.y = object.y | 0;
             if (object.vx != null)
-                message.vx = Number(object.vx);
+                message.vx = object.vx | 0;
             if (object.vy != null)
-                message.vy = Number(object.vy);
+                message.vy = object.vy | 0;
             return message;
         };
 
@@ -275,13 +275,13 @@ export const shared = $root.shared = (() => {
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
             if (message.x != null && message.hasOwnProperty("x"))
-                object.x = options.json && !isFinite(message.x) ? String(message.x) : message.x;
+                object.x = message.x;
             if (message.y != null && message.hasOwnProperty("y"))
-                object.y = options.json && !isFinite(message.y) ? String(message.y) : message.y;
+                object.y = message.y;
             if (message.vx != null && message.hasOwnProperty("vx"))
-                object.vx = options.json && !isFinite(message.vx) ? String(message.vx) : message.vx;
+                object.vx = message.vx;
             if (message.vy != null && message.hasOwnProperty("vy"))
-                object.vy = options.json && !isFinite(message.vy) ? String(message.vy) : message.vy;
+                object.vy = message.vy;
             return object;
         };
 
@@ -3789,34 +3789,35 @@ export const google = $root.google = (() => {
     return google;
 })();
 
-export const userinterface = $root.userinterface = (() => {
+export const lobby = $root.lobby = (() => {
 
     /**
-     * Namespace userinterface.
-     * @exports userinterface
+     * Namespace lobby.
+     * @exports lobby
      * @namespace
      */
-    const userinterface = {};
+    const lobby = {};
 
-    userinterface.PaddleUpdate = (function() {
+    lobby.UserStatus = (function() {
 
         /**
-         * Properties of a PaddleUpdate.
-         * @memberof userinterface
-         * @interface IPaddleUpdate
-         * @property {number|null} [paddleId] PaddleUpdate paddleId
-         * @property {number|null} [move] PaddleUpdate move
+         * Properties of a UserStatus.
+         * @memberof lobby
+         * @interface IUserStatus
+         * @property {string|null} [uuid] UserStatus uuid
+         * @property {string|null} [lobbyId] UserStatus lobbyId
+         * @property {string|null} [status] UserStatus status
          */
 
         /**
-         * Constructs a new PaddleUpdate.
-         * @memberof userinterface
-         * @classdesc Represents a PaddleUpdate.
-         * @implements IPaddleUpdate
+         * Constructs a new UserStatus.
+         * @memberof lobby
+         * @classdesc Represents a UserStatus.
+         * @implements IUserStatus
          * @constructor
-         * @param {userinterface.IPaddleUpdate=} [properties] Properties to set
+         * @param {lobby.IUserStatus=} [properties] Properties to set
          */
-        function PaddleUpdate(properties) {
+        function UserStatus(properties) {
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -3824,91 +3825,105 @@ export const userinterface = $root.userinterface = (() => {
         }
 
         /**
-         * PaddleUpdate paddleId.
-         * @member {number} paddleId
-         * @memberof userinterface.PaddleUpdate
+         * UserStatus uuid.
+         * @member {string} uuid
+         * @memberof lobby.UserStatus
          * @instance
          */
-        PaddleUpdate.prototype.paddleId = 0;
+        UserStatus.prototype.uuid = "";
 
         /**
-         * PaddleUpdate move.
-         * @member {number} move
-         * @memberof userinterface.PaddleUpdate
+         * UserStatus lobbyId.
+         * @member {string} lobbyId
+         * @memberof lobby.UserStatus
          * @instance
          */
-        PaddleUpdate.prototype.move = 0;
+        UserStatus.prototype.lobbyId = "";
 
         /**
-         * Creates a new PaddleUpdate instance using the specified properties.
+         * UserStatus status.
+         * @member {string} status
+         * @memberof lobby.UserStatus
+         * @instance
+         */
+        UserStatus.prototype.status = "";
+
+        /**
+         * Creates a new UserStatus instance using the specified properties.
          * @function create
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @static
-         * @param {userinterface.IPaddleUpdate=} [properties] Properties to set
-         * @returns {userinterface.PaddleUpdate} PaddleUpdate instance
+         * @param {lobby.IUserStatus=} [properties] Properties to set
+         * @returns {lobby.UserStatus} UserStatus instance
          */
-        PaddleUpdate.create = function create(properties) {
-            return new PaddleUpdate(properties);
+        UserStatus.create = function create(properties) {
+            return new UserStatus(properties);
         };
 
         /**
-         * Encodes the specified PaddleUpdate message. Does not implicitly {@link userinterface.PaddleUpdate.verify|verify} messages.
+         * Encodes the specified UserStatus message. Does not implicitly {@link lobby.UserStatus.verify|verify} messages.
          * @function encode
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @static
-         * @param {userinterface.IPaddleUpdate} message PaddleUpdate message or plain object to encode
+         * @param {lobby.IUserStatus} message UserStatus message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        PaddleUpdate.encode = function encode(message, writer) {
+        UserStatus.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.paddleId != null && Object.hasOwnProperty.call(message, "paddleId"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.paddleId);
-            if (message.move != null && Object.hasOwnProperty.call(message, "move"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.move);
+            if (message.uuid != null && Object.hasOwnProperty.call(message, "uuid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uuid);
+            if (message.lobbyId != null && Object.hasOwnProperty.call(message, "lobbyId"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.lobbyId);
+            if (message.status != null && Object.hasOwnProperty.call(message, "status"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.status);
             return writer;
         };
 
         /**
-         * Encodes the specified PaddleUpdate message, length delimited. Does not implicitly {@link userinterface.PaddleUpdate.verify|verify} messages.
+         * Encodes the specified UserStatus message, length delimited. Does not implicitly {@link lobby.UserStatus.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @static
-         * @param {userinterface.IPaddleUpdate} message PaddleUpdate message or plain object to encode
+         * @param {lobby.IUserStatus} message UserStatus message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        PaddleUpdate.encodeDelimited = function encodeDelimited(message, writer) {
+        UserStatus.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a PaddleUpdate message from the specified reader or buffer.
+         * Decodes a UserStatus message from the specified reader or buffer.
          * @function decode
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.PaddleUpdate} PaddleUpdate
+         * @returns {lobby.UserStatus} UserStatus
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        PaddleUpdate.decode = function decode(reader, length, error) {
+        UserStatus.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.PaddleUpdate();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.UserStatus();
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 if (tag === error)
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.paddleId = reader.int32();
+                        message.uuid = reader.string();
                         break;
                     }
                 case 2: {
-                        message.move = reader.int32();
+                        message.lobbyId = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.status = reader.string();
                         break;
                     }
                 default:
@@ -3920,118 +3935,126 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Decodes a PaddleUpdate message from the specified reader or buffer, length delimited.
+         * Decodes a UserStatus message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.PaddleUpdate} PaddleUpdate
+         * @returns {lobby.UserStatus} UserStatus
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        PaddleUpdate.decodeDelimited = function decodeDelimited(reader) {
+        UserStatus.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a PaddleUpdate message.
+         * Verifies a UserStatus message.
          * @function verify
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        PaddleUpdate.verify = function verify(message) {
+        UserStatus.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.paddleId != null && message.hasOwnProperty("paddleId"))
-                if (!$util.isInteger(message.paddleId))
-                    return "paddleId: integer expected";
-            if (message.move != null && message.hasOwnProperty("move"))
-                if (!$util.isInteger(message.move))
-                    return "move: integer expected";
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                if (!$util.isString(message.uuid))
+                    return "uuid: string expected";
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                if (!$util.isString(message.lobbyId))
+                    return "lobbyId: string expected";
+            if (message.status != null && message.hasOwnProperty("status"))
+                if (!$util.isString(message.status))
+                    return "status: string expected";
             return null;
         };
 
         /**
-         * Creates a PaddleUpdate message from a plain object. Also converts values to their respective internal types.
+         * Creates a UserStatus message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.PaddleUpdate} PaddleUpdate
+         * @returns {lobby.UserStatus} UserStatus
          */
-        PaddleUpdate.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.PaddleUpdate)
+        UserStatus.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.UserStatus)
                 return object;
-            let message = new $root.userinterface.PaddleUpdate();
-            if (object.paddleId != null)
-                message.paddleId = object.paddleId | 0;
-            if (object.move != null)
-                message.move = object.move | 0;
+            let message = new $root.lobby.UserStatus();
+            if (object.uuid != null)
+                message.uuid = String(object.uuid);
+            if (object.lobbyId != null)
+                message.lobbyId = String(object.lobbyId);
+            if (object.status != null)
+                message.status = String(object.status);
             return message;
         };
 
         /**
-         * Creates a plain object from a PaddleUpdate message. Also converts values to other types if specified.
+         * Creates a plain object from a UserStatus message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @static
-         * @param {userinterface.PaddleUpdate} message PaddleUpdate
+         * @param {lobby.UserStatus} message UserStatus
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PaddleUpdate.toObject = function toObject(message, options) {
+        UserStatus.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             let object = {};
             if (options.defaults) {
-                object.paddleId = 0;
-                object.move = 0;
+                object.uuid = "";
+                object.lobbyId = "";
+                object.status = "";
             }
-            if (message.paddleId != null && message.hasOwnProperty("paddleId"))
-                object.paddleId = message.paddleId;
-            if (message.move != null && message.hasOwnProperty("move"))
-                object.move = message.move;
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                object.uuid = message.uuid;
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                object.lobbyId = message.lobbyId;
+            if (message.status != null && message.hasOwnProperty("status"))
+                object.status = message.status;
             return object;
         };
 
         /**
-         * Converts this PaddleUpdate to JSON.
+         * Converts this UserStatus to JSON.
          * @function toJSON
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        PaddleUpdate.prototype.toJSON = function toJSON() {
+        UserStatus.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for PaddleUpdate
+         * Gets the default type url for UserStatus
          * @function getTypeUrl
-         * @memberof userinterface.PaddleUpdate
+         * @memberof lobby.UserStatus
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        PaddleUpdate.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        UserStatus.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/userinterface.PaddleUpdate";
+            return typeUrlPrefix + "/lobby.UserStatus";
         };
 
-        return PaddleUpdate;
+        return UserStatus;
     })();
 
-    userinterface.QuitMessage = (function() {
+    lobby.QuitMessage = (function() {
 
         /**
          * Properties of a QuitMessage.
-         * @memberof userinterface
+         * @memberof lobby
          * @interface IQuitMessage
          * @property {string|null} [uuid] QuitMessage uuid
          * @property {string|null} [lobbyId] QuitMessage lobbyId
@@ -4039,11 +4062,11 @@ export const userinterface = $root.userinterface = (() => {
 
         /**
          * Constructs a new QuitMessage.
-         * @memberof userinterface
+         * @memberof lobby
          * @classdesc Represents a QuitMessage.
          * @implements IQuitMessage
          * @constructor
-         * @param {userinterface.IQuitMessage=} [properties] Properties to set
+         * @param {lobby.IQuitMessage=} [properties] Properties to set
          */
         function QuitMessage(properties) {
             if (properties)
@@ -4055,7 +4078,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * QuitMessage uuid.
          * @member {string} uuid
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @instance
          */
         QuitMessage.prototype.uuid = "";
@@ -4063,7 +4086,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * QuitMessage lobbyId.
          * @member {string} lobbyId
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @instance
          */
         QuitMessage.prototype.lobbyId = "";
@@ -4071,21 +4094,21 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a new QuitMessage instance using the specified properties.
          * @function create
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @static
-         * @param {userinterface.IQuitMessage=} [properties] Properties to set
-         * @returns {userinterface.QuitMessage} QuitMessage instance
+         * @param {lobby.IQuitMessage=} [properties] Properties to set
+         * @returns {lobby.QuitMessage} QuitMessage instance
          */
         QuitMessage.create = function create(properties) {
             return new QuitMessage(properties);
         };
 
         /**
-         * Encodes the specified QuitMessage message. Does not implicitly {@link userinterface.QuitMessage.verify|verify} messages.
+         * Encodes the specified QuitMessage message. Does not implicitly {@link lobby.QuitMessage.verify|verify} messages.
          * @function encode
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @static
-         * @param {userinterface.IQuitMessage} message QuitMessage message or plain object to encode
+         * @param {lobby.IQuitMessage} message QuitMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
@@ -4100,11 +4123,11 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Encodes the specified QuitMessage message, length delimited. Does not implicitly {@link userinterface.QuitMessage.verify|verify} messages.
+         * Encodes the specified QuitMessage message, length delimited. Does not implicitly {@link lobby.QuitMessage.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @static
-         * @param {userinterface.IQuitMessage} message QuitMessage message or plain object to encode
+         * @param {lobby.IQuitMessage} message QuitMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
@@ -4115,18 +4138,18 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Decodes a QuitMessage message from the specified reader or buffer.
          * @function decode
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.QuitMessage} QuitMessage
+         * @returns {lobby.QuitMessage} QuitMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
         QuitMessage.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.QuitMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.QuitMessage();
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 if (tag === error)
@@ -4151,10 +4174,10 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Decodes a QuitMessage message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.QuitMessage} QuitMessage
+         * @returns {lobby.QuitMessage} QuitMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
@@ -4167,7 +4190,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Verifies a QuitMessage message.
          * @function verify
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -4187,15 +4210,15 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a QuitMessage message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.QuitMessage} QuitMessage
+         * @returns {lobby.QuitMessage} QuitMessage
          */
         QuitMessage.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.QuitMessage)
+            if (object instanceof $root.lobby.QuitMessage)
                 return object;
-            let message = new $root.userinterface.QuitMessage();
+            let message = new $root.lobby.QuitMessage();
             if (object.uuid != null)
                 message.uuid = String(object.uuid);
             if (object.lobbyId != null)
@@ -4206,9 +4229,9 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a plain object from a QuitMessage message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @static
-         * @param {userinterface.QuitMessage} message QuitMessage
+         * @param {lobby.QuitMessage} message QuitMessage
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -4230,7 +4253,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Converts this QuitMessage to JSON.
          * @function toJSON
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -4241,7 +4264,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Gets the default type url for QuitMessage
          * @function getTypeUrl
-         * @memberof userinterface.QuitMessage
+         * @memberof lobby.QuitMessage
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
@@ -4250,28 +4273,28 @@ export const userinterface = $root.userinterface = (() => {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/userinterface.QuitMessage";
+            return typeUrlPrefix + "/lobby.QuitMessage";
         };
 
         return QuitMessage;
     })();
 
-    userinterface.ReadyMessage = (function() {
+    lobby.ReadyMessage = (function() {
 
         /**
          * Properties of a ReadyMessage.
-         * @memberof userinterface
+         * @memberof lobby
          * @interface IReadyMessage
          * @property {string|null} [lobbyId] ReadyMessage lobbyId
          */
 
         /**
          * Constructs a new ReadyMessage.
-         * @memberof userinterface
+         * @memberof lobby
          * @classdesc Represents a ReadyMessage.
          * @implements IReadyMessage
          * @constructor
-         * @param {userinterface.IReadyMessage=} [properties] Properties to set
+         * @param {lobby.IReadyMessage=} [properties] Properties to set
          */
         function ReadyMessage(properties) {
             if (properties)
@@ -4283,7 +4306,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * ReadyMessage lobbyId.
          * @member {string} lobbyId
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @instance
          */
         ReadyMessage.prototype.lobbyId = "";
@@ -4291,21 +4314,21 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a new ReadyMessage instance using the specified properties.
          * @function create
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @static
-         * @param {userinterface.IReadyMessage=} [properties] Properties to set
-         * @returns {userinterface.ReadyMessage} ReadyMessage instance
+         * @param {lobby.IReadyMessage=} [properties] Properties to set
+         * @returns {lobby.ReadyMessage} ReadyMessage instance
          */
         ReadyMessage.create = function create(properties) {
             return new ReadyMessage(properties);
         };
 
         /**
-         * Encodes the specified ReadyMessage message. Does not implicitly {@link userinterface.ReadyMessage.verify|verify} messages.
+         * Encodes the specified ReadyMessage message. Does not implicitly {@link lobby.ReadyMessage.verify|verify} messages.
          * @function encode
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @static
-         * @param {userinterface.IReadyMessage} message ReadyMessage message or plain object to encode
+         * @param {lobby.IReadyMessage} message ReadyMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
@@ -4318,11 +4341,11 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Encodes the specified ReadyMessage message, length delimited. Does not implicitly {@link userinterface.ReadyMessage.verify|verify} messages.
+         * Encodes the specified ReadyMessage message, length delimited. Does not implicitly {@link lobby.ReadyMessage.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @static
-         * @param {userinterface.IReadyMessage} message ReadyMessage message or plain object to encode
+         * @param {lobby.IReadyMessage} message ReadyMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
@@ -4333,18 +4356,18 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Decodes a ReadyMessage message from the specified reader or buffer.
          * @function decode
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.ReadyMessage} ReadyMessage
+         * @returns {lobby.ReadyMessage} ReadyMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
         ReadyMessage.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.ReadyMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.ReadyMessage();
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 if (tag === error)
@@ -4365,10 +4388,10 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Decodes a ReadyMessage message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.ReadyMessage} ReadyMessage
+         * @returns {lobby.ReadyMessage} ReadyMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
@@ -4381,7 +4404,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Verifies a ReadyMessage message.
          * @function verify
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -4398,15 +4421,15 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a ReadyMessage message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.ReadyMessage} ReadyMessage
+         * @returns {lobby.ReadyMessage} ReadyMessage
          */
         ReadyMessage.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.ReadyMessage)
+            if (object instanceof $root.lobby.ReadyMessage)
                 return object;
-            let message = new $root.userinterface.ReadyMessage();
+            let message = new $root.lobby.ReadyMessage();
             if (object.lobbyId != null)
                 message.lobbyId = String(object.lobbyId);
             return message;
@@ -4415,9 +4438,9 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a plain object from a ReadyMessage message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @static
-         * @param {userinterface.ReadyMessage} message ReadyMessage
+         * @param {lobby.ReadyMessage} message ReadyMessage
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -4435,7 +4458,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Converts this ReadyMessage to JSON.
          * @function toJSON
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -4446,7 +4469,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Gets the default type url for ReadyMessage
          * @function getTypeUrl
-         * @memberof userinterface.ReadyMessage
+         * @memberof lobby.ReadyMessage
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
@@ -4455,539 +4478,28 @@ export const userinterface = $root.userinterface = (() => {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/userinterface.ReadyMessage";
+            return typeUrlPrefix + "/lobby.ReadyMessage";
         };
 
         return ReadyMessage;
     })();
 
-    userinterface.SpectateMessage = (function() {
-
-        /**
-         * Properties of a SpectateMessage.
-         * @memberof userinterface
-         * @interface ISpectateMessage
-         */
-
-        /**
-         * Constructs a new SpectateMessage.
-         * @memberof userinterface
-         * @classdesc Represents a SpectateMessage.
-         * @implements ISpectateMessage
-         * @constructor
-         * @param {userinterface.ISpectateMessage=} [properties] Properties to set
-         */
-        function SpectateMessage(properties) {
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * Creates a new SpectateMessage instance using the specified properties.
-         * @function create
-         * @memberof userinterface.SpectateMessage
-         * @static
-         * @param {userinterface.ISpectateMessage=} [properties] Properties to set
-         * @returns {userinterface.SpectateMessage} SpectateMessage instance
-         */
-        SpectateMessage.create = function create(properties) {
-            return new SpectateMessage(properties);
-        };
-
-        /**
-         * Encodes the specified SpectateMessage message. Does not implicitly {@link userinterface.SpectateMessage.verify|verify} messages.
-         * @function encode
-         * @memberof userinterface.SpectateMessage
-         * @static
-         * @param {userinterface.ISpectateMessage} message SpectateMessage message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        SpectateMessage.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified SpectateMessage message, length delimited. Does not implicitly {@link userinterface.SpectateMessage.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof userinterface.SpectateMessage
-         * @static
-         * @param {userinterface.ISpectateMessage} message SpectateMessage message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        SpectateMessage.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a SpectateMessage message from the specified reader or buffer.
-         * @function decode
-         * @memberof userinterface.SpectateMessage
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.SpectateMessage} SpectateMessage
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        SpectateMessage.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.SpectateMessage();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a SpectateMessage message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof userinterface.SpectateMessage
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.SpectateMessage} SpectateMessage
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        SpectateMessage.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a SpectateMessage message.
-         * @function verify
-         * @memberof userinterface.SpectateMessage
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        SpectateMessage.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            return null;
-        };
-
-        /**
-         * Creates a SpectateMessage message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof userinterface.SpectateMessage
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.SpectateMessage} SpectateMessage
-         */
-        SpectateMessage.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.SpectateMessage)
-                return object;
-            return new $root.userinterface.SpectateMessage();
-        };
-
-        /**
-         * Creates a plain object from a SpectateMessage message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof userinterface.SpectateMessage
-         * @static
-         * @param {userinterface.SpectateMessage} message SpectateMessage
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        SpectateMessage.toObject = function toObject() {
-            return {};
-        };
-
-        /**
-         * Converts this SpectateMessage to JSON.
-         * @function toJSON
-         * @memberof userinterface.SpectateMessage
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        SpectateMessage.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for SpectateMessage
-         * @function getTypeUrl
-         * @memberof userinterface.SpectateMessage
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        SpectateMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/userinterface.SpectateMessage";
-        };
-
-        return SpectateMessage;
-    })();
-
-    userinterface.ClientMessage = (function() {
-
-        /**
-         * Properties of a ClientMessage.
-         * @memberof userinterface
-         * @interface IClientMessage
-         * @property {userinterface.IPaddleUpdate|null} [paddleUpdate] ClientMessage paddleUpdate
-         * @property {userinterface.IQuitMessage|null} [quit] ClientMessage quit
-         * @property {userinterface.IReadyMessage|null} [ready] ClientMessage ready
-         * @property {userinterface.ISpectateMessage|null} [spectate] ClientMessage spectate
-         */
-
-        /**
-         * Constructs a new ClientMessage.
-         * @memberof userinterface
-         * @classdesc Represents a ClientMessage.
-         * @implements IClientMessage
-         * @constructor
-         * @param {userinterface.IClientMessage=} [properties] Properties to set
-         */
-        function ClientMessage(properties) {
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * ClientMessage paddleUpdate.
-         * @member {userinterface.IPaddleUpdate|null|undefined} paddleUpdate
-         * @memberof userinterface.ClientMessage
-         * @instance
-         */
-        ClientMessage.prototype.paddleUpdate = null;
-
-        /**
-         * ClientMessage quit.
-         * @member {userinterface.IQuitMessage|null|undefined} quit
-         * @memberof userinterface.ClientMessage
-         * @instance
-         */
-        ClientMessage.prototype.quit = null;
-
-        /**
-         * ClientMessage ready.
-         * @member {userinterface.IReadyMessage|null|undefined} ready
-         * @memberof userinterface.ClientMessage
-         * @instance
-         */
-        ClientMessage.prototype.ready = null;
-
-        /**
-         * ClientMessage spectate.
-         * @member {userinterface.ISpectateMessage|null|undefined} spectate
-         * @memberof userinterface.ClientMessage
-         * @instance
-         */
-        ClientMessage.prototype.spectate = null;
-
-        // OneOf field names bound to virtual getters and setters
-        let $oneOfFields;
-
-        /**
-         * ClientMessage payload.
-         * @member {"paddleUpdate"|"quit"|"ready"|"spectate"|undefined} payload
-         * @memberof userinterface.ClientMessage
-         * @instance
-         */
-        Object.defineProperty(ClientMessage.prototype, "payload", {
-            get: $util.oneOfGetter($oneOfFields = ["paddleUpdate", "quit", "ready", "spectate"]),
-            set: $util.oneOfSetter($oneOfFields)
-        });
-
-        /**
-         * Creates a new ClientMessage instance using the specified properties.
-         * @function create
-         * @memberof userinterface.ClientMessage
-         * @static
-         * @param {userinterface.IClientMessage=} [properties] Properties to set
-         * @returns {userinterface.ClientMessage} ClientMessage instance
-         */
-        ClientMessage.create = function create(properties) {
-            return new ClientMessage(properties);
-        };
-
-        /**
-         * Encodes the specified ClientMessage message. Does not implicitly {@link userinterface.ClientMessage.verify|verify} messages.
-         * @function encode
-         * @memberof userinterface.ClientMessage
-         * @static
-         * @param {userinterface.IClientMessage} message ClientMessage message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        ClientMessage.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.paddleUpdate != null && Object.hasOwnProperty.call(message, "paddleUpdate"))
-                $root.userinterface.PaddleUpdate.encode(message.paddleUpdate, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.quit != null && Object.hasOwnProperty.call(message, "quit"))
-                $root.userinterface.QuitMessage.encode(message.quit, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.ready != null && Object.hasOwnProperty.call(message, "ready"))
-                $root.userinterface.ReadyMessage.encode(message.ready, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            if (message.spectate != null && Object.hasOwnProperty.call(message, "spectate"))
-                $root.userinterface.SpectateMessage.encode(message.spectate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified ClientMessage message, length delimited. Does not implicitly {@link userinterface.ClientMessage.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof userinterface.ClientMessage
-         * @static
-         * @param {userinterface.IClientMessage} message ClientMessage message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        ClientMessage.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a ClientMessage message from the specified reader or buffer.
-         * @function decode
-         * @memberof userinterface.ClientMessage
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.ClientMessage} ClientMessage
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        ClientMessage.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.ClientMessage();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.paddleUpdate = $root.userinterface.PaddleUpdate.decode(reader, reader.uint32());
-                        break;
-                    }
-                case 2: {
-                        message.quit = $root.userinterface.QuitMessage.decode(reader, reader.uint32());
-                        break;
-                    }
-                case 3: {
-                        message.ready = $root.userinterface.ReadyMessage.decode(reader, reader.uint32());
-                        break;
-                    }
-                case 4: {
-                        message.spectate = $root.userinterface.SpectateMessage.decode(reader, reader.uint32());
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a ClientMessage message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof userinterface.ClientMessage
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.ClientMessage} ClientMessage
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        ClientMessage.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a ClientMessage message.
-         * @function verify
-         * @memberof userinterface.ClientMessage
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        ClientMessage.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            let properties = {};
-            if (message.paddleUpdate != null && message.hasOwnProperty("paddleUpdate")) {
-                properties.payload = 1;
-                {
-                    let error = $root.userinterface.PaddleUpdate.verify(message.paddleUpdate);
-                    if (error)
-                        return "paddleUpdate." + error;
-                }
-            }
-            if (message.quit != null && message.hasOwnProperty("quit")) {
-                if (properties.payload === 1)
-                    return "payload: multiple values";
-                properties.payload = 1;
-                {
-                    let error = $root.userinterface.QuitMessage.verify(message.quit);
-                    if (error)
-                        return "quit." + error;
-                }
-            }
-            if (message.ready != null && message.hasOwnProperty("ready")) {
-                if (properties.payload === 1)
-                    return "payload: multiple values";
-                properties.payload = 1;
-                {
-                    let error = $root.userinterface.ReadyMessage.verify(message.ready);
-                    if (error)
-                        return "ready." + error;
-                }
-            }
-            if (message.spectate != null && message.hasOwnProperty("spectate")) {
-                if (properties.payload === 1)
-                    return "payload: multiple values";
-                properties.payload = 1;
-                {
-                    let error = $root.userinterface.SpectateMessage.verify(message.spectate);
-                    if (error)
-                        return "spectate." + error;
-                }
-            }
-            return null;
-        };
-
-        /**
-         * Creates a ClientMessage message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof userinterface.ClientMessage
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.ClientMessage} ClientMessage
-         */
-        ClientMessage.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.ClientMessage)
-                return object;
-            let message = new $root.userinterface.ClientMessage();
-            if (object.paddleUpdate != null) {
-                if (typeof object.paddleUpdate !== "object")
-                    throw TypeError(".userinterface.ClientMessage.paddleUpdate: object expected");
-                message.paddleUpdate = $root.userinterface.PaddleUpdate.fromObject(object.paddleUpdate);
-            }
-            if (object.quit != null) {
-                if (typeof object.quit !== "object")
-                    throw TypeError(".userinterface.ClientMessage.quit: object expected");
-                message.quit = $root.userinterface.QuitMessage.fromObject(object.quit);
-            }
-            if (object.ready != null) {
-                if (typeof object.ready !== "object")
-                    throw TypeError(".userinterface.ClientMessage.ready: object expected");
-                message.ready = $root.userinterface.ReadyMessage.fromObject(object.ready);
-            }
-            if (object.spectate != null) {
-                if (typeof object.spectate !== "object")
-                    throw TypeError(".userinterface.ClientMessage.spectate: object expected");
-                message.spectate = $root.userinterface.SpectateMessage.fromObject(object.spectate);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a ClientMessage message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof userinterface.ClientMessage
-         * @static
-         * @param {userinterface.ClientMessage} message ClientMessage
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        ClientMessage.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (message.paddleUpdate != null && message.hasOwnProperty("paddleUpdate")) {
-                object.paddleUpdate = $root.userinterface.PaddleUpdate.toObject(message.paddleUpdate, options);
-                if (options.oneofs)
-                    object.payload = "paddleUpdate";
-            }
-            if (message.quit != null && message.hasOwnProperty("quit")) {
-                object.quit = $root.userinterface.QuitMessage.toObject(message.quit, options);
-                if (options.oneofs)
-                    object.payload = "quit";
-            }
-            if (message.ready != null && message.hasOwnProperty("ready")) {
-                object.ready = $root.userinterface.ReadyMessage.toObject(message.ready, options);
-                if (options.oneofs)
-                    object.payload = "ready";
-            }
-            if (message.spectate != null && message.hasOwnProperty("spectate")) {
-                object.spectate = $root.userinterface.SpectateMessage.toObject(message.spectate, options);
-                if (options.oneofs)
-                    object.payload = "spectate";
-            }
-            return object;
-        };
-
-        /**
-         * Converts this ClientMessage to JSON.
-         * @function toJSON
-         * @memberof userinterface.ClientMessage
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        ClientMessage.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for ClientMessage
-         * @function getTypeUrl
-         * @memberof userinterface.ClientMessage
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        ClientMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/userinterface.ClientMessage";
-        };
-
-        return ClientMessage;
-    })();
-
-    userinterface.ErrorMessage = (function() {
+    lobby.ErrorMessage = (function() {
 
         /**
          * Properties of an ErrorMessage.
-         * @memberof userinterface
+         * @memberof lobby
          * @interface IErrorMessage
          * @property {string|null} [message] ErrorMessage message
          */
 
         /**
          * Constructs a new ErrorMessage.
-         * @memberof userinterface
+         * @memberof lobby
          * @classdesc Represents an ErrorMessage.
          * @implements IErrorMessage
          * @constructor
-         * @param {userinterface.IErrorMessage=} [properties] Properties to set
+         * @param {lobby.IErrorMessage=} [properties] Properties to set
          */
         function ErrorMessage(properties) {
             if (properties)
@@ -4999,7 +4511,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * ErrorMessage message.
          * @member {string} message
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @instance
          */
         ErrorMessage.prototype.message = "";
@@ -5007,21 +4519,21 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a new ErrorMessage instance using the specified properties.
          * @function create
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @static
-         * @param {userinterface.IErrorMessage=} [properties] Properties to set
-         * @returns {userinterface.ErrorMessage} ErrorMessage instance
+         * @param {lobby.IErrorMessage=} [properties] Properties to set
+         * @returns {lobby.ErrorMessage} ErrorMessage instance
          */
         ErrorMessage.create = function create(properties) {
             return new ErrorMessage(properties);
         };
 
         /**
-         * Encodes the specified ErrorMessage message. Does not implicitly {@link userinterface.ErrorMessage.verify|verify} messages.
+         * Encodes the specified ErrorMessage message. Does not implicitly {@link lobby.ErrorMessage.verify|verify} messages.
          * @function encode
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @static
-         * @param {userinterface.IErrorMessage} message ErrorMessage message or plain object to encode
+         * @param {lobby.IErrorMessage} message ErrorMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
@@ -5034,11 +4546,11 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Encodes the specified ErrorMessage message, length delimited. Does not implicitly {@link userinterface.ErrorMessage.verify|verify} messages.
+         * Encodes the specified ErrorMessage message, length delimited. Does not implicitly {@link lobby.ErrorMessage.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @static
-         * @param {userinterface.IErrorMessage} message ErrorMessage message or plain object to encode
+         * @param {lobby.IErrorMessage} message ErrorMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
@@ -5049,18 +4561,18 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Decodes an ErrorMessage message from the specified reader or buffer.
          * @function decode
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.ErrorMessage} ErrorMessage
+         * @returns {lobby.ErrorMessage} ErrorMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
         ErrorMessage.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.ErrorMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.ErrorMessage();
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 if (tag === error)
@@ -5081,10 +4593,10 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Decodes an ErrorMessage message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.ErrorMessage} ErrorMessage
+         * @returns {lobby.ErrorMessage} ErrorMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
@@ -5097,7 +4609,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Verifies an ErrorMessage message.
          * @function verify
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -5114,15 +4626,15 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates an ErrorMessage message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.ErrorMessage} ErrorMessage
+         * @returns {lobby.ErrorMessage} ErrorMessage
          */
         ErrorMessage.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.ErrorMessage)
+            if (object instanceof $root.lobby.ErrorMessage)
                 return object;
-            let message = new $root.userinterface.ErrorMessage();
+            let message = new $root.lobby.ErrorMessage();
             if (object.message != null)
                 message.message = String(object.message);
             return message;
@@ -5131,9 +4643,9 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a plain object from an ErrorMessage message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @static
-         * @param {userinterface.ErrorMessage} message ErrorMessage
+         * @param {lobby.ErrorMessage} message ErrorMessage
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -5151,7 +4663,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Converts this ErrorMessage to JSON.
          * @function toJSON
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -5162,7 +4674,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Gets the default type url for ErrorMessage
          * @function getTypeUrl
-         * @memberof userinterface.ErrorMessage
+         * @memberof lobby.ErrorMessage
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
@@ -5171,30 +4683,32 @@ export const userinterface = $root.userinterface = (() => {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/userinterface.ErrorMessage";
+            return typeUrlPrefix + "/lobby.ErrorMessage";
         };
 
         return ErrorMessage;
     })();
 
-    userinterface.WelcomeMessage = (function() {
+    lobby.StartMessage = (function() {
 
         /**
-         * Properties of a WelcomeMessage.
-         * @memberof userinterface
-         * @interface IWelcomeMessage
-         * @property {number|null} [paddleId] WelcomeMessage paddleId
+         * Properties of a StartMessage.
+         * @memberof lobby
+         * @interface IStartMessage
+         * @property {string|null} [lobbyId] StartMessage lobbyId
+         * @property {string|null} [gameId] StartMessage gameId
+         * @property {string|null} [map] StartMessage map
          */
 
         /**
-         * Constructs a new WelcomeMessage.
-         * @memberof userinterface
-         * @classdesc Represents a WelcomeMessage.
-         * @implements IWelcomeMessage
+         * Constructs a new StartMessage.
+         * @memberof lobby
+         * @classdesc Represents a StartMessage.
+         * @implements IStartMessage
          * @constructor
-         * @param {userinterface.IWelcomeMessage=} [properties] Properties to set
+         * @param {lobby.IStartMessage=} [properties] Properties to set
          */
-        function WelcomeMessage(properties) {
+        function StartMessage(properties) {
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -5202,77 +4716,105 @@ export const userinterface = $root.userinterface = (() => {
         }
 
         /**
-         * WelcomeMessage paddleId.
-         * @member {number} paddleId
-         * @memberof userinterface.WelcomeMessage
+         * StartMessage lobbyId.
+         * @member {string} lobbyId
+         * @memberof lobby.StartMessage
          * @instance
          */
-        WelcomeMessage.prototype.paddleId = 0;
+        StartMessage.prototype.lobbyId = "";
 
         /**
-         * Creates a new WelcomeMessage instance using the specified properties.
-         * @function create
-         * @memberof userinterface.WelcomeMessage
-         * @static
-         * @param {userinterface.IWelcomeMessage=} [properties] Properties to set
-         * @returns {userinterface.WelcomeMessage} WelcomeMessage instance
+         * StartMessage gameId.
+         * @member {string} gameId
+         * @memberof lobby.StartMessage
+         * @instance
          */
-        WelcomeMessage.create = function create(properties) {
-            return new WelcomeMessage(properties);
+        StartMessage.prototype.gameId = "";
+
+        /**
+         * StartMessage map.
+         * @member {string} map
+         * @memberof lobby.StartMessage
+         * @instance
+         */
+        StartMessage.prototype.map = "";
+
+        /**
+         * Creates a new StartMessage instance using the specified properties.
+         * @function create
+         * @memberof lobby.StartMessage
+         * @static
+         * @param {lobby.IStartMessage=} [properties] Properties to set
+         * @returns {lobby.StartMessage} StartMessage instance
+         */
+        StartMessage.create = function create(properties) {
+            return new StartMessage(properties);
         };
 
         /**
-         * Encodes the specified WelcomeMessage message. Does not implicitly {@link userinterface.WelcomeMessage.verify|verify} messages.
+         * Encodes the specified StartMessage message. Does not implicitly {@link lobby.StartMessage.verify|verify} messages.
          * @function encode
-         * @memberof userinterface.WelcomeMessage
+         * @memberof lobby.StartMessage
          * @static
-         * @param {userinterface.IWelcomeMessage} message WelcomeMessage message or plain object to encode
+         * @param {lobby.IStartMessage} message StartMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        WelcomeMessage.encode = function encode(message, writer) {
+        StartMessage.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.paddleId != null && Object.hasOwnProperty.call(message, "paddleId"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.paddleId);
+            if (message.lobbyId != null && Object.hasOwnProperty.call(message, "lobbyId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.lobbyId);
+            if (message.gameId != null && Object.hasOwnProperty.call(message, "gameId"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.gameId);
+            if (message.map != null && Object.hasOwnProperty.call(message, "map"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.map);
             return writer;
         };
 
         /**
-         * Encodes the specified WelcomeMessage message, length delimited. Does not implicitly {@link userinterface.WelcomeMessage.verify|verify} messages.
+         * Encodes the specified StartMessage message, length delimited. Does not implicitly {@link lobby.StartMessage.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof userinterface.WelcomeMessage
+         * @memberof lobby.StartMessage
          * @static
-         * @param {userinterface.IWelcomeMessage} message WelcomeMessage message or plain object to encode
+         * @param {lobby.IStartMessage} message StartMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        WelcomeMessage.encodeDelimited = function encodeDelimited(message, writer) {
+        StartMessage.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a WelcomeMessage message from the specified reader or buffer.
+         * Decodes a StartMessage message from the specified reader or buffer.
          * @function decode
-         * @memberof userinterface.WelcomeMessage
+         * @memberof lobby.StartMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.WelcomeMessage} WelcomeMessage
+         * @returns {lobby.StartMessage} StartMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        WelcomeMessage.decode = function decode(reader, length, error) {
+        StartMessage.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.WelcomeMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.StartMessage();
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 if (tag === error)
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.paddleId = reader.int32();
+                        message.lobbyId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.gameId = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.map = reader.string();
                         break;
                     }
                 default:
@@ -5284,121 +4826,140 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Decodes a WelcomeMessage message from the specified reader or buffer, length delimited.
+         * Decodes a StartMessage message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof userinterface.WelcomeMessage
+         * @memberof lobby.StartMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.WelcomeMessage} WelcomeMessage
+         * @returns {lobby.StartMessage} StartMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        WelcomeMessage.decodeDelimited = function decodeDelimited(reader) {
+        StartMessage.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a WelcomeMessage message.
+         * Verifies a StartMessage message.
          * @function verify
-         * @memberof userinterface.WelcomeMessage
+         * @memberof lobby.StartMessage
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        WelcomeMessage.verify = function verify(message) {
+        StartMessage.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.paddleId != null && message.hasOwnProperty("paddleId"))
-                if (!$util.isInteger(message.paddleId))
-                    return "paddleId: integer expected";
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                if (!$util.isString(message.lobbyId))
+                    return "lobbyId: string expected";
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                if (!$util.isString(message.gameId))
+                    return "gameId: string expected";
+            if (message.map != null && message.hasOwnProperty("map"))
+                if (!$util.isString(message.map))
+                    return "map: string expected";
             return null;
         };
 
         /**
-         * Creates a WelcomeMessage message from a plain object. Also converts values to their respective internal types.
+         * Creates a StartMessage message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof userinterface.WelcomeMessage
+         * @memberof lobby.StartMessage
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.WelcomeMessage} WelcomeMessage
+         * @returns {lobby.StartMessage} StartMessage
          */
-        WelcomeMessage.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.WelcomeMessage)
+        StartMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.StartMessage)
                 return object;
-            let message = new $root.userinterface.WelcomeMessage();
-            if (object.paddleId != null)
-                message.paddleId = object.paddleId | 0;
+            let message = new $root.lobby.StartMessage();
+            if (object.lobbyId != null)
+                message.lobbyId = String(object.lobbyId);
+            if (object.gameId != null)
+                message.gameId = String(object.gameId);
+            if (object.map != null)
+                message.map = String(object.map);
             return message;
         };
 
         /**
-         * Creates a plain object from a WelcomeMessage message. Also converts values to other types if specified.
+         * Creates a plain object from a StartMessage message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof userinterface.WelcomeMessage
+         * @memberof lobby.StartMessage
          * @static
-         * @param {userinterface.WelcomeMessage} message WelcomeMessage
+         * @param {lobby.StartMessage} message StartMessage
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        WelcomeMessage.toObject = function toObject(message, options) {
+        StartMessage.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             let object = {};
-            if (options.defaults)
-                object.paddleId = 0;
-            if (message.paddleId != null && message.hasOwnProperty("paddleId"))
-                object.paddleId = message.paddleId;
+            if (options.defaults) {
+                object.lobbyId = "";
+                object.gameId = "";
+                object.map = "";
+            }
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                object.lobbyId = message.lobbyId;
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                object.gameId = message.gameId;
+            if (message.map != null && message.hasOwnProperty("map"))
+                object.map = message.map;
             return object;
         };
 
         /**
-         * Converts this WelcomeMessage to JSON.
+         * Converts this StartMessage to JSON.
          * @function toJSON
-         * @memberof userinterface.WelcomeMessage
+         * @memberof lobby.StartMessage
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        WelcomeMessage.prototype.toJSON = function toJSON() {
+        StartMessage.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for WelcomeMessage
+         * Gets the default type url for StartMessage
          * @function getTypeUrl
-         * @memberof userinterface.WelcomeMessage
+         * @memberof lobby.StartMessage
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        WelcomeMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        StartMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/userinterface.WelcomeMessage";
+            return typeUrlPrefix + "/lobby.StartMessage";
         };
 
-        return WelcomeMessage;
+        return StartMessage;
     })();
 
-    userinterface.GameStartMessage = (function() {
+    lobby.Player = (function() {
 
         /**
-         * Properties of a GameStartMessage.
-         * @memberof userinterface
-         * @interface IGameStartMessage
+         * Properties of a Player.
+         * @memberof lobby
+         * @interface IPlayer
+         * @property {string|null} [uuid] Player uuid
+         * @property {boolean|null} [ready] Player ready
          */
 
         /**
-         * Constructs a new GameStartMessage.
-         * @memberof userinterface
-         * @classdesc Represents a GameStartMessage.
-         * @implements IGameStartMessage
+         * Constructs a new Player.
+         * @memberof lobby
+         * @classdesc Represents a Player.
+         * @implements IPlayer
          * @constructor
-         * @param {userinterface.IGameStartMessage=} [properties] Properties to set
+         * @param {lobby.IPlayer=} [properties] Properties to set
          */
-        function GameStartMessage(properties) {
+        function Player(properties) {
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -5406,267 +4967,91 @@ export const userinterface = $root.userinterface = (() => {
         }
 
         /**
-         * Creates a new GameStartMessage instance using the specified properties.
-         * @function create
-         * @memberof userinterface.GameStartMessage
-         * @static
-         * @param {userinterface.IGameStartMessage=} [properties] Properties to set
-         * @returns {userinterface.GameStartMessage} GameStartMessage instance
+         * Player uuid.
+         * @member {string} uuid
+         * @memberof lobby.Player
+         * @instance
          */
-        GameStartMessage.create = function create(properties) {
-            return new GameStartMessage(properties);
+        Player.prototype.uuid = "";
+
+        /**
+         * Player ready.
+         * @member {boolean} ready
+         * @memberof lobby.Player
+         * @instance
+         */
+        Player.prototype.ready = false;
+
+        /**
+         * Creates a new Player instance using the specified properties.
+         * @function create
+         * @memberof lobby.Player
+         * @static
+         * @param {lobby.IPlayer=} [properties] Properties to set
+         * @returns {lobby.Player} Player instance
+         */
+        Player.create = function create(properties) {
+            return new Player(properties);
         };
 
         /**
-         * Encodes the specified GameStartMessage message. Does not implicitly {@link userinterface.GameStartMessage.verify|verify} messages.
+         * Encodes the specified Player message. Does not implicitly {@link lobby.Player.verify|verify} messages.
          * @function encode
-         * @memberof userinterface.GameStartMessage
+         * @memberof lobby.Player
          * @static
-         * @param {userinterface.IGameStartMessage} message GameStartMessage message or plain object to encode
+         * @param {lobby.IPlayer} message Player message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        GameStartMessage.encode = function encode(message, writer) {
+        Player.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.uuid != null && Object.hasOwnProperty.call(message, "uuid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uuid);
+            if (message.ready != null && Object.hasOwnProperty.call(message, "ready"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.ready);
             return writer;
         };
 
         /**
-         * Encodes the specified GameStartMessage message, length delimited. Does not implicitly {@link userinterface.GameStartMessage.verify|verify} messages.
+         * Encodes the specified Player message, length delimited. Does not implicitly {@link lobby.Player.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof userinterface.GameStartMessage
+         * @memberof lobby.Player
          * @static
-         * @param {userinterface.IGameStartMessage} message GameStartMessage message or plain object to encode
+         * @param {lobby.IPlayer} message Player message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        GameStartMessage.encodeDelimited = function encodeDelimited(message, writer) {
+        Player.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a GameStartMessage message from the specified reader or buffer.
+         * Decodes a Player message from the specified reader or buffer.
          * @function decode
-         * @memberof userinterface.GameStartMessage
+         * @memberof lobby.Player
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.GameStartMessage} GameStartMessage
+         * @returns {lobby.Player} Player
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        GameStartMessage.decode = function decode(reader, length, error) {
+        Player.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.GameStartMessage();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a GameStartMessage message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof userinterface.GameStartMessage
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.GameStartMessage} GameStartMessage
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        GameStartMessage.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a GameStartMessage message.
-         * @function verify
-         * @memberof userinterface.GameStartMessage
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        GameStartMessage.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            return null;
-        };
-
-        /**
-         * Creates a GameStartMessage message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof userinterface.GameStartMessage
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.GameStartMessage} GameStartMessage
-         */
-        GameStartMessage.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.GameStartMessage)
-                return object;
-            return new $root.userinterface.GameStartMessage();
-        };
-
-        /**
-         * Creates a plain object from a GameStartMessage message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof userinterface.GameStartMessage
-         * @static
-         * @param {userinterface.GameStartMessage} message GameStartMessage
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        GameStartMessage.toObject = function toObject() {
-            return {};
-        };
-
-        /**
-         * Converts this GameStartMessage to JSON.
-         * @function toJSON
-         * @memberof userinterface.GameStartMessage
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        GameStartMessage.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for GameStartMessage
-         * @function getTypeUrl
-         * @memberof userinterface.GameStartMessage
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        GameStartMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/userinterface.GameStartMessage";
-        };
-
-        return GameStartMessage;
-    })();
-
-    userinterface.GameEndMessage = (function() {
-
-        /**
-         * Properties of a GameEndMessage.
-         * @memberof userinterface
-         * @interface IGameEndMessage
-         * @property {Array.<number>|null} [score] GameEndMessage score
-         */
-
-        /**
-         * Constructs a new GameEndMessage.
-         * @memberof userinterface
-         * @classdesc Represents a GameEndMessage.
-         * @implements IGameEndMessage
-         * @constructor
-         * @param {userinterface.IGameEndMessage=} [properties] Properties to set
-         */
-        function GameEndMessage(properties) {
-            this.score = [];
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * GameEndMessage score.
-         * @member {Array.<number>} score
-         * @memberof userinterface.GameEndMessage
-         * @instance
-         */
-        GameEndMessage.prototype.score = $util.emptyArray;
-
-        /**
-         * Creates a new GameEndMessage instance using the specified properties.
-         * @function create
-         * @memberof userinterface.GameEndMessage
-         * @static
-         * @param {userinterface.IGameEndMessage=} [properties] Properties to set
-         * @returns {userinterface.GameEndMessage} GameEndMessage instance
-         */
-        GameEndMessage.create = function create(properties) {
-            return new GameEndMessage(properties);
-        };
-
-        /**
-         * Encodes the specified GameEndMessage message. Does not implicitly {@link userinterface.GameEndMessage.verify|verify} messages.
-         * @function encode
-         * @memberof userinterface.GameEndMessage
-         * @static
-         * @param {userinterface.IGameEndMessage} message GameEndMessage message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        GameEndMessage.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.score != null && message.score.length) {
-                writer.uint32(/* id 1, wireType 2 =*/10).fork();
-                for (let i = 0; i < message.score.length; ++i)
-                    writer.int32(message.score[i]);
-                writer.ldelim();
-            }
-            return writer;
-        };
-
-        /**
-         * Encodes the specified GameEndMessage message, length delimited. Does not implicitly {@link userinterface.GameEndMessage.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof userinterface.GameEndMessage
-         * @static
-         * @param {userinterface.IGameEndMessage} message GameEndMessage message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        GameEndMessage.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a GameEndMessage message from the specified reader or buffer.
-         * @function decode
-         * @memberof userinterface.GameEndMessage
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.GameEndMessage} GameEndMessage
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        GameEndMessage.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.GameEndMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.Player();
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 if (tag === error)
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        if (!(message.score && message.score.length))
-                            message.score = [];
-                        if ((tag & 7) === 2) {
-                            let end2 = reader.uint32() + reader.pos;
-                            while (reader.pos < end2)
-                                message.score.push(reader.int32());
-                        } else
-                            message.score.push(reader.int32());
+                        message.uuid = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.ready = reader.bool();
                         break;
                     }
                 default:
@@ -5678,136 +5063,692 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Decodes a GameEndMessage message from the specified reader or buffer, length delimited.
+         * Decodes a Player message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof userinterface.GameEndMessage
+         * @memberof lobby.Player
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.GameEndMessage} GameEndMessage
+         * @returns {lobby.Player} Player
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        GameEndMessage.decodeDelimited = function decodeDelimited(reader) {
+        Player.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a GameEndMessage message.
+         * Verifies a Player message.
          * @function verify
-         * @memberof userinterface.GameEndMessage
+         * @memberof lobby.Player
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GameEndMessage.verify = function verify(message) {
+        Player.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.score != null && message.hasOwnProperty("score")) {
-                if (!Array.isArray(message.score))
-                    return "score: array expected";
-                for (let i = 0; i < message.score.length; ++i)
-                    if (!$util.isInteger(message.score[i]))
-                        return "score: integer[] expected";
-            }
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                if (!$util.isString(message.uuid))
+                    return "uuid: string expected";
+            if (message.ready != null && message.hasOwnProperty("ready"))
+                if (typeof message.ready !== "boolean")
+                    return "ready: boolean expected";
             return null;
         };
 
         /**
-         * Creates a GameEndMessage message from a plain object. Also converts values to their respective internal types.
+         * Creates a Player message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof userinterface.GameEndMessage
+         * @memberof lobby.Player
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.GameEndMessage} GameEndMessage
+         * @returns {lobby.Player} Player
          */
-        GameEndMessage.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.GameEndMessage)
+        Player.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.Player)
                 return object;
-            let message = new $root.userinterface.GameEndMessage();
-            if (object.score) {
-                if (!Array.isArray(object.score))
-                    throw TypeError(".userinterface.GameEndMessage.score: array expected");
-                message.score = [];
-                for (let i = 0; i < object.score.length; ++i)
-                    message.score[i] = object.score[i] | 0;
+            let message = new $root.lobby.Player();
+            if (object.uuid != null)
+                message.uuid = String(object.uuid);
+            if (object.ready != null)
+                message.ready = Boolean(object.ready);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Player message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof lobby.Player
+         * @static
+         * @param {lobby.Player} message Player
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Player.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.uuid = "";
+                object.ready = false;
+            }
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                object.uuid = message.uuid;
+            if (message.ready != null && message.hasOwnProperty("ready"))
+                object.ready = message.ready;
+            return object;
+        };
+
+        /**
+         * Converts this Player to JSON.
+         * @function toJSON
+         * @memberof lobby.Player
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Player.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for Player
+         * @function getTypeUrl
+         * @memberof lobby.Player
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        Player.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/lobby.Player";
+        };
+
+        return Player;
+    })();
+
+    lobby.UpdateMessage = (function() {
+
+        /**
+         * Properties of an UpdateMessage.
+         * @memberof lobby
+         * @interface IUpdateMessage
+         * @property {string|null} [lobbyId] UpdateMessage lobbyId
+         * @property {Array.<lobby.IPlayer>|null} [players] UpdateMessage players
+         * @property {string|null} [status] UpdateMessage status
+         * @property {string|null} [mode] UpdateMessage mode
+         */
+
+        /**
+         * Constructs a new UpdateMessage.
+         * @memberof lobby
+         * @classdesc Represents an UpdateMessage.
+         * @implements IUpdateMessage
+         * @constructor
+         * @param {lobby.IUpdateMessage=} [properties] Properties to set
+         */
+        function UpdateMessage(properties) {
+            this.players = [];
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UpdateMessage lobbyId.
+         * @member {string} lobbyId
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.lobbyId = "";
+
+        /**
+         * UpdateMessage players.
+         * @member {Array.<lobby.IPlayer>} players
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.players = $util.emptyArray;
+
+        /**
+         * UpdateMessage status.
+         * @member {string} status
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.status = "";
+
+        /**
+         * UpdateMessage mode.
+         * @member {string} mode
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.mode = "";
+
+        /**
+         * Creates a new UpdateMessage instance using the specified properties.
+         * @function create
+         * @memberof lobby.UpdateMessage
+         * @static
+         * @param {lobby.IUpdateMessage=} [properties] Properties to set
+         * @returns {lobby.UpdateMessage} UpdateMessage instance
+         */
+        UpdateMessage.create = function create(properties) {
+            return new UpdateMessage(properties);
+        };
+
+        /**
+         * Encodes the specified UpdateMessage message. Does not implicitly {@link lobby.UpdateMessage.verify|verify} messages.
+         * @function encode
+         * @memberof lobby.UpdateMessage
+         * @static
+         * @param {lobby.IUpdateMessage} message UpdateMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        UpdateMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.lobbyId != null && Object.hasOwnProperty.call(message, "lobbyId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.lobbyId);
+            if (message.players != null && message.players.length)
+                for (let i = 0; i < message.players.length; ++i)
+                    $root.lobby.Player.encode(message.players[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.status != null && Object.hasOwnProperty.call(message, "status"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.status);
+            if (message.mode != null && Object.hasOwnProperty.call(message, "mode"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.mode);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UpdateMessage message, length delimited. Does not implicitly {@link lobby.UpdateMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof lobby.UpdateMessage
+         * @static
+         * @param {lobby.IUpdateMessage} message UpdateMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        UpdateMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an UpdateMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof lobby.UpdateMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {lobby.UpdateMessage} UpdateMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        UpdateMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.UpdateMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.lobbyId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        if (!(message.players && message.players.length))
+                            message.players = [];
+                        message.players.push($root.lobby.Player.decode(reader, reader.uint32()));
+                        break;
+                    }
+                case 3: {
+                        message.status = reader.string();
+                        break;
+                    }
+                case 4: {
+                        message.mode = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
             }
             return message;
         };
 
         /**
-         * Creates a plain object from a GameEndMessage message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof userinterface.GameEndMessage
+         * Decodes an UpdateMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof lobby.UpdateMessage
          * @static
-         * @param {userinterface.GameEndMessage} message GameEndMessage
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {lobby.UpdateMessage} UpdateMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        UpdateMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an UpdateMessage message.
+         * @function verify
+         * @memberof lobby.UpdateMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UpdateMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                if (!$util.isString(message.lobbyId))
+                    return "lobbyId: string expected";
+            if (message.players != null && message.hasOwnProperty("players")) {
+                if (!Array.isArray(message.players))
+                    return "players: array expected";
+                for (let i = 0; i < message.players.length; ++i) {
+                    let error = $root.lobby.Player.verify(message.players[i]);
+                    if (error)
+                        return "players." + error;
+                }
+            }
+            if (message.status != null && message.hasOwnProperty("status"))
+                if (!$util.isString(message.status))
+                    return "status: string expected";
+            if (message.mode != null && message.hasOwnProperty("mode"))
+                if (!$util.isString(message.mode))
+                    return "mode: string expected";
+            return null;
+        };
+
+        /**
+         * Creates an UpdateMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof lobby.UpdateMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {lobby.UpdateMessage} UpdateMessage
+         */
+        UpdateMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.UpdateMessage)
+                return object;
+            let message = new $root.lobby.UpdateMessage();
+            if (object.lobbyId != null)
+                message.lobbyId = String(object.lobbyId);
+            if (object.players) {
+                if (!Array.isArray(object.players))
+                    throw TypeError(".lobby.UpdateMessage.players: array expected");
+                message.players = [];
+                for (let i = 0; i < object.players.length; ++i) {
+                    if (typeof object.players[i] !== "object")
+                        throw TypeError(".lobby.UpdateMessage.players: object expected");
+                    message.players[i] = $root.lobby.Player.fromObject(object.players[i]);
+                }
+            }
+            if (object.status != null)
+                message.status = String(object.status);
+            if (object.mode != null)
+                message.mode = String(object.mode);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an UpdateMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof lobby.UpdateMessage
+         * @static
+         * @param {lobby.UpdateMessage} message UpdateMessage
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GameEndMessage.toObject = function toObject(message, options) {
+        UpdateMessage.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             let object = {};
             if (options.arrays || options.defaults)
-                object.score = [];
-            if (message.score && message.score.length) {
-                object.score = [];
-                for (let j = 0; j < message.score.length; ++j)
-                    object.score[j] = message.score[j];
+                object.players = [];
+            if (options.defaults) {
+                object.lobbyId = "";
+                object.status = "";
+                object.mode = "";
+            }
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                object.lobbyId = message.lobbyId;
+            if (message.players && message.players.length) {
+                object.players = [];
+                for (let j = 0; j < message.players.length; ++j)
+                    object.players[j] = $root.lobby.Player.toObject(message.players[j], options);
+            }
+            if (message.status != null && message.hasOwnProperty("status"))
+                object.status = message.status;
+            if (message.mode != null && message.hasOwnProperty("mode"))
+                object.mode = message.mode;
+            return object;
+        };
+
+        /**
+         * Converts this UpdateMessage to JSON.
+         * @function toJSON
+         * @memberof lobby.UpdateMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        UpdateMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for UpdateMessage
+         * @function getTypeUrl
+         * @memberof lobby.UpdateMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        UpdateMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/lobby.UpdateMessage";
+        };
+
+        return UpdateMessage;
+    })();
+
+    lobby.ClientMessage = (function() {
+
+        /**
+         * Properties of a ClientMessage.
+         * @memberof lobby
+         * @interface IClientMessage
+         * @property {lobby.IQuitMessage|null} [quit] ClientMessage quit
+         * @property {lobby.IReadyMessage|null} [ready] ClientMessage ready
+         */
+
+        /**
+         * Constructs a new ClientMessage.
+         * @memberof lobby
+         * @classdesc Represents a ClientMessage.
+         * @implements IClientMessage
+         * @constructor
+         * @param {lobby.IClientMessage=} [properties] Properties to set
+         */
+        function ClientMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * ClientMessage quit.
+         * @member {lobby.IQuitMessage|null|undefined} quit
+         * @memberof lobby.ClientMessage
+         * @instance
+         */
+        ClientMessage.prototype.quit = null;
+
+        /**
+         * ClientMessage ready.
+         * @member {lobby.IReadyMessage|null|undefined} ready
+         * @memberof lobby.ClientMessage
+         * @instance
+         */
+        ClientMessage.prototype.ready = null;
+
+        // OneOf field names bound to virtual getters and setters
+        let $oneOfFields;
+
+        /**
+         * ClientMessage payload.
+         * @member {"quit"|"ready"|undefined} payload
+         * @memberof lobby.ClientMessage
+         * @instance
+         */
+        Object.defineProperty(ClientMessage.prototype, "payload", {
+            get: $util.oneOfGetter($oneOfFields = ["quit", "ready"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * Creates a new ClientMessage instance using the specified properties.
+         * @function create
+         * @memberof lobby.ClientMessage
+         * @static
+         * @param {lobby.IClientMessage=} [properties] Properties to set
+         * @returns {lobby.ClientMessage} ClientMessage instance
+         */
+        ClientMessage.create = function create(properties) {
+            return new ClientMessage(properties);
+        };
+
+        /**
+         * Encodes the specified ClientMessage message. Does not implicitly {@link lobby.ClientMessage.verify|verify} messages.
+         * @function encode
+         * @memberof lobby.ClientMessage
+         * @static
+         * @param {lobby.IClientMessage} message ClientMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        ClientMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.quit != null && Object.hasOwnProperty.call(message, "quit"))
+                $root.lobby.QuitMessage.encode(message.quit, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.ready != null && Object.hasOwnProperty.call(message, "ready"))
+                $root.lobby.ReadyMessage.encode(message.ready, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ClientMessage message, length delimited. Does not implicitly {@link lobby.ClientMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof lobby.ClientMessage
+         * @static
+         * @param {lobby.IClientMessage} message ClientMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        ClientMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a ClientMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof lobby.ClientMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {lobby.ClientMessage} ClientMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        ClientMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.ClientMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.quit = $root.lobby.QuitMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
+                        message.ready = $root.lobby.ReadyMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a ClientMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof lobby.ClientMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {lobby.ClientMessage} ClientMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        ClientMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a ClientMessage message.
+         * @function verify
+         * @memberof lobby.ClientMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ClientMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            let properties = {};
+            if (message.quit != null && message.hasOwnProperty("quit")) {
+                properties.payload = 1;
+                {
+                    let error = $root.lobby.QuitMessage.verify(message.quit);
+                    if (error)
+                        return "quit." + error;
+                }
+            }
+            if (message.ready != null && message.hasOwnProperty("ready")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.lobby.ReadyMessage.verify(message.ready);
+                    if (error)
+                        return "ready." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a ClientMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof lobby.ClientMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {lobby.ClientMessage} ClientMessage
+         */
+        ClientMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.ClientMessage)
+                return object;
+            let message = new $root.lobby.ClientMessage();
+            if (object.quit != null) {
+                if (typeof object.quit !== "object")
+                    throw TypeError(".lobby.ClientMessage.quit: object expected");
+                message.quit = $root.lobby.QuitMessage.fromObject(object.quit);
+            }
+            if (object.ready != null) {
+                if (typeof object.ready !== "object")
+                    throw TypeError(".lobby.ClientMessage.ready: object expected");
+                message.ready = $root.lobby.ReadyMessage.fromObject(object.ready);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a ClientMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof lobby.ClientMessage
+         * @static
+         * @param {lobby.ClientMessage} message ClientMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ClientMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (message.quit != null && message.hasOwnProperty("quit")) {
+                object.quit = $root.lobby.QuitMessage.toObject(message.quit, options);
+                if (options.oneofs)
+                    object.payload = "quit";
+            }
+            if (message.ready != null && message.hasOwnProperty("ready")) {
+                object.ready = $root.lobby.ReadyMessage.toObject(message.ready, options);
+                if (options.oneofs)
+                    object.payload = "ready";
             }
             return object;
         };
 
         /**
-         * Converts this GameEndMessage to JSON.
+         * Converts this ClientMessage to JSON.
          * @function toJSON
-         * @memberof userinterface.GameEndMessage
+         * @memberof lobby.ClientMessage
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GameEndMessage.prototype.toJSON = function toJSON() {
+        ClientMessage.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for GameEndMessage
+         * Gets the default type url for ClientMessage
          * @function getTypeUrl
-         * @memberof userinterface.GameEndMessage
+         * @memberof lobby.ClientMessage
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        GameEndMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        ClientMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/userinterface.GameEndMessage";
+            return typeUrlPrefix + "/lobby.ClientMessage";
         };
 
-        return GameEndMessage;
+        return ClientMessage;
     })();
 
-    userinterface.ServerMessage = (function() {
+    lobby.ServerMessage = (function() {
 
         /**
          * Properties of a ServerMessage.
-         * @memberof userinterface
+         * @memberof lobby
          * @interface IServerMessage
-         * @property {userinterface.IErrorMessage|null} [error] ServerMessage error
-         * @property {userinterface.IWelcomeMessage|null} [welcome] ServerMessage welcome
-         * @property {userinterface.IGameStartMessage|null} [start] ServerMessage start
-         * @property {shared.IMatchState|null} [state] ServerMessage state
-         * @property {userinterface.IGameEndMessage|null} [end] ServerMessage end
+         * @property {lobby.IStartMessage|null} [start] ServerMessage start
+         * @property {lobby.IUpdateMessage|null} [update] ServerMessage update
+         * @property {lobby.IErrorMessage|null} [error] ServerMessage error
          */
 
         /**
          * Constructs a new ServerMessage.
-         * @memberof userinterface
+         * @memberof lobby
          * @classdesc Represents a ServerMessage.
          * @implements IServerMessage
          * @constructor
-         * @param {userinterface.IServerMessage=} [properties] Properties to set
+         * @param {lobby.IServerMessage=} [properties] Properties to set
          */
         function ServerMessage(properties) {
             if (properties)
@@ -5817,102 +5758,82 @@ export const userinterface = $root.userinterface = (() => {
         }
 
         /**
-         * ServerMessage error.
-         * @member {userinterface.IErrorMessage|null|undefined} error
-         * @memberof userinterface.ServerMessage
-         * @instance
-         */
-        ServerMessage.prototype.error = null;
-
-        /**
-         * ServerMessage welcome.
-         * @member {userinterface.IWelcomeMessage|null|undefined} welcome
-         * @memberof userinterface.ServerMessage
-         * @instance
-         */
-        ServerMessage.prototype.welcome = null;
-
-        /**
          * ServerMessage start.
-         * @member {userinterface.IGameStartMessage|null|undefined} start
-         * @memberof userinterface.ServerMessage
+         * @member {lobby.IStartMessage|null|undefined} start
+         * @memberof lobby.ServerMessage
          * @instance
          */
         ServerMessage.prototype.start = null;
 
         /**
-         * ServerMessage state.
-         * @member {shared.IMatchState|null|undefined} state
-         * @memberof userinterface.ServerMessage
+         * ServerMessage update.
+         * @member {lobby.IUpdateMessage|null|undefined} update
+         * @memberof lobby.ServerMessage
          * @instance
          */
-        ServerMessage.prototype.state = null;
+        ServerMessage.prototype.update = null;
 
         /**
-         * ServerMessage end.
-         * @member {userinterface.IGameEndMessage|null|undefined} end
-         * @memberof userinterface.ServerMessage
+         * ServerMessage error.
+         * @member {lobby.IErrorMessage|null|undefined} error
+         * @memberof lobby.ServerMessage
          * @instance
          */
-        ServerMessage.prototype.end = null;
+        ServerMessage.prototype.error = null;
 
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
 
         /**
          * ServerMessage payload.
-         * @member {"error"|"welcome"|"start"|"state"|"end"|undefined} payload
-         * @memberof userinterface.ServerMessage
+         * @member {"start"|"update"|"error"|undefined} payload
+         * @memberof lobby.ServerMessage
          * @instance
          */
         Object.defineProperty(ServerMessage.prototype, "payload", {
-            get: $util.oneOfGetter($oneOfFields = ["error", "welcome", "start", "state", "end"]),
+            get: $util.oneOfGetter($oneOfFields = ["start", "update", "error"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
         /**
          * Creates a new ServerMessage instance using the specified properties.
          * @function create
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @static
-         * @param {userinterface.IServerMessage=} [properties] Properties to set
-         * @returns {userinterface.ServerMessage} ServerMessage instance
+         * @param {lobby.IServerMessage=} [properties] Properties to set
+         * @returns {lobby.ServerMessage} ServerMessage instance
          */
         ServerMessage.create = function create(properties) {
             return new ServerMessage(properties);
         };
 
         /**
-         * Encodes the specified ServerMessage message. Does not implicitly {@link userinterface.ServerMessage.verify|verify} messages.
+         * Encodes the specified ServerMessage message. Does not implicitly {@link lobby.ServerMessage.verify|verify} messages.
          * @function encode
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @static
-         * @param {userinterface.IServerMessage} message ServerMessage message or plain object to encode
+         * @param {lobby.IServerMessage} message ServerMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
         ServerMessage.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.error != null && Object.hasOwnProperty.call(message, "error"))
-                $root.userinterface.ErrorMessage.encode(message.error, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.welcome != null && Object.hasOwnProperty.call(message, "welcome"))
-                $root.userinterface.WelcomeMessage.encode(message.welcome, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             if (message.start != null && Object.hasOwnProperty.call(message, "start"))
-                $root.userinterface.GameStartMessage.encode(message.start, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            if (message.state != null && Object.hasOwnProperty.call(message, "state"))
-                $root.shared.MatchState.encode(message.state, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-            if (message.end != null && Object.hasOwnProperty.call(message, "end"))
-                $root.userinterface.GameEndMessage.encode(message.end, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                $root.lobby.StartMessage.encode(message.start, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.update != null && Object.hasOwnProperty.call(message, "update"))
+                $root.lobby.UpdateMessage.encode(message.update, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.error != null && Object.hasOwnProperty.call(message, "error"))
+                $root.lobby.ErrorMessage.encode(message.error, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };
 
         /**
-         * Encodes the specified ServerMessage message, length delimited. Does not implicitly {@link userinterface.ServerMessage.verify|verify} messages.
+         * Encodes the specified ServerMessage message, length delimited. Does not implicitly {@link lobby.ServerMessage.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @static
-         * @param {userinterface.IServerMessage} message ServerMessage message or plain object to encode
+         * @param {lobby.IServerMessage} message ServerMessage message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
@@ -5923,41 +5844,33 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Decodes a ServerMessage message from the specified reader or buffer.
          * @function decode
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.ServerMessage} ServerMessage
+         * @returns {lobby.ServerMessage} ServerMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
         ServerMessage.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.ServerMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.ServerMessage();
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 if (tag === error)
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.error = $root.userinterface.ErrorMessage.decode(reader, reader.uint32());
+                        message.start = $root.lobby.StartMessage.decode(reader, reader.uint32());
                         break;
                     }
                 case 2: {
-                        message.welcome = $root.userinterface.WelcomeMessage.decode(reader, reader.uint32());
+                        message.update = $root.lobby.UpdateMessage.decode(reader, reader.uint32());
                         break;
                     }
                 case 3: {
-                        message.start = $root.userinterface.GameStartMessage.decode(reader, reader.uint32());
-                        break;
-                    }
-                case 4: {
-                        message.state = $root.shared.MatchState.decode(reader, reader.uint32());
-                        break;
-                    }
-                case 5: {
-                        message.end = $root.userinterface.GameEndMessage.decode(reader, reader.uint32());
+                        message.error = $root.lobby.ErrorMessage.decode(reader, reader.uint32());
                         break;
                     }
                 default:
@@ -5971,10 +5884,10 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Decodes a ServerMessage message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.ServerMessage} ServerMessage
+         * @returns {lobby.ServerMessage} ServerMessage
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
@@ -5987,7 +5900,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Verifies a ServerMessage message.
          * @function verify
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -5996,52 +5909,32 @@ export const userinterface = $root.userinterface = (() => {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             let properties = {};
-            if (message.error != null && message.hasOwnProperty("error")) {
-                properties.payload = 1;
-                {
-                    let error = $root.userinterface.ErrorMessage.verify(message.error);
-                    if (error)
-                        return "error." + error;
-                }
-            }
-            if (message.welcome != null && message.hasOwnProperty("welcome")) {
-                if (properties.payload === 1)
-                    return "payload: multiple values";
-                properties.payload = 1;
-                {
-                    let error = $root.userinterface.WelcomeMessage.verify(message.welcome);
-                    if (error)
-                        return "welcome." + error;
-                }
-            }
             if (message.start != null && message.hasOwnProperty("start")) {
-                if (properties.payload === 1)
-                    return "payload: multiple values";
                 properties.payload = 1;
                 {
-                    let error = $root.userinterface.GameStartMessage.verify(message.start);
+                    let error = $root.lobby.StartMessage.verify(message.start);
                     if (error)
                         return "start." + error;
                 }
             }
-            if (message.state != null && message.hasOwnProperty("state")) {
+            if (message.update != null && message.hasOwnProperty("update")) {
                 if (properties.payload === 1)
                     return "payload: multiple values";
                 properties.payload = 1;
                 {
-                    let error = $root.shared.MatchState.verify(message.state);
+                    let error = $root.lobby.UpdateMessage.verify(message.update);
                     if (error)
-                        return "state." + error;
+                        return "update." + error;
                 }
             }
-            if (message.end != null && message.hasOwnProperty("end")) {
+            if (message.error != null && message.hasOwnProperty("error")) {
                 if (properties.payload === 1)
                     return "payload: multiple values";
                 properties.payload = 1;
                 {
-                    let error = $root.userinterface.GameEndMessage.verify(message.end);
+                    let error = $root.lobby.ErrorMessage.verify(message.error);
                     if (error)
-                        return "end." + error;
+                        return "error." + error;
                 }
             }
             return null;
@@ -6050,39 +5943,29 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a ServerMessage message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.ServerMessage} ServerMessage
+         * @returns {lobby.ServerMessage} ServerMessage
          */
         ServerMessage.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.ServerMessage)
+            if (object instanceof $root.lobby.ServerMessage)
                 return object;
-            let message = new $root.userinterface.ServerMessage();
-            if (object.error != null) {
-                if (typeof object.error !== "object")
-                    throw TypeError(".userinterface.ServerMessage.error: object expected");
-                message.error = $root.userinterface.ErrorMessage.fromObject(object.error);
-            }
-            if (object.welcome != null) {
-                if (typeof object.welcome !== "object")
-                    throw TypeError(".userinterface.ServerMessage.welcome: object expected");
-                message.welcome = $root.userinterface.WelcomeMessage.fromObject(object.welcome);
-            }
+            let message = new $root.lobby.ServerMessage();
             if (object.start != null) {
                 if (typeof object.start !== "object")
-                    throw TypeError(".userinterface.ServerMessage.start: object expected");
-                message.start = $root.userinterface.GameStartMessage.fromObject(object.start);
+                    throw TypeError(".lobby.ServerMessage.start: object expected");
+                message.start = $root.lobby.StartMessage.fromObject(object.start);
             }
-            if (object.state != null) {
-                if (typeof object.state !== "object")
-                    throw TypeError(".userinterface.ServerMessage.state: object expected");
-                message.state = $root.shared.MatchState.fromObject(object.state);
+            if (object.update != null) {
+                if (typeof object.update !== "object")
+                    throw TypeError(".lobby.ServerMessage.update: object expected");
+                message.update = $root.lobby.UpdateMessage.fromObject(object.update);
             }
-            if (object.end != null) {
-                if (typeof object.end !== "object")
-                    throw TypeError(".userinterface.ServerMessage.end: object expected");
-                message.end = $root.userinterface.GameEndMessage.fromObject(object.end);
+            if (object.error != null) {
+                if (typeof object.error !== "object")
+                    throw TypeError(".lobby.ServerMessage.error: object expected");
+                message.error = $root.lobby.ErrorMessage.fromObject(object.error);
             }
             return message;
         };
@@ -6090,9 +5973,9 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Creates a plain object from a ServerMessage message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @static
-         * @param {userinterface.ServerMessage} message ServerMessage
+         * @param {lobby.ServerMessage} message ServerMessage
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -6100,30 +5983,20 @@ export const userinterface = $root.userinterface = (() => {
             if (!options)
                 options = {};
             let object = {};
-            if (message.error != null && message.hasOwnProperty("error")) {
-                object.error = $root.userinterface.ErrorMessage.toObject(message.error, options);
-                if (options.oneofs)
-                    object.payload = "error";
-            }
-            if (message.welcome != null && message.hasOwnProperty("welcome")) {
-                object.welcome = $root.userinterface.WelcomeMessage.toObject(message.welcome, options);
-                if (options.oneofs)
-                    object.payload = "welcome";
-            }
             if (message.start != null && message.hasOwnProperty("start")) {
-                object.start = $root.userinterface.GameStartMessage.toObject(message.start, options);
+                object.start = $root.lobby.StartMessage.toObject(message.start, options);
                 if (options.oneofs)
                     object.payload = "start";
             }
-            if (message.state != null && message.hasOwnProperty("state")) {
-                object.state = $root.shared.MatchState.toObject(message.state, options);
+            if (message.update != null && message.hasOwnProperty("update")) {
+                object.update = $root.lobby.UpdateMessage.toObject(message.update, options);
                 if (options.oneofs)
-                    object.payload = "state";
+                    object.payload = "update";
             }
-            if (message.end != null && message.hasOwnProperty("end")) {
-                object.end = $root.userinterface.GameEndMessage.toObject(message.end, options);
+            if (message.error != null && message.hasOwnProperty("error")) {
+                object.error = $root.lobby.ErrorMessage.toObject(message.error, options);
                 if (options.oneofs)
-                    object.payload = "end";
+                    object.payload = "error";
             }
             return object;
         };
@@ -6131,7 +6004,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Converts this ServerMessage to JSON.
          * @function toJSON
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -6142,7 +6015,7 @@ export const userinterface = $root.userinterface = (() => {
         /**
          * Gets the default type url for ServerMessage
          * @function getTypeUrl
-         * @memberof userinterface.ServerMessage
+         * @memberof lobby.ServerMessage
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
@@ -6151,30 +6024,282 @@ export const userinterface = $root.userinterface = (() => {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/userinterface.ServerMessage";
+            return typeUrlPrefix + "/lobby.ServerMessage";
         };
 
         return ServerMessage;
     })();
 
-    userinterface.MatchSetup = (function() {
+    lobby.UserStatusPublish = (function() {
 
         /**
-         * Properties of a MatchSetup.
-         * @memberof userinterface
-         * @interface IMatchSetup
-         * @property {Array.<string>|null} [players] MatchSetup players
+         * Properties of a UserStatusPublish.
+         * @memberof lobby
+         * @interface IUserStatusPublish
+         * @property {string|null} [uuid] UserStatusPublish uuid
+         * @property {string|null} [lobbyId] UserStatusPublish lobbyId
+         * @property {string|null} [status] UserStatusPublish status
          */
 
         /**
-         * Constructs a new MatchSetup.
-         * @memberof userinterface
-         * @classdesc Represents a MatchSetup.
-         * @implements IMatchSetup
+         * Constructs a new UserStatusPublish.
+         * @memberof lobby
+         * @classdesc Represents a UserStatusPublish.
+         * @implements IUserStatusPublish
          * @constructor
-         * @param {userinterface.IMatchSetup=} [properties] Properties to set
+         * @param {lobby.IUserStatusPublish=} [properties] Properties to set
          */
-        function MatchSetup(properties) {
+        function UserStatusPublish(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UserStatusPublish uuid.
+         * @member {string} uuid
+         * @memberof lobby.UserStatusPublish
+         * @instance
+         */
+        UserStatusPublish.prototype.uuid = "";
+
+        /**
+         * UserStatusPublish lobbyId.
+         * @member {string} lobbyId
+         * @memberof lobby.UserStatusPublish
+         * @instance
+         */
+        UserStatusPublish.prototype.lobbyId = "";
+
+        /**
+         * UserStatusPublish status.
+         * @member {string} status
+         * @memberof lobby.UserStatusPublish
+         * @instance
+         */
+        UserStatusPublish.prototype.status = "";
+
+        /**
+         * Creates a new UserStatusPublish instance using the specified properties.
+         * @function create
+         * @memberof lobby.UserStatusPublish
+         * @static
+         * @param {lobby.IUserStatusPublish=} [properties] Properties to set
+         * @returns {lobby.UserStatusPublish} UserStatusPublish instance
+         */
+        UserStatusPublish.create = function create(properties) {
+            return new UserStatusPublish(properties);
+        };
+
+        /**
+         * Encodes the specified UserStatusPublish message. Does not implicitly {@link lobby.UserStatusPublish.verify|verify} messages.
+         * @function encode
+         * @memberof lobby.UserStatusPublish
+         * @static
+         * @param {lobby.IUserStatusPublish} message UserStatusPublish message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        UserStatusPublish.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.uuid != null && Object.hasOwnProperty.call(message, "uuid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uuid);
+            if (message.lobbyId != null && Object.hasOwnProperty.call(message, "lobbyId"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.lobbyId);
+            if (message.status != null && Object.hasOwnProperty.call(message, "status"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.status);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UserStatusPublish message, length delimited. Does not implicitly {@link lobby.UserStatusPublish.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof lobby.UserStatusPublish
+         * @static
+         * @param {lobby.IUserStatusPublish} message UserStatusPublish message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        UserStatusPublish.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a UserStatusPublish message from the specified reader or buffer.
+         * @function decode
+         * @memberof lobby.UserStatusPublish
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {lobby.UserStatusPublish} UserStatusPublish
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        UserStatusPublish.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.UserStatusPublish();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.uuid = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.lobbyId = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.status = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a UserStatusPublish message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof lobby.UserStatusPublish
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {lobby.UserStatusPublish} UserStatusPublish
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        UserStatusPublish.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a UserStatusPublish message.
+         * @function verify
+         * @memberof lobby.UserStatusPublish
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UserStatusPublish.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                if (!$util.isString(message.uuid))
+                    return "uuid: string expected";
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                if (!$util.isString(message.lobbyId))
+                    return "lobbyId: string expected";
+            if (message.status != null && message.hasOwnProperty("status"))
+                if (!$util.isString(message.status))
+                    return "status: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a UserStatusPublish message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof lobby.UserStatusPublish
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {lobby.UserStatusPublish} UserStatusPublish
+         */
+        UserStatusPublish.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.UserStatusPublish)
+                return object;
+            let message = new $root.lobby.UserStatusPublish();
+            if (object.uuid != null)
+                message.uuid = String(object.uuid);
+            if (object.lobbyId != null)
+                message.lobbyId = String(object.lobbyId);
+            if (object.status != null)
+                message.status = String(object.status);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a UserStatusPublish message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof lobby.UserStatusPublish
+         * @static
+         * @param {lobby.UserStatusPublish} message UserStatusPublish
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        UserStatusPublish.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.uuid = "";
+                object.lobbyId = "";
+                object.status = "";
+            }
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                object.uuid = message.uuid;
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                object.lobbyId = message.lobbyId;
+            if (message.status != null && message.hasOwnProperty("status"))
+                object.status = message.status;
+            return object;
+        };
+
+        /**
+         * Converts this UserStatusPublish to JSON.
+         * @function toJSON
+         * @memberof lobby.UserStatusPublish
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        UserStatusPublish.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for UserStatusPublish
+         * @function getTypeUrl
+         * @memberof lobby.UserStatusPublish
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        UserStatusPublish.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/lobby.UserStatusPublish";
+        };
+
+        return UserStatusPublish;
+    })();
+
+    lobby.MatchCreateRequest = (function() {
+
+        /**
+         * Properties of a MatchCreateRequest.
+         * @memberof lobby
+         * @interface IMatchCreateRequest
+         * @property {Array.<string>|null} [players] MatchCreateRequest players
+         */
+
+        /**
+         * Constructs a new MatchCreateRequest.
+         * @memberof lobby
+         * @classdesc Represents a MatchCreateRequest.
+         * @implements IMatchCreateRequest
+         * @constructor
+         * @param {lobby.IMatchCreateRequest=} [properties] Properties to set
+         */
+        function MatchCreateRequest(properties) {
             this.players = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
@@ -6183,35 +6308,35 @@ export const userinterface = $root.userinterface = (() => {
         }
 
         /**
-         * MatchSetup players.
+         * MatchCreateRequest players.
          * @member {Array.<string>} players
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @instance
          */
-        MatchSetup.prototype.players = $util.emptyArray;
+        MatchCreateRequest.prototype.players = $util.emptyArray;
 
         /**
-         * Creates a new MatchSetup instance using the specified properties.
+         * Creates a new MatchCreateRequest instance using the specified properties.
          * @function create
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @static
-         * @param {userinterface.IMatchSetup=} [properties] Properties to set
-         * @returns {userinterface.MatchSetup} MatchSetup instance
+         * @param {lobby.IMatchCreateRequest=} [properties] Properties to set
+         * @returns {lobby.MatchCreateRequest} MatchCreateRequest instance
          */
-        MatchSetup.create = function create(properties) {
-            return new MatchSetup(properties);
+        MatchCreateRequest.create = function create(properties) {
+            return new MatchCreateRequest(properties);
         };
 
         /**
-         * Encodes the specified MatchSetup message. Does not implicitly {@link userinterface.MatchSetup.verify|verify} messages.
+         * Encodes the specified MatchCreateRequest message. Does not implicitly {@link lobby.MatchCreateRequest.verify|verify} messages.
          * @function encode
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @static
-         * @param {userinterface.IMatchSetup} message MatchSetup message or plain object to encode
+         * @param {lobby.IMatchCreateRequest} message MatchCreateRequest message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        MatchSetup.encode = function encode(message, writer) {
+        MatchCreateRequest.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.players != null && message.players.length)
@@ -6221,33 +6346,33 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Encodes the specified MatchSetup message, length delimited. Does not implicitly {@link userinterface.MatchSetup.verify|verify} messages.
+         * Encodes the specified MatchCreateRequest message, length delimited. Does not implicitly {@link lobby.MatchCreateRequest.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @static
-         * @param {userinterface.IMatchSetup} message MatchSetup message or plain object to encode
+         * @param {lobby.IMatchCreateRequest} message MatchCreateRequest message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        MatchSetup.encodeDelimited = function encodeDelimited(message, writer) {
+        MatchCreateRequest.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a MatchSetup message from the specified reader or buffer.
+         * Decodes a MatchCreateRequest message from the specified reader or buffer.
          * @function decode
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.MatchSetup} MatchSetup
+         * @returns {lobby.MatchCreateRequest} MatchCreateRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        MatchSetup.decode = function decode(reader, length, error) {
+        MatchCreateRequest.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.MatchSetup();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.MatchCreateRequest();
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 if (tag === error)
@@ -6268,30 +6393,30 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Decodes a MatchSetup message from the specified reader or buffer, length delimited.
+         * Decodes a MatchCreateRequest message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.MatchSetup} MatchSetup
+         * @returns {lobby.MatchCreateRequest} MatchCreateRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        MatchSetup.decodeDelimited = function decodeDelimited(reader) {
+        MatchCreateRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a MatchSetup message.
+         * Verifies a MatchCreateRequest message.
          * @function verify
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        MatchSetup.verify = function verify(message) {
+        MatchCreateRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.players != null && message.hasOwnProperty("players")) {
@@ -6305,20 +6430,20 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Creates a MatchSetup message from a plain object. Also converts values to their respective internal types.
+         * Creates a MatchCreateRequest message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.MatchSetup} MatchSetup
+         * @returns {lobby.MatchCreateRequest} MatchCreateRequest
          */
-        MatchSetup.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.MatchSetup)
+        MatchCreateRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.MatchCreateRequest)
                 return object;
-            let message = new $root.userinterface.MatchSetup();
+            let message = new $root.lobby.MatchCreateRequest();
             if (object.players) {
                 if (!Array.isArray(object.players))
-                    throw TypeError(".userinterface.MatchSetup.players: array expected");
+                    throw TypeError(".lobby.MatchCreateRequest.players: array expected");
                 message.players = [];
                 for (let i = 0; i < object.players.length; ++i)
                     message.players[i] = String(object.players[i]);
@@ -6327,15 +6452,15 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Creates a plain object from a MatchSetup message. Also converts values to other types if specified.
+         * Creates a plain object from a MatchCreateRequest message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @static
-         * @param {userinterface.MatchSetup} message MatchSetup
+         * @param {lobby.MatchCreateRequest} message MatchCreateRequest
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        MatchSetup.toObject = function toObject(message, options) {
+        MatchCreateRequest.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             let object = {};
@@ -6350,53 +6475,52 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Converts this MatchSetup to JSON.
+         * Converts this MatchCreateRequest to JSON.
          * @function toJSON
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        MatchSetup.prototype.toJSON = function toJSON() {
+        MatchCreateRequest.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for MatchSetup
+         * Gets the default type url for MatchCreateRequest
          * @function getTypeUrl
-         * @memberof userinterface.MatchSetup
+         * @memberof lobby.MatchCreateRequest
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        MatchSetup.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        MatchCreateRequest.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/userinterface.MatchSetup";
+            return typeUrlPrefix + "/lobby.MatchCreateRequest";
         };
 
-        return MatchSetup;
+        return MatchCreateRequest;
     })();
 
-    userinterface.MatchInput = (function() {
+    lobby.MatchCreateResponse = (function() {
 
         /**
-         * Properties of a MatchInput.
-         * @memberof userinterface
-         * @interface IMatchInput
-         * @property {number|null} [paddleId] MatchInput paddleId
-         * @property {number|null} [move] MatchInput move
+         * Properties of a MatchCreateResponse.
+         * @memberof lobby
+         * @interface IMatchCreateResponse
+         * @property {string|null} [gameId] MatchCreateResponse gameId
          */
 
         /**
-         * Constructs a new MatchInput.
-         * @memberof userinterface
-         * @classdesc Represents a MatchInput.
-         * @implements IMatchInput
+         * Constructs a new MatchCreateResponse.
+         * @memberof lobby
+         * @classdesc Represents a MatchCreateResponse.
+         * @implements IMatchCreateResponse
          * @constructor
-         * @param {userinterface.IMatchInput=} [properties] Properties to set
+         * @param {lobby.IMatchCreateResponse=} [properties] Properties to set
          */
-        function MatchInput(properties) {
+        function MatchCreateResponse(properties) {
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -6404,91 +6528,77 @@ export const userinterface = $root.userinterface = (() => {
         }
 
         /**
-         * MatchInput paddleId.
-         * @member {number} paddleId
-         * @memberof userinterface.MatchInput
+         * MatchCreateResponse gameId.
+         * @member {string} gameId
+         * @memberof lobby.MatchCreateResponse
          * @instance
          */
-        MatchInput.prototype.paddleId = 0;
+        MatchCreateResponse.prototype.gameId = "";
 
         /**
-         * MatchInput move.
-         * @member {number} move
-         * @memberof userinterface.MatchInput
-         * @instance
-         */
-        MatchInput.prototype.move = 0;
-
-        /**
-         * Creates a new MatchInput instance using the specified properties.
+         * Creates a new MatchCreateResponse instance using the specified properties.
          * @function create
-         * @memberof userinterface.MatchInput
+         * @memberof lobby.MatchCreateResponse
          * @static
-         * @param {userinterface.IMatchInput=} [properties] Properties to set
-         * @returns {userinterface.MatchInput} MatchInput instance
+         * @param {lobby.IMatchCreateResponse=} [properties] Properties to set
+         * @returns {lobby.MatchCreateResponse} MatchCreateResponse instance
          */
-        MatchInput.create = function create(properties) {
-            return new MatchInput(properties);
+        MatchCreateResponse.create = function create(properties) {
+            return new MatchCreateResponse(properties);
         };
 
         /**
-         * Encodes the specified MatchInput message. Does not implicitly {@link userinterface.MatchInput.verify|verify} messages.
+         * Encodes the specified MatchCreateResponse message. Does not implicitly {@link lobby.MatchCreateResponse.verify|verify} messages.
          * @function encode
-         * @memberof userinterface.MatchInput
+         * @memberof lobby.MatchCreateResponse
          * @static
-         * @param {userinterface.IMatchInput} message MatchInput message or plain object to encode
+         * @param {lobby.IMatchCreateResponse} message MatchCreateResponse message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        MatchInput.encode = function encode(message, writer) {
+        MatchCreateResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.paddleId != null && Object.hasOwnProperty.call(message, "paddleId"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.paddleId);
-            if (message.move != null && Object.hasOwnProperty.call(message, "move"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.move);
+            if (message.gameId != null && Object.hasOwnProperty.call(message, "gameId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.gameId);
             return writer;
         };
 
         /**
-         * Encodes the specified MatchInput message, length delimited. Does not implicitly {@link userinterface.MatchInput.verify|verify} messages.
+         * Encodes the specified MatchCreateResponse message, length delimited. Does not implicitly {@link lobby.MatchCreateResponse.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof userinterface.MatchInput
+         * @memberof lobby.MatchCreateResponse
          * @static
-         * @param {userinterface.IMatchInput} message MatchInput message or plain object to encode
+         * @param {lobby.IMatchCreateResponse} message MatchCreateResponse message or plain object to encode
          * @param {$protobuf.default.Writer} [writer] Writer to encode to
          * @returns {$protobuf.default.Writer} Writer
          */
-        MatchInput.encodeDelimited = function encodeDelimited(message, writer) {
+        MatchCreateResponse.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a MatchInput message from the specified reader or buffer.
+         * Decodes a MatchCreateResponse message from the specified reader or buffer.
          * @function decode
-         * @memberof userinterface.MatchInput
+         * @memberof lobby.MatchCreateResponse
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.MatchInput} MatchInput
+         * @returns {lobby.MatchCreateResponse} MatchCreateResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        MatchInput.decode = function decode(reader, length, error) {
+        MatchCreateResponse.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.MatchInput();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.MatchCreateResponse();
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 if (tag === error)
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.paddleId = reader.int32();
-                        break;
-                    }
-                case 2: {
-                        message.move = reader.int32();
+                        message.gameId = reader.string();
                         break;
                     }
                 default:
@@ -6500,729 +6610,105 @@ export const userinterface = $root.userinterface = (() => {
         };
 
         /**
-         * Decodes a MatchInput message from the specified reader or buffer, length delimited.
+         * Decodes a MatchCreateResponse message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof userinterface.MatchInput
+         * @memberof lobby.MatchCreateResponse
          * @static
          * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.MatchInput} MatchInput
+         * @returns {lobby.MatchCreateResponse} MatchCreateResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
          */
-        MatchInput.decodeDelimited = function decodeDelimited(reader) {
+        MatchCreateResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a MatchInput message.
+         * Verifies a MatchCreateResponse message.
          * @function verify
-         * @memberof userinterface.MatchInput
+         * @memberof lobby.MatchCreateResponse
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        MatchInput.verify = function verify(message) {
+        MatchCreateResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.paddleId != null && message.hasOwnProperty("paddleId"))
-                if (!$util.isInteger(message.paddleId))
-                    return "paddleId: integer expected";
-            if (message.move != null && message.hasOwnProperty("move"))
-                if (!$util.isInteger(message.move))
-                    return "move: integer expected";
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                if (!$util.isString(message.gameId))
+                    return "gameId: string expected";
             return null;
         };
 
         /**
-         * Creates a MatchInput message from a plain object. Also converts values to their respective internal types.
+         * Creates a MatchCreateResponse message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof userinterface.MatchInput
+         * @memberof lobby.MatchCreateResponse
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.MatchInput} MatchInput
+         * @returns {lobby.MatchCreateResponse} MatchCreateResponse
          */
-        MatchInput.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.MatchInput)
+        MatchCreateResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.MatchCreateResponse)
                 return object;
-            let message = new $root.userinterface.MatchInput();
-            if (object.paddleId != null)
-                message.paddleId = object.paddleId | 0;
-            if (object.move != null)
-                message.move = object.move | 0;
+            let message = new $root.lobby.MatchCreateResponse();
+            if (object.gameId != null)
+                message.gameId = String(object.gameId);
             return message;
         };
 
         /**
-         * Creates a plain object from a MatchInput message. Also converts values to other types if specified.
+         * Creates a plain object from a MatchCreateResponse message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof userinterface.MatchInput
+         * @memberof lobby.MatchCreateResponse
          * @static
-         * @param {userinterface.MatchInput} message MatchInput
+         * @param {lobby.MatchCreateResponse} message MatchCreateResponse
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        MatchInput.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (options.defaults) {
-                object.paddleId = 0;
-                object.move = 0;
-            }
-            if (message.paddleId != null && message.hasOwnProperty("paddleId"))
-                object.paddleId = message.paddleId;
-            if (message.move != null && message.hasOwnProperty("move"))
-                object.move = message.move;
-            return object;
-        };
-
-        /**
-         * Converts this MatchInput to JSON.
-         * @function toJSON
-         * @memberof userinterface.MatchInput
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        MatchInput.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for MatchInput
-         * @function getTypeUrl
-         * @memberof userinterface.MatchInput
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        MatchInput.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/userinterface.MatchInput";
-        };
-
-        return MatchInput;
-    })();
-
-    userinterface.MatchQuit = (function() {
-
-        /**
-         * Properties of a MatchQuit.
-         * @memberof userinterface
-         * @interface IMatchQuit
-         * @property {string|null} [uuid] MatchQuit uuid
-         */
-
-        /**
-         * Constructs a new MatchQuit.
-         * @memberof userinterface
-         * @classdesc Represents a MatchQuit.
-         * @implements IMatchQuit
-         * @constructor
-         * @param {userinterface.IMatchQuit=} [properties] Properties to set
-         */
-        function MatchQuit(properties) {
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * MatchQuit uuid.
-         * @member {string} uuid
-         * @memberof userinterface.MatchQuit
-         * @instance
-         */
-        MatchQuit.prototype.uuid = "";
-
-        /**
-         * Creates a new MatchQuit instance using the specified properties.
-         * @function create
-         * @memberof userinterface.MatchQuit
-         * @static
-         * @param {userinterface.IMatchQuit=} [properties] Properties to set
-         * @returns {userinterface.MatchQuit} MatchQuit instance
-         */
-        MatchQuit.create = function create(properties) {
-            return new MatchQuit(properties);
-        };
-
-        /**
-         * Encodes the specified MatchQuit message. Does not implicitly {@link userinterface.MatchQuit.verify|verify} messages.
-         * @function encode
-         * @memberof userinterface.MatchQuit
-         * @static
-         * @param {userinterface.IMatchQuit} message MatchQuit message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        MatchQuit.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.uuid != null && Object.hasOwnProperty.call(message, "uuid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uuid);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified MatchQuit message, length delimited. Does not implicitly {@link userinterface.MatchQuit.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof userinterface.MatchQuit
-         * @static
-         * @param {userinterface.IMatchQuit} message MatchQuit message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        MatchQuit.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a MatchQuit message from the specified reader or buffer.
-         * @function decode
-         * @memberof userinterface.MatchQuit
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.MatchQuit} MatchQuit
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        MatchQuit.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.MatchQuit();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.uuid = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a MatchQuit message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof userinterface.MatchQuit
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.MatchQuit} MatchQuit
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        MatchQuit.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a MatchQuit message.
-         * @function verify
-         * @memberof userinterface.MatchQuit
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        MatchQuit.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.uuid != null && message.hasOwnProperty("uuid"))
-                if (!$util.isString(message.uuid))
-                    return "uuid: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a MatchQuit message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof userinterface.MatchQuit
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.MatchQuit} MatchQuit
-         */
-        MatchQuit.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.MatchQuit)
-                return object;
-            let message = new $root.userinterface.MatchQuit();
-            if (object.uuid != null)
-                message.uuid = String(object.uuid);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a MatchQuit message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof userinterface.MatchQuit
-         * @static
-         * @param {userinterface.MatchQuit} message MatchQuit
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        MatchQuit.toObject = function toObject(message, options) {
+        MatchCreateResponse.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             let object = {};
             if (options.defaults)
-                object.uuid = "";
-            if (message.uuid != null && message.hasOwnProperty("uuid"))
-                object.uuid = message.uuid;
+                object.gameId = "";
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                object.gameId = message.gameId;
             return object;
         };
 
         /**
-         * Converts this MatchQuit to JSON.
+         * Converts this MatchCreateResponse to JSON.
          * @function toJSON
-         * @memberof userinterface.MatchQuit
+         * @memberof lobby.MatchCreateResponse
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        MatchQuit.prototype.toJSON = function toJSON() {
+        MatchCreateResponse.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for MatchQuit
+         * Gets the default type url for MatchCreateResponse
          * @function getTypeUrl
-         * @memberof userinterface.MatchQuit
+         * @memberof lobby.MatchCreateResponse
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        MatchQuit.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        MatchCreateResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/userinterface.MatchQuit";
+            return typeUrlPrefix + "/lobby.MatchCreateResponse";
         };
 
-        return MatchQuit;
+        return MatchCreateResponse;
     })();
 
-    userinterface.MatchStart = (function() {
-
-        /**
-         * Properties of a MatchStart.
-         * @memberof userinterface
-         * @interface IMatchStart
-         * @property {string|null} [uuid] MatchStart uuid
-         */
-
-        /**
-         * Constructs a new MatchStart.
-         * @memberof userinterface
-         * @classdesc Represents a MatchStart.
-         * @implements IMatchStart
-         * @constructor
-         * @param {userinterface.IMatchStart=} [properties] Properties to set
-         */
-        function MatchStart(properties) {
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * MatchStart uuid.
-         * @member {string} uuid
-         * @memberof userinterface.MatchStart
-         * @instance
-         */
-        MatchStart.prototype.uuid = "";
-
-        /**
-         * Creates a new MatchStart instance using the specified properties.
-         * @function create
-         * @memberof userinterface.MatchStart
-         * @static
-         * @param {userinterface.IMatchStart=} [properties] Properties to set
-         * @returns {userinterface.MatchStart} MatchStart instance
-         */
-        MatchStart.create = function create(properties) {
-            return new MatchStart(properties);
-        };
-
-        /**
-         * Encodes the specified MatchStart message. Does not implicitly {@link userinterface.MatchStart.verify|verify} messages.
-         * @function encode
-         * @memberof userinterface.MatchStart
-         * @static
-         * @param {userinterface.IMatchStart} message MatchStart message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        MatchStart.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.uuid != null && Object.hasOwnProperty.call(message, "uuid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uuid);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified MatchStart message, length delimited. Does not implicitly {@link userinterface.MatchStart.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof userinterface.MatchStart
-         * @static
-         * @param {userinterface.IMatchStart} message MatchStart message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        MatchStart.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a MatchStart message from the specified reader or buffer.
-         * @function decode
-         * @memberof userinterface.MatchStart
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.MatchStart} MatchStart
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        MatchStart.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.MatchStart();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.uuid = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a MatchStart message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof userinterface.MatchStart
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.MatchStart} MatchStart
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        MatchStart.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a MatchStart message.
-         * @function verify
-         * @memberof userinterface.MatchStart
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        MatchStart.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.uuid != null && message.hasOwnProperty("uuid"))
-                if (!$util.isString(message.uuid))
-                    return "uuid: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a MatchStart message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof userinterface.MatchStart
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.MatchStart} MatchStart
-         */
-        MatchStart.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.MatchStart)
-                return object;
-            let message = new $root.userinterface.MatchStart();
-            if (object.uuid != null)
-                message.uuid = String(object.uuid);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a MatchStart message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof userinterface.MatchStart
-         * @static
-         * @param {userinterface.MatchStart} message MatchStart
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        MatchStart.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (options.defaults)
-                object.uuid = "";
-            if (message.uuid != null && message.hasOwnProperty("uuid"))
-                object.uuid = message.uuid;
-            return object;
-        };
-
-        /**
-         * Converts this MatchStart to JSON.
-         * @function toJSON
-         * @memberof userinterface.MatchStart
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        MatchStart.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for MatchStart
-         * @function getTypeUrl
-         * @memberof userinterface.MatchStart
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        MatchStart.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/userinterface.MatchStart";
-        };
-
-        return MatchStart;
-    })();
-
-    userinterface.MatchEnd = (function() {
-
-        /**
-         * Properties of a MatchEnd.
-         * @memberof userinterface
-         * @interface IMatchEnd
-         * @property {number|null} [winner] MatchEnd winner
-         */
-
-        /**
-         * Constructs a new MatchEnd.
-         * @memberof userinterface
-         * @classdesc Represents a MatchEnd.
-         * @implements IMatchEnd
-         * @constructor
-         * @param {userinterface.IMatchEnd=} [properties] Properties to set
-         */
-        function MatchEnd(properties) {
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * MatchEnd winner.
-         * @member {number} winner
-         * @memberof userinterface.MatchEnd
-         * @instance
-         */
-        MatchEnd.prototype.winner = 0;
-
-        /**
-         * Creates a new MatchEnd instance using the specified properties.
-         * @function create
-         * @memberof userinterface.MatchEnd
-         * @static
-         * @param {userinterface.IMatchEnd=} [properties] Properties to set
-         * @returns {userinterface.MatchEnd} MatchEnd instance
-         */
-        MatchEnd.create = function create(properties) {
-            return new MatchEnd(properties);
-        };
-
-        /**
-         * Encodes the specified MatchEnd message. Does not implicitly {@link userinterface.MatchEnd.verify|verify} messages.
-         * @function encode
-         * @memberof userinterface.MatchEnd
-         * @static
-         * @param {userinterface.IMatchEnd} message MatchEnd message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        MatchEnd.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.winner != null && Object.hasOwnProperty.call(message, "winner"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.winner);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified MatchEnd message, length delimited. Does not implicitly {@link userinterface.MatchEnd.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof userinterface.MatchEnd
-         * @static
-         * @param {userinterface.IMatchEnd} message MatchEnd message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        MatchEnd.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a MatchEnd message from the specified reader or buffer.
-         * @function decode
-         * @memberof userinterface.MatchEnd
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {userinterface.MatchEnd} MatchEnd
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        MatchEnd.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.userinterface.MatchEnd();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.winner = reader.int32();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a MatchEnd message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof userinterface.MatchEnd
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {userinterface.MatchEnd} MatchEnd
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        MatchEnd.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a MatchEnd message.
-         * @function verify
-         * @memberof userinterface.MatchEnd
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        MatchEnd.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.winner != null && message.hasOwnProperty("winner"))
-                if (!$util.isInteger(message.winner))
-                    return "winner: integer expected";
-            return null;
-        };
-
-        /**
-         * Creates a MatchEnd message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof userinterface.MatchEnd
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {userinterface.MatchEnd} MatchEnd
-         */
-        MatchEnd.fromObject = function fromObject(object) {
-            if (object instanceof $root.userinterface.MatchEnd)
-                return object;
-            let message = new $root.userinterface.MatchEnd();
-            if (object.winner != null)
-                message.winner = object.winner | 0;
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a MatchEnd message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof userinterface.MatchEnd
-         * @static
-         * @param {userinterface.MatchEnd} message MatchEnd
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        MatchEnd.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (options.defaults)
-                object.winner = 0;
-            if (message.winner != null && message.hasOwnProperty("winner"))
-                object.winner = message.winner;
-            return object;
-        };
-
-        /**
-         * Converts this MatchEnd to JSON.
-         * @function toJSON
-         * @memberof userinterface.MatchEnd
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        MatchEnd.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for MatchEnd
-         * @function getTypeUrl
-         * @memberof userinterface.MatchEnd
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        MatchEnd.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/userinterface.MatchEnd";
-        };
-
-        return MatchEnd;
-    })();
-
-    return userinterface;
+    return lobby;
 })();
 
 export { $root as default };
