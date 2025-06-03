@@ -72,10 +72,10 @@ body {
 	pointer-events: none;
 	overflow: hidden;
 	transition:
-		top 0.5s,
-		left 0.5s,
-		width 0.5s 0.3s,
-		height 0.5s 0.3s;
+		top 0.1s linear,
+		left 0.1s linear,
+		width 0.1s 0.3s linear,
+		height 0.1s 0.3s linear;
 	display: none;
 }
 
@@ -85,12 +85,13 @@ body {
 	left: 0;
 	border: 5px solid var(--window);
 	/*pointer-events: none;*/
+	min-height: 100px;
+	min-width: 100px;
 	overflow: hidden;
 	transition:
-		top 0.2s,
-		left 0.2s,
-		width 0.2s,
-		height 0.2s;
+		top 2s,
+		left 2s,
+		width 5s, 0.3s height 5s, 0.3s;
 	z-index: 2;
 	/*animation: w 0.5s linear infinite;*/
 	/* animation-timing-function: step-start; */
@@ -248,7 +249,7 @@ body {
 }
 
 .glitch:before {
-	/*animation: glitch-top 0.2s linear infinite;*/
+	animation: glitch-top 0.2s linear infinite;
 	/*animation-timing-function: step-start;*/
 	clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
 	-webkit-clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
@@ -272,7 +273,7 @@ body {
 }
 
 .glitch:after {
-	/*animation: glitch-bottom 0.2s linear infinite;*/
+	animation: glitch-bottom 0.2s linear infinite;
 	/*animation-timing-function: step-start;*/
 	clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
 	-webkit-clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);

@@ -14,6 +14,7 @@ import {
 	Vector3
 } from "@babylonjs/core";
 import { CubeCluster } from "./CubeCluster";
+import { Gears } from "./Gears";
 
 
 export class Environment {
@@ -31,12 +32,14 @@ export class Environment {
 	private playCluster!: CubeCluster;
 	private homeCluster!: CubeCluster;
 
+	private gears!: Gears;
+
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
 
 		this.scene = new Scene(engine);
 		this.scene.autoClear = true; // Color buffer
-		this.scene.clearColor = new Color4(0.1, 0., 0.2, 1);
+		this.scene.clearColor = new Color4(0., 0., 0., 1);
 
 		this.scene.setRenderingAutoClearDepthStencil(0, true);
 
@@ -50,18 +53,31 @@ export class Environment {
 					this.scene.debugLayer.show();
 				}
 			}
+
+			//if (ev.key == 'Escape') {
+			//	this.scene.setActiveCameraByName('home');
+			//}
+			//
+			if (ev.key == ' ') {
+
+				this.scene.setActiveCameraByName('menu');
+			}
 		});
 
-		this.playCluster = new CubeCluster("play", new Vector3(0, 0, 0), this.scene);
-		this.homeCluster = new CubeCluster("home", new Vector3(7, -1, 3), this.scene, {
-			radius: 1.5,
-			quantity: 100,
-			expendY: 1,
-			expendX: 1.5,
-			expendZ: 1.5,
-			centerLayer: 20,
-			orbitLayer: 10,
-		});
+		window.addEventListener('resize', () => {
+			engine.resize();
+		})
+
+		//this.playCluster = new CubeCluster("play", new Vector3(0, 0, 0), this.scene);
+		//this.homeCluster = new CubeCluster("home", new Vector3(7, -1, 3), this.scene, {
+		//	radius: 1.5,
+		//	quantity: 100,
+		//	expendY: 1,
+		//	expendX: 1.5,
+		//	expendZ: 1.5,
+		//	centerLayer: 20,
+		//	orbitLayer: 10,
+		//});
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
 		this.frame = 0;
@@ -71,13 +87,16 @@ export class Environment {
 		});
 		this.glow.intensity = 0.4;
 
+		this.gears = new Gears(this.scene);
+
 	}
 
 	public async init() {
 
 		//this.camera = new FreeCamera("camera", new Vector3(20, 3, 0), this.scene);
-		this.camera = new ArcRotateCamera("camera", -Math.PI * 0.8, Math.PI * 0.4, 10, Vector3.Zero(), this.scene);
-		this.camera.inertia = 0.1;
+		this.camera = new ArcRotateCamera("camera", -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
+		this.camera.inertia = 0.8;
+		this.camera.speed = 10;
 		this.camera.rotation.set(0, Math.PI * 1.5, 0);
 		this.camera.attachControl(this.canvas, true);
 		this.camera.minZ = 0.1;
@@ -92,10 +111,11 @@ export class Environment {
 		//cube.material = m;
 		//cube.receiveShadows = true;
 
+		await this.gears.load();
 
+		//await this.playCluster.init();
+		//await this.homeCluster.init();
 
-		await this.playCluster.init();
-		await this.homeCluster.init();
 		//const l = new DirectionalLight("light", new Vector3(0, 1, 0), this.scene);
 		//const hl = new HemisphericLight("hlight", new Vector3(1, 0, 0), this.scene);
 		//hl.intensity = 0.5;
@@ -103,20 +123,21 @@ export class Environment {
 	}
 
 	public render() {
-		if (!this.frame) { this.updateCss(); }
+		this.updateCss(this.frame % 64);
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		this.playCluster.update(this.deltaTime);
-		this.homeCluster.update(this.deltaTime);
+		this.gears.update(this.deltaTime);
+		//this.playCluster.update(this.deltaTime);
+		//this.homeCluster.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
-		this.frame %= 1;
 	}
 
-	private updateCss() {
-		this.playCluster.updateCSS();
-		this.homeCluster.updateCSS();
+	private updateCss(n: number) {
+		this.gears.updateCSS(n == 0);
+		//this.playCluster.updateCSS();
+		//this.homeCluster.updateCSS();
 	}
 
 	private async load() {
@@ -128,8 +149,8 @@ export class Environment {
 	}
 
 	public dispose() {
-		this.playCluster.dispose();
-		this.homeCluster.dispose();
+		//this.playCluster.dispose();
+		//this.homeCluster.dispose();
 		this.glow.dispose();
 		this.camera.dispose();
 		this.scene.dispose();
