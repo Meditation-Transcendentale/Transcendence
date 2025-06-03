@@ -28,6 +28,7 @@ const verifyApiKey = (req, res, done) => {
 app.addHook('onRequest', verifyApiKey);
 
 const nats = await connect({ servers: process.env.NATS_URL });
+console.log(`connected to ${nats.getServer()}`);
 const jc = JSONCodec();
 
 async function checkFriendshipStatus(user, friend) {
@@ -59,7 +60,7 @@ app.post('/add', handleErrors(async (req, res) => {
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
 
 	const addedPlayerUsername = req.body.inputUsername;
-
+	
 	if (!addedPlayerUsername) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.USERNAME_REQUIRED };
 	}
@@ -74,6 +75,8 @@ app.post('/add', handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, 'user.addFriendRequest', { userId: user.id, friendId: friend.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_SENT });
+	console.log(`publishing on: notification.${friend.uuid}.friendRequest`)
+	nats.publish(`notification.${friend.uuid}.friendRequest`, jc.encode({ senderID: user.uuid }));
 }));
 
 app.post('/accept', handleErrors(async (req, res) => {
@@ -97,6 +100,8 @@ app.post('/accept', handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, 'user.acceptFriendRequest', { friendshipId: friendship.id });
 	
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_ACCEPTED });
+	console.log(`publishing on: notification.${friend.uuid}.friendAccept`)
+	nats.publish(`notification.${friend.uuid}.friendAccept`, jc.encode({ senderID: user.uuid}));
 }));
 
 app.delete('/decline', handleErrors(async (req, res) => {
