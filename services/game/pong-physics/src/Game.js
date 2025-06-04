@@ -47,6 +47,7 @@ export class Game {
 				.addComponent('position', Position(x, y))
 				.addComponent('paddle', {
 					id: i,
+					move: 0,
 					speed: config.paddleSpeed,
 					offset: 0,
 					maxOffset: config.MAX_OFFSET,
@@ -124,19 +125,12 @@ export class Game {
    * @param {number} playerId
    * @param {{offset: number, x: number, y: number}} input
    */
-	updatePaddleInput(playerId, input) {
+	updatePaddleInput(playerId, move) {
 		const paddleEntity = this.paddleEntities[playerId];
 		if (!paddleEntity) return;
 
 		const paddle = paddleEntity.getComponent('paddle');
-		const position = paddleEntity.getComponent('position');
-		if (paddle.offset !== input.offset || position.x !== input.x || position.y !== input.y) {
-			paddle.offset = input.offset;
-			paddle.offset = Math.max(-paddle.maxOffset, Math.min(paddle.offset, paddle.maxOffset));
-			position.x = input.x;
-			position.y = input.y;
-			paddle.dirty = true;
-		}
+		paddle.move = move;
 	}
 
 	setWallOff(playerId) {
@@ -232,11 +226,10 @@ export class Game {
 			.map(key => {
 				const paddleEntity = this.paddleEntities[key];
 				const paddle = paddleEntity.getComponent('paddle');
-				if (!paddle.dirty) return null;
-				paddle.dirty = false;
-				return { id: paddle.id, offset: paddle.offset, connected: paddle.isConnected };
-			})
-			.filter(Boolean);
+				// if (!paddle.dirty) return null;
+				// paddle.dirty = false;
+				return { id: paddle.id, move: paddle.move, offset: paddle.offset };
+			});
 
 		return { balls, paddles };
 	}
@@ -256,11 +249,18 @@ export class Game {
 		const pos = ball.getComponent('position');
 		pos.x = 0;
 		pos.y = 0;
-		const vel = ball.getComponent('velocity');
-		vel.x = 0;
-		vel.y = 0;
-	}
 
+		const vel = ball.getComponent('velocity');
+		const speed = 10; // adjust as desired
+		const angleRange = Math.PI / 4; // 45°
+		const baseAngle = Math.random() < 0.5
+			? Math.random() * angleRange - angleRange / 2           // -22.5° … +22.5°
+			: Math.PI + (Math.random() * angleRange - angleRange / 2); // 157.5° … 202.5°
+
+		vel.x = Math.cos(baseAngle) * speed;
+		vel.y = 0;
+		// vel.y = Math.sin(baseAngle) * speed;
+	}
 	launchBall() {
 		const ball = this.entityManager.getEntitiesWithComponents(['ball'])[0];
 		const pos = ball.getComponent('position');

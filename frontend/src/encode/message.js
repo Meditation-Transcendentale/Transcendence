@@ -111,13 +111,13 @@ export const shared = $root.shared = (() => {
             if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
             if (message.x != null && Object.hasOwnProperty.call(message, "x"))
-                writer.uint32(/* id 2, wireType 5 =*/21).float(message.x);
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.x);
             if (message.y != null && Object.hasOwnProperty.call(message, "y"))
-                writer.uint32(/* id 3, wireType 5 =*/29).float(message.y);
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.y);
             if (message.vx != null && Object.hasOwnProperty.call(message, "vx"))
-                writer.uint32(/* id 4, wireType 5 =*/37).float(message.vx);
+                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.vx);
             if (message.vy != null && Object.hasOwnProperty.call(message, "vy"))
-                writer.uint32(/* id 5, wireType 5 =*/45).float(message.vy);
+                writer.uint32(/* id 5, wireType 0 =*/40).int32(message.vy);
             return writer;
         };
 
@@ -159,19 +159,19 @@ export const shared = $root.shared = (() => {
                         break;
                     }
                 case 2: {
-                        message.x = reader.float();
+                        message.x = reader.int32();
                         break;
                     }
                 case 3: {
-                        message.y = reader.float();
+                        message.y = reader.int32();
                         break;
                     }
                 case 4: {
-                        message.vx = reader.float();
+                        message.vx = reader.int32();
                         break;
                     }
                 case 5: {
-                        message.vy = reader.float();
+                        message.vy = reader.int32();
                         break;
                     }
                 default:
@@ -213,17 +213,17 @@ export const shared = $root.shared = (() => {
                 if (!$util.isInteger(message.id))
                     return "id: integer expected";
             if (message.x != null && message.hasOwnProperty("x"))
-                if (typeof message.x !== "number")
-                    return "x: number expected";
+                if (!$util.isInteger(message.x))
+                    return "x: integer expected";
             if (message.y != null && message.hasOwnProperty("y"))
-                if (typeof message.y !== "number")
-                    return "y: number expected";
+                if (!$util.isInteger(message.y))
+                    return "y: integer expected";
             if (message.vx != null && message.hasOwnProperty("vx"))
-                if (typeof message.vx !== "number")
-                    return "vx: number expected";
+                if (!$util.isInteger(message.vx))
+                    return "vx: integer expected";
             if (message.vy != null && message.hasOwnProperty("vy"))
-                if (typeof message.vy !== "number")
-                    return "vy: number expected";
+                if (!$util.isInteger(message.vy))
+                    return "vy: integer expected";
             return null;
         };
 
@@ -242,13 +242,13 @@ export const shared = $root.shared = (() => {
             if (object.id != null)
                 message.id = object.id | 0;
             if (object.x != null)
-                message.x = Number(object.x);
+                message.x = object.x | 0;
             if (object.y != null)
-                message.y = Number(object.y);
+                message.y = object.y | 0;
             if (object.vx != null)
-                message.vx = Number(object.vx);
+                message.vx = object.vx | 0;
             if (object.vy != null)
-                message.vy = Number(object.vy);
+                message.vy = object.vy | 0;
             return message;
         };
 
@@ -275,13 +275,13 @@ export const shared = $root.shared = (() => {
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
             if (message.x != null && message.hasOwnProperty("x"))
-                object.x = options.json && !isFinite(message.x) ? String(message.x) : message.x;
+                object.x = message.x;
             if (message.y != null && message.hasOwnProperty("y"))
-                object.y = options.json && !isFinite(message.y) ? String(message.y) : message.y;
+                object.y = message.y;
             if (message.vx != null && message.hasOwnProperty("vx"))
-                object.vx = options.json && !isFinite(message.vx) ? String(message.vx) : message.vx;
+                object.vx = message.vx;
             if (message.vy != null && message.hasOwnProperty("vy"))
-                object.vy = options.json && !isFinite(message.vy) ? String(message.vy) : message.vy;
+                object.vy = message.vy;
             return object;
         };
 
@@ -322,7 +322,6 @@ export const shared = $root.shared = (() => {
          * @interface IPaddle
          * @property {number|null} [id] Paddle id
          * @property {number|null} [move] Paddle move
-         * @property {number|null} [offset] Paddle offset
          * @property {boolean|null} [dead] Paddle dead
          */
 
@@ -356,14 +355,6 @@ export const shared = $root.shared = (() => {
          * @instance
          */
         Paddle.prototype.move = 0;
-
-        /**
-         * Paddle offset.
-         * @member {number} offset
-         * @memberof shared.Paddle
-         * @instance
-         */
-        Paddle.prototype.offset = 0;
 
         /**
          * Paddle dead.
@@ -401,10 +392,8 @@ export const shared = $root.shared = (() => {
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
             if (message.move != null && Object.hasOwnProperty.call(message, "move"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.move);
-            if (message.offset != null && Object.hasOwnProperty.call(message, "offset"))
-                writer.uint32(/* id 3, wireType 5 =*/29).float(message.offset);
             if (message.dead != null && Object.hasOwnProperty.call(message, "dead"))
-                writer.uint32(/* id 4, wireType 0 =*/32).bool(message.dead);
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.dead);
             return writer;
         };
 
@@ -450,10 +439,6 @@ export const shared = $root.shared = (() => {
                         break;
                     }
                 case 3: {
-                        message.offset = reader.float();
-                        break;
-                    }
-                case 4: {
                         message.dead = reader.bool();
                         break;
                     }
@@ -498,9 +483,6 @@ export const shared = $root.shared = (() => {
             if (message.move != null && message.hasOwnProperty("move"))
                 if (!$util.isInteger(message.move))
                     return "move: integer expected";
-            if (message.offset != null && message.hasOwnProperty("offset"))
-                if (typeof message.offset !== "number")
-                    return "offset: number expected";
             if (message.dead != null && message.hasOwnProperty("dead"))
                 if (typeof message.dead !== "boolean")
                     return "dead: boolean expected";
@@ -523,8 +505,6 @@ export const shared = $root.shared = (() => {
                 message.id = object.id | 0;
             if (object.move != null)
                 message.move = object.move | 0;
-            if (object.offset != null)
-                message.offset = Number(object.offset);
             if (object.dead != null)
                 message.dead = Boolean(object.dead);
             return message;
@@ -546,15 +526,12 @@ export const shared = $root.shared = (() => {
             if (options.defaults) {
                 object.id = 0;
                 object.move = 0;
-                object.offset = 0;
                 object.dead = false;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
             if (message.move != null && message.hasOwnProperty("move"))
                 object.move = message.move;
-            if (message.offset != null && message.hasOwnProperty("offset"))
-                object.offset = options.json && !isFinite(message.offset) ? String(message.offset) : message.offset;
             if (message.dead != null && message.hasOwnProperty("dead"))
                 object.dead = message.dead;
             return object;

@@ -3,7 +3,7 @@ import uWS from 'uWebSockets.js';
 import {
 	decodeClientMessage,
 	encodeServerMessage
-} from './proto/message.js';
+} from './proto/helper.js';
 
 const sockets = new Map(); // lobbyId → Set<ws>
 
@@ -37,7 +37,7 @@ export function createUwsApp(path, lobbyService) {
 
 			try {
 				const state = lobbyService.join(lobbyId, ws.userId);
-				const buf = encodeServerMessage({ update: state });
+				const buf = encodeServerMessage({ update: { lobbyId: state.lobbyId, players: state.players, status: state.status, mode: state.mode } });
 				ws.subscribe(lobbyId);
 				app.publish(lobbyId, buf, true);
 			} catch (err) {
@@ -59,7 +59,6 @@ export function createUwsApp(path, lobbyService) {
 				console.log(newState);
 
 				if (newState.gameId) {
-					// send “start” to everyone...
 					const startBuf = encodeServerMessage({
 						start: {
 							lobbyId: newState.lobbyId,
@@ -69,11 +68,10 @@ export function createUwsApp(path, lobbyService) {
 					});
 					app.publish(ws.lobbyId, startBuf, true);
 
-					// …then close them out
-					for (const peer of sockets.get(ws.lobbyId) || []) {
-						peer.close(1000, 'Game starting');
-					}
-					sockets.delete(ws.lobbyId);
+					// for (const peer of sockets.get(ws.lobbyId) || []) {
+					// 	peer.close(1000, 'Game starting');
+					// }
+					// sockets.delete(ws.lobbyId);
 					return;
 				}
 			}

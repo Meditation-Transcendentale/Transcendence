@@ -36,7 +36,7 @@ app.register(fastifyRateLimit, {
 });
 
 app.register(fastifyCORS, {
-	origin: ['http://10.19.220.253:8080', 'http://localhost:8081', 'http://172.19.0.2:8081', 'http://172.17.0.1:8080', 'http://localhost:8080', "http://192.168.1.84:8080"],
+	origin: ['http://10.19.219.174:8080', 'http://localhost:8081', 'http://172.19.0.2:8081', 'http://172.17.0.1:8080', 'http://localhost:8080', "http://192.168.1.84:8080"],
 	methods: ['GET', 'POST', 'PATCH', 'DELETE'],
 	allowedHeaders: ['Content-Type'],
 	credentials: true

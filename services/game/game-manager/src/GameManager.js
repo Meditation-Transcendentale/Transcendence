@@ -8,8 +8,9 @@ import {
 	encodePhysicsRequest,
 	decodePhysicsResponse,
 	encodeStateUpdate,
-	encodeMatchSetup
-} from './proto/message.js';
+	encodeMatchSetup,
+	decodeStateUpdate
+} from './proto/helper.js';
 
 export class GameManager {
 	constructor(nc) {
@@ -43,7 +44,7 @@ export class GameManager {
 		})();
 
 		// Subscribe to "games.*.match.end" (req/rep)
-		const subEnd = this.nc.subscribe('games.*.*.match.end');
+		const subEnd = this.nc.subscribe('games.*.*.match.quit');
 		(async () => {
 			for await (const msg of subEnd) {
 				const [, , gameId] = msg.subject.split('.');
@@ -111,13 +112,11 @@ export class GameManager {
 		if (!match || match.status !== 'running') return;
 
 		// queue inputs for next tick
-		for (const pi of request.inputs) {
-			this.handleInput({
-				gameId,
-				paddleId: pi.paddleId,
-				move: pi.move,
-			});
-		}
+		this.handleInput({
+			gameId,
+			paddleId: request.paddleId,
+			move: request.move,
+		});
 	}
 
 	// ─── Public API ─────────────────────────────────────────────────
@@ -149,7 +148,7 @@ export class GameManager {
 		if (!match || match.status !== 'created') return false;
 
 		match.status = 'running';
-		const tickMs = 1000 / (match.options.tickRate || 60);
+		const tickMs = 1000 / 60;
 
 		match.interval = setInterval(() => {
 			this._tickMatch(gameId);
@@ -167,7 +166,7 @@ export class GameManager {
 		}
 
 		match.inputs[targetTick].push({
-			paddleId,
+			id: paddleId,
 			move,
 		});
 	}
@@ -183,7 +182,7 @@ export class GameManager {
 
 		match.status = 'ended';
 
-		this.nc.publish(`games.${match.mode}.${gameId}.match.end`, null);
+		this.nc.publish(`games.${match.mode}.${gameId}.match.end`, new Uint8Array());
 		this.games.delete(gameId);
 
 		console.log(`[GameManager] Ended match ${gameId}`);
@@ -237,15 +236,17 @@ export class GameManager {
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles;
 			if (resp.goal) {
-				newState.scores[resp.goal.scorerId] = (newState.scores[resp.scorerId] || 0) + 1;
+				console.log(resp.goal);
+				console.log(newState.score[resp.goal.scorerId]);
+				newState.score[resp.goal.scorerId] = (newState.score[resp.goal.scorerId] || 0) + 1;
 
 				match.isPaused = true;
-				const pauseMs = match.options.pauseMs || 1000;
-				const tickMs = 1000 / (match.options.tickRate || 60);
+				const pauseMs = 1000;
+				const tickMs = 1000 / (60);
 				const pauseTicks = Math.ceil(pauseMs / tickMs);
 				match.resumeTick = match.tick + pauseTicks;
 				match.pendingServe = true;
-				if (newState.scores[resp.goal.scorerId] >= (match.options.winScore || Infinity)) {
+				if (newState.score[resp.goal.scorerId] >= (5 || Infinity)) {
 					newState.isGameOver = true;
 				}
 			}
@@ -253,7 +254,15 @@ export class GameManager {
 			match.state = newState;
 			delete match.inputs[match.tick];
 
-			const buf = encodeStateUpdate({ state: newState });
+			const buf = encodeStateUpdate({
+				gameId: newState.gameId.toString(),
+				tick: newState.tick,
+				balls: newState.balls,
+				paddles: newState.paddles,
+				score: newState.score,
+				ranks: newState.ranks,
+				stage: newState.stage,
+			});
 			this.nc.publish(
 				`games.${match.mode}.${gameId}.match.state`,
 				buf

@@ -23,16 +23,31 @@ export const Physics = {
 	   * @returns {{ gameId: string, tick: number, balls: Array, paddles: Array }}
 	   */
 
-	processTick({ gameId, lastState }) {
+	// message PhysicsRequest {
+	//   string gameId = 1;
+	//   int64 tick = 2;
+	//   repeated PaddleInput input = 3;
+	//   int32 stage = 4; // BR mode stage; others: ignored
+	// }
+	processTick({ gameId, tick, input }) {
 		if (!this.games.has(gameId)) {
 			console.log(`[physics] Initializing new game ${gameId}`);
 			this.games.set(gameId, new Game(gameId));
 		}
+		// console.log(performance.now());
 		let events = [];
 		const game = this.games.get(gameId);
 		const em = game.entityManager;
-		const subSteps = 20;
+		const subSteps = 1;
 		const dt = 1 / 60 / subSteps;
+
+		if (input && Array.isArray(input)) {
+			for (let i = 0; i < input.length; i++) {
+				const { id, move } = input[i];
+				game.updatePaddleInput(id, move);
+
+			}
+		}
 
 		const collidableEntities = em.getEntitiesWithComponents(['position', 'collider']);
 		const tree = new AABBTree();
@@ -86,6 +101,8 @@ export const Physics = {
 								: 0; // left paddle component id
 							scorer = ballPos.x > 0 ? 0 : 1;
 							events.push({ type: 'goal', gameId, playerId: scorer });
+							console.log(`Scorer id = ${scorer}`);
+							game.resetBall();
 							break;
 						}
 						if (penetration > 0) {
@@ -154,7 +171,7 @@ export const Physics = {
 		const tempstate = game.getState();
 		return {
 			gameId,
-			tick,
+			tick: tick,
 			balls: tempstate.balls,
 			paddles: tempstate.paddles,
 			events

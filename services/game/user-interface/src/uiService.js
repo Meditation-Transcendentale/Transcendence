@@ -13,8 +13,10 @@ import {
 	encodeWelcomeMessage,
 	encodeGameStartMessage,
 	encodeGameEndMessage,
+	encodeServerMessage,
+	decodeStateMessage,
 	// WS ← NATS state update
-} from './proto/message.js';
+} from './proto/helper.js';
 
 export default class UIService {
 	constructor() {
@@ -22,11 +24,14 @@ export default class UIService {
 		this.allowedByGame = new Map(); // gameId → { players: string[], mode: string }
 		this.sessions = new Map(); // uuid → { ws, role, gameId, mode, paddleId? }
 		this.games = new Map(); // gameId → Set<sessionId>
+		this.nc = null;
 	}
-
 	async start() {
-		await natsClient.connect(process.env.NATS_URL);
+		// 0) Connect to NATS
+		const nc = await natsClient.connect(process.env.NATS_URL);
+		this.nc = nc;
 
+		// 1) Start µWS WebSocket server
 		this.uwsApp = startWsServer({
 			port: Number(process.env.SERVER_PORT) || 5004,
 			handlers: {
@@ -38,42 +43,54 @@ export default class UIService {
 			}
 		});
 
-		// 1) MatchSetup → record players & mode
-		natsClient.subscribe('games.*.*.match.setup', (data, msg) => {
-			const [, mode, gameId] = msg.subject.split('.');
-			const { players } = decodeMatchSetup(data);
-			this.allowedByGame.set(gameId, { players, mode });
-			this.games.set(gameId, new Set());
-			console.log(`User Interface: New game setup ${gameId}`);
-		});
-
-		// // 2) MatchStart → broadcast GameStartMessage
-		// natsClient.subscribe('games.*.*.match.start', (data, msg) => {
-		// 	decodeMatchStart(data); // validate
-		// 	const [, , gameId] = msg.subject.split('.');
-		// 	const buf = encodeGameStartMessage();
-		// 	this.uwsApp.publish(gameId, buf, true);
-		// });
+		// 2) MatchSetup → record players & mode
+		{
+			const sub = nc.subscribe('games.*.*.match.setup');
+			(async () => {
+				for await (const m of sub) {
+					const [, mode, gameId] = m.subject.split('.');
+					const { players } = decodeMatchSetup(m.data);
+					this.allowedByGame.set(gameId, { players, mode });
+					this.games.set(gameId, new Set());
+					console.log(`User Interface: New game setup ${gameId}`);
+				}
+			})();
+		}
 
 		// 3) StateUpdate → broadcast StateMessage
-		natsClient.subscribe('games.*.*.state.update', data => {
-			const [, , gameId] = msg.subject.split('.');
-			this.uwsApp.publish(gameId, data, /* isBinary= */ true);
-		});
+		{
+			const sub = nc.subscribe('games.*.*.match.state');
+			(async () => {
+				for await (const m of sub) {
+					const [, , gameId] = m.subject.split('.');
+					const matchState = decodeStateMessage(m.data);
+					const wsPayload = encodeServerMessage({
+						state: matchState
+					});
+					this.uwsApp.publish(gameId, wsPayload, /* isBinary= */ true);
+				}
+			})();
+		}
 
 		// 4) MatchEnd → broadcast GameEndMessage & cleanup
-		natsClient.subscribe('games.*.*.match.end', (data, msg) => {
-			const { winner } = decodeMatchEnd(data);
-			const [, , gameId] = msg.subject.split('.');
-			const buf = encodeGameEndMessage({ score: [winner] });
-			for (const sid of this.games.get(gameId) || []) {
-				const s = this.sessions.get(sid);
-				s.ws.send(buf, true);
-				s.ws.close();
-			}
-			this.allowedByGame.delete(gameId);
-			this.games.delete(gameId);
-		});
+		{
+			const sub = nc.subscribe('games.*.*.match.end');
+			(async () => {
+				for await (const m of sub) {
+					const [, , gameId] = m.subject.split('.');
+					const { winner } = decodeMatchEnd(m.data);
+					const buf = encodeServerMessage({ end: [winner] });
+					for (const sid of this.games.get(gameId) || []) {
+						const s = this.sessions.get(sid);
+						s.ws.send(buf, /* isBinary= */ true);
+						s.ws.close();
+					}
+					this.allowedByGame.delete(gameId);
+					this.games.delete(gameId);
+					console.log(`Game ${gameId} ended, winner paddleId=${winner}`);
+				}
+			})();
+		}
 	}
 
 	handleRegisterGame(ws) {
@@ -97,11 +114,11 @@ export default class UIService {
 		}
 
 		// 3) Prevent double-registration
-		if (this.sessions.has(uuid)) {
-			const errBuf = encodeErrorMessage({ message: 'Already registered' });
-			ws.send(errBuf, true);
-			return ws.close();
-		}
+		// if (this.sessions.has(uuid)) {
+		// 	const errBuf = encodeErrorMessage({ message: 'Already registered' });
+		// 	ws.send(errBuf, true);
+		// 	return ws.close();
+		// }
 
 		// 4) Register player
 		this.sessions.set(uuid, { ws, role, gameId, mode });
@@ -111,7 +128,9 @@ export default class UIService {
 			const paddleId = players.indexOf(uuid);
 			this.sessions.get(uuid).paddleId = paddleId;
 
-			const welcomeBuf = encodeWelcomeMessage({ paddleId });
+			const welcomeBuf = encodeServerMessage({
+				welcome: { paddleId }
+			});
 			ws.send(welcomeBuf, true);
 		}
 	}
@@ -150,9 +169,14 @@ export default class UIService {
 		// 2) if all players are ready
 		if (readySet.size === players.length) {
 			const topic = `games.${mode}.${gameId}.match.start`;
-			natsClient.publish(topic, encodeMatchStart());
+			try {
+				natsClient.publish(topic, encodeMatchStart({ gameId: gameId }));
+			}
+			catch (err) {
+				console.log(err);
+			}
 
-			const buf = encodeGameStartMessage();
+			const buf = encodeGameStartMessage({});
 			this.uwsApp.publish(gameId, buf, /* isBinary= */ true);
 
 			this.readyPlayers.delete(gameId);

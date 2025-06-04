@@ -1,6 +1,6 @@
 // src/uwsServer.js
 import { App } from 'uWebSockets.js';
-import { decodeClientMessage } from './proto/message.js';
+import { decodeClientMessage } from './proto/helper.js';
 
 export function startWsServer({ port, handlers }) {
 	const app = App().ws('/*', {
@@ -35,7 +35,9 @@ export function startWsServer({ port, handlers }) {
 			else if (msg.quit) handlers.quit(ws);
 			else if (msg.ready) handlers.ready(ws);
 			else if (msg.spectate) handlers.spectate(ws);
-			else console.warn('Unknown ClientMessage payload');
+			else {
+				console.warn('Unknown ClientMessage payload');
+			}
 		}
 	})
 		.listen(port, token => {

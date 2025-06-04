@@ -12,7 +12,7 @@ export class VisualEffectSystem extends System {
 	constructor(scene: Scene) {
 		super();
 		this.scene = scene;
-		for(let i = 0; i < this.maxParticle; i++) {
+		for (let i = 0; i < this.maxParticle; i++) {
 			this.particlePool.push(this.createParticleSystem());
 		}
 	}

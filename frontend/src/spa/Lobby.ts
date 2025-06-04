@@ -1,4 +1,4 @@
-import { decodeClientMessage, decodeServerMessage, encodeClientMessage, encodeReadyMessage } from "../encode/lobbyMessage";
+import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
 import Router from "./Router";
 import { User } from "./User";
 
@@ -25,7 +25,8 @@ export default class Lobby {
 	private mode: string | null;
 	private state: lobbyState;
 
-	private gameIP = "10.19.220.253";
+	private gameIP = window.location.hostname;
+	// private gameIP = "localhost";
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
@@ -83,9 +84,11 @@ export default class Lobby {
 		}
 
 		this.ws.onmessage = (msg) => {
-			const payload = decodeServerMessage(new Uint8Array(msg.data)) as any;
-			console.log(payload);
-			if ('error' in payload) {
+			const buf = new Uint8Array(msg.data as ArrayBuffer);
+			const payload = decodeServerMessage(buf);
+			console.log('Raw message data:', new Uint8Array(msg.data));
+			console.log('Decoded payload:', payload);
+			if (payload.error != null) {
 				this.id = null;
 				this.ws?.close();
 				this.ws = null;
@@ -94,16 +97,16 @@ export default class Lobby {
 				return;
 			}
 
-			if ('update' in payload) {
-				this.mode = payload.update.mod;
+			if (payload.update != null) {
+				this.mode = payload.update.mode;
 				console.log(`Update :${payload}`);
 			}
 
-			if ('start' in payload) {
+			if (payload.start != null) {
 				console.log("Everyone is ready");
 				const gameId = payload.start.gameId;
 				const map = "default"; //payload.start.map;
-				//Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mod}&map=${this.map}`));
+				Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${map}`), false, false);
 				this.ws?.close();
 			}
 		}

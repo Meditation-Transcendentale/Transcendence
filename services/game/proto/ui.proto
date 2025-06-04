@@ -1,0 +1,90 @@
+// ----------------------------------------------------------------------
+// proto/user_interface.proto
+// ----------------------------------------------------------------------
+syntax = "proto3";
+
+package userinterface;
+
+import "google/protobuf/empty.proto";
+import "shared.proto"; // Import core shared types
+
+// -----------------------------------------------------------------------------
+// Client → Server messages
+// -----------------------------------------------------------------------------
+message PaddleUpdate {
+  int32 paddleId = 1;
+  int32 move     = 2; // -1: left, 0: none, 1: right
+}
+
+message QuitMessage {
+  string uuid    = 1; // player’s UUID
+  string lobbyId = 2; // lobby to quit
+}
+
+message ReadyMessage {
+  string lobbyId = 1; // player toggles ready in this lobby
+}
+
+message SpectateMessage {}
+
+// Envelope for *all* client→server messages
+message ClientMessage {
+  oneof payload {
+    PaddleUpdate    paddleUpdate = 1;
+    QuitMessage     quit         = 2;
+    ReadyMessage    ready        = 3;
+    SpectateMessage spectate     = 4;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Server → Client messages
+// -----------------------------------------------------------------------------
+message ErrorMessage {
+  string message = 1; // human‐readable error
+}
+
+message WelcomeMessage {
+  int32 paddleId = 1;
+}
+
+message GameStartMessage {}
+
+message GameEndMessage {
+  repeated int32 score = 1;
+}
+
+// Envelope for *all* server→client messages
+message ServerMessage {
+  oneof payload {
+    ErrorMessage       error   = 1;
+    WelcomeMessage     welcome = 2;
+    GameStartMessage   start   = 3;
+    shared.MatchState  state   = 4;
+    GameEndMessage     end     = 5;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// NATS messages for game lifecycle
+// -----------------------------------------------------------------------------
+message MatchSetup {
+  repeated string players = 1; // player UUIDs
+}
+
+message MatchInput {
+  int32  paddleId = 1;
+  int32  move     = 2;
+}
+
+message MatchQuit {
+  string uuid = 1;
+}
+
+message MatchStart {
+  string uuid = 1;
+}
+
+message MatchEnd {
+  int32 winner = 1;
+}
