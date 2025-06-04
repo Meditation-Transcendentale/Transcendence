@@ -1,0 +1,11 @@
+// nats.publish.gameInvite.json
+// notification.${uuid}.gameInvite
+{
+    "senderId":{
+        "format": "uuid",
+        "type": "string"
+    },
+    "lobbyId":{
+        "type": "string"
+    }
+}

@@ -1013,7 +1013,8 @@
                                                 "type": "object",
                                                 "properties": {
                                                     "id": { "type": "integer", "example": "67890" },
-                                                    "friend_username": { "type": "string", "example": "User1233" }
+                                                    "friend_username": { "type": "string", "example": "User1233" },
+													"friend_uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" }
                                                 }
                                             }
                                         }
