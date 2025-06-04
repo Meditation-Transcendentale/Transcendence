@@ -136,7 +136,6 @@ export class Pong {
 					return;
 				}
 
-				// Decode using the helper instead of UI.game.ServerMessage.decode
 				let serverMsg: userinterface.ServerMessage;
 				try {
 					const buf = new Uint8Array(event.data);
