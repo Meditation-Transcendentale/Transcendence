@@ -11,7 +11,7 @@ const handleSubmit = function(e: Event) {
 	console.log(e.type);
 }
 
-export class App {
+class app3d {
 	private canvas: HTMLCanvasElement;
 
 	private engine: Engine;
@@ -54,4 +54,18 @@ export class App {
 		this.environment.dispose();
 		this.engine.dispose();
 	}
+
+	public loadVue(vue: string): void {
+		this.environment.loadVue(vue);
+	}
+
+	public unloadVue(vue: string): void {
+		this.environment.unloadVue(vue);
+	}
+
+	public setVue(vue: string) {
+		this.environment.setVue(vue);
+	}
 }
+
+export const App3D = new app3d();

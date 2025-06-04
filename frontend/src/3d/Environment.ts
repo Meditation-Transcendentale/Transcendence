@@ -15,6 +15,7 @@ import {
 } from "@babylonjs/core";
 import { CubeCluster } from "./CubeCluster";
 import { Gears } from "./Gears";
+import { updateVues } from "../Vue";
 
 
 export class Environment {
@@ -123,7 +124,8 @@ export class Environment {
 	}
 
 	public render() {
-		this.updateCss(this.frame % 64);
+		updateVues();
+		//this.updateCss(this.frame % 64);
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
@@ -148,9 +150,22 @@ export class Environment {
 
 	}
 
+	public loadVue(vue: string): void {
+		this.gears.loadVue(vue);
+	}
+
+	public unloadVue(vue: string): void {
+		this.gears.unloadVue(vue);
+	}
+
+	public setVue(vue: string): void {
+		this.gears.setVue(vue);
+	}
+
 	public dispose() {
 		//this.playCluster.dispose();
 		//this.homeCluster.dispose();
+		this.gears.dispose();
 		this.glow.dispose();
 		this.camera.dispose();
 		this.scene.dispose();

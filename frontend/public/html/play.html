@@ -1,30 +1,42 @@
-<div id="play" class="instant">
-	<div id="play-create" class="instant">
-		<label>Create</label><br/>
-		<select id="play-mod">
-			<option id="pong-mod" value="pong">Pong</option>
-			<option id="br-mod" value="br">BR</option>
-			<option id="io-mod" value="io">IO</option>
-		</select>
-		<select id="play-map">
-			<option id="default-map" value="default">Default Map</option>
-		</select>
-		<select id="play-submod" >
-			<option id="local-mod" value="local">Local</option>
-			<option id="ia-mod" value="ia">IA</option>
-			<option id="online-mod" value="online">Online</option>
-		</select><br/>
-		<input type="button" id="create-btn" value="Create Lobby"></input>
-	</div><br/>
-
-	<div id="play-join" class="instant">
-		<label>Join</label><br/>
-		<input type="text" id="join-id" placeholder="lobby id"/>
-		<input type="button" id="join-btn" value="Join"/>
+<div id="play" class="sub-container">
+	<link rel="stylesheet" type="text/css" href="/play.css">
+	<div id="play-create">
+		<span id="create-label">
+			  CREATE
+		</span>
+		<div id="create-mod">
+			<label>MOD</label>
+			<input id="pong-mod" type="button" value="PONG"></input>
+			<input id="br-mod" type="button" value="BR"></input>
+			<!--<input id="io-mod" type="button" value="io">IO</input>-->
+		</div>
+		<div id="create-map">
+			<label>MAPS</label>
+			<input id="default-map" type="button" value="default" ></input>
+			<input id="terminator-map" type="button" value="terminator"></input>
+		</div>
+		<div id="create-submod">
+			<label>P</label>
+			<label>O</label>
+			<label>N</label>
+			<label>G</label>
+			<label>\ </label>
+			<label>M</label>
+			<label>O</label>
+			<label>D</label>
+						<input id="local-submod" type="button" value="local" ></input>
+			<input id="ia-submod" type="button" value="ia" ></input>
+			<input id="online-submod" type="button" value="online" ></input>
+		</div>
+		<input type="button" id="create-btn" type="button" value="create"></input>
 	</div>
-
-	<input id="play-refresh" type="button" value="Refresh">
-	<div id="play-list">
+	<div id="play-join">
+		<span id="join-label">JOIN</span>
+		<div id="join-input">
+			<input type="text" id="join-id" placeholder="lobby id"/>
+			<input type="button" id="join-btn" value="join"></input>
+		</div>
+		<div id="join-list">
+		</div>
 	</div>
-
 </div>

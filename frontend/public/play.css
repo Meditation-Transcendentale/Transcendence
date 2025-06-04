@@ -1,0 +1,225 @@
+#play-create {
+	width: 100%;
+	height: 100%;
+	/*background-color: blue;*/
+}
+
+#create-label {
+	display: block;
+	position: absolute;
+	text-align: center;
+	top: 50%;
+	left: 0%;
+	width: 100%;
+	height: 50px;
+	color: whitesmoke;
+	font-size: 250px;
+	font-family: radio;
+	font-weight: bold;
+	line-height: 20px;
+	transform: rotate(-90deg);
+	background-color: transparent;
+	/*mix-blend-mode: difference;*/
+	/*background: radial-gradient(circle at 18.7% 37.8%, rgb(250, 250, 250) 0%, rgb(225, 234, 238) 90%);*/
+
+
+}
+
+#create-mod {
+	position: absolute;
+	top: 10%;
+	left: 30%;
+	color: white;
+	z-index: 1;
+}
+
+#create-mod>label {
+	font-size: 100px;
+	color: white;
+	font-family: sensible-senseless;
+	background-color: black;
+	padding-top: 30px;
+	padding-left: 100px;
+	padding-right: 100px;
+	border: 2px white solid;
+	/*mix-blend-mode: difference;*/
+	/*background: radial-gradient(circle at 18.7% 37.8%, rgb(250, 250, 250) 0%, rgb(225, 234, 238) 90%);*/
+
+}
+
+#create-mod>input {
+	position: absolute;
+	background-color: white;
+	font-family: owlcave;
+	color: black;
+	font-size: 50px;
+	border: none;
+	min-width: 30%;
+	border: 1px white solid;
+	transition: transform 0.2s,
+		left 0.2s,
+		color 0.1s,
+		background-color 0.3s;
+}
+
+#create-mod>input[ok] {
+	left: 0%;
+	color: white;
+	background-color: black;
+}
+
+#create-mod>input:hover {
+	transform: translateX(-5%);
+}
+
+#create-mod>input[ok]:hover {
+	transform: translateX(+5%);
+}
+
+#pong-mod {
+	top: 110px;
+	left: 70%;
+}
+
+#br-mod {
+	top: 166px;
+	left: 70%;
+}
+
+
+#create-map {
+	position: absolute;
+	left: 5%;
+	top: 30%;
+}
+
+#create-map>label {
+	font-size: 100px;
+	color: white;
+	font-family: sensible-senseless;
+	background-color: black;
+	padding-top: 30px;
+	padding-left: 100px;
+	padding-right: 100px;
+	border: 2px white solid;
+}
+
+#create-map>input {
+	position: absolute;
+	background-color: white;
+	font-family: owlcave;
+	color: black;
+	font-size: 50px;
+	border: none;
+	min-width: 30%;
+	border: 1px white solid;
+	transition: transform 0.2s,
+		left 0.2s,
+		color 0.1s,
+		background-color 0.3s;
+}
+
+#create-map>input:hover {
+	transform: scale(1.1);
+}
+
+#create-map>input[ok] {
+	color: white;
+	background-color: black;
+	transform: scale(1.1);
+}
+
+#create-map>input[ok]:hover {
+	transform: scale(0.99);
+}
+
+#default-map {
+	top: 110px;
+	left: 10%;
+}
+
+#terminator-map {
+	top: 170px;
+	left: 5%;
+	background-color: grey !important;
+}
+
+
+
+#create-submod {
+	position: absolute;
+	top: 20%;
+	right: 5%;
+	color: white;
+	z-index: 1;
+}
+
+#create-submod>label {
+	display: block;
+	position: relative;
+	font-size: 60px;
+	color: white;
+	z-index: 2;
+	font-family: sensible-senseless;
+	background-color: black;
+	padding-top: 30px;
+	width: 60px;
+	padding-left: 20px;
+	padding-right: 10px;
+	border: 2px white solid;
+	/*mix-blend-mode: difference;*/
+	/*background: radial-gradient(circle at 18.7% 37.8%, rgb(250, 250, 250) 0%, rgb(225, 234, 238) 90%);*/
+
+}
+
+#create-submod>input {
+	position: absolute;
+	background-color: white;
+	font-family: owlcave;
+	color: black;
+	text-align: left;
+	font-size: 50px;
+	border: none;
+	min-width: 150%;
+	border: 1px white solid;
+	left: -140%;
+	z-index: 0;
+	transition: transform 0.2s,
+		left 0.2s,
+		color 0.1s,
+		background-color 0.3s;
+}
+
+#create-submod[off]>input {
+	pointer-events: none;
+	color: black !important;
+	background-color: grey !important;
+
+}
+
+#create-submod>input:hover {
+	transform: translateX(10%);
+}
+
+#create-submod>input[ok] {
+	transform: translateX(50%);
+	color: white;
+	background-color: black;
+}
+
+/*#create-submod>input[on] {*/
+/*	color: black !important;*/
+/*	background-color: grey !important;*/
+/*}*/
+
+#local-submod {
+	top: 80%;
+}
+
+#ia-submod {
+	top: 73%;
+}
+
+#online-submod {
+	top: 66%;
+}

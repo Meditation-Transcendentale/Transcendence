@@ -21,11 +21,14 @@ class RouterC {
 
 	private routes: Map<string, routePage>;
 
+	private parser: DOMParser;
+
 	constructor() {
 		this.initRoute = null;
 		this.location = `http://${window.location.hostname}:8080`;
 		this.oldURL = "";
 		this.currentPage = null;
+		this.parser = new DOMParser();
 
 		this.routes = new Map<string, routePage>;
 
@@ -67,7 +70,7 @@ class RouterC {
 		this.routes.set("/play", {
 			html: "/play",
 			ts: "./Play",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/friendlist", {
 			html: "/friendlist",
@@ -189,8 +192,7 @@ class RouterC {
 		const text = await response.text();
 		const div = document.createElement("div");
 		div.innerHTML = text;
-
-		return div;
+		return div.firstChild as HTMLDivElement;
 	}
 
 	private async getTS(path: string): Promise<{ default: any }> {

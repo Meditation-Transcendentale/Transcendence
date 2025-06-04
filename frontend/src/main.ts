@@ -1,4 +1,4 @@
-import { App } from "./3d/App";
+import { App3D } from "./3d/App";
 import Router from "./spa/Router";
 
 
@@ -11,13 +11,24 @@ import Router from "./spa/Router";
 //
 
 async function init() {
-	const app = new App();
-	app.init()
-		.then(() => { app.run() })
+	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
+
+
+	App3D.init()
+		.then(() => {
+			Router.nav(window.location.href.substring(window.location.origin.length), false, false);
+			App3D.run()
+		})
 
 	window.onbeforeunload = () => {
-		app.dispose();
+		App3D.dispose();
 	}
+
+	window.addEventListener('keydown', (e) => {
+		if (e.key == 'Escape') {
+			Router.nav('/home', false, true)
+		}
+	})
 }
 window.addEventListener("DOMContentLoaded", () => { init() })
 

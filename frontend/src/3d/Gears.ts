@@ -1,4 +1,5 @@
-import { AbstractMesh, CascadedShadowGenerator, Color3, DirectionalLight, LoadAssetContainerAsync, Matrix, Mesh, PBRMaterial, Quaternion, Scene, ShadowGenerator, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, BoundingBox, Camera, CascadedShadowGenerator, Color3, DirectionalLight, LoadAssetContainerAsync, Matrix, Mesh, PBRMaterial, Quaternion, Scene, ShadowGenerator, Vector3 } from "@babylonjs/core";
+import { homeVue, playVue } from "../Vue";
 
 
 interface cssElem {
@@ -50,9 +51,7 @@ export class Gears {
 
 	private ontop: boolean = false;
 
-
-
-
+	private outerBounding!: Vector3[];
 
 	constructor(scene: Scene) {
 		this.meshes = [];
@@ -85,38 +84,32 @@ export class Gears {
 		this.outerRotationNoY = [];
 
 
-		this.play = this.initCssElem('play');
-		this.playCreate = this.initCssElem('play-create', 'menu');
-		this.playJoin = this.initCssElem('play-join', 'menu');
-		this.playLobby = this.initCssElem('play-lobby', 'menu');
-
-		this.playJoin.div.remove();
-		this.playCreate.div.remove();
-		this.playLobby.div.remove();
-
-		this.play.div.addEventListener('click', () => {
-			this.play.div.remove();
-			this.play.hover = false;
-			this.scene.setActiveCameraByName('menu');
-			document.body.appendChild(this.playJoin.div);
-			document.body.appendChild(this.playCreate.div);
-			document.body.appendChild(this.playLobby.div);
-		})
-
-		window.addEventListener('keydown', (e) => {
-			if (e.key == 'Escape') {
-				this.playJoin.div.remove();
-				this.playCreate.div.remove();
-				this.playLobby.div.remove();
-
-				this.playJoin.hover = false;
-				this.playCreate.hover = false;
-				this.playLobby.hover = false;
-
-				this.scene.setActiveCameraByName('home');
-				document.body.appendChild(this.play.div);
-			}
-		})
+		//this.play = this.initCssElem('play');
+		//this.playCreate = this.initCssElem('play-create', 'menu');
+		//this.playJoin = this.initCssElem('play-join', 'menu');
+		//this.playLobby = this.initCssElem('play-lobby', 'menu');
+		//
+		//this.playJoin.div.remove();
+		//this.playCreate.div.remove();
+		//this.playLobby.div.remove();
+		//
+		//this.play.div.addEventListener('click', () => {
+		//})
+		//
+		//window.addEventListener('keydown', (e) => {
+		//	if (e.key == 'Escape') {
+		//		this.playJoin.div.remove();
+		//		this.playCreate.div.remove();
+		//		this.playLobby.div.remove();
+		//
+		//		this.playJoin.hover = false;
+		//		this.playCreate.hover = false;
+		//		this.playLobby.hover = false;
+		//
+		//		this.scene.setActiveCameraByName('home');
+		//		document.body.appendChild(this.play.div);
+		//	}
+		//})
 	}
 
 	private initCssElem(name: string, headerClass: string = ''): cssElem {
@@ -188,19 +181,26 @@ export class Gears {
 		}
 
 
-		this.initBounding();
+		//this.initBounding();
+
+		this.outerBounding = [];
+		const b = this.outer.getBoundingInfo().boundingBox.vectors;
+		for (let i = 0; i < b.length; i++) {
+			this.outerBounding.push(b[i].clone());
+		}
+		console.log(this.outerBounding);
 		this.initInstance()
 		loaded.addAllToScene();
 		this.scene.setActiveCameraByName('home');
 	}
 
 	private initBounding() {
-		this.outer.getBoundingInfo().boundingBox.vectors.forEach((v: any) => {
-			this.play.bounding.push(new Vector3(v._x, v._y, v._z));
-			this.playCreate.bounding.push(new Vector3(v._x, v._y, v._z));
-			this.playJoin.bounding.push(new Vector3(v._x, v._y, v._z));
-			this.playLobby.bounding.push(new Vector3(v._x, v._y, v._z));
-		});
+		//this.outer.getBoundingInfo().boundingBox.vectors.forEach((v: any) => {
+		//	this.play.bounding.push(new Vector3(v._x, v._y, v._z));
+		//	this.playCreate.bounding.push(new Vector3(v._x, v._y, v._z));
+		//	this.playJoin.bounding.push(new Vector3(v._x, v._y, v._z));
+		//	this.playLobby.bounding.push(new Vector3(v._x, v._y, v._z));
+		//});
 
 	}
 
@@ -298,15 +298,16 @@ export class Gears {
 		//this.inner2.rotateAround(this.p.add(new Vector3(1.1, 0, 1.1)), Vector3.Up(), 0.01)
 		this.inner3.thinInstanceSetBuffer('matrix', this.inner3Buffer);
 		//this.inner3.rotateAround(this.p.add(new Vector3(1.1, 0, 1.1)), Vector3.Up(), 0.01)
+		//console.log(this.outerMatrix[8]);
 
 
 	}
 
 	public updateCSS(u: boolean) {
-		this.updateCssElem(this.play, 8);
-		this.updateCssElem(this.playCreate, 17);
-		this.updateCssElem(this.playJoin, 14);
-		this.updateCssElem(this.playLobby, 10);
+		//this.updateCssElem(this.play, 8);
+		//this.updateCssElem(this.playCreate, 17);
+		//this.updateCssElem(this.playJoin, 14);
+		//this.updateCssElem(this.playLobby, 10);
 	}
 
 	private updateCssElem(e: cssElem, i: number) {
@@ -382,6 +383,60 @@ export class Gears {
 		el.div.addEventListener('mouseleave', () => { hover = false; el.hover = false; }, { once: true });
 		fn();
 
+	}
+
+	public loadVue(vue: string) {
+		switch (vue) {
+			case 'play': {
+				playVue.enable();
+				break;
+			}
+			case 'home': {
+				homeVue.enable();
+				break;
+			}
+		}
+	}
+
+	public unloadVue(vue: string) {
+		switch (vue) {
+			case 'play': {
+				playVue.disable();
+				break;
+			}
+			case 'home': {
+				homeVue.disable();
+				break;
+			}
+		}
+
+	}
+
+	public setVue(vue: string) {
+		switch (vue) {
+			case 'play': {
+				playVue.init(this.scene.getCameraByName('menu') as Camera);
+				playVue.addWindow('create', this.outer, this.outerBounding, this.outerMatrix[17]);
+				playVue.addWindow('join', this.outer, this.outerBounding, this.outerMatrix[14]);
+				//playVue.addWindow('lobby', this.outer, this.outerBounding, this.outerMatrix[10]);
+				break;
+			}
+			case 'home': {
+				homeVue.init(this.scene.getCameraByName('home') as Camera);
+				homeVue.addWindow('play', this.outer, this.outerBounding, this.outerMatrix[8]);
+				break;
+			}
+		}
+	}
+
+	public dispose() {
+		for (let i = 0; i < this.meshes.length; i++) {
+			this.meshes[i].dispose();
+		}
+		this.sun.dispose();
+		this.sunBack.dispose();
+		this.shadow.dispose();
+		this.mat.dispose();
 	}
 
 }

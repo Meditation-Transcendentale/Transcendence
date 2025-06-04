@@ -1,3 +1,5 @@
+import { App3D } from "../3d/App";
+import { homeVue } from "../Vue";
 import { meRequest, postRequest } from "./requests";
 import Router from "./Router";
 import { User } from "./User";
@@ -27,6 +29,11 @@ class Home {
 			quit: div.querySelector("#home-quit") as HTMLInputElement
 		};
 
+		App3D.setVue('home');
+		homeVue.windowAddEvent('play', 'click', () => {
+			Router.nav('/play');
+		})
+
 		this.ref.info.addEventListener("click", () => {
 			Router.nav("/info");
 		})
@@ -51,6 +58,7 @@ class Home {
 	}
 
 	public load(params: URLSearchParams) {
+		App3D.loadVue('home');
 		meRequest()
 			.catch(() => window.location.reload());
 		(document.querySelector("#main-container") as HTMLDivElement).innerHTML = "";
@@ -58,6 +66,7 @@ class Home {
 	}
 
 	public async unload() {
+		App3D.unloadVue('home');
 		this.div.remove();
 	}
 
