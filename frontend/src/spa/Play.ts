@@ -19,7 +19,7 @@ export default class Play {
 	private div: HTMLDivElement;
 	private ref: playHtmlReference;
 
-	private gameIP = "10.19.219.221";
+	private gameIP = window.location.hostname;
 	// private gameIP = "localhost";
 	constructor(div: HTMLDivElement) {
 		this.div = div;

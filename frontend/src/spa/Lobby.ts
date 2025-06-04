@@ -25,7 +25,7 @@ export default class Lobby {
 	private mode: string | null;
 	private state: lobbyState;
 
-	private gameIP = "10.19.219.221";
+	private gameIP = window.location.hostname;
 	// private gameIP = "localhost";
 
 	constructor(div: HTMLDivElement) {

@@ -7,23 +7,27 @@ import { TransformComponent } from "../components/TransformComponent.js";
 import { InputManager } from "../input/InputManager.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
 import { localPaddleId } from "../Pong.js";
+import { userinterface } from "../utils/proto/message.js";
+import { encodeClientMessage } from "../utils/proto/helper.js";
 
 export class InputSystem extends System {
 	private inputManager: InputManager;
 	private wsManager: WebSocketManager;
 	private localPaddleId: number | null = null;
 	private readonly MAX_OFFSET: number = 8.4;
-	private move: boolean;
+	private move: number;
+	private lastSentMove: number = 0;
 
 	constructor(inputManager: InputManager, wsManager: WebSocketManager) {
 		super();
 		this.inputManager = inputManager;
 		this.wsManager = wsManager;
 		this.localPaddleId = localPaddleId;
-		this.move = false;
+		this.move = 0;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		const dt = deltaTime / 1000;
 		for (const entity of entities) {
 			if (
 				!entity.hasComponent(InputComponent) ||
@@ -43,33 +47,39 @@ export class InputSystem extends System {
 			const leftPressed = this.inputManager.isKeyPressed("KeyA");
 			const rightPressed = this.inputManager.isKeyPressed("KeyD");
 
-			this.move = leftPressed || rightPressed;
+			this.move = 0;
+			if (leftPressed && !rightPressed) this.move = 1;
+			else if (rightPressed && !leftPressed) this.move = -1;
 
-			if (this.move) {
-				offsetChange = leftPressed ? 0.4 : -0.4;
-			}
-			paddle.offset = Scalar.Clamp(paddle.offset, -this.MAX_OFFSET, this.MAX_OFFSET);
+			offsetChange = this.move * 10 * dt;
+			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -this.MAX_OFFSET, this.MAX_OFFSET);
 
-			if (this.move) {
-				paddle.offset += offsetChange;
-
-				const rotationMatrix = Matrix.RotationYawPitchRoll(
-					transform.rotation.y,
-					transform.rotation.x,
-					transform.rotation.z
-				);
-				const localRight = Vector3.TransformCoordinates(new Vector3(1, 0, 0), rotationMatrix);
-				transform.position.copyFrom(transform.basePosition.add(localRight.scale(paddle.offset)));
-
-				this.wsManager.send({
-					type: "paddleUpdate",
-					data: {
+			const rotationMatrix = Matrix.RotationYawPitchRoll(
+				transform.rotation.y,
+				transform.rotation.x,
+				transform.rotation.z
+			);
+			const localRight = Vector3.TransformCoordinates(
+				Vector3.Right(),
+				rotationMatrix
+			);
+			const displacement = localRight.clone().scale(paddle.offset);
+			transform.position.copyFrom(
+				transform.basePosition.add(displacement)
+			);
+			if (this.move != this.lastSentMove) {
+				const payload: userinterface.IClientMessage = {
+					paddleUpdate: {
 						paddleId: localPaddleId,
 						move: this.move,
-						offset: paddle.offset,
 					}
-				});
-				console.log("playerId =" + localPaddleId);
+				};
+
+				const buffer = encodeClientMessage(payload);
+				this.wsManager.socket.send(buffer);
+				this.lastSentMove = this.move;
+
+				// console.log("Sent move to server: move =", this.move, "offset = ", paddle.offset);
 			}
 		}
 	}

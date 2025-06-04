@@ -12,7 +12,7 @@ import { global } from "../Pong";
 import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
-export let localPaddleId: number | 0;
+import { localPaddleId } from "../Pong";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -65,7 +65,6 @@ export class NetworkingSystem extends System {
 
 				// 2. Paddle updates
 				paddles.forEach(p => {
-					// skip local paddle
 					// if (p.id === localPaddleId) return;
 
 					const e = entities.find(e =>
@@ -75,7 +74,8 @@ export class NetworkingSystem extends System {
 					if (!e) return;
 
 					const paddleComp = e.getComponent(PaddleComponent)!;
-					paddleComp.offset += p.move * 0.4;  // update direction
+					// console.log(paddleComp.id);
+					paddleComp.offset = p.offset; // update direction
 
 					const tf = e.getComponent(TransformComponent)!;
 					const rot = tf.rotation;
@@ -88,7 +88,7 @@ export class NetworkingSystem extends System {
 
 				// 3. Score update
 				if (score) {
-					console.log(score);
+					//console.log(score);
 					const myScore = score[localPaddleId] ?? 0;
 					const otherId = score
 						.map((_, i) => i)
