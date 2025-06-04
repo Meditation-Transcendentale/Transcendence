@@ -125,19 +125,12 @@ export class Game {
    * @param {number} playerId
    * @param {{offset: number, x: number, y: number}} input
    */
-	updatePaddleInput(playerId, input) {
+	updatePaddleInput(playerId, move) {
 		const paddleEntity = this.paddleEntities[playerId];
 		if (!paddleEntity) return;
 
 		const paddle = paddleEntity.getComponent('paddle');
-		const position = paddleEntity.getComponent('position');
-		if (paddle.offset !== input.offset || position.x !== input.x || position.y !== input.y) {
-			paddle.offset = input.offset;
-			paddle.offset = Math.max(-paddle.maxOffset, Math.min(paddle.offset, paddle.maxOffset));
-			position.x = input.x;
-			position.y = input.y;
-			paddle.dirty = true;
-		}
+		paddle.move = move;
 	}
 
 	setWallOff(playerId) {
@@ -235,7 +228,7 @@ export class Game {
 				const paddle = paddleEntity.getComponent('paddle');
 				// if (!paddle.dirty) return null;
 				// paddle.dirty = false;
-				return { id: paddle.id, move: paddle.move };
+				return { id: paddle.id, move: paddle.move, offset: paddle.offset };
 			});
 
 		return { balls, paddles };
@@ -258,7 +251,6 @@ export class Game {
 		pos.y = 0;
 
 		const vel = ball.getComponent('velocity');
-		// Pick a random angle between -45° and 45° for one side, or 135° to 225° for the other
 		const speed = 10; // adjust as desired
 		const angleRange = Math.PI / 4; // 45°
 		const baseAngle = Math.random() < 0.5
@@ -266,7 +258,8 @@ export class Game {
 			: Math.PI + (Math.random() * angleRange - angleRange / 2); // 157.5° … 202.5°
 
 		vel.x = Math.cos(baseAngle) * speed;
-		vel.y = Math.sin(baseAngle) * speed;
+		vel.y = 0;
+		// vel.y = Math.sin(baseAngle) * speed;
 	}
 	launchBall() {
 		const ball = this.entityManager.getEntitiesWithComponents(['ball'])[0];

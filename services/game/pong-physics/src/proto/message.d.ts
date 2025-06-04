@@ -133,6 +133,9 @@ export namespace shared {
         /** Paddle move */
         move?: (number|null);
 
+        /** Paddle offset */
+        offset?: (number|null);
+
         /** Paddle dead */
         dead?: (boolean|null);
     }
@@ -151,6 +154,9 @@ export namespace shared {
 
         /** Paddle move. */
         public move: number;
+
+        /** Paddle offset. */
+        public offset: number;
 
         /** Paddle dead. */
         public dead: boolean;

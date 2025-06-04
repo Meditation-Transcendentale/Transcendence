@@ -322,6 +322,7 @@ export const shared = $root.shared = (() => {
          * @interface IPaddle
          * @property {number|null} [id] Paddle id
          * @property {number|null} [move] Paddle move
+         * @property {number|null} [offset] Paddle offset
          * @property {boolean|null} [dead] Paddle dead
          */
 
@@ -355,6 +356,14 @@ export const shared = $root.shared = (() => {
          * @instance
          */
         Paddle.prototype.move = 0;
+
+        /**
+         * Paddle offset.
+         * @member {number} offset
+         * @memberof shared.Paddle
+         * @instance
+         */
+        Paddle.prototype.offset = 0;
 
         /**
          * Paddle dead.
@@ -392,8 +401,10 @@ export const shared = $root.shared = (() => {
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
             if (message.move != null && Object.hasOwnProperty.call(message, "move"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.move);
+            if (message.offset != null && Object.hasOwnProperty.call(message, "offset"))
+                writer.uint32(/* id 3, wireType 5 =*/29).float(message.offset);
             if (message.dead != null && Object.hasOwnProperty.call(message, "dead"))
-                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.dead);
+                writer.uint32(/* id 4, wireType 0 =*/32).bool(message.dead);
             return writer;
         };
 
@@ -439,6 +450,10 @@ export const shared = $root.shared = (() => {
                         break;
                     }
                 case 3: {
+                        message.offset = reader.float();
+                        break;
+                    }
+                case 4: {
                         message.dead = reader.bool();
                         break;
                     }
@@ -483,6 +498,9 @@ export const shared = $root.shared = (() => {
             if (message.move != null && message.hasOwnProperty("move"))
                 if (!$util.isInteger(message.move))
                     return "move: integer expected";
+            if (message.offset != null && message.hasOwnProperty("offset"))
+                if (typeof message.offset !== "number")
+                    return "offset: number expected";
             if (message.dead != null && message.hasOwnProperty("dead"))
                 if (typeof message.dead !== "boolean")
                     return "dead: boolean expected";
@@ -505,6 +523,8 @@ export const shared = $root.shared = (() => {
                 message.id = object.id | 0;
             if (object.move != null)
                 message.move = object.move | 0;
+            if (object.offset != null)
+                message.offset = Number(object.offset);
             if (object.dead != null)
                 message.dead = Boolean(object.dead);
             return message;
@@ -526,12 +546,15 @@ export const shared = $root.shared = (() => {
             if (options.defaults) {
                 object.id = 0;
                 object.move = 0;
+                object.offset = 0;
                 object.dead = false;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
             if (message.move != null && message.hasOwnProperty("move"))
                 object.move = message.move;
+            if (message.offset != null && message.hasOwnProperty("offset"))
+                object.offset = options.json && !isFinite(message.offset) ? String(message.offset) : message.offset;
             if (message.dead != null && message.hasOwnProperty("dead"))
                 object.dead = message.dead;
             return object;

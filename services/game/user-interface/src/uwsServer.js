@@ -35,7 +35,9 @@ export function startWsServer({ port, handlers }) {
 			else if (msg.quit) handlers.quit(ws);
 			else if (msg.ready) handlers.ready(ws);
 			else if (msg.spectate) handlers.spectate(ws);
-			else console.warn('Unknown ClientMessage payload');
+			else {
+				console.warn('Unknown ClientMessage payload');
+			}
 		}
 	})
 		.listen(port, token => {

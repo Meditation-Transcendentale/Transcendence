@@ -79,7 +79,7 @@ export default class UIService {
 				for await (const m of sub) {
 					const [, , gameId] = m.subject.split('.');
 					const { winner } = decodeMatchEnd(m.data);
-					const buf = encodeGameEndMessage({ score: [winner] });
+					const buf = encodeServerMessage({ end: [winner] });
 					for (const sid of this.games.get(gameId) || []) {
 						const s = this.sessions.get(sid);
 						s.ws.send(buf, /* isBinary= */ true);
@@ -92,55 +92,6 @@ export default class UIService {
 			})();
 		}
 	}
-	// async start() {
-	// 	await natsClient.connect(process.env.NATS_URL);
-	//
-	// 	this.uwsApp = startWsServer({
-	// 		port: Number(process.env.SERVER_PORT) || 5004,
-	// 		handlers: {
-	// 			registerGame: this.handleRegisterGame.bind(this),
-	// 			paddleUpdate: this.handlePaddleUpdate.bind(this),
-	// 			quit: this.handleQuit.bind(this),
-	// 			ready: this.handleReady.bind(this),
-	// 			spectate: this.handleSpectate.bind(this),
-	// 		}
-	// 	});
-	//
-	// 	// 1) MatchSetup → record players & mode
-	// 	natsClient.subscribe('games.*.*.match.setup', (data, msg) => {
-	// 		const [, mode, gameId] = msg.subject.split('.');
-	// 		const { players } = decodeMatchSetup(data);
-	// 		this.allowedByGame.set(gameId, { players, mode });
-	// 		this.games.set(gameId, new Set());
-	// 		console.log(`User Interface: New game setup ${gameId}`);
-	// 	});
-	//
-	//
-	// 	// 3) StateUpdate → broadcast StateMessage
-	// 	natsClient.subscribe('games.*.*.match.state', (data, msg) => {
-	// 		const [, , gameId] = msg.subject.split('.');
-	// 		const state = decodeStateMessage(msg.data);
-	// 		const wsPayload = encodeServerMessage({
-	// 			state: { state: state }
-	// 		});
-	// 		console.log(state);
-	// 		this.uwsApp.publish(gameId, wsPayload, /* isBinary= */ true);
-	// 	});
-	//
-	// 	// 4) MatchEnd → broadcast GameEndMessage & cleanup
-	// 	natsClient.subscribe('games.*.*.match.end', (data, msg) => {
-	// 		const { winner } = decodeMatchEnd(data);
-	// 		const [, , gameId] = msg.subject.split('.');
-	// 		const buf = encodeGameEndMessage({ score: [winner] });
-	// 		for (const sid of this.games.get(gameId) || []) {
-	// 			const s = this.sessions.get(sid);
-	// 			s.ws.send(buf, true);
-	// 			s.ws.close();
-	// 		}
-	// 		this.allowedByGame.delete(gameId);
-	// 		this.games.delete(gameId);
-	// 	});
-	// }
 
 	handleRegisterGame(ws) {
 		const { uuid, role, gameId } = ws;

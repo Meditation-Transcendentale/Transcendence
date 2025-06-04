@@ -107,7 +107,7 @@ async function start() {
 			}
 		}
 		let goal = null;
-		if (scorerId)
+		if (goalScored)
 			goal = { scorerId };
 		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal });
 		msg.respond(buffer);
