@@ -111,10 +111,19 @@ export default class LobbyService {
 			})
 
 			try {
-				const replyBuf = await natsClient.request(
-					`games.${lobby.mode}.match.create`,
-					reqBuf, {}
-				)
+				let replyBuf;
+				if (lobby.mode == `tournament`)
+				{
+					replyBuf = await natsClient.request(
+						`games.tournament.create`,
+						reqBuf, {}
+					)
+				} else {
+					replyBuf = await natsClient.request(
+						`games.${lobby.mode}.match.create`,
+						reqBuf, {}
+					)
+				}
 				console.log('raw reply hex:', Buffer.from(replyBuf).toString('hex'));
 				const resp = decodeMatchCreateResponse(replyBuf)
 				console.log('decoded resp:', resp);

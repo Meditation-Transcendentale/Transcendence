@@ -40,6 +40,14 @@ export function createUwsApp(path, tournamentService) {
             } catch (err) {
 
             }
+        },
+
+        message: async (ws, message, isBinary) => {
+            const buf = new Uint8Array(message);
+            const payload = decodeClientMessage(buf);
+            if (payload.ready) {
+                tournamentService
+            }
         }
     })
 }

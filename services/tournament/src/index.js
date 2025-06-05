@@ -6,7 +6,7 @@ import TournamentService from './tournamentService'
 
 async function start() {
     nc = await connect(config.NATS_URL);
-    const tournamentService = new TournamentService();
+    const tournamentService = new TournamentService(nc);
     const app = Fastify({ logger: true });
     await app.register(fastifyCors, { origin: '*' });
     app.decorate('tournamentService', tournamentService);
@@ -15,6 +15,16 @@ async function start() {
         tournamentService.shutdown();
         await natsClient.close();
     });
+
+    const subNewTournament = nc.subscribe('games.tournament.create');
+    (async () => {
+        for await (const msg of subNewTournament) {
+            //const playersList decode msg.data somehow
+            const tournamentId = tournamentService.create(playerslist);
+            //send tournament id to the players uuid
+        }
+    })
+    
     await app.listen({ port: config.PORT, host: '0.0.0.0'});
     app.log.info(`HTTP API listening on ${config.PORT}`);
 

@@ -26,7 +26,7 @@ class MatchNode {
 class Tournament {
     constructor({ id, players }) {
         this.id = id;
-        this.players = new Map (shuffle(players), true); //uuid / bool(up)
+        this.players = new Map (shuffle(players), false); //uuid / bool(ready)
         this.root = this.buildTree(this.players);
     }
 
@@ -63,17 +63,19 @@ class Tournament {
 }
 
 export default class tournamentService {
-    constructor() {
+    constructor(nc) {
         this.tournaments = new Map();
         this.interval = setInterval(() => this.cleanup(),
-        config.HEARTBEAT_INTERVAL
+            config.HEARTBEAT_INTERVAL
         )
+        this.nc = nc;
     }
 
     create(players){
         const id = Date.now().toString();
         const tournament = new Tournament ({ id, players });
         this.tournaments.set(id, tournament);
+        return (id)
     }
 
     cleanup() {
