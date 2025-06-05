@@ -9,13 +9,15 @@ import { createButton } from "./utils";
 interface playHtmlReference {
 	create: HTMLDivElement;
 	join: HTMLDivElement;
-	modPong: HTMLInputElement;
-	modBR: HTMLInputElement;
-	mapDefault: HTMLInputElement;
-	smod: HTMLDivElement;
-	smodLocal: HTMLInputElement;
-	smodOnline: HTMLInputElement;
-	smodAI: HTMLInputElement;
+	//modPong: HTMLInputElement;
+	//modBR: HTMLInputElement;
+	//mapDefault: HTMLInputElement;
+	//smod: HTMLDivElement;
+	//smodLocal: HTMLInputElement;
+	//smodOnline: HTMLInputElement;
+	//smodAI: HTMLInputElement;
+	createBtn: HTMLInputElement;
+	list: HTMLDivElement;
 };
 
 enum playState {
@@ -24,10 +26,83 @@ enum playState {
 	lobby = 2
 }
 
+interface createState {
+	mod: number,
+	map: boolean,
+	submod: boolean
+}
+
+type lobby = {
+	id: string,
+	mod: string,
+	maxPlayers: number,
+	players: string[]
+}
+
+interface listResp {
+	lobbies: lobby[];
+}
+
+const lr: listResp = {
+	lobbies: [
+		{
+			id: "egeggege-wefwefbwejhf-wefhbwf-wefwfe",
+			mod: "local",
+			maxPlayers: 1,
+			players: ["ehehe", "ededede"]
+		},
+		{
+			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
+			mod: "online",
+			maxPlayers: 2,
+			players: ["bob"]
+		},
+		{
+			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
+			mod: 'pongbr',
+			maxPlayers: 100,
+			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
+		},
+		{
+			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
+			mod: 'pongbr',
+			maxPlayers: 100,
+			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
+		},
+		{
+			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
+			mod: 'pongbr',
+			maxPlayers: 100,
+			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
+		},
+		{
+			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
+			mod: 'pongbr',
+			maxPlayers: 100,
+			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
+		},
+		{
+			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
+			mod: 'pongbr',
+			maxPlayers: 100,
+			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
+		},
+
+
+
+
+	]
+};
+
+
 export default class Play {
 	private div: HTMLDivElement;
 	private ref: playHtmlReference;
 	private state: playState;
+
+	private createState: createState;
+
+
 
 	private gameIP = "10.19.220.253";
 	constructor(div: HTMLDivElement) {
@@ -37,65 +112,107 @@ export default class Play {
 		this.ref = {
 			create: div.querySelector('#play-create') as HTMLDivElement,
 			join: div.querySelector("#play-join") as HTMLDivElement,
-			modPong: div.querySelector("#pong-mod") as HTMLInputElement,
-			modBR: div.querySelector("#br-mod") as HTMLInputElement,
-			mapDefault: div.querySelector("#default-map") as HTMLInputElement,
-			smod: div.querySelector("#create-submod") as HTMLDivElement,
-			smodLocal: div.querySelector("#local-submod") as HTMLInputElement,
-			smodAI: div.querySelector("#ia-submod") as HTMLInputElement,
-			smodOnline: div.querySelector("#online-submod") as HTMLInputElement,
+			//modPong: div.querySelector("#pong-mod") as HTMLInputElement,
+			//modBR: div.querySelector("#br-mod") as HTMLInputElement,
+			//mapDefault: div.querySelector("#default-map") as HTMLInputElement,
+			//smod: div.querySelector("#create-submod") as HTMLDivElement,
+			//smodLocal: div.querySelector("#local-submod") as HTMLInputElement,
+			//smodAI: div.querySelector("#ia-submod") as HTMLInputElement,
+			//smodOnline: div.querySelector("#online-submod") as HTMLInputElement,
+			createBtn: div.querySelector("#create-btn") as HTMLInputElement,
+			list: div.querySelector("#join-list") as HTMLDivElement
+		}
 
-
+		this.createState = {
+			mod: 0,
+			map: false,
+			submod: false
 		}
 
 		this.state = playState.create;
 		this.ref.create.remove();
 		this.ref.join.remove();
-		this.ref.smod.toggleAttribute('off');
-		this.ref.smodLocal.toggleAttribute('on');
-		this.ref.smodOnline.toggleAttribute('on');
+		//this.ref.smod.toggleAttribute('off');
+		//this.ref.createBtn.toggleAttribute('off');
 
-
-		this.ref.modPong.addEventListener('click', () => {
-			this.ref.modPong.toggleAttribute('ok');
-			this.ref.modBR.removeAttribute('ok');
-			this.ref.smod.toggleAttribute('off');
-			this.ref.smodAI.toggleAttribute('on');
-			this.ref.smodLocal.toggleAttribute('on');
-			this.ref.smodOnline.toggleAttribute('on');
-		})
-
-		this.ref.modBR.addEventListener('click', () => {
-			this.ref.modBR.toggleAttribute('ok');
-			this.ref.modPong.removeAttribute('ok');
-			this.ref.smod.setAttribute('off', '');
-			this.ref.smodLocal.setAttribute('on', '')
-			this.ref.smodOnline.setAttribute('on', '')
-			this.ref.smodAI.setAttribute('on', '')
-
-		})
-
-		this.ref.mapDefault.addEventListener('click', () => {
-			this.ref.mapDefault.toggleAttribute('ok');
-		})
-
-		this.ref.smodOnline.addEventListener('click', () => {
-			this.ref.smodOnline.toggleAttribute('ok')
-			this.ref.smodLocal.removeAttribute('ok')
-			this.ref.smodAI.removeAttribute('ok')
-		})
-
-		this.ref.smodLocal.addEventListener('click', () => {
-			this.ref.smodLocal.toggleAttribute('ok')
-			this.ref.smodAI.removeAttribute('ok')
-			this.ref.smodOnline.removeAttribute('ok')
-		})
-
-		this.ref.smodAI.addEventListener('click', () => {
-			this.ref.smodAI.toggleAttribute('ok')
-			this.ref.smodLocal.removeAttribute('ok')
-			this.ref.smodOnline.removeAttribute('ok')
-		})
+		//
+		//this.ref.modPong.addEventListener('click', () => {
+		//	this.ref.modPong.toggleAttribute('ok');
+		//	this.ref.modBR.removeAttribute('ok');
+		//	this.ref.smod.toggleAttribute('off');
+		//	this.createState.mod = this.ref.modPong.hasAttribute('ok') ? 1 : 0;
+		//	if (this.createState.mod && this.createState.map && this.createState.submod) {
+		//		this.ref.createBtn.setAttribute('ok', '');
+		//	} else {
+		//		this.ref.createBtn.removeAttribute('ok');
+		//	}
+		//})
+		//
+		//this.ref.modBR.addEventListener('click', () => {
+		//	this.ref.modBR.toggleAttribute('ok');
+		//	this.ref.modPong.removeAttribute('ok');
+		//	this.ref.smod.setAttribute('off', '');
+		//	this.createState.mod = this.ref.modBR.hasAttribute('ok') ? 2 : 0;
+		//	if (this.createState.mod && this.createState.map) {
+		//		this.ref.createBtn.setAttribute('ok', '');
+		//	} else {
+		//		this.ref.createBtn.removeAttribute('ok');
+		//	}
+		//
+		//})
+		//
+		//this.ref.mapDefault.addEventListener('click', () => {
+		//	this.ref.mapDefault.toggleAttribute('ok');
+		//	this.createState.map = this.ref.mapDefault.hasAttribute('ok');
+		//
+		//	if ((this.createState.mod == 2 || this.createState.mod == 1 && this.createState.submod) && this.createState.map) {
+		//		this.ref.createBtn.setAttribute('ok', '');
+		//	} else {
+		//		this.ref.createBtn.removeAttribute('ok');
+		//	}
+		//
+		//})
+		//
+		//this.ref.smodOnline.addEventListener('click', () => {
+		//	this.ref.smodOnline.toggleAttribute('ok')
+		//	this.ref.smodLocal.removeAttribute('ok')
+		//	this.ref.smodAI.removeAttribute('ok')
+		//	this.createState.submod = this.ref.smodOnline.hasAttribute('ok');
+		//	if (this.createState.mod && this.createState.map && this.createState.submod) {
+		//		this.ref.createBtn.setAttribute('ok', '');
+		//	} else {
+		//		this.ref.createBtn.removeAttribute('ok');
+		//	}
+		//
+		//
+		//})
+		//
+		//this.ref.smodLocal.addEventListener('click', () => {
+		//	this.ref.smodLocal.toggleAttribute('ok')
+		//	this.ref.smodAI.removeAttribute('ok')
+		//	this.ref.smodOnline.removeAttribute('ok')
+		//	this.createState.submod = this.ref.smodLocal.hasAttribute('ok');
+		//	if (this.createState.mod && this.createState.map && this.createState.submod) {
+		//		this.ref.createBtn.setAttribute('ok', '');
+		//	} else {
+		//		this.ref.createBtn.removeAttribute('ok');
+		//	}
+		//
+		//
+		//})
+		//
+		//this.ref.smodAI.addEventListener('click', () => {
+		//	this.ref.smodAI.toggleAttribute('ok')
+		//	this.ref.smodLocal.removeAttribute('ok')
+		//	this.ref.smodOnline.removeAttribute('ok')
+		//	this.createState.submod = this.ref.smodAI.hasAttribute('ok');
+		//	if (this.createState.mod && this.createState.map && this.createState.submod) {
+		//		this.ref.createBtn.setAttribute('ok', '');
+		//	} else {
+		//		this.ref.createBtn.removeAttribute('ok');
+		//	}
+		//
+		//})
 
 
 
@@ -175,6 +292,7 @@ export default class Play {
 			}
 
 		}
+		this.parseListResp(lr);
 		if (User.status?.lobby) {
 			Router.nav(`/lobby?id=${User.status.lobby}`, false, false);
 		}
@@ -260,6 +378,28 @@ export default class Play {
 		if (resp?.status) {
 			resp.json().then((json) => console.log(json));
 		}
+	}
+
+	private parseListResp(resp: listResp) {
+		this.ref.list.innerHTML = '';
+		for (let i = 0; i < resp.lobbies.length; i++) {
+			this.createLobbyList(resp.lobbies[i])
+		}
+	}
+
+	private createLobbyList(l: lobby) {
+		const div = document.createElement('div');
+		const id = document.createElement('span');
+		const mod = document.createElement('span');
+		const player = document.createElement('span');
+		id.innerText = l.id;
+		mod.innerText = l.mod;
+		player.innerText = `${l.players.length}/${l.maxPlayers}`;
+		div.appendChild(id);
+		div.appendChild(mod);
+		div.appendChild(player);
+
+		this.ref.list.appendChild(div);
 	}
 
 

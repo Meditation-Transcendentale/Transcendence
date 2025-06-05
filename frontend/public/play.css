@@ -1,225 +1,434 @@
-#play-create {
-	width: 100%;
-	height: 100%;
-	/*background-color: blue;*/
-}
-
-#create-label {
-	display: block;
-	position: absolute;
-	text-align: center;
-	top: 50%;
-	left: 0%;
-	width: 100%;
-	height: 50px;
-	color: whitesmoke;
-	font-size: 250px;
-	font-family: radio;
-	font-weight: bold;
-	line-height: 20px;
-	transform: rotate(-90deg);
-	background-color: transparent;
-	/*mix-blend-mode: difference;*/
-	/*background: radial-gradient(circle at 18.7% 37.8%, rgb(250, 250, 250) 0%, rgb(225, 234, 238) 90%);*/
-
-
-}
-
-#create-mod {
-	position: absolute;
-	top: 10%;
-	left: 30%;
-	color: white;
-	z-index: 1;
-}
-
-#create-mod>label {
-	font-size: 100px;
-	color: white;
-	font-family: sensible-senseless;
-	background-color: black;
-	padding-top: 30px;
-	padding-left: 100px;
-	padding-right: 100px;
-	border: 2px white solid;
-	/*mix-blend-mode: difference;*/
-	/*background: radial-gradient(circle at 18.7% 37.8%, rgb(250, 250, 250) 0%, rgb(225, 234, 238) 90%);*/
-
-}
-
-#create-mod>input {
-	position: absolute;
-	background-color: white;
-	font-family: owlcave;
-	color: black;
-	font-size: 50px;
-	border: none;
-	min-width: 30%;
-	border: 1px white solid;
-	transition: transform 0.2s,
-		left 0.2s,
-		color 0.1s,
-		background-color 0.3s;
-}
-
-#create-mod>input[ok] {
-	left: 0%;
-	color: white;
-	background-color: black;
-}
-
-#create-mod>input:hover {
-	transform: translateX(-5%);
-}
-
-#create-mod>input[ok]:hover {
-	transform: translateX(+5%);
-}
-
-#pong-mod {
-	top: 110px;
-	left: 70%;
-}
-
-#br-mod {
-	top: 166px;
-	left: 70%;
-}
-
-
-#create-map {
-	position: absolute;
-	left: 5%;
-	top: 30%;
-}
-
-#create-map>label {
-	font-size: 100px;
-	color: white;
-	font-family: sensible-senseless;
-	background-color: black;
-	padding-top: 30px;
-	padding-left: 100px;
-	padding-right: 100px;
-	border: 2px white solid;
-}
-
-#create-map>input {
-	position: absolute;
-	background-color: white;
-	font-family: owlcave;
-	color: black;
-	font-size: 50px;
-	border: none;
-	min-width: 30%;
-	border: 1px white solid;
-	transition: transform 0.2s,
-		left 0.2s,
-		color 0.1s,
-		background-color 0.3s;
-}
-
-#create-map>input:hover {
-	transform: scale(1.1);
-}
-
-#create-map>input[ok] {
-	color: white;
-	background-color: black;
-	transform: scale(1.1);
-}
-
-#create-map>input[ok]:hover {
-	transform: scale(0.99);
-}
-
-#default-map {
-	top: 110px;
-	left: 10%;
-}
-
-#terminator-map {
-	top: 170px;
-	left: 5%;
-	background-color: grey !important;
-}
-
-
-
-#create-submod {
-	position: absolute;
-	top: 20%;
-	right: 5%;
-	color: white;
-	z-index: 1;
-}
-
-#create-submod>label {
-	display: block;
-	position: relative;
-	font-size: 60px;
-	color: white;
-	z-index: 2;
-	font-family: sensible-senseless;
-	background-color: black;
-	padding-top: 30px;
-	width: 60px;
-	padding-left: 20px;
-	padding-right: 10px;
-	border: 2px white solid;
-	/*mix-blend-mode: difference;*/
-	/*background: radial-gradient(circle at 18.7% 37.8%, rgb(250, 250, 250) 0%, rgb(225, 234, 238) 90%);*/
-
-}
-
-#create-submod>input {
-	position: absolute;
-	background-color: white;
-	font-family: owlcave;
-	color: black;
-	text-align: left;
-	font-size: 50px;
-	border: none;
-	min-width: 150%;
-	border: 1px white solid;
-	left: -140%;
-	z-index: 0;
-	transition: transform 0.2s,
-		left 0.2s,
-		color 0.1s,
-		background-color 0.3s;
-}
-
-#create-submod[off]>input {
-	pointer-events: none;
-	color: black !important;
-	background-color: grey !important;
-
-}
-
-#create-submod>input:hover {
-	transform: translateX(10%);
-}
-
-#create-submod>input[ok] {
-	transform: translateX(50%);
-	color: white;
-	background-color: black;
-}
-
-/*#create-submod>input[on] {*/
-/*	color: black !important;*/
+/*#create-label {*/
+/*	display: block;*/
+/*	position: absolute;*/
+/*	text-align: center;*/
+/*	top: 50%;*/
+/*	left: 0%;*/
+/*	width: 100%;*/
+/*	height: 50px;*/
+/*	color: whitesmoke;*/
+/*	font-size: 20vh;*/
+/*	font-family: radio;*/
+/*	font-weight: bold;*/
+/*	line-height: 20px;*/
+/*	transform: rotate(-90deg);*/
+/*	background-color: transparent;*/
+/*	/*mix-blend-mode: difference;*/
+/*	/*background: radial-gradient(circle at 18.7% 37.8%, rgb(250, 250, 250) 0%, rgb(225, 234, 238) 90%);*/
+/**/
+/**/
+/*}*/
+/**/
+/*#create-mod {*/
+/*	position: absolute;*/
+/*	top: 10%;*/
+/*	left: 30%;*/
+/*	color: white;*/
+/*	z-index: 1;*/
+/*}*/
+/**/
+/*#create-mod>label {*/
+/*	font-size: 10vh;*/
+/*	color: white;*/
+/*	font-family: sensible-senseless;*/
+/*	background-color: black;*/
+/*	padding-top: 3vh;*/
+/*	padding-left: 10vh;*/
+/*	padding-right: 10vh;*/
+/*	border: 2px white solid;*/
+/*	/*mix-blend-mode: difference;*/
+/*	/*background: radial-gradient(circle at 18.7% 37.8%, rgb(250, 250, 250) 0%, rgb(225, 234, 238) 90%);*/
+/**/
+/*}*/
+/**/
+/*#create-mod>input {*/
+/*	position: absolute;*/
+/*	background-color: white;*/
+/*	font-family: owlcave;*/
+/*	color: black;*/
+/*	font-size: 5vh;*/
+/*	border: none;*/
+/*	min-width: 30%;*/
+/*	border: 1px white solid;*/
+/*	transition: transform 0.2s,*/
+/*		left 0.2s,*/
+/*		color 0.1s,*/
+/*		background-color 0.3s;*/
+/*}*/
+/**/
+/*#create-mod>input[ok] {*/
+/*	left: 0%;*/
+/*	color: white;*/
+/*	background-color: black;*/
+/*}*/
+/**/
+/*#create-mod>input:hover {*/
+/*	transform: translateX(-5%);*/
+/*}*/
+/**/
+/*#create-mod>input[ok]:hover {*/
+/*	transform: translateX(+5%);*/
+/*}*/
+/**/
+/*#pong-mod {*/
+/*	top: 11vh;*/
+/*	left: 70%;*/
+/*}*/
+/**/
+/*#br-mod {*/
+/*	top: 17vh;*/
+/*	left: 70%;*/
+/*}*/
+/**/
+/**/
+/*#create-map {*/
+/*	position: absolute;*/
+/*	left: 5%;*/
+/*	top: 35%;*/
+/*}*/
+/**/
+/*#create-map>label {*/
+/*	font-size: 10vh;*/
+/*	color: white;*/
+/*	font-family: sensible-senseless;*/
+/*	background-color: black;*/
+/*	padding-top: 3vh;*/
+/*	padding-left: 10vh;*/
+/*	padding-right: 10vh;*/
+/*	border: 2px white solid;*/
+/*}*/
+/**/
+/*#create-map>input {*/
+/*	position: absolute;*/
+/*	background-color: white;*/
+/*	font-family: owlcave;*/
+/*	color: black;*/
+/*	font-size: 5vh;*/
+/*	border: none;*/
+/*	min-width: 30%;*/
+/*	border: 1px white solid;*/
+/*	transition: transform 0.2s,*/
+/*		left 0.2s,*/
+/*		color 0.1s,*/
+/*		background-color 0.3s;*/
+/*}*/
+/**/
+/*#create-map>input:hover {*/
+/*	transform: scale(1.02);*/
+/*}*/
+/**/
+/*#create-map>input[ok] {*/
+/*	color: white;*/
+/*	background-color: black;*/
+/*	transform: scale(1.1);*/
+/*}*/
+/**/
+/*#create-map>input[ok]:hover {*/
+/*	transform: scale(1.02);*/
+/*}*/
+/**/
+/*#default-map {*/
+/*	top: 11vh;*/
+/*	left: 10%;*/
+/*}*/
+/**/
+/*#terminator-map {*/
+/*	top: 17vh;*/
+/*	left: 5%;*/
 /*	background-color: grey !important;*/
 /*}*/
+/**/
+/**/
+/**/
+/*#create-submod {*/
+/*	position: absolute;*/
+/*	top: 20%;*/
+/*	right: 5%;*/
+/*	color: white;*/
+/*	z-index: 1;*/
+/*}*/
+/**/
+/*#create-submod>label {*/
+/*	display: block;*/
+/*	position: relative;*/
+/*	font-size: 6vh;*/
+/*	color: white;*/
+/*	z-index: 2;*/
+/*	font-family: sensible-senseless;*/
+/*	background-color: black;*/
+/*	padding-top: 3vh;*/
+/*	width: 6vh;*/
+/*	padding-left: 2vh;*/
+/*	padding-right: 1vh;*/
+/*	border: 2px white solid;*/
+/*	/*mix-blend-mode: difference;*/
+/*	/*background: radial-gradient(circle at 18.7% 37.8%, rgb(250, 250, 250) 0%, rgb(225, 234, 238) 90%);*/
+/**/
+/*}*/
+/**/
+/*#create-submod>input {*/
+/*	position: absolute;*/
+/*	background-color: white;*/
+/*	font-family: owlcave;*/
+/*	color: black;*/
+/*	text-align: left;*/
+/*	font-size: 5vh;*/
+/*	border: none;*/
+/*	min-width: 150%;*/
+/*	border: 1px white solid;*/
+/*	left: -140%;*/
+/*	z-index: 0;*/
+/*	transition: transform 0.2s,*/
+/*		left 0.2s,*/
+/*		color 0.1s,*/
+/*		background-color 0.3s;*/
+/*}*/
+/**/
+/*#create-submod[off]>input {*/
+/*	pointer-events: none;*/
+/*	color: black !important;*/
+/*	background-color: grey !important;*/
+/**/
+/*}*/
+/**/
+/*#create-submod>input:hover {*/
+/*	transform: translateX(10%);*/
+/*}*/
+/**/
+/*#create-submod>input[ok] {*/
+/*	transform: translateX(50%);*/
+/*	color: white;*/
+/*	background-color: black;*/
+/*}*/
+/**/
+/*/*#create-submod>input[on] {*/
+/*/*	color: black !important;*/
+/*/*	background-color: grey !important;*/
+/*/*}*/
+/**/
+/*#local-submod {*/
+/*	top: 70%;*/
+/*}*/
+/**/
+/*#ia-submod {*/
+/*	top: 63%;*/
+/*}*/
+/**/
+/*#online-submod {*/
+/*	top: 56%;*/
+/*}*/
+/**/
+/*#create-btn {*/
+/*	position: absolute;*/
+/*	top: 80%;*/
+/*	left: 20%;*/
+/*	font-size: 10vh;*/
+/*	/*height: 10vh;*/
+/*	color: black;*/
+/*	font-family: owlcave;*/
+/*	background-color: grey;*/
+/*	pointer-events: none;*/
+/**/
+/*	border: 2px black solid;*/
+/*	padding-left: 5vh;*/
+/*	padding-right: 5vh;*/
+/*	padding-top: 0.vh;*/
+/*	transition: transform 0.2s,*/
+/*		left 0.2s,*/
+/*		color 0.1s,*/
+/*		background-color 0.3s;*/
+/**/
+/*}*/
+/**/
+/*#create-btn:hover {*/
+/*	transform: scale(1.1);*/
+/*}*/
+/**/
+/*#create-btn[ok] {*/
+/*	background-color: white;*/
+/*	pointer-events: auto;*/
+/*	animation: scale-shaking 0.5s ease infinite;*/
+/*}*/
+/**/
+/**/
+/*@keyframes scale-shaking {*/
+/*	0% {*/
+/*		transform: scale(1);*/
+/*	}*/
+/**/
+/*	25% {*/
+/*		transform: scale(1.1);*/
+/*	}*/
+/**/
+/*	50% {*/
+/*		transform: scale(1);*/
+/*	}*/
+/**/
+/*	75% {*/
+/*		transform: scale(0.99);*/
+/*	}*/
+/**/
+/*}*/
+/**/
 
-#local-submod {
-	top: 80%;
+/*######################CREATE#################*/
+
+#play-create {
+	font-size: 2vh;
+	width: 100%;
+	height: 100%;
+	font-family: monospace;
 }
 
-#ia-submod {
-	top: 73%;
+#play-create>span {
+	color: black;
+	background-color: white;
 }
 
-#online-submod {
-	top: 66%;
+#play-create>select {
+	appearance: none;
+	-moz-appearance: none;
+	font-size: 1.9vh;
+	color: white;
+	background-color: black;
+	border: 0.2vh blue solid;
+}
+
+
+#create-btn {
+	appearance: none;
+	color: blak;
+	background-color: white;
+	font-size: 2vh;
+	font-family: monospace;
+	border: 0.2vh red solid;
+	/*transform: translateY(vh);*/
+}
+
+#create-btn:hover {
+	color: white;
+	background-color: black;
+}
+
+/*######################JOIN###################*/
+.a {
+	width: fit-content;
+}
+
+.d {
+	vertical-align: top;
+	display: inline-block;
+	white-space: nowrap;
+	color: black;
+	/*background: white;*/
+	background-color: white;
+	font-size: 2vh;
+	font-family: monospace;
+	/*-webkit-box-decoration-break: clone;*/
+	/*-ms-box-decoration-break: clone;*/
+	/*-o-box-decoration-break: clone;*/
+	/*box-decoration-break: clone;*/
+	/*box-shadow: 10px 0 0 orange, -10px 0 0 orange;*/
+	margin-bottom: 10px;
+	overflow: hidden;
+	animation: typing 0.5s steps(20, end);
+}
+
+@keyframes typing {
+	from {
+		width: 0
+	}
+
+	to {
+		width: 100%
+	}
+}
+
+
+#play-join {
+	width: 100%;
+	height: 100%;
+	font-size: 2vh;
+}
+
+#play-join>.sep {
+	height: 1vh;
+}
+
+#play-join>span {
+	vertical-align: top;
+	display: inline;
+	color: black;
+	/*background: white;*/
+	background-color: white;
+	font-size: 2vh;
+	font-family: monospace;
+	/*-webkit-box-decoration-break: clone;*/
+	/*-ms-box-decoration-break: clone;*/
+	/*-o-box-decoration-break: clone;*/
+	/*box-decoration-break: clone;*/
+	/*box-shadow: 10px 0 0 orange, -10px 0 0 orange;*/
+	margin-bottom: 10px;
+}
+
+#play-join>input {
+	all: unset;
+	color: black;
+	border: 0.2vh red solid;
+	background-color: white;
+	font-size: 2vh;
+	font-family: monospace;
+	transform: translateY(-0.2vh);
+}
+
+#join-id::placeholder {
+	color: #911;
+}
+
+
+#join-btn:hover {
+	color: white;
+	background-color: black;
+}
+
+#join-list {
+	vertical-align: top;
+	display: inline-block;
+	height: 10vh;
+	overflow: scroll;
+	width: fit-content;
+	scrollbar-color: black white;
+	scrollbar-width: none;
+	margin-bottom: 1vh;
+	border: 0.2vh blue solid;
+}
+
+#join-list>div {
+	display: block;
+	width: 100%;
+	background-color: white;
+}
+
+#join-list>div>span {
+	display: inline-block;
+	font-family: monospace;
+	border: 0.1vh black solid;
+	/*font-size: 20px;*/
+	/*padding-left: 1vh;*/
+	padding-right: 1vh;
+	color: black;
+	background-color: white;
+	padding-left: 1vh;
+	min-width: 8vh;
+}
+
+#join-list>div:hover {
+	color: white;
+	background-color: black;
+
+	>span {
+		color: white;
+		background-color: black;
+
+	}
 }

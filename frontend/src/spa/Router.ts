@@ -112,26 +112,26 @@ class RouterC {
 			url.search = "";
 		}
 
-		await meRequest("no-cache")
-			.then(() => {
-				if (url.pathname == "/auth" || url.pathname == "/register") {
-					url.pathname = "/home";
-					url.search = "";
-				}
-				this.oldURL = url.href;
-			})
-			.catch(() => {
-				this.oldURL = url.href;
-				if (url.pathname != "/auth" && url.pathname != "/register") {
-					url.pathname = "/auth";
-					url.search = "";
-					if (!this.first) {
-						meReject();
-						throw ("aaa");
-					};
-					console.log("%c Not logged in redirected to /auth", "color: white; background-color: red")
-				}
-			})
+		//await meRequest("no-cache")
+		//.then(() => {
+		if (url.pathname == "/auth" || url.pathname == "/register") {
+			url.pathname = "/home";
+			url.search = "";
+		}
+		this.oldURL = url.href;
+		//})
+		//.catch(() => {
+		//	this.oldURL = url.href;
+		//	if (url.pathname != "/auth" && url.pathname != "/register") {
+		//		url.pathname = "/auth";
+		//		url.search = "";
+		//		if (!this.first) {
+		//			meReject();
+		//			throw ("aaa");
+		//		};
+		//		console.log("%c Not logged in redirected to /auth", "color: white; background-color: red")
+		//	}
+		//})
 
 
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);

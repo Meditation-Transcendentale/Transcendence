@@ -59,8 +59,8 @@ class Home {
 
 	public load(params: URLSearchParams) {
 		App3D.loadVue('home');
-		meRequest()
-			.catch(() => window.location.reload());
+		//meRequest()
+		//.catch(() => window.location.reload());
 		(document.querySelector("#main-container") as HTMLDivElement).innerHTML = "";
 		document.querySelector("#main-container")?.appendChild(this.div);
 	}
