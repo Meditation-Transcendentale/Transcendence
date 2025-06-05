@@ -41,7 +41,7 @@ class Lobby {
 
 	allReady() {
 		return (
-			this.players.size > 0 &&
+			this.players.size == this.maxPlayers &&
 			[...this.players.values()].every(p => p.isReady)
 		)
 	}
