@@ -46,6 +46,35 @@ canvas {
 	src: url('/assets/susle.otf');
 }
 
+@font-face {
+	font-family: de-valancia;
+	src: url('/assets/de-valancia.otf');
+}
+
+@font-face {
+	font-family: droid-1997;
+	src: url('/assets/droid_1997.otf');
+}
+
+@font-face {
+	font-family: telegrama;
+	src: url('/assets/telegrama/outline_font/telegrama_raw_osn.otf');
+}
+
+@font-face {
+	font-family: selobae;
+	src: url('/assets/SELOBAE.otf');
+}
+
+@font-face {
+	font-family: selobae-rough;
+	src: url('/assets/SELOBAEROUGH.otf');
+}
+
+@font-face {
+	font-family: lou;
+	src: url('/assets/Lou.otf');
+}
 
 
 #fps {

@@ -17,7 +17,7 @@ interface playHtmlReference {
 	//smodOnline: HTMLInputElement;
 	//smodAI: HTMLInputElement;
 	createBtn: HTMLInputElement;
-	list: HTMLDivElement;
+	list: HTMLTableElement;
 };
 
 enum playState {
@@ -49,7 +49,7 @@ const lr: listResp = {
 			id: "egeggege-wefwefbwejhf-wefhbwf-wefwfe",
 			mod: "local",
 			maxPlayers: 1,
-			players: ["ehehe", "ededede"]
+			players: ["ehehe"]
 		},
 		{
 			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
@@ -62,7 +62,37 @@ const lr: listResp = {
 			mod: 'pongbr',
 			maxPlayers: 100,
 			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
+		}, {
+			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
+			mod: "online",
+			maxPlayers: 2,
+			players: ["bob"]
 		},
+
+		{
+			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
+			mod: 'pongbr',
+			maxPlayers: 100,
+			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
+		}, {
+			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
+			mod: "online",
+			maxPlayers: 2,
+			players: ["bob"]
+		},
+
+		{
+			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
+			mod: 'pongbr',
+			maxPlayers: 100,
+			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
+		}, {
+			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
+			mod: "online",
+			maxPlayers: 2,
+			players: ["bob"]
+		},
+
 		{
 			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
 			mod: 'pongbr',
@@ -75,6 +105,25 @@ const lr: listResp = {
 			maxPlayers: 100,
 			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
 		},
+		{
+			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
+			mod: "online",
+			maxPlayers: 2,
+			players: ["bob"]
+		},
+
+		{
+			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
+			mod: 'pongbr',
+			maxPlayers: 100,
+			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
+		}, {
+			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
+			mod: "online",
+			maxPlayers: 2,
+			players: ["bob"]
+		},
+
 		{
 			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
 			mod: 'pongbr',
@@ -120,7 +169,7 @@ export default class Play {
 			//smodAI: div.querySelector("#ia-submod") as HTMLInputElement,
 			//smodOnline: div.querySelector("#online-submod") as HTMLInputElement,
 			createBtn: div.querySelector("#create-btn") as HTMLInputElement,
-			list: div.querySelector("#join-list") as HTMLDivElement
+			list: div.querySelector("#join-list") as HTMLTableElement
 		}
 
 		this.createState = {
@@ -129,7 +178,7 @@ export default class Play {
 			submod: false
 		}
 
-		this.state = playState.create;
+		this.state = playState.join;
 		this.ref.create.remove();
 		this.ref.join.remove();
 		//this.ref.smod.toggleAttribute('off');
@@ -381,17 +430,32 @@ export default class Play {
 	}
 
 	private parseListResp(resp: listResp) {
-		this.ref.list.innerHTML = '';
+		const body = this.ref.list.querySelector("tbody") as HTMLElement;
+		body.innerHTML = '';
+		//this.ref.list.innerHTML = '';
+		//const div = document.createElement('tr');
+		//const id = document.createElement('th');
+		//const mod = document.createElement('th');
+		//const player = document.createElement('th');
+		//id.innerText = "lobby id";
+		//mod.innerText = "mod";
+		//player.innerText = "players";
+		//div.appendChild(id);
+		//div.appendChild(mod);
+		//div.appendChild(player);
+		//
+		//this.ref.list.appendChild(div);
+
 		for (let i = 0; i < resp.lobbies.length; i++) {
-			this.createLobbyList(resp.lobbies[i])
+			body.appendChild(this.createLobbyList(resp.lobbies[i]));
 		}
 	}
 
-	private createLobbyList(l: lobby) {
-		const div = document.createElement('div');
-		const id = document.createElement('span');
-		const mod = document.createElement('span');
-		const player = document.createElement('span');
+	private createLobbyList(l: lobby): HTMLElement {
+		const div = document.createElement('tr');
+		const id = document.createElement('td');
+		const mod = document.createElement('td');
+		const player = document.createElement('td');
 		id.innerText = l.id;
 		mod.innerText = l.mod;
 		player.innerText = `${l.players.length}/${l.maxPlayers}`;
@@ -399,7 +463,7 @@ export default class Play {
 		div.appendChild(mod);
 		div.appendChild(player);
 
-		this.ref.list.appendChild(div);
+		return div;
 	}
 
 

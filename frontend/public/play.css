@@ -274,7 +274,7 @@
 /*######################CREATE#################*/
 
 #play-create {
-	font-size: 2vh;
+	font-size: 3vh;
 	width: 100%;
 	height: 100%;
 	font-family: monospace;
@@ -371,64 +371,127 @@
 	margin-bottom: 10px;
 }
 
-#play-join>input {
+
+
+.sub-window {
+	position: absolute;
+	z-index: 2;
+	display: block;
+	min-height: 5vh;
+	min-width: 10vh;
+	background-color: #111;
+	font-size: 2vh;
+	border: 0.3vh white solid;
+}
+
+
+
+#join-input-container {
+	height: 10vh;
+	top: 40%;
+	width: 30vh;
+}
+
+#join-id {
 	all: unset;
-	color: black;
-	border: 0.2vh red solid;
-	background-color: white;
+	appearance: unset;
+	position: relative;
+	text-align: center;
+	top: 40%;
 	font-size: 2vh;
 	font-family: monospace;
-	transform: translateY(-0.2vh);
+	width: 100%;
+	transform: translateY(-50%);
+	color: white;
+	background-color: transparent;
+	border-top: 0.1vh white solid;
+	border-bottom: 0.1vh white solid;
 }
 
 #join-id::placeholder {
-	color: #911;
+	color: #999;
+}
+
+.top-bar {
+	position: sticky;
+	top: 0;
+	font-family: de-valancia;
+	font-size: 2vh;
+	letter-spacing: -0.6vh;
+	font-weight: bold;
+	font-variant: small-caps;
+	color: white;
+	text-align: right;
+	background-color: black;
+	border-bottom: 0.2vh #aaa solid;
+	padding-right: 1vh;
+}
+
+#join-list-container {
+	display: inline-block;
+	top: 30%;
+	left: 40%;
+	height: 30vh;
+	width: fit-content;
+	overflow: scroll;
+}
+
+#join-list-container>table {
+	display: inline-block;
+	border-collapse: collapse;
+	width: 100%;
+	color: white;
 }
 
 
-#join-btn:hover {
+
+#join-list th {
+	padding-right: 2vh;
+	padding-left: 0.5vh;
+	text-align: left;
 	color: white;
-	background-color: black;
+	overflow: hidden;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 20vh;
 }
 
 #join-list {
-	vertical-align: top;
 	display: inline-block;
-	height: 10vh;
-	overflow: scroll;
-	width: fit-content;
-	scrollbar-color: black white;
-	scrollbar-width: none;
-	margin-bottom: 1vh;
-	border: 0.2vh blue solid;
-}
-
-#join-list>div {
-	display: block;
+	border-collapse: collapse;
+	font-family: de-valancia;
+	font-weight: 100;
+	letter-spacing: -0.5vh;
+	font-size: 2vh;
 	width: 100%;
-	background-color: white;
+	height: 50%;
+	text-align: left;
 }
 
-#join-list>div>span {
-	display: inline-block;
-	font-family: monospace;
-	border: 0.1vh black solid;
-	/*font-size: 20px;*/
-	/*padding-left: 1vh;*/
-	padding-right: 1vh;
+#join-list>thead>td>th {
+	padding-right: 2vh;
+}
+
+#join-list thead th {
+	position: sticky;
+	top: 2.55vh;
+	background-color: black;
+}
+
+.list-body>tr>td {
+	text-align: left;
+	color: white;
+	overflow: hidden;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 20vh;
+	padding-right: 2vh;
+	padding-left: 0.5vh;
+	text-overflow: ellipsis;
+	border-top: 0.1vh solid #ccc;
+}
+
+.list-body>tr:hover>td {
 	color: black;
 	background-color: white;
-	padding-left: 1vh;
-	min-width: 8vh;
-}
-
-#join-list>div:hover {
-	color: white;
-	background-color: black;
-
-	>span {
-		color: white;
-		background-color: black;
-
-	}
 }
