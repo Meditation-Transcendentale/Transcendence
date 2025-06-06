@@ -9,7 +9,8 @@ import {
 	decodePhysicsResponse,
 	encodeStateUpdate,
 	encodeMatchSetup,
-	decodeStateUpdate
+	decodeStateUpdate,
+	decodeMatchQuit
 } from './proto/helper.js';
 
 export class GameManager {
@@ -48,6 +49,7 @@ export class GameManager {
 		(async () => {
 			for await (const msg of subEnd) {
 				const [, , gameId] = msg.subject.split('.');
+				const uuid = decodeMatchQuit(msg.data);
 				await this._onMatchEnd(gameId);
 			}
 		})();
@@ -85,7 +87,7 @@ export class GameManager {
 		console.log('📬 replying on', msg.reply);
 		if (msg.reply) {
 			const respBuf = encodeMatchCreateResponse({ gameId: gameId.toString() });
-			msg.respond(respBuf);  // in nats.js v2 this is sync/void
+			msg.respond(respBuf);
 			console.log('✅ replied with gameId=', gameId);
 		} else {
 			console.warn('⚠️ no reply subject; request() will time out.');
@@ -198,29 +200,6 @@ export class GameManager {
 
 		match.tick++;
 
-		// Handle paused state
-		if (match.isPaused) {
-			if (match.tick < match.resumeTick) {
-				const updBuf = encodeStateUpdate({ state: match.state });
-				this.nc.publish(
-					`games.${match.mode}.${gameId}.state.update`,
-					updBuf
-				);
-				return;
-			}
-			match.isPaused = false;
-
-			const inputsThisTick = match.inputs[match.tick] || [];
-			if (match.pendingServe) {
-				inputsThisTick.push({
-					playerId: null,
-					input: { type: 'serve' }
-				});
-				match.pendingServe = false;
-			}
-			match.inputs[match.tick] = inputsThisTick;
-		}
-
 		const inputs = match.inputs[match.tick] || [];
 		const lastState = match.state;
 
@@ -230,22 +209,13 @@ export class GameManager {
 			const respMsg = await this.nc.request(`games.${match.mode}.${gameId}.physics.request`, reqBuf);
 			const resp = decodePhysicsResponse(respMsg.data);
 
-			// Handle goal if one occurred this tick
 			const newState = lastState;
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles;
 			if (resp.goal) {
-				console.log(resp.goal);
-				console.log(newState.score[resp.goal.scorerId]);
 				newState.score[resp.goal.scorerId] = (newState.score[resp.goal.scorerId] || 0) + 1;
 
-				match.isPaused = true;
-				const pauseMs = 1000;
-				const tickMs = 1000 / (60);
-				const pauseTicks = Math.ceil(pauseMs / tickMs);
-				match.resumeTick = match.tick + pauseTicks;
-				match.pendingServe = true;
 				if (newState.score[resp.goal.scorerId] >= (5 || Infinity)) {
 					newState.isGameOver = true;
 				}

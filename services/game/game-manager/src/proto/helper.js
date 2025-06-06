@@ -27,6 +27,10 @@ export function decodeMatchCreateResponse(buffer) {
 	return Proto.shared.MatchCreateResponse.decode(buffer);
 }
 
+export function decodeMatchQuit(buffer) {
+	return Proto.shared.MatchQuit.decode(buffer);
+}
+
 /**
  * MatchInput
  */
