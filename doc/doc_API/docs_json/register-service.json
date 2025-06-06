@@ -25,7 +25,7 @@
             "post": {
                 "summary": "Register a new user",
                 "tags": ["Register"],
-                "description": "Register a new user in DB.",
+                "description": "Register a new user in DB. ( Allowed characters for password : !?@#$%&*()_+-={};:|,.<>",
                 "requestBody": {
                     "required": true,
                     "content": {
