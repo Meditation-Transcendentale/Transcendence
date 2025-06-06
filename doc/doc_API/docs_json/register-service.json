@@ -25,7 +25,7 @@
             "post": {
                 "summary": "Register a new user",
                 "tags": ["Register"],
-                "description": "Register a new user in DB. ( Allowed characters for password : !?@#$%&*()_+-={};:|,.<>",
+                "description": "Register a new user in DB. ( Allowed characters for password : !?@#$%&*()_{};:|,.<>",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -35,7 +35,7 @@
                                 "required": ["username", "password"],
                                 "properties": {
                                     "username": { "type": "string", "example": "user123", "description": "Username must be at least 3 characters long and maximum 20 characters long. Allowed characters: a-z, A-Z, 0-9" },
-									"password": { "type": "string", "format": "password", "example": "password1234", "description": "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter and one digit. Allowed special characters : !?@#$%&*()_+-={};:|,.<>" }
+									"password": { "type": "string", "format": "password", "example": "password1234", "description": "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter and one digit. Allowed special characters : !?@#$%&*()_{};:|,.<>" }
                                 }
                             }
                         }
