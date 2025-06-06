@@ -15,9 +15,9 @@ import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
-import * as UI from './utils/proto/message.js';
 import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
 import type { userinterface } from './utils/proto/message.js';
+import { Inspector } from '@babylonjs/inspector';
 
 // const API_BASE = "http://10.19.220.253:4000";
 const API_BASE = `http://${window.location.hostname}:4000`;
@@ -62,7 +62,7 @@ export class Pong {
 			arenaSizeZ: 20,
 			wallWidth: 1
 		};
-		// Inspector.Show(this.scene, {});
+		Inspector.Show(this.scene, {});
 
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.intensity = 0.3;
@@ -112,7 +112,7 @@ export class Pong {
 			this.camera
 		));
 		this.ecs.addSystem(new VisualEffectSystem(this.scene));
-		this.ecs.addSystem(new UISystem(this.scene));
+		//this.ecs.addSystem(new UISystem(this.scene));
 
 		createGameTemplate(this.ecs, config, localPaddleId);
 	}

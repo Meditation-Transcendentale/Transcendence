@@ -28,6 +28,7 @@ export class InputSystem extends System {
 
 	update(entities: Entity[], deltaTime: number): void {
 		const dt = deltaTime / 1000;
+		// console.log("Input system:", performance.now());
 		for (const entity of entities) {
 			if (
 				!entity.hasComponent(InputComponent) ||

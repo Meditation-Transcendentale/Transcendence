@@ -1,8 +1,8 @@
 import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
 
-export function gameScoreInterface(scoreP1: number, scoreP2: number){
+export function gameScoreInterface(scoreP1: number, scoreP2: number) {
 	const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-	
+
 	const scoreTitle = new TextBlock();
 	scoreTitle.text = "Score";
 	scoreTitle.color = "white";
@@ -30,10 +30,10 @@ export function gameScoreInterface(scoreP1: number, scoreP2: number){
 	}
 }
 
-export function gameEndUI(playerWin: boolean){
+export function gameEndUI(playerWin: boolean) {
 	const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("ENDUI");
-	
-	if (playerWin){
+
+	if (playerWin) {
 		const scoreTitle = new TextBlock();
 		scoreTitle.text = "You won!";
 		scoreTitle.color = "green";
