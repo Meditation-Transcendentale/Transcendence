@@ -21,8 +21,8 @@ async function start() {
         for await (const msg of subNewTournament) {
             //const playersList decode msg.data somehow
             const tournamentId = tournamentService.create(playerslist);
-            //send tournament id to the players uuid
         }
+            //send tournament id to the players uuid
     })
     
     await app.listen({ port: config.PORT, host: '0.0.0.0'});

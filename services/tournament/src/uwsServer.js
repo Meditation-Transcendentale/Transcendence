@@ -34,9 +34,10 @@ export function createUwsApp(path, tournamentService) {
                 /**
                  * Join 
                  */
-                // const state = tournamentService.join(tournamentId, ws.userId);
+                // const state = tournamentService.readyForGame(tournamentId, ws.userId);
                 // const buf = encode
-
+                ws.subscribe(tournamentId);
+                app.publish(tournamentId, buf, true);
             } catch (err) {
 
             }
@@ -46,7 +47,7 @@ export function createUwsApp(path, tournamentService) {
             const buf = new Uint8Array(message);
             const payload = decodeClientMessage(buf);
             if (payload.ready) {
-                tournamentService
+                newState = await tournamentService.ready(ws.tournamentId, ws.userId);
             }
         }
     })
