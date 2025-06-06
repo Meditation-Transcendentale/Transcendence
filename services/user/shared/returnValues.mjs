@@ -55,7 +55,7 @@ const returnMessages = {
 	LOGGED_OUT: 'Logged out successfully',
 	USERNAME_ALREADY_USED: 'Username is already in use',
 	USERNAME_PASSWORD_REQUIRED: 'Username and password are required',
-	USERNAME_INVALID: 'Username must be between 3 and 20 characters',
+	USERNAME_INVALID: 'Username must be between 3 and 20 characters without any special characters',
 	PASSWORD_INVALID: 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number',
 	USER_CREATED: 'User registered successfully',
 	FRIENDLIST_NOT_FOUND: 'Friendlist is empty',

@@ -1,7 +1,7 @@
 DOCKER_COMPOSE = docker compose
 DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml
 
-.PHONY: build down re
+.PHONY: build down re reKeepData
 
 build:
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) up --build
@@ -13,6 +13,8 @@ down:
     fi
 	docker volume rm -f $$(docker volume ls)
 
+up: 
+	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) up
 re:
 	if [ -d ./shared ]; then \
         rm -rf ./shared; \

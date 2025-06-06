@@ -88,7 +88,7 @@ app.patch('/', handleErrors(async (req, res) => {
 
 }));
 
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!?@#$%&*()_{};:|,.<>]{8,}$/;
 
 app.patch('/password', handleErrors(async (req, res) => {
 
