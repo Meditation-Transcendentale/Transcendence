@@ -17,13 +17,15 @@ export class InputSystem extends System {
 	private readonly MAX_OFFSET: number = 8.4;
 	private move: number;
 	private lastSentMove: number = 0;
+	private isLocalGame: boolean;
 
-	constructor(inputManager: InputManager, wsManager: WebSocketManager) {
+	constructor(inputManager: InputManager, wsManager: WebSocketManager, isLocalGame: boolean) {
 		super();
 		this.inputManager = inputManager;
 		this.wsManager = wsManager;
 		this.localPaddleId = localPaddleId;
 		this.move = 0;
+		this.isLocalGame = isLocalGame;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -44,12 +46,19 @@ export class InputSystem extends System {
 			const transform = entity.getComponent(TransformComponent)!;
 
 			let offsetChange = 0;
-			const leftPressed = this.inputManager.isKeyPressed("KeyA");
-			const rightPressed = this.inputManager.isKeyPressed("KeyD");
+			let UpPressed;
+			let DownPressed;
+			if (paddle.id == localPaddleId){
+				UpPressed = this.inputManager.isKeyPressed("KeyW");
+				DownPressed = this.inputManager.isKeyPressed("KeyS");
+			} else if (this.isLocalGame){
+				UpPressed = this.inputManager.isKeyPressed("ArrowUp");
+				DownPressed = this.inputManager.isKeyPressed("ArrowDown");
+			}
 
 			this.move = 0;
-			if (leftPressed && !rightPressed) this.move = 1;
-			else if (rightPressed && !leftPressed) this.move = -1;
+			if (UpPressed && !DownPressed) this.move = 1;
+			else if (DownPressed && !UpPressed) this.move = -1;
 
 			offsetChange = this.move * 10 * dt;
 			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -this.MAX_OFFSET, this.MAX_OFFSET);
@@ -70,7 +79,7 @@ export class InputSystem extends System {
 			if (this.move != this.lastSentMove) {
 				const payload: userinterface.IClientMessage = {
 					paddleUpdate: {
-						paddleId: localPaddleId,
+						paddleId: paddle.id,
 						move: this.move,
 					}
 				};
