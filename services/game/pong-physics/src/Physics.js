@@ -185,13 +185,13 @@ export const Physics = {
 					if (collidedPaddle) {
 						const paddlePos = collidedPaddle.getComponent('position');
 						const paddleCollider = collidedPaddle.getComponent('collider');
-						const paddleHalfHeight = paddleCollider.height / 2;
+						const paddleHalfHeight = paddleCollider.width / 2;
 						const relativeIntersectY = ballPos.y - paddlePos.y;
 
 						let rawNormY = relativeIntersectY / paddleHalfHeight;
 						rawNormY = Math.max(-1, Math.min(1, rawNormY));
 
-						const deadZone = 0.4;
+						const deadZone = 0.;
 						let mappedY;
 						if (Math.abs(rawNormY) < deadZone) {
 							mappedY = 0;
@@ -201,7 +201,7 @@ export const Physics = {
 								: (rawNormY + deadZone) / (1 - deadZone);
 						}
 
-						const maxBounceAngle = (60 * Math.PI) / 180;
+						const maxBounceAngle = (75 * Math.PI) / 180;
 						const bounceAngle = mappedY * maxBounceAngle;
 
 						const isLeftPaddle = paddlePos.x < 0;
