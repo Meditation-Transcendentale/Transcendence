@@ -78,7 +78,7 @@ class Tournament {
     markReady(playerId){
         const player = this.players.get(playerId);
         if (!p) throw new Error('Player not in tournament');
-        player.ready = false;  
+        player.ready = true;  
     }
 
     getState() { //NEED TO CREATE THE ENCODE/DECODE
@@ -122,7 +122,7 @@ export default class tournamentService {
 
         tournament.markReady(playerId);
         
-        const state = tournament.getState(); //players ready/not tree
+        const state = tournament.getState(); //players + tree
 
         if (match.player1.ready && match.player2.ready)
         {

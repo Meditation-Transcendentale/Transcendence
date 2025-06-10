@@ -49,7 +49,7 @@ class Home {
 				.catch((resp) => { this.logoutReject(resp) })
 		});
 
-		const url = `ws://localhost:7011/notification?uuid=${encodeURIComponent(User.uuid as string)}`;
+		const url = `ws://localhost:7011/notification?uuid=${encodeURIComponent(User.uuid as string)}`;//change localhost
 
 		const notificationSocket = new WebSocket(url);
 		notificationSocket.onopen = () => {
