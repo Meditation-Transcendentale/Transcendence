@@ -2,13 +2,15 @@ FROM node:18
 
 WORKDIR /app
 
-COPY package.json tsconfig.json vite.config.ts  ./
+COPY package.json tsconfig.json vite.config.ts esbuild.config.js ./
 COPY public ./public
 COPY src ./src
 
-RUN npm install
+RUN npm install && npm run build
+
 
 EXPOSE 8081
 
-CMD ["npm", "run", "dev"]
+
+CMD ["npm", "run", "start"]
 

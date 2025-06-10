@@ -1,19 +1,8 @@
-import {
-	ArcRotateCamera,
-	Color3,
-	Color4,
-	DirectionalLight,
-	Engine,
-	GlowLayer,
-	HemisphericLight,
-	Matrix,
-	Mesh,
-	MeshBuilder,
-	Scene,
-	StandardMaterial,
-	Vector3
-} from "@babylonjs/core";
-import { CubeCluster } from "./CubeCluster";
+import { Scene } from "@babylonjs/core/scene"
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Gears } from "./Gears";
 import { updateVues } from "../Vue";
 
@@ -27,11 +16,6 @@ export class Environment {
 	private lastTime: number;
 	private deltaTime: number;
 	private frame: number;
-
-	private glow: GlowLayer;
-
-	private playCluster!: CubeCluster;
-	private homeCluster!: CubeCluster;
 
 	private gears!: Gears;
 
@@ -47,13 +31,13 @@ export class Environment {
 
 		window.addEventListener("keydown", (ev) => {
 			// Alt+I
-			if (ev.altKey && (ev.key === "I" || ev.key === "i")) {
-				if (this.scene.debugLayer.isVisible()) {
-					this.scene.debugLayer.hide();
-				} else {
-					this.scene.debugLayer.show();
-				}
-			}
+			//if (ev.altKey && (ev.key === "I" || ev.key === "i")) {
+			//	if (this.scene.debugLayer.isVisible()) {
+			//		//this.scene.debugLayer.hide();
+			//	} else {
+			//		this.scene.debugLayer.show();
+			//	}
+			//}
 
 			//if (ev.key == 'Escape') {
 			//	this.scene.setActiveCameraByName('home');
@@ -69,32 +53,15 @@ export class Environment {
 			engine.resize();
 		})
 
-		//this.playCluster = new CubeCluster("play", new Vector3(0, 0, 0), this.scene);
-		//this.homeCluster = new CubeCluster("home", new Vector3(7, -1, 3), this.scene, {
-		//	radius: 1.5,
-		//	quantity: 100,
-		//	expendY: 1,
-		//	expendX: 1.5,
-		//	expendZ: 1.5,
-		//	centerLayer: 20,
-		//	orbitLayer: 10,
-		//});
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
 		this.frame = 0;
-
-		this.glow = new GlowLayer("glow", this.scene, {
-			mainTextureSamples: 4,
-		});
-		this.glow.intensity = 0.4;
-
 		this.gears = new Gears(this.scene);
 
 	}
 
 	public async init() {
 
-		//this.camera = new FreeCamera("camera", new Vector3(20, 3, 0), this.scene);
 		this.camera = new ArcRotateCamera("camera", -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		this.camera.inertia = 0.8;
 		this.camera.speed = 10;
@@ -102,52 +69,18 @@ export class Environment {
 		this.camera.attachControl(this.canvas, true);
 		this.camera.minZ = 0.1;
 
-		//const cube = MeshBuilder.CreateBox('box', { size: 10, sideOrientation: Mesh.BACKSIDE }, this.scene);
-		//const m = new StandardMaterial('mat', this.scene);
-		//m.diffuseColor = Color3.White();
-		//m.specularColor = Color3.Black();
-		////m.cullBackFaces = false;
-		////m.backFaceCulling = false;
-		////m.twoSidedLighting = true;
-		//cube.material = m;
-		//cube.receiveShadows = true;
-
 		await this.gears.load();
-
-		//await this.playCluster.init();
-		//await this.homeCluster.init();
-
-		//const l = new DirectionalLight("light", new Vector3(0, 1, 0), this.scene);
-		//const hl = new HemisphericLight("hlight", new Vector3(1, 0, 0), this.scene);
-		//hl.intensity = 0.5;
 
 	}
 
 	public render() {
 		updateVues();
-		//this.updateCss(this.frame % 64);
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
 		this.gears.update(this.deltaTime);
-		//this.playCluster.update(this.deltaTime);
-		//this.homeCluster.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
-	}
-
-	private updateCss(n: number) {
-		this.gears.updateCSS(n == 0);
-		//this.playCluster.updateCSS();
-		//this.homeCluster.updateCSS();
-	}
-
-	private async load() {
-
-	}
-
-	private initSky() {
-
 	}
 
 	public loadVue(vue: string): void {
@@ -163,11 +96,8 @@ export class Environment {
 	}
 
 	public dispose() {
-		//this.playCluster.dispose();
-		//this.homeCluster.dispose();
-		this.gears.dispose();
-		this.glow.dispose();
-		this.camera.dispose();
-		this.scene.dispose();
+		this.gears?.dispose();
+		this.camera?.dispose();
+		this.scene?.dispose();
 	}
 }

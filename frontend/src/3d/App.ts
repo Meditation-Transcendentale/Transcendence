@@ -1,8 +1,6 @@
 import {
 	Engine,
-} from "@babylonjs/core";
-import "@babylonjs/core/Debug/debugLayer";
-import "@babylonjs/inspector";
+} from "@babylonjs/core/Engines/engine";
 
 import { Environment } from "./Environment";
 
@@ -22,6 +20,8 @@ class app3d {
 
 
 	constructor() {
+		console.log("eeeeee");
+
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
 		this.canvas.focus();
 		//
@@ -51,8 +51,8 @@ class app3d {
 	}
 
 	public dispose() {
-		this.environment.dispose();
-		this.engine.dispose();
+		this.environment?.dispose();
+		this.engine?.dispose();
 	}
 
 	public loadVue(vue: string): void {
