@@ -108,6 +108,8 @@ async function getAvatarCdnUrl(picture, uuid) {
 
 }
 
+// https://developers.google.com/oauthplayground/
+
 app.post('/auth-google', handleErrors(async (req, res) => {
 	
 	const { token } = req.body;
@@ -129,8 +131,10 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
 	if (!user) {
 		const uuid = uuidv4();
+		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
+		console.log('Avatar CDN URL:', avatarCdnUrl);
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
-		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatar_path });
+		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatarCdnUrl });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
 
