@@ -1,8 +1,14 @@
-import { Engine, Scene, Vector3, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Color3, Mesh } from "@babylonjs/core";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Scene } from "@babylonjs/core/scene";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 import { GameTemplateConfig } from "../templates/GameTemplate";
 
 export function createCamera(scene: Scene, canvas: any): ArcRotateCamera {
-	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0.3, 60, Vector3.Zero(), scene);
+	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0., 60, Vector3.Zero(), scene);
 	camera.attachControl(canvas, true);
 	new HemisphericLight("light", new Vector3(0, 1, 0), scene);
 
@@ -22,7 +28,7 @@ export function createWallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
 }
 
 export function createArenaMesh(scene: Scene, config: GameTemplateConfig): Mesh {
-	const arenaMesh = MeshBuilder.CreateBox("arenaBox", {width: config.arenaSizeX, height: config.arenaSizeZ, depth: 1}, scene);
+	const arenaMesh = MeshBuilder.CreateBox("arenaBox", { width: config.arenaSizeX, height: config.arenaSizeZ, depth: 1 }, scene);
 	const material = new StandardMaterial("arenaMaterial", scene);
 	material.diffuseColor.set(0, 0, 0);
 	material.specularColor.set(0, 0, 0);
