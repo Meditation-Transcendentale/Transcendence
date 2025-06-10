@@ -31,6 +31,7 @@ services:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
       - user_shared:/app/shared
+      - cdn_data:/app/cdn_data
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -41,6 +42,7 @@ services:
       - FT_API_SECRET=${FT_API_SECRET}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
+      - CDN_URL=${CDN_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -209,7 +211,6 @@ services:
       update_user_info-service:
         condition: service_started
         
-  
   database_certs-init:
     build:
       context: ./database_certs-init
@@ -223,6 +224,16 @@ services:
       - SSL_CERT=${SSL_CERT}
     networks:
       - transcendence-network
+  
+  cdn:
+    build: ./services/cdn
+    container_name: cdn
+    volumes:
+      - ./shared/certs:/app/certs:ro
+      - cdn_data:/usr/share/nginx/html
+    ports:
+      - "3002:443"
+    restart: unless-stopped
 
 volumes:
   user_shared:
@@ -231,6 +242,12 @@ volumes:
       type: none
       o: bind
       device: ./services/user/shared
+  cdn_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/cdn/public
 
 networks:
   transcendence-network:

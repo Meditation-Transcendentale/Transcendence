@@ -1,7 +1,9 @@
 services:
   cdn:
     build: .
-    container_name: babylonjs-cdn
+    container_name: cdn
+    volumes:
+      - ./shared/certs:/app/certs:ro
     ports:
       - "8081:80"
     restart: unless-stopped

@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors, handleErrorsValid } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
+import { arrayBuffer } from 'stream/consumers';
 
 dotenv.config({ path: "../../../../.env" });
 
@@ -88,6 +89,25 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_IN });
 }));
 
+async function getAvatarCdnUrl(picture, uuid) {
+	console.log("picture", picture);
+	const response = await fetch(picture);
+	console.log("response", response);
+	if (response.status !== 200) {
+		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
+	}
+
+	const arrayBuffer = await response.arrayBuffer();
+	const buffer = Buffer.from(arrayBuffer);
+	const filename = `${uuid}.png`;
+	const fullPath = `/app/cdn_data/${filename}`;
+
+	fs.writeFileSync(fullPath, buffer);
+	
+	return `${process.env.CDN_URL}/${filename}`;
+
+}
+
 app.post('/auth-google', handleErrors(async (req, res) => {
 	
 	const { token } = req.body;
@@ -147,9 +167,12 @@ async function get42accessToken(code) {
 		cached42Token.expires_at = now + response.data.expires_in * 1000;
 		return { token42: cached42Token.token};
 	} catch (error) {
+		console.error('Error fetching 42 access token:', error);
 		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
 	}
 }
+
+
 
 app.get('/42', handleErrors(async (req, res) => {
 	
@@ -170,9 +193,13 @@ app.get('/42', handleErrors(async (req, res) => {
 	const username = response.data.login;
 	const avatar_path = response.data.image.link;
 
+
+
 	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
 	if (!user) {
 		const uuid = uuidv4();
+		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
+		console.log('Avatar CDN URL:', avatarCdnUrl);
 		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatar_path });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
