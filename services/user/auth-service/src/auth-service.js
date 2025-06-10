@@ -200,7 +200,7 @@ app.get('/42', handleErrors(async (req, res) => {
 		const uuid = uuidv4();
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
 		console.log('Avatar CDN URL:', avatarCdnUrl);
-		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatar_path });
+		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatarCdnUrl });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
 
