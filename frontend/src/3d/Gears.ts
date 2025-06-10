@@ -1,4 +1,4 @@
-import { AbstractMesh, BoundingBox, Camera, CascadedShadowGenerator, Color3, DirectionalLight, LoadAssetContainerAsync, Matrix, Mesh, PBRMaterial, Quaternion, Scene, ShadowGenerator, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, BoundingBox, Camera, CascadedShadowGenerator, Color3, DirectionalLight, GlowLayer, LoadAssetContainerAsync, Matrix, Mesh, PBRMaterial, Quaternion, Scene, ShadowGenerator, Vector3 } from "@babylonjs/core";
 import { homeVue, playVue } from "../Vue";
 
 
@@ -43,10 +43,6 @@ export class Gears {
 	private p!: Vector3;
 	private numInstance: number;
 
-	private play: cssElem;
-	private playJoin: cssElem;
-	private playCreate: cssElem;
-	private playLobby: cssElem;
 
 
 	private ontop: boolean = false;
@@ -61,7 +57,7 @@ export class Gears {
 		this.mat.albedoColor = Color3.White();
 		this.mat.metallic = 0;
 		this.mat.roughness = 1;
-		this.mat.backFaceCulling = false;
+		//this.mat.backFaceCulling = false;
 
 
 		this.numInstance = 50;

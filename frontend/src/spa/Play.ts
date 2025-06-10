@@ -16,7 +16,7 @@ interface playHtmlReference {
 	//smodLocal: HTMLInputElement;
 	//smodOnline: HTMLInputElement;
 	//smodAI: HTMLInputElement;
-	createBtn: HTMLInputElement;
+	//createBtn: HTMLInputElement;
 	list: HTMLTableElement;
 };
 
@@ -168,7 +168,7 @@ export default class Play {
 			//smodLocal: div.querySelector("#local-submod") as HTMLInputElement,
 			//smodAI: div.querySelector("#ia-submod") as HTMLInputElement,
 			//smodOnline: div.querySelector("#online-submod") as HTMLInputElement,
-			createBtn: div.querySelector("#create-btn") as HTMLInputElement,
+			//createBtn: div.querySelector("#create-btn") as HTMLInputElement,
 			list: div.querySelector("#join-list") as HTMLTableElement
 		}
 
@@ -178,7 +178,7 @@ export default class Play {
 			submod: false
 		}
 
-		this.state = playState.join;
+		this.state = playState.create;
 		this.ref.create.remove();
 		this.ref.join.remove();
 		//this.ref.smod.toggleAttribute('off');

@@ -1,76 +1,55 @@
 <div id="play" class="sub-container">
 	<link rel="stylesheet" type="text/css" href="/play.css">
-	<!--<div id="play-create">-->
-	<!--	<span id="create-label">-->
-	<!--		  CREATE-->
-	<!--	</span>-->
-	<!--	<div id="create-mod">-->
-	<!--		<label>MOD</label>-->
-	<!--		<input id="pong-mod" type="button" value="PONG"></input>-->
-	<!--		<input id="br-mod" type="button" value="BR"></input>-->
-	<!--		<!--<input id="io-mod" type="button" value="io">IO</input>-->
-	<!--	</div>-->
-	<!--	<div id="create-map">-->
-	<!--		<label>MAPS</label>-->
-	<!--		<input id="default-map" type="button" value="default" ></input>-->
-	<!--		<input id="terminator-map" type="button" value="terminator"></input>-->
-	<!--	</div>-->
-	<!--	<div id="create-submod">-->
-	<!--		<label>P</label>-->
-	<!--		<label>O</label>-->
-	<!--		<label>N</label>-->
-	<!--		<label>G</label>-->
-	<!--		<label>\ </label>-->
-	<!--		<label>M</label>-->
-	<!--		<label>O</label>-->
-	<!--		<label>D</label>-->
-	<!--					<input id="local-submod" type="button" value="local" ></input>-->
-	<!--		<input id="ia-submod" type="button" value="ia" ></input>-->
-	<!--		<input id="online-submod" type="button" value="online" ></input>-->
-	<!--	</div>-->
-	<!--	<input type="button" id="create-btn" type="button" value="create"></input>-->
-	<!--</div>-->
-	<div id="play-create">
-		<!--<span>dqq dqwd qwdq qwdhqwd qwdqd qwd qjdq wdjqwdqns qwd sdqjwdnq dq</span><br/>-->
+	<div id="play-create" class="sub-container">
+		<div id="create-mod-window" class="window">
+			<div class="window-bar">CHOOSE MOD</div>
+			<input id="br-mod" class="window-content" type="button" value="BR"/>
+			<input id="pong-mod" class="window-content" type="button" value="PONG"/>
+		</div>
+		<div id="create-map-window" class="window">
+			<div class="window-bar">CHOOSE MAP</div>
+			<div id="create-map" class="window-content">
+				<input id="default-map" type="button" value="DEFAULT"/>
+				<input id="term-map" type="button" value="TERMINATOR"/>
+			</div>
+		</div>
+		<div id="create-submod-window" class="window">
+			<div class="window-bar">CHOOSE PONG VARIANT</div>
+			<div id="create-submod" class="window-content">
+				<input id="local-smod"  type="button" value="LOCAL"/>
+				<input id="online-smod"  type="button" value="ONLINE"/>
+				<input id="ai-mod" type="button" value="AI"/>
+			</div>
+		</div>
+		<div id="create-btn-window" class="window">
+			<div class="window-bar">CREATE</div>
+			<input id="create-btn" class="window-content" type="button" value="CREATE"/>
+		</div>
 		<span>wfef web?</span><br/>
-		<!--<span>dqdwqdn qdwbqd qwjdjfrf rfjrf dqhwd 3wefvweb evwe wefhwf csjhc efewfhvwf sadqwiud qdwjhqds sjchvwcjhewfiuwfensc</span><br/>-->
 		<span>qewefwef  ewef MOD</span>
-		<select id="create-mod">
-			<option id="pongL-mod" value="pong">PONG-LOCAL</option>
-			<option id="pongO-mod" value="pong">PONG-ONLINE</option>
-			<option id="pongA-mod" value="pong">PONG-AI</option>
-			<option id="br-mod" value="br">BR</option>
-			<option id="io-mod" value="io">IO</option>
-		</select>
 		<span>aidbqd qwd</span><br/><br/><br/>
 		<span>webwefb fwebfwe</span><br/>
 		<span>fwefjhbwefjhwef MAP</span>
-		<select id="create-map">
-			<option id="default-map" value="default">DEfault</option>
-			<option id="term-map" value="terminator">TermiNATOR</option>
-		</select><br/><br/><br/>
 		<span>wehfjbwef wefkjbwef wefjhwefhwefjwvef CREATE</span>
-		<input type="button" id="create-btn" type="button" value="create"></input>
 		<span>ewef.</span>
 	</div>
-	<div id="play-join">
-		<div class="a"><span class="d">fwef wef akjbw,</span></div><div class="sep"></div>
-		<span >kdbas kja awjdkwad ww</span><br/><div class="sep"></div>
+	<div id="play-join" class="sub-container">
+		<div class="a"><span class="d">fwef wef akjbw,</span></div>
+		<span >kdbas kja awjdkwad ww</span><br/>
 		<span >qd dqjwhd qjwhdd djqhd qjwhdqhjwd qwjdhdq djqhdwdjhqb djwhqbd qwdhbd qdwjhbq  hwwhhwhwhq whdqd</span><br/>
 		<span >asd skksksksksad LIST</span>
-		<div id="join-list-container" class="sub-window">
-			<div class="top-bar">LIST LOBBY</div>
-			<table id="join-list">
-			<thead>	<tr><th>Lobby id</th><th>Mod</th><th>Players</th></tr></thead>
-			<tbody class="list-body"></tbody>
-			</table>
-		</div>
 		<span> wke fjweh  wejfhwef weeehwf</span><br/>
 		<span> ewfbwefwejhfwef wjehfwefbw fwejh JOIN</span>
-		<div id="join-input-container" class="sub-window">
-		<div class="top-bar">JOIN LOBBY</div>
-		<input type="text" id="join-id" placeholder="......................."/>
-		<!--<input type="button" id="join-btn" value="join"></input>-->
+		<div id="join-list-container" class="window">
+			<div class="window-bar">LIST LOBBY</div>
+			<table id="join-list" class="window-content">
+				<thead>	<tr><th>Lobby id</th><th>Mod</th><th>Players</th></tr></thead>
+				<tbody class="list-body"></tbody>
+			</table>
+		</div>
+		<div id="join-input-container" class="window">
+			<div class="window-bar">JOIN LOBBY</div>
+			<input type="text" id="join-id" class="window-content" placeholder="......................."/>
 		</div>
 	</div>
 	

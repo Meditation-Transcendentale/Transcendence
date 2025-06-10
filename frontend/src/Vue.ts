@@ -24,15 +24,15 @@ class cssWindow {
 	constructor(name: string, options: vueOptions) {
 		this.name = name;
 		this.div = document.createElement('div');
-		this.div.id = `${name}-window`;
-		this.div.className = `window`;
+		this.div.id = `${name}-frame`;
+		this.div.className = `frame`;
 
 		this.header = document.createElement('div');
-		this.header.className = 'header';
+		this.header.className = 'frame-text';
 		this.header.innerText = name.toUpperCase();
 
 		this.div.appendChild(this.header.cloneNode(true));
-		this.header.className = 'header glitch';
+		this.header.className = 'frame-hover';
 
 		this.pos = new Float32Array(4);
 		this.bounding = [];
