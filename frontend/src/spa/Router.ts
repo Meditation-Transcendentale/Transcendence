@@ -60,7 +60,7 @@ class RouterC {
 		this.routes.set("/stats", {
 			html: "/stats",
 			ts: "./Stats",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/lobby", {
 			html: "/lobby",

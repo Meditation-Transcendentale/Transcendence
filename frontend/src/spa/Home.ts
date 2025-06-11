@@ -33,6 +33,9 @@ class Home {
 		homeVue.windowAddEvent('play', 'click', () => {
 			Router.nav('/play');
 		})
+		homeVue.windowAddEvent('stats', 'click', () => {
+			Router.nav(`/stats?u=${User.username}`)
+		})
 
 		this.ref.info.addEventListener("click", () => {
 			Router.nav("/info");

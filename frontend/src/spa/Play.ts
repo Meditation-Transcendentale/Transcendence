@@ -111,7 +111,6 @@ const lr: listResp = {
 interface playHtmlReference {
 	create: HTMLDivElement;
 	join: HTMLDivElement;
-	pongMod: HTMLInputElement;
 	brMod: HTMLInputElement;
 	tournamentMod: HTMLInputElement;
 	defaultMap: HTMLInputElement;
@@ -119,7 +118,6 @@ interface playHtmlReference {
 	onlineMod: HTMLInputElement;
 	aiMod: HTMLInputElement;
 	createBtn: HTMLInputElement;
-	smodWin: HTMLDivElement;
 	createWin: HTMLDivElement;
 	list: HTMLTableElement;
 };
@@ -131,9 +129,8 @@ enum playState {
 }
 
 interface createState {
-	mod: number,
-	map: boolean,
-	submod: boolean
+	mod: string | null,
+	map: string | null,
 }
 
 type lobby = {
@@ -164,50 +161,88 @@ export default class Play {
 		this.ref = {
 			create: div.querySelector('#play-create') as HTMLDivElement,
 			join: div.querySelector("#play-join") as HTMLDivElement,
-			pongMod: div.querySelector("#pong-mod") as HTMLInputElement,
 			brMod: div.querySelector("#br-mod") as HTMLInputElement,
 			tournamentMod: div.querySelector("#tournament-mod") as HTMLInputElement,
 			defaultMap: div.querySelector("#default-map") as HTMLInputElement,
-			localMod: div.querySelector("#local-smod") as HTMLInputElement,
-			onlineMod: div.querySelector("#online-smod") as HTMLInputElement,
-			aiMod: div.querySelector("#ai-smod") as HTMLInputElement,
+			localMod: div.querySelector("#local-mod") as HTMLInputElement,
+			onlineMod: div.querySelector("#online-mod") as HTMLInputElement,
+			aiMod: div.querySelector("#ai-mod") as HTMLInputElement,
 			createBtn: div.querySelector("#create-btn") as HTMLInputElement,
-			smodWin: div.querySelector("#create-submod-window") as HTMLDivElement,
 			createWin: div.querySelector("#create-btn-window") as HTMLDivElement,
 			list: div.querySelector("#join-list") as HTMLTableElement
 		}
 
 		this.createState = {
-			mod: 0,
-			map: false,
-			submod: false
+			mod: null,
+			map: null,
 		}
 
 		this.state = playState.create;
 		this.ref.create.remove();
 		this.ref.join.remove();
 
-		this.ref.smodWin.toggleAttribute("off");
+		this.ref.createWin.toggleAttribute("off");
 
-		this.ref.pongMod.addEventListener("click", () => {
-			this.ref.pongMod.toggleAttribute("on");
-			this.ref.brMod.removeAttribute("on")
-			this.ref.tournamentMod.removeAttribute("on");
-			this.ref.smodWin.toggleAttribute("off");
-		})
+
 
 		this.ref.brMod.addEventListener("click", () => {
-			this.ref.brMod.toggleAttribute("on");
-			this.ref.pongMod.removeAttribute("on")
+			this.createState.mod = this.ref.brMod.toggleAttribute("on") ? "br" : null;
 			this.ref.tournamentMod.removeAttribute("on");
-			this.ref.smodWin.setAttribute("off", "");
+			this.ref.localMod.removeAttribute("on");
+			this.ref.onlineMod.removeAttribute("on");
+			this.ref.aiMod.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
 		})
 
 		this.ref.tournamentMod.addEventListener("click", () => {
-			this.ref.tournamentMod.toggleAttribute("on");
-			this.ref.brMod.removeAttribute("on")
-			this.ref.pongMod.removeAttribute("on");
-			this.ref.smodWin.setAttribute("off", "");
+			this.createState.mod = this.ref.tournamentMod.toggleAttribute("on") ? "tournament" : null;
+			this.ref.brMod.removeAttribute("on");
+			this.ref.localMod.removeAttribute("on");
+			this.ref.onlineMod.removeAttribute("on");
+			this.ref.aiMod.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+		})
+
+		this.ref.localMod.addEventListener("click", () => {
+			this.createState.mod = this.ref.localMod.toggleAttribute("on") ? "local" : null;
+			this.ref.tournamentMod.removeAttribute("on");
+			this.ref.brMod.removeAttribute("on");
+			this.ref.onlineMod.removeAttribute("on");
+			this.ref.aiMod.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+		})
+
+		this.ref.onlineMod.addEventListener("click", () => {
+			this.createState.mod = this.ref.onlineMod.toggleAttribute("on") ? "online" : null;
+			this.ref.tournamentMod.removeAttribute("on");
+			this.ref.localMod.removeAttribute("on");
+			this.ref.brMod.removeAttribute("on");
+			this.ref.aiMod.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+		})
+
+		this.ref.aiMod.addEventListener("click", () => {
+			this.createState.mod = this.ref.aiMod.toggleAttribute("on") ? "ai" : null;
+			this.ref.tournamentMod.removeAttribute("on");
+			this.ref.localMod.removeAttribute("on");
+			this.ref.onlineMod.removeAttribute("on");
+			this.ref.brMod.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+		})
+
+		this.ref.defaultMap.addEventListener("click", () => {
+			this.createState.map = this.ref.defaultMap.toggleAttribute("on") ? "default" : null;
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+		})
+
+		this.ref.createBtn.addEventListener("click", () => {
+			console.log(`create game-> mod:${this.createState.mod}, map:${this.createState.map}`)
 		})
 
 		//this.ref.smod.toggleAttribute('off');

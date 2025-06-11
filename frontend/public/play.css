@@ -1,43 +1,5 @@
 /*######################CREATE#################*/
 
-#create-mod-window {
-	width: 40vh;
-	top: 30%;
-	left: 50%;
-}
-
-#create-mod {
-	width: 100%;
-	height: calc(100% - 4vh);
-	margin-top: 0.5vh;
-	margin-bottom: 0.5vh;
-}
-
-#create-mod>tbody>tr>td {
-	min-width: 20%;
-	height: 100%;
-	text-align: center;
-}
-
-#pong-mod,
-#br-mod,
-#tournament-mod {
-	border: 0.2vh white solid;
-	width: calc(100% - 1vh);
-	height: 90%;
-	font-size: 4vh;
-	font-weight: 100;
-	text-align: center;
-}
-
-#pong-mod:hover,
-#br-mod:hover,
-#tournament-mod:hover {
-	color: var(--window-background);
-	background-color: var(--window-color);
-}
-
-/*####*/
 
 #create-map-window {
 	display: block;
@@ -72,31 +34,50 @@
 
 /*####*/
 
-#create-submod-window {
-	width: 10vh;
-	top: calc(30% + 12vh);
-	left: calc(50% + (40% * 1 / 4));
+#create-mod-window {
+	width: 20vh;
+	top: 30%;
+	left: 40%;
 }
 
-#create-submod {
+#create-mod {
 	display: grid;
 	grid-template-columns: 1 auto auto auto;
 	background-color: inherit-color;
 	row-gap: 0.2vh;
 	overflow-y: scroll;
+	margin-top: 0.5vh;
+	margin-bottom: 0.5vh;
 }
 
-#create-submod>input {
+#create-mod>input {
+	display: inline-block;
+	line-height: 0vh;
 	padding-left: 1vh;
 	background-color: var(--window-background);
-	font-size: 2vh;
+	font-size: 3vh;
+	height: 3.4vh;
+	max-height: 3.4vh;
 	font-weight: 100;
+	transition: font-size 0.2s;
+	vertical-align: middle;
 }
 
-#create-submod>input:hover {
+#create-mod>input:hover {
 	color: var(--window-background) !important;
 	background-color: var(--window-color) !important;
+	font-size: 3.1vh;
 }
+
+#create-mod>input[on] {
+	font-size: 3.2vh;
+}
+
+#create-mod>input[on]:hover {
+	background-color: #abc4eb !important;
+	font-size: 3.2vh;
+}
+
 
 /*####*/
 
@@ -122,6 +103,11 @@
 	color: var(--window-background);
 	background-color: var(--window-color)
 }
+
+#create-btn:active {
+	border-color: blue;
+}
+
 
 
 /*######################JOIN###################*/

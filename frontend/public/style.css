@@ -29,8 +29,8 @@ body {
 	--font-window-bar: bold small-caps 2vh de-valancia;
 	--font-window-content: de-valancia 2vh 100;
 
-	--input-on-color: black;
-	--input-on-background: red;
+	--input-on-color: white;
+	--input-on-background: blue;
 }
 
 canvas {
@@ -164,12 +164,11 @@ canvas {
 }
 
 
-.window[off],
-.window[off] *,
+.window[off] input,
 input[off] {
 	color: grey;
-	background-color: #555;
-	border-color: grey;
+	background-color: #222;
+	border-color: grey !important;
 	pointer-events: none;
 }
 

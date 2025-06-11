@@ -1,3 +1,5 @@
+import { App3D } from "../3d/App";
+import { statsVue } from "../Vue";
 import { getRequest } from "./requests";
 import { raiseStatus } from "./utils";
 
@@ -48,11 +50,20 @@ class Stats {
 				.then((json) => { this.statsResolve(json) })
 				.catch((resp) => { this.statsReject(resp) });
 		});
+
+
+		App3D.setVue('stats');
+		statsVue.windowAddEvent('create', 'click', () => {
+		})
+
+		statsVue.windowAddEvent('join', 'click', () => {
+		})
+
 	}
 
 	public load(params: URLSearchParams) {
 		if (!this.checkParams(params)) { return; }
-
+		statsVue.enable();
 		this.ref.username.innerText = params.get("u") as string;
 		getRequest(`stats/player/${this.ref.username.innerText}/classic`)
 			.then((json) => {
@@ -63,6 +74,7 @@ class Stats {
 	}
 
 	public async unload() {
+		statsVue.disable();
 		this.div.remove();
 	}
 

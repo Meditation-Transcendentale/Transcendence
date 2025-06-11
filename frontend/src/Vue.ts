@@ -198,8 +198,10 @@ class Vue {
 
 export const playVue = new Vue();
 export const homeVue = new Vue();
+export const statsVue = new Vue();
 
 export function updateVues() {
 	playVue.update();
+	statsVue.update();
 	homeVue.update();
 }
