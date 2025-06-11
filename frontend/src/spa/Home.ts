@@ -9,6 +9,7 @@ type homeHtmlReference = {
 	stats: HTMLInputElement,
 	play: HTMLInputElement,
 	friendlist: HTMLInputElement,
+	br: HTMLInputElement,
 	quit: HTMLInputElement
 };
 
@@ -24,6 +25,7 @@ class Home {
 			stats: div.querySelector("#home-stats") as HTMLInputElement,
 			play: div.querySelector("#home-play") as HTMLInputElement,
 			friendlist: div.querySelector("#home-friendlist") as HTMLInputElement,
+			br: div.querySelector("#home-br") as HTMLInputElement,
 			quit: div.querySelector("#home-quit") as HTMLInputElement
 		};
 
@@ -43,6 +45,10 @@ class Home {
 			Router.nav("/friendlist");
 		})
 
+		this.ref.br.addEventListener("click", () => {
+			Router.nav("/br", false, true);
+		})
+
 		this.ref.quit.addEventListener("click", () => {
 			postRequest("auth/logout", {})
 				.then((json) => { this.logoutResolve(json) })
@@ -54,37 +60,37 @@ class Home {
 		const notificationSocket = new WebSocket(url);
 		notificationSocket.onopen = () => {
 			console.log('Connected to notificationSocket server')
-		  }
-		  
-		  notificationSocket.onmessage = (event) => {
+		}
+
+		notificationSocket.onmessage = (event) => {
 			const message = JSON.parse(event.data)
 			console.log('Received message:', message)
-		  
+
 			switch (message.type) {
-			  case 'notification.friendRequest':
-				console.log('Friend request:', message.data)
-				break
-			  case 'notification.friendAccept':
-				console.log('Friend accepted:', message.data)
-				break
-			  case 'notification.gameInvite':
-				console.log('Game invite:', message.data)
-				break
-			  case 'notification.status':
-				console.log('Status update:', message.data)
-				break
-			  default:
-				console.warn('Unknown message type:', message.type)
+				case 'notification.friendRequest':
+					console.log('Friend request:', message.data)
+					break
+				case 'notification.friendAccept':
+					console.log('Friend accepted:', message.data)
+					break
+				case 'notification.gameInvite':
+					console.log('Game invite:', message.data)
+					break
+				case 'notification.status':
+					console.log('Status update:', message.data)
+					break
+				default:
+					console.warn('Unknown message type:', message.type)
 			}
-		  }
-		  
-		  notificationSocket.onerror = (err) => {
+		}
+
+		notificationSocket.onerror = (err) => {
 			console.error('WebSocket error:', err)
-		  }
-		  
-		  notificationSocket.onclose = () => {
+		}
+
+		notificationSocket.onclose = () => {
 			console.log('WebSocket connection closed')
-		  }
+		}
 	}
 
 	public load(params: URLSearchParams) {

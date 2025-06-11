@@ -79,6 +79,11 @@ class RouterC {
 			ts: "./Game",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
+		this.routes.set("/br", {
+			html: "/html",
+			ts: "./br",
+			callback: (url: URL) => { this.loadInMain(url) }
+		} as routePage);
 
 
 		window.addEventListener("popstate", () => {
