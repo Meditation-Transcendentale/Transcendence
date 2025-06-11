@@ -18,7 +18,6 @@ export class InputSystem extends System {
 	private localPaddleId: number | null = null;
 	private readonly MAX_OFFSET: number = 8.4;
 	private move: number;
-	private lastSentMove: number = 0;
 
 	constructor(inputManager: InputManager, wsManager: WebSocketManager) {
 		super();
@@ -47,12 +46,29 @@ export class InputSystem extends System {
 			const transform = entity.getComponent(TransformComponent)!;
 
 			let offsetChange = 0;
-			const leftPressed = this.inputManager.isKeyPressed("KeyA");
-			const rightPressed = this.inputManager.isKeyPressed("KeyD");
+			let UpPressed = false;
+			let DownPressed = false;
+			if (paddle.id == 0){
+				UpPressed = this.inputManager.isKeyPressed("KeyW");
+				DownPressed = this.inputManager.isKeyPressed("KeyS");
+				console.log("0");
+			} else {
+				DownPressed = this.inputManager.isKeyPressed("ArrowUp");
+				UpPressed = this.inputManager.isKeyPressed("ArrowDown");
+				console.log("1");
+			}
 
-			this.move = 0;
-			if (leftPressed && !rightPressed) this.move = 1;
-			else if (rightPressed && !leftPressed) this.move = -1;
+			paddle.move = 0;
+			if (UpPressed && !DownPressed){
+				paddle.move = 1;
+				console.log("upmove");
+			}
+			else if (DownPressed && !UpPressed){
+				paddle.move = -1;
+				console.log("downmove");
+			}
+
+			console.log("move: ", this.move);
 
 			offsetChange = this.move * 10 * dt;
 			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -this.MAX_OFFSET, this.MAX_OFFSET);
@@ -70,17 +86,17 @@ export class InputSystem extends System {
 			transform.position.copyFrom(
 				transform.basePosition.add(displacement)
 			);
-			if (this.move != this.lastSentMove) {
+			if (paddle.move != paddle.lastMove) {
 				const payload: userinterface.IClientMessage = {
 					paddleUpdate: {
-						paddleId: localPaddleId,
-						move: this.move,
+						paddleId: paddle.id,
+						move: paddle.move,
 					}
 				};
 
 				const buffer = encodeClientMessage(payload);
 				this.wsManager.socket.send(buffer);
-				this.lastSentMove = this.move;
+				paddle.lastMove = paddle.move;
 
 				// console.log("Sent move to server: move =", this.move, "offset = ", paddle.offset);
 			}
