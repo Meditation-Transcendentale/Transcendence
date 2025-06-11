@@ -3,7 +3,7 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
-
+import { Inspector } from '@babylonjs/inspector';
 
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
@@ -46,6 +46,7 @@ export class Pong {
 	private glowLayer: any;
 	private uuid!: string;
 	private isLocalGame: boolean;
+	private visualEffectSystem!: VisualEffectSystem;
 
 	constructor(canvas: any, gameId: any, gameMode: any) {
 		this.canvas = canvas;
@@ -58,7 +59,7 @@ export class Pong {
 		console.log("start");
 		this.engine = new Engine(this.canvas, true);
 		engine = this.engine;
-
+		
 		this.scene = new Scene(this.engine);
 		const config = {
 			numberOfBalls: 1,
@@ -66,6 +67,8 @@ export class Pong {
 			arenaSizeZ: 20,
 			wallWidth: 1
 		};
+		
+		Inspector.Show(this.scene, {});
 
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.intensity = 0.3;
@@ -112,7 +115,8 @@ export class Pong {
 			instanceManagers.wall,
 			this.camera
 		));
-		this.ecs.addSystem(new VisualEffectSystem(this.scene));
+		this.visualEffectSystem = new VisualEffectSystem(this.scene);
+		this.ecs.addSystem(this.visualEffectSystem);
 		//this.ecs.addSystem(new UISystem());
 
 		createGameTemplate(this.ecs, config, localPaddleId, this.isLocalGame);
@@ -170,6 +174,7 @@ export class Pong {
 			}, 5000);
 		});
 	}
+
 	dispose() {
 		this.baseMeshes.arena.material.dispose();
 		this.baseMeshes.arena.dispose();
@@ -192,6 +197,7 @@ export class Pong {
 		} else if (this.scoreUI?.parentNode) {
 			this.scoreUI.parentNode.removeChild(this.scoreUI);
 		}
+		this.visualEffectSystem?.dispose();
 		clearTimeout(resizeTimeout);
 		this.engine.dispose();
 	}
