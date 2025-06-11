@@ -63,6 +63,7 @@ const returnMessages = {
 	PLAYER_INACTIVE: 'Player not in a lobby or a game',
 	SELF_RESEARCH: 'You cannot search for yourself',
 	CANT_ENABLE_2FA: 'You cannot enable 2FA for this account',
+	INVALID_AVATAR_URL: 'Invalid avatar URL'
 
 }
 

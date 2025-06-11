@@ -63,6 +63,36 @@ async function checkPassword2FA(user, password, token) {
 	}
 }
 
+function isValidUrlAndImage(url) {
+	try {
+		new URL(url);
+		const response = axios.head(url, { httpsAgent: agent });
+		const contentType = response.headers['content-type'];
+		if (!contentType || !contentType.startsWith('image/'))
+			return false;
+		return true;
+	} catch (error) {
+		return false;
+	}
+}
+
+async function getAvatarCdnUrl(avatar, uuid) {
+	const response = await fetch(avatar);
+	if (response.status !== 200) {
+		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
+	}
+
+	const arrayBuffer = await response.arrayBuffer();
+	const buffer = Buffer.from(arrayBuffer);
+	const filename = `${uuid}.png`;
+	const fullPath = `/app/cdn_data/${filename}`;
+
+	fs.writeFileSync(fullPath, buffer);
+
+	return `${process.env.CDN_URL}/${filename}`;
+}
+
+
 app.patch('/', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
@@ -81,6 +111,9 @@ app.patch('/', handleErrors(async (req, res) => {
 	}
 
 	if (avatar) {
+		// if (!isValidUrlAndImage(avatar))
+		// 	throw { status: statusCode.BAD_REQUEST, message: returnMessages.INVALID_AVATAR_URL };
+		// const avatarUrl = await getAvatarCdnUrl(avatar, user.uuid);
 		await natsRequest(nats, jc, 'user.updateAvatar', { avatar, userId: user.id });
 	}
 

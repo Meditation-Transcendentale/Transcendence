@@ -59,6 +59,7 @@ services:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
       - user_shared:/app/shared
+      - cdn_data:/app/cdn_data
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
@@ -66,6 +67,7 @@ services:
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NATS_URL=${NATS_URL}
+      - CDN_URL=${CDN_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -233,6 +235,9 @@ services:
       - cdn_data:/usr/share/nginx/html
     ports:
       - "3002:443"
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
     restart: unless-stopped
 
 volumes:

@@ -90,9 +90,9 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 }));
 
 async function getAvatarCdnUrl(picture, uuid) {
-	console.log("picture", picture);
+	// console.log("picture", picture);
 	const response = await fetch(picture);
-	console.log("response", response);
+	console.log("response", response.headers);
 	if (response.status !== 200) {
 		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
 	}
@@ -119,6 +119,9 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
 	}
 
+	// console.log("google token : ", token);
+	// console.log("google client id : ", process.env.GOOGLE_CLIENT_ID);
+
 	const ticket = await googleClient.verifyIdToken({
 		idToken: token,
 		audience: process.env.GOOGLE_CLIENT_ID
@@ -132,7 +135,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 	if (!user) {
 		const uuid = uuidv4();
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
-		console.log('Avatar CDN URL:', avatarCdnUrl);
+		// console.log('Avatar CDN URL:', avatarCdnUrl);
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
 		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatarCdnUrl });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
@@ -141,7 +144,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
-	res.code(retCode).send({ message: retMessage});
+	res.code(retCode).send({ message: retMessage });
 
 }));
 
@@ -181,7 +184,7 @@ async function get42accessToken(code) {
 app.get('/42', handleErrors(async (req, res) => {
 	
 	const { token42 } = await get42accessToken(req.query.code);
-	console.log('42 token:', token42);
+	// console.log('42 token:', token42);
 	let response;
 
 	try {
@@ -197,13 +200,11 @@ app.get('/42', handleErrors(async (req, res) => {
 	const username = response.data.login;
 	const avatar_path = response.data.image.link;
 
-
-
 	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
 	if (!user) {
 		const uuid = uuidv4();
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
-		console.log('Avatar CDN URL:', avatarCdnUrl);
+		// console.log('Avatar CDN URL:', avatarCdnUrl);
 		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatarCdnUrl });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 	}
