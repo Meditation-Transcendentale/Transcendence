@@ -1,4 +1,10 @@
-import { Engine, Scene, Color4, ArcRotateCamera, GlowLayer } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
+
+
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -10,23 +16,20 @@ import { InputManager } from "./input/InputManager.js";
 import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
 import { getOrCreateUUID } from "./utils/getUUID.js";
 import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
-import { DebugVisualizer } from "./debug/DebugVisualizer.js";
 import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
 import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
-import * as UI from './utils/proto/message.js';
 import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
 import type { userinterface } from './utils/proto/message.js';
 
-// const API_BASE = "http://10.19.220.253:4000";
 const API_BASE = `http://${window.location.hostname}:4000`;
 export const global = {
 	endUI: null as any
 }
 export let localPaddleId: any = null;
 let engine: any;
-let resizeTimeout: number;
+let resizeTimeout: NodeJS.Timeout;
 export class Pong {
 	private engine!: Engine;
 	private scene!: Scene;
@@ -35,10 +38,8 @@ export class Pong {
 	private wsManager!: WebSocketManager;
 	private inputManager!: InputManager;
 	private camera!: ArcRotateCamera;
-	private debugVisualizer!: DebugVisualizer;
 	private gameId;
 	private canvas;
-	private paddleId: any;
 	private scoreUI: any;
 	private baseMeshes: any;
 	private instanceManagers: any;
@@ -65,7 +66,6 @@ export class Pong {
 			arenaSizeZ: 20,
 			wallWidth: 1
 		};
-		// Inspector.Show(this.scene, {});
 
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.intensity = 0.3;
@@ -78,14 +78,10 @@ export class Pong {
 
 		this.uuid = await getOrCreateUUID();
 		const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		//const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
-		// localPaddleId = await this.waitForWelcome();
-		localPaddleId = 0;
-		await this.waitForRegistration();
-
+		localPaddleId = await this.waitForRegistration();
 		this.initECS(config, this.instanceManagers, this.uuid);
 
 		this.stateManager = new StateManager(this.ecs);
@@ -117,7 +113,7 @@ export class Pong {
 			this.camera
 		));
 		this.ecs.addSystem(new VisualEffectSystem(this.scene));
-		this.ecs.addSystem(new UISystem(this.scene));
+		//this.ecs.addSystem(new UISystem());
 
 		createGameTemplate(this.ecs, config, localPaddleId, this.isLocalGame);
 	}
@@ -186,11 +182,8 @@ export class Pong {
 		this.engine.clear(new Color4(1, 1, 1, 1), true, true);
 		this.engine.stopRenderLoop();
 		if (this.wsManager?.socket) {
-			// this.wsManager.socket.removeEventListener('message', this.wsManager.socketListener);
 			this.wsManager.socket.close();
 		}
-		// this.scene.onBeforeRenderObservable.clear();
-		// this.scene.onBPointerObservable.clear();
 		this.scene?.dispose();
 		this.engine?.dispose();
 		global.endUI?.dispose();

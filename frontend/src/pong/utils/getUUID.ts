@@ -2,5 +2,8 @@ import { User } from "../../spa/User";
 
 
 export function getOrCreateUUID() {
-	return User.uuid;
+	if (User.uuid)
+		return User.uuid.toString()
+	else
+		return "";
 }

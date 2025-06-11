@@ -13,7 +13,8 @@ export function startWsServer({ port, handlers }) {
 				{
 					uuid: params.get('uuid'),
 					role: params.get('role'),
-					gameId: params.get('gameId')
+					gameId: params.get('gameId'),
+					isAlive: false
 				},
 				req.getHeader('sec-websocket-key'),
 				req.getHeader('sec-websocket-protocol'),
@@ -24,6 +25,7 @@ export function startWsServer({ port, handlers }) {
 
 		open: ws => {
 			const { gameId } = ws;
+			ws.isAlive = true;
 			ws.subscribe(gameId);
 			handlers.registerGame?.(ws);
 		},
@@ -38,7 +40,13 @@ export function startWsServer({ port, handlers }) {
 			else {
 				console.warn('Unknown ClientMessage payload');
 			}
+		},
+
+		close: ws => {
+			ws.isAlive = false;
+			handlers.quit(ws);
 		}
+
 	})
 		.listen(port, token => {
 			if (!token) throw new Error(`uWS listen failed on port ${port}`);

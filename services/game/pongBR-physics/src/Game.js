@@ -26,7 +26,7 @@ export class Game {
 	}
 
 	init() {
-		const ballCount = this.options.ballCount || 1;
+		const ballCount = 200 || 1;
 		for (let i = 0; i < ballCount; i++) {
 			const circleRadius = 50;
 			const r = Math.sqrt(Math.random()) * circleRadius;

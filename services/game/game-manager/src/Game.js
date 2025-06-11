@@ -74,6 +74,10 @@ export class Game {
 		return this.state;
 	}
 
+	getPlayers() {
+		return this.players;
+	}
+
 	updateState(newState) {
 		this.state = newState;
 	}
