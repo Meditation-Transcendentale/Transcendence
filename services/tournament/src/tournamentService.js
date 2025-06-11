@@ -14,10 +14,13 @@ class MatchNode {
         this.parent = null; //MatchNode
         this.winner = null; //tournament.players
         this.gameId = null;
+        this.score = null;
+        this.round = null;
     }
 
     setWinner(playerId) {
         this.winner = playerId;
+        this.winner.ready = false;
         if (this.parent) this.parent.receiveWinner(playerId);
     }
     
@@ -27,10 +30,26 @@ class MatchNode {
 }
 
 class Tournament {
-    constructor({ id, players }) {
+    constructor({ nc, id, players }) {
+        this.nc = nc;
         this.id = id;
         this.players = new Map(shuffle(players).map(p => [{ uuid: p }, { ready: false }]));
         this.root = this.buildTree(this.players);
+        this.current_round = 0;
+
+        const subTournamentEndGame = nc.subscribe ('games.tournament.*.match.end');
+        (async () => {
+            for await (const msg of subTournamentEndGame) {
+                //const decode msg.data somehow
+                const [, , gameId] = msg.subject.split(".");
+                match = this.findMatchByGameId(this.root, gameId);
+                if (!match) { return; }
+                //match.setWinner(msg.data)//will see what there is in the msg
+                //if (match == this.root)
+                //end of tournament, return;
+                //if it was the last game from this round, send ready-check 
+            }
+        })
     }
 
     buildTournamentTree(players) {
@@ -73,6 +92,17 @@ class Tournament {
         if (leftResult) return leftResult;
     
         return findMatchByPlayer(root.right, playerId);
+    }
+
+    findMatchByGameId(root, gameId) {
+        if (!root) return null;
+    
+        if (root.gameId == gameId) return root;
+    
+        const leftResult = findMatchByGameId(root.left, gameId);
+        if (leftResult) return leftResult;
+    
+        return findMatchByGameId(root.right, gameId);
     }
 
     markReady(playerId){
@@ -136,6 +166,7 @@ export default class tournamentService {
                 )
                 const resp = decodeMatchCreateResponse(replyBuf);
                 match.gameId = resp.gameId;
+                
                 //send
             } catch (err) {
                 console.error ('Failed to create game:', err);
