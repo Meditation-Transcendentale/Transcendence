@@ -151,6 +151,7 @@ services:
       - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
+      - HOSTNAME=${HOSTNAME}
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
