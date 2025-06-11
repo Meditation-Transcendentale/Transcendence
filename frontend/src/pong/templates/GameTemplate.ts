@@ -15,7 +15,7 @@ export interface GameTemplateConfig {
 	wallWidth: number;
 }
 
-export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number): void {
+export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, isLocalGame: boolean): void {
 	console.log("localplayerif in template=" + localPaddleId);
 
 	const scoreUI = new Entity();
@@ -28,9 +28,9 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 		const x = i ? -posX : posX;
 		const rotation_y = i % 2 ? -90 * Math.PI / 180 : 90 * Math.PI / 180;
 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.25, 0), 0));
-		if (i === localPaddleId)
+		if (i === localPaddleId || isLocalGame)
 			paddleEntity.addComponent(new InputComponent(true));
-		else
+		else 
 			paddleEntity.addComponent(new InputComponent());
 		paddleEntity.addComponent(new TransformComponent(
 			new Vector3(x, 0.25, 0),

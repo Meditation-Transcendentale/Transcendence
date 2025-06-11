@@ -17,15 +17,13 @@ export class InputSystem extends System {
 	private readonly MAX_OFFSET: number = 8.4;
 	private move: number;
 	private lastSentMove: number = 0;
-	private isLocalGame: boolean;
 
-	constructor(inputManager: InputManager, wsManager: WebSocketManager, isLocalGame: boolean) {
+	constructor(inputManager: InputManager, wsManager: WebSocketManager) {
 		super();
 		this.inputManager = inputManager;
 		this.wsManager = wsManager;
 		this.localPaddleId = localPaddleId;
 		this.move = 0;
-		this.isLocalGame = isLocalGame;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -51,7 +49,7 @@ export class InputSystem extends System {
 			if (paddle.id == localPaddleId){
 				UpPressed = this.inputManager.isKeyPressed("KeyW");
 				DownPressed = this.inputManager.isKeyPressed("KeyS");
-			} else if (this.isLocalGame){
+			} else {
 				UpPressed = this.inputManager.isKeyPressed("ArrowUp");
 				DownPressed = this.inputManager.isKeyPressed("ArrowDown");
 			}
