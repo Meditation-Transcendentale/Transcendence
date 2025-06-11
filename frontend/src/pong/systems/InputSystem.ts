@@ -1,4 +1,6 @@
-import { Matrix, Scalar, Vector3 } from "@babylonjs/core";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
+import { Matrix } from "@babylonjs/core/Maths/math";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { InputComponent } from "../components/InputComponent.js";
@@ -28,6 +30,7 @@ export class InputSystem extends System {
 
 	update(entities: Entity[], deltaTime: number): void {
 		const dt = deltaTime / 1000;
+		// console.log("Input system:", performance.now());
 		for (const entity of entities) {
 			if (
 				!entity.hasComponent(InputComponent) ||

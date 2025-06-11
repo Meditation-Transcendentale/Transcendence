@@ -27,6 +27,7 @@ export class ThinInstanceSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		// console.log("Thin instance system:", performance.now());
 		this.frameCount++;
 		this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
 

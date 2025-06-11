@@ -13,6 +13,7 @@ export class WebSocketManager {
 		};
 
 		this.socket.onerror = (error) => console.error("WebSocket error", error);
+		this.socket.onclose = () => console.log("Connection closed")
 	}
 
 	private handleMessage(data: any): void {

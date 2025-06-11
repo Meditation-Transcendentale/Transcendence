@@ -1,4 +1,6 @@
-import { Matrix, Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Matrix } from "@babylonjs/core/Maths/math";
+
 // src/systems/NetworkingSystem.ts
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
@@ -35,6 +37,7 @@ export class NetworkingSystem extends System {
 	update(entities: Entity[], deltaTime: number): void {
 		const messages = this.wsManager.getMessages();
 
+		// console.log("Networking system:", performance.now());
 		messages.forEach((raw: ArrayBuffer) => {
 			let serverMsg: userinterface.ServerMessage;
 			try {
@@ -74,7 +77,6 @@ export class NetworkingSystem extends System {
 					if (!e) return;
 
 					const paddleComp = e.getComponent(PaddleComponent)!;
-					// console.log(paddleComp.id);
 					paddleComp.offset = p.offset; // update direction
 
 					const tf = e.getComponent(TransformComponent)!;

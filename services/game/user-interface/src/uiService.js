@@ -82,8 +82,10 @@ export default class UIService {
 					const buf = encodeServerMessage({ end: [winner] });
 					for (const sid of this.games.get(gameId) || []) {
 						const s = this.sessions.get(sid);
-						s.ws.send(buf, /* isBinary= */ true);
-						s.ws.close();
+						if (s.ws.isAlive) {
+							s.ws.send(buf, /* isBinary= */ true);
+							s.ws.close();
+						}
 					}
 					this.allowedByGame.delete(gameId);
 					this.games.delete(gameId);
@@ -146,7 +148,7 @@ export default class UIService {
 		const sess = this.sessions.get(ws.uuid);
 		const topic = `games.${sess.mode}.${sess.gameId}.match.quit`;
 		natsClient.publish(topic, encodeMatchQuit({ uuid: ws.uuid }));
-		ws.close();
+		// ws.close();
 	}
 
 	handleReady(ws) {
