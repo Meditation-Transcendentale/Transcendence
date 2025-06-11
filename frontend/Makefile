@@ -11,7 +11,7 @@ up:
 	docker compose -f $(DOCKER_COMPOSE_FILE) up --build
 
 down:
-	docker compose -f $(DOCKER_COMPOSE_FILE) stop
+	docker compose -f $(DOCKER_COMPOSE_FILE) stop -t 3
 	docker compose -f $(DOCKER_COMPOSE_FILE) rm -f -v
 	docker compose -f $(DOCKER_COMPOSE_FILE) down
 

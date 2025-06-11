@@ -28,6 +28,9 @@ body {
 
 	--font-window-bar: bold small-caps 2vh de-valancia;
 	--font-window-content: de-valancia 2vh 100;
+
+	--input-on-color: black;
+	--input-on-background: red;
 }
 
 canvas {
@@ -161,6 +164,16 @@ canvas {
 }
 
 
+.window[off],
+.window[off] *,
+input[off] {
+	color: grey;
+	background-color: #555;
+	border-color: grey;
+	pointer-events: none;
+}
+
+
 
 .window-bar {
 	position: sticky;
@@ -201,4 +214,9 @@ canvas {
 
 input {
 	all: unset;
+}
+
+input[on] {
+	color: var(--input-on-color) !important;
+	background-color: var(--input-on-background) !important;
 }

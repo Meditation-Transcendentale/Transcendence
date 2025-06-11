@@ -9,11 +9,10 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@babylonjs/core": "^8.0.0",
-    "@babylonjs/gui": "8.2.0",
-    "@babylonjs/inspector": "^8.3.0",
+    "@babylonjs/core": "^8.11.0",
+    "@babylonjs/gui": "8.11.0",
+    "@babylonjs/inspector": "^8.11.0",
     "@types/node": "^22.14.1",
-    "buffer": "^6.0.3",
     "esbuild": "^0.19.11",
     "glob": "^11.0.2",
     "protobufjs": "^7.5.0",

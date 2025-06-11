@@ -1,19 +1,128 @@
 /*######################CREATE#################*/
 
 #create-mod-window {
-	width: 30vh;
-	height: 20vh;
+	width: 40vh;
 	top: 30%;
 	left: 50%;
 }
 
-#create-mod-window>input {
-	border: 0.2vh white solid;
-	width: 46%;
-	margin-left: 0.4vh;
-	margin-top: 0.4vh;
-	margin-right: 0.4vh;
+#create-mod {
+	width: 100%;
+	height: calc(100% - 4vh);
+	margin-top: 0.5vh;
+	margin-bottom: 0.5vh;
 }
+
+#create-mod>tbody>tr>td {
+	min-width: 20%;
+	height: 100%;
+	text-align: center;
+}
+
+#pong-mod,
+#br-mod,
+#tournament-mod {
+	border: 0.2vh white solid;
+	width: calc(100% - 1vh);
+	height: 90%;
+	font-size: 4vh;
+	font-weight: 100;
+	text-align: center;
+}
+
+#pong-mod:hover,
+#br-mod:hover,
+#tournament-mod:hover {
+	color: var(--window-background);
+	background-color: var(--window-color);
+}
+
+/*####*/
+
+#create-map-window {
+	display: block;
+	width: 15vh;
+	height: 20vh;
+	top: 15vh;
+	left: 10vh;
+	max-height: 20vh;
+	overflow: auto;
+}
+
+#create-map {
+	display: grid;
+	grid-template-columns: 1 auto auto auto;
+	background-color: white;
+	row-gap: 0.2vh;
+	overflow-y: scroll;
+}
+
+#create-map>input {
+	padding-left: 1vh;
+	background-color: var(--window-background);
+	font-size: 2vh;
+	font-weight: 100;
+}
+
+#create-map>input:hover {
+	color: var(--window-background);
+	background-color: var(--window-color)
+}
+
+
+/*####*/
+
+#create-submod-window {
+	width: 10vh;
+	top: calc(30% + 12vh);
+	left: calc(50% + (40% * 1 / 4));
+}
+
+#create-submod {
+	display: grid;
+	grid-template-columns: 1 auto auto auto;
+	background-color: inherit-color;
+	row-gap: 0.2vh;
+	overflow-y: scroll;
+}
+
+#create-submod>input {
+	padding-left: 1vh;
+	background-color: var(--window-background);
+	font-size: 2vh;
+	font-weight: 100;
+}
+
+#create-submod>input:hover {
+	color: var(--window-background) !important;
+	background-color: var(--window-color) !important;
+}
+
+/*####*/
+
+#create-btn-window {
+	top: 50%;
+	left: 5%;
+	width: 20vh;
+	height: fit-content;
+	text-align: center;
+}
+
+#create-btn {
+	width: 90%;
+	height: 18vh;
+	text-align: center;
+	border: 0.2vh white solid;
+	margin-top: 1vh;
+	margin-bottom: 1vh;
+	font-size: 5vh;
+}
+
+#create-btn:hover {
+	color: var(--window-background);
+	background-color: var(--window-color)
+}
+
 
 /*######################JOIN###################*/
 .a {

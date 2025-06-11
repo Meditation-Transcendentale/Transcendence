@@ -19,6 +19,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - ../shared/certs:/app/certs:ro
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/8081"]

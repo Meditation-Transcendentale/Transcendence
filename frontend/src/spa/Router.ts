@@ -182,7 +182,7 @@ class RouterC {
 
 	private async getHTML(path: string): Promise<HTMLDivElement> {
 		console.log("%c Fetching %s", "color: black; background-color: plum", path);
-		const url = `http://${window.location.hostname}:8080/html` + path + ".html";
+		const url = `https://${window.location.hostname}:8080/html` + path + ".html";
 		const response = await fetch(url, { redirect: "error" })
 
 		if (!response.ok) {

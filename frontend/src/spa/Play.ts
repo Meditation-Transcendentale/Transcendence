@@ -6,43 +6,6 @@ import { User } from "./User";
 import { createButton } from "./utils";
 
 
-interface playHtmlReference {
-	create: HTMLDivElement;
-	join: HTMLDivElement;
-	//modPong: HTMLInputElement;
-	//modBR: HTMLInputElement;
-	//mapDefault: HTMLInputElement;
-	//smod: HTMLDivElement;
-	//smodLocal: HTMLInputElement;
-	//smodOnline: HTMLInputElement;
-	//smodAI: HTMLInputElement;
-	//createBtn: HTMLInputElement;
-	list: HTMLTableElement;
-};
-
-enum playState {
-	create = 0,
-	join = 1,
-	lobby = 2
-}
-
-interface createState {
-	mod: number,
-	map: boolean,
-	submod: boolean
-}
-
-type lobby = {
-	id: string,
-	mod: string,
-	maxPlayers: number,
-	players: string[]
-}
-
-interface listResp {
-	lobbies: lobby[];
-}
-
 const lr: listResp = {
 	lobbies: [
 		{
@@ -144,6 +107,46 @@ const lr: listResp = {
 };
 
 
+
+interface playHtmlReference {
+	create: HTMLDivElement;
+	join: HTMLDivElement;
+	pongMod: HTMLInputElement;
+	brMod: HTMLInputElement;
+	tournamentMod: HTMLInputElement;
+	defaultMap: HTMLInputElement;
+	localMod: HTMLInputElement;
+	onlineMod: HTMLInputElement;
+	aiMod: HTMLInputElement;
+	createBtn: HTMLInputElement;
+	smodWin: HTMLDivElement;
+	createWin: HTMLDivElement;
+	list: HTMLTableElement;
+};
+
+enum playState {
+	create = 0,
+	join = 1,
+	lobby = 2
+}
+
+interface createState {
+	mod: number,
+	map: boolean,
+	submod: boolean
+}
+
+type lobby = {
+	id: string,
+	mod: string,
+	maxPlayers: number,
+	players: string[]
+}
+
+interface listResp {
+	lobbies: lobby[];
+}
+
 export default class Play {
 	private div: HTMLDivElement;
 	private ref: playHtmlReference;
@@ -161,14 +164,16 @@ export default class Play {
 		this.ref = {
 			create: div.querySelector('#play-create') as HTMLDivElement,
 			join: div.querySelector("#play-join") as HTMLDivElement,
-			//modPong: div.querySelector("#pong-mod") as HTMLInputElement,
-			//modBR: div.querySelector("#br-mod") as HTMLInputElement,
-			//mapDefault: div.querySelector("#default-map") as HTMLInputElement,
-			//smod: div.querySelector("#create-submod") as HTMLDivElement,
-			//smodLocal: div.querySelector("#local-submod") as HTMLInputElement,
-			//smodAI: div.querySelector("#ia-submod") as HTMLInputElement,
-			//smodOnline: div.querySelector("#online-submod") as HTMLInputElement,
-			//createBtn: div.querySelector("#create-btn") as HTMLInputElement,
+			pongMod: div.querySelector("#pong-mod") as HTMLInputElement,
+			brMod: div.querySelector("#br-mod") as HTMLInputElement,
+			tournamentMod: div.querySelector("#tournament-mod") as HTMLInputElement,
+			defaultMap: div.querySelector("#default-map") as HTMLInputElement,
+			localMod: div.querySelector("#local-smod") as HTMLInputElement,
+			onlineMod: div.querySelector("#online-smod") as HTMLInputElement,
+			aiMod: div.querySelector("#ai-smod") as HTMLInputElement,
+			createBtn: div.querySelector("#create-btn") as HTMLInputElement,
+			smodWin: div.querySelector("#create-submod-window") as HTMLDivElement,
+			createWin: div.querySelector("#create-btn-window") as HTMLDivElement,
 			list: div.querySelector("#join-list") as HTMLTableElement
 		}
 
@@ -181,6 +186,30 @@ export default class Play {
 		this.state = playState.create;
 		this.ref.create.remove();
 		this.ref.join.remove();
+
+		this.ref.smodWin.toggleAttribute("off");
+
+		this.ref.pongMod.addEventListener("click", () => {
+			this.ref.pongMod.toggleAttribute("on");
+			this.ref.brMod.removeAttribute("on")
+			this.ref.tournamentMod.removeAttribute("on");
+			this.ref.smodWin.toggleAttribute("off");
+		})
+
+		this.ref.brMod.addEventListener("click", () => {
+			this.ref.brMod.toggleAttribute("on");
+			this.ref.pongMod.removeAttribute("on")
+			this.ref.tournamentMod.removeAttribute("on");
+			this.ref.smodWin.setAttribute("off", "");
+		})
+
+		this.ref.tournamentMod.addEventListener("click", () => {
+			this.ref.tournamentMod.toggleAttribute("on");
+			this.ref.brMod.removeAttribute("on")
+			this.ref.pongMod.removeAttribute("on");
+			this.ref.smodWin.setAttribute("off", "");
+		})
+
 		//this.ref.smod.toggleAttribute('off');
 		//this.ref.createBtn.toggleAttribute('off');
 

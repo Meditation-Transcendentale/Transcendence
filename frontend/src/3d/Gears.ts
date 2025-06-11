@@ -1,9 +1,13 @@
+
+import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
+import "@babylonjs/loaders/glTF/2.0/";
+//import { GLTFFileLoader} from "@babylonjs/loaders/glTF/glTFFileLoader";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
@@ -20,6 +24,8 @@ interface cssElem {
 	pos: Float32Array;
 	hover: boolean;
 }
+
+//const Loader = new GLTFFileLoader();
 
 export class Gears {
 	private meshes: AbstractMesh[];
@@ -94,7 +100,7 @@ export class Gears {
 	}
 
 	public async load() {
-		const loaded = await LoadAssetContainerAsync("public/assets/gears.glb", this.scene);
+		const loaded = await LoadAssetContainerAsync("/assets/gears.glb", this.scene);
 
 		let rotation = Quaternion.FromEulerAngles(degToRad(21.44), degToRad(41.3), degToRad(-34));
 		this.sun = new DirectionalLight('sun', new Vector3(0, -1, 0).applyRotationQuaternionInPlace(rotation), this.scene);
