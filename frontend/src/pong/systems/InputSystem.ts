@@ -44,19 +44,27 @@ export class InputSystem extends System {
 			const transform = entity.getComponent(TransformComponent)!;
 
 			let offsetChange = 0;
-			let UpPressed;
-			let DownPressed;
+			let UpPressed = false;
+			let DownPressed = false;
 			if (paddle.id == localPaddleId){
 				UpPressed = this.inputManager.isKeyPressed("KeyW");
 				DownPressed = this.inputManager.isKeyPressed("KeyS");
 			} else {
-				UpPressed = this.inputManager.isKeyPressed("ArrowUp");
-				DownPressed = this.inputManager.isKeyPressed("ArrowDown");
+				DownPressed = this.inputManager.isKeyPressed("ArrowUp");
+				UpPressed = this.inputManager.isKeyPressed("ArrowDown");
 			}
 
 			this.move = 0;
-			if (UpPressed && !DownPressed) this.move = 1;
-			else if (DownPressed && !UpPressed) this.move = -1;
+			if (UpPressed && !DownPressed){
+				this.move = 1;
+				console.log("upmove");
+			}
+			else if (DownPressed && !UpPressed){
+				this.move = -1;
+				console.log("downmove");
+			} 
+
+			console.log("move: ", this.move);
 
 			offsetChange = this.move * 10 * dt;
 			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -this.MAX_OFFSET, this.MAX_OFFSET);

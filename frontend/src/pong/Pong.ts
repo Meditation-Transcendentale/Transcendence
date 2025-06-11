@@ -44,10 +44,13 @@ export class Pong {
 	private instanceManagers: any;
 	private glowLayer: any;
 	private uuid!: string;
+	private isLocalGame: boolean;
 
-	constructor(canvas: any, gameId: any) {
+	constructor(canvas: any, gameId: any, gameMode: any) {
 		this.canvas = canvas;
 		this.gameId = gameId;
+		this.isLocalGame = (gameMode == "local");
+		console.log("isLocal: ", this.isLocalGame)
 	}
 
 	async start() {
@@ -80,7 +83,9 @@ export class Pong {
 		this.inputManager = new InputManager();
 
 		// localPaddleId = await this.waitForWelcome();
-		localPaddleId = await this.waitForRegistration();
+		localPaddleId = 0;
+		await this.waitForRegistration();
+
 		this.initECS(config, this.instanceManagers, this.uuid);
 
 		this.stateManager = new StateManager(this.ecs);
@@ -114,7 +119,7 @@ export class Pong {
 		this.ecs.addSystem(new VisualEffectSystem(this.scene));
 		this.ecs.addSystem(new UISystem(this.scene));
 
-		createGameTemplate(this.ecs, config, localPaddleId);
+		createGameTemplate(this.ecs, config, localPaddleId, this.isLocalGame);
 	}
 
 	private createBaseMeshes(config: GameTemplateConfig) {
