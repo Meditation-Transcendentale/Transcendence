@@ -3,6 +3,8 @@ DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-s
 
 .PHONY: build down up re reKeepData update-hostname-env
 
+# curl -u <username>:<password> ftp://<ftp_host>/chemin/vers/.env -o .env
+
 build:
 	$(MAKE) update-hostname-env
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) up --build
@@ -35,3 +37,4 @@ update-hostname-env:
 	else \
 		echo "HOSTNAME=$$(hostname)" >> .env; \
 	fi
+
