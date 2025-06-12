@@ -9,16 +9,16 @@ const jc = JSONCodec();
 const nats = await connect({ servers: process.env.NATS_URL });
 
 async function handleNatsSubscription(subject, handler) {
-    const sub = nats.subscribe(subject);
-    for await (const msg of sub) {
-        try {
-            await handler(msg);
-        } catch (error) {
-            const status = error.status || 500;
-            const message = error.message || "Internal Server Error";
-            nats.publish(msg.reply, jc.encode({ success: false, status, message }));
-        }
-    }
+	const sub = nats.subscribe(subject);
+	for await (const msg of sub) {
+		try {
+			await handler(msg);
+		} catch (error) {
+			const status = error.status || 500;
+			const message = error.message || "Internal Server Error";
+			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
+		}
+	}
 }
 
 handleErrorsNats(async () => {

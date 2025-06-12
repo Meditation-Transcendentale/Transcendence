@@ -10,7 +10,38 @@ scrape_configs:
     scheme: https
     tls_config:
       insecure_skip_verify: true
-  # - job_name: 'auth'
-  #   static_configs:
-  #     - targets: ['auth-service:4002']
-  #   metrics_path: '/metrics'
+  - job_name: 'auth'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/auth/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  - job_name: 'stats'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/stats/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  - job_name: 'friends'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/friends/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  - job_name: 'get-info'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/info/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  - job_name: 'update-info'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/update-info/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true

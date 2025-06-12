@@ -1,9 +1,11 @@
 DOCKER_COMPOSE = docker compose
-DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml
+DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml -f ./prometheus/docker-compose-prometheus.yml
 
-.PHONY: build down up re reKeepData update-hostname-env
+.PHONY: all build down up re reKeepData update-hostname-env
 
 # curl -u <username>:<password> ftp://<ftp_host>/chemin/vers/.env -o .env
+
+all : re
 
 build:
 	$(MAKE) update-hostname-env

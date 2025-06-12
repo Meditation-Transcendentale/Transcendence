@@ -51,6 +51,13 @@ app.setErrorHandler((error, req, res) => {
 });
 
 const verifyJWT = async (req, res) => {
+	if (req.raw.url && req.raw.url.endsWith('/metrics')) {
+		const IP = req.ip || req.raw.socket.remoteAddress;
+		if (IP.startsWith('172.18.') || IP.startsWith('172.19.') || IP.startsWith('172.20.')) {
+			return;
+		}
+		return res.code(403).send({ message: 'Forbidden' });
+	}
 
 	const token = req.cookies.accessToken;
 	if (!token) {
