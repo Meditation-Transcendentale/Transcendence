@@ -17,6 +17,7 @@ import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
 import { createCamera, createBaseMeshes, createInstanceManagers } from "./utils/initGame.js";
 import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
+import Router from "../spa/Router";
 import type { userinterface } from './utils/proto/message.js';
 
 const API_BASE = `http://${window.location.hostname}:4000`;
@@ -41,7 +42,6 @@ export class Pong {
 	private baseMeshes: any;
 	private instanceManagers: any;
 	private scoreUI: any;
-	private endUI: any;
 
 	private canvas;
 	private gameId;
@@ -97,11 +97,10 @@ export class Pong {
 		));
 		this.visualEffectSystem = new VisualEffectSystem(this.scene);
 		this.ecs.addSystem(this.visualEffectSystem);
-		this.uiSystem = new UISystem();
+		this.uiSystem = new UISystem(this);
 		this.scoreUI = this.uiSystem.scoreUI;
-		this.endUI = this.uiSystem.endUI;
 		this.ecs.addSystem(this.uiSystem);
-		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid, this.scoreUI, this.endUI));
+		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid));
 	
 		createGameTemplate(this.ecs, config, localPaddleId, this.isLocalGame);
 	}
@@ -129,7 +128,6 @@ export class Pong {
 				// Check for the welcome case
 				if (serverMsg.welcome?.paddleId != null) {
 					const paddleId = serverMsg.welcome.paddleId;
-					// console.log('Received WelcomeMessage:', paddleId);
 
 					// Create and send a “ready” ClientMessage via helper
 					const readyPayload: userinterface.IClientMessage = { ready: {} };
@@ -167,7 +165,6 @@ export class Pong {
 		this.engine?.dispose();
 
 		this.visualEffectSystem?.dispose();
-		this.uiSystem?.disposeUI();
 
 		if (this.scoreUI?.dispose) {
 			this.scoreUI.dispose();
@@ -176,6 +173,7 @@ export class Pong {
 		}
 		clearTimeout(resizeTimeout);
 		this.engine.dispose();
+		Router.nav(`/play`, false, false);
 	}
 
 	public static INIT() {
@@ -186,6 +184,5 @@ export class Pong {
 					engine.resize();
 			}, 100); // délai pour limiter les appels trop fréquents
 		});
-
 	}
 }
