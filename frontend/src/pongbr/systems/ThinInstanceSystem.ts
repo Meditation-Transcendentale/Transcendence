@@ -6,12 +6,16 @@ import { BallComponent } from "../components/BallComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { PortalComponent } from "../components/PortalComponent.js";
+import { GoalComponent } from "../components/GoalComponent.js";
+import { PillarComponent } from "../components/PillarComponent.js";
 
 export class ThinInstanceSystem extends System {
 	private ballManager: ThinInstanceManager;
 	private paddleManager: ThinInstanceManager;
 	private wallManager: ThinInstanceManager;
 	private portalManager: ThinInstanceManager;
+	private goalManager: ThinInstanceManager;
+	private pillarManager: ThinInstanceManager;
 	private camera: Camera;
 	private frameCount: number = 0;
 
@@ -20,6 +24,8 @@ export class ThinInstanceSystem extends System {
 		paddleManager: ThinInstanceManager,
 		wallManager: ThinInstanceManager,
 		portalManager: ThinInstanceManager,
+		goalManager: ThinInstanceManager,
+		pillarManager: ThinInstanceManager,
 		camera: Camera
 	) {
 		super();
@@ -27,6 +33,8 @@ export class ThinInstanceSystem extends System {
 		this.paddleManager = paddleManager;
 		this.wallManager = wallManager;
 		this.portalManager = portalManager;
+		this.goalManager = goalManager;
+		this.pillarManager = pillarManager;
 		this.camera = camera;
 	}
 
@@ -44,5 +52,7 @@ export class ThinInstanceSystem extends System {
 		this.paddleManager.update(activePaddleEntities, PaddleComponent, this.camera, this.frameCount);
 		this.wallManager.update(entities, WallComponent, this.camera, this.frameCount);
 		this.portalManager.update(entities, PortalComponent, this.camera, this.frameCount);
+		this.goalManager.update(entities, GoalComponent, this.camera, this.frameCount);
+		this.pillarManager.update(entities, PillarComponent, this.camera, this.frameCount);
 	}
 }

@@ -65,18 +65,22 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 		));
 		ecs.addEntity(wallEntity);
 	}
-	const r = 53 * (1 / Math.sqrt(2))
+	const R = 50.9;
+	const N = 4;
 	for (let i = 0; i < 4; i++) {
-		let x = i / 2 > 0.5 ? -r : r;
-		let z = i % 2 ? r : -r;
-		const rotation_y = i % 2 ? 0 : 90 * Math.PI / 180;
+		const theta = (2 * Math.PI * i) / N;
+
+		const x = R * Math.cos(theta);
+		const z = R * Math.sin(theta);
+
+		const rotationY = theta + Math.PI / 2;
 		const scale_x = 1;
 		const scale_z = 1;
 		let portalEntity = new Entity();
 		portalEntity.addComponent(new PortalComponent(0, new Vector3(x, 0, z)));
 		portalEntity.addComponent(new TransformComponent(
-			new Vector3(x, 0, z),
-			new Vector3(0, 0, 0),
+			new Vector3(x, 4.5, z),
+			new Vector3(0, rotationY, 0),
 			new Vector3(scale_x, 1, scale_z)
 		));
 		ecs.addEntity(portalEntity);

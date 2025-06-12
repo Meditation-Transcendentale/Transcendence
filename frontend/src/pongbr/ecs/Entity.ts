@@ -7,7 +7,6 @@ export class Entity {
 
 	constructor() {
 		this.id = Entity._idCounter++;
-		console.log("id:" + this.id);
 	}
 
 	addComponent(component: Component): this {

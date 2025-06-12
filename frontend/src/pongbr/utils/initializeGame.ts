@@ -16,19 +16,19 @@ export function createCamera(scene: Scene, canvas: any): ArcRotateCamera {
 }
 
 export function createWallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
-	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: config.wallWidth, height: 1, depth: 20 }, scene);
+	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: 1, height: 1, depth: 2 }, scene);
 	const wallMaterial = new StandardMaterial("wallMaterial", scene);
 	wallMaterial.diffuseColor.set(0, 0, 0);
-	wallMaterial.emissiveColor.set(1, 1, 1);
+	wallMaterial.emissiveColor.set(1, 0, 1);
 	wallMesh.material = wallMaterial;
-	wallMesh.setEnabled(true);
+	wallMesh.setEnabled(false);
 	wallMesh.setPivotPoint(Vector3.Zero());
 
 	return wallMesh;
 }
 
 export function createArenaMesh(scene: Scene, config: GameTemplateConfig): Mesh {
-	const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 100, height: 1 }, scene);
+	const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 100, height: 1, tessellation: 64 }, scene);
 	const material = new StandardMaterial("arenaMaterial", scene);
 	// material.diffuseColor.set(0, 0, 0;
 	// material.specularColor.set(0, 0, 0);
@@ -55,7 +55,7 @@ export function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh
 	const paddleMesh = MeshBuilder.CreateBox("paddleBase", { width: 3, height: 0.4, depth: 0.4 }, scene);
 	const paddleMaterial = new StandardMaterial("paddleMaterial", scene);
 	paddleMaterial.diffuseColor.set(0, 0, 0);
-	paddleMaterial.emissiveColor.set(1, 1, 1);
+	paddleMaterial.emissiveColor.set(0, 1, 1);
 	paddleMesh.material = paddleMaterial;
 	paddleMesh.setEnabled(true);
 	paddleMesh.setPivotPoint(Vector3.Zero());
@@ -64,13 +64,44 @@ export function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh
 }
 
 export function createPortalMesh(scene: Scene, config: GameTemplateConfig): Mesh {
-	const portalMesh = MeshBuilder.CreateBox("paddleBase", { width: 4, height: 4, depth: 4 }, scene);
+	const portalMesh = MeshBuilder.CreateBox("paddleBase", { width: 4, height: 8, depth: 2 }, scene);
 	const paddleMaterial = new StandardMaterial("portalMaterial", scene);
 	paddleMaterial.diffuseColor.set(0, 1, 0);
-	paddleMaterial.emissiveColor.set(1, 1, 1);
+	paddleMaterial.emissiveColor.set(1, 1, 0);
 	portalMesh.material = paddleMaterial;
 	portalMesh.setEnabled(true);
 	portalMesh.setPivotPoint(Vector3.Zero());
 
 	return portalMesh;
 }
+
+// utils/initializeGame.ts
+
+export function createPillarMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+	const m = MeshBuilder.CreateBox("pillarBase", {
+		width: 0.5,
+		height: 2,
+		depth: 0.5
+	}, scene);
+	m.isVisible = true;
+	const mat = new StandardMaterial("pillarMat", scene);
+	mat.diffuseColor.set(0.8, 0.8, 0.8);
+	m.material = mat;
+	m.setPivotPoint(Vector3.Zero());
+	return m;
+}
+
+export function createGoalMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+	const m = MeshBuilder.CreateBox("goalBase", {
+		width: 1,
+		height: 1,
+		depth: 0.5
+	}, scene);
+	const mat = new StandardMaterial("goalMat", scene);
+	mat.diffuseColor.set(1, 0, 0);
+	m.material = mat;
+	m.setEnabled(false);
+	m.setPivotPoint(Vector3.Zero());
+	return m;
+}
+

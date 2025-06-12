@@ -15,13 +15,15 @@ import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
 import { getOrCreateUUID } from "./utils/getUUID.js";
-import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
+import { GameTemplateConfig } from "./templates/GameTemplate.js";
 import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
 import { gameScoreInterface } from "./utils/displayGameInfo.js";
-import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh, createPortalMesh } from "./utils/initializeGame.js";
+import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh, createPortalMesh, createPillarMesh, createGoalMesh } from "./utils/initializeGame.js";
 import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
 import type { userinterface } from './utils/proto/message.js';
+import { PaddleBundle } from "./templates/builder.js";
+import { createGameTemplate } from "./templates/builder.js";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export const global = {
@@ -45,6 +47,7 @@ export class PongBR {
 	private instanceManagers: any;
 	private glowLayer: any;
 	private uuid!: string;
+	private paddleBundles!: PaddleBundle[];
 
 	constructor(canvas: any, gameId: any) {
 		this.canvas = canvas;
@@ -90,9 +93,11 @@ export class PongBR {
 	private createInstanceManagers(baseMeshes: any) {
 		return {
 			ball: new ThinInstanceManager(baseMeshes.ball, 1, 50, 100),
-			paddle: new ThinInstanceManager(baseMeshes.paddle, 2, 50, 100),
-			wall: new ThinInstanceManager(baseMeshes.wall, 4, 50, 100),
-			portal: new ThinInstanceManager(baseMeshes.portal, 4, 50, 100)
+			paddle: new ThinInstanceManager(baseMeshes.paddle, 100, 50, 100),
+			wall: new ThinInstanceManager(baseMeshes.wall, 100, 50, 100),
+			portal: new ThinInstanceManager(baseMeshes.portal, 4, 50, 100),
+			pillar: new ThinInstanceManager(baseMeshes.pillar, /* capacity */ 200, 50, 100),
+			goal: new ThinInstanceManager(baseMeshes.goal,   /* capacity */ 100, 50, 100),
 		}
 	}
 
@@ -106,12 +111,14 @@ export class PongBR {
 			instanceManagers.paddle,
 			instanceManagers.wall,
 			instanceManagers.portal,
+			instanceManagers.goal,
+			instanceManagers.pillar,
 			this.camera
 		));
 		// this.ecs.addSystem(new VisualEffectSystem(this.scene));
 		//this.ecs.addSystem(new UISystem());
 
-		createGameTemplate(this.ecs, config, localPaddleId);
+		this.paddleBundles = createGameTemplate(this.ecs, 12);
 	}
 
 	private createBaseMeshes(config: GameTemplateConfig) {
@@ -120,7 +127,9 @@ export class PongBR {
 			ball: createBallMesh(this.scene, config),
 			paddle: createPaddleMesh(this.scene, config),
 			wall: createWallMesh(this.scene, config),
-			portal: createPortalMesh(this.scene, config)
+			portal: createPortalMesh(this.scene, config),
+			pillar: createPillarMesh(this.scene, config),
+			goal: createGoalMesh(this.scene, config),
 		}
 	}
 
