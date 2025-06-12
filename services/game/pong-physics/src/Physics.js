@@ -118,10 +118,10 @@ export const Physics = {
 
 						const { mtv, penetration } = computeCircleBoxMTV(ballPos, ballCollider, wallPos, otherCollider);
 						if (wall.isGoal === true && penetration > 0) {
-							let scorer = wall.id === 0
-								? 1  // right paddle component id
-								: 0; // left paddle component id
-							scorer = ballPos.x > 0 ? 0 : 1;
+							// let scorer = wall.id === 0
+							// 	? 0  // right paddle component id
+							// 	: 1; // left paddle component id
+							let scorer = ballPos.x > 0 ? 1 : 0;
 							events.push({ type: 'goal', gameId, playerId: scorer });
 							console.log(`Scorer id = ${scorer}`);
 							game.resetBall();

@@ -1,4 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Vector2 } from "@babylonjs/core";
 import { Matrix } from "@babylonjs/core/Maths/math";
 
 // src/systems/NetworkingSystem.ts
@@ -9,8 +10,8 @@ import { BallComponent } from "../components/BallComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
-import { gameEndUI } from "../utils/displayGameInfo.js";
-import { global } from "../Pong";
+// import { endUI } from "./UISystem.js";
+// import { global } from "../Pong";
 import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
@@ -20,16 +21,16 @@ export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
 	private uuid: string;
 	private scoreUI: any;
+	private endUI: any;
 	private myScore: number;
 	private opponentScore: number;
 	// private endUI = globalEndUI;
 
 
-	constructor(wsManager: WebSocketManager, uuid: string, scoreUI: any) {
+	constructor(wsManager: WebSocketManager, uuid: string) {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
-		this.scoreUI = scoreUI;
 		this.myScore = 0;
 		this.opponentScore = 0;
 	}
@@ -90,23 +91,27 @@ export class NetworkingSystem extends System {
 
 				// 3. Score update
 				if (score) {
-					//console.log(score);
+					const e = entities.find(e => e.hasComponent(UIComponent));
+					let ui = e?.getComponent(UIComponent);
 					const myScore = score[localPaddleId] ?? 0;
 					const otherId = score
 						.map((_, i) => i)
 						.find(i => i !== localPaddleId)!;
 					const theirScore = score[otherId] ?? 0;
-					//this.scoreUI.update(myScore, theirScore);
+					if (ui) {
+						ui.score.x = myScore;
+						ui.score.y = theirScore;
+					}
 				}
 			}
 
 			// === Game End ===
 			if (serverMsg.end) {
 				console.log("Received GameEndMessage");
-				const scores = serverMsg.end.score as number[];
-				const myScore = scores[localPaddleId] ?? 0;
-				const other = scores.find((_, i) => i !== localPaddleId) ?? 0;
-				global.endUI = gameEndUI(myScore < other);
+				// const scores = serverMsg.end.score as number[];
+				// const myScore = scores[localPaddleId] ?? 0;
+				// const other = scores.find((_, i) => i !== localPaddleId) ?? 0;
+				// global.endUI = gameEndUI(myScore < other);
 			}
 		});
 	}

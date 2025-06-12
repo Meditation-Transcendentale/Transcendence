@@ -29,7 +29,6 @@ export class InputSystem extends System {
 
 	update(entities: Entity[], deltaTime: number): void {
 		const dt = deltaTime / 1000;
-		// console.log("Input system:", performance.now());
 		for (const entity of entities) {
 			if (
 				!entity.hasComponent(InputComponent) ||
@@ -51,24 +50,18 @@ export class InputSystem extends System {
 			if (paddle.id == 0){
 				UpPressed = this.inputManager.isKeyPressed("KeyW");
 				DownPressed = this.inputManager.isKeyPressed("KeyS");
-				console.log("0");
 			} else {
 				DownPressed = this.inputManager.isKeyPressed("ArrowUp");
 				UpPressed = this.inputManager.isKeyPressed("ArrowDown");
-				console.log("1");
 			}
 
 			paddle.move = 0;
 			if (UpPressed && !DownPressed){
 				paddle.move = 1;
-				console.log("upmove");
 			}
 			else if (DownPressed && !UpPressed){
 				paddle.move = -1;
-				console.log("downmove");
 			}
-
-			console.log("move: ", this.move);
 
 			offsetChange = this.move * 10 * dt;
 			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -this.MAX_OFFSET, this.MAX_OFFSET);
@@ -98,7 +91,6 @@ export class InputSystem extends System {
 				this.wsManager.socket.send(buffer);
 				paddle.lastMove = paddle.move;
 
-				// console.log("Sent move to server: move =", this.move, "offset = ", paddle.offset);
 			}
 		}
 	}

@@ -2,7 +2,7 @@ import { Vector2 } from "@babylonjs/core/Maths/math";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { Button } from "@babylonjs/gui/2D/controls/button";
+// import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 
 import { System } from "../ecs/System.js";
@@ -67,7 +67,6 @@ export class UISystem extends System {
 		}
 	}
 
-
 	gameEndUI(playerWin: boolean) {
 		const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("EndUI");
 
@@ -97,5 +96,9 @@ export class UISystem extends System {
 				advancedTexture.dispose();
 			}
 		};
+	}
+
+	disposeUI(): void{
+		this.endUI.dispose();
 	}
 }
