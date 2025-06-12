@@ -1,32 +1,19 @@
 <div id="auth" class="intant">
 	<link rel="stylesheet" type="text/css" href="/register.css">
-	<div id="rdd">
-		<div id="rd1" class="d1"></div>
-		<div id="rd2" class="d1"></div>
-		<div id="rd3" class="d1"></div>
-		<div id="rd4" class="d1"></div>
-		<div id="rd5" class="d1"></div>
-	</div>
-	<!-- <div id="arrow"> -->
-	<!-- 	<div id="arrow-tail"></div> -->
-	<!-- 	<div id="arrow-head"></div> -->
-	<!-- </div> -->
-	<!-- <h1 id="rt">REGISTER</h1> -->
-	<div id="rr">
-		<div id="rtc"></div>
-	<h1 id="rt">
-		<span>R</span><span>E</span><span>G</span><span>I</span><span>S</span><span>T</span><span>E</span><span>R</span>
-	</h1>
-	</div>
-		<input id="register-username" type="text" placeholder="Username"></input><br>
-		<input id="register-password" type="password" placeholder="Password"><br>
-		<input id="register-submit" type="button" value="Register">
-	<a id="login" class="center" href="/auth"><span>L</span><span>O</span><span>G</span><span>I</span><span>N</span></a>
-	<div id="rt">
-		<div id="rtc"></div>
-	<div id="register-btn-cont"
-	
+	<div id="register-window" class="window">
+		<div class="window-bar">REGISTER</div>
+		<div class="window-content">
+			<form id="register-form" autocomplete="off">
+				<input id="register-username" class="readable" type="text" placeholder="Username">
+				<input id="register-password" class="readable" type="password" placeholder="Password">
+				<input id="register-submit" type="submit" value="register">
+			</form>
+			<div id='sepv'></div>
+			<div id='seph'></div>
+			<div id="requirement">8 character minimun, 15max, one caps, forbidden * / []</div>
+		</div>
 
 	</div>
+
 </div>
 

@@ -28,6 +28,7 @@ body {
 
 	--font-window-bar: bold small-caps 2vh de-valancia;
 	--font-window-content: de-valancia 2vh 100;
+	--font-readable: normal normal 2vh dotrice;
 
 	--input-on-color: white;
 	--input-on-background: blue;
@@ -218,4 +219,10 @@ input {
 input[on] {
 	color: var(--input-on-color) !important;
 	background-color: var(--input-on-background) !important;
+}
+
+.readable {
+	font: var(--font-readable);
+	text-transform: none;
+	letter-spacing: normal;
 }

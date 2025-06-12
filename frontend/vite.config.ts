@@ -8,6 +8,9 @@ export default defineConfig({
 		https: {
 			key: fs.readFileSync("./certs/server.key"),
 			cert: fs.readFileSync("./certs/server.crt")
+		},
+		watch: {
+			usePolling: true
 		}
 	},
 	build: {

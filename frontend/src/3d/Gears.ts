@@ -14,7 +14,7 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { homeVue, playVue, statsVue } from "../Vue";
+import { homeVue, loginVue, playVue, registerVue, statsVue } from "../Vue";
 
 
 interface cssElem {
@@ -269,6 +269,15 @@ export class Gears {
 				statsVue.enable();
 				break;
 			}
+			case 'login': {
+				loginVue.enable();
+				break;
+			}
+			case 'register': {
+				registerVue.enable();
+				break;
+			}
+
 		}
 	}
 
@@ -286,6 +295,14 @@ export class Gears {
 				statsVue.disable();
 				break;
 			}
+			case 'login': {
+				loginVue.disable();
+				break;
+			}
+			case 'register': {
+				registerVue.disable();
+				break;
+			}
 		}
 
 	}
@@ -296,7 +313,6 @@ export class Gears {
 				playVue.init(this.scene.getCameraByName('menu') as Camera);
 				playVue.addWindow('create', this.outer, this.outerBounding, this.outerMatrix[17]);
 				playVue.addWindow('join', this.outer, this.outerBounding, this.outerMatrix[14]);
-				//playVue.addWindow('lobby', this.outer, this.outerBounding, this.outerMatrix[10]);
 				break;
 			}
 			case 'home': {
@@ -311,6 +327,17 @@ export class Gears {
 				statsVue.addWindow('br', this.outer, this.outerBounding, this.outerMatrix[14]);
 				break;
 			}
+			case 'login': {
+				loginVue.init(this.scene.getCameraByName('home') as Camera);
+				loginVue.addWindow('register', this.outer, this.outerBounding, this.outerMatrix[8]);
+				break;
+			}
+			case 'register': {
+				registerVue.init(this.scene.getCameraByName('menu') as Camera);
+				registerVue.addWindow('login', this.outer, this.outerBounding, this.outerMatrix[16]);
+				break;
+			}
+
 		}
 	}
 

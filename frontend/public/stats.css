@@ -1,0 +1,39 @@
+#stats-username-window {
+	top: 5vh;
+	left: 60vh;
+	border-width: 0.15vh;
+	min-width: 20vh;
+	width: calc(fit-content + 2vh);
+}
+
+#stats-username-window>.window-content {
+	height: 7vh;
+}
+
+#stats-username {
+	position: absolute;
+	top: 50%;
+	left: 1vh;
+	text-align: center;
+	min-width: 18vh;
+	height: 3vh;
+	border-top: 0.1vh white solid;
+	border-bottom: 0.1vh white solid;
+	line-height: 3vh;
+}
+
+/*############################################################*/
+
+#stats-table-window {
+	top: 10vh;
+	left: 5vh;
+	width: 20vh;
+	height: 40vh;
+}
+
+#stats-history-window {
+	top: 30vh;
+	left: 40vh;
+	width: 40vh;
+	height: 40vh;
+}

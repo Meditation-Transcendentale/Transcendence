@@ -1,16 +1,16 @@
-#register-window {
+#login-window {
 	top: 20%;
 	left: 20%;
 	width: 40vh;
 }
 
-#register-window>.window-content {
+#login-window>.window-content {
 	position: relative;
 	width: 100%;
 	height: fit-content;
 }
 
-#register-form {
+#login-form {
 	position: relative;
 	display: block;
 	width: 100%;
@@ -18,42 +18,42 @@
 	/*height: 25vh;*/
 }
 
-#register-form>input {
+#login-form>input {
 	text-align: center;
 	position: absolute;
 	font-size: 2.5vh;
 }
 
-#register-username,
-#register-password,
-#register-submit {
+#login-username,
+#login-password,
+#login-submit {
 	height: 4vh;
 	max-height: 3.5vh;
 }
 
-#register-username,
-#register-password {
+#login-username,
+#login-password {
 	left: 2vh;
 	border: 0.1vh white solid;
 	width: 18vh;
 }
 
 
-#register-username {
+#login-username {
 	top: 2vh;
 }
 
-#register-password {
+#login-password {
 	top: 7vh;
 }
 
-#register-submit {
+#login-submit {
 	top: 14vh;
 	bottom: 0;
 	width: 100%;
 }
 
-#register-submit:hover {
+#login-submit:hover {
 	color: var(--window-background);
 	background-color: var(--window-color);
 }
@@ -83,12 +83,12 @@
 	width: 15.7vh;
 }
 
-#register-submit[error] {
+#login-submit[error] {
 	transition: background-color 0.2s;
 	background-color: #8f2414;
 	color: black;
 }
 
-#register-submit[error]:hover {
+#login-submit[error]:hover {
 	pointer-events: none;
 }

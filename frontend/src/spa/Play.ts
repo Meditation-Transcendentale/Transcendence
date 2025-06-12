@@ -120,6 +120,7 @@ interface playHtmlReference {
 	createBtn: HTMLInputElement;
 	createWin: HTMLDivElement;
 	list: HTMLTableElement;
+	joinId: HTMLInputElement;
 };
 
 enum playState {
@@ -169,7 +170,8 @@ export default class Play {
 			aiMod: div.querySelector("#ai-mod") as HTMLInputElement,
 			createBtn: div.querySelector("#create-btn") as HTMLInputElement,
 			createWin: div.querySelector("#create-btn-window") as HTMLDivElement,
-			list: div.querySelector("#join-list") as HTMLTableElement
+			list: div.querySelector("#join-list") as HTMLTableElement,
+			joinId: div.querySelector("#join-id") as HTMLInputElement,
 		}
 
 		this.createState = {
@@ -243,6 +245,14 @@ export default class Play {
 
 		this.ref.createBtn.addEventListener("click", () => {
 			console.log(`create game-> mod:${this.createState.mod}, map:${this.createState.map}`)
+		})
+
+		this.ref.joinId.addEventListener("focusin", () => {
+			this.div.querySelector("#join-indic")?.setAttribute("on", "");
+		})
+
+		this.ref.joinId.addEventListener("focusout", () => {
+			this.div.querySelector("#join-indic")?.removeAttribute("on");
 		})
 
 		//this.ref.smod.toggleAttribute('off');

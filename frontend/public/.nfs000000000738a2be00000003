@@ -8,27 +8,16 @@
 	top: 15vh;
 	left: 10vh;
 	max-height: 20vh;
-	overflow: hidden;
-}
-
-#create-map-window>.window-content {
-	display: grid;
-
-	width: 100%;
-	overflow: hidden;
-	background-color: white;
-	column-gap: 0.3vh;
+	overflow: auto;
 }
 
 #create-map {
 	width: 15vh;
 	display: grid;
-	grid-column: 1 / 1;
-	height: fit-content;
 	grid-template-columns: 1 auto auto auto;
 	background-color: white;
 	row-gap: 0.2vh;
-	overflow: scroll;
+	overflow-y: scroll;
 }
 
 #create-map>input {
@@ -45,12 +34,9 @@
 
 
 #map-description {
-	grid-column: 2 / 2;
-	width: 100%;
-	font-weight: 100;
-	font-size: 2vh;
-	color: var(--window-color);
-	background-color: var(--window-background);
+	position: relative;
+	right: 0;
+	top: 0;
 }
 
 /*####*/

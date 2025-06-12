@@ -4,13 +4,13 @@ import { getRequest } from "./requests";
 import { raiseStatus } from "./utils";
 
 type statsHtmlReference = {
-	classic: HTMLInputElement,
-	br: HTMLInputElement,
-	io: HTMLInputElement,
+	//classic: HTMLInputElement,
+	//br: HTMLInputElement,
+	//io: HTMLInputElement,
 	username: HTMLDivElement,
-	container: HTMLDivElement;
-	stats: HTMLDivElement,
-	history: HTMLDivElement
+	//container: HTMLDivElement;
+	//stats: HTMLDivElement,
+	//history: HTMLDivElement
 }
 
 class Stats {
@@ -21,35 +21,35 @@ class Stats {
 		this.div = div;
 
 		this.ref = {
-			classic: this.div.querySelector("#classic-menu") as HTMLInputElement,
-			br: this.div.querySelector("#br-menu") as HTMLInputElement,
-			io: this.div.querySelector("#io-menu") as HTMLInputElement,
+			//classic: this.div.querySelector("#classic-menu") as HTMLInputElement,
+			//br: this.div.querySelector("#br-menu") as HTMLInputElement,
+			//io: this.div.querySelector("#io-menu") as HTMLInputElement,
 			username: this.div.querySelector("#stats-username") as HTMLDivElement,
-			container: this.div.querySelector("#stats-container") as HTMLDivElement,
-			stats: this.div.querySelector("#stats-table") as HTMLDivElement,
-			history: this.div.querySelector("#stats-history") as HTMLDivElement
+			//container: this.div.querySelector("#stats-container") as HTMLDivElement,
+			//stats: this.div.querySelector("#stats-table") as HTMLDivElement,
+			//history: this.div.querySelector("#stats-history") as HTMLDivElement
 		}
-
-		this.ref.classic.addEventListener("click", () => {
-			// window.history.pushState("", "", `/stats?u=${this.ref.username.innerText}&m=classic`)
-			getRequest(`stats/player/${this.ref.username.innerText}/classic`)
-				.then((json) => { this.statsResolve(json) })
-				.catch((resp) => { this.statsReject(resp) });
-		});
-
-		this.ref.br.addEventListener("click", () => {
-			// window.history.pushState("", "", `/stats?u=${this.ref.username.innerText}&m=br`)
-			getRequest(`stats/player/${this.ref.username.innerText}/br`)
-				.then((json) => { this.statsResolve(json) })
-				.catch((resp) => { this.statsReject(resp) });
-		});
-
-		this.ref.io.addEventListener("click", () => {
-			// window.history.pushState("", "", `/stats?u=${this.ref.username.innerText}&m=br`)
-			getRequest(`stats/player/${this.ref.username.innerText}/io`)
-				.then((json) => { this.statsResolve(json) })
-				.catch((resp) => { this.statsReject(resp) });
-		});
+		//
+		//this.ref.classic.addEventListener("click", () => {
+		//	// window.history.pushState("", "", `/stats?u=${this.ref.username.innerText}&m=classic`)
+		//	getRequest(`stats/player/${this.ref.username.innerText}/classic`)
+		//		.then((json) => { this.statsResolve(json) })
+		//		.catch((resp) => { this.statsReject(resp) });
+		//});
+		//
+		//this.ref.br.addEventListener("click", () => {
+		//	// window.history.pushState("", "", `/stats?u=${this.ref.username.innerText}&m=br`)
+		//	getRequest(`stats/player/${this.ref.username.innerText}/br`)
+		//		.then((json) => { this.statsResolve(json) })
+		//		.catch((resp) => { this.statsReject(resp) });
+		//});
+		//
+		//this.ref.io.addEventListener("click", () => {
+		//	// window.history.pushState("", "", `/stats?u=${this.ref.username.innerText}&m=br`)
+		//	getRequest(`stats/player/${this.ref.username.innerText}/io`)
+		//		.then((json) => { this.statsResolve(json) })
+		//		.catch((resp) => { this.statsReject(resp) });
+		//});
 
 
 		App3D.setVue('stats');
@@ -64,13 +64,16 @@ class Stats {
 	public load(params: URLSearchParams) {
 		if (!this.checkParams(params)) { return; }
 		statsVue.enable();
+
 		this.ref.username.innerText = params.get("u") as string;
-		getRequest(`stats/player/${this.ref.username.innerText}/classic`)
-			.then((json) => {
-				this.statsResolve(json);
-				document.querySelector("#home-container")?.appendChild(this.div);
-			})
-			.catch((resp) => { this.statsReject(resp) });
+
+		document.querySelector("#main-container")?.appendChild(this.div);
+		//getRequest(`stats/player/${this.ref.username.innerText}/classic`)
+		//	.then((json) => {
+		//		this.statsResolve(json);
+		//		document.querySelector("#home-container")?.appendChild(this.div);
+		//	})
+		//	.catch((resp) => { this.statsReject(resp) });
 	}
 
 	public async unload() {

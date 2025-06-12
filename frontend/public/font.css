@@ -50,6 +50,11 @@
 
 
 @font-face {
-	font-family: doctrice-bold;
+	font-family: dotrice-bold;
 	src: url('/assets/hdad-dotrice-1.001/Dotrice-Bold-Condensed.otf');
+}
+
+@font-face {
+	font-family: dotrice;
+	src: url('/assets/hdad-dotrice-1.001/Dotrice-Condensed.otf');
 }

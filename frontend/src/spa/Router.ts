@@ -32,9 +32,9 @@ class RouterC {
 
 		this.routes = new Map<string, routePage>;
 
-		this.routes.set("/auth", {
-			html: "/auth",
-			ts: "./Auth",
+		this.routes.set("/login", {
+			html: "/login",
+			ts: "./Login",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/register", {
@@ -114,22 +114,22 @@ class RouterC {
 
 		//await meRequest("no-cache")
 		//.then(() => {
-		if (url.pathname == "/auth" || url.pathname == "/register") {
-			url.pathname = "/home";
-			url.search = "";
-		}
+		//if (url.pathname == "/login" || url.pathname == "/register") {
+		//	url.pathname = "/home";
+		//	url.search = "";
+		//}
 		this.oldURL = url.href;
 		//})
 		//.catch(() => {
 		//	this.oldURL = url.href;
-		//	if (url.pathname != "/auth" && url.pathname != "/register") {
-		//		url.pathname = "/auth";
+		//	if (url.pathname != "/login" && url.pathname != "/register") {
+		//		url.pathname = "/login";
 		//		url.search = "";
 		//		if (!this.first) {
 		//			meReject();
 		//			throw ("aaa");
 		//		};
-		//		console.log("%c Not logged in redirected to /auth", "color: white; background-color: red")
+		//		console.log("%c Not logged in redirected to /login", "color: white; background-color: red")
 		//	}
 		//})
 
