@@ -25,6 +25,7 @@ re:
 	fi
 	$(MAKE) update-hostname-env
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) down
+	docker volume rm -f $$(docker volume ls)
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) up --build
 
 reKeepData:

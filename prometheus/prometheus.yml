@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'register'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/register/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  # - job_name: 'auth'
+  #   static_configs:
+  #     - targets: ['auth-service:4002']
+  #   metrics_path: '/metrics'

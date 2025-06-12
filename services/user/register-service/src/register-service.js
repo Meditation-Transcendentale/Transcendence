@@ -47,7 +47,8 @@ const requestDuration = new Histogram({
 	name: 'http_request_duration_seconds',
 	help: 'Duration of HTTP requests in seconds',
 	labelNames: ['method', 'route', 'status'],
-	registers: [metricsRegistry]
+	registers: [metricsRegistry],
+	buckets: [0.1, 0.5, 1, 2, 5, 10]
 });
 
 const requestCounter = new Counter({
@@ -57,16 +58,29 @@ const requestCounter = new Counter({
 	registers: [metricsRegistry]
 });
 
-app.addHook('onRequest', (req, res) => {
+app.addHook('onRequest', (req, res, done) => {
+	req.startTime = process.hrtime();
+	done();
+});
+
+app.addHook('onResponse', (req, res, done) => {
+
+	if (req.raw.url && req.raw.url.startsWith('/metrics')) {
+		return done();
+	}
+
+	const diff = process.hrtime(req.startTime);
+	const duration = diff[0] + diff[1] / 1e9;
+
 	const route = req.routerPath || req.routeOptions?.url || 'unknown';
 	const method = req.method;
 	const statusCode = res.statusCode;
 
+	console.log(`Request: ${method} ${route} - Status: ${statusCode} - Duration: ${duration.toFixed(3)} seconds`);
 	requestCounter.inc({ method, route, status: statusCode });
-
-	const duration = res.getResponseTime() / 1000;
 	requestDuration.observe({ method, route, status: statusCode }, duration);
 
+	done();
 });
 
 app.get('/metrics', async (req, res) => {
