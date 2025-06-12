@@ -31,7 +31,7 @@ canvas {
 	width: 100%;
 	height: 100%;
 	display: block;
-	z-index: -1;
+	z-index: 0;
 
 }
 
@@ -42,6 +42,7 @@ canvas {
 	height: 100%;
 	display: block;
 	background-color: transparent;
+	pointer-events: none;
 }
 
 
@@ -58,20 +59,53 @@ canvas {
 	margin: auto;
 	overflow: visible;
 	justify-content: right;
+	z-index: 1;
+	pointer-events: auto;
+}
+
+#play {
+	display: block;
+	position: absolute;
+	/* right: 0px; */
+	top: 0px;
+
+	/*display: inline-block;*/
+	/*width: 1%;*/
+	margin: auto;
+	overflow: visible;
+	justify-content: right;
+	z-index: 1;
+	pointer-events: auto;
+}
+
+#lobby {
+	display: block;
+	position: absolute;
+	/* right: 0px; */
+	top: 0px;
+
+	/*display: inline-block;*/
+	/*width: 1%;*/
+	margin: auto;
+	overflow: visible;
+	justify-content: right;
+	z-index: 1;
+	pointer-events: auto;
 }
 
 #menu-button {
 	background-color: red;
 	display: block;
+	z-index: 1;
 }
 
 #menu-dropdown {
 	display: none;
 	position: absolute;
-	z-index: 1;
 	background-color: green;
 	overflow: clip;
 	justify-content: right;
+	z-index: 1;
 }
 
 #menu-dropdown a {

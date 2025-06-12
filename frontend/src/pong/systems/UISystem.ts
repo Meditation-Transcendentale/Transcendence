@@ -2,9 +2,10 @@ import { Vector2 } from "@babylonjs/core/Maths/math";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-// import { Button } from "@babylonjs/gui/2D/controls/button";
+import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 
+import { Pong } from "../Pong"
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { UIComponent } from "../components/UIComponent.js";
@@ -14,9 +15,11 @@ export class UISystem extends System {
 	public scoreUI: any;
 	public endUI: any;
 	private gameEnded: boolean = false;
+	private pong: Pong;
 
-	constructor() {
+	constructor(pong: Pong) {
 		super();
+		this.pong = pong;
 		this.scoreValue = new Vector2(0, 0);
 		this.scoreUI = this.gameScoreUI();
 	}
@@ -76,6 +79,7 @@ export class UISystem extends System {
 		panel.cornerRadius = 4;
 		panel.thickness = 0;
 		panel.background = "#7f7f7f33";
+		panel.isPointerBlocker = false;
 		panel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
 		panel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
 		advancedTexture.addControl(panel);
@@ -91,6 +95,23 @@ export class UISystem extends System {
 		title.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
 		panel.addControl(title);
 
+		const quitButton = Button.CreateSimpleButton("quit", "Quitter");
+		quitButton.width = "150px";
+		quitButton.height = "40px";
+		quitButton.color = "white";
+		quitButton.background = "red";
+		quitButton.cornerRadius = 10;
+		quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+		quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+		quitButton.top = "-20px";
+		
+		quitButton.onPointerUpObservable.add(() => {
+			advancedTexture.dispose();
+			this.endUI.dispose();
+			this.pong.dispose();
+		});
+		advancedTexture.addControl(quitButton);
+
 		return {
 			dispose: () => {
 				advancedTexture.dispose();
@@ -98,7 +119,7 @@ export class UISystem extends System {
 		};
 	}
 
-	disposeUI(): void{
-		this.endUI.dispose();
-	}
+	// disposeUI(): void{
+	// 	this.endUI.dispose();
+	// }
 }
