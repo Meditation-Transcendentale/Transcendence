@@ -5,6 +5,8 @@ import fs from 'fs';
 import { connect, JSONCodec } from 'nats';
 import { v4 as uuidv4 } from 'uuid';
 
+import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
+
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
@@ -37,6 +39,41 @@ const verifyApiKey = (req, res, done) => {
 	}
 	done();
 }
+
+const metricsRegistry = new Registry();
+collectDefaultMetrics({ register: metricsRegistry });
+
+const requestDuration = new Histogram({
+	name: 'http_request_duration_seconds',
+	help: 'Duration of HTTP requests in seconds',
+	labelNames: ['method', 'route', 'status'],
+	registers: [metricsRegistry]
+});
+
+const requestCounter = new Counter({
+	name: 'http_requests_total',
+	help: 'Total number of HTTP requests',
+	labelNames: ['method', 'route', 'status'],
+	registers: [metricsRegistry]
+});
+
+app.addHook('onRequest', (req, res) => {
+	const route = req.routerPath || req.routeOptions?.url || 'unknown';
+	const method = req.method;
+	const statusCode = res.statusCode;
+
+	requestCounter.inc({ method, route, status: statusCode });
+
+	const duration = res.getResponseTime() / 1000;
+	requestDuration.observe({ method, route, status: statusCode }, duration);
+
+});
+
+app.get('/metrics', async (req, res) => {
+	res.header('Content-Type', metricsRegistry.contentType);
+	res.send(await metricsRegistry.metrics());
+});
+
 
 app.addHook('onRequest', verifyApiKey);
 
