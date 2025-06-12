@@ -6,7 +6,7 @@ import natsClient from './natsClient.js'
 
 
 class MatchNode {
-    constructor () {
+    constructor() {
         this.player1 = null; //tournament.players
         this.player2 = null; //tournament.players
         this.left = null; //MatchNode
@@ -15,7 +15,7 @@ class MatchNode {
         this.winner = null; //tournament.players
         this.gameId = null;
         this.score = null;
-        this.round = null;
+        this.depth = null;
     }
 
     setWinner(playerId) {
@@ -23,7 +23,7 @@ class MatchNode {
         this.winner.ready = false;
         if (this.parent) this.parent.receiveWinner(playerId);
     }
-    
+
     receiveWinner(playerId) {
         playerId == this.left.winner ? player1 = playerId : player2 = playerId;
     }
@@ -37,7 +37,7 @@ class Tournament {
         this.root = this.buildTree(this.players);
         this.current_round = 0;
 
-        const subTournamentEndGame = nc.subscribe ('games.tournament.*.match.end');
+        const subTournamentEndGame = nc.subscribe('games.tournament.*.match.end');
         (async () => {
             for await (const msg of subTournamentEndGame) {
                 //const decode msg.data somehow
@@ -56,7 +56,7 @@ class Tournament {
         if (players.length === 0 || players.length % 2 !== 0) {
             throw new Error("Empty or odd playerlist");
         }
-    
+
         const leaves = [];
         for (let i = 0; i < players.length; i += 2) {
             const node = new MatchNode();
@@ -64,11 +64,11 @@ class Tournament {
             node.player2 = players[i + 1];
             leaves.push(node);
         }
-    
-        function pairMatches(nodes) {
+        function pairMatches(nodes, depth) {
             const nextRound = [];
             for (let i = 0; i < nodes.length; i += 2) {
                 const parent = new MatchNode();
+                parent.depth = depth;
                 const left = nodes[i];
                 const right = nodes[i + 1];
                 parent.left = left;
@@ -77,50 +77,50 @@ class Tournament {
                 right.parent = parent;
                 nextRound.push(parent);
             }
-            return nextRound.length === 1 ? nextRound[0] : pairMatches(nextRound);
+            return nextRound.length === 1 ? nextRound[0] : pairMatches(nextRound, depth + 1);
         }
-    
-        return pairMatches(leaves);
+
+        return pairMatches(leaves, 0);
     }
 
     findMatchByPlayer(root, playerId) {
         if (!root) return null;
-    
+
         if (root.player1 === playerId || root.player2 === playerId) return root;
-    
+
         const leftResult = findMatchByPlayer(root.left, playerId);
         if (leftResult) return leftResult;
-    
+
         return findMatchByPlayer(root.right, playerId);
     }
 
     findMatchByGameId(root, gameId) {
         if (!root) return null;
-    
+
         if (root.gameId == gameId) return root;
-    
+
         const leftResult = findMatchByGameId(root.left, gameId);
         if (leftResult) return leftResult;
-    
+
         return findMatchByGameId(root.right, gameId);
     }
 
-    markReady(playerId){
+    markReady(playerId) {
         const player = this.players.get(playerId);
         if (!p) throw new Error('Player not in tournament');
-        player.ready = true;  
+        player.ready = true;
     }
 
     getState() { //NEED TO CREATE THE ENCODE/DECODE
-		return {
-			tournamentId: this.id,
-			players: [...this.players.entries()].map(([uuid, { isReady }]) => ({
-				uuid,
-				ready: isReady,
-			})),
+        return {
+            tournamentId: this.id,
+            players: [...this.players.entries()].map(([uuid, { isReady }]) => ({
+                uuid,
+                ready: isReady,
+            })),
             tree: this.root
-		}
-	}
+        }
+    }
 
 }
 
@@ -133,29 +133,28 @@ export default class tournamentService {
         this.nc = nc;
     }
 
-    create(players){
+    create(players) {
         const id = Date.now().toString();
-        const tournament = new Tournament ({ id, players });
+        const tournament = new Tournament({ id, players });
         this.tournaments.set(id, tournament);
         return (id)
     }
 
-    async ready (tournamentId, playerId) {
+    async ready(tournamentId, playerId) {
         const tournament = this.tournaments.get(tournamentId);
         if (!tournament) throw new Error('Tournament not found');
 
         const player = tournament.players.get(playerId);
-        if (!player) throw new Error ('Player eliminated | not in tournament')
+        if (!player) throw new Error('Player eliminated | not in tournament')
 
         const match = tournament.findMatchByPlayer(playerId);
-        if (!match) throw new Error ('Match not found')
+        if (!match) throw new Error('Match not found')
 
         tournament.markReady(playerId);
-        
+
         const state = tournament.getState(); //players + tree
 
-        if (match.player1.ready && match.player2.ready)
-        {
+        if (match.player1.ready && match.player2.ready) {
             const reqBuf = encodeMatchCreateRequest({
                 players: [match.player1.uuid, match.player2.uuid],
             })
@@ -166,10 +165,10 @@ export default class tournamentService {
                 )
                 const resp = decodeMatchCreateResponse(replyBuf);
                 match.gameId = resp.gameId;
-                
+
                 //send
             } catch (err) {
-                console.error ('Failed to create game:', err);
+                console.error('Failed to create game:', err);
             }
         }
 
@@ -193,10 +192,10 @@ export default class tournamentService {
     }
 }
 
-const shuffle = (players) => { 
-    for (let i = players.length - 1; i > 0; i--) { 
-      const j = Math.floor(Math.random() * (i + 1)); 
-      [players[i], players[j]] = [players[j], players[i]]; 
-    } 
-    return players; 
-  }; 
+const shuffle = (players) => {
+    for (let i = players.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [players[i], players[j]] = [players[j], players[i]];
+    }
+    return players;
+}; 
