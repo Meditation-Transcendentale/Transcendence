@@ -28,7 +28,6 @@ const verifyApiKey = (req, res, done) => {
 app.addHook('onRequest', verifyApiKey);
 
 const nats = await connect({ servers: process.env.NATS_URL });
-console.log(`connected to ${nats.getServer()}`);
 const jc = JSONCodec();
 
 async function checkFriendshipStatus(user, friend) {
