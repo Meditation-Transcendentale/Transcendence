@@ -152,7 +152,6 @@ services:
     environment:
       - NODE_ENV=development
       - HOSTNAME=${HOSTNAME}
-      - PROMETHEUS_IP=${PROMETHEUS_IP}
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}

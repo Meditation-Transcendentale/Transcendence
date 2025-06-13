@@ -38,6 +38,6 @@ update-hostname-env:
 	@if grep -q '^HOSTNAME=' .env; then \
 		sed -i "s/^HOSTNAME=.*/HOSTNAME=$$(hostname)/" .env; \
 	else \
-		echo "HOSTNAME=$$(hostname)" >> .env; \
+		echo "\nHOSTNAME=$$(hostname)" >> .env; \
 	fi
 
