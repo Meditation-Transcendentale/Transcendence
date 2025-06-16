@@ -1,9 +1,11 @@
 DOCKER_COMPOSE = docker compose
-DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml
+DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml -f ./metrics/docker-compose-metrics.yml
 
-.PHONY: build down up re reKeepData update-hostname-env
+.PHONY: all build down up re reKeepData update-hostname-env
 
 # curl -u <username>:<password> ftp://<ftp_host>/chemin/vers/.env -o .env
+
+all : re
 
 build:
 	$(MAKE) update-hostname-env
@@ -25,6 +27,7 @@ re:
 	fi
 	$(MAKE) update-hostname-env
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) down
+	docker volume rm -f $$(docker volume ls)
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) up --build
 
 reKeepData:
@@ -35,6 +38,6 @@ update-hostname-env:
 	@if grep -q '^HOSTNAME=' .env; then \
 		sed -i "s/^HOSTNAME=.*/HOSTNAME=$$(hostname)/" .env; \
 	else \
-		echo "HOSTNAME=$$(hostname)" >> .env; \
+		echo "\nHOSTNAME=$$(hostname)" >> .env; \
 	fi
 

@@ -6,6 +6,8 @@ import axios from "axios";
 import https from "https";
 import { connect, JSONCodec } from "nats";
 
+import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
+
 import { twoFARoutes } from "./2FA.js";
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
@@ -28,6 +30,53 @@ const verifyApiKey = (req, res, done) => {
 	}
 	done();
 }
+
+const metricsRegistry = new Registry();
+collectDefaultMetrics({ register: metricsRegistry });
+
+const requestDuration = new Histogram({
+	name: 'http_request_duration_seconds',
+	help: 'Duration of HTTP requests in seconds',
+	labelNames: ['method', 'route', 'status'],
+	registers: [metricsRegistry],
+	buckets: [0.1, 0.5, 1, 2, 5, 10]
+});
+
+const requestCounter = new Counter({
+	name: 'http_requests_total',
+	help: 'Total number of HTTP requests',
+	labelNames: ['method', 'route', 'status'],
+	registers: [metricsRegistry]
+});
+
+app.addHook('onRequest', (req, res, done) => {
+	req.startTime = process.hrtime();
+	done();
+});
+
+app.addHook('onResponse', (req, res, done) => {
+
+	if (req.raw.url && req.raw.url.startsWith('/metrics')) {
+		return done();
+	}
+
+	const diff = process.hrtime(req.startTime);
+	const duration = diff[0] + diff[1] / 1e9;
+
+	const route = req.routerPath || req.routeOptions?.url || 'unknown';
+	const method = req.method;
+	const statusCode = res.statusCode;
+
+	requestCounter.inc({ method, route, status: statusCode });
+	requestDuration.observe({ method, route, status: statusCode }, duration);
+
+	done();
+});
+
+app.get('/metrics', async (req, res) => {
+	res.header('Content-Type', metricsRegistry.contentType);
+	res.send(await metricsRegistry.metrics());
+});
 
 app.addHook('onRequest', verifyApiKey);
 
