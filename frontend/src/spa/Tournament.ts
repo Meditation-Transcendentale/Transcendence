@@ -35,7 +35,6 @@ export default class Tournament {
 		this.ws = null;
 		this.id = null;
 		this.mode = null;
-
 		this.ref = {
 			quit: div.querySelector("#tournament-quit") as HTMLInputElement,
 			tree: div.querySelector("#tournament-tree") as HTMLDivElement
@@ -92,13 +91,15 @@ export default class Tournament {
 			}
 
 			if (payload.update != null) {
-				if (payload.update.players != null)
-				{
+				if (payload.update.players != null) {
+					if (this)
 					this.players = new Map(
-						(payload.update.players ?? [])
-						  .filter(p => p.uuid != null && p.ready != null)
-						  .map(p => [p.uuid as string, p.ready as boolean])
-					  );
+						payload.update.players != null
+							? payload.update.players
+								.filter(p => p.uuid != null && p.ready != null)
+								.map(p => [p.uuid as string, p.ready as boolean])
+							: []
+					);
 				}
 				if (payload.update.tree != null) {
 					this.tree = payload.update.tree as MatchNode;
@@ -133,7 +134,7 @@ export default class Tournament {
 		matchInfo.classList.add('match-info');
 	
 		const p1 = document.createElement('div');
-		p1.textContent = `Player 1: ${node?.player1 ?? 'TBD'}`;
+		p1.textContent = `Player 1: ${node?.player1 ?? 'TBD'}`; //how to smoothly get player names ?
 		matchInfo.appendChild(p1);
 	
 		const p2 = document.createElement('div');
@@ -143,10 +144,6 @@ export default class Tournament {
 		const winner = document.createElement('div');
 		winner.textContent = `Winner: ${node?.winner ?? 'Pending'}`;
 		matchInfo.appendChild(winner);
-	
-		const gameId = document.createElement('div');
-		gameId.textContent = `Game ID: ${node?.gameId ?? 'N/A'}`;
-		matchInfo.appendChild(gameId);
 	
 		container.appendChild(matchInfo);
 	
