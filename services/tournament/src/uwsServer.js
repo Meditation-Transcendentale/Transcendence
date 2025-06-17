@@ -1,6 +1,6 @@
 import uWS from 'uWebSockets.js';
 
-const sockets = new Map();
+export const tournamentSockets = new Map();
 
 export function createUwsApp(path, tournamentService) {
     const app = uWS.App();
@@ -27,17 +27,11 @@ export function createUwsApp(path, tournamentService) {
         open: (ws) => {
             ws.isAlive = true;
             const { tournamentId } = ws;
-            sockets.set(tournamentId, sockets.get(tournamentId) || new Set());
-            sockets.get(tournamentId).add(ws);
+            tournamentSockets.set(tournamentId, tournamentSockets.get(tournamentId) || new Set());
+            tournamentSockets.get(tournamentId).add(ws);
 
             try {
-                /**
-                 * Join 
-                 */
-                // const state = tournamentService.readyForGame(tournamentId, ws.userId);
-                // const buf = encode
                 ws.subscribe(tournamentId);
-                app.publish(tournamentId, buf, true);
             } catch (err) {
 
             }
@@ -50,5 +44,7 @@ export function createUwsApp(path, tournamentService) {
                 newState = await tournamentService.ready(ws.tournamentId, ws.userId);
             }
         }
-    })
+    })  
+
+    return app;
 }

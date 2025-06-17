@@ -30,11 +30,12 @@ class MatchNode {
 }
 
 class Tournament {
-    constructor({ nc, id, players }) {
+    constructor(nc, id, players, uwsApp ) {
         this.nc = nc;
+        this.uwsApp = uwsApp;
         this.id = id;
         this.players = new Map(shuffle(players).map(p => [{ uuid: p }, { ready: false }]));
-        this.root = this.buildTree(this.players);
+        this.root = this.buildTournamentTree(this.players);
         this.current_round = 0;
 
         const subTournamentEndGame = nc.subscribe('games.tournament.*.match.end');
@@ -45,9 +46,12 @@ class Tournament {
                 match = this.findMatchByGameId(this.root, gameId);
                 if (!match) { return; }
                 //match.setWinner(msg.data)//will see what there is in the msg
-                //if (match == this.root)
-                //end of tournament, return;
-                //if it was the last game from this round, send ready-check 
+                if (match == this.root) return;
+                if (!areAllMatchesFinishedAtDepth(this.root, match.depth))
+                {
+                    //encode ready-check
+                    this.uwsApp.publish(this.id)
+                }
             }
         })
     }
@@ -122,6 +126,27 @@ class Tournament {
         }
     }
 
+    getNodesAtDepth(root, targetDepth) {
+        const result = [];
+    
+        function traverse(node) {
+            if (!node) return;
+            if (node.depth === targetDepth) result.push(node);
+            else {
+                traverse(node.left);
+                traverse(node.right);
+            }
+        }
+    
+        traverse(root);
+        return result;
+    }
+    
+    areAllMatchesFinishedAtDepth(root, depth) {
+        const nodes = getNodesAtDepth(root, depth);
+        return nodes.every(node => node.winner !== null);
+    }
+    
 }
 
 export default class tournamentService {
@@ -133,11 +158,11 @@ export default class tournamentService {
         this.nc = nc;
     }
 
-    create(players) {
+    create(players, uwsApp) {
         const id = Date.now().toString();
-        const tournament = new Tournament({ id, players });
+        const tournament = new Tournament(this.nc, id, players, uwsApp);
         this.tournaments.set(id, tournament);
-        return (id)
+        return (id);
     }
 
     async ready(tournamentId, playerId) {
@@ -152,7 +177,7 @@ export default class tournamentService {
 
         tournament.markReady(playerId);
 
-        const state = tournament.getState(); //players + tree
+        const state = tournament.getState();
 
         if (match.player1.ready && match.player2.ready) {
             const reqBuf = encodeMatchCreateRequest({
