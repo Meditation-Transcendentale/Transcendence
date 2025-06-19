@@ -1,0 +1,225 @@
+import config from './config.js'
+
+class MatchNode {
+    constructor() {
+        this.player1 = null; //tournament.players
+        this.player2 = null; //tournament.players
+        this.left = null; //MatchNode
+        this.right = null; //MatchNode
+        this.parent = null; //MatchNode
+        this.winner = null; //tournament.players
+        this.gameId = null;
+        this.score = null;
+        this.depth = null;
+    }
+
+    setWinner(playerId) {
+        this.winner = playerId;
+        this.winner.ready = false;
+        if (this.parent) this.parent.receiveWinner(playerId);
+    }
+
+    receiveWinner(playerId) {
+        playerId == this.left.winner ? player1 = playerId : player2 = playerId;
+    }
+}
+
+class Tournament {
+    constructor(nc, jc, id, players, uwsApp ) {
+        this.nc = nc;
+        this.jc = jc;
+        this.uwsApp = uwsApp;
+        this.id = id;
+        this.players = new Map(shuffle(players).map(p => [{ uuid: p }, { ready: false }]));
+        this.root = this.buildTournamentTree(this.players);
+        this.current_round = 0;
+
+        const subTournamentEndGame = nc.subscribe('games.tournament.*.match.end');
+        (async () => {
+            for await (const msg of subTournamentEndGame) {
+                const data = this.jc.decode(msg.data);
+                const [, , gameId] = msg.subject.split(".");
+                match = this.findMatchByGameId(this.root, gameId);
+                if (!match) { return; }
+                match.setWinner(msg.data.winner)
+                if (match == this.root) return;
+                if (!areAllMatchesFinishedAtDepth(this.root, match.depth))
+                {
+                    const readyBuf = this.jc.encode({
+                        ready_check: true
+                    });
+                    this.uwsApp.publish(this.id, readyBuf);
+                }
+            }
+        })
+    }
+
+    buildTournamentTree(players) {
+        if (players.length === 0 || players.length % 2 !== 0) {
+            throw new Error("Empty or odd playerlist");
+        }
+
+        const leaves = [];
+        for (let i = 0; i < players.length; i += 2) {
+            const node = new MatchNode();
+            node.player1 = players[i];
+            node.player2 = players[i + 1];
+            leaves.push(node);
+        }
+        function pairMatches(nodes, depth) {
+            const nextRound = [];
+            for (let i = 0; i < nodes.length; i += 2) {
+                const parent = new MatchNode();
+                parent.depth = depth;
+                const left = nodes[i];
+                const right = nodes[i + 1];
+                parent.left = left;
+                parent.right = right;
+                left.parent = parent;
+                right.parent = parent;
+                nextRound.push(parent);
+            }
+            return nextRound.length === 1 ? nextRound[0] : pairMatches(nextRound, depth + 1);
+        }
+
+        return pairMatches(leaves, 0);
+    }
+
+    findMatchByPlayer(root, playerId) {
+        if (!root) return null;
+
+        if (root.player1 === playerId || root.player2 === playerId) return root;
+
+        const leftResult = findMatchByPlayer(root.left, playerId);
+        if (leftResult) return leftResult;
+
+        return findMatchByPlayer(root.right, playerId);
+    }
+
+    findMatchByGameId(root, gameId) {
+        if (!root) return null;
+
+        if (root.gameId == gameId) return root;
+
+        const leftResult = findMatchByGameId(root.left, gameId);
+        if (leftResult) return leftResult;
+
+        return findMatchByGameId(root.right, gameId);
+    }
+
+    markReady(playerId) {
+        const player = this.players.get(playerId);
+        if (!p) throw new Error('Player not in tournament');
+        player.ready = true;
+    }
+
+    getState() {
+        return {
+            tournamentId: this.id,
+            players: [...this.players.entries()].map(([uuid, { isReady }]) => ({
+                uuid,
+                ready: isReady,
+            })),
+            tree: this.root
+        }
+    }
+
+    getNodesAtDepth(root, targetDepth) {
+        const result = [];
+    
+        function traverse(node) {
+            if (!node) return;
+            if (node.depth === targetDepth) result.push(node);
+            else {
+                traverse(node.left);
+                traverse(node.right);
+            }
+        }
+    
+        traverse(root);
+        return result;
+    }
+    
+    areAllMatchesFinishedAtDepth(root, depth) {
+        const nodes = getNodesAtDepth(root, depth);
+        return nodes.every(node => node.winner !== null);
+    }
+    
+}
+
+export default class tournamentService {
+    constructor(nc, jc) {
+        this.tournaments = new Map();
+        this.interval = setInterval(() => this.cleanup(),
+            config.HEARTBEAT_INTERVAL
+        )
+        this.nc = nc;
+        this.jc = jc;
+    }
+
+    create(players, uwsApp) {
+        const id = Date.now().toString();
+        const tournament = new Tournament(this.nc, this.jc, id, players, uwsApp);
+        this.tournaments.set(id, tournament);
+        return (id);
+    }
+
+    async ready(tournamentId, playerId) {
+        const tournament = this.tournaments.get(tournamentId);
+        if (!tournament) throw new Error('Tournament not found');
+
+        const player = tournament.players.get(playerId);
+        if (!player) throw new Error('Player eliminated | not in tournament')
+
+        const match = tournament.findMatchByPlayer(playerId);
+        if (!match) throw new Error('Match not found')
+
+        tournament.markReady(playerId);
+
+        const state = tournament.getState();
+
+        if (match.player1.ready && match.player2.ready) { //add MatchCreate encode/decode functions
+            const reqBuf = encodeMatchCreateRequest({
+                players: [match.player1.uuid, match.player2.uuid],
+            })
+            try {
+                const replyBuf = await natsClient.request(
+                    `games.online.match.create`,
+                    reqBuf, {}
+                )
+                const resp = decodeMatchCreateResponse(replyBuf);
+                match.gameId = resp.gameId;
+
+                //send
+            } catch (err) {
+                console.error('Failed to create game:', err);
+            }
+        }
+
+        return state
+    }
+
+    cleanup() {
+        const now = Date.now();
+        for (const [id, lobby] of this.tournaments) {
+            if (
+                this.tournaments.players.size === 0 ||
+                now - lobby.createdAt > config.HEARTBEAT_INTERVAL * 2
+            ) {
+                this.tournaments.delete(id);
+            }
+        }
+    }
+
+    shutdown() {
+        clearInterval(this.interval);
+    }
+}
+
+const shuffle = (players) => {
+    for (let i = players.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [players[i], players[j]] = [players[j], players[i]];
+    }
+    return players;
+}; 

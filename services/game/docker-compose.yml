@@ -118,3 +118,20 @@ services:
       - NATS_URL=nats://nats:4222
     depends_on:
       - nats
+
+  tournament:
+    build:
+      context: ./tournament
+    volumes:
+      - ./tournament/src:/app/src
+      # - ./lobby-manager/test:/app/test
+      - ./tournament/package.json:/app/package.json
+      - ./tournament/.env.example:/app/.env
+    depends_on:
+      - nats
+    command: npm run dev
+    environment:
+      - NATS_URL=nats://nats:4222
+      - PORT=5009
+    ports:
+      - "5009:5009"
