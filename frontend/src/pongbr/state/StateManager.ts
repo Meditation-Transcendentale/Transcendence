@@ -16,7 +16,7 @@ export class StateManager {
 		const now = performance.now();
 		const deltaTime = now - this.lastUpdate;
 		this.lastUpdate = now;
-		this.ecs.update(deltaTime);
+		this.ecs.update(deltaTime / 1000);
 		this.id = requestAnimationFrame(() => this.update());
 		if (!this.start) {
 			console.log(this.id);

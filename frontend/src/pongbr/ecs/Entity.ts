@@ -22,4 +22,8 @@ export class Entity {
 	hasComponent(componentClass: Function): boolean {
 		return this.components.has(componentClass.name);
 	}
+	removeComponent<T>(componentClass: { new(...args: any[]): T }): this {
+		this.components.delete(componentClass.name);
+		return this;
+	}
 }

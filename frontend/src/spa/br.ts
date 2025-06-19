@@ -13,14 +13,14 @@ export default class br {
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 		this.pongbr = null;
-		PongBR.INIT();
+		// PongBR.INIT();
 		this.mod = null;
 		this.map = null;
 		this.id = null;
 	}
 
 	public load(params: URLSearchParams) {
-		this.pongbr?.dispose();
+		// this.pongbr?.dispose();
 		this.pongbr = new PongBR(document.querySelector("#canvas"), params.get("id"));
 		this.pongbr.start();
 	}

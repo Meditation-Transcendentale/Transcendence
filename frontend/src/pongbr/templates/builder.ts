@@ -9,21 +9,53 @@ import { WallComponent } from "../components/WallComponent";
 import { PillarComponent } from "../components/PillarComponent";
 import { BallComponent } from "../components/BallComponent";
 import { DisabledComponent } from "../components/DisabledComponent";
+import { InputComponent } from "../components/InputComponent";
 import { TransformComponent } from "../components/TransformComponent";
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+function intersectSegmentsXZ(
+	A: Vector3,
+	B: Vector3,
+	C: Vector3,
+	D: Vector3
+): Vector3 | null {
+	const ab = B.subtract(A);
+	const cd = D.subtract(C);
+	const ac = C.subtract(A);
+
+	const denom = ab.x * cd.z - ab.z * cd.x;
+	if (Math.abs(denom) < 1e-6) {
+		// Parallel or nearly so
+		return null;
+	}
+
+	const t = (ac.x * cd.z - ac.z * cd.x) / denom;
+	if (t < 0 || t > 1) return null;
+
+	const u = (ac.x * ab.z - ac.z * ab.x) / denom;
+	if (u < 0 || u > 1) return null;
+
+	// Intersection lies on both segments
+	return new Vector3(
+		A.x + t * ab.x,
+		A.y + t * ab.y,  // or keep original Y, depending on your use
+		A.z + t * ab.z
+	);
+}
 // ─── In-File Default Configuration ─────────────────────────────────────
 const DEFAULT_CONFIG = {
-	arenaRadius: 50,    // circle radius
-	wallWidth: 1,       // thickness of walls and death walls
+	arenaRadius: 100,    // circle radius
+	wallWidth: 10,       // thickness of walls and death walls
+	paddleWidth: 1,       // thickness of walls and death walls
 	paddleHeight: 1,    // vertical size of paddles and goals
-	paddleDepth: 0.4,   // radial thickness of paddle
+	paddleDepth: 1,   // radial thickness of paddle
 	goalDepth: 1,       // radial thickness of goal opening
 };
 
 type GameTemplateConfig = typeof DEFAULT_CONFIG;
 
 type PaddleBundle = {
+	sliceIndex: number;
 	paddle: Entity;
 	goal: Entity;
 	deathWall: Entity;
@@ -37,99 +69,121 @@ export function buildScoreUI(ecs: any): Entity {
 	ecs.addEntity(ui);
 	return ui;
 }
+
 export function buildPaddles(
 	ecs: any,
-	cfg: BuilderConfig,
-	playerCount: number
+	playerCount: number,
+	config: GameTemplateConfig = DEFAULT_CONFIG
 ): PaddleBundle[] {
 	const bundles: PaddleBundle[] = [];
+	const {
+		arenaRadius,
+		paddleWidth,
+		paddleHeight,
+		wallWidth,
+		goalDepth,
+	} = config;
+
 	const angleStep = (2 * Math.PI) / playerCount;
-	const paddleRadius = cfg.arenaRadius - cfg.paddleDepth / 2;
-	const goalRadius = cfg.arenaRadius + cfg.wallWidth / 2 + cfg.goalDepth / 2;
+	const halfSlice = angleStep / 2;
+	const paddleArc = angleStep * 0.07;
+	const halfArc = paddleArc / 2;
+	const maxOffset = halfSlice - halfArc;
+	const y = paddleHeight / 2 + 1;
+	const goalRadius = arenaRadius + wallWidth / 2 + goalDepth / 2;
+	const pillarSize = arenaRadius * angleStep * 0.07;
 
 	for (let i = 0; i < playerCount; i++) {
-		// define slice boundaries and midpoint
 		const sliceStart = i * angleStep;
-		const sliceEnd = sliceStart + angleStep;
-		const midAngle = sliceStart + angleStep / 2;
-		const cosM = Math.cos(midAngle), sinM = Math.sin(midAngle);
-		const rotY = -midAngle + Math.PI / 2;
-		const arcLen = paddleRadius * angleStep;
+		const midAngle = sliceStart + halfSlice;
 
-		// — Paddle at slice midpoint —
-		const paddlePos = new Vector3(
-			cosM * paddleRadius,
-			cfg.paddleHeight / 2,
-			sinM * paddleRadius
-		);
+		// World-space center of paddle
+		const px = Math.cos(midAngle);
+		const pz = Math.sin(midAngle);
+		// Yaw so quad is tangent; subtract halfArc so center aligns
+		const yaw = - (midAngle - halfArc) + Math.PI / 2;
+
+		// Paddle entity
 		const paddle = new Entity();
-		paddle.addComponent(new PaddleComponent(i, paddlePos.clone(), 0));
+		paddle.addComponent(
+			new PaddleComponent(i, new Vector3(px, y, pz), 0, maxOffset, yaw, playerCount / 2)
+		);
+		paddle.addComponent(new InputComponent(true));
 		paddle.addComponent(
 			new TransformComponent(
-				paddlePos,
-				new Vector3(0, rotY, 0),
-				new Vector3(arcLen / 15, arcLen / 15 / cfg.paddleHeight, cfg.paddleDepth)
+				new Vector3(0, 0, 0),
+				new Vector3(0, yaw, 0),
+				new Vector3(1, 1, 1)
 			)
 		);
 		ecs.addEntity(paddle);
 
-		// — Goal at same midpoint, outer ring —
-		const goalPos = new Vector3(
-			cosM * goalRadius,
-			cfg.paddleHeight / 2,
-			sinM * goalRadius
-		);
+		// Goal entity
+		const gx = Math.cos(midAngle) * goalRadius;
+		const gz = Math.sin(midAngle) * goalRadius;
 		const goal = new Entity();
-		goal.addComponent(new GoalComponent(i, goalPos.clone()));
+		goal.addComponent(new GoalComponent(i, new Vector3(gx, y, gz)));
 		goal.addComponent(
 			new TransformComponent(
-				goalPos,
-				new Vector3(0, rotY, 0),
-				new Vector3(arcLen, cfg.paddleHeight, cfg.goalDepth)
+				new Vector3(gx, y, gz),
+				new Vector3(0, yaw, 0),
+				new Vector3(paddleWidth, paddleHeight, goalDepth * (1 + 1 / playerCount))
 			)
 		);
 		ecs.addEntity(goal);
 
-		// — Death wall (hidden until activation) — same size as goal
+		// Death wall entity
 		const deathWall = new Entity();
-		deathWall.addComponent(new WallComponent(i, goalPos.clone()));
+		deathWall.addComponent(new WallComponent(i, new Vector3(gx, y, gz)));
 		deathWall.addComponent(
 			new TransformComponent(
-				goalPos,
-				new Vector3(0, rotY, 0),
-				new Vector3(arcLen, 1, cfg.goalDepth)
+				new Vector3(gx, y, gz),
+				new Vector3(0, yaw, 0),
+				new Vector3(paddleWidth, 1, goalDepth * (1 + 1 / playerCount))
 			)
 		);
 		deathWall.addComponent(new DisabledComponent());
 		ecs.addEntity(deathWall);
 
-		// — Pillars at slice boundaries —
+		// Pillars
 		const pillars: [Entity, Entity] = [null as any, null as any];
-		[sliceStart, sliceEnd].forEach((ang, idx) => {
-			const cx = Math.cos(ang), cz = Math.sin(ang);
-			const pillarPos = new Vector3(
-				cx * paddleRadius,
-				cfg.paddleHeight / 2,
-				cz * paddleRadius
-			);
+		[sliceStart, sliceStart + angleStep].forEach((angle, idx) => {
+			// radial position on the circle
+			const baseX = Math.cos(angle) * arenaRadius;
+			const baseZ = Math.sin(angle) * arenaRadius;
+
+			// compute the tangent (local right) at that angle:
+			// tangent = (-sin, 0, +cos)
+			const tx = -Math.sin(angle);
+			const tz = Math.cos(angle);
+
+			// half your pillar’s thickness in world units:
+			const halfThickness = pillarSize / 2;  // or whatever your mesh’s thickness is
+
+			// step the pillar *back* toward the arena by half its thickness:
+			const px = baseX - tx * halfThickness;
+			const pz = baseZ - tz * halfThickness;
+
+			const yaw = -angle + Math.PI / 2;  // so its “face” points inward
+
 			const pillar = new Entity();
-			pillar.addComponent(new PillarComponent(i, idx === 0 ? 'start' : 'end'));
+			pillar.addComponent(new PillarComponent(i, idx === 0 ? "start" : "end"));
 			pillar.addComponent(
 				new TransformComponent(
-					pillarPos,
-					new Vector3(0, rotY, 0),
-					new Vector3(arcLen / 10, cfg.paddleHeight, arcLen / 10)
+					new Vector3(px, y, pz),
+					new Vector3(0, yaw, 0),
+					new Vector3(pillarSize, paddleHeight, pillarSize)
 				)
 			);
 			ecs.addEntity(pillar);
 			pillars[idx] = pillar;
 		});
-
-		bundles.push({ paddle, goal, deathWall, pillars });
+		bundles.push({ sliceIndex: i, paddle, goal, deathWall, pillars });
 	}
 
 	return bundles;
 }
+
 // ─── 3. Build Arena Walls ───────────────────────────────────────────
 export function buildWalls(ecs: any, config: GameTemplateConfig): Entity[] {
 	const walls: Entity[] = [];
@@ -168,7 +222,7 @@ export function buildBall(ecs: any): Entity {
 export function createGameTemplate(ecs: any, playerCount: number): PaddleBundle[] {
 	const config = DEFAULT_CONFIG;
 	buildScoreUI(ecs);
-	const bundles = buildPaddles(ecs, config, playerCount);
+	const bundles = buildPaddles(ecs, playerCount);
 	buildWalls(ecs, config);
 	buildBall(ecs);
 	return bundles;
