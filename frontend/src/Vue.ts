@@ -22,6 +22,8 @@ class cssWindow {
 
 	public _enable: boolean;
 
+	private frameUpdateCount: number;
+
 
 	constructor(name: string, options: vueOptions) {
 		this.name = name;
@@ -54,30 +56,34 @@ class cssWindow {
 			this.onHover();
 		})
 
+		this.frameUpdateCount = Math.floor(Math.random() * 16 + 10);
+
 	}
 
-	public update(camera: Camera) {
+	public update(camera: Camera, frame: number) {
 		if (!this._enable) { return; }
 		//console.log(this.matrix);
 		const model = this.matrix.multiply(this.mesh.worldMatrixFromCache);
 		const scene = camera._scene.getTransformMatrix();
 		const viewport = camera.viewport;
 
-		this.pos[0] = 2;
-		this.pos[1] = 2;
-		this.pos[2] = -1;
-		this.pos[3] = -1;
-		for (let i = 0; i < this.bounding.length; i++) {
-			const p = Vector3.Project(
-				this.bounding[i],
-				model,
-				scene,
-				viewport
-			);
-			this.pos[0] = Math.min(this.pos[0], p.x);
-			this.pos[1] = Math.min(this.pos[1], p.y);
-			this.pos[2] = Math.max(this.pos[2], p.x);
-			this.pos[3] = Math.max(this.pos[3], p.y);
+		if (frame % this.frameUpdateCount == 0) {
+			this.pos[0] = 2;
+			this.pos[1] = 2;
+			this.pos[2] = -1;
+			this.pos[3] = -1;
+			for (let i = 0; i < this.bounding.length; i++) {
+				const p = Vector3.Project(
+					this.bounding[i],
+					model,
+					scene,
+					viewport
+				);
+				this.pos[0] = Math.min(this.pos[0], p.x);
+				this.pos[1] = Math.min(this.pos[1], p.y);
+				this.pos[2] = Math.max(this.pos[2], p.x);
+				this.pos[3] = Math.max(this.pos[3], p.y);
+			}
 		}
 		this.div.style.top = `${this.pos[1] * 100 - 3 + (true ? Math.random() * 2 : 0)}%`;
 		this.div.style.left = `${this.pos[0] * 100 + (true ? Math.random() * 0.5 : 0)}%`;
@@ -164,10 +170,10 @@ class Vue {
 		}));
 	}
 
-	public update() {
+	public update(frame: number) {
 		if (!this._enable) { return; }
 		for (let i = 0; i < this.windows.length; i++) {
-			this.windows[i].update(this.camera);
+			this.windows[i].update(this.camera, frame);
 		}
 	}
 
@@ -202,10 +208,10 @@ export const statsVue = new Vue();
 export const loginVue = new Vue();
 export const registerVue = new Vue();
 
-export function updateVues() {
-	playVue.update();
-	statsVue.update();
-	homeVue.update();
-	loginVue.update();
-	registerVue.update();
+export function updateVues(frame: number) {
+	playVue.update(frame);
+	statsVue.update(frame);
+	homeVue.update(frame);
+	loginVue.update(frame);
+	registerVue.update(frame);
 }
