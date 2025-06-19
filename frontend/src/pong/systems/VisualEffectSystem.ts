@@ -20,6 +20,8 @@ export class VisualEffectSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		const now = performance.now();
+		// console.log("vfx: ", now);
 
 		for (const entity of entities) {
 			if (

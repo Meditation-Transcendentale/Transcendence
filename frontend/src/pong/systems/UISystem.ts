@@ -25,6 +25,8 @@ export class UISystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		const now = performance.now();
+		// console.log("ui: ", now);
 		entities.forEach((entity: Entity) => {
 			if (entity.hasComponent(UIComponent)) {
 				const ui = entity.getComponent(UIComponent);

@@ -4,7 +4,6 @@ export class InputManager {
 	constructor() {
 		document.addEventListener("keydown", (e) => {
 			this.keysPressed.add(e.code);
-			console.log("keydown:", e.code);
 		});
 		document.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
 	}

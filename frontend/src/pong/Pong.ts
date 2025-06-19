@@ -87,7 +87,6 @@ export class Pong {
 
 	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
 		this.ecs = new ECSManager();
-		this.ecs.addSystem(new MovementSystem());
 		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
 		this.ecs.addSystem(new ThinInstanceSystem(
 			instanceManagers.ball,
@@ -95,6 +94,7 @@ export class Pong {
 			instanceManagers.wall,
 			this.camera
 		));
+		this.ecs.addSystem(new MovementSystem());
 		this.visualEffectSystem = new VisualEffectSystem(this.scene);
 		this.ecs.addSystem(this.visualEffectSystem);
 		this.uiSystem = new UISystem(this);
@@ -151,6 +151,7 @@ export class Pong {
 
 	dispose() {
 		const { arena, ball, paddle, wall } = this.baseMeshes;
+		this.stateManager.setter(false);
 
 		[arena, ball, wall, paddle].forEach(mesh => {
 			mesh.material?.dispose?.();

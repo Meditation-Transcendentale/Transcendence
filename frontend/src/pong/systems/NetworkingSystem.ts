@@ -19,6 +19,8 @@ import { localPaddleId } from "../Pong";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
+	private oldVelX: number;
+	private oldVelY: number;
 	private uuid: string;
 	private scoreUI: any;
 	private endUI: any;
@@ -33,12 +35,15 @@ export class NetworkingSystem extends System {
 		this.uuid = uuid;
 		this.myScore = 0;
 		this.opponentScore = 0;
+		this.oldVelX = 0;
+		this.oldVelY = 0;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
 		const messages = this.wsManager.getMessages();
 
-		// console.log("Networking system:", performance.now());
+		const now = performance.now();
+
 		messages.forEach((raw: ArrayBuffer) => {
 			let serverMsg: userinterface.ServerMessage;
 			try {
@@ -63,8 +68,14 @@ export class NetworkingSystem extends System {
 					);
 					if (!e) return;
 					const ball = e.getComponent(BallComponent)!;
-					ball.position.set(b.x, 0.5, b.y);
-					ball.velocity.set(b.vx, 0, b.vy);
+					ball.serverPosition.set(b.x, 0.5, b.y);
+					ball.lastServerUpdate = performance.now();
+					// console.log();
+					if (b.vx != this.oldVelX || b.vy != this.oldVelY){
+						ball.velocity.set(b.vx, 0, b.vy);
+						this.oldVelX = b.vx!;
+						this.oldVelY = b.vy!;
+					}
 				});
 
 				// 2. Paddle updates
