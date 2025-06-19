@@ -89,7 +89,7 @@ export class NetworkingSystem extends System {
 					if (!e) return;
 
 					const paddleComp = e.getComponent(PaddleComponent)!;
-					paddleComp.offset = p.offset; // update direction
+					// paddleComp.offset = p.offset; // update direction
 
 					const tf = e.getComponent(TransformComponent)!;
 					const rot = tf.rotation;

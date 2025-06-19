@@ -32,8 +32,6 @@ export class MovementSystem extends System {
 					} else if (dist > 0.5) {
 						ball.position.copyFrom(ball.serverPosition);
 					}
-				} else {
-					// console.log("age > 17:", age);
 				}
 			}
 		});

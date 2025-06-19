@@ -66,7 +66,7 @@ export class InputSystem extends System {
 				paddle.move = -1;
 			}
 
-			offsetChange = this.move * 10 * dt;
+			offsetChange = paddle.move * 10 * dt;
 			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -this.MAX_OFFSET, this.MAX_OFFSET);
 
 			const rotationMatrix = Matrix.RotationYawPitchRoll(
