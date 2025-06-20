@@ -8,6 +8,7 @@ import { Color3, Color4, Vector3 } from "@babylonjs/core/Maths/math";
 import { GameTemplateConfig } from "../templates/GameTemplate";
 import { ShaderMaterial, Vector2, VertexBuffer } from "@babylonjs/core";
 import { PaddleMaterial } from './PaddleMaterial';
+import { PortalMaterial } from "./PortalMaterial";
 export function createCamera(scene: Scene, canvas: any): ArcRotateCamera {
 	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0., 60, Vector3.Zero(), scene);
 	camera.attachControl(canvas, true);
@@ -58,10 +59,9 @@ export function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh
 		paddleWidth = 1,
 		paddleHeight = 1,
 		paddleDepth = 1
-		// radialSegments = 32
 		;
 
-	const paddle = MeshBuilder.CreateTiledBox("paddle", {
+	const paddle = MeshBuilder.CreateTiledBox("paddleBase", {
 		//sideOrientation: BABYLON.Mesh.DOUBLESIDE,
 		//pattern: pat,
 		// alignVertical: av,
@@ -72,30 +72,9 @@ export function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh
 		tileSize: 0.1,
 		tileWidth: 0.1
 	}, scene);
-	paddle.enableEdgesRendering();
+	// paddle.enableEdgesRendering();
 	paddle.alwaysSelectAsActiveMesh = true
 	paddle.edgesColor = new Color4(0., 1.0, 0.0, 1.0);
-	console.log(paddle.getVertexBuffer(VertexBuffer.PositionKind));
-	// const shape = [
-	// 	new Vector3(-paddleDepth / 2, -paddleHeight / 2, 0),
-	// 	new Vector3(paddleDepth / 2, -paddleHeight / 2, 0),
-	// 	new Vector3(paddleDepth / 2, paddleHeight / 2, 0),
-	// 	new Vector3(-paddleDepth / 2, paddleHeight / 2, 0),
-	// ];
-	// // 2) build a *straight* path of many points along X (which we'll bend in the shader)
-	// const path: Vector3[] = [];
-	// for (let i = 0; i <= radialSegments; i++) {
-	// 	const t = i / radialSegments;
-	// 	// x runs -W/2 -> +W/2
-	// 	path.push(new Vector3((t - 0.5), 0, 0));
-	// }
-	//
-	// // 3) extrude the 4-point shape along that straight path:
-	// const paddle = MeshBuilder.ExtrudeShape(
-	// 	"paddle",
-	// 	{ shape, path, cap: Mesh.CAP_ALL, closeShape: true, sideOrientation: Mesh.DOUBLESIDE },
-	// 	scene
-	// );
 
 	const mat = new PaddleMaterial('paddleMaterial', scene);
 
@@ -106,22 +85,51 @@ export function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh
 	paddle.material = mat;
 	mat.diffuseColor = Color3.Red();
 	paddle.isVisible = true;
-	// mat.alpha = 0.1;
 	mat.forceDepthWrite = true;
-	// mat.freeze();
 	return paddle;
 }
 
 export function createPortalMesh(scene: Scene, config: GameTemplateConfig): Mesh {
-	const portalMesh = MeshBuilder.CreateBox("portalBase", { width: 4, height: 8, depth: 2 }, scene);
-	const paddleMaterial = new StandardMaterial("portalMaterial", scene);
-	paddleMaterial.diffuseColor.set(0, 1, 0);
-	paddleMaterial.emissiveColor.set(1, 1, 0);
-	portalMesh.material = paddleMaterial;
-	portalMesh.setEnabled(true);
-	portalMesh.setPivotPoint(Vector3.Zero());
+	// const portalMesh = MeshBuilder.CreateBox("portalBase", { width: 4, height: 8, depth: 2 }, scene);
+	const
+		arenaRadius = 100.,
+		portalWidth = 1,
+		portalHeight = 1,
+		portalDepth = 1
+		;
 
-	return portalMesh;
+	// const portal = MeshBuilder.CreateTiledBox("portalBase", {
+	// 	//sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+	// 	//pattern: pat,
+	// 	// alignVertical: av,
+	// 	// alignHorizontal: ah,
+	// 	width: portalWidth,
+	// 	height: portalHeight,
+	// 	depth: portalDepth,
+	// 	tileSize: 0.1,
+	// 	tileWidth: 0.1
+	// }, scene);
+	const portal = MeshBuilder.CreatePlane("testBox",
+		{ size: 2, sideOrientation: Mesh.DOUBLESIDE }, scene);
+	portal.alwaysSelectAsActiveMesh = true
+
+	const mat = new PortalMaterial('portalMaterial', scene);
+
+	// (mat.backFaceCulling) = false;
+	mat.setUniform("arenaRadius", arenaRadius);
+	mat.setUniform("playerCount", 100.);
+	mat.setUniform("fillFraction", 0.05);
+	portal.material = mat;
+	// mat.diffuseColor = Color3.Blue();
+	portal.isVisible = true;
+	mat.forceDepthWrite = true;
+	mat.onCompiled = (effect) => {
+		// these private properties hold the final GLSL text  
+		console.log("=== VERTEX SHADER ===\n", (effect as any)._vertexSource);
+		console.log("=== FRAGMENT SHADER ===\n", (effect as any)._fragmentSource);
+	};
+	return portal;
+
 }
 
 // utils/initializeGame.ts

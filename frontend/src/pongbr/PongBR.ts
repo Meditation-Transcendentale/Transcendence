@@ -27,7 +27,7 @@ import type { userinterface } from './utils/proto/message.js';
 import { buildPaddles, PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
 import { AnimationComponent } from "./components/AnimationComponent.js";
-import { Vector3 } from "@babylonjs/core";
+import { Vector3, Vector2 } from "@babylonjs/core";
 import { AnimationSystem } from "./systems/AnimationSystem.js";
 import { Easing } from "./utils/Easing.js";
 import { computePaddleTransforms, TransformBundle } from "./templates/transformBuilder.js";
@@ -111,6 +111,8 @@ export class PongBR {
 
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
+			this.baseMeshes.portal.material.setUniform("time", performance.now() * 0.001);
+			this.baseMeshes.portal.material.enableResolutionUniform();
 		});
 
 	}

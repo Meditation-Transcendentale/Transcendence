@@ -12,6 +12,7 @@ import { DisabledComponent } from "../components/DisabledComponent";
 import { InputComponent } from "../components/InputComponent";
 import { TransformComponent } from "../components/TransformComponent";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PortalComponent } from "../components/PortalComponent";
 
 function intersectSegmentsXZ(
 	A: Vector3,
@@ -97,16 +98,11 @@ export function buildPaddles(
 		const sliceStart = i * angleStep;
 		const midAngle = sliceStart + halfSlice;
 
-		// World-space center of paddle
-		const px = Math.cos(midAngle);
-		const pz = Math.sin(midAngle);
-		// Yaw so quad is tangent; subtract halfArc so center aligns
 		const yaw = - (midAngle - halfArc) + Math.PI / 2;
 
-		// Paddle entity
 		const paddle = new Entity();
 		paddle.addComponent(
-			new PaddleComponent(i, new Vector3(px, y, pz), 0, maxOffset, yaw, playerCount / 2)
+			new PaddleComponent(i, new Vector3(0, 0, 0), 0, maxOffset, yaw, playerCount / 2)
 		);
 		paddle.addComponent(new InputComponent(true));
 		paddle.addComponent(
@@ -118,7 +114,6 @@ export function buildPaddles(
 		);
 		ecs.addEntity(paddle);
 
-		// Goal entity
 		const gx = Math.cos(midAngle) * goalRadius;
 		const gz = Math.sin(midAngle) * goalRadius;
 		const goal = new Entity();
@@ -132,7 +127,6 @@ export function buildPaddles(
 		);
 		ecs.addEntity(goal);
 
-		// Death wall entity
 		const deathWall = new Entity();
 		deathWall.addComponent(new WallComponent(i, new Vector3(gx, y, gz)));
 		deathWall.addComponent(
@@ -218,6 +212,18 @@ export function buildBall(ecs: any): Entity {
 	return ball;
 }
 
+export function buildPortal(ecs: any) {
+	const startPos = new Vector3(0, 0, 0);
+	let angle = Math.PI / 4;
+	for (let i = 0; i < 4; i++) {
+		const portal = new Entity();
+		portal.addComponent(new PortalComponent(i, startPos,));
+		portal.addComponent(new TransformComponent(startPos, new Vector3(Math.PI * 2 / 3, angle, -Math.PI / 4), Vector3.One()));
+		angle += Math.PI / 2;
+		ecs.addEntity(portal);
+	}
+	return;
+}
 // ─── 5. Assemble Game Template ─────────────────────────────────────
 export function createGameTemplate(ecs: any, playerCount: number): PaddleBundle[] {
 	const config = DEFAULT_CONFIG;
@@ -225,6 +231,7 @@ export function createGameTemplate(ecs: any, playerCount: number): PaddleBundle[
 	const bundles = buildPaddles(ecs, playerCount);
 	buildWalls(ecs, config);
 	buildBall(ecs);
+	buildPortal(ecs);
 	return bundles;
 }
 
