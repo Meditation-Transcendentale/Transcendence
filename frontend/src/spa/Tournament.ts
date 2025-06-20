@@ -8,10 +8,15 @@ interface tournamentHtmlReference {
 	tree: HTMLDivElement;
 }
 
+interface Player {
+	uuid: string | null;
+	name: string | null;
+}
+
 interface MatchNode {
-	player1: string | null;
-	player2: string | null;
-	winner: string | null;
+	player1: Player | null;
+	player2: Player | null;
+	winner: Player | null;
 	gameId: string | null;
 	depth: number;
 	left: MatchNode | null;
@@ -105,6 +110,11 @@ export default class Tournament {
 					this.tree = payload.update.tree as MatchNode;
 					this.treeResolve();
 				}
+			}
+
+			if (payload.ready != null)
+			{
+				
 			}
 
 			if (payload.start != null) {
