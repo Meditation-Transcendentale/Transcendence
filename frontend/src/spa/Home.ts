@@ -81,8 +81,8 @@ class Home {
 			console.log('Connected to notificationSocket server');
 		  }
 		  
-		  notificationSocket.onmessage = (event) => {
-			const message = JSON.parse(event.data)
+		notificationSocket.onmessage = (event) => {
+			const message = JSON.parse(event.data);
 			console.log('Received message:', message);
 		  
 			switch (message.type) {
@@ -101,15 +101,15 @@ class Home {
 			  default:
 				console.warn('Unknown message type:', message.type);
 			}
-		  }
+		}
 		  
-		  notificationSocket.onerror = (err) => {
+		notificationSocket.onerror = (err) => {
 			console.error('WebSocket error:', err);
-		  }
+		}
 		  
-		  notificationSocket.onclose = () => {
+		notificationSocket.onclose = () => {
 			console.log('WebSocket connection closed');
-		  }
+		}
 	}
 }
 

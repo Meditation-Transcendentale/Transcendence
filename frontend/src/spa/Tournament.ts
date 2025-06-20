@@ -10,7 +10,7 @@ interface tournamentHtmlReference {
 
 interface Player {
 	uuid: string | null;
-	name: string | null;
+	isReady: boolean;
 }
 
 interface MatchNode {
@@ -30,7 +30,7 @@ export default class Tournament {
 	private ws: WebSocket | null;
 	private id: string | null;
 	private mode: string | null; //
-	private players: Map<string, boolean> | null;
+	private players: Map<Player, boolean> | null; //key:player value:isConnected
 	private tree: MatchNode | null;	
 
 	private gameIP = window.location.hostname;
@@ -40,6 +40,8 @@ export default class Tournament {
 		this.ws = null;
 		this.id = null;
 		this.mode = null;
+		this.tree = null;
+		this.players = null;
 		this.ref = {
 			quit: div.querySelector("#tournament-quit") as HTMLInputElement,
 			tree: div.querySelector("#tournament-tree") as HTMLDivElement
@@ -75,7 +77,6 @@ export default class Tournament {
 		const url = `ws://${this.gameIP}:5019/tournament?uuid=${encodeURIComponent(User.uuid as string)}&tournamentId=${encodeURIComponent(id as string)}`;
 		console.log("URL", url);
 		this.ws = new WebSocket(url);
-		this.ws.binaryType = "arraybuffer";
 
 		this.ws.onopen = (e) => {
 			console.log(e);
@@ -83,33 +84,34 @@ export default class Tournament {
 		}
 
 		this.ws.onmessage = (msg) => {
-			const buf = new Uint8Array(msg.data as ArrayBuffer);
-			const payload = decodeServerMessage(buf);
-			console.log('Raw message data:', new Uint8Array(msg.data));
-			console.log('Decoded payload:', payload);
-			if (payload.error != null) {
-				this.id = null;
-				this.ws?.close();
-				this.ws = null;
-				Router.nav("/home/play");
-				return;
+			const data = JSON.parse(msg.data);
+			switch (data.type) {
+				case 'error':
+					this.id = null;
+					this.ws?.close();
+					this.ws = null;
+					Router.nav("/home/play");
+					break;
+				case 'update':
+					if (data.update.players != null) {
+						if (this)
+						this.players = new Map(
+							data.update.players != null
+								? data.update.players
+									.filter(p => p.uuid != null && p.ready != null)
+									.map(p => [p.uuid as string, p.ready as boolean])
+								: []
+						);
+					}
+					if (payload.update.tree != null) {
+						this.tree = payload.update.tree as MatchNode;
+						this.treeResolve();
+					}
+
 			}
 
+
 			if (payload.update != null) {
-				if (payload.update.players != null) {
-					if (this)
-					this.players = new Map(
-						payload.update.players != null
-							? payload.update.players
-								.filter(p => p.uuid != null && p.ready != null)
-								.map(p => [p.uuid as string, p.ready as boolean])
-							: []
-					);
-				}
-				if (payload.update.tree != null) {
-					this.tree = payload.update.tree as MatchNode;
-					this.treeResolve();
-				}
 			}
 
 			if (payload.ready != null)

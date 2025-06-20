@@ -2,56 +2,75 @@ import config from './config.js'
 
 class MatchNode {
     constructor() {
-        this.player1 = null; //tournament.players
-        this.player2 = null; //tournament.players
+        this.player1_uuid = null; //uuid
+        this.player2_uuid = null; //uuid
         this.left = null; //MatchNode
         this.right = null; //MatchNode
         this.parent = null; //MatchNode
-        this.winner = null; //tournament.players
+        this.winner_uuid = null; //uuid
         this.gameId = null;
         this.score = null;
         this.depth = null;
     }
 
-    setWinner(playerId) {
-        this.winner = playerId;
-        this.winner.ready = false;
-        if (this.parent) this.parent.receiveWinner(playerId);
+    setResult(matchData) {
+        this.score = matchData.score;
+        this.winner_uuid = matchData.uuid;
+        if (this.parent) this.parent.receiveWinner(matchData.uuid);
     }
 
     receiveWinner(playerId) {
-        playerId == this.left.winner ? player1 = playerId : player2 = playerId;
+        playerId == this.left.winner_uuid ? player1_uuid = playerId : player2_uuid = playerId;
     }
 }
 
 class Tournament {
-    constructor(nc, jc, id, players, uwsApp ) {
+    constructor(nc, jc, id, players, uwsApp) {
         this.nc = nc;
         this.jc = jc;
         this.uwsApp = uwsApp;
         this.id = id;
-        this.players = new Map(shuffle(players).map(p => [{ uuid: p }, { ready: false }]));
+        this.players = new Map(shuffle(players).map(p => [p, { ready: false }]));
         this.root = this.buildTournamentTree(this.players);
         this.current_round = 0;
 
         const subTournamentEndGame = nc.subscribe('games.tournament.*.match.end');
         (async () => {
             for await (const msg of subTournamentEndGame) {
-                const data = this.jc.decode(msg.data);
                 const [, , gameId] = msg.subject.split(".");
                 match = this.findMatchByGameId(this.root, gameId);
                 if (!match) { return; }
-                match.setWinner(msg.data.winner)
+                const data = this.jc.decode(msg.data);
+                match.setResult(data);
                 if (match == this.root) return;
-                if (!areAllMatchesFinishedAtDepth(this.root, match.depth))
-                {
-                    const readyBuf = this.jc.encode({
-                        ready_check: true
-                    });
-                    this.uwsApp.publish(this.id, readyBuf);
+                if (!areAllMatchesFinishedAtDepth(this.root, match.depth)) {
+                    this.sendReadyCheck();
+                    this.sendUpdate();
                 }
             }
         })
+    }
+
+    sendReadyCheck() {
+        const readyBuf = this.jc.encode({
+            type: `ready_check`
+        });
+        [...this.players.keys()].forEach((key) => {
+            this.players.set(key, false);
+        });
+        this.uwsApp.publish(this.id, readyBuf);
+    }
+
+    sendUpdate() {
+        const updateBuf = this.jc.encode({
+            type: `update`,
+            players: [...this.players.entries()].map(([player_uuid, isReady]) => ({
+                uuid: player_uuid,
+                ready: isReady,
+            })),
+            tree: this.root
+        });
+        this.uwsApp.publish(this.id, updateBuf);
     }
 
     buildTournamentTree(players) {
@@ -62,8 +81,8 @@ class Tournament {
         const leaves = [];
         for (let i = 0; i < players.length; i += 2) {
             const node = new MatchNode();
-            node.player1 = players[i];
-            node.player2 = players[i + 1];
+            node.player1_uuid = players[i].key;
+            node.player2_uuid = players[i + 1].key;
             leaves.push(node);
         }
         function pairMatches(nodes, depth) {
@@ -88,7 +107,7 @@ class Tournament {
     findMatchByPlayer(root, playerId) {
         if (!root) return null;
 
-        if (root.player1 === playerId || root.player2 === playerId) return root;
+        if (root.player1_uuid === playerId || root.player2_uuid === playerId) return root;
 
         const leftResult = findMatchByPlayer(root.left, playerId);
         if (leftResult) return leftResult;
@@ -116,8 +135,8 @@ class Tournament {
     getState() {
         return {
             tournamentId: this.id,
-            players: [...this.players.entries()].map(([uuid, { isReady }]) => ({
-                uuid,
+            players: [...this.players.entries()].map(([player_uuid, isReady]) => ({
+                uuid: player_uuid,
                 ready: isReady,
             })),
             tree: this.root
@@ -126,7 +145,7 @@ class Tournament {
 
     getNodesAtDepth(root, targetDepth) {
         const result = [];
-    
+
         function traverse(node) {
             if (!node) return;
             if (node.depth === targetDepth) result.push(node);
@@ -135,16 +154,20 @@ class Tournament {
                 traverse(node.right);
             }
         }
-    
+
         traverse(root);
         return result;
     }
-    
+
     areAllMatchesFinishedAtDepth(root, depth) {
         const nodes = getNodesAtDepth(root, depth);
-        return nodes.every(node => node.winner !== null);
+        return nodes.every(node => node.winner_uuid !== null);
     }
-    
+
+    getPlayerByUuid(uuid) {
+        return this.players.get(uuid);
+    }
+
 }
 
 export default class tournamentService {
@@ -176,9 +199,11 @@ export default class tournamentService {
 
         tournament.markReady(playerId);
 
+        tournament.sendUpdate();
+
         const state = tournament.getState();
 
-        if (match.player1.ready && match.player2.ready) { //add MatchCreate encode/decode functions
+        if (tournament.getPlayerByUuid(match.player1_uuid).ready && tournament.getPlayerByUuid(match.player2_uuid).ready) { //add MatchCreate encode/decode functions
             const reqBuf = encodeMatchCreateRequest({
                 players: [match.player1.uuid, match.player2.uuid],
             })

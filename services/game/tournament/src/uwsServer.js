@@ -43,6 +43,10 @@ export function createUwsApp(path, tournamentService) {
             if (payload.ready) {
                 newState = await tournamentService.ready(ws.tournamentId, ws.userId);
             }
+        },
+
+        close: (ws) => {
+            
         }
     })  
 
