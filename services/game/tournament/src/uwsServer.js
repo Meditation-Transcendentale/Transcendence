@@ -32,6 +32,8 @@ export function createUwsApp(path, tournamentService) {
 
             try {
                 ws.subscribe(tournamentId);
+                const buf = tournamentService.getTournament(tournamentId).getState();
+                ws.send(buf);
             } catch (err) {
 
             }

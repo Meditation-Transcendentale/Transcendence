@@ -236,6 +236,10 @@ export default class tournamentService {
         }
     }
 
+    getTournament(tournamentId){
+        return (this.tournaments.get(tournamentId));
+    }
+
     shutdown() {
         clearInterval(this.interval);
     }

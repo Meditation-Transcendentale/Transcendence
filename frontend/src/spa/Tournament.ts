@@ -10,6 +10,7 @@ interface tournamentHtmlReference {
 
 interface Player {
 	uuid: string | null;
+	username: string | null;
 	isReady: boolean;
 }
 
@@ -30,7 +31,7 @@ export default class Tournament {
 	private ws: WebSocket | null;
 	private id: string | null;
 	private mode: string | null; //
-	private players: Map<Player, boolean> | null; //key:player value:isConnected
+	private players: Map<Player, boolean> | null; //key:player value:isReady
 	private tree: MatchNode | null;	
 
 	private gameIP = window.location.hostname;
@@ -94,24 +95,21 @@ export default class Tournament {
 					break;
 				case 'update':
 					if (data.update.players != null) {
-						if (this)
-						this.players = new Map(
-							data.update.players != null
-								? data.update.players
-									.filter(p => p.uuid != null && p.ready != null)
-									.map(p => [p.uuid as string, p.ready as boolean])
-								: []
-						);
+						if (!this.players) {
+							this.players = new Map(
+								data.update.players != null
+									? data.update.players
+										.filter(p => p.uuid != null && p.ready != null)
+										.map(p => [p.uuid as string, p.ready as boolean])
+									: []
+							);
+						}
 					}
-					if (payload.update.tree != null) {
+					if (data.update.tree != null) {
 						this.tree = payload.update.tree as MatchNode;
 						this.treeResolve();
 					}
 
-			}
-
-
-			if (payload.update != null) {
 			}
 
 			if (payload.ready != null)
