@@ -86,7 +86,7 @@ export class PongBR {
 				const raw = prompt("Next round player count?");
 				const next = raw ? parseInt(raw, 10) : NaN;
 				if (!isNaN(next)) {
-					this.baseMeshes.paddle.material.setUniform("playerCount", next);
+					//this.baseMeshes.paddle.material.setUniform("playerCount", next);
 					this.transitionToRound(next);
 				}
 			}
@@ -111,8 +111,8 @@ export class PongBR {
 
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
-			this.baseMeshes.portal.material.setUniform("time", performance.now() * 0.001);
-			this.baseMeshes.portal.material.enableResolutionUniform();
+			this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
+			//this.baseMeshes.portal.material.enableResolutionUniform();
 		});
 
 	}

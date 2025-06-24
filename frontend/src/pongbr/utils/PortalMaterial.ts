@@ -37,11 +37,11 @@ export class PortalMaterial extends CustomMaterial {
 		  float width = (PERIMETER / 4.) * fillFraction;
 
 
-		  float radiusOffset = position.z;
+		  float radiusOffset = position.z + 0.5;
 		  float r = arenaRadius + 25.;
-		  positionUpdated.x = cos(localA) * r ;
+		  positionUpdated.x = cos(localA) * r + width;
 		  positionUpdated.y = (position.y) ;
-		  positionUpdated.z = sin(localA) * r ; 
+		  positionUpdated.z = sin(localA) * r + width; 
 		  vOrigXZ = positionUpdated.xz;
 
 		`);
