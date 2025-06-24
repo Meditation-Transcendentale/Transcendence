@@ -27,8 +27,8 @@
 #stats-table-window {
 	top: 10vh;
 	left: 5vh;
-	width: 20vh;
-	height: 40vh;
+	width: 30vh;
+	height: fit-content;
 }
 
 #stats-history-window {
@@ -36,4 +36,57 @@
 	left: 40vh;
 	width: 40vh;
 	height: 40vh;
+}
+
+.player-stat {
+	width: 100%;
+	border-color: white;
+	border-style: solid;
+	border-width: 0;
+	border-bottom-width: 0.2vh;
+}
+
+.player-stat>div {
+	display: inline;
+	width: fit-content;
+}
+
+
+
+.player-stat>div:last-child {
+	position: absolute;
+	right: 0vh;
+	width: 5vh;
+	text-align: center;
+	border-color: white;
+	border-style: solid;
+	border-width: 0;
+	border-left-width: 0.1vh;
+
+}
+
+.match-history {
+	width: 100%;
+}
+
+.match-history>tbody>tr[win] {
+	background-color: green;
+}
+
+.match-history>tbody>tr[lose] {
+	background-color: red;
+}
+
+.match-history tr>th {
+	text-align: left;
+}
+
+.match-history,
+tr>td {
+	text-align: center;
+}
+
+.match-history,
+tr>td:last-child {
+	text-align: right;
 }

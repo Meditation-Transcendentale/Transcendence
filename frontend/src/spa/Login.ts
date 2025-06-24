@@ -79,14 +79,14 @@ class Login {
 	}
 
 	private loginResolve(json: any) {
-		raiseStatus(true, json.message);
+		//raiseStatus(true, json.message);
 		Router.nav("/home", true);
 	}
 
 	private loginReject(resp: Response) {
 		try {
-			resp.json()
-				.then((json) => { raiseStatus(false, json.message); })
+			resp.json();
+			//.then((json) => { raiseStatus(false, json.message); })
 		} catch (err) {
 			this.ref.result.value = "FATAL ERROR";
 			this.ref.result.setAttribute('error', '');

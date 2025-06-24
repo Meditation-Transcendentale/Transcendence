@@ -74,7 +74,7 @@ export class Environment {
 	}
 
 	public render() {
-		updateVues(frame);
+		updateVues(this.frame);
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;

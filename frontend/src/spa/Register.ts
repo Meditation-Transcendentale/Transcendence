@@ -53,7 +53,7 @@ class Register {
 	}
 
 	private registerResolve(json: any) {
-		raiseStatus(true, json.message);
+		//raiseStatus(true, json.message);
 		postRequest("auth/login", {
 			username: this.ref.username.value,
 			password: this.ref.password.value
@@ -63,14 +63,14 @@ class Register {
 	}
 
 	private loginResolve(json: any) {
-		raiseStatus(true, json.message);
+		//raiseStatus(true, json.message);
 		Router.nav("/home", true);
 	}
 
 	private requestReject(resp: Response) {
 		try {
 			resp.json()
-				.then((json) => { raiseStatus(false, json.message); })
+			//.then((json) => { raiseStatus(false, json.message); })
 		} catch (err) {
 			this.ref.result.value = "FATAL ERROR";
 			this.ref.result.setAttribute('error', '');

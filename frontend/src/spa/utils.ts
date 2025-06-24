@@ -46,3 +46,21 @@ export function setDraggable(win: HTMLElement) {
 		window.addEventListener('mouseup', reset);
 	});
 }
+
+export function createDivception(options: {
+	class: string,
+	children?: string[],
+	childrenClass?: string,
+}): HTMLDivElement {
+	const div = document.createElement("div");
+
+	div.className = options.class;
+	if (!options.children) { return div; };
+	for (let i = 0; i < options.children.length; i++) {
+		const child = document.createElement("div");
+		child.innerText = options.children[i];
+		child.className = options.childrenClass ? options.childrenClass : "";
+		div.appendChild(child);
+	}
+	return div;
+}

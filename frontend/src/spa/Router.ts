@@ -112,31 +112,32 @@ class RouterC {
 			url.search = "";
 		}
 
-		//await meRequest("no-cache")
-		//.then(() => {
-		//if (url.pathname == "/login" || url.pathname == "/register") {
-		//	url.pathname = "/home";
-		//	url.search = "";
-		//}
-		this.oldURL = url.href;
-		//})
-		//.catch(() => {
-		//	this.oldURL = url.href;
-		//	if (url.pathname != "/login" && url.pathname != "/register") {
-		//		url.pathname = "/login";
-		//		url.search = "";
-		//		if (!this.first) {
-		//			meReject();
-		//			throw ("aaa");
-		//		};
-		//		console.log("%c Not logged in redirected to /login", "color: white; background-color: red")
-		//	}
-		//})
+		//this.oldURL = url.href;
+		await meRequest("no-cache")
+			.then(() => {
+				if (url.pathname == "/login" || url.pathname == "/register") {
+					url.pathname = "/home";
+					url.search = "";
+				}
+				this.oldURL = url.href;
+				this.first = false;
+			})
+			.catch(() => {
+				this.oldURL = url.href;
+				if (url.pathname != "/login" && url.pathname != "/register") {
+					url.pathname = "/login";
+					url.search = "";
+					if (!this.first) {
+						meReject();
+						throw ("aaa");
+					};
+					console.log("%c Not logged in redirected to /login", "color: white; background-color: red")
+				}
+			})
 
 
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
 
-		this.first = false;
 		this.routes.get(url.pathname)?.callback(url);
 		if (history) {
 			window.history.pushState("", "", url.pathname + url.search)
