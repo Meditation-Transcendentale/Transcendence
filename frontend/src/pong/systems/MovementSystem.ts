@@ -26,10 +26,10 @@ export class MovementSystem extends System {
 
 				if (age < 17){
 					const dist = Vector3.Distance(ball.position, ball.serverPosition);
-					if (dist > 0 && dist < 0.5) {
+					if (dist > 0 && dist < 1) {
 						const corrected = Vector3.Lerp(ball.position, ball.serverPosition, 0.1);
 						ball.position.copyFrom(corrected);
-					} else if (dist > 0.5) {
+					} else if (dist > 1) {
 						ball.position.copyFrom(ball.serverPosition);
 					}
 				}

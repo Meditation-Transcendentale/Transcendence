@@ -7,10 +7,13 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { GameTemplateConfig } from "../templates/GameTemplate";
 import { ThinInstanceManager } from "../rendering/ThinInstanceManager.js";
+import { ShaderMaterial } from "@babylonjs/core";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
-export function createCamera(scene: Scene, canvas: any): ArcRotateCamera {
+export function createCamera(scene: Scene, canvas: any, localPaddleId: number, gameMode: string): ArcRotateCamera {
 	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0., 60, Vector3.Zero(), scene);
-	// camera.attachControl(canvas, true);
+	if (localPaddleId >= 2 && gameMode === "online")
+		camera.attachControl(canvas, true);
 	new HemisphericLight("light", new Vector3(0, 1, 0), scene);
 
 	return camera;
@@ -77,7 +80,7 @@ export function createBaseMeshes(scene: Scene, config: GameTemplateConfig) {
 export function createInstanceManagers(baseMeshes: any) {
 	return {
 		ball: new ThinInstanceManager(baseMeshes.ball, 1, 50, 100),
-		paddle: new ThinInstanceManager(baseMeshes.paddle, 2, 50, 100),
+		paddle: new ThinInstanceManager(baseMeshes.paddle, 4, 50, 100),
 		wall: new ThinInstanceManager(baseMeshes.wall, 4, 50, 100)
 	}
 }

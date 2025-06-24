@@ -79,25 +79,55 @@ export class NetworkingSystem extends System {
 				});
 
 				// 2. Paddle updates
+				// paddles.forEach(p => {
+				// 	// if (p.id === localPaddleId) return;
+
+				// 	const e = entities.find(e =>
+				// 		e.hasComponent(PaddleComponent) &&
+				// 		(e.getComponent(PaddleComponent)!.id === p.id || e.getComponent(PaddleComponent)!.id - 2 === p.id)
+				// 	);
+				// 	if (!e) return;
+					
+				// 	const paddleComp = e.getComponent(PaddleComponent)!;
+				// 	const inputComp = e.getComponent(InputComponent)!;
+				// 	console.log(paddleComp.id);
+				// 	if (inputComp.gameMode === "online" && !inputComp.isLocal)
+				// 		paddleComp.offset = p.offset; // update direction
+
+				// 	const tf = e.getComponent(TransformComponent)!;
+				// 	const rot = tf.rotation;
+				// 	const right = Vector3.TransformCoordinates(
+				// 		new Vector3(1, 0, 0),
+				// 		Matrix.RotationYawPitchRoll(rot.y, rot.x, rot.z)
+				// 	);
+				// 	tf.position.copyFrom(tf.basePosition.add(right.scale(paddleComp.offset)));
+				// });
 				paddles.forEach(p => {
 					// if (p.id === localPaddleId) return;
 
-					const e = entities.find(e =>
+					const matchedEntities = entities.filter(e =>
 						e.hasComponent(PaddleComponent) &&
-						e.getComponent(PaddleComponent)!.id === p.id
+						(e.getComponent(PaddleComponent)!.id === p.id || e.getComponent(PaddleComponent)!.id - 2 === p.id)
 					);
-					if (!e) return;
+					if (!matchedEntities) return;
+					
+					matchedEntities.forEach(e => {
+						const paddleComp = e.getComponent(PaddleComponent)!;
+						const inputComp = e.getComponent(InputComponent)!;
+						// console.log(paddleComp.id);
+						if (inputComp.gameMode === "online" && !inputComp.isLocal)
+						{
+							paddleComp.offset = p.offset;
+						}
 
-					const paddleComp = e.getComponent(PaddleComponent)!;
-					// paddleComp.offset = p.offset; // update direction
-
-					const tf = e.getComponent(TransformComponent)!;
-					const rot = tf.rotation;
-					const right = Vector3.TransformCoordinates(
-						new Vector3(1, 0, 0),
-						Matrix.RotationYawPitchRoll(rot.y, rot.x, rot.z)
-					);
-					tf.position.copyFrom(tf.basePosition.add(right.scale(paddleComp.offset)));
+						const tf = e.getComponent(TransformComponent)!;
+						const rot = tf.rotation;
+						const right = Vector3.TransformCoordinates(
+							new Vector3(1, 0, 0),
+							Matrix.RotationYawPitchRoll(rot.y, rot.x, rot.z)
+						);
+						tf.position.copyFrom(tf.basePosition.add(right.scale(paddleComp.offset)));
+					});
 				});
 
 				// 3. Score update
