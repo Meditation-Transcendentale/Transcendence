@@ -45,12 +45,12 @@ export class Pong {
 
 	private canvas;
 	private gameId;
-	private isLocalGame: boolean;
+	private gameMode: string;
 
 	constructor(canvas: any, gameId: any, gameMode: any) {
 		this.canvas = canvas;
 		this.gameId = gameId;
-		this.isLocalGame = (gameMode === "local");
+		this.gameMode = gameMode;
 	}
 
 	async start() {
@@ -65,17 +65,17 @@ export class Pong {
 			wallWidth: 1
 		};
 
-		this.camera = createCamera(this.scene, this.canvas);
-
+		
 		this.baseMeshes = createBaseMeshes(this.scene, config);
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
 		this.uuid = await getOrCreateUUID();
-
+		
 		const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
-
+		
 		localPaddleId = await this.waitForRegistration();
+		this.camera = createCamera(this.scene, this.canvas, localPaddleId, this.gameMode);
 		this.initECS(config, this.instanceManagers, this.uuid);
 		this.stateManager = new StateManager(this.ecs);
 		this.stateManager.update();
@@ -87,7 +87,6 @@ export class Pong {
 
 	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
 		this.ecs = new ECSManager();
-		this.ecs.addSystem(new MovementSystem());
 		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
 		this.ecs.addSystem(new ThinInstanceSystem(
 			instanceManagers.ball,
@@ -95,6 +94,7 @@ export class Pong {
 			instanceManagers.wall,
 			this.camera
 		));
+		this.ecs.addSystem(new MovementSystem());
 		this.visualEffectSystem = new VisualEffectSystem(this.scene);
 		this.ecs.addSystem(this.visualEffectSystem);
 		this.uiSystem = new UISystem(this);
@@ -102,7 +102,7 @@ export class Pong {
 		this.ecs.addSystem(this.uiSystem);
 		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid));
 	
-		createGameTemplate(this.ecs, config, localPaddleId, this.isLocalGame);
+		createGameTemplate(this.ecs, config, localPaddleId, this.gameMode);
 	}
 	
 
@@ -151,6 +151,7 @@ export class Pong {
 
 	dispose() {
 		const { arena, ball, paddle, wall } = this.baseMeshes;
+		this.stateManager.setter(false);
 
 		[arena, ball, wall, paddle].forEach(mesh => {
 			mesh.material?.dispose?.();

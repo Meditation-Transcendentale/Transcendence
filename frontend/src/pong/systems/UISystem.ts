@@ -25,6 +25,8 @@ export class UISystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		const now = performance.now();
+		// console.log("ui: ", now);
 		entities.forEach((entity: Entity) => {
 			if (entity.hasComponent(UIComponent)) {
 				const ui = entity.getComponent(UIComponent);
@@ -37,8 +39,8 @@ export class UISystem extends System {
 					this.gameEnded = true;
 					this.scoreUI.dispose();
 					setTimeout(() => {
-						console.log("x: ", ui.score.x, " y: ", ui.score.y);
-						this.endUI = this.gameEndUI(ui.score.x > ui.score.y);
+						// console.log("x: ", ui.score.x, " y: ", ui.score.y);
+						this.endUI = this.gameEndUI(ui.score.x > ui.score.y, ui.gameMode);
 					}, 100);
 				}
 			}
@@ -70,7 +72,7 @@ export class UISystem extends System {
 		}
 	}
 
-	gameEndUI(playerWin: boolean) {
+	gameEndUI(playerWin: boolean, gameMode: string) {
 		const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("EndUI");
 
 		const panel = new Rectangle();
@@ -87,7 +89,10 @@ export class UISystem extends System {
 		console.log(playerWin);
 
 		const title = new TextBlock();
-		title.text = playerWin ? "You Won!" : "You Lost!";
+		if (gameMode === "local")
+			title.text = playerWin ? "PLayer 1 Won!" : "Player 2 Won!";
+		else
+			title.text = playerWin ? "You Won!" : "You Lost!";
 		title.color = playerWin ? "#7CFC00" : "#FF4C4C";
 		title.fontSize = 50;
 		title.fontFamily = "Segoe UI";
@@ -95,7 +100,7 @@ export class UISystem extends System {
 		title.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
 		panel.addControl(title);
 
-		const quitButton = Button.CreateSimpleButton("quit", "Quitter");
+		const quitButton = Button.CreateSimpleButton("quit", "Exit");
 		quitButton.width = "150px";
 		quitButton.height = "40px";
 		quitButton.color = "white";
@@ -118,8 +123,4 @@ export class UISystem extends System {
 			}
 		};
 	}
-
-	// disposeUI(): void{
-	// 	this.endUI.dispose();
-	// }
 }

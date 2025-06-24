@@ -40,4 +40,3 @@ update-hostname-env:
 	else \
 		echo "\nHOSTNAME=$$(hostname)" >> .env; \
 	fi
-

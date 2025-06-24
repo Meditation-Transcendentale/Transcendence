@@ -28,6 +28,9 @@ export class InputSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		// console.log("update input");
+		const now = performance.now();
+		// console.log("input: ", now);
 		const dt = deltaTime / 1000;
 		for (const entity of entities) {
 			if (
@@ -39,21 +42,34 @@ export class InputSystem extends System {
 			}
 
 			const input = entity.getComponent(InputComponent)!;
-			if (input.isLocal != true) continue;
+			if (!input.isLocal) continue;
 
 			const paddle = entity.getComponent(PaddleComponent)!;
 			const transform = entity.getComponent(TransformComponent)!;
 
 			let offsetChange = 0;
-			let UpPressed = false;
-			let DownPressed = false;
-			if (paddle.id == 0){
-				UpPressed = this.inputManager.isKeyPressed("KeyW");
-				DownPressed = this.inputManager.isKeyPressed("KeyS");
+			let upKeys = [];
+			let downKeys = [];
+			if (input.gameMode === "online" || input.gameMode === "ia"){
+				if (paddle.id == 0){
+					upKeys = ["KeyW", "ArrowUp"];
+					downKeys = ["KeyS", "ArrowDown"];
+				} else {
+					downKeys = ["KeyW", "ArrowUp"];
+					upKeys = ["KeyS", "ArrowDown"];
+				}
 			} else {
-				DownPressed = this.inputManager.isKeyPressed("ArrowUp");
-				UpPressed = this.inputManager.isKeyPressed("ArrowDown");
+				if (paddle.id == 0){
+					upKeys = ["KeyW"];
+					downKeys = ["KeyS"];
+				} else if (paddle.id == 1){
+					upKeys = ["ArrowDown"];
+					downKeys = ["ArrowUp"];
+				}
 			}
+			
+			let UpPressed = upKeys.some(key => this.inputManager.isKeyPressed(key));
+			let DownPressed = downKeys.some(key => this.inputManager.isKeyPressed(key));
 
 			paddle.move = 0;
 			if (UpPressed && !DownPressed){
@@ -63,7 +79,7 @@ export class InputSystem extends System {
 				paddle.move = -1;
 			}
 
-			offsetChange = this.move * 10 * dt;
+			offsetChange = paddle.move * 10 * dt;
 			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -this.MAX_OFFSET, this.MAX_OFFSET);
 
 			const rotationMatrix = Matrix.RotationYawPitchRoll(
@@ -83,7 +99,7 @@ export class InputSystem extends System {
 				const payload: userinterface.IClientMessage = {
 					paddleUpdate: {
 						paddleId: paddle.id,
-						move: paddle.move,
+						move: paddle.move, //remplacer par paddle.offset
 					}
 				};
 
