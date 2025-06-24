@@ -36,28 +36,31 @@ class Home {
 		homeVue.windowAddEvent('stats', 'click', () => {
 			Router.nav(`/stats?u=${User.username}`)
 		})
-
-		this.ref.info.addEventListener("click", () => {
-			Router.nav("/info");
+		homeVue.windowAddEvent('/!\\TEST/!\\', 'click', () => {
+			Router.nav('/test')
 		})
 
-		this.ref.stats.addEventListener("click", () => {
-			Router.nav(`/stats?u=${User.username}`);
-		})
+		//this.ref.info.addEventListener("click", () => {
+		//	Router.nav("/info");
+		//})
+		//
+		//this.ref.stats.addEventListener("click", () => {
+		//	Router.nav(`/stats?u=${User.username}`);
+		//})
+		//
+		//this.ref.play.addEventListener("click", () => {
+		//	Router.nav("/play");
+		//})
+		//
+		//this.ref.friendlist.addEventListener("click", () => {
+		//	Router.nav("/friendlist");
+		//})
 
-		this.ref.play.addEventListener("click", () => {
-			Router.nav("/play");
-		})
-
-		this.ref.friendlist.addEventListener("click", () => {
-			Router.nav("/friendlist");
-		})
-
-		this.ref.quit.addEventListener("click", () => {
-			postRequest("auth/logout", {})
-				.then((json) => { this.logoutResolve(json) })
-				.catch((resp) => { this.logoutReject(resp) })
-		});
+		//this.ref.quit.addEventListener("click", () => {
+		//	postRequest("auth/logout", {})
+		//		.then((json) => { this.logoutResolve(json) })
+		//		.catch((resp) => { this.logoutReject(resp) })
+		//});
 	}
 
 	public load(params: URLSearchParams) {

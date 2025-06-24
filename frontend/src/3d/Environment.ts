@@ -49,9 +49,6 @@ export class Environment {
 			}
 		});
 
-		window.addEventListener('resize', () => {
-			engine.resize();
-		})
 
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;

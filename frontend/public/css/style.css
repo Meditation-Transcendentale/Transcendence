@@ -127,13 +127,13 @@ canvas {
 	background-color: var(--frame-color);
 	font-family: sans-serif;
 	font-weight: bold;
-	font-size: 1.5em;
+	font-size: 2vh;
 	pointer-events: none;
 }
 
 .frame-hover {
 	width: auto;
-	font-size: 1em;
+	font-size: 1.5vh;
 	background-color: blue;
 	color: white;
 	pointer-events: none;

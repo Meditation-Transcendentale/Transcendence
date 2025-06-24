@@ -82,6 +82,12 @@ class RouterC {
 			ts: "./Game",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
+		this.routes.set("/test", { //TO USE FOR TEMPORARY ROUTE EX: BR / IO
+			html: "/test",
+			ts: "./Test",
+			callback: (url: URL) => { this.loadInMain(url) }
+		} as routePage);
+
 
 
 		window.addEventListener("popstate", () => {
