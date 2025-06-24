@@ -16,7 +16,10 @@ export class PortalMaterial extends CustomMaterial {
 
 
 		this.Vertex_Definitions(`
+      varying   vec2 vOrigXZ;     // our varying into the frag
+
 		`)
+
 
 		this.Vertex_Begin(`
 			#define M_PI 3.1415926535897932384626433832795
@@ -28,7 +31,7 @@ export class PortalMaterial extends CustomMaterial {
 		this.Vertex_Before_PositionUpdated(`
 
 		  float sliceAngle = 2.0 * PI / 4.;
-		  float paddleArc  = sliceAngle * fillFraction;
+		  float paddleArc  = sliceAngle ;
 		  float localA     = paddleArc * position.x;
 
 		  float width = (PERIMETER / 4.) * fillFraction;
@@ -36,105 +39,120 @@ export class PortalMaterial extends CustomMaterial {
 
 		  float radiusOffset = position.z;
 		  float r = arenaRadius + 25.;
-		  positionUpdated.x = cos(localA) * r - (position.z) * (width * RATIO);
-		  positionUpdated.y = (position.y+ 0.5) * width * RATIO + 0.5;
-		  positionUpdated.z = sin(localA) * r; 
+		  positionUpdated.x = cos(localA) * r ;
+		  positionUpdated.y = (position.y) ;
+		  positionUpdated.z = sin(localA) * r ; 
+		  vOrigXZ = positionUpdated.xz;
 
 		`);
 
+		this.Vertex_After_WorldPosComputed(`
+
+
+										   `)
+
 		this.Fragment_Definitions(`
+								  			#define PERIMETER 2. * M_PI * 100.
+			#define M_PI 3.1415926535897932384626433832795
 
- 	  #define PI 3.14159265359
- 	    #define TWO_PI 6.28318530718
- 	    #define HALF_PI 1.57079632679
+#define time time*0.15
+#define tau 6.2831853
 
- 	    vec3 mod289(vec3 x){ return x - floor(x*(1.0/289.0))*289.0; }
- 	    vec4 mod289(vec4 x){ return x - floor(x*(1.0/289.0))*289.0; }
- 	    vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
- 	    vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314 * r; }
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
 
- 	    float snoise(vec3 v){
- 	      const vec2 C = vec2(1.0/6.0,1.0/3.0);
- 	      const vec4 D = vec4(0.0,0.5,1.0,2.0);
- 	      vec3 i = floor(v + dot(v,C.yyy));
- 	      vec3 x0 = v - i + dot(i,C.xxx);
- 	      vec3 g = step(x0.yzx,x0.xyz);
- 	      vec3 l = 1.0 - g;
- 	      vec3 i1 = min(g.xyz,l.zxy), i2 = max(g.xyz,l.zxy);
- 	      vec3 x1 = x0 - i1 + C.xxx;
- 	      vec3 x2 = x0 - i2 + C.yyy;
- 	      vec3 x3 = x0 - D.yyy;
- 	      i = mod289(i);
- 	      vec4 p = permute( permute( permute(
- 	        i.z+vec4(0.0,i1.z,i2.z,1.0))
- 	        + i.y+vec4(0.0,i1.y,i2.y,1.0))
- 	        + i.x+vec4(0.0,i1.x,i2.x,1.0));
- 	      float n_ = 1.0/7.0;
- 	      vec3 ns = n_*D.wyz - D.xzx;
- 	      vec4 j = p - 49.0 * floor(p*ns.z*ns.z);
- 	      vec4 x_ = floor(j*ns.z), y_ = floor(j - 7.0*x_);
- 	      vec4 x = x_*ns.x + ns.yyyy, y = y_*ns.x + ns.yyyy;
- 	      vec4 h = 1.0 - abs(x) - abs(y);
- 	      vec4 b0 = vec4(x.xy,y.xy), b1 = vec4(x.zw,y.zw);
- 	      vec4 s0 = floor(b0)*2.0+1.0, s1 = floor(b1)*2.0+1.0;
- 	      vec4 sh = -step(h,vec4(0.0));
- 	      vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
- 	      vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
- 	      vec3 p0 = vec3(a0.xy,h.x), p1 = vec3(a0.zw,h.y);
- 	      vec3 p2 = vec3(a1.xy,h.z), p3 = vec3(a1.zw,h.w);
- 	      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),
- 	                                     dot(p2,p2),dot(p3,p3)));
- 	      p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
- 	      vec4 m = max(0.6-vec4(dot(x0,x0),dot(x1,x1),
- 	                            dot(x2,x2),dot(x3,x3)),0.0);
- 	      m = m*m;
- 	      return 42.0 * dot(m*m, vec4(dot(p0,x0),dot(p1,x1),
- 	                                  dot(p2,x2),dot(p3,x3)));
- 	    }
+mat2 makem2(in float theta){float c = cos(theta);float s = sin(theta);return mat2(c,-s,s,c);}
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
 
- 	    float fbm3d(vec3 x, const in int it){
- 	      float v=0.0, a=0.5;
- 	      vec3 shift=vec3(100.0);
- 	      for(int i=0;i<32;i++){
- 	        if(i<it){
- 	          v += a * snoise(x);
- 	          x = x*2.0 + shift;
- 	          a *= 0.5;
- 	        }
- 	      }
- 	      return v;
- 	    }
-								  `);
+  // fetch four corner hashes
+  float a = hash(i + vec2(0.0, 0.0));
+  float b = hash(i + vec2(1.0, 0.0));
+  float c = hash(i + vec2(0.0, 1.0));
+  float d = hash(i + vec2(1.0, 1.0));
+
+  // bilinear blend
+  float ab = mix(a, b, u.x);
+  float cd = mix(c, d, u.x);
+  return mix(ab, cd, u.y);
+}
+float fbm(in vec2 p)
+{	
+vec4 tt=fract(vec4(time*2.)+vec4(0.0,0.25,0.5,0.75));
+vec2 p1=p-normalize(p)*tt.x;
+vec2 p2=vec2(4.0)+p-normalize(p)*tt.y;
+vec2 p3=vec2(12.0)+p-normalize(p)*tt.z;
+vec2 p4=vec2(3.0)+p-normalize(p)*tt.w;
+vec4 tr=vec4(1.0)-abs(tt-vec4(0.5))*2.0;//*vec4(0.0,1.0,0.0,1.0);
+float z=2.;
+vec4 rz = vec4(0.);
+for (float i= 1.;i < 4.;i++)
+{
+rz+= abs((vec4(noise(p1),noise(p2),noise(p3),noise(p4))-vec4(0.5))*2.)/z;
+z = z*2.;
+p1 = p1*2.;
+p2 = p2*2.;
+p3 = p3*2.;
+p4 = p4*2.;
+}
+return dot(rz,tr)*0.25;
+}
+float dualfbm(in vec2 p)
+{
+    //get two rotated fbm calls and displace the domain
+	vec2 p2 = p*.7;
+	vec2 basis = vec2(fbm(p2-time*1.6),fbm(p2+time*1.7));
+	basis = (basis-.5)*.2;
+	p += basis;
+	
+	return fbm(p); //*makem2(time*2.0));
+}
+
+float circ(vec2 p) 
+{
+	float r = length(p);
+	r = log(sqrt(r));
+	return abs(mod(r*2.,tau)-4.54)*10.+.5;
+
+}
+
+	  `);
 
 		this.Fragment_Begin(`
+				      varying vec2 vOrigXZ;
 
 							`);
 
 
 		this.Fragment_MainBegin(`
-      vec2 uv = fract(vPositionW.xz * 0.09);
-	
+ // 							vec2 fragCoord = gl_FragCoord.xy;
+ // vec2 p = fragCoord.xy / iResolution.xy-0.5;
+ // 	 p.x *= iResolution.x/iResolution.y;
+ // 	p*= 2.;
+		  float width = (PERIMETER / 4.) * fillFraction;
+		vec2 p = vOrigXZ / width;
+							
 			`);
 
 		this.Fragment_Before_FragColor(`
-
-	  	 float t = time * 0.2;
-      float r = length(uv);
-      float a = atan(uv.y, uv.x) + r * 1.2;
-
-      float x = fbm3d(vec3(sin(a), cos(a), pow(r,0.3) + t*0.1), 3);
-      float y = fbm3d(vec3(cos(1.0 - a), sin(1.0 - a), pow(r,0.5) + t*0.1), 4);
-      float c = fbm3d(vec3(x, y, r + t*0.3), 5);
-      c = fbm3d(vec3(c - x, c - y, c + t*0.3), 6);
-      c = (c + r * 5.0) / 6.0;
-
-      vec3 col = vec3(
-        smoothstep(0.3, 0.4, y),
-        smoothstep(0.4, 0.55, y),
-        smoothstep(0.2, 0.55, y)
-      );		 
-      	color = vec4( col,  1.0 );
-		`);
+float rz = dualfbm(p);
+	
+	//rings
+	//ip /= 7.0; //exp(mod(time*10.,3.14159));
+	//rz *= pow(abs((0.0-circ(p))),.99);
+    
+    rz *= abs((-circ(vec2(p.x / 4.2, p.y / 7.0))));
+    rz *= abs((-circ(vec2(p.x / 4.2, p.y / 7.0))));
+    rz *= abs((-circ(vec2(p.x / 4.2, p.y / 7.0))));
+	
+	//final color
+	vec3 col = vec3(10.00,3.00,3.15)/rz;
+	col=pow(abs(col),vec3(1.93));
+color = vec4(col,1.5);
+	  	 		`);
 
 
 

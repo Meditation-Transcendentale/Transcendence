@@ -15,7 +15,7 @@ export class AnimationSystem implements System {
 			)
 			.forEach(ent => {
 				const tx = ent.getComponent(TransformComponent)!;
-				// tx.rotation.y += Math.PI / 1000;
+				tx.rotation.y += Math.PI / 1000;
 				// tx.rotation.z -= Math.PI / 220;
 
 			});
