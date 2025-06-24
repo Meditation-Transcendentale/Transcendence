@@ -19,7 +19,7 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 	console.log("localplayerif in template=" + localPaddleId);
 
 	const scoreUI = new Entity();
-	scoreUI.addComponent(new UIComponent());
+	scoreUI.addComponent(new UIComponent(gameMode));
 	ecs.addEntity(scoreUI);
 
 	for (let i = 0; i < 4; i++) {
