@@ -53,6 +53,8 @@ canvas {
 	position: absolute;
 	right: 20px;
 	top: 0px;
+	z-index: 1;
+	pointer-events: auto;
 
 	/*display: inline-block;*/
 	/*width: 1%;*/
