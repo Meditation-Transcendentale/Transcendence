@@ -196,12 +196,11 @@ class Stats {
 		this.ref.username.innerText = params.get("u") as string;
 
 		document.querySelector("#main-container")?.appendChild(this.div);
+		this.ref.history.appendChild(this.ref.classicHistory);
+		this.ref.stats.appendChild(this.classicPlayerStats!.div);
+		this.mode = 1;
 		getRequest(`stats/player/${this.ref.username.innerText}/classic`)
 			.then((json: any) => {
-				this.ref.history.appendChild(this.ref.classicHistory);
-				this.ref.stats.appendChild(this.classicPlayerStats!.div);
-				this.mode = 1;
-
 				//console.log(json)
 				this.classicResolve(json.playerStats);
 				//		document.querySelector("#home-container")?.appendChild(this.div);

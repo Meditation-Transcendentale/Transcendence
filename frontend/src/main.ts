@@ -14,6 +14,8 @@ async function init() {
 	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
 
 
+	Router.AUTHENTIFICATION = false;
+
 	App3D.init()
 		.then(() => {
 			Router.nav(window.location.href.substring(window.location.origin.length), false, false);

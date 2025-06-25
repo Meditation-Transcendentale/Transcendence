@@ -23,6 +23,8 @@ class RouterC {
 
 	private parser: DOMParser;
 
+	public AUTHENTIFICATION: boolean = true;
+
 	constructor() {
 		this.initRoute = null;
 		this.location = `http://${window.location.hostname}:8080`;
@@ -118,28 +120,36 @@ class RouterC {
 			url.search = "";
 		}
 
-		//this.oldURL = url.href;
-		await meRequest("no-cache")
-			.then(() => {
-				if (url.pathname == "/login" || url.pathname == "/register") {
-					url.pathname = "/home";
-					url.search = "";
-				}
-				this.oldURL = url.href;
-				this.first = false;
-			})
-			.catch(() => {
-				this.oldURL = url.href;
-				if (url.pathname != "/login" && url.pathname != "/register") {
-					url.pathname = "/login";
-					url.search = "";
-					if (!this.first) {
-						meReject();
-						throw ("aaa");
-					};
-					console.log("%c Not logged in redirected to /login", "color: white; background-color: red")
-				}
-			})
+		if (this.AUTHENTIFICATION) {
+			//this.oldURL = url.href;
+			await meRequest("no-cache")
+				.then(() => {
+					if (url.pathname == "/login" || url.pathname == "/register") {
+						url.pathname = "/home";
+						url.search = "";
+					}
+					this.oldURL = url.href;
+					this.first = false;
+				})
+				.catch(() => {
+					this.oldURL = url.href;
+					if (url.pathname != "/login" && url.pathname != "/register") {
+						url.pathname = "/login";
+						url.search = "";
+						if (!this.first) {
+							meReject();
+							throw ("aaa");
+						};
+						console.log("%c Not logged in redirected to /login", "color: white; background-color: red")
+					}
+				})
+		} else {
+			if (url.pathname == "/login" || url.pathname == "/register") {
+				url.pathname = "/home";
+				url.search = "";
+			}
+			this.oldURL = url.href;
+		}
 
 
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
