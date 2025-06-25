@@ -3,7 +3,10 @@ import { Component } from "../ecs/Component.js";
 
 export class BallComponent implements Component {
     public id: number;
+	public serverPosition: Vector3 = Vector3.Zero();
+	public lastServerUpdate: number = performance.now();
     public position: Vector3;
+	public previousPosition: Vector3 = Vector3.Zero();
     public velocity: Vector3;
 	// public destroy: boolean;
 

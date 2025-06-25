@@ -31,6 +31,7 @@ services:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
       - user_shared:/app/shared
+      - cdn_data:/app/cdn_data
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -41,6 +42,7 @@ services:
       - FT_API_SECRET=${FT_API_SECRET}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
+      - CDN_URL=${CDN_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -57,6 +59,7 @@ services:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
       - user_shared:/app/shared
+      - cdn_data:/app/cdn_data
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
@@ -64,6 +67,7 @@ services:
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NATS_URL=${NATS_URL}
+      - CDN_URL=${CDN_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -147,6 +151,7 @@ services:
       - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
+      - HOSTNAME=${HOSTNAME}
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
@@ -209,7 +214,6 @@ services:
       update_user_info-service:
         condition: service_started
         
-  
   database_certs-init:
     build:
       context: ./database_certs-init
@@ -223,6 +227,39 @@ services:
       - SSL_CERT=${SSL_CERT}
     networks:
       - transcendence-network
+  
+  cdn:
+    build: ./services/cdn
+    container_name: cdn
+    volumes:
+      - ./shared/certs:/app/certs:ro
+      - cdn_data:/usr/share/nginx/html
+    ports:
+      - "3002:443"
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus
+  #   volumes:
+  #     - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - ./prometheus/web-config.yml:/etc/prometheus/web-config.yml
+  #     - ./shared/certs:/etc/prometheus/certs:ro
+  #   ports:
+  #     - "9090:9090"
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--web.config.file=/etc/prometheus/web-config.yml'
+  #     - '--web.listen-address=:9090'
+  #     - '--web.enable-lifecycle'
+  #   depends_on:
+  #     database_certs-init:
+  #       condition: service_completed_successfully
+  #   networks:
+  #     - transcendence-network
 
 volumes:
   user_shared:
@@ -231,6 +268,12 @@ volumes:
       type: none
       o: bind
       device: ./services/user/shared
+  cdn_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/cdn/public
 
 networks:
   transcendence-network:

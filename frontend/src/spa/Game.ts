@@ -25,7 +25,12 @@ export default class Game {
 			return;
 		}
 		this.pong?.dispose();
-		this.pong = new Pong(document.querySelector("#canvas"), params.get("id"));
+		this.pong = new Pong(document.querySelector("#canvas"), params.get("id"), params.get("mod"));
 		this.pong.start();
+	}
+
+	public async unload() {
+		// this.pong?.dispose();
+		// this.div.remove();
 	}
 }

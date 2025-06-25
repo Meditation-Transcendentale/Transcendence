@@ -29,6 +29,7 @@
 
   "devDependencies": {
     "protobufjs": "^7.5.3"
+  },
 
   "dependencies": {
     "@fastify/cors": "^11.0.1",

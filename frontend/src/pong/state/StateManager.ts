@@ -19,13 +19,11 @@ export class StateManager {
 		this.ecs.update(deltaTime);
 		this.id = requestAnimationFrame(() => this.update());
 		if (!this.start) {
-			console.log(this.id);
 			cancelAnimationFrame(this.id);
 		}
 	}
 
 	setter(value: boolean): void {
-		console.log("change start");
 		this.start = value;
 	}
 }

@@ -24,6 +24,8 @@ export class CameraFollowSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		const now = performance.now();
+		// console.log("camera: ", now);
 		const localPaddle = entities.find(entity => {
 			const input = entity.getComponent(InputComponent);
 			return input && input.isLocal;

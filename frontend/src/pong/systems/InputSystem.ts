@@ -18,7 +18,6 @@ export class InputSystem extends System {
 	private localPaddleId: number | null = null;
 	private readonly MAX_OFFSET: number = 8.4;
 	private move: number;
-	private lastSentMove: number = 0;
 
 	constructor(inputManager: InputManager, wsManager: WebSocketManager) {
 		super();
@@ -29,8 +28,10 @@ export class InputSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		// console.log("update input");
+		const now = performance.now();
+		// console.log("input: ", now);
 		const dt = deltaTime / 1000;
-		// console.log("Input system:", performance.now());
 		for (const entity of entities) {
 			if (
 				!entity.hasComponent(InputComponent) ||
@@ -41,20 +42,44 @@ export class InputSystem extends System {
 			}
 
 			const input = entity.getComponent(InputComponent)!;
-			if (input.isLocal != true) continue;
+			if (!input.isLocal) continue;
 
 			const paddle = entity.getComponent(PaddleComponent)!;
 			const transform = entity.getComponent(TransformComponent)!;
 
 			let offsetChange = 0;
-			const leftPressed = this.inputManager.isKeyPressed("KeyA");
-			const rightPressed = this.inputManager.isKeyPressed("KeyD");
+			let upKeys = [];
+			let downKeys = [];
+			if (input.gameMode === "online" || input.gameMode === "ia"){
+				if (paddle.id == 0){
+					upKeys = ["KeyW", "ArrowUp"];
+					downKeys = ["KeyS", "ArrowDown"];
+				} else {
+					downKeys = ["KeyW", "ArrowUp"];
+					upKeys = ["KeyS", "ArrowDown"];
+				}
+			} else {
+				if (paddle.id == 0){
+					upKeys = ["KeyW"];
+					downKeys = ["KeyS"];
+				} else if (paddle.id == 1){
+					upKeys = ["ArrowDown"];
+					downKeys = ["ArrowUp"];
+				}
+			}
+			
+			let UpPressed = upKeys.some(key => this.inputManager.isKeyPressed(key));
+			let DownPressed = downKeys.some(key => this.inputManager.isKeyPressed(key));
 
-			this.move = 0;
-			if (leftPressed && !rightPressed) this.move = 1;
-			else if (rightPressed && !leftPressed) this.move = -1;
+			paddle.move = 0;
+			if (UpPressed && !DownPressed){
+				paddle.move = 1;
+			}
+			else if (DownPressed && !UpPressed){
+				paddle.move = -1;
+			}
 
-			offsetChange = this.move * 10 * dt;
+			offsetChange = paddle.move * 10 * dt;
 			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -this.MAX_OFFSET, this.MAX_OFFSET);
 
 			const rotationMatrix = Matrix.RotationYawPitchRoll(
@@ -70,19 +95,18 @@ export class InputSystem extends System {
 			transform.position.copyFrom(
 				transform.basePosition.add(displacement)
 			);
-			if (this.move != this.lastSentMove) {
+			if (paddle.move != paddle.lastMove) {
 				const payload: userinterface.IClientMessage = {
 					paddleUpdate: {
-						paddleId: localPaddleId,
-						move: this.move,
+						paddleId: paddle.id,
+						move: paddle.move, //remplacer par paddle.offset
 					}
 				};
 
 				const buffer = encodeClientMessage(payload);
 				this.wsManager.socket.send(buffer);
-				this.lastSentMove = this.move;
+				paddle.lastMove = paddle.move;
 
-				// console.log("Sent move to server: move =", this.move, "offset = ", paddle.offset);
 			}
 		}
 	}
