@@ -1,0 +1,94 @@
+#register-window {
+	top: 20%;
+	left: 20%;
+	width: 40vh;
+}
+
+#register-window>.window-content {
+	position: relative;
+	width: 100%;
+	height: fit-content;
+}
+
+#register-form {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: 17.5vh;
+	/*height: 25vh;*/
+}
+
+#register-form>input {
+	text-align: center;
+	position: absolute;
+	font-size: 2.5vh;
+}
+
+#register-username,
+#register-password,
+#register-submit {
+	height: 4vh;
+	max-height: 3.5vh;
+}
+
+#register-username,
+#register-password {
+	left: 2vh;
+	border: 0.1vh white solid;
+	width: 18vh;
+}
+
+
+#register-username {
+	top: 2vh;
+}
+
+#register-password {
+	top: 7vh;
+}
+
+#register-submit {
+	top: 14vh;
+	bottom: 0;
+	width: 100%;
+}
+
+#register-submit:hover {
+	color: var(--window-background);
+	background-color: var(--window-color);
+}
+
+#sepv {
+	position: absolute;
+	background-color: var(--window-color);
+	width: 0.3vh;
+	height: 12vh;
+	top: 1vh;
+	left: 21vh;
+}
+
+#seph {
+	position: absolute;
+	background-color: var(--window-color);
+	width: 37vh;
+	height: 0.3vh;
+	top: 14vh;
+	left: 1.5vh;
+}
+
+#requirement {
+	position: absolute;
+	top: 1.5vh;
+	right: 2vh;
+	width: 15.7vh;
+}
+
+#register-submit[error] {
+	transition: background-color 0.2s;
+	background-color: #8f2414;
+	color: black;
+}
+
+#register-submit[error]:hover {
+	pointer-events: none;
+}

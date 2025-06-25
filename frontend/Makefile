@@ -1,5 +1,5 @@
 IMAGE_NAME=front
-CONTAINER_NAME=front-container
+CONTAINER_NAME=frontend-frontend-1
 DOCKERFILE=Dockerfile.dev
 PORT=8080
 DOCKER_COMPOSE_FILE=docker-compose.yml
@@ -11,6 +11,8 @@ up:
 	docker compose -f $(DOCKER_COMPOSE_FILE) up --build
 
 down:
+	docker compose -f $(DOCKER_COMPOSE_FILE) stop -t 3
+	docker compose -f $(DOCKER_COMPOSE_FILE) rm -f -v
 	docker compose -f $(DOCKER_COMPOSE_FILE) down
 
 logs:

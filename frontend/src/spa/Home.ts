@@ -1,3 +1,5 @@
+import { App3D } from "../3d/App";
+import { homeVue } from "../Vue";
 import { meRequest, postRequest } from "./requests";
 import Router from "./Router";
 import { User } from "./User";
@@ -29,25 +31,32 @@ class Home {
 			quit: div.querySelector("#home-quit") as HTMLInputElement
 		};
 
-		this.ref.info.addEventListener("click", () => {
-			Router.nav("/info");
+		App3D.setVue('home');
+		homeVue.windowAddEvent('play', 'click', () => {
+			Router.nav('/play');
+		})
+		homeVue.windowAddEvent('stats', 'click', () => {
+			Router.nav(`/stats?u=${User.username}`)
+		})
+		homeVue.windowAddEvent('/!\\TEST/!\\', 'click', () => {
+			Router.nav('/test')
 		})
 
-		this.ref.stats.addEventListener("click", () => {
-			Router.nav(`/stats?u=${User.username}`);
-		})
-
-		this.ref.play.addEventListener("click", () => {
-			Router.nav("/play");
-		})
-
-		this.ref.friendlist.addEventListener("click", () => {
-			Router.nav("/friendlist");
-		})
-
-		this.ref.br.addEventListener("click", () => {
-			Router.nav("/br", false, true);
-		})
+		//this.ref.info.addEventListener("click", () => {
+		//	Router.nav("/info");
+		//})
+		//
+		//this.ref.stats.addEventListener("click", () => {
+		//	Router.nav(`/stats?u=${User.username}`);
+		//})
+		//
+		//this.ref.play.addEventListener("click", () => {
+		//	Router.nav("/play");
+		//})
+		//
+		//this.ref.friendlist.addEventListener("click", () => {
+		//	Router.nav("/friendlist");
+		//})
 
 		this.ref.quit.addEventListener("click", () => {
 			postRequest("auth/logout", {})
@@ -94,13 +103,15 @@ class Home {
 	}
 
 	public load(params: URLSearchParams) {
-		meRequest()
-			.catch(() => window.location.reload());
+		App3D.loadVue('home');
+		//meRequest()
+		//.catch(() => window.location.reload());
 		(document.querySelector("#main-container") as HTMLDivElement).innerHTML = "";
 		document.querySelector("#main-container")?.appendChild(this.div);
 	}
 
 	public async unload() {
+		App3D.unloadVue('home');
 		this.div.remove();
 	}
 

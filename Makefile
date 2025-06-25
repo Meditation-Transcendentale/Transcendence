@@ -13,9 +13,6 @@ build:
 
 down:
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) down
-	if [ -d ./shared ]; then \
-		rm -rf ./shared; \
-	fi
 	docker volume rm -f $$(docker volume ls)
 
 up:
