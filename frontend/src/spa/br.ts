@@ -1,5 +1,6 @@
 import Router from "./Router";
 import { PongBR } from "../pongbr/PongBR";
+import { App3D } from "../3d/App";
 
 
 export default class br {
@@ -12,6 +13,7 @@ export default class br {
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
+		App3D.setVue('test');
 		this.pongbr = null;
 		// PongBR.INIT();
 		this.mod = null;
@@ -19,9 +21,18 @@ export default class br {
 		this.id = null;
 	}
 
+	public unload() {
+		App3D.unloadVue('test');
+		document.querySelector("canvas")?.blur();
+		//this.pongbr?.dispose();
+		//this.div.remove();
+	}
+
 	public load(params: URLSearchParams) {
+		App3D.loadVue('test');
+		document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
-		this.pongbr = new PongBR(document.querySelector("#canvas"), params.get("id"));
+		this.pongbr = new PongBR(document.querySelector("#canvas"), params.get("id"), App3D.scene);
 		this.pongbr.start();
 	}
 }

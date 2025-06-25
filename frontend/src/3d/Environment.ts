@@ -9,9 +9,10 @@ import { updateVues } from "../Vue";
 
 export class Environment {
 	private canvas: HTMLCanvasElement;
-	private scene!: Scene;
+	public scene!: Scene;
 
 	private camera!: ArcRotateCamera;
+	private camera_br!: ArcRotateCamera;
 
 	private lastTime: number;
 	private deltaTime: number;
@@ -59,12 +60,8 @@ export class Environment {
 
 	public async init() {
 
-		this.camera = new ArcRotateCamera("camera", -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
-		this.camera.inertia = 0.8;
-		this.camera.speed = 10;
-		this.camera.rotation.set(0, Math.PI * 1.5, 0);
-		this.camera.attachControl(this.canvas, true);
-		this.camera.minZ = 0.1;
+		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
+		this.camera_br.attachControl(this.canvas, true);
 
 		await this.gears.load();
 

@@ -347,7 +347,7 @@ export class Gears {
 				break;
 			}
 			case 'test': {
-				testVue.init(this.scene.getCameraByName('menu') as Camera);
+				testVue.init(this.scene.getCameraByName('br') as Camera);
 				break;
 			}
 

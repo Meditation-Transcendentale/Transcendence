@@ -13,7 +13,7 @@ class app3d {
 	private canvas: HTMLCanvasElement;
 
 	private engine: Engine;
-	private environment: Environment;
+	public environment: Environment;
 
 	private fps: HTMLElement;
 
@@ -70,6 +70,9 @@ class app3d {
 
 	public setVue(vue: string) {
 		this.environment.setVue(vue);
+	}
+	public get scene() {
+		return this.environment.scene;
 	}
 }
 

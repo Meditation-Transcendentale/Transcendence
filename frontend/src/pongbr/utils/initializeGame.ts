@@ -6,7 +6,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3, Color4, Vector3 } from "@babylonjs/core/Maths/math";
 import { GameTemplateConfig } from "../templates/GameTemplate";
-import { Effect, Material, ShaderMaterial, Vector2, VertexBuffer } from "@babylonjs/core";
+import { Effect, Material, ShaderMaterial, TransformNode, Vector2, VertexBuffer } from "@babylonjs/core";
 import { PaddleMaterial } from './PaddleMaterial';
 import { PortalMaterial } from "./PortalMaterial";
 
@@ -238,16 +238,18 @@ void main() {
 }
 `
 
-export function createCamera(scene: Scene, canvas: any): ArcRotateCamera {
+export function createCamera(scene: Scene, canvas: any, pongRoot: TransformNode): ArcRotateCamera {
 	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0., 60, Vector3.Zero(), scene);
+	camera.parent = pongRoot;
 	camera.attachControl(canvas, true);
-	new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+	//new HemisphericLight("light", new Vector3(0, 1, 0), scene);
 
 	return camera;
 }
 
-export function createWallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+export function createWallMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: 1, height: 1, depth: 2 }, scene);
+	wallMesh.parent = pongRoot;
 	const wallMaterial = new StandardMaterial("wallMaterial", scene);
 	wallMaterial.diffuseColor.set(0, 0, 0);
 	wallMaterial.emissiveColor.set(1, 0, 1);
@@ -258,8 +260,9 @@ export function createWallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
 	return wallMesh;
 }
 
-export function createArenaMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+export function createArenaMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 200, height: 1, tessellation: 128 }, scene);
+	arenaMesh.parent = pongRoot;
 	const material = new StandardMaterial("arenaMaterial", scene);
 	// material.diffuseColor.set(0, 0, 0;
 	// material.specularColor.set(0, 0, 0);
@@ -269,8 +272,9 @@ export function createArenaMesh(scene: Scene, config: GameTemplateConfig): Mesh 
 	return arenaMesh;
 }
 
-export function createBallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+export function createBallMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 1 }, scene);
+	ballMesh.parent = pongRoot;
 	const ballMaterial = new StandardMaterial("ballMaterial", scene);
 	ballMaterial.diffuseColor.set(1, 1, 1);
 	// ballMaterial.diffuseTexture = new Texture("moi.png", scene);
@@ -282,7 +286,7 @@ export function createBallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
 	return ballMesh;
 }
 
-export function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+export function createPaddleMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const
 		arenaRadius = 100,
 		paddleWidth = 1,
@@ -301,6 +305,7 @@ export function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh
 		tileSize: 0.1,
 		tileWidth: 0.1
 	}, scene);
+	paddle.parent = pongRoot;
 	// paddle.enableEdgesRendering();
 	paddle.alwaysSelectAsActiveMesh = true
 	paddle.edgesColor = new Color4(0., 1.0, 0.0, 1.0);
@@ -318,11 +323,12 @@ export function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh
 	return paddle;
 }
 
-export function createPortalMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+export function createPortalMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const portal = MeshBuilder.CreatePlane("portalBase",
 		{ size: 1, sideOrientation: Mesh.DOUBLESIDE }, scene);
 	portal.alwaysSelectAsActiveMesh = true
 
+	portal.parent = pongRoot;
 	const mat = new ShaderMaterial("portalMat", scene, { vertex: "portal", fragment: "portal" }, {
 		attributes: ["position", "uv", "world0", "world1", "world2", "world3", "worldPos"],
 		uniforms: ["time", "world", "viewProjection", "projection"],
@@ -335,12 +341,13 @@ export function createPortalMesh(scene: Scene, config: GameTemplateConfig): Mesh
 
 // utils/initializeGame.ts
 
-export function createPillarMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+export function createPillarMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const m = MeshBuilder.CreateBox("pillarBase", {
 		width: 0.5,
 		height: 2,
 		depth: 0.5
 	}, scene);
+	m.parent = pongRoot;
 	m.isVisible = true;
 	const mat = new StandardMaterial("pillarMat", scene);
 	mat.diffuseColor.set(0.8, 0.8, 0.8);
@@ -349,12 +356,13 @@ export function createPillarMesh(scene: Scene, config: GameTemplateConfig): Mesh
 	return m;
 }
 
-export function createGoalMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+export function createGoalMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const m = MeshBuilder.CreateBox("goalBase", {
 		width: 1,
 		height: 1,
 		depth: 0.5
 	}, scene);
+	m.parent = pongRoot;
 	const mat = new StandardMaterial("goalMat", scene);
 	mat.diffuseColor.set(1, 0, 0);
 	m.material = mat;

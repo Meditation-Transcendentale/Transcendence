@@ -27,7 +27,7 @@ import type { userinterface } from './utils/proto/message.js';
 import { buildPaddles, PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
 import { AnimationComponent } from "./components/AnimationComponent.js";
-import { Vector3, Vector2 } from "@babylonjs/core";
+import { Vector3, Vector2, TransformNode, Camera } from "@babylonjs/core";
 import { AnimationSystem } from "./systems/AnimationSystem.js";
 import { Easing } from "./utils/Easing.js";
 import { computePaddleTransforms, TransformBundle } from "./templates/transformBuilder.js";
@@ -58,16 +58,16 @@ export class PongBR {
 	private uuid!: string;
 	private paddleBundles!: PaddleBundle[];
 
-	constructor(canvas: any, gameId: any) {
+	constructor(canvas: any, gameId: any, scene: Scene) {
 		this.canvas = canvas;
 		this.gameId = gameId;
+		this.scene = scene;
 	}
 
 	async start() {
 		console.log("start");
 		this.engine = new Engine(this.canvas, true);
 		engine = this.engine;
-		this.scene = new Scene(this.engine);
 		this.scene.debugLayer.show({ showInspector: true, embedMode: true });
 		const config = {
 			numberOfBalls: 1,
@@ -77,11 +77,10 @@ export class PongBR {
 		};
 
 		// const spector = new Spector();
-		// spector.displayUI();               // pops up the Spector control panel
+		// spector.displayUI();               
 		// spector.spyCanvas(
 		// );
 		window.addEventListener("keydown", (e) => {
-			// press “T” to trigger a transition
 			if (e.key.toLowerCase() === "t") {
 				const raw = prompt("Next round player count?");
 				const next = raw ? parseInt(raw, 10) : NaN;
@@ -91,10 +90,16 @@ export class PongBR {
 				}
 			}
 		});
-		this.camera = createCamera(this.scene, this.canvas);
+		const pongRoot = new TransformNode("pongRoot", this.scene);
+		pongRoot.position.set(100, 0, 200);
+		pongRoot.rotation.y = Math.PI * 0.1;
+		pongRoot.scaling.set(2, 2, 2);
+		this.camera = this.scene.getCameraByName('br') as ArcRotateCamera;
+		this.camera.parent = pongRoot;
+		this.camera.attachControl(this.canvas);
 		this.camera.minZ = 0.01;
 
-		this.baseMeshes = this.createBaseMeshes(config);
+		this.baseMeshes = this.createBaseMeshes(config, pongRoot);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
 		this.uuid = await getOrCreateUUID();
@@ -238,15 +243,15 @@ export class PongBR {
 	}
 
 
-	private createBaseMeshes(config: GameTemplateConfig) {
+	private createBaseMeshes(config: GameTemplateConfig, pongRoot: TransformNode) {
 		return {
-			arena: createArenaMesh(this.scene, config),
-			ball: createBallMesh(this.scene, config),
-			paddle: createPaddleMesh(this.scene, config),
-			wall: createWallMesh(this.scene, config),
-			portal: createPortalMesh(this.scene, config),
-			pillar: createPillarMesh(this.scene, config),
-			goal: createGoalMesh(this.scene, config),
+			arena: createArenaMesh(this.scene, config, pongRoot),
+			ball: createBallMesh(this.scene, config, pongRoot),
+			paddle: createPaddleMesh(this.scene, config, pongRoot),
+			wall: createWallMesh(this.scene, config, pongRoot),
+			portal: createPortalMesh(this.scene, config, pongRoot),
+			pillar: createPillarMesh(this.scene, config, pongRoot),
+			goal: createGoalMesh(this.scene, config, pongRoot),
 		}
 	}
 
