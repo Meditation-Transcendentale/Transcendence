@@ -45,3 +45,31 @@ scrape_configs:
     scheme: https
     tls_config:
       insecure_skip_verify: true
+  - job_name: 'game-manager'
+    static_configs:
+      - targets: ['host.docker.internal:5050']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  - job_name: 'user-interface'
+    static_configs:
+      - targets: ['host.docker.internal:5051']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  - job_name: 'pong-physics'
+    static_configs:
+      - targets: ['host.docker.internal:5052']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  - job_name: 'pongBR-physics'
+    static_configs:
+      - targets: ['host.docker.internal:5053']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true

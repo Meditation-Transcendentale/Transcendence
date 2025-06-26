@@ -39,6 +39,7 @@ services:
       - nats
     ports:
       - "5003:5003"
+      - "5050:5050" # For metrics
 
   user-interface:
     build: ./user-interface
@@ -50,6 +51,7 @@ services:
     command: npm run start
     ports:
     - "5004:5004"
+    - "5051:5051" # For metrics
     restart: unless-stopped
     environment:
       - SERVICE_NAME=user-interface
