@@ -1,7 +1,7 @@
 DOCKER_COMPOSE = docker compose
 DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml -f ./metrics/docker-compose-metrics.yml
 
-.PHONY: all build down stop up re cleanVolumes reCleanData update-hostname-env
+.PHONY: all build down stop up re cleanVolumes clean reCleanData update-hostname-env
 
 # curl -u <username>:<password> ftp://<ftp_host>/chemin/vers/.env -o .env
 
@@ -35,6 +35,13 @@ reCleanData:
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) down
 	docker volume rm -f $$(docker volume ls)
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) up --build
+
+clean:
+	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) down
+	if [ -d ./shared ]; then \
+		rm -rf ./shared; \
+	fi
+	docker volume rm -f $$(docker volume ls)
 
 update-hostname-env:
 	@if grep -q '^HOSTNAME=' .env; then \
