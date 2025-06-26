@@ -112,7 +112,7 @@ export default class LobbyService {
 
 			try {
 				let replyBuf;
-				if (lobby.mode == `tournament`)
+				if (lobby.mode == `tournament`) //no
 				{
 					replyBuf = await natsClient.request(
 						`games.tournament.create`,

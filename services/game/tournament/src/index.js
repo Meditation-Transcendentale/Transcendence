@@ -30,9 +30,9 @@ async function start() {
     const subNewTournament = nc.subscribe('games.tournament.create');
     (async () => {
         for await (const msg of subNewTournament) {
-            //const playersList decode msg.data somehow
-            const tournamentId = tournamentService.create(playerslist, uwsApp);
-
+            const playersList = jc.decode(msg.data);
+            const tournamentId = tournamentService.create(playersList, uwsApp);
+            
         }
             //send tournament id to the players uuid
     })
