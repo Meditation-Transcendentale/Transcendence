@@ -8,8 +8,6 @@ import {
   heuristic_distance_to_predicted_return
 } from './heuristics.js';
 
-import { PADDLE_HALF_HEIGHT } from './constants.js';
-
 export function evaluateNode(node, phase = "offense", predictedReturnY = null) {
   const myPaddleY = node.ballVel[0] > 0 ? node.aiPaddlePos : node.playerPaddlePos;
   const oppPaddleY = node.ballVel[0] < 0 ? node.playerPaddlePos : node.aiPaddlePos;
@@ -35,35 +33,34 @@ export function evaluateNode(node, phase = "offense", predictedReturnY = null) {
 
   const w = phase === "offense" ? offenseWeights : defenseWeights;
 
-  const [ttiOpt, ttiPess] = heuristic_time_to_intercept(node, myPaddleY);
-  const [varOpt, varPess] = heuristic_return_angle_variability(node);
-  const [disruptOpt, disruptPess] = heuristic_opponent_disruption(node, oppPaddleY);
-  const [centerOpt, centerPess] = heuristic_center_bias_correction(node);
-  const [entropyOpt, entropyPess] = heuristic_entropy_reaction(node, oppPaddleY);
-  const [consistencyOpt, consistencyPess] = heuristic_consistency(node);
+  const tti = heuristic_time_to_intercept(node, myPaddleY);
+  const variability = heuristic_return_angle_variability(node);
+  const disruption = heuristic_opponent_disruption(node, oppPaddleY);
+  const centerBias = heuristic_center_bias_correction(node);
+  const entropy = heuristic_entropy_reaction(node, oppPaddleY);
+  const consistency = heuristic_consistency(node);
 
-  let returnDistOpt = 0, returnDistPess = 0;
+  let returnDist = 0;
   if (phase === "defense" && predictedReturnY !== null) {
-    [returnDistOpt, returnDistPess] = heuristic_distance_to_predicted_return(node, predictedReturnY);
+    returnDist = heuristic_distance_to_predicted_return(node, predictedReturnY);
   }
 
-  const optimistic =
-    w.tti * ttiOpt +
-    w.var * varOpt +
-    w.disrupt * disruptOpt +
-    w.center * centerOpt +
-    w.entropy * entropyOpt +
-    w.consistency * consistencyOpt +
-    (w.returnDist || 0) * returnDistOpt;
+  const score =
+    w.tti * tti +
+    w.var * variability +
+    w.disrupt * disruption +
+    w.center * centerBias +
+    w.entropy * entropy +
+    w.consistency * consistency +
+    (w.returnDist || 0) * returnDist;
 
-  const pessimistic =
-    w.tti * ttiPess +
-    w.var * varPess +
-    w.disrupt * disruptPess +
-    w.center * centerPess +
-    w.entropy * entropyPess +
-    w.consistency * consistencyPess +
-    (w.returnDist || 0) * returnDistPess;
-
-  return [optimistic, pessimistic];
+  if (!Number.isFinite(score)) {
+    console.warn("NaN in evaluateNode", {
+      node,
+      ballPos: node.ballPos,
+      ballVel: node.ballVel,
+      futureBallState: node.futureBallState
+    });
+  }
+  return score;
 }

@@ -1,13 +1,9 @@
 export class GameStateNode {
-  constructor(ballPos, ballVel, aiPaddlePos, playerPaddlePos, nextBallPos) {
-    this.ballPos = ballPos;
-    this.ballVel = ballVel;
+  constructor(newBallState, aiPaddlePos, playerPaddlePos, futureBallState) {
+    this.ballPos = [newBallState[0], newBallState[1]];
+    this.ballVel = [newBallState[2], newBallState[3]];
     this.aiPaddlePos = aiPaddlePos;
     this.playerPaddlePos = playerPaddlePos;
-    this.nextBallPos = nextBallPos;
-    this.children = [];
-    this.parent = null;
-    this.alpha = 0;
-    this.beta = 0;
+    this.futureBallState = futureBallState;
   }
 }

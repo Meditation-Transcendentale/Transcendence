@@ -1,38 +1,27 @@
 import { GameStateNode } from './GameStateNode.js';
 import { minmax } from './minmax.js';
 import { expand } from './expand.js';
-import { predictBallPosition } from './physics.js';
+import { predictBallState } from './physics.js';
 import { STEP_SIZE } from './constants.js';
 
-const ballPos = [0, 1];
-const ballVel = [-1, 0.5];
-const aiPaddlePos = 2;
-const playerPaddlePos = 0;
+const initialBallPos = [0, 0];
+const initialBallVel = [5, 5];
+const futureBallState = predictBallState(initialBallPos, initialBallVel);
 
-const isAITurn = ballVel[0] < 0;
-const phase = isAITurn ? "offense" : "defense";
-const [predictedPos] = predictBallPosition(ballPos, ballVel);
+console.log("Initial futureBallState:", futureBallState);
 
-console.log(predictedPos);
+const initialBallState = [initialBallPos[0], initialBallPos[1], initialBallVel[0], initialBallVel[1]];
 
-// const root = new GameStateNode(ballPos, ballVel, aiPaddlePos, playerPaddlePos, predictedPos);
-// root.depth = 0;
+const root = new GameStateNode(
+  initialBallState,
+  0, // ai paddle
+  0, // player paddle
+  futureBallState
+);
 
-// expand(root);
+const result = minmax(root, 2, -Infinity, Infinity, true);
 
-// let bestScore = -Infinity;
-// let bestNode = null;
-
-// for (const child of root.children) {
-//   const score = minmax(child, 1, -Infinity, Infinity, !isAITurn);
-//   if (score > bestScore) {
-//     bestScore = score;
-//     bestNode = child;
-//   }
-// }
-
-// const finalTargetY = bestNode.aiPaddlePos;
-
-// console.log("Best Node Target Y:", finalTargetY.toFixed(2));
-// console.log("Current Y:", aiPaddlePos.toFixed(2));
-// console.log("Delta Y:", (finalTargetY - aiPaddlePos).toFixed(2));
+console.log("Best score:", result.value);
+console.log("Chosen impact Y:", result.node.futureBallState[1]);
+console.log("AI paddle pos:", result.node.aiPaddlePos);
+console.log("Player paddle pos:", result.node.playerPaddlePos);
