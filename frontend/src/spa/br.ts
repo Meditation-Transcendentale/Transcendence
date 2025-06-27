@@ -15,7 +15,6 @@ export default class br {
 		this.div = div;
 		App3D.setVue('test');
 		this.pongbr = null;
-		// PongBR.INIT();
 		this.mod = null;
 		this.map = null;
 		this.id = null;
@@ -23,16 +22,18 @@ export default class br {
 
 	public unload() {
 		App3D.unloadVue('test');
-		document.querySelector("canvas")?.blur();
+		//document.querySelector("canvas")?.blur();
+		this.pongbr?.stop();
 		//this.pongbr?.dispose();
 		//this.div.remove();
 	}
 
 	public load(params: URLSearchParams) {
 		App3D.loadVue('test');
-		document.querySelector("canvas")?.focus();
+		//document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
-		this.pongbr = new PongBR(document.querySelector("#canvas"), params.get("id"), App3D.scene);
+		if (!this.pongbr)
+			this.pongbr = new PongBR(document.querySelector("#canvas"), params.get("id"), App3D.scene);
 		this.pongbr.start();
 	}
 }

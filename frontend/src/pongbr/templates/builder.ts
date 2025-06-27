@@ -13,6 +13,7 @@ import { InputComponent } from "../components/InputComponent";
 import { TransformComponent } from "../components/TransformComponent";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PortalComponent } from "../components/PortalComponent";
+import { TransformNode } from "@babylonjs/core";
 
 function intersectSegmentsXZ(
 	A: Vector3,
@@ -45,7 +46,7 @@ function intersectSegmentsXZ(
 }
 // ─── In-File Default Configuration ─────────────────────────────────────
 const DEFAULT_CONFIG = {
-	arenaRadius: 100,    // circle radius
+	arenaRadius: 200,    // circle radius
 	wallWidth: 10,       // thickness of walls and death walls
 	paddleWidth: 1,       // thickness of walls and death walls
 	paddleHeight: 1,    // vertical size of paddles and goals
@@ -74,7 +75,8 @@ export function buildScoreUI(ecs: any): Entity {
 export function buildPaddles(
 	ecs: any,
 	playerCount: number,
-	config: GameTemplateConfig = DEFAULT_CONFIG
+	config: GameTemplateConfig = DEFAULT_CONFIG,
+	pongRoot: TransformNode
 ): PaddleBundle[] {
 	const bundles: PaddleBundle[] = [];
 	const {
@@ -109,7 +111,8 @@ export function buildPaddles(
 			new TransformComponent(
 				new Vector3(0, 0, 0),
 				new Vector3(0, yaw, 0),
-				new Vector3(1, 1, 1)
+				new Vector3(1, 1, 1),
+				pongRoot
 			)
 		);
 		ecs.addEntity(paddle);
@@ -122,7 +125,8 @@ export function buildPaddles(
 			new TransformComponent(
 				new Vector3(gx, y, gz),
 				new Vector3(0, yaw, 0),
-				new Vector3(paddleWidth, paddleHeight, goalDepth * (1 + 1 / playerCount))
+				new Vector3(paddleWidth, paddleHeight, goalDepth * (1 + 1 / playerCount)),
+				pongRoot
 			)
 		);
 		ecs.addEntity(goal);
@@ -133,7 +137,8 @@ export function buildPaddles(
 			new TransformComponent(
 				new Vector3(gx, y, gz),
 				new Vector3(0, yaw, 0),
-				new Vector3(paddleWidth, 1, goalDepth * (1 + 1 / playerCount))
+				new Vector3(paddleWidth, 1, goalDepth * (1 + 1 / playerCount)),
+				pongRoot
 			)
 		);
 		deathWall.addComponent(new DisabledComponent());
@@ -166,7 +171,8 @@ export function buildPaddles(
 				new TransformComponent(
 					new Vector3(px, y, pz),
 					new Vector3(0, yaw, 0),
-					new Vector3(pillarSize, paddleHeight, pillarSize)
+					new Vector3(pillarSize, paddleHeight, pillarSize),
+					pongRoot
 				)
 			);
 			ecs.addEntity(pillar);
@@ -179,7 +185,7 @@ export function buildPaddles(
 }
 
 // ─── 3. Build Arena Walls ───────────────────────────────────────────
-export function buildWalls(ecs: any, config: GameTemplateConfig): Entity[] {
+export function buildWalls(ecs: any, config: GameTemplateConfig, pongRoot: TransformNode): Entity[] {
 	const walls: Entity[] = [];
 	const R = config.arenaRadius + config.wallWidth / 2;
 	const positions = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2];
@@ -193,7 +199,8 @@ export function buildWalls(ecs: any, config: GameTemplateConfig): Entity[] {
 			new TransformComponent(
 				new Vector3(x, 0, z),
 				new Vector3(0, angle, 0),
-				new Vector3(angle % Math.PI ? config.wallWidth : length, 1, angle % Math.PI ? length : config.wallWidth)
+				new Vector3(angle % Math.PI ? config.wallWidth : length, 1, angle % Math.PI ? length : config.wallWidth),
+				pongRoot
 			)
 		);
 		ecs.addEntity(wall);
@@ -203,35 +210,35 @@ export function buildWalls(ecs: any, config: GameTemplateConfig): Entity[] {
 }
 
 // ─── 4. Build Ball ─────────────────────────────────────────────────
-export function buildBall(ecs: any): Entity {
+export function buildBall(ecs: any, pongRoot: TransformNode): Entity {
 	const ball = new Entity();
-	const startPos = new Vector3(0, 0.5, 0);
+	const startPos = new Vector3(0, 5., 0);
 	ball.addComponent(new BallComponent(0, startPos, Vector3.Zero()));
-	ball.addComponent(new TransformComponent(startPos, Vector3.Zero(), Vector3.One()));
+	ball.addComponent(new TransformComponent(startPos, Vector3.Zero(), Vector3.One(), pongRoot));
 	ecs.addEntity(ball);
 	return ball;
 }
 
-export function buildPortal(ecs: any) {
+export function buildPortal(ecs: any, pongRoot: TransformNode) {
 	const startPos = new Vector3(0, 0, 0);
 	let angle = Math.PI / 4;
 	for (let i = 0; i < 4; i++) {
 		const portal = new Entity();
 		portal.addComponent(new PortalComponent(i, startPos,));
-		portal.addComponent(new TransformComponent(startPos, new Vector3(Math.PI * 2 / 3, angle, -Math.PI / 4), Vector3.One()));
+		portal.addComponent(new TransformComponent(startPos, new Vector3(Math.PI * 2 / 3, angle, -Math.PI / 4), Vector3.One(), pongRoot));
 		angle += Math.PI / 2;
 		ecs.addEntity(portal);
 	}
 	return;
 }
 // ─── 5. Assemble Game Template ─────────────────────────────────────
-export function createGameTemplate(ecs: any, playerCount: number): PaddleBundle[] {
+export function createGameTemplate(ecs: any, playerCount: number, pongRoot: TransformNode): PaddleBundle[] {
 	const config = DEFAULT_CONFIG;
 	buildScoreUI(ecs);
-	const bundles = buildPaddles(ecs, playerCount);
-	buildWalls(ecs, config);
-	buildBall(ecs);
-	buildPortal(ecs);
+	const bundles = buildPaddles(ecs, playerCount, config, pongRoot);
+	buildWalls(ecs, config, pongRoot);
+	buildBall(ecs, pongRoot);
+	buildPortal(ecs, pongRoot);
 	return bundles;
 }
 

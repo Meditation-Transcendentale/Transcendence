@@ -150,7 +150,7 @@ class cssWindow {
 
 class Vue {
 	public windows: cssWindow[];
-	private camera!: Camera;
+	public camera!: Camera;
 	private _enable: boolean;
 
 	constructor() {

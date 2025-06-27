@@ -25,9 +25,13 @@ class app3d {
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
 		this.canvas.focus();
 		//
-		this.engine = new Engine(this.canvas, true, {}, true); //antial, option, adpatToDeviceRAtio
+		this.engine = new Engine(this.canvas, true, {
+			useHighPrecisionFloats: true,
+			useHighPrecisionMatrix: true
+		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
 		this.engine.setHardwareScalingLevel(1.0);
+		//this.engine.useReverseDepthBuffee = true;
 		//console.log(this.engine.getRenderWidth(), this.engine.getRenderHeight());
 		//
 		window.addEventListener('resize', () => {

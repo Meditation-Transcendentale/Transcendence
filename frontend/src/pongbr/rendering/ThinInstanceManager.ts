@@ -16,8 +16,11 @@ export class ThinInstanceManager {
 		this.capacity = capacity;
 		this.instanceTransforms = new Float32Array(capacity * 16);
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16);
+		//this.mesh.doNotSyncBoundingInfo = true;
 		this.updateThreshold = updateThreshold;
 		this.cullThreshold = cullThreshold;
+		this.mesh.setBoundingInfo((this.mesh.getScene()?.getMeshByName("arenaBox") as Mesh).getBoundingInfo());
+		this.mesh.doNotSyncBoundingInfo = true;
 	}
 
 	private computeWorldMatrix(entity: Entity, allEntities: Entity[]): Matrix {
@@ -33,13 +36,12 @@ export class ThinInstanceManager {
 			rotationQuaternion,
 			transform.position
 		);
-		if (transform.parent !== undefined) {
-			const parentEntity = allEntities.find(e => e.id === transform.parent);
-			if (parentEntity) {
-				const parentMatrix = this.computeWorldMatrix(parentEntity, allEntities);
-				localMatrix = parentMatrix.multiply(localMatrix);
-			}
-		}
+		//const parentEntity = transform.parent;
+		//if (parentEntity) {
+		//	const parentMatrix = parentEntity.getWorldMatrix();
+		//	const parent = parentMatrix.clone().invert();
+		//	localMatrix = parentMatrix.multiply(localMatrix);
+		//}
 		return localMatrix;
 	}
 
@@ -54,24 +56,12 @@ export class ThinInstanceManager {
 					const comp = entity.getComponent(componentClass) as { position: Vector3 };
 					matrix = Matrix.Translation(comp.position.x, comp.position.y, comp.position.z);
 				}
-				const pos = Vector3.TransformCoordinates(Vector3.Zero(), matrix);
-				const distance = Vector3.Distance(camera.position, pos);
-				let shouldUpdate = true;
-				if (distance > this.cullThreshold) {
-					shouldUpdate = false;
-				} else if (distance > this.updateThreshold) {
-					if (frameCount % 5 !== 0) {
-						shouldUpdate = false;
-					}
-				}
-				shouldUpdate = true;
-				if (shouldUpdate) {
-					matrix.copyToArray(this.instanceTransforms, count * 16);
-				}
+				matrix.copyToArray(this.instanceTransforms, count * 16);
 				count++;
 			}
 		});
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16, true);
 		this.mesh.thinInstanceCount = count;
+		this.mesh.thinInstanceRefreshBoundingInfo(true);
 	}
 }

@@ -49,7 +49,7 @@ void main() {
 
 
 	  float radiusOffset = position.z;
-	  float r = 125.;
+	  float r = 225.;
 	  positionUpdated.x = cos(localA) * r - (position.z) * (width * RATIO);
 	  positionUpdated.y = (position.y+ 0.5) * width * RATIO + 0.5;
 	  positionUpdated.z = sin(localA) * r; 
@@ -238,14 +238,14 @@ void main() {
 }
 `
 
-export function createCamera(scene: Scene, canvas: any, pongRoot: TransformNode): ArcRotateCamera {
-	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0., 60, Vector3.Zero(), scene);
-	camera.parent = pongRoot;
-	camera.attachControl(canvas, true);
-	//new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-
-	return camera;
-}
+//export function createCamera(scene: Scene, canvas: any, pongRoot: TransformNode): ArcRotateCamera {
+//	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0., 60, Vector3.Zero(), scene);
+//	camera.parent = pongRoot;
+//	camera.attachControl(canvas, true);
+//	//new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+//
+//	return camera;
+//}
 
 export function createWallMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: 1, height: 1, depth: 2 }, scene);
@@ -276,9 +276,9 @@ export function createBallMesh(scene: Scene, config: GameTemplateConfig, pongRoo
 	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 1 }, scene);
 	ballMesh.parent = pongRoot;
 	const ballMaterial = new StandardMaterial("ballMaterial", scene);
-	ballMaterial.diffuseColor.set(1, 1, 1);
+	ballMaterial.emissiveColor = Color3.Black();
 	// ballMaterial.diffuseTexture = new Texture("moi.png", scene);
-	ballMaterial.emissiveColor.set(1, 1, 1);
+	//ballMaterial.emissiveColor.set(1, 1, 1);
 	ballMesh.setEnabled(true);
 	ballMesh.setPivotPoint(Vector3.Zero());
 	ballMesh.material = ballMaterial;
@@ -306,14 +306,14 @@ export function createPaddleMesh(scene: Scene, config: GameTemplateConfig, pongR
 		tileWidth: 0.1
 	}, scene);
 	paddle.parent = pongRoot;
+	//paddle.showBoundingBox = true;
 	// paddle.enableEdgesRendering();
-	paddle.alwaysSelectAsActiveMesh = true
-	paddle.edgesColor = new Color4(0., 1.0, 0.0, 1.0);
-
+	//paddle.alwaysSelectAsActiveMesh = true
+	//paddle.edgesColor = new Color4(0., 1.0, 0.0, 1.0);
 	const mat = new PaddleMaterial('paddleMaterial', scene);
 
 	// (mat.backFaceCulling) = false;
-	mat.setUniform("arenaRadius", 100.);
+	mat.setUniform("arenaRadius", 200.);
 	mat.setUniform("playerCount", 100.);
 	mat.setUniform("fillFraction", 0.25);
 	paddle.material = mat;
@@ -350,7 +350,7 @@ export function createPillarMesh(scene: Scene, config: GameTemplateConfig, pongR
 	m.parent = pongRoot;
 	m.isVisible = true;
 	const mat = new StandardMaterial("pillarMat", scene);
-	mat.diffuseColor.set(0.8, 0.8, 0.8);
+	mat.diffuseColor = Color3.Blue();
 	m.material = mat;
 	m.setPivotPoint(Vector3.Zero());
 	return m;
