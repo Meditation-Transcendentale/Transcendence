@@ -26,12 +26,14 @@ export default class br {
 		this.pongbr?.stop();
 		//this.pongbr?.dispose();
 		//this.div.remove();
+		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "0";
 	}
 
 	public load(params: URLSearchParams) {
 		App3D.loadVue('test');
 		//document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
+		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";
 		if (!this.pongbr)
 			this.pongbr = new PongBR(document.querySelector("#canvas"), params.get("id"), App3D.scene);
 		this.pongbr.start();

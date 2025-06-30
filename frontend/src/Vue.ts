@@ -208,6 +208,7 @@ export const statsVue = new Vue();
 export const loginVue = new Vue();
 export const registerVue = new Vue();
 export const testVue = new Vue();
+export const lobbyVue = new Vue();
 
 export function updateVues(frame: number) {
 	playVue.update(frame);
@@ -216,4 +217,5 @@ export function updateVues(frame: number) {
 	loginVue.update(frame);
 	registerVue.update(frame);
 	testVue.update(frame);
+	lobbyVue.update(frame);
 }
