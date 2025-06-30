@@ -8,7 +8,7 @@ import {
 
 
 export function heuristic_time_to_intercept(node, paddleY) {
-  const targetY = node.futureBallState[1];
+  const targetY = node.futureBallState.ballPos[1];
   const dist = Math.abs(targetY - paddleY);
   const frames = dist / MAX_PADDLE_SPEED;
   const maxFrames = MAP_HEIGHT / MAX_PADDLE_SPEED;
@@ -17,11 +17,11 @@ export function heuristic_time_to_intercept(node, paddleY) {
 
 export function heuristic_return_angle_variability(node) {
   try {
-    const xDist = Math.abs(node.futureBallState[0] - node.ballPos[0]);
-    const time = xDist / Math.abs(node.ballVel[0]);
+    const xDist = Math.abs(node.futureBallState.ballPos[0] - node.ballState.ballPos[0]);
+    const time = xDist / Math.abs(node.ballState.ballVel[0]);
     const frames = time * FPS;
     const maxReach = Math.min(MAX_PADDLE_SPEED * frames + PADDLE_HALF_HEIGHT, 7.5);
-    const dist = Math.abs(node.futureBallState[1] - node.playerPaddlePos);
+    const dist = Math.abs(node.futureBallState.ballPos[1] - node.playerPaddlePos);
     const actualReach = Math.min(dist, maxReach);
     const maxReturns = maxReach / STEP_SIZE;
     const numReturns = actualReach / STEP_SIZE;
@@ -34,12 +34,12 @@ export function heuristic_return_angle_variability(node) {
 
 export function heuristic_opponent_disruption(node, paddleY) {
   try {
-    const xDist = Math.abs(node.futureBallState[0] - node.ballPos[0]);
-    const time = xDist / Math.abs(node.ballVel[0]);
+    const xDist = Math.abs(node.futureBallState.ballPos[0] - node.ballState.ballPos[0]);
+    const time = xDist / Math.abs(node.ballState.ballVel[0]);
     const frames = time * FPS;
     const rawReach = MAX_PADDLE_SPEED * frames + PADDLE_HALF_HEIGHT;
     const maxReach = Math.min(rawReach, 7.5);
-    const targetY = node.futureBallState[1];
+    const targetY = node.futureBallState.ballPos[1];
     const dist = Math.abs(targetY - paddleY);
     return Math.min(dist / maxReach, 1.0);
   } catch {
@@ -48,7 +48,7 @@ export function heuristic_opponent_disruption(node, paddleY) {
 }
 
 export function heuristic_center_bias_correction(node) {
-  const [vx, vy] = node.ballVel;
+  const [vx, vy] = node.ballState.ballVel;
   const angle = Math.abs(Math.atan2(vy, vx));
   const ideal = Math.PI / 6;
   const max = Math.PI * 5 / 12;
@@ -58,11 +58,11 @@ export function heuristic_center_bias_correction(node) {
 
 export function heuristic_entropy_reaction(node, paddleY) {
   try {
-    const xDist = Math.abs(node.futureBallState[0] - node.ballPos[0]);
-    const time = xDist / Math.abs(node.ballVel[0]);
+    const xDist = Math.abs(node.futureBallState.ballPos[0] - node.ballState.ballPos[0]);
+    const time = xDist / Math.abs(node.ballState.ballVel[0]);
     const frames = time * FPS;
     const maxMove = Math.min(MAX_PADDLE_SPEED * frames, 7.5);
-    const targetY = node.futureBallState[1];
+    const targetY = node.futureBallState.ballPos[1];
     const dist = Math.abs(targetY - paddleY);
     const move = Math.min(dist, maxMove);
     const dir = targetY > paddleY ? 1 : -1;
@@ -77,7 +77,7 @@ export function heuristic_entropy_reaction(node, paddleY) {
 }
 
 export function heuristic_consistency(node) {
-  const [vx, vy] = node.ballVel;
+  const [vx, vy] = node.ballState.ballVel;
   const angle = Math.abs(Math.atan2(vy, vx));
   const max = Math.PI * 17 / 36;
   const raw = 1 - (angle / max);

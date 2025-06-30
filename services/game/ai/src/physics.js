@@ -34,8 +34,8 @@ export function predictBallState(ballPos, ballVel) {
     v_by = -v_by;
   }
 
-  return [
-    [nextReceiverX, Math.round(predictedY * 1000) / 1000],
-    [v_bx, v_by]
-  ];
+  return {
+    ballPos: [nextReceiverX, Math.round(predictedY * 1000) / 1000],
+    ballVel: [v_bx, v_by]
+  };
 }

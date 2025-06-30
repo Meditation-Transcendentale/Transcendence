@@ -1,0 +1,1250 @@
+
+--- PROFILE 0 ---
+[isLosing] ImpactY=0.00 ReceiverY=0.00 Δ=0.00 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.09] | AI=-3.87 | Player=0.00 | FuturePos=[-9.13,-2.60] | FutureVel=[-0.22,-0.09] | Δ=8.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.77 | Player=0.00 | FuturePos=[-9.13,-3.01] | FutureVel=[-0.22,-0.10] | Δ=8.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.67 | Player=0.00 | FuturePos=[-9.13,-3.43] | FutureVel=[-0.22,-0.10] | Δ=7.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.57 | Player=0.00 | FuturePos=[-9.13,-3.84] | FutureVel=[-0.22,-0.11] | Δ=7.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.47 | Player=0.00 | FuturePos=[-9.13,-4.26] | FutureVel=[-0.22,-0.11] | Δ=7.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.37 | Player=0.00 | FuturePos=[-9.13,-4.58] | FutureVel=[-0.22,0.12] | Δ=7.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.27 | Player=0.00 | FuturePos=[-9.13,-4.16] | FutureVel=[-0.22,0.12] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.17 | Player=0.00 | FuturePos=[-9.13,-3.75] | FutureVel=[-0.22,0.13] | Δ=7.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.07 | Player=0.00 | FuturePos=[-9.13,-3.33] | FutureVel=[-0.22,0.13] | Δ=7.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.97 | Player=0.00 | FuturePos=[-9.13,-2.92] | FutureVel=[-0.22,0.14] | Δ=7.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.87 | Player=0.00 | FuturePos=[-9.13,-2.50] | FutureVel=[-0.22,0.14] | Δ=7.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.77 | Player=0.00 | FuturePos=[-9.13,-2.09] | FutureVel=[-0.22,0.15] | Δ=7.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.67 | Player=0.00 | FuturePos=[-9.13,-1.67] | FutureVel=[-0.22,0.15] | Δ=6.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.57 | Player=0.00 | FuturePos=[-9.13,-1.26] | FutureVel=[-0.22,0.16] | Δ=6.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.47 | Player=0.00 | FuturePos=[-9.13,-0.84] | FutureVel=[-0.22,0.16] | Δ=6.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.37 | Player=0.00 | FuturePos=[-9.13,-0.43] | FutureVel=[-0.22,0.17] | Δ=6.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.27 | Player=0.00 | FuturePos=[-9.13,-0.01] | FutureVel=[-0.22,0.17] | Δ=6.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.17 | Player=0.00 | FuturePos=[-9.13,0.40] | FutureVel=[-0.22,0.18] | Δ=6.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.07 | Player=0.00 | FuturePos=[-9.13,0.81] | FutureVel=[-0.22,0.18] | Δ=6.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.97 | Player=0.00 | FuturePos=[-9.13,1.23] | FutureVel=[-0.22,0.19] | Δ=6.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.87 | Player=0.00 | FuturePos=[-9.13,1.65] | FutureVel=[-0.22,0.19] | Δ=6.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.77 | Player=0.00 | FuturePos=[-9.13,2.06] | FutureVel=[-0.22,0.20] | Δ=6.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.67 | Player=0.00 | FuturePos=[-9.13,2.47] | FutureVel=[-0.22,0.20] | Δ=5.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.57 | Player=0.00 | FuturePos=[-9.13,2.89] | FutureVel=[-0.22,0.21] | Δ=5.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.47 | Player=0.00 | FuturePos=[-9.13,3.30] | FutureVel=[-0.22,0.21] | Δ=5.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.37 | Player=0.00 | FuturePos=[-9.13,3.72] | FutureVel=[-0.22,0.22] | Δ=5.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.27 | Player=0.00 | FuturePos=[-9.13,4.13] | FutureVel=[-0.22,0.22] | Δ=5.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.17 | Player=0.00 | FuturePos=[-9.13,4.55] | FutureVel=[-0.22,0.23] | Δ=5.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.07 | Player=0.00 | FuturePos=[-9.13,4.29] | FutureVel=[-0.22,-0.23] | Δ=5.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.97 | Player=0.00 | FuturePos=[-9.13,3.87] | FutureVel=[-0.22,-0.24] | Δ=5.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.87 | Player=0.00 | FuturePos=[-9.13,3.46] | FutureVel=[-0.22,-0.24] | Δ=5.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.77 | Player=0.00 | FuturePos=[-9.13,3.04] | FutureVel=[-0.22,-0.25] | Δ=5.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.67 | Player=0.00 | FuturePos=[-9.13,2.63] | FutureVel=[-0.22,-0.25] | Δ=4.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.57 | Player=0.00 | FuturePos=[-9.13,2.21] | FutureVel=[-0.22,-0.26] | Δ=4.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.47 | Player=0.00 | FuturePos=[-9.13,1.80] | FutureVel=[-0.22,-0.26] | Δ=4.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.37 | Player=0.00 | FuturePos=[-9.13,1.38] | FutureVel=[-0.22,-0.27] | Δ=4.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.27 | Player=0.00 | FuturePos=[-9.13,0.97] | FutureVel=[-0.22,-0.27] | Δ=4.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.17 | Player=0.00 | FuturePos=[-9.13,0.55] | FutureVel=[-0.22,-0.28] | Δ=4.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.07 | Player=0.00 | FuturePos=[-9.13,0.14] | FutureVel=[-0.22,-0.28] | Δ=4.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.03 | Player=0.00 | FuturePos=[-9.13,-0.28] | FutureVel=[-0.22,-0.29] | Δ=4.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.13 | Player=0.00 | FuturePos=[-9.13,-0.69] | FutureVel=[-0.22,-0.29] | Δ=4.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.23 | Player=0.00 | FuturePos=[-9.13,-1.10] | FutureVel=[-0.22,-0.30] | Δ=4.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.33 | Player=0.00 | FuturePos=[-9.13,-1.52] | FutureVel=[-0.22,-0.30] | Δ=3.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.43 | Player=0.00 | FuturePos=[-9.13,-1.94] | FutureVel=[-0.22,-0.31] | Δ=3.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.53 | Player=0.00 | FuturePos=[-9.13,-2.35] | FutureVel=[-0.22,-0.31] | Δ=3.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.63 | Player=0.00 | FuturePos=[-9.13,-2.76] | FutureVel=[-0.22,-0.32] | Δ=3.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.73 | Player=0.00 | FuturePos=[-9.13,-3.18] | FutureVel=[-0.22,-0.32] | Δ=3.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.83 | Player=0.00 | FuturePos=[-9.13,-3.59] | FutureVel=[-0.22,-0.33] | Δ=3.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.93 | Player=0.00 | FuturePos=[-9.13,-4.01] | FutureVel=[-0.22,-0.33] | Δ=3.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.03 | Player=0.00 | FuturePos=[-9.13,-4.42] | FutureVel=[-0.22,-0.34] | Δ=3.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.13 | Player=0.00 | FuturePos=[-9.13,-4.41] | FutureVel=[-0.22,0.34] | Δ=3.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.23 | Player=0.00 | FuturePos=[-9.13,-4.00] | FutureVel=[-0.22,0.35] | Δ=3.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.33 | Player=0.00 | FuturePos=[-9.13,-3.58] | FutureVel=[-0.22,0.35] | Δ=2.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.43 | Player=0.00 | FuturePos=[-9.13,-3.17] | FutureVel=[-0.22,0.36] | Δ=2.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.53 | Player=0.00 | FuturePos=[-9.13,-2.75] | FutureVel=[-0.22,0.36] | Δ=2.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.63 | Player=0.00 | FuturePos=[-9.13,-2.34] | FutureVel=[-0.22,0.37] | Δ=2.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.73 | Player=0.00 | FuturePos=[-9.13,-1.92] | FutureVel=[-0.22,0.37] | Δ=2.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.83 | Player=0.00 | FuturePos=[-9.13,-1.51] | FutureVel=[-0.22,0.38] | Δ=2.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.93 | Player=0.00 | FuturePos=[-9.13,-1.09] | FutureVel=[-0.22,0.38] | Δ=2.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.03 | Player=0.00 | FuturePos=[-9.13,-0.68] | FutureVel=[-0.22,0.39] | Δ=2.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.13 | Player=0.00 | FuturePos=[-9.13,-0.26] | FutureVel=[-0.22,0.39] | Δ=2.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.23 | Player=0.00 | FuturePos=[-9.13,0.15] | FutureVel=[-0.22,0.40] | Δ=2.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.33 | Player=0.00 | FuturePos=[-9.13,0.56] | FutureVel=[-0.22,0.40] | Δ=1.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.43 | Player=0.00 | FuturePos=[-9.13,0.98] | FutureVel=[-0.22,0.41] | Δ=1.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.53 | Player=0.00 | FuturePos=[-9.13,1.40] | FutureVel=[-0.22,0.41] | Δ=1.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.63 | Player=0.00 | FuturePos=[-9.13,1.81] | FutureVel=[-0.22,0.42] | Δ=1.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.73 | Player=0.00 | FuturePos=[-9.13,2.22] | FutureVel=[-0.22,0.42] | Δ=1.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.83 | Player=0.00 | FuturePos=[-9.13,2.64] | FutureVel=[-0.22,0.43] | Δ=1.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.93 | Player=0.00 | FuturePos=[-9.13,3.05] | FutureVel=[-0.22,0.43] | Δ=1.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.03 | Player=0.00 | FuturePos=[-9.13,3.47] | FutureVel=[-0.22,0.44] | Δ=1.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.13 | Player=0.00 | FuturePos=[-9.13,3.88] | FutureVel=[-0.22,0.44] | Δ=1.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.45] | AI=3.23 | Player=0.00 | FuturePos=[-9.13,4.30] | FutureVel=[-0.22,0.45] | Δ=1.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.33 Δ=0.98 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.54 ReceiverY=-3.87 Δ=8.41 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.54] | BallVel=[0.24,0.03] | AI=3.33 | Player=-3.87 | FuturePos=[9.13,2.41] | FutureVel=[0.24,-0.03] | Δ=8.41 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.43 Δ=0.88 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.12 ReceiverY=-3.87 Δ=7.99 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.12] | BallVel=[0.24,0.06] | AI=3.43 | Player=-3.87 | FuturePos=[9.13,0.89] | FutureVel=[0.24,-0.06] | Δ=7.99 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.53 Δ=0.78 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.71 ReceiverY=-3.87 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.71] | BallVel=[0.24,0.08] | AI=3.53 | Player=-3.87 | FuturePos=[9.13,-0.64] | FutureVel=[0.24,-0.08] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.63 Δ=0.68 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.29 ReceiverY=-3.87 Δ=7.16 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.29] | BallVel=[0.24,0.11] | AI=3.63 | Player=-3.87 | FuturePos=[9.13,-2.17] | FutureVel=[0.24,-0.11] | Δ=7.16 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.73 Δ=0.58 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.88 ReceiverY=-3.87 Δ=6.75 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.88] | BallVel=[0.24,0.13] | AI=3.73 | Player=-3.87 | FuturePos=[9.13,-3.69] | FutureVel=[0.24,-0.13] | Δ=6.75 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.83 Δ=0.48 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.46 ReceiverY=-3.87 Δ=6.33 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.46] | BallVel=[0.24,0.16] | AI=3.83 | Player=-3.87 | FuturePos=[9.13,-4.03] | FutureVel=[0.24,0.16] | Δ=6.33 | Threshold=1.00
+Best Score:    -9999.000
+AI Paddle:     3.83
+Ball Pos:      [9.13, 4.31]
+Ball Vel:      [-0.22, 0.48]
+Future Pos:    [-9.13, 2.46]
+Future Vel:    [-0.22, -0.48]
+
+--- PROFILE 1 ---
+[isLosing] ImpactY=0.00 ReceiverY=0.00 Δ=0.00 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.09] | AI=-3.87 | Player=0.00 | FuturePos=[-9.13,-2.60] | FutureVel=[-0.22,-0.09] | Δ=8.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.77 | Player=0.00 | FuturePos=[-9.13,-3.01] | FutureVel=[-0.22,-0.10] | Δ=8.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.67 | Player=0.00 | FuturePos=[-9.13,-3.43] | FutureVel=[-0.22,-0.10] | Δ=7.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.57 | Player=0.00 | FuturePos=[-9.13,-3.84] | FutureVel=[-0.22,-0.11] | Δ=7.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.47 | Player=0.00 | FuturePos=[-9.13,-4.26] | FutureVel=[-0.22,-0.11] | Δ=7.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.37 | Player=0.00 | FuturePos=[-9.13,-4.58] | FutureVel=[-0.22,0.12] | Δ=7.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.27 | Player=0.00 | FuturePos=[-9.13,-4.16] | FutureVel=[-0.22,0.12] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.17 | Player=0.00 | FuturePos=[-9.13,-3.75] | FutureVel=[-0.22,0.13] | Δ=7.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.07 | Player=0.00 | FuturePos=[-9.13,-3.33] | FutureVel=[-0.22,0.13] | Δ=7.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.97 | Player=0.00 | FuturePos=[-9.13,-2.92] | FutureVel=[-0.22,0.14] | Δ=7.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.87 | Player=0.00 | FuturePos=[-9.13,-2.50] | FutureVel=[-0.22,0.14] | Δ=7.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.77 | Player=0.00 | FuturePos=[-9.13,-2.09] | FutureVel=[-0.22,0.15] | Δ=7.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.67 | Player=0.00 | FuturePos=[-9.13,-1.67] | FutureVel=[-0.22,0.15] | Δ=6.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.57 | Player=0.00 | FuturePos=[-9.13,-1.26] | FutureVel=[-0.22,0.16] | Δ=6.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.47 | Player=0.00 | FuturePos=[-9.13,-0.84] | FutureVel=[-0.22,0.16] | Δ=6.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.37 | Player=0.00 | FuturePos=[-9.13,-0.43] | FutureVel=[-0.22,0.17] | Δ=6.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.27 | Player=0.00 | FuturePos=[-9.13,-0.01] | FutureVel=[-0.22,0.17] | Δ=6.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.17 | Player=0.00 | FuturePos=[-9.13,0.40] | FutureVel=[-0.22,0.18] | Δ=6.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.07 | Player=0.00 | FuturePos=[-9.13,0.81] | FutureVel=[-0.22,0.18] | Δ=6.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.97 | Player=0.00 | FuturePos=[-9.13,1.23] | FutureVel=[-0.22,0.19] | Δ=6.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.87 | Player=0.00 | FuturePos=[-9.13,1.65] | FutureVel=[-0.22,0.19] | Δ=6.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.77 | Player=0.00 | FuturePos=[-9.13,2.06] | FutureVel=[-0.22,0.20] | Δ=6.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.67 | Player=0.00 | FuturePos=[-9.13,2.47] | FutureVel=[-0.22,0.20] | Δ=5.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.57 | Player=0.00 | FuturePos=[-9.13,2.89] | FutureVel=[-0.22,0.21] | Δ=5.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.47 | Player=0.00 | FuturePos=[-9.13,3.30] | FutureVel=[-0.22,0.21] | Δ=5.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.37 | Player=0.00 | FuturePos=[-9.13,3.72] | FutureVel=[-0.22,0.22] | Δ=5.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.27 | Player=0.00 | FuturePos=[-9.13,4.13] | FutureVel=[-0.22,0.22] | Δ=5.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.17 | Player=0.00 | FuturePos=[-9.13,4.55] | FutureVel=[-0.22,0.23] | Δ=5.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.07 | Player=0.00 | FuturePos=[-9.13,4.29] | FutureVel=[-0.22,-0.23] | Δ=5.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.97 | Player=0.00 | FuturePos=[-9.13,3.87] | FutureVel=[-0.22,-0.24] | Δ=5.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.87 | Player=0.00 | FuturePos=[-9.13,3.46] | FutureVel=[-0.22,-0.24] | Δ=5.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.77 | Player=0.00 | FuturePos=[-9.13,3.04] | FutureVel=[-0.22,-0.25] | Δ=5.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.67 | Player=0.00 | FuturePos=[-9.13,2.63] | FutureVel=[-0.22,-0.25] | Δ=4.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.57 | Player=0.00 | FuturePos=[-9.13,2.21] | FutureVel=[-0.22,-0.26] | Δ=4.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.47 | Player=0.00 | FuturePos=[-9.13,1.80] | FutureVel=[-0.22,-0.26] | Δ=4.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.37 | Player=0.00 | FuturePos=[-9.13,1.38] | FutureVel=[-0.22,-0.27] | Δ=4.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.27 | Player=0.00 | FuturePos=[-9.13,0.97] | FutureVel=[-0.22,-0.27] | Δ=4.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.17 | Player=0.00 | FuturePos=[-9.13,0.55] | FutureVel=[-0.22,-0.28] | Δ=4.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.07 | Player=0.00 | FuturePos=[-9.13,0.14] | FutureVel=[-0.22,-0.28] | Δ=4.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.03 | Player=0.00 | FuturePos=[-9.13,-0.28] | FutureVel=[-0.22,-0.29] | Δ=4.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.13 | Player=0.00 | FuturePos=[-9.13,-0.69] | FutureVel=[-0.22,-0.29] | Δ=4.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.23 | Player=0.00 | FuturePos=[-9.13,-1.10] | FutureVel=[-0.22,-0.30] | Δ=4.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.33 | Player=0.00 | FuturePos=[-9.13,-1.52] | FutureVel=[-0.22,-0.30] | Δ=3.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.43 | Player=0.00 | FuturePos=[-9.13,-1.94] | FutureVel=[-0.22,-0.31] | Δ=3.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.53 | Player=0.00 | FuturePos=[-9.13,-2.35] | FutureVel=[-0.22,-0.31] | Δ=3.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.63 | Player=0.00 | FuturePos=[-9.13,-2.76] | FutureVel=[-0.22,-0.32] | Δ=3.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.73 | Player=0.00 | FuturePos=[-9.13,-3.18] | FutureVel=[-0.22,-0.32] | Δ=3.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.83 | Player=0.00 | FuturePos=[-9.13,-3.59] | FutureVel=[-0.22,-0.33] | Δ=3.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.93 | Player=0.00 | FuturePos=[-9.13,-4.01] | FutureVel=[-0.22,-0.33] | Δ=3.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.03 | Player=0.00 | FuturePos=[-9.13,-4.42] | FutureVel=[-0.22,-0.34] | Δ=3.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.13 | Player=0.00 | FuturePos=[-9.13,-4.41] | FutureVel=[-0.22,0.34] | Δ=3.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.23 | Player=0.00 | FuturePos=[-9.13,-4.00] | FutureVel=[-0.22,0.35] | Δ=3.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.33 | Player=0.00 | FuturePos=[-9.13,-3.58] | FutureVel=[-0.22,0.35] | Δ=2.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.43 | Player=0.00 | FuturePos=[-9.13,-3.17] | FutureVel=[-0.22,0.36] | Δ=2.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.53 | Player=0.00 | FuturePos=[-9.13,-2.75] | FutureVel=[-0.22,0.36] | Δ=2.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.63 | Player=0.00 | FuturePos=[-9.13,-2.34] | FutureVel=[-0.22,0.37] | Δ=2.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.73 | Player=0.00 | FuturePos=[-9.13,-1.92] | FutureVel=[-0.22,0.37] | Δ=2.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.83 | Player=0.00 | FuturePos=[-9.13,-1.51] | FutureVel=[-0.22,0.38] | Δ=2.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.93 | Player=0.00 | FuturePos=[-9.13,-1.09] | FutureVel=[-0.22,0.38] | Δ=2.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.03 | Player=0.00 | FuturePos=[-9.13,-0.68] | FutureVel=[-0.22,0.39] | Δ=2.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.13 | Player=0.00 | FuturePos=[-9.13,-0.26] | FutureVel=[-0.22,0.39] | Δ=2.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.23 | Player=0.00 | FuturePos=[-9.13,0.15] | FutureVel=[-0.22,0.40] | Δ=2.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.33 | Player=0.00 | FuturePos=[-9.13,0.56] | FutureVel=[-0.22,0.40] | Δ=1.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.43 | Player=0.00 | FuturePos=[-9.13,0.98] | FutureVel=[-0.22,0.41] | Δ=1.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.53 | Player=0.00 | FuturePos=[-9.13,1.40] | FutureVel=[-0.22,0.41] | Δ=1.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.63 | Player=0.00 | FuturePos=[-9.13,1.81] | FutureVel=[-0.22,0.42] | Δ=1.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.73 | Player=0.00 | FuturePos=[-9.13,2.22] | FutureVel=[-0.22,0.42] | Δ=1.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.83 | Player=0.00 | FuturePos=[-9.13,2.64] | FutureVel=[-0.22,0.43] | Δ=1.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.93 | Player=0.00 | FuturePos=[-9.13,3.05] | FutureVel=[-0.22,0.43] | Δ=1.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.03 | Player=0.00 | FuturePos=[-9.13,3.47] | FutureVel=[-0.22,0.44] | Δ=1.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.13 | Player=0.00 | FuturePos=[-9.13,3.88] | FutureVel=[-0.22,0.44] | Δ=1.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.45] | AI=3.23 | Player=0.00 | FuturePos=[-9.13,4.30] | FutureVel=[-0.22,0.45] | Δ=1.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.33 Δ=0.98 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.54 ReceiverY=-3.87 Δ=8.41 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.54] | BallVel=[0.24,0.03] | AI=3.33 | Player=-3.87 | FuturePos=[9.13,2.41] | FutureVel=[0.24,-0.03] | Δ=8.41 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.43 Δ=0.88 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.12 ReceiverY=-3.87 Δ=7.99 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.12] | BallVel=[0.24,0.06] | AI=3.43 | Player=-3.87 | FuturePos=[9.13,0.89] | FutureVel=[0.24,-0.06] | Δ=7.99 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.53 Δ=0.78 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.71 ReceiverY=-3.87 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.71] | BallVel=[0.24,0.08] | AI=3.53 | Player=-3.87 | FuturePos=[9.13,-0.64] | FutureVel=[0.24,-0.08] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.63 Δ=0.68 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.29 ReceiverY=-3.87 Δ=7.16 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.29] | BallVel=[0.24,0.11] | AI=3.63 | Player=-3.87 | FuturePos=[9.13,-2.17] | FutureVel=[0.24,-0.11] | Δ=7.16 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.73 Δ=0.58 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.88 ReceiverY=-3.87 Δ=6.75 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.88] | BallVel=[0.24,0.13] | AI=3.73 | Player=-3.87 | FuturePos=[9.13,-3.69] | FutureVel=[0.24,-0.13] | Δ=6.75 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.83 Δ=0.48 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.46 ReceiverY=-3.87 Δ=6.33 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.46] | BallVel=[0.24,0.16] | AI=3.83 | Player=-3.87 | FuturePos=[9.13,-4.03] | FutureVel=[0.24,0.16] | Δ=6.33 | Threshold=1.00
+Best Score:    -9999.000
+AI Paddle:     3.83
+Ball Pos:      [9.13, 4.31]
+Ball Vel:      [-0.22, 0.48]
+Future Pos:    [-9.13, 2.46]
+Future Vel:    [-0.22, -0.48]
+
+--- PROFILE 2 ---
+[isLosing] ImpactY=0.00 ReceiverY=0.00 Δ=0.00 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.09] | AI=-3.87 | Player=0.00 | FuturePos=[-9.13,-2.60] | FutureVel=[-0.22,-0.09] | Δ=8.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.77 | Player=0.00 | FuturePos=[-9.13,-3.01] | FutureVel=[-0.22,-0.10] | Δ=8.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.67 | Player=0.00 | FuturePos=[-9.13,-3.43] | FutureVel=[-0.22,-0.10] | Δ=7.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.57 | Player=0.00 | FuturePos=[-9.13,-3.84] | FutureVel=[-0.22,-0.11] | Δ=7.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.47 | Player=0.00 | FuturePos=[-9.13,-4.26] | FutureVel=[-0.22,-0.11] | Δ=7.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.37 | Player=0.00 | FuturePos=[-9.13,-4.58] | FutureVel=[-0.22,0.12] | Δ=7.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.27 | Player=0.00 | FuturePos=[-9.13,-4.16] | FutureVel=[-0.22,0.12] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.17 | Player=0.00 | FuturePos=[-9.13,-3.75] | FutureVel=[-0.22,0.13] | Δ=7.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.07 | Player=0.00 | FuturePos=[-9.13,-3.33] | FutureVel=[-0.22,0.13] | Δ=7.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.97 | Player=0.00 | FuturePos=[-9.13,-2.92] | FutureVel=[-0.22,0.14] | Δ=7.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.87 | Player=0.00 | FuturePos=[-9.13,-2.50] | FutureVel=[-0.22,0.14] | Δ=7.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.77 | Player=0.00 | FuturePos=[-9.13,-2.09] | FutureVel=[-0.22,0.15] | Δ=7.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.67 | Player=0.00 | FuturePos=[-9.13,-1.67] | FutureVel=[-0.22,0.15] | Δ=6.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.57 | Player=0.00 | FuturePos=[-9.13,-1.26] | FutureVel=[-0.22,0.16] | Δ=6.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.47 | Player=0.00 | FuturePos=[-9.13,-0.84] | FutureVel=[-0.22,0.16] | Δ=6.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.37 | Player=0.00 | FuturePos=[-9.13,-0.43] | FutureVel=[-0.22,0.17] | Δ=6.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.27 | Player=0.00 | FuturePos=[-9.13,-0.01] | FutureVel=[-0.22,0.17] | Δ=6.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.17 | Player=0.00 | FuturePos=[-9.13,0.40] | FutureVel=[-0.22,0.18] | Δ=6.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.07 | Player=0.00 | FuturePos=[-9.13,0.81] | FutureVel=[-0.22,0.18] | Δ=6.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.97 | Player=0.00 | FuturePos=[-9.13,1.23] | FutureVel=[-0.22,0.19] | Δ=6.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.87 | Player=0.00 | FuturePos=[-9.13,1.65] | FutureVel=[-0.22,0.19] | Δ=6.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.77 | Player=0.00 | FuturePos=[-9.13,2.06] | FutureVel=[-0.22,0.20] | Δ=6.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.67 | Player=0.00 | FuturePos=[-9.13,2.47] | FutureVel=[-0.22,0.20] | Δ=5.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.57 | Player=0.00 | FuturePos=[-9.13,2.89] | FutureVel=[-0.22,0.21] | Δ=5.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.47 | Player=0.00 | FuturePos=[-9.13,3.30] | FutureVel=[-0.22,0.21] | Δ=5.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.37 | Player=0.00 | FuturePos=[-9.13,3.72] | FutureVel=[-0.22,0.22] | Δ=5.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.27 | Player=0.00 | FuturePos=[-9.13,4.13] | FutureVel=[-0.22,0.22] | Δ=5.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.17 | Player=0.00 | FuturePos=[-9.13,4.55] | FutureVel=[-0.22,0.23] | Δ=5.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.07 | Player=0.00 | FuturePos=[-9.13,4.29] | FutureVel=[-0.22,-0.23] | Δ=5.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.97 | Player=0.00 | FuturePos=[-9.13,3.87] | FutureVel=[-0.22,-0.24] | Δ=5.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.87 | Player=0.00 | FuturePos=[-9.13,3.46] | FutureVel=[-0.22,-0.24] | Δ=5.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.77 | Player=0.00 | FuturePos=[-9.13,3.04] | FutureVel=[-0.22,-0.25] | Δ=5.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.67 | Player=0.00 | FuturePos=[-9.13,2.63] | FutureVel=[-0.22,-0.25] | Δ=4.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.57 | Player=0.00 | FuturePos=[-9.13,2.21] | FutureVel=[-0.22,-0.26] | Δ=4.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.47 | Player=0.00 | FuturePos=[-9.13,1.80] | FutureVel=[-0.22,-0.26] | Δ=4.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.37 | Player=0.00 | FuturePos=[-9.13,1.38] | FutureVel=[-0.22,-0.27] | Δ=4.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.27 | Player=0.00 | FuturePos=[-9.13,0.97] | FutureVel=[-0.22,-0.27] | Δ=4.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.17 | Player=0.00 | FuturePos=[-9.13,0.55] | FutureVel=[-0.22,-0.28] | Δ=4.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.07 | Player=0.00 | FuturePos=[-9.13,0.14] | FutureVel=[-0.22,-0.28] | Δ=4.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.03 | Player=0.00 | FuturePos=[-9.13,-0.28] | FutureVel=[-0.22,-0.29] | Δ=4.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.13 | Player=0.00 | FuturePos=[-9.13,-0.69] | FutureVel=[-0.22,-0.29] | Δ=4.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.23 | Player=0.00 | FuturePos=[-9.13,-1.10] | FutureVel=[-0.22,-0.30] | Δ=4.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.33 | Player=0.00 | FuturePos=[-9.13,-1.52] | FutureVel=[-0.22,-0.30] | Δ=3.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.43 | Player=0.00 | FuturePos=[-9.13,-1.94] | FutureVel=[-0.22,-0.31] | Δ=3.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.53 | Player=0.00 | FuturePos=[-9.13,-2.35] | FutureVel=[-0.22,-0.31] | Δ=3.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.63 | Player=0.00 | FuturePos=[-9.13,-2.76] | FutureVel=[-0.22,-0.32] | Δ=3.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.73 | Player=0.00 | FuturePos=[-9.13,-3.18] | FutureVel=[-0.22,-0.32] | Δ=3.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.83 | Player=0.00 | FuturePos=[-9.13,-3.59] | FutureVel=[-0.22,-0.33] | Δ=3.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.93 | Player=0.00 | FuturePos=[-9.13,-4.01] | FutureVel=[-0.22,-0.33] | Δ=3.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.03 | Player=0.00 | FuturePos=[-9.13,-4.42] | FutureVel=[-0.22,-0.34] | Δ=3.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.13 | Player=0.00 | FuturePos=[-9.13,-4.41] | FutureVel=[-0.22,0.34] | Δ=3.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.23 | Player=0.00 | FuturePos=[-9.13,-4.00] | FutureVel=[-0.22,0.35] | Δ=3.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.33 | Player=0.00 | FuturePos=[-9.13,-3.58] | FutureVel=[-0.22,0.35] | Δ=2.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.43 | Player=0.00 | FuturePos=[-9.13,-3.17] | FutureVel=[-0.22,0.36] | Δ=2.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.53 | Player=0.00 | FuturePos=[-9.13,-2.75] | FutureVel=[-0.22,0.36] | Δ=2.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.63 | Player=0.00 | FuturePos=[-9.13,-2.34] | FutureVel=[-0.22,0.37] | Δ=2.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.73 | Player=0.00 | FuturePos=[-9.13,-1.92] | FutureVel=[-0.22,0.37] | Δ=2.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.83 | Player=0.00 | FuturePos=[-9.13,-1.51] | FutureVel=[-0.22,0.38] | Δ=2.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.93 | Player=0.00 | FuturePos=[-9.13,-1.09] | FutureVel=[-0.22,0.38] | Δ=2.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.03 | Player=0.00 | FuturePos=[-9.13,-0.68] | FutureVel=[-0.22,0.39] | Δ=2.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.13 | Player=0.00 | FuturePos=[-9.13,-0.26] | FutureVel=[-0.22,0.39] | Δ=2.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.23 | Player=0.00 | FuturePos=[-9.13,0.15] | FutureVel=[-0.22,0.40] | Δ=2.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.33 | Player=0.00 | FuturePos=[-9.13,0.56] | FutureVel=[-0.22,0.40] | Δ=1.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.43 | Player=0.00 | FuturePos=[-9.13,0.98] | FutureVel=[-0.22,0.41] | Δ=1.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.53 | Player=0.00 | FuturePos=[-9.13,1.40] | FutureVel=[-0.22,0.41] | Δ=1.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.63 | Player=0.00 | FuturePos=[-9.13,1.81] | FutureVel=[-0.22,0.42] | Δ=1.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.73 | Player=0.00 | FuturePos=[-9.13,2.22] | FutureVel=[-0.22,0.42] | Δ=1.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.83 | Player=0.00 | FuturePos=[-9.13,2.64] | FutureVel=[-0.22,0.43] | Δ=1.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.93 | Player=0.00 | FuturePos=[-9.13,3.05] | FutureVel=[-0.22,0.43] | Δ=1.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.03 | Player=0.00 | FuturePos=[-9.13,3.47] | FutureVel=[-0.22,0.44] | Δ=1.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.13 | Player=0.00 | FuturePos=[-9.13,3.88] | FutureVel=[-0.22,0.44] | Δ=1.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.45] | AI=3.23 | Player=0.00 | FuturePos=[-9.13,4.30] | FutureVel=[-0.22,0.45] | Δ=1.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.33 Δ=0.98 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.54 ReceiverY=-3.87 Δ=8.41 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.54] | BallVel=[0.24,0.03] | AI=3.33 | Player=-3.87 | FuturePos=[9.13,2.41] | FutureVel=[0.24,-0.03] | Δ=8.41 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.43 Δ=0.88 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.12 ReceiverY=-3.87 Δ=7.99 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.12] | BallVel=[0.24,0.06] | AI=3.43 | Player=-3.87 | FuturePos=[9.13,0.89] | FutureVel=[0.24,-0.06] | Δ=7.99 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.53 Δ=0.78 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.71 ReceiverY=-3.87 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.71] | BallVel=[0.24,0.08] | AI=3.53 | Player=-3.87 | FuturePos=[9.13,-0.64] | FutureVel=[0.24,-0.08] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.63 Δ=0.68 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.29 ReceiverY=-3.87 Δ=7.16 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.29] | BallVel=[0.24,0.11] | AI=3.63 | Player=-3.87 | FuturePos=[9.13,-2.17] | FutureVel=[0.24,-0.11] | Δ=7.16 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.73 Δ=0.58 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.88 ReceiverY=-3.87 Δ=6.75 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.88] | BallVel=[0.24,0.13] | AI=3.73 | Player=-3.87 | FuturePos=[9.13,-3.69] | FutureVel=[0.24,-0.13] | Δ=6.75 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.83 Δ=0.48 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.46 ReceiverY=-3.87 Δ=6.33 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.46] | BallVel=[0.24,0.16] | AI=3.83 | Player=-3.87 | FuturePos=[9.13,-4.03] | FutureVel=[0.24,0.16] | Δ=6.33 | Threshold=1.00
+Best Score:    -9999.000
+AI Paddle:     3.83
+Ball Pos:      [9.13, 4.31]
+Ball Vel:      [-0.22, 0.48]
+Future Pos:    [-9.13, 2.46]
+Future Vel:    [-0.22, -0.48]
+
+--- PROFILE 3 ---
+[isLosing] ImpactY=0.00 ReceiverY=0.00 Δ=0.00 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.09] | AI=-3.87 | Player=0.00 | FuturePos=[-9.13,-2.60] | FutureVel=[-0.22,-0.09] | Δ=8.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.77 | Player=0.00 | FuturePos=[-9.13,-3.01] | FutureVel=[-0.22,-0.10] | Δ=8.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.67 | Player=0.00 | FuturePos=[-9.13,-3.43] | FutureVel=[-0.22,-0.10] | Δ=7.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.57 | Player=0.00 | FuturePos=[-9.13,-3.84] | FutureVel=[-0.22,-0.11] | Δ=7.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.47 | Player=0.00 | FuturePos=[-9.13,-4.26] | FutureVel=[-0.22,-0.11] | Δ=7.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.37 | Player=0.00 | FuturePos=[-9.13,-4.58] | FutureVel=[-0.22,0.12] | Δ=7.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.27 | Player=0.00 | FuturePos=[-9.13,-4.16] | FutureVel=[-0.22,0.12] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.17 | Player=0.00 | FuturePos=[-9.13,-3.75] | FutureVel=[-0.22,0.13] | Δ=7.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.07 | Player=0.00 | FuturePos=[-9.13,-3.33] | FutureVel=[-0.22,0.13] | Δ=7.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.97 | Player=0.00 | FuturePos=[-9.13,-2.92] | FutureVel=[-0.22,0.14] | Δ=7.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.87 | Player=0.00 | FuturePos=[-9.13,-2.50] | FutureVel=[-0.22,0.14] | Δ=7.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.77 | Player=0.00 | FuturePos=[-9.13,-2.09] | FutureVel=[-0.22,0.15] | Δ=7.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.67 | Player=0.00 | FuturePos=[-9.13,-1.67] | FutureVel=[-0.22,0.15] | Δ=6.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.57 | Player=0.00 | FuturePos=[-9.13,-1.26] | FutureVel=[-0.22,0.16] | Δ=6.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.47 | Player=0.00 | FuturePos=[-9.13,-0.84] | FutureVel=[-0.22,0.16] | Δ=6.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.37 | Player=0.00 | FuturePos=[-9.13,-0.43] | FutureVel=[-0.22,0.17] | Δ=6.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.27 | Player=0.00 | FuturePos=[-9.13,-0.01] | FutureVel=[-0.22,0.17] | Δ=6.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.17 | Player=0.00 | FuturePos=[-9.13,0.40] | FutureVel=[-0.22,0.18] | Δ=6.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.07 | Player=0.00 | FuturePos=[-9.13,0.81] | FutureVel=[-0.22,0.18] | Δ=6.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.97 | Player=0.00 | FuturePos=[-9.13,1.23] | FutureVel=[-0.22,0.19] | Δ=6.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.87 | Player=0.00 | FuturePos=[-9.13,1.65] | FutureVel=[-0.22,0.19] | Δ=6.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.77 | Player=0.00 | FuturePos=[-9.13,2.06] | FutureVel=[-0.22,0.20] | Δ=6.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.67 | Player=0.00 | FuturePos=[-9.13,2.47] | FutureVel=[-0.22,0.20] | Δ=5.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.57 | Player=0.00 | FuturePos=[-9.13,2.89] | FutureVel=[-0.22,0.21] | Δ=5.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.47 | Player=0.00 | FuturePos=[-9.13,3.30] | FutureVel=[-0.22,0.21] | Δ=5.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.37 | Player=0.00 | FuturePos=[-9.13,3.72] | FutureVel=[-0.22,0.22] | Δ=5.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.27 | Player=0.00 | FuturePos=[-9.13,4.13] | FutureVel=[-0.22,0.22] | Δ=5.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.17 | Player=0.00 | FuturePos=[-9.13,4.55] | FutureVel=[-0.22,0.23] | Δ=5.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.07 | Player=0.00 | FuturePos=[-9.13,4.29] | FutureVel=[-0.22,-0.23] | Δ=5.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.97 | Player=0.00 | FuturePos=[-9.13,3.87] | FutureVel=[-0.22,-0.24] | Δ=5.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.87 | Player=0.00 | FuturePos=[-9.13,3.46] | FutureVel=[-0.22,-0.24] | Δ=5.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.77 | Player=0.00 | FuturePos=[-9.13,3.04] | FutureVel=[-0.22,-0.25] | Δ=5.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.67 | Player=0.00 | FuturePos=[-9.13,2.63] | FutureVel=[-0.22,-0.25] | Δ=4.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.57 | Player=0.00 | FuturePos=[-9.13,2.21] | FutureVel=[-0.22,-0.26] | Δ=4.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.47 | Player=0.00 | FuturePos=[-9.13,1.80] | FutureVel=[-0.22,-0.26] | Δ=4.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.37 | Player=0.00 | FuturePos=[-9.13,1.38] | FutureVel=[-0.22,-0.27] | Δ=4.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.27 | Player=0.00 | FuturePos=[-9.13,0.97] | FutureVel=[-0.22,-0.27] | Δ=4.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.17 | Player=0.00 | FuturePos=[-9.13,0.55] | FutureVel=[-0.22,-0.28] | Δ=4.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.07 | Player=0.00 | FuturePos=[-9.13,0.14] | FutureVel=[-0.22,-0.28] | Δ=4.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.03 | Player=0.00 | FuturePos=[-9.13,-0.28] | FutureVel=[-0.22,-0.29] | Δ=4.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.13 | Player=0.00 | FuturePos=[-9.13,-0.69] | FutureVel=[-0.22,-0.29] | Δ=4.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.23 | Player=0.00 | FuturePos=[-9.13,-1.10] | FutureVel=[-0.22,-0.30] | Δ=4.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.33 | Player=0.00 | FuturePos=[-9.13,-1.52] | FutureVel=[-0.22,-0.30] | Δ=3.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.43 | Player=0.00 | FuturePos=[-9.13,-1.94] | FutureVel=[-0.22,-0.31] | Δ=3.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.53 | Player=0.00 | FuturePos=[-9.13,-2.35] | FutureVel=[-0.22,-0.31] | Δ=3.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.63 | Player=0.00 | FuturePos=[-9.13,-2.76] | FutureVel=[-0.22,-0.32] | Δ=3.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.73 | Player=0.00 | FuturePos=[-9.13,-3.18] | FutureVel=[-0.22,-0.32] | Δ=3.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.83 | Player=0.00 | FuturePos=[-9.13,-3.59] | FutureVel=[-0.22,-0.33] | Δ=3.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.93 | Player=0.00 | FuturePos=[-9.13,-4.01] | FutureVel=[-0.22,-0.33] | Δ=3.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.03 | Player=0.00 | FuturePos=[-9.13,-4.42] | FutureVel=[-0.22,-0.34] | Δ=3.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.13 | Player=0.00 | FuturePos=[-9.13,-4.41] | FutureVel=[-0.22,0.34] | Δ=3.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.23 | Player=0.00 | FuturePos=[-9.13,-4.00] | FutureVel=[-0.22,0.35] | Δ=3.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.33 | Player=0.00 | FuturePos=[-9.13,-3.58] | FutureVel=[-0.22,0.35] | Δ=2.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.43 | Player=0.00 | FuturePos=[-9.13,-3.17] | FutureVel=[-0.22,0.36] | Δ=2.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.53 | Player=0.00 | FuturePos=[-9.13,-2.75] | FutureVel=[-0.22,0.36] | Δ=2.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.63 | Player=0.00 | FuturePos=[-9.13,-2.34] | FutureVel=[-0.22,0.37] | Δ=2.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.73 | Player=0.00 | FuturePos=[-9.13,-1.92] | FutureVel=[-0.22,0.37] | Δ=2.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.83 | Player=0.00 | FuturePos=[-9.13,-1.51] | FutureVel=[-0.22,0.38] | Δ=2.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.93 | Player=0.00 | FuturePos=[-9.13,-1.09] | FutureVel=[-0.22,0.38] | Δ=2.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.03 | Player=0.00 | FuturePos=[-9.13,-0.68] | FutureVel=[-0.22,0.39] | Δ=2.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.13 | Player=0.00 | FuturePos=[-9.13,-0.26] | FutureVel=[-0.22,0.39] | Δ=2.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.23 | Player=0.00 | FuturePos=[-9.13,0.15] | FutureVel=[-0.22,0.40] | Δ=2.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.33 | Player=0.00 | FuturePos=[-9.13,0.56] | FutureVel=[-0.22,0.40] | Δ=1.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.43 | Player=0.00 | FuturePos=[-9.13,0.98] | FutureVel=[-0.22,0.41] | Δ=1.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.53 | Player=0.00 | FuturePos=[-9.13,1.40] | FutureVel=[-0.22,0.41] | Δ=1.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.63 | Player=0.00 | FuturePos=[-9.13,1.81] | FutureVel=[-0.22,0.42] | Δ=1.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.73 | Player=0.00 | FuturePos=[-9.13,2.22] | FutureVel=[-0.22,0.42] | Δ=1.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.83 | Player=0.00 | FuturePos=[-9.13,2.64] | FutureVel=[-0.22,0.43] | Δ=1.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.93 | Player=0.00 | FuturePos=[-9.13,3.05] | FutureVel=[-0.22,0.43] | Δ=1.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.03 | Player=0.00 | FuturePos=[-9.13,3.47] | FutureVel=[-0.22,0.44] | Δ=1.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.13 | Player=0.00 | FuturePos=[-9.13,3.88] | FutureVel=[-0.22,0.44] | Δ=1.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.45] | AI=3.23 | Player=0.00 | FuturePos=[-9.13,4.30] | FutureVel=[-0.22,0.45] | Δ=1.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.33 Δ=0.98 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.54 ReceiverY=-3.87 Δ=8.41 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.54] | BallVel=[0.24,0.03] | AI=3.33 | Player=-3.87 | FuturePos=[9.13,2.41] | FutureVel=[0.24,-0.03] | Δ=8.41 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.43 Δ=0.88 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.12 ReceiverY=-3.87 Δ=7.99 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.12] | BallVel=[0.24,0.06] | AI=3.43 | Player=-3.87 | FuturePos=[9.13,0.89] | FutureVel=[0.24,-0.06] | Δ=7.99 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.53 Δ=0.78 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.71 ReceiverY=-3.87 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.71] | BallVel=[0.24,0.08] | AI=3.53 | Player=-3.87 | FuturePos=[9.13,-0.64] | FutureVel=[0.24,-0.08] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.63 Δ=0.68 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.29 ReceiverY=-3.87 Δ=7.16 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.29] | BallVel=[0.24,0.11] | AI=3.63 | Player=-3.87 | FuturePos=[9.13,-2.17] | FutureVel=[0.24,-0.11] | Δ=7.16 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.73 Δ=0.58 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.88 ReceiverY=-3.87 Δ=6.75 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.88] | BallVel=[0.24,0.13] | AI=3.73 | Player=-3.87 | FuturePos=[9.13,-3.69] | FutureVel=[0.24,-0.13] | Δ=6.75 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.83 Δ=0.48 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.46 ReceiverY=-3.87 Δ=6.33 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.46] | BallVel=[0.24,0.16] | AI=3.83 | Player=-3.87 | FuturePos=[9.13,-4.03] | FutureVel=[0.24,0.16] | Δ=6.33 | Threshold=1.00
+Best Score:    -9999.000
+AI Paddle:     3.83
+Ball Pos:      [9.13, 4.31]
+Ball Vel:      [-0.22, 0.48]
+Future Pos:    [-9.13, 2.46]
+Future Vel:    [-0.22, -0.48]
+
+--- PROFILE 4 ---
+[isLosing] ImpactY=0.00 ReceiverY=0.00 Δ=0.00 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.87 Δ=8.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.09] | AI=-3.87 | Player=0.00 | FuturePos=[-9.13,-2.60] | FutureVel=[-0.22,-0.09] | Δ=8.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.77 Δ=8.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.77 | Player=0.00 | FuturePos=[-9.13,-3.01] | FutureVel=[-0.22,-0.10] | Δ=8.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.67 Δ=7.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.10] | AI=-3.67 | Player=0.00 | FuturePos=[-9.13,-3.43] | FutureVel=[-0.22,-0.10] | Δ=7.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.57 Δ=7.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.57 | Player=0.00 | FuturePos=[-9.13,-3.84] | FutureVel=[-0.22,-0.11] | Δ=7.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.47 Δ=7.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.11] | AI=-3.47 | Player=0.00 | FuturePos=[-9.13,-4.26] | FutureVel=[-0.22,-0.11] | Δ=7.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.37 Δ=7.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.37 | Player=0.00 | FuturePos=[-9.13,-4.58] | FutureVel=[-0.22,0.12] | Δ=7.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.27 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.12] | AI=-3.27 | Player=0.00 | FuturePos=[-9.13,-4.16] | FutureVel=[-0.22,0.12] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.17 Δ=7.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.17 | Player=0.00 | FuturePos=[-9.13,-3.75] | FutureVel=[-0.22,0.13] | Δ=7.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-3.07 Δ=7.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.13] | AI=-3.07 | Player=0.00 | FuturePos=[-9.13,-3.33] | FutureVel=[-0.22,0.13] | Δ=7.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.97 Δ=7.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.97 | Player=0.00 | FuturePos=[-9.13,-2.92] | FutureVel=[-0.22,0.14] | Δ=7.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.87 Δ=7.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.14] | AI=-2.87 | Player=0.00 | FuturePos=[-9.13,-2.50] | FutureVel=[-0.22,0.14] | Δ=7.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.77 Δ=7.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.77 | Player=0.00 | FuturePos=[-9.13,-2.09] | FutureVel=[-0.22,0.15] | Δ=7.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.67 Δ=6.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.15] | AI=-2.67 | Player=0.00 | FuturePos=[-9.13,-1.67] | FutureVel=[-0.22,0.15] | Δ=6.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.57 Δ=6.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.57 | Player=0.00 | FuturePos=[-9.13,-1.26] | FutureVel=[-0.22,0.16] | Δ=6.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.47 Δ=6.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.16] | AI=-2.47 | Player=0.00 | FuturePos=[-9.13,-0.84] | FutureVel=[-0.22,0.16] | Δ=6.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.37 Δ=6.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.37 | Player=0.00 | FuturePos=[-9.13,-0.43] | FutureVel=[-0.22,0.17] | Δ=6.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.27 Δ=6.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.17] | AI=-2.27 | Player=0.00 | FuturePos=[-9.13,-0.01] | FutureVel=[-0.22,0.17] | Δ=6.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.17 Δ=6.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.17 | Player=0.00 | FuturePos=[-9.13,0.40] | FutureVel=[-0.22,0.18] | Δ=6.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-2.07 Δ=6.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.18] | AI=-2.07 | Player=0.00 | FuturePos=[-9.13,0.81] | FutureVel=[-0.22,0.18] | Δ=6.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.97 Δ=6.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.97 | Player=0.00 | FuturePos=[-9.13,1.23] | FutureVel=[-0.22,0.19] | Δ=6.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.87 Δ=6.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.19] | AI=-1.87 | Player=0.00 | FuturePos=[-9.13,1.65] | FutureVel=[-0.22,0.19] | Δ=6.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.77 Δ=6.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.77 | Player=0.00 | FuturePos=[-9.13,2.06] | FutureVel=[-0.22,0.20] | Δ=6.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.67 Δ=5.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.20] | AI=-1.67 | Player=0.00 | FuturePos=[-9.13,2.47] | FutureVel=[-0.22,0.20] | Δ=5.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.57 Δ=5.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.57 | Player=0.00 | FuturePos=[-9.13,2.89] | FutureVel=[-0.22,0.21] | Δ=5.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.47 Δ=5.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.21] | AI=-1.47 | Player=0.00 | FuturePos=[-9.13,3.30] | FutureVel=[-0.22,0.21] | Δ=5.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.37 Δ=5.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.37 | Player=0.00 | FuturePos=[-9.13,3.72] | FutureVel=[-0.22,0.22] | Δ=5.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.27 Δ=5.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.22] | AI=-1.27 | Player=0.00 | FuturePos=[-9.13,4.13] | FutureVel=[-0.22,0.22] | Δ=5.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.17 Δ=5.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.17 | Player=0.00 | FuturePos=[-9.13,4.55] | FutureVel=[-0.22,0.23] | Δ=5.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-1.07 Δ=5.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.23] | AI=-1.07 | Player=0.00 | FuturePos=[-9.13,4.29] | FutureVel=[-0.22,-0.23] | Δ=5.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.97 Δ=5.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.97 | Player=0.00 | FuturePos=[-9.13,3.87] | FutureVel=[-0.22,-0.24] | Δ=5.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.87 Δ=5.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.24] | AI=-0.87 | Player=0.00 | FuturePos=[-9.13,3.46] | FutureVel=[-0.22,-0.24] | Δ=5.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.77 Δ=5.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.77 | Player=0.00 | FuturePos=[-9.13,3.04] | FutureVel=[-0.22,-0.25] | Δ=5.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.67 Δ=4.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.25] | AI=-0.67 | Player=0.00 | FuturePos=[-9.13,2.63] | FutureVel=[-0.22,-0.25] | Δ=4.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.57 Δ=4.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.57 | Player=0.00 | FuturePos=[-9.13,2.21] | FutureVel=[-0.22,-0.26] | Δ=4.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.47 Δ=4.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.26] | AI=-0.47 | Player=0.00 | FuturePos=[-9.13,1.80] | FutureVel=[-0.22,-0.26] | Δ=4.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.37 Δ=4.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.37 | Player=0.00 | FuturePos=[-9.13,1.38] | FutureVel=[-0.22,-0.27] | Δ=4.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.27 Δ=4.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.27] | AI=-0.27 | Player=0.00 | FuturePos=[-9.13,0.97] | FutureVel=[-0.22,-0.27] | Δ=4.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.17 Δ=4.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.17 | Player=0.00 | FuturePos=[-9.13,0.55] | FutureVel=[-0.22,-0.28] | Δ=4.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=-0.07 Δ=4.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.28] | AI=-0.07 | Player=0.00 | FuturePos=[-9.13,0.14] | FutureVel=[-0.22,-0.28] | Δ=4.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.03 Δ=4.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.03 | Player=0.00 | FuturePos=[-9.13,-0.28] | FutureVel=[-0.22,-0.29] | Δ=4.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.13 Δ=4.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.29] | AI=0.13 | Player=0.00 | FuturePos=[-9.13,-0.69] | FutureVel=[-0.22,-0.29] | Δ=4.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.23 Δ=4.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.23 | Player=0.00 | FuturePos=[-9.13,-1.10] | FutureVel=[-0.22,-0.30] | Δ=4.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.33 Δ=3.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.30] | AI=0.33 | Player=0.00 | FuturePos=[-9.13,-1.52] | FutureVel=[-0.22,-0.30] | Δ=3.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.43 Δ=3.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.43 | Player=0.00 | FuturePos=[-9.13,-1.94] | FutureVel=[-0.22,-0.31] | Δ=3.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.53 Δ=3.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.31] | AI=0.53 | Player=0.00 | FuturePos=[-9.13,-2.35] | FutureVel=[-0.22,-0.31] | Δ=3.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.63 Δ=3.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.63 | Player=0.00 | FuturePos=[-9.13,-2.76] | FutureVel=[-0.22,-0.32] | Δ=3.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.73 Δ=3.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.32] | AI=0.73 | Player=0.00 | FuturePos=[-9.13,-3.18] | FutureVel=[-0.22,-0.32] | Δ=3.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.83 Δ=3.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.83 | Player=0.00 | FuturePos=[-9.13,-3.59] | FutureVel=[-0.22,-0.33] | Δ=3.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=0.93 Δ=3.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.33] | AI=0.93 | Player=0.00 | FuturePos=[-9.13,-4.01] | FutureVel=[-0.22,-0.33] | Δ=3.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.03 Δ=3.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.03 | Player=0.00 | FuturePos=[-9.13,-4.42] | FutureVel=[-0.22,-0.34] | Δ=3.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.13 Δ=3.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.34] | AI=1.13 | Player=0.00 | FuturePos=[-9.13,-4.41] | FutureVel=[-0.22,0.34] | Δ=3.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.23 Δ=3.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.23 | Player=0.00 | FuturePos=[-9.13,-4.00] | FutureVel=[-0.22,0.35] | Δ=3.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.33 Δ=2.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.35] | AI=1.33 | Player=0.00 | FuturePos=[-9.13,-3.58] | FutureVel=[-0.22,0.35] | Δ=2.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.43 Δ=2.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.43 | Player=0.00 | FuturePos=[-9.13,-3.17] | FutureVel=[-0.22,0.36] | Δ=2.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.53 Δ=2.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.36] | AI=1.53 | Player=0.00 | FuturePos=[-9.13,-2.75] | FutureVel=[-0.22,0.36] | Δ=2.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.63 Δ=2.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.63 | Player=0.00 | FuturePos=[-9.13,-2.34] | FutureVel=[-0.22,0.37] | Δ=2.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.73 Δ=2.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.37] | AI=1.73 | Player=0.00 | FuturePos=[-9.13,-1.92] | FutureVel=[-0.22,0.37] | Δ=2.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.83 Δ=2.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.83 | Player=0.00 | FuturePos=[-9.13,-1.51] | FutureVel=[-0.22,0.38] | Δ=2.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=1.93 Δ=2.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.38] | AI=1.93 | Player=0.00 | FuturePos=[-9.13,-1.09] | FutureVel=[-0.22,0.38] | Δ=2.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.03 Δ=2.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.03 | Player=0.00 | FuturePos=[-9.13,-0.68] | FutureVel=[-0.22,0.39] | Δ=2.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.13 Δ=2.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.39] | AI=2.13 | Player=0.00 | FuturePos=[-9.13,-0.26] | FutureVel=[-0.22,0.39] | Δ=2.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.23 Δ=2.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.23 | Player=0.00 | FuturePos=[-9.13,0.15] | FutureVel=[-0.22,0.40] | Δ=2.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.33 Δ=1.98 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.40] | AI=2.33 | Player=0.00 | FuturePos=[-9.13,0.56] | FutureVel=[-0.22,0.40] | Δ=1.98 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.43 Δ=1.88 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.43 | Player=0.00 | FuturePos=[-9.13,0.98] | FutureVel=[-0.22,0.41] | Δ=1.88 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.53 Δ=1.78 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.41] | AI=2.53 | Player=0.00 | FuturePos=[-9.13,1.40] | FutureVel=[-0.22,0.41] | Δ=1.78 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.63 Δ=1.68 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.63 | Player=0.00 | FuturePos=[-9.13,1.81] | FutureVel=[-0.22,0.42] | Δ=1.68 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.73 Δ=1.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.42] | AI=2.73 | Player=0.00 | FuturePos=[-9.13,2.22] | FutureVel=[-0.22,0.42] | Δ=1.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.83 Δ=1.48 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.83 | Player=0.00 | FuturePos=[-9.13,2.64] | FutureVel=[-0.22,0.43] | Δ=1.48 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=2.93 Δ=1.38 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.43] | AI=2.93 | Player=0.00 | FuturePos=[-9.13,3.05] | FutureVel=[-0.22,0.43] | Δ=1.38 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.03 Δ=1.28 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.03 | Player=0.00 | FuturePos=[-9.13,3.47] | FutureVel=[-0.22,0.44] | Δ=1.28 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.13 Δ=1.18 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.44] | AI=3.13 | Player=0.00 | FuturePos=[-9.13,3.88] | FutureVel=[-0.22,0.44] | Δ=1.18 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.23 Δ=1.08 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[9.13,4.31] | BallVel=[-0.22,0.45] | AI=3.23 | Player=0.00 | FuturePos=[-9.13,4.30] | FutureVel=[-0.22,0.45] | Δ=1.08 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.33 Δ=0.98 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.54 ReceiverY=-3.87 Δ=8.41 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.54] | BallVel=[0.24,0.03] | AI=3.33 | Player=-3.87 | FuturePos=[9.13,2.41] | FutureVel=[0.24,-0.03] | Δ=8.41 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.43 Δ=0.88 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=4.12 ReceiverY=-3.87 Δ=7.99 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,4.12] | BallVel=[0.24,0.06] | AI=3.43 | Player=-3.87 | FuturePos=[9.13,0.89] | FutureVel=[0.24,-0.06] | Δ=7.99 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.53 Δ=0.78 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.71 ReceiverY=-3.87 Δ=7.58 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.71] | BallVel=[0.24,0.08] | AI=3.53 | Player=-3.87 | FuturePos=[9.13,-0.64] | FutureVel=[0.24,-0.08] | Δ=7.58 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.63 Δ=0.68 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=3.29 ReceiverY=-3.87 Δ=7.16 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,3.29] | BallVel=[0.24,0.11] | AI=3.63 | Player=-3.87 | FuturePos=[9.13,-2.17] | FutureVel=[0.24,-0.11] | Δ=7.16 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.73 Δ=0.58 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.88 ReceiverY=-3.87 Δ=6.75 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.88] | BallVel=[0.24,0.13] | AI=3.73 | Player=-3.87 | FuturePos=[9.13,-3.69] | FutureVel=[0.24,-0.13] | Δ=6.75 | Threshold=1.00
+[isLosing] ImpactY=4.31 ReceiverY=3.83 Δ=0.48 Limit=1.00
+LOWER: -3.875 UPPER: 3.875
+[isLosing] ImpactY=2.46 ReceiverY=-3.87 Δ=6.33 Limit=1.00
+[Eval] Score=-9999.000 | BallPos=[-9.13,2.46] | BallVel=[0.24,0.16] | AI=3.83 | Player=-3.87 | FuturePos=[9.13,-4.03] | FutureVel=[0.24,0.16] | Δ=6.33 | Threshold=1.00
+Best Score:    -9999.000
+AI Paddle:     3.83
+Ball Pos:      [9.13, 4.31]
+Ball Vel:      [-0.22, 0.48]
+Future Pos:    [-9.13, 2.46]
+Future Vel:    [-0.22, -0.48]

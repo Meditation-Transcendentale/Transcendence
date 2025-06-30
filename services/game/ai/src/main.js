@@ -1,27 +1,33 @@
+import { weightsProfiles } from './weightsProfiles.js';
 import { GameStateNode } from './GameStateNode.js';
-import { minmax } from './minmax.js';
-import { expand } from './expand.js';
 import { predictBallState } from './physics.js';
-import { STEP_SIZE } from './constants.js';
+import { expand } from './expand.js';
+import { minmax } from './minmax.js';
+import { evaluateNode } from './evaluate.js';
 
-const initialBallPos = [0, 0];
-const initialBallVel = [5, 5];
-const futureBallState = predictBallState(initialBallPos, initialBallVel);
+const initialBallState = {
+  ballPos: [0, 0],
+  ballVel: [0.2, 0.5]
+};
 
-console.log("Initial futureBallState:", futureBallState);
-
-const initialBallState = [initialBallPos[0], initialBallPos[1], initialBallVel[0], initialBallVel[1]];
+const futureBallState = predictBallState(initialBallState.ballPos, initialBallState.ballVel);
 
 const root = new GameStateNode(
   initialBallState,
-  0, // ai paddle
-  0, // player paddle
+  0, // AI paddle position
+  0, // Player paddle position
   futureBallState
 );
 
-const result = minmax(root, 2, -Infinity, Infinity, true);
+weightsProfiles.forEach((_, profileIndex) => {
+  console.log(`\n--- PROFILE ${profileIndex} ---`);
 
-console.log("Best score:", result.value);
-console.log("Chosen impact Y:", result.node.futureBallState[1]);
-console.log("AI paddle pos:", result.node.aiPaddlePos);
-console.log("Player paddle pos:", result.node.playerPaddlePos);
+  const result = minmax(root, 2, -Infinity, Infinity, true, profileIndex);
+
+  console.log(`Best Score:    ${result.value.toFixed(3)}`);
+  console.log(`AI Paddle:     ${result.node.aiPaddlePos.toFixed(2)}`);
+  console.log(`Ball Pos:      [${result.node.ballState.ballPos.map(n => n.toFixed(2)).join(', ')}]`);
+  console.log(`Ball Vel:      [${result.node.ballState.ballVel.map(n => n.toFixed(2)).join(', ')}]`);
+  console.log(`Future Pos:    [${result.node.futureBallState.ballPos.map(n => n.toFixed(2)).join(', ')}]`);
+  console.log(`Future Vel:    [${result.node.futureBallState.ballVel.map(n => n.toFixed(2)).join(', ')}]`);
+});
