@@ -210,7 +210,7 @@ export class PongBR {
 	async transitionToRound(nextCount: number) {
 		// reuse the same config you used at startup
 		const cfg = { arenaRadius: 100, wallWidth: 1, paddleHeight: 1, paddleDepth: 1, goalDepth: 1 };
-		const targets: PaddleBundle[] = buildPaddles(this.ecs, nextCount);
+		const targets: PaddleBundle[] = buildPaddles(this.ecs, nextCount, this.pongRoot);
 
 		// survivors & eliminated logic as before…
 		const survivors = this.paddleBundles.filter(b => b.sliceIndex < nextCount);
@@ -284,13 +284,13 @@ export class PongBR {
 			this.ecs.removeEntity(b.paddle);
 			this.ecs.removeEntity(b.goal);
 			this.ecs.removeEntity(b.deathWall);
-			b.pillars.forEach(p => this.ecs.removeEntity(p));
+			this.ecs.removeEntity(b.pillar);
 		});
 		survivors.forEach(b => {
 			this.ecs.removeEntity(b.paddle);
 			this.ecs.removeEntity(b.goal);
 			this.ecs.removeEntity(b.deathWall);
-			b.pillars.forEach(p => this.ecs.removeEntity(p));
+			this.ecs.removeEntity(b.pillar);
 		});
 
 		this.paddleBundles = targets;

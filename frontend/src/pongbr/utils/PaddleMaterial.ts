@@ -28,7 +28,7 @@ export class PaddleMaterial extends CustomMaterial {
 
 		  float sliceAngle = 2.0 * PI / playerCount;
 		  float paddleArc  = sliceAngle * fillFraction;
-		  float localA     = paddleArc * position.x;
+		  float localA     = paddleArc * (position.x);
 
 		  float width = (PERIMETER / playerCount) * fillFraction;
 

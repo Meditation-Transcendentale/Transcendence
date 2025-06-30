@@ -12,6 +12,7 @@ services:
       # - ./lobby-manager/test:/app/test
       - ./lobby-manager/package.json:/app/package.json
       - ./lobby-manager/.env.example:/app/.env
+      - ../../shared/certs:/app/certs:ro
     depends_on:
       - nats
     command: npm run dev
@@ -47,6 +48,7 @@ services:
       - ./user-interface/test:/app/test
       - ./user-interface/package.json:/app/package.json
       - ./user-interface/.env.example:/app/.env
+      - ../../shared/certs:/app/certs:ro
     command: npm run start
     ports:
     - "5004:5004"

@@ -343,16 +343,15 @@ export function createPortalMesh(scene: Scene, config: GameTemplateConfig, pongR
 
 export function createPillarMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const m = MeshBuilder.CreateBox("pillarBase", {
-		width: 0.5,
-		height: 2,
-		depth: 0.5
+		width: 1.,
+		height: 1,
+		depth: 1
 	}, scene);
 	m.parent = pongRoot;
 	m.isVisible = true;
 	const mat = new StandardMaterial("pillarMat", scene);
 	mat.diffuseColor = Color3.Blue();
 	m.material = mat;
-	m.setPivotPoint(Vector3.Zero());
 	return m;
 }
 
