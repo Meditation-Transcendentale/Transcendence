@@ -12,7 +12,7 @@ services:
       # - ./lobby-manager/test:/app/test
       - ./lobby-manager/package.json:/app/package.json
       - ./lobby-manager/.env.example:/app/.env
-      - ../../shared/certs:/app/certs:ro
+      - ../../shared/certs:/usr/src/app/certs:ro
     depends_on:
       - nats
     command: npm run dev
