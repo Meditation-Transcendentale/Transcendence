@@ -1,4 +1,5 @@
 // src/uwsServer.js
+import { readFileSync } from 'fs';
 import uWS from 'uWebSockets.js';
 import {
 	decodeClientMessage,
@@ -8,7 +9,10 @@ import {
 const sockets = new Map(); // lobbyId → Set<ws>
 
 export function createUwsApp(path, lobbyService) {
-	const app = uWS.App();
+	const app = uWS.App({
+		key_file_name: readFileSync("./certs/server.key"),
+		cert_file_name: readFileSync("./certs/server.crt")
+	});
 
 	app.ws(path, {
 		idleTimeout: 60,

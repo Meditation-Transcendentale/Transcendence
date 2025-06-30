@@ -1,6 +1,6 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 
@@ -27,7 +27,7 @@ import type { userinterface } from './utils/proto/message.js';
 import { buildPaddles, PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
 import { AnimationComponent } from "./components/AnimationComponent.js";
-import { Vector3, Vector2 } from "@babylonjs/core";
+import { Vector3, Vector2, TransformNode, Camera, Light, PointLight, MeshBuilder, StandardMaterial, Mesh } from "@babylonjs/core";
 import { AnimationSystem } from "./systems/AnimationSystem.js";
 import { Easing } from "./utils/Easing.js";
 import { computePaddleTransforms, TransformBundle } from "./templates/transformBuilder.js";
@@ -57,18 +57,18 @@ export class PongBR {
 	private glowLayer: any;
 	private uuid!: string;
 	private paddleBundles!: PaddleBundle[];
+	private pongRoot!: TransformNode;
 
-	constructor(canvas: any, gameId: any) {
+	constructor(canvas: any, gameId: any, scene: Scene) {
 		this.canvas = canvas;
 		this.gameId = gameId;
+		this.scene = scene;
+		this.engine = this.scene.getEngine() as Engine;
+		this.init();
 	}
 
-	async start() {
-		console.log("start");
-		this.engine = new Engine(this.canvas, true);
-		engine = this.engine;
-		this.scene = new Scene(this.engine);
-		this.scene.debugLayer.show({ showInspector: true, embedMode: true });
+	private init() {
+		console.log("INIT");
 		const config = {
 			numberOfBalls: 1,
 			arenaSizeX: 30,
@@ -77,44 +77,103 @@ export class PongBR {
 		};
 
 		// const spector = new Spector();
-		// spector.displayUI();               // pops up the Spector control panel
+		// spector.displayUI();               
 		// spector.spyCanvas(
 		// );
+		const camera = this.scene.getCameraByName('menu') as Camera;
+		camera.maxZ = 20000;
 		window.addEventListener("keydown", (e) => {
-			// press “T” to trigger a transition
 			if (e.key.toLowerCase() === "t") {
 				const raw = prompt("Next round player count?");
 				const next = raw ? parseInt(raw, 10) : NaN;
 				if (!isNaN(next)) {
-					//this.baseMeshes.paddle.material.setUniform("playerCount", next);
+					this.baseMeshes.paddle.material.setUniform("playerCount", next);
 					this.transitionToRound(next);
 				}
 			}
 		});
-		this.camera = createCamera(this.scene, this.canvas);
-		this.camera.minZ = 0.01;
-
-		this.baseMeshes = this.createBaseMeshes(config);
+		this.pongRoot = new TransformNode("pongRoot", this.scene);
+		this.pongRoot.position.set(-2200, -3500, -3500);
+		const light = new PointLight('lightBr', new Vector3(-300, 25, 0), this.scene)
+		light.parent = this.pongRoot;
+		const light2 = new PointLight('lightBr2', new Vector3(+300, 25, 0), this.scene)
+		light2.parent = this.pongRoot;
+		const light4 = new PointLight('lightBr4', new Vector3(0, 25, -300), this.scene)
+		light4.parent = this.pongRoot;
+		const light3 = new PointLight('lightBr3', new Vector3(0, 25, 300), this.scene)
+		light3.parent = this.pongRoot;
+		//this.pongRoot.position.set(0, 0, 0);
+		this.pongRoot.rotation.z -= 30.9000;
+		//this.pongRoot.rotation.y = Math.PI * 0.1;
+		this.pongRoot.scaling.set(1, 1, 1);
+		this.camera = this.scene.getCameraByName('br') as ArcRotateCamera;
+		this.camera.parent = this.pongRoot;
+		this.camera.attachControl(this.canvas);
+		this.camera.minZ = 0.2;
+		//this.camera.fov = 80 * Math.PI / 180.0;
+		//this.camera.maxZ = 10000;
+		this.baseMeshes = this.createBaseMeshes(config, this.pongRoot);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
-		this.uuid = await getOrCreateUUID();
+
+		this.scene.clearColor = new Color4(0, 0, 0, 1);
+		this.scene.ambientColor = Color3.White();
+		//const skybox = MeshBuilder.CreateBox("skyBox", { size: 1000, sideOrientation: Mesh.BACKSIDE }, this.scene);
+		//skybox.infiniteDistance = true;
+		//const mat = new StandardMaterial('skymat', this.scene);
+		//mat.diffuseColor = Color3.White();
+		//skybox.material = mat;
+		//skybox.material.backFaceCulling = false;
+
+
+
+
+		this.uuid = getOrCreateUUID();
 		// const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
 		// this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
 		// localPaddleId = await this.waitForRegistration();
 		localPaddleId = 0;
-		this.initECS(config, this.instanceManagers, this.uuid);
+		this.initECS(config, this.instanceManagers, this.uuid, this.pongRoot);
 
 		this.stateManager = new StateManager(this.ecs);
+		this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
+
+
+	}
+	public start() {
+		console.log("start");
+		//this.engine = new Engine(this.canvas, true);
+		//engine = this.engine;
+		this.pongRoot.setEnabled(true);
+		this.stateManager.setter(true);
 		this.stateManager.update();
+		this.scene.debugLayer.show({ showInspector: true, embedMode: true });
 
-		this.engine.runRenderLoop(() => {
-			this.scene.render();
+		//this.engine.runRenderLoop(() => {
+		//	this.scene.render();
+		this.scene.onBeforeRenderObservable.add(() => {
+			// called _before_ every frame is drawn
 			this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
-			//this.baseMeshes.portal.material.enableResolutionUniform();
 		});
+		//	//this.baseMeshes.portal.material.enableResolutionUniform();
+		//});
 
+	}
+	public stop(): void {
+		//if (this.engine) {
+		//	this.engine.stopRenderLoop();
+		//}
+
+		//if (this.scene) {
+		//  this.scene.detachControl();
+		//}
+
+		this.pongRoot.setEnabled(false);
+		this.stateManager.setter(false);
+
+		console.log("render loop stopped and game paused");
 	}
 
 	private createInstanceManagers(baseMeshes: any) {
@@ -128,7 +187,7 @@ export class PongBR {
 		}
 	}
 
-	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
+	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string, pongRoot: TransformNode) {
 		this.ecs = new ECSManager();
 		this.ecs.addSystem(new MovementSystem());
 		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
@@ -145,13 +204,13 @@ export class PongBR {
 		));
 		// this.ecs.addSystem(new VisualEffectSystem(this.scene));
 		//this.ecs.addSystem(new UISystem());
-		this.paddleBundles = createGameTemplate(this.ecs, 100);
+		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot);
 	}
 
 	async transitionToRound(nextCount: number) {
 		// reuse the same config you used at startup
 		const cfg = { arenaRadius: 100, wallWidth: 1, paddleHeight: 1, paddleDepth: 1, goalDepth: 1 };
-		const targets: PaddleBundle[] = buildPaddles(this.ecs, nextCount);
+		const targets: PaddleBundle[] = buildPaddles(this.ecs, nextCount, this.pongRoot);
 
 		// survivors & eliminated logic as before…
 		const survivors = this.paddleBundles.filter(b => b.sliceIndex < nextCount);
@@ -225,28 +284,28 @@ export class PongBR {
 			this.ecs.removeEntity(b.paddle);
 			this.ecs.removeEntity(b.goal);
 			this.ecs.removeEntity(b.deathWall);
-			b.pillars.forEach(p => this.ecs.removeEntity(p));
+			this.ecs.removeEntity(b.pillar);
 		});
 		survivors.forEach(b => {
 			this.ecs.removeEntity(b.paddle);
 			this.ecs.removeEntity(b.goal);
 			this.ecs.removeEntity(b.deathWall);
-			b.pillars.forEach(p => this.ecs.removeEntity(p));
+			this.ecs.removeEntity(b.pillar);
 		});
 
 		this.paddleBundles = targets;
 	}
 
 
-	private createBaseMeshes(config: GameTemplateConfig) {
+	private createBaseMeshes(config: GameTemplateConfig, pongRoot: TransformNode) {
 		return {
-			arena: createArenaMesh(this.scene, config),
-			ball: createBallMesh(this.scene, config),
-			paddle: createPaddleMesh(this.scene, config),
-			wall: createWallMesh(this.scene, config),
-			portal: createPortalMesh(this.scene, config),
-			pillar: createPillarMesh(this.scene, config),
-			goal: createGoalMesh(this.scene, config),
+			//arena: createArenaMesh(this.scene, config, pongRoot),
+			ball: createBallMesh(this.scene, config, pongRoot),
+			paddle: createPaddleMesh(this.scene, config, pongRoot),
+			wall: createWallMesh(this.scene, config, pongRoot),
+			portal: createPortalMesh(this.scene, config, pongRoot),
+			pillar: createPillarMesh(this.scene, config, pongRoot),
+			goal: createGoalMesh(this.scene, config, pongRoot),
 		}
 	}
 

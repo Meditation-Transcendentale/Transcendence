@@ -2,11 +2,11 @@ export class InputManager {
 	private keysPressed: Set<string> = new Set();
 
 	constructor() {
-		document.addEventListener("keydown", (e) => {
+		document.querySelector('canvas')?.addEventListener("keydown", (e) => {
 			this.keysPressed.add(e.code);
 			console.log("keydown:", e.code);
 		});
-		document.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
+		document.querySelector('canvas')?.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
 	}
 
 	isKeyPressed(keyCode: string): boolean {

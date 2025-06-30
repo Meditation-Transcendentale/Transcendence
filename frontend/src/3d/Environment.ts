@@ -1,17 +1,19 @@
 import { Scene } from "@babylonjs/core/scene"
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Gears } from "./Gears";
 import { updateVues } from "../Vue";
+import { FresnelParameters, MeshBuilder, StandardMaterial } from "@babylonjs/core";
 
 
 export class Environment {
 	private canvas: HTMLCanvasElement;
-	private scene!: Scene;
+	public scene!: Scene;
 
 	private camera!: ArcRotateCamera;
+	private camera_br!: ArcRotateCamera;
 
 	private lastTime: number;
 	private deltaTime: number;
@@ -57,14 +59,29 @@ export class Environment {
 
 	}
 
+	private createMesh() {
+		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 1, tessellation: 128 }, this.scene);
+		arenaMesh.position = new Vector3(-2200, -3500, -3500);
+		//arenaMesh.rotation.x += Math.PI / 2;
+		arenaMesh.rotation.z -= 30.9000;
+		const material = new StandardMaterial("arenaMaterial", this.scene);
+		material.diffuseColor.set(0, 0, 0);
+		material.specularColor.set(0, 0, 0);
+		material.emissiveColor.set(1, 1, 1);
+		material.disableLighting = true;
+		const fresnel = new FresnelParameters();
+		fresnel.isEnabled = true;
+		fresnel.leftColor = new Color3(1, 1, 1);
+		fresnel.rightColor = new Color3(0, 0, 0);
+		fresnel.power = 15;
+		material.emissiveFresnelParameters = fresnel;
+		arenaMesh.material = material;
+	}
 	public async init() {
 
-		this.camera = new ArcRotateCamera("camera", -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
-		this.camera.inertia = 0.8;
-		this.camera.speed = 10;
-		this.camera.rotation.set(0, Math.PI * 1.5, 0);
-		this.camera.attachControl(this.canvas, true);
-		this.camera.minZ = 0.1;
+		this.createMesh();
+		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
+		this.camera_br.attachControl(this.canvas, true);
 
 		await this.gears.load();
 

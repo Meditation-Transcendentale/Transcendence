@@ -1,9 +1,13 @@
 // src/uwsServer.js
+import { readFileSync } from 'fs';
 import { App } from 'uWebSockets.js';
 import { decodeClientMessage } from './proto/helper.js';
 
 export function startWsServer({ port, handlers }) {
-	const app = App().ws('/*', {
+	const app = App({
+		key_file_name: readFileSync("./certs/server.key"),
+		cert_file_name: readFileSync("./certs/server.crt")
+	}).ws('/*', {
 		idleTimeout: 30,
 		maxBackpressure: 1024,
 

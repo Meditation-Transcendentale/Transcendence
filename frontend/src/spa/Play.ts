@@ -246,6 +246,18 @@ export default class Play {
 
 		this.ref.createBtn.addEventListener("click", () => {
 			console.log(`create game-> mod:${this.createState.mod}, map:${this.createState.map}`)
+			this.postRequest("lobby/create", {
+
+
+				mode: this.createState.mod,
+
+				map: this.createState.map
+
+			})
+
+				.then((json) => { this.createResolve(json) })
+
+				.catch((resp) => { this.createReject(resp) });
 		})
 
 		this.ref.joinId.addEventListener("focusin", () => {
