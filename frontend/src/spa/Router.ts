@@ -57,7 +57,7 @@ class RouterC {
 		this.routes.set("/info", {
 			html: "/info",
 			ts: "./Info",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/stats", {
 			html: "/stats",
@@ -67,7 +67,7 @@ class RouterC {
 		this.routes.set("/lobby", {
 			html: "/lobby",
 			ts: "./Lobby",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/play", {
 			html: "/play",
@@ -77,7 +77,7 @@ class RouterC {
 		this.routes.set("/friendlist", {
 			html: "/friendlist",
 			ts: "./Friendlist",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/game", {
 			html: "/game",

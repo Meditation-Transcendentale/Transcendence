@@ -1,12 +1,12 @@
+import { App3D } from "../3d/App";
 import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
+import { lobbyVue } from "../Vue";
 import Router from "./Router";
 import { User } from "./User";
 
 
 interface lobbyHtmlReference {
 	ready: HTMLInputElement;
-	quit: HTMLInputElement;
-	list: HTMLDivElement;
 }
 
 enum lobbyState {
@@ -36,9 +36,7 @@ export default class Lobby {
 		this.state = lobbyState.none;
 
 		this.ref = {
-			ready: div.querySelector("#lobby-ready") as HTMLInputElement,
-			quit: div.querySelector("#lobby-quit") as HTMLInputElement,
-			list: div.querySelector("#lobby-player-list") as HTMLDivElement
+			ready: div.querySelector("#ready-btn") as HTMLInputElement,
 		};
 
 		this.ref.ready.addEventListener("click", () => {
@@ -46,31 +44,36 @@ export default class Lobby {
 			console.log("je suis la")
 		})
 
-		this.ref.quit.addEventListener("click", () => {
-			this.ws?.close();
-			User.status = null;
-			Router.nav(`/play`, false, false);
+		App3D.setVue("lobby");
+
+		lobbyVue.windowAddEvent('BACK', 'click', () => {
+			Router.nav("/play", false, true);
 		})
 	}
 
 
 	public load(params: URLSearchParams) {
-		if (!this.ws) {
-			this.ref.ready.disabled = true;
-			this.state = lobbyState.none;
-			this.setupWs(params.get("id") as string);
-		} else if (this.id && this.id == params.get("id")) {
-			//nav to past lobby
+		this.ws = null;
+		this.id = null;
+		this.mode = null;
+		this.state = lobbyState.none;
+		if (!params.has("id")) {
+			console.error("Not id passed to lobby");
+			//return;
 		}
-		document.querySelector('#home-container')?.appendChild(this.div);
+		App3D.loadVue("lobby");
+		this.id = params.get("id") as string;
+		this.setupWs(this.id);
+		document.querySelector('#main-container')?.appendChild(this.div);
 	}
 
 	public async unload() {
+		App3D.unloadVue("lobby");
 		this.div.remove();
 	}
 
 	private setupWs(id: string) {
-		const url = `ws://${this.gameIP}:5011/lobbies?uuid=${encodeURIComponent(User.uuid as string)}&lobbyId=${encodeURIComponent(id as string)}`;
+		const url = `wss://${this.gameIP}:5011/lobbies?uuid=${encodeURIComponent(User.uuid as string)}&lobbyId=${encodeURIComponent(id as string)}`;
 		console.log("URL", url);
 		this.ws = new WebSocket(url);
 		this.ws.binaryType = "arraybuffer";
@@ -93,12 +96,12 @@ export default class Lobby {
 				this.ws?.close();
 				this.ws = null;
 				this.state = 0;
-				Router.nav("/home/play");
+				Router.nav("/play");
 				return;
 			}
 
 			if (payload.update != null) {
-				this.mode = payload.update.mode;
+				this.mode = payload.update.mode as null;
 				console.log(`Update :${payload}`);
 			}
 
@@ -106,7 +109,7 @@ export default class Lobby {
 				console.log("Everyone is ready");
 				const gameId = payload.start.gameId;
 				const map = "default"; //payload.start.map;
-				Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${map}`), false, false);
+				Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
 				this.ws?.close();
 			}
 		}
