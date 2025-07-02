@@ -1,8 +1,10 @@
 IMAGE_NAME=front
 CONTAINER_NAME=frontend-frontend-1
-DOCKERFILE=Dockerfile.dev
-PORT=8080
+DOCKERFILE=Dockerfile
+PORT=7000
 DOCKER_COMPOSE_FILE=docker-compose.yml
+
+all: up
 
 build:
 	docker build -f $(DOCKERFILE) -t $(IMAGE_NAME) .

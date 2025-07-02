@@ -1,9 +1,9 @@
-import { App3D } from "../3d/App";
-import { playVue } from "../Vue";
-import { getRequest, postRequest } from "./requests";
-import Router from "./Router";
-import { User } from "./User";
-import { createButton } from "./utils";
+import { App3D } from "../3d/App.js";
+import { playVue } from "../Vue.js";
+import { getRequest, postRequest } from "./requests.js";
+import Router from "./Router.js";
+import { User } from "./User.js";
+import { createButton } from "./utils.js";
 
 
 const lr: listResp = {

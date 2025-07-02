@@ -7,8 +7,8 @@ const spa = glob.sync("src/spa/*.ts");
 Object(spa).forEach((file) => {
 	esbuild.build({
 		entryPoints: [file],
-		//bundle: true,
-		outdir: "./dist/spa",
+		bundle: true,
+		outfile: `./dist/spa/${path.basename(file, '.ts')}.js`,
 		treeShaking: true,
 		//legalComments: 'none',
 		format: "esm",
@@ -23,7 +23,7 @@ Object(spa).forEach((file) => {
 esbuild.build({
 	entryPoints: ['src/3d/App.ts'],
 	bundle: true,
-	outdir: "./dist/3d",
+	outfile: "./dist/3d/App.js",
 	treeShaking: true,
 	//legalComments: 'none',
 	format: "esm",
@@ -36,8 +36,8 @@ esbuild.build({
 
 esbuild.build({
 	entryPoints: ['src/main.ts'],
-	//bundle: true,
-	outdir: "./dist/",
+	bundle: true,
+	outfile: "./dist/main.js",
 	treeShaking: true,
 	legalComments: 'none',
 	format: "esm",
@@ -50,8 +50,8 @@ esbuild.build({
 
 esbuild.build({
 	entryPoints: ['src/Vue.ts'],
-	//bundle: true,
-	outdir: "./dist/",
+	bundle: true,
+	outfile: "./dist/Vue.js",
 	treeShaking: true,
 	legalComments: 'none',
 	format: "esm",

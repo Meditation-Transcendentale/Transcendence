@@ -1,5 +1,5 @@
-import Router from "./Router";
-import { Pong } from "../pong/Pong";
+import Router from "./Router.js";
+import { Pong } from "../pong/Pong.js";
 
 
 export default class Game {

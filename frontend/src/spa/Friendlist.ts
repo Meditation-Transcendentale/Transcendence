@@ -1,7 +1,7 @@
-import { meReject, meRequest } from "./checkMe";
-import { deleteRequest, getRequest, postRequest } from "./requests";
-import Router from "./Router";
-import { createButton, setDraggable } from "./utils";
+import { meReject, meRequest } from "./checkMe.js";
+import { deleteRequest, getRequest, postRequest } from "./requests.js";
+import Router from "./Router.js";
+import { createButton, setDraggable } from "./utils.js";
 
 
 interface Friend {

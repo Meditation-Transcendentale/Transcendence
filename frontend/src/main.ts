@@ -1,5 +1,6 @@
-import { App3D } from "./3d/App";
-import Router from "./spa/Router";
+import { App3D } from "./3d/App.js";
+import Router from "./spa/Router.js";
+import "Vue";
 
 
 

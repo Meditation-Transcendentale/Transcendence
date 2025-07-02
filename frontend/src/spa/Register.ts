@@ -1,8 +1,8 @@
-import { App3D } from "../3d/App";
-import { registerVue } from "../Vue";
-import { postRequest } from "./requests";
-import Router from "./Router";
-import { raiseStatus } from "./utils";
+import { App3D } from "../3d/App.js";
+import { registerVue } from "../Vue.js";
+import { postRequest } from "./requests.js";
+import Router from "./Router.js";
+import { raiseStatus } from "./utils.js";
 
 type registerHtmlReference = {
 	username: HTMLInputElement,

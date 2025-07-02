@@ -33,6 +33,7 @@ class Home {
 
 		App3D.setVue('home');
 		homeVue.windowAddEvent('play', 'click', () => {
+			console.log("ejerw00");
 			Router.nav('/play');
 		})
 		homeVue.windowAddEvent('stats', 'click', () => {

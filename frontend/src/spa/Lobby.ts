@@ -1,8 +1,8 @@
-import { App3D } from "../3d/App";
+import { App3D } from "../3d/App.js";
 import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
-import { lobbyVue } from "../Vue";
-import Router from "./Router";
-import { User } from "./User";
+import { lobbyVue } from "../Vue.js";
+import Router from "./Router.js";
+import { User } from "./User.js";
 
 
 interface lobbyHtmlReference {
