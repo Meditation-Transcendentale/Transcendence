@@ -16,10 +16,10 @@
     "esbuild": "^0.19.11",
     "glob": "^11.0.2",
     "protobufjs": "^7.5.0",
-    "typescript": "^5.2.2",
-    "vite": "^6.3.3"
+    "typescript": "^5.2.2"
   },
   "dependencies": {
-    "transcendence-frontend": "file:"
+    "transcendence-frontend": "file:",
+    "vite": "^7.0.0"
   }
 }

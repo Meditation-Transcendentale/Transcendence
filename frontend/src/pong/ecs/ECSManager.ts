@@ -17,6 +17,7 @@ export class ECSManager {
 		this.systems.push(system);
 	}
 
+
 	update(deltaTime: number): void {
 		// console.log("before:", performance.now());
 		for (const system of this.systems) {

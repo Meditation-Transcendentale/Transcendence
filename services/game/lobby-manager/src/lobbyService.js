@@ -12,6 +12,7 @@ class Lobby {
 		this.id = id
 		this.mode = mode
 		this.map = map
+		console.log(mode);
 		this.maxPlayers = config.MAX_PLAYERS[mode] ?? 2
 		// userId -> { isReady, lastSeen }
 		this.players = new Map()

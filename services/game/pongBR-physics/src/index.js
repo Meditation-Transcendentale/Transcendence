@@ -16,7 +16,7 @@ async function start() {
 	const nc = await connect({ servers: NATS_URL });
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
 
-	const endSub = nc.subscribe('game.pongBR.end');
+	const endSub = nc.subscribe('games.ia.*.match.end');
 	(async () => {
 		for await (const msg of endSub) {
 			const { gameId } = jc.decode(msg.data);
@@ -26,25 +26,25 @@ async function start() {
 		}
 	})();
 
-	const inputSub = nc.subscribe('game.pongBR.input');
-	(async () => {
-		for await (const msg of inputSub) {
-			console.log(`[${SERVICE_NAME}] Received input message`);
-			const { gameId, inputs } = jc.decode(msg.data);
-			if (endedGames.has(gameId)) continue;
+	//const inputSub = nc.subscribe('game.br.input');
+	//(async () => {
+	//	for await (const msg of inputSub) {
+	//		console.log(`[${SERVICE_NAME}] Received input message`);
+	//		const { gameId, inputs } = jc.decode(msg.data);
+	//		if (endedGames.has(gameId)) continue;
+	//
+	//		for (const { playerId, type } of inputs) {
+	//			Physics.handleImmediateInput({
+	//				gameId,
+	//				inputs: [
+	//					{ playerId, input: { type } }
+	//				]
+	//			});
+	//		}
+	//	}
+	//})();
 
-			for (const { playerId, type } of inputs) {
-				Physics.handleImmediateInput({
-					gameId,
-					inputs: [
-						{ playerId, input: { type } }
-					]
-				});
-			}
-		}
-	})();
-
-	const sub = nc.subscribe('game.pongBR.tick');
+	const sub = nc.subscribe('games.br.*.physics.request');
 	for await (const msg of sub) {
 		const data = jc.decode(msg.data);
 
@@ -55,7 +55,7 @@ async function start() {
 
 		const result = Physics.processTick(data);
 		const buffer = encodeStateUpdate(result.gameId, result.tick, result.balls, result.paddles);
-		const temp = decodeStateUpdate(buffer);
+		//const temp = decodeStateUpdate(buffer);
 		nc.publish('game.state', buffer);
 	}
 }

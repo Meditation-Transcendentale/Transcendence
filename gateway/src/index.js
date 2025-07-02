@@ -10,12 +10,12 @@ import fastifyCORS from "@fastify/cors";
 import axios from "axios";
 import https from "https";
 
-const FRONTEND_PORT = 8080;
-const hostIP = '10.19.219.61'
-const hostOrigin = `http://${hostIP}:${FRONTEND_PORT}`;
 
 dotenv.config({ path: "../../.env" });
 
+const FRONTEND_PORT = 8080;
+const hostIP = process.env.HOSTNAME;
+const hostOrigin = `https://${hostIP}:${FRONTEND_PORT}`;
 const app = fastify({
 	logger: true,
 	https: {
@@ -39,7 +39,7 @@ app.register(fastifyRateLimit, {
 });
 
 app.register(fastifyCORS, {
-	origin: [hostOrigin],
+	origin: [hostOrigin, `https://localhost:${FRONTEND_PORT}`],
 	methods: ['GET', 'POST', 'PATCH', 'DELETE'],
 	allowedHeaders: ['Content-Type'],
 	credentials: true
