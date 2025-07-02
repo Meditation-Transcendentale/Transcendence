@@ -6,7 +6,6 @@ import {
   FPS
 } from './constants.js';
 
-
 export function heuristic_time_to_intercept(node, paddleY) {
   const targetY = node.futureBallState.ballPos[1];
   const dist = Math.abs(targetY - paddleY);
@@ -20,7 +19,7 @@ export function heuristic_return_angle_variability(node) {
     const xDist = Math.abs(node.futureBallState.ballPos[0] - node.ballState.ballPos[0]);
     const time = xDist / Math.abs(node.ballState.ballVel[0]);
     const frames = time * FPS;
-    const maxReach = Math.min(MAX_PADDLE_SPEED * frames + PADDLE_HALF_HEIGHT, 7.5);
+    const maxReach = MAX_PADDLE_SPEED * frames + PADDLE_HALF_HEIGHT;
     const dist = Math.abs(node.futureBallState.ballPos[1] - node.playerPaddlePos);
     const actualReach = Math.min(dist, maxReach);
     const maxReturns = maxReach / STEP_SIZE;
@@ -37,8 +36,7 @@ export function heuristic_opponent_disruption(node, paddleY) {
     const xDist = Math.abs(node.futureBallState.ballPos[0] - node.ballState.ballPos[0]);
     const time = xDist / Math.abs(node.ballState.ballVel[0]);
     const frames = time * FPS;
-    const rawReach = MAX_PADDLE_SPEED * frames + PADDLE_HALF_HEIGHT;
-    const maxReach = Math.min(rawReach, 7.5);
+    const maxReach = MAX_PADDLE_SPEED * frames + PADDLE_HALF_HEIGHT;
     const targetY = node.futureBallState.ballPos[1];
     const dist = Math.abs(targetY - paddleY);
     return Math.min(dist / maxReach, 1.0);
@@ -61,7 +59,7 @@ export function heuristic_entropy_reaction(node, paddleY) {
     const xDist = Math.abs(node.futureBallState.ballPos[0] - node.ballState.ballPos[0]);
     const time = xDist / Math.abs(node.ballState.ballVel[0]);
     const frames = time * FPS;
-    const maxMove = Math.min(MAX_PADDLE_SPEED * frames, 7.5);
+    const maxMove = MAX_PADDLE_SPEED * frames;
     const targetY = node.futureBallState.ballPos[1];
     const dist = Math.abs(targetY - paddleY);
     const move = Math.min(dist, maxMove);
@@ -80,12 +78,7 @@ export function heuristic_consistency(node) {
   const [vx, vy] = node.ballState.ballVel;
   const angle = Math.abs(Math.atan2(vy, vx));
   const max = Math.PI * 17 / 36;
-  const raw = 1 - (angle / max);
+  const raw = 1 - (max / angle);
+  console.log(`${angle}|${max}|${raw}`);
   return Math.max(0.0, Math.min(raw, 1.0));
-}
-
-export function heuristic_distance_to_predicted_return(node, predictedY) {
-  const dist = Math.abs(predictedY - node.aiPaddlePos);
-  const norm = Math.min(dist / MAX_PADDLE_SPEED, 1.0);
-  return 1.0 - norm;
 }

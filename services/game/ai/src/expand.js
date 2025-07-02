@@ -10,7 +10,6 @@ function generateFullRange() {
   for (let y = lower; y <= upper; y += STEP_SIZE) {
     range.push(Math.round(y * 100) / 100);
   }
-  console.log ("LOWER:", lower, "UPPER:", upper)
   return range;
 }
 
@@ -23,10 +22,10 @@ export function expand(node) {
   const paddlePositions = generateFullRange();
 
   for (const paddlePos of paddlePositions) {
-    const offset = paddlePos - targetY;
+    const offset = targetY - paddlePos;
 
-    const angleFactor = 0.05;
-    const newVelY = node.ballState.ballVel[1] + offset * angleFactor;
+    const angleFactor = 0.5;
+    const newVelY = offset * angleFactor;
 
     const newBallVel = [newVelX, newVelY];
     const futureBallState = predictBallState(node.futureBallState.ballPos, newBallVel);
@@ -45,7 +44,7 @@ export function expand(node) {
       playerPaddle,
       futureBallState
     );
-
+    // console.log(`newChild:${child.ballState.ballPos}|${child.ballState.ballVel}|${child.aiPaddlePos}|${child.playerPaddlePos}|${child.futureBallState.ballPos}|${child.futureBallState.ballVel}`)
     children.push(child);
   }
 
