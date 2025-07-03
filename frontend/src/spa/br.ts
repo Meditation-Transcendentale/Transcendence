@@ -1,6 +1,6 @@
-import Router from "./Router.js";
-import { PongBR } from "../pongbr/PongBR.js";
-import { App3D } from "../3d/App.js";
+import Router from "./Router";
+import { PongBR } from "../pongbr/PongBR";
+import { App3D } from "../3d/App";
 
 
 export default class br {

@@ -1,8 +1,6 @@
-import { App3D } from "./3d/App.js";
-import Router from "./spa/Router.js";
-import "Vue";
-
-
+import { App3D } from "./3d/App";
+import Router from "./spa/Router";
+import * as Vue from "./Vue";
 
 //async function init() {
 //	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));

@@ -1,4 +1,4 @@
-import { App3D } from "../3d/App.js";
+import { App3D } from "../3d/App";
 
 export default class Test {
 	private div: HTMLDivElement;

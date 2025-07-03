@@ -2,9 +2,9 @@ FROM node:22 AS builder
 
 WORKDIR /app
 COPY package.json tsconfig.json ./
+RUN npm install
 COPY esbuild.config.mjs ./
 COPY src ./src
-RUN npm install
 RUN npm run build
 
 FROM nginx:alpine

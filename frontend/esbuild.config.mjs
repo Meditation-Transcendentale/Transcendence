@@ -33,8 +33,8 @@ build({
 	//minifySyntax: true,
 	//minifyWhitespace: true,
 	//minifyIdentifiers: true,
+	external: ['Vue.ts', 'Vue.js', 'Vue'],
 	splitting: false,
-	external: ['Vue'],
 	resolveExtensions: ['.ts', '.js'],
 
 })

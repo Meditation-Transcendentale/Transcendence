@@ -1,4 +1,4 @@
-import { meReject, meRequest } from "./requests.js";
+import { meReject, meRequest } from "./requests";
 
 type routePage = {
 	html: string,
@@ -214,7 +214,7 @@ class RouterC {
 
 	private async getTS(path: string): Promise<{ default: any }> {
 		console.log("%c Importing %s", "color: black; background-color: orange", path);
-		const ts = await import(/* @vite-ignore */ `${path}.js`);
+		const ts = await import(/* @vite-ignore */ `${path}`);
 		return ts;
 	}
 }

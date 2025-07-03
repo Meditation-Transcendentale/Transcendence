@@ -1,9 +1,9 @@
-import { App3D } from "../3d/App.js";
-import { playVue } from "../Vue.js";
-import { getRequest, postRequest } from "./requests.js";
-import Router from "./Router.js";
-import { User } from "./User.js";
-import { createButton } from "./utils.js";
+import { App3D } from "../3d/App";
+import { playVue } from "../Vue";
+import { getRequest, postRequest } from "./requests";
+import Router from "./Router";
+import { User } from "./User";
+import { createButton } from "./utils";
 
 
 const lr: listResp = {
@@ -174,6 +174,8 @@ export default class Play {
 			list: div.querySelector("#join-list") as HTMLTableElement,
 			joinId: div.querySelector("#join-id") as HTMLInputElement,
 		}
+
+		console.log("brmod: ", this.ref.brMod);
 
 		this.createState = {
 			mod: null,

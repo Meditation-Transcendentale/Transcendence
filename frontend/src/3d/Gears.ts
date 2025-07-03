@@ -335,6 +335,7 @@ export class Gears {
 				break;
 			}
 			case 'home': {
+				console.log(homeVue);
 				homeVue.init(this.scene.getCameraByName('home') as Camera);
 				homeVue.addWindow('play', this.outer, this.outerBounding, this.outerMatrix[8]);
 				homeVue.addWindow('stats', this.outer, this.outerBounding, this.outerMatrix[9]);

@@ -1,6 +1,6 @@
 import { deleteRequest, patchRequest, postRequest } from "./requests";
-import { User } from "./User.js";
-import { raiseStatus } from "./utils.js";
+import { User } from "./User";
+import { raiseStatus } from "./utils";
 
 interface infoHtmlReference {
 	username: HTMLInputElement,

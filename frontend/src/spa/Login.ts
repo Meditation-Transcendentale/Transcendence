@@ -1,9 +1,9 @@
-import { App3D } from "../3d/App.js";
-import { loginVue } from "../Vue.js";
-import Router from "./Router.js";
+import { App3D } from "../3d/App";
+import { loginVue } from "../Vue";
+import Router from "./Router";
 
-import { postRequest } from "./requests.js";
-import { raiseStatus } from "./utils.js";
+import { postRequest } from "./requests";
+import { raiseStatus } from "./utils";
 
 type authHtmlReference = {
 	username: HTMLInputElement;

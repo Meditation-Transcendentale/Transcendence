@@ -1,4 +1,4 @@
-import { User } from "./User.js";
+import { User } from "./User";
 
 export async function getRequest(path: string): Promise<JSON> {
 	const response = await fetch(`https://${window.location.hostname}:3000/${encodeURI(path)}`, {

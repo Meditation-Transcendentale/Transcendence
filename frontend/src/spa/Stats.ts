@@ -1,7 +1,7 @@
-import { App3D } from "../3d/App.js";
-import { statsVue } from "../Vue.js";
-import { getRequest } from "./requests.js";
-import { createDivception, raiseStatus } from "./utils.js";
+import { App3D } from "../3d/App";
+import { statsVue } from "../Vue";
+import { getRequest } from "./requests";
+import { createDivception, raiseStatus } from "./utils";
 
 type statsHtmlReference = {
 	username: HTMLDivElement,
