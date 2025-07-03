@@ -1,5 +1,5 @@
 import { App3D } from "../3d/App";
-import { playVue } from "../Vue";
+//import { playVue } from "../Vue";
 import { getRequest, postRequest } from "./requests";
 import Router from "./Router";
 import { User } from "./User";
@@ -362,6 +362,7 @@ export default class Play {
 		//}
 
 		App3D.setVue('play');
+		const playVue = App3D.getVue('play');
 		playVue.windowAddEvent('create', 'click', () => {
 			this.ref.join.remove();
 			this.div.appendChild(this.ref.create);

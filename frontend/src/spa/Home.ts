@@ -1,5 +1,5 @@
 import { App3D } from "../3d/App";
-import { homeVue } from "../Vue";
+//import { homeVue } from "../Vue";
 import { meRequest, postRequest } from "./requests";
 import Router from "./Router";
 import { User } from "./User";
@@ -35,6 +35,7 @@ class Home {
 		console.log("jhfrkejhgrkhgerg", document.querySelector("play-frame"));
 
 		App3D.setVue('home');
+		const homeVue = App3D.getVue('home');
 		homeVue.windowAddEvent('play', 'click', () => {
 			console.log("play clicked");
 			Router.nav('/play');
@@ -48,7 +49,7 @@ class Home {
 			Router.nav('/test')
 		})
 
-		
+
 
 		// document.getElementById('home-play')?.addEventListener('click', () => {
 		// 	console.log('play clicked');
@@ -124,7 +125,6 @@ class Home {
 
 	public load(params: URLSearchParams) {
 		App3D.loadVue('home');
-		console.log(homeVue);
 		//meRequest()
 		//.catch(() => window.location.reload());
 		(document.querySelector("#main-container") as HTMLDivElement).innerHTML = "";

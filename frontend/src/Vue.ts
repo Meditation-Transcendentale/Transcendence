@@ -149,7 +149,7 @@ class cssWindow {
 	}
 }
 
-class Vue {
+export class Vue {
 	public windows: cssWindow[];
 	public camera!: Camera;
 	private _enable: boolean;

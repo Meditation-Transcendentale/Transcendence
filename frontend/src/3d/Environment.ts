@@ -4,7 +4,7 @@ import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Gears } from "./Gears";
-import { updateVues } from "../Vue";
+import { updateVues, Vue } from "../Vue";
 import { FresnelParameters, MeshBuilder, StandardMaterial } from "@babylonjs/core";
 
 
@@ -107,6 +107,10 @@ export class Environment {
 
 	public setVue(vue: string): void {
 		this.gears.setVue(vue);
+	}
+
+	public getVue(vue: string): Vue {
+		return this.gears.getVue(vue);
 	}
 
 	public dispose() {

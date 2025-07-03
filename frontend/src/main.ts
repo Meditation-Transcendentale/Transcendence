@@ -1,6 +1,5 @@
 import { App3D } from "./3d/App";
 import Router from "./spa/Router";
-import * as Vue from "./Vue";
 
 //async function init() {
 //	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
@@ -9,9 +8,16 @@ import * as Vue from "./Vue";
 //}
 //
 
+
 async function init() {
 	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
 
+	const ws = new WebSocket('wss://yourdomain.com/ws/');
+	ws.onopen = () => console.log('Connected securely via WSS');
+	ws.onmessage = (event) => {
+		console.log(event.data);
+		if (event.data === 'reload') window.location.reload();
+	};
 
 	Router.AUTHENTIFICATION = false;
 

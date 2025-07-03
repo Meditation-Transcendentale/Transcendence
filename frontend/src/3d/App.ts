@@ -3,6 +3,7 @@ import {
 } from "@babylonjs/core/Engines/engine";
 
 import { Environment } from "./Environment";
+import { Vue } from "../Vue";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -74,6 +75,10 @@ class app3d {
 
 	public setVue(vue: string) {
 		this.environment.setVue(vue);
+	}
+
+	public getVue(vue: string): Vue {
+		return this.environment.getVue(vue);
 	}
 	public get scene() {
 		return this.environment.scene;

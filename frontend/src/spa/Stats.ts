@@ -94,6 +94,7 @@ class Stats {
 		this.initPlayerStats();
 
 		App3D.setVue('stats');
+		const statsVue = App3D.getVue('stats');
 		statsVue.windowAddEvent('pong', 'click', () => {
 			if (this.mode != 1) {
 				this.ref.brHistory.remove();

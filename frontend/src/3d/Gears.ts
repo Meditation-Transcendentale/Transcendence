@@ -14,7 +14,7 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue } from "../Vue";
+import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue, Vue } from "../Vue";
 
 
 interface cssElem {
@@ -368,6 +368,33 @@ export class Gears {
 				break;
 			}
 		}
+	}
+
+	public getVue(vue: string): Vue {
+		switch (vue) {
+			case 'play': {
+				return playVue;
+			}
+			case 'home': {
+				return homeVue;
+			}
+			case 'stats': {
+				return statsVue;
+			}
+			case 'login': {
+				return loginVue;
+			}
+			case 'register': {
+				return registerVue;
+			}
+			case 'test': {
+				return testVue;
+			}
+			case 'lobby': {
+				return lobbyVue;
+			}
+		}
+		return homeVue;
 	}
 
 	public dispose() {
