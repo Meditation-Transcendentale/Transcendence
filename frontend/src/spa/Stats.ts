@@ -1,5 +1,4 @@
 import { App3D } from "../3d/App";
-import { statsVue } from "../Vue";
 import { getRequest } from "./requests";
 import { createDivception, raiseStatus } from "./utils";
 

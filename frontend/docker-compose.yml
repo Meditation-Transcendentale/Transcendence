@@ -12,6 +12,7 @@
 services:
   builder:
     container_name: builder
+    user: "0:0"
     build: 
       context: ./
       dockerfile: Dockerfile
@@ -21,12 +22,22 @@ services:
     volumes:
       - ./src:/app/src:ro
       - /app/node_modules
-      - public:/app/public
+      - bomba:/app/dist
     networks:
       - one
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "ls"]
+      start_period: 3s
+      start_interval: 4s
+      interval: 3600s
+      timeout: 5s
+      retries: 3
+
+
   server:
     container_name: nginx
+    user: "0:0"
     build: 
       context: ./
       dockerfile: Dockerfile
@@ -34,20 +45,17 @@ services:
     ports:
       - "7000:7000"
     volumes:
+      - bomba:/usr/share/nginx/html/dist
       - ../shared/certs:/app/certs:ro
-      - public:/app/public:ro
     networks:
       - one
     restart: always
-
+  
 volumes:
-  public:
+  bomba:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./public/
-
+        
 networks:
   one:
     driver: bridge
+   
