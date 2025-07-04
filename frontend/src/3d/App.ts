@@ -3,7 +3,7 @@ import {
 } from "@babylonjs/core/Engines/engine";
 
 import { Environment } from "./Environment";
-import { Vue } from "../Vue";
+import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue, Vue } from "../Vue";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -78,8 +78,32 @@ class app3d {
 	}
 
 	public getVue(vue: string): Vue {
-		return this.environment.getVue(vue);
+		switch (vue) {
+			case 'play': {
+				return playVue;
+			}
+			case 'home': {
+				return homeVue;
+			}
+			case 'stats': {
+				return statsVue;
+			}
+			case 'login': {
+				return loginVue;
+			}
+			case 'register': {
+				return registerVue;
+			}
+			case 'test': {
+				return testVue;
+			}
+			case 'lobby': {
+				return lobbyVue;
+			}
+		}
+		return homeVue;
 	}
+
 	public get scene() {
 		return this.environment.scene;
 	}

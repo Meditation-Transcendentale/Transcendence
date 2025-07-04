@@ -370,33 +370,6 @@ export class Gears {
 		}
 	}
 
-	public getVue(vue: string): Vue {
-		switch (vue) {
-			case 'play': {
-				return playVue;
-			}
-			case 'home': {
-				return homeVue;
-			}
-			case 'stats': {
-				return statsVue;
-			}
-			case 'login': {
-				return loginVue;
-			}
-			case 'register': {
-				return registerVue;
-			}
-			case 'test': {
-				return testVue;
-			}
-			case 'lobby': {
-				return lobbyVue;
-			}
-		}
-		return homeVue;
-	}
-
 	public dispose() {
 		for (let i = 0; i < this.meshes.length; i++) {
 			this.meshes[i]?.dispose();

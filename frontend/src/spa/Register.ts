@@ -1,5 +1,5 @@
 import { App3D } from "../3d/App";
-import { registerVue } from "../Vue";
+//import { registerVue } from "../Vue";
 import { postRequest } from "./requests";
 import Router from "./Router";
 import { raiseStatus } from "./utils";
@@ -36,6 +36,7 @@ class Register {
 		})
 
 		App3D.setVue('register');
+		const registerVue = App3D.getVue('register');
 		registerVue.windowAddEvent('login', 'click', () => {
 			Router.nav("/login");
 		})

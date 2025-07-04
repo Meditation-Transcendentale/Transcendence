@@ -24,7 +24,7 @@ services:
       - /app/node_modules
       - bomba:/app/dist
     networks:
-      - one
+      - front
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "ls"]
@@ -48,7 +48,8 @@ services:
       - bomba:/usr/share/nginx/html/dist
       - ../shared/certs:/app/certs:ro
     networks:
-      - one
+      - front
+      - api-network
     restart: always
   
 volumes:
@@ -56,6 +57,10 @@ volumes:
     driver: local
         
 networks:
-  one:
+  front:
+    name: front
     driver: bridge
+  api-network:
+    name: api-network
+    external: true
    

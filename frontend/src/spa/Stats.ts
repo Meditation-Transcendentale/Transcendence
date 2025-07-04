@@ -191,7 +191,7 @@ class Stats {
 
 	public load(params: URLSearchParams) {
 		if (!this.checkParams(params)) { return; }
-		statsVue.enable();
+		App3D.loadVue('stats');
 
 		this.ref.username.innerText = params.get("u") as string;
 
@@ -209,7 +209,7 @@ class Stats {
 	}
 
 	public async unload() {
-		statsVue.disable();
+		App3D.unloadVue('stats');
 		this.div.remove();
 	}
 

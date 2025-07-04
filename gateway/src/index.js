@@ -39,7 +39,7 @@ app.register(fastifyRateLimit, {
 });
 
 app.register(fastifyCORS, {
-	origin: [hostOrigin],
+	origin: ["*"],
 	methods: ['GET', 'POST', 'PATCH', 'DELETE'],
 	allowedHeaders: ['Content-Type'],
 	credentials: true

@@ -109,10 +109,6 @@ export class Environment {
 		this.gears.setVue(vue);
 	}
 
-	public getVue(vue: string): Vue {
-		return this.gears.getVue(vue);
-	}
-
 	public dispose() {
 		this.gears?.dispose();
 		this.camera?.dispose();
