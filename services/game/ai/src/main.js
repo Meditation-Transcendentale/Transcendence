@@ -4,61 +4,45 @@ import { predictBallState } from './physics.js';
 import { expand } from './expand.js';
 import { runMinmax } from './minmax.js';
 import { evaluateNode } from './evaluate.js';
-import {
-  heuristic_time_to_intercept,
-  heuristic_return_angle_variability,
-  heuristic_opponent_disruption,
-  heuristic_center_bias_correction,
-  heuristic_entropy_reaction,
-  heuristic_consistency
-} from './heuristics.js';
 
-function logHeuristics(node) {
-  const isAIMove = node.ballState.ballVel[0] > 0;
-  const myPaddleY = isAIMove ? node.aiPaddlePos : node.playerPaddlePos;
-  const oppPaddleY = isAIMove ? node.playerPaddlePos : node.aiPaddlePos;
-  const predictedY = node.futureBallState.ballPos[1];
+const initialBallStates = [
+  { ballPos: [-2, 3], ballVel: [0.15, 0.1] },
+  { ballPos: [2, -4], ballVel: [-0.12, 0.2] },
+  { ballPos: [0, 0], ballVel: [0.2, 0] },
+  { ballPos: [-1, 4.5], ballVel: [0.1, -0.3] },
+  { ballPos: [-2, 4.7], ballVel: [0.12, -0.05] },
+  { ballPos: [-3, -1], ballVel: [0.1, 0.5] }
+];
 
-  const log = (name, val) => console.log(`${name.padEnd(30)}: ${val.toFixed(3)}`);
+const DEPTHS = [1, 2];
 
-  console.log(`\n--- HEURISTICS FOR BEST NODE ---`);
-  log("time_to_intercept", heuristic_time_to_intercept(node, myPaddleY));
-  log("return_angle_variability", heuristic_return_angle_variability(node));
-  log("opponent_disruption", heuristic_opponent_disruption(node, oppPaddleY));
-  log("center_bias_correction", heuristic_center_bias_correction(node));
-  log("entropy_reaction", heuristic_entropy_reaction(node, oppPaddleY));
-  log("consistency", heuristic_consistency(node));
-  // log("distance_to_return", heuristic_distance_to_predicted_return(node, predictedY));
-}
+initialBallStates.forEach((initialBallState, ballIndex) => {
+  DEPTHS.forEach((DEPTH) => {
+    weightsProfiles.forEach((weights, profileIndex) => {
+      const futureBallState = predictBallState(initialBallState.ballPos, initialBallState.ballVel);
 
+      const root = new GameStateNode(
+        initialBallState,
+        0, // AI paddle position
+        0, // Player paddle position
+        futureBallState
+      );
 
-const initialBallState = {
-  ballPos: [-2, -3],
-  ballVel: [0.12, 0.3]
-};
+      console.log(`\n--- Test #${ballIndex} | Depth=${DEPTH} | Profile=${profileIndex} ---`);
+      console.log(`Initial Ball Pos: ${root.ballState.ballPos}`);
+      console.log(`Initial Ball Vel: ${root.ballState.ballVel}`);
+      console.log(`AI Paddle: ${root.aiPaddlePos}`);
+      console.log(`Player Paddle: ${root.playerPaddlePos}`);
 
-const futureBallState = predictBallState(initialBallState.ballPos, initialBallState.ballVel);
+      const best = runMinmax(root, DEPTH, true, profileIndex);
 
-const root = new GameStateNode(
-  initialBallState,
-  0, // AI paddle position
-  0, // Player paddle position
-  futureBallState
-);
-
-console.log(`Initial state:${root.ballState.ballPos}|${root.ballState.ballVel}|${root.futureBallState.ballPos}|${root.futureBallState.ballVel}`)
-
-// weightsProfiles.forEach((_, profileIndex) => {
-  // console.log(`\n--- PROFILE ${profileIndex} ---`);
-
-  const result = runMinmax(root, 3, true, 0);
-
-  console.log(`Best Score:    ${result.value}`);
-  console.log(`AI Paddle:     ${result.node.aiPaddlePos.toFixed(2)}`);
-  console.log(`Ball Pos:      [${result.node.ballState.ballPos.map(n => n.toFixed(2)).join(', ')}]`);
-  console.log(`Ball Vel:      [${result.node.ballState.ballVel.map(n => n.toFixed(2)).join(', ')}]`);
-  console.log(`Future Pos:    [${result.node.futureBallState.ballPos.map(n => n.toFixed(2)).join(', ')}]`);
-  console.log(`Future Vel:    [${result.node.futureBallState.ballVel.map(n => n.toFixed(2)).join(', ')}]`);
-
-  logHeuristics(result.node);
-// });
+      console.log(`--- Decision ---`);
+      console.log(`Best Value: ${best.value}`);
+      console.log(`Chosen Next Node:`);
+      console.log(`Ball Pos: ${best.node.ballState.ballPos}`);
+      console.log(`Ball Vel: ${best.node.ballState.ballVel}`);
+      console.log(`AI Paddle: ${best.node.aiPaddlePos}`);
+      console.log(`Player Paddle: ${best.node.playerPaddlePos}`);
+    });
+  });
+});

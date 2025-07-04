@@ -1,40 +1,31 @@
 import { weightsProfiles } from './weightsProfiles.js';
+
 import {
-  heuristic_time_to_intercept,
-  heuristic_return_angle_variability,
-  heuristic_opponent_disruption,
-  heuristic_center_bias_correction,
-  heuristic_entropy_reaction,
-  heuristic_consistency
+  h_distanceToBall,
+  h_opponentMisalign,
+  h_ballDirectionFavor,
+  h_centering,
+  h_timeToCollision
 } from './heuristics.js';
 
-export function evaluateNode(node, weightIndex) {
-  const [ttiW, varW, disruptW, centerW, entropyW, consistencyW] = weightsProfiles[weightIndex];
+export function evaluateNode(stateNode, weightsIndex) {
+  const aiY = stateNode.aiPaddlePos;
+  const playerY = stateNode.playerPaddlePos;
+  const collisionY = stateNode.ballState.ballPos[1];
+  const ballDirX = stateNode.ballState.ballVel[0];
+  const framesToCollision = stateNode.framesToCollision ?? 0;
 
-  const isAIMove = node.ballState.ballVel[0] >= 0;
-  const myPaddleY = isAIMove ? node.aiPaddlePos : node.playerPaddlePos;
-  const oppPaddleY = isAIMove ? node.playerPaddlePos : node.aiPaddlePos;
-
-  const tti = heuristic_time_to_intercept(node, myPaddleY);
-  const variability = heuristic_return_angle_variability(node);
-  const disruption = heuristic_opponent_disruption(node, oppPaddleY);
-  const center = heuristic_center_bias_correction(node);
-  const entropy = heuristic_entropy_reaction(node, oppPaddleY);
-  const consistency = heuristic_consistency(node);
-
-  // console.log(`Score:${ttiW * tti +
-  //   varW * variability +
-  //   disruptW * disruption +
-  //   centerW * center +
-  //   entropyW * entropy +
-  //   consistencyW * consistency}`);
+  const h1 = h_distanceToBall(aiY, collisionY);
+  const h2 = h_opponentMisalign(playerY, collisionY);
+  const h3 = h_ballDirectionFavor(ballDirX);
+  const h4 = h_centering(aiY);
+  const h5 = h_timeToCollision(framesToCollision);
 
   return (
-    ttiW * tti +
-    varW * variability +
-    disruptW * disruption +
-    centerW * center +
-    entropyW * entropy +
-    consistencyW * consistency
+    weightsProfiles[weightsIndex].h1 * h1 +
+    weightsProfiles[weightsIndex].h2 * h2 +
+    weightsProfiles[weightsIndex].h3 * h3 +
+    weightsProfiles[weightsIndex].h4 * h4 +
+    weightsProfiles[weightsIndex].h5 * h5
   );
 }

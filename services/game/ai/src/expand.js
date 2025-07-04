@@ -1,11 +1,11 @@
 import { GameStateNode } from './GameStateNode.js';
 import { predictBallState } from './physics.js';
-import { BALL_ACCELERATION, STEP_SIZE, PADDLE_HEIGHT, MAP_HEIGHT, WALL_SIZE } from './constants.js';
+import { BALL_ACCELERATION, STEP_SIZE, PADDLE_HEIGHT, MAP_HEIGHT, WALL_SIZE, PADDLE_AI_X } from './constants.js';
 import { evaluateNode } from './evaluate.js';
 
 function generateFullRange() {
   const lower = -(MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) * 0.5;
-  const upper =  (MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) * 0.5;
+  const upper = (MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) * 0.5;
   const range = [];
   for (let y = lower; y <= upper; y += STEP_SIZE) {
     range.push(Math.round(y * 100) / 100);
@@ -15,10 +15,14 @@ function generateFullRange() {
 
 export function expand(node) {
   const children = [];
-  const isAIMove = node.ballState.ballVel[0] > 0;
+  const isAIMove = node.ballState.ballVel[0] >= 0;
 
+  let newVelX;
   const targetY = node.futureBallState.ballPos[1];
-  const newVelX = node.ballState.ballVel[0] * -BALL_ACCELERATION;
+  if (Math.abs(node.ballState.ballPos[0]) !== PADDLE_AI_X)
+    newVelX = node.ballState.ballVel[0];
+  else
+    newVelX = -node.ballState.ballVel[0] * BALL_ACCELERATION;
   const paddlePositions = generateFullRange();
 
   for (const paddlePos of paddlePositions) {
@@ -38,13 +42,17 @@ export function expand(node) {
       ballVel: [newVelX, newVelY]
     };
 
+    const dx = Math.abs(futureBallState.ballPos[0] - node.futureBallState.ballPos[0]);
+    const vx = Math.abs(newBallVel[0]);
+    const framesToCollision = vx > 0 ? dx / vx : 0;
+
     const child = new GameStateNode(
       newBallState,
       aiPaddle,
       playerPaddle,
       futureBallState
     );
-    // console.log(`newChild:${child.ballState.ballPos}|${child.ballState.ballVel}|${child.aiPaddlePos}|${child.playerPaddlePos}|${child.futureBallState.ballPos}|${child.futureBallState.ballVel}`)
+    child.framesToCollision = framesToCollision;
     children.push(child);
   }
 

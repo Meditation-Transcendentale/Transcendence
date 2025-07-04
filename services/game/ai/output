@@ -1,257 +1,780 @@
-Initial state:4,0.8|0.4,0.112|9.125,2.235|0.4,0.112
-0|val:0.5681104463129788
-0|val:0.5893586214141328
-0|val:0.695845205023369
-0|val:0.8055377499830676
-0|val:0.8723565409903935
-0|val:0.8041261075218877
-0|val:0.7311438881344632
-0|val:0.6800527136459629
-0|val:0.7597260829568626
-0|val:0.7797671965660589
-0|val:0.7057471645028282
-0|val:0.7250453130014669
-0|val:0.7976124063008537
-0|val:0.8703191580808595
-0|val:0.8684155053818687
-0|val:0.7885647610163942
-0|val:0.6855751449152432
-0|val:0.6243557633278738
-0|val:0.6679964117338982
-0|val:0.6269222236296308
-1|MIN Sending best: 0.5681104463129788
-0|val:0.5468003136732733
-1|MIN PRUNING: 0.5468003136732733|0.5681104463129788
-1|MIN Sending best: 0.5468003136732733
-0|val:0.7080029083734876
-0|val:0.8129099245200733
-0|val:0.7722241570542636
-0|val:0.7319793744300135
-0|val:0.6838380599120748
-0|val:0.7194109627994498
-0|val:0.7895449191039706
-0|val:0.7168402663118889
-0|val:0.70815522786127
-0|val:0.7865771620044633
-0|val:0.8605374072758194
-0|val:0.9087251337067821
-0|val:0.8282725715112397
-0|val:0.7489085775336535
-0|val:0.6710528619092981
-0|val:0.7229761781892339
-0|val:0.7243787811927473
-0|val:0.6147595479819066
-0|val:0.6004228450471434
-0|val:0.6486660083858771
-1|MIN Sending best: 0.6004228450471434
-0|val:0.7747541330061232
-0|val:0.8531558880206247
-0|val:0.9286761458742393
-0|val:0.8492304635800523
-0|val:0.7708324924404981
-0|val:0.692666993236865
-0|val:0.7174630982908674
-0|val:0.7764435843695794
-0|val:0.6664593266481024
-0|val:0.6319831681099238
-0|val:0.6755662686532709
-0|val:0.7224705173682544
-1|MIN Sending best: 0.6319831681099238
-0|val:0.7717321651824154
-0|val:0.6987891912616484
-0|val:0.7213933555118157
-0|val:0.7996880885444617
-0|val:0.8781185049179074
-0|val:0.9113016937607645
-0|val:0.8319622829872688
-0|val:0.7536343759055187
-0|val:0.6755608744262966
-0|val:0.7319825227539558
-0|val:0.7407651227508366
-0|val:0.6282696282886884
-1|MIN PRUNING: 0.6282696282886884|0.6319831681099238
-1|MIN Sending best: 0.6282696282886884
-0|val:0.6492721317847584
-0|val:0.7512173833164548
-0|val:0.8215927414136767
-0|val:0.7777649335221667
-0|val:0.7391419099675324
-0|val:0.6775046229926542
-0|val:0.7287467068750699
-0|val:0.7588376381458597
-0|val:0.6862123557481659
-0|val:0.7411392938883103
-0|val:0.8186984624268201
-0|val:0.8911085667766954
-0|val:0.8992040260356329
-0|val:0.8188686077431012
-0|val:0.73982893040143
-0|val:0.6620415495054578
-0|val:0.7158763618159216
-0|val:0.6785375476991905
-0|val:0.5750499526228237
-1|MIN PRUNING: 0.5750499526228237|0.6319831681099238
-1|MIN Sending best: 0.5750499526228237
-0|val:0.5962735107969188
-1|MIN PRUNING: 0.5962735107969188|0.6319831681099238
-1|MIN Sending best: 0.5962735107969188
-0|val:0.5434563052701123
-1|MIN PRUNING: 0.5434563052701123|0.6319831681099238
-1|MIN Sending best: 0.5434563052701123
-0|val:0.6176373497304034
-1|MIN PRUNING: 0.6176373497304034|0.6319831681099238
-1|MIN Sending best: 0.6176373497304034
-0|val:0.5942954958953142
-1|MIN PRUNING: 0.5942954958953142|0.6319831681099238
-1|MIN Sending best: 0.5942954958953142
-0|val:0.6544013367819661
-0|val:0.7589733805207195
-0|val:0.8666764985345468
-0|val:0.8446205819101987
-0|val:0.7973485567904142
-0|val:0.7253194977978261
-0|val:0.6816945857137306
-0|val:0.7619861574777496
-0|val:0.6951705081883031
-0|val:0.7351466908728166
-0|val:0.809646322966709
-0|val:0.882136772477549
-0|val:0.946119665527386
-0|val:0.8658946122807181
-0|val:0.7858767370691895
-0|val:0.7043632768405077
-0|val:0.6486571452543854
-0|val:0.6688260056906354
-0|val:0.5620947791859258
-1|MIN PRUNING: 0.5620947791859258|0.6319831681099238
-1|MIN Sending best: 0.5620947791859258
-0|val:0.7152256091203889
-0|val:0.8184496147476308
-0|val:0.8168130642643956
-0|val:0.775097865691927
-0|val:0.7375989492521126
-0|val:0.66722960588911
-0|val:0.7422574046552323
-0|val:0.6996734536610871
-0|val:0.7233722793636099
-0|val:0.8017263206162086
-0|val:0.8777862321300027
-0|val:0.9502536750565782
-0|val:0.8856122123503343
-0|val:0.8058228508448062
-0|val:0.7278363603586504
-0|val:0.6734370340264388
-0|val:0.7193985136576484
-0|val:0.6101246633863315
-1|MIN PRUNING: 0.6101246633863315|0.6319831681099238
-1|MIN Sending best: 0.6101246633863315
-0|val:0.9459284830929149
-0|val:0.9062932090581322
-0|val:0.8278429049408997
-0|val:0.7496032404129227
-0|val:0.671590581596629
-0|val:0.7358004727849337
-0|val:0.663331078310924
-0|val:0.6600831954977195
-0|val:0.7025637104780773
-0|val:0.7480760042488148
-1|MIN Sending best: 0.6600831954977195
-0|val:0.6937279242381509
-0|val:0.7025841835706256
-0|val:0.7167777752102162
-0|val:0.6999991628243851
-0|val:0.7781904295101344
-0|val:0.8565280788855696
-0|val:0.9335877556598207
-0|val:0.9258833244873679
-0|val:0.8469364753853512
-0|val:0.7686779280753744
-0|val:0.6906902340199602
-0|val:0.7148068824536584
-0|val:0.6715932795601378
-0|val:0.6446021047777448
-1|MIN PRUNING: 0.6446021047777448|0.6600831954977195
-1|MIN Sending best: 0.6446021047777448
-0|val:0.713677322993889
-0|val:0.817418284103854
-0|val:0.8486825863513556
-0|val:0.8061203275705742
-0|val:0.7661188435267152
-0|val:0.6950627482081686
-0|val:0.7139566468590927
-0|val:0.7039870150972057
-0|val:0.7195831628460756
-0|val:0.7979463864978418
-0|val:0.873446221705423
-0|val:0.9458812609501615
-0|val:0.9138881539545103
-0|val:0.833586496087211
-0|val:0.7549823836948328
-0|val:0.677330717425003
-0|val:0.6871983091865108
-0|val:0.610848931319697
-1|MIN PRUNING: 0.610848931319697|0.6600831954977195
-1|MIN Sending best: 0.610848931319697
-0|val:0.6621651112132606
-0|val:0.7671304046324877
-0|val:0.8751397422623682
-0|val:0.8844206528566368
-0|val:0.833518752041325
-0|val:0.7604393614140921
-0|val:0.6896500037567763
-0|val:0.726604837613471
-0|val:0.6907739148678349
-0|val:0.7402371638647952
-0|val:0.8140778483495611
-0|val:0.8865391139447523
-0|val:0.9591866274478292
-0|val:0.9013101969410566
-0|val:0.8213620113731082
-0|val:0.7356119151242405
-0|val:0.6241301999619002
-1|MIN PRUNING: 0.6241301999619002|0.6600831954977195
-1|MIN Sending best: 0.6241301999619002
-0|val:0.5339564584708133
-1|MIN PRUNING: 0.5339564584708133|0.6600831954977195
-1|MIN Sending best: 0.5339564584708133
-0|val:0.5426178185985692
-1|MIN PRUNING: 0.5426178185985692|0.6600831954977195
-1|MIN Sending best: 0.5426178185985692
-0|val:0.6009583852428173
-1|MIN PRUNING: 0.6009583852428173|0.6600831954977195
-1|MIN Sending best: 0.6009583852428173
-0|val:0.6618459375631547
-0|val:0.7646477036059004
-0|val:0.8712258418901442
-0|val:0.8881928022023493
-0|val:0.848247067914244
-0|val:0.779746086448695
-0|val:0.7089101806671607
-0|val:0.7046843259159465
-0|val:0.6779521144525975
-0|val:0.7502971903253033
-0|val:0.8269371867772859
-0|val:0.8993573972583948
-0|val:0.9718883480350816
-0|val:0.923122699909895
-0|val:0.8430548953215034
-0|val:0.7632670873213054
-0|val:0.6613449339721253
-0|val:0.6471238762221687
-1|MIN PRUNING: 0.6471238762221687|0.6600831954977195
-1|MIN Sending best: 0.6471238762221687
-2|MAX Sending best: 0.6600831954977195
-Best Score:    0.6600831954977195
-AI Paddle:     2.53
-Ball Pos:      [9.13, 2.23]
-Ball Vel:      [-0.44, -0.15]
-Future Pos:    [-9.13, -3.88]
-Future Vel:    [-0.44, -0.15]
 
---- HEURISTICS FOR BEST NODE ---
-time_to_intercept             : 0.388
-return_angle_variability      : 0.990
-opponent_disruption           : 0.017
-center_bias_correction        : 0.000
-entropy_reaction              : 0.000
-consistency                   : 0.000
+--- Test #0 | Depth=1 | Profile=0 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.849835
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,0.0014999999999999458
+AI Paddle: -1.17
+Player Paddle: 0
+
+--- Test #0 | Depth=1 | Profile=1 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.6465750000000001
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,0.0014999999999999458
+AI Paddle: -1.17
+Player Paddle: 0
+
+--- Test #0 | Depth=1 | Profile=2 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.8056849999999999
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,0.0014999999999999458
+AI Paddle: -1.17
+Player Paddle: 0
+
+--- Test #0 | Depth=1 | Profile=3 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7881800000000001
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,0.0014999999999999458
+AI Paddle: -1.17
+Player Paddle: 0
+
+--- Test #0 | Depth=1 | Profile=4 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.59915
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,-0.4985
+AI Paddle: -0.17
+Player Paddle: 0
+
+--- Test #0 | Depth=2 | Profile=0 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.800335
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,-0.4985
+AI Paddle: -0.17
+Player Paddle: 0
+
+--- Test #0 | Depth=2 | Profile=1 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.611785
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,-0.4985
+AI Paddle: -0.17
+Player Paddle: 0
+
+--- Test #0 | Depth=2 | Profile=2 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.760685
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,-0.4985
+AI Paddle: -0.17
+Player Paddle: 0
+
+--- Test #0 | Depth=2 | Profile=3 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7431800000000001
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,-0.4985
+AI Paddle: -0.17
+Player Paddle: 0
+
+--- Test #0 | Depth=2 | Profile=4 ---
+Initial Ball Pos: -2,3
+Initial Ball Vel: 0.15,0.1
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.5444999999999999
+Chosen Next Node:
+Ball Pos: 9.125,-1.167
+Ball Vel: 0.15,-0.4985
+AI Paddle: -0.17
+Player Paddle: 0
+
+--- Test #1 | Depth=1 | Profile=0 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.33176999999999995
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #1 | Depth=1 | Profile=1 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.3009899999999999
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #1 | Depth=1 | Profile=2 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.35650000000000004
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #1 | Depth=1 | Profile=3 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.24113999999999997
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #1 | Depth=1 | Profile=4 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.27575
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #1 | Depth=2 | Profile=0 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.32276999999999995
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #1 | Depth=2 | Profile=1 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.26498999999999995
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #1 | Depth=2 | Profile=2 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.34299999999999997
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #1 | Depth=2 | Profile=3 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.23213999999999996
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #1 | Depth=2 | Profile=4 ---
+Initial Ball Pos: 2,-4
+Initial Ball Vel: -0.12,0.2
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.25325
+Chosen Next Node:
+Ball Pos: -9.125,-3.958
+Ball Vel: -0.12,-0.494
+AI Paddle: 0
+Player Paddle: -2.97
+
+--- Test #2 | Depth=1 | Profile=0 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.84895
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.015
+AI Paddle: 0.03
+Player Paddle: 0
+
+--- Test #2 | Depth=1 | Profile=1 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.5989500000000001
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.015
+AI Paddle: 0.03
+Player Paddle: 0
+
+--- Test #2 | Depth=1 | Profile=2 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7991
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.015
+AI Paddle: 0.03
+Player Paddle: 0
+
+--- Test #2 | Depth=1 | Profile=3 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7997000000000001
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.015
+AI Paddle: 0.03
+Player Paddle: 0
+
+--- Test #2 | Depth=1 | Profile=4 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.60465
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.465
+AI Paddle: 0.93
+Player Paddle: 0
+
+--- Test #2 | Depth=2 | Profile=0 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7966500000000001
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.465
+AI Paddle: 0.93
+Player Paddle: 0
+
+--- Test #2 | Depth=2 | Profile=1 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.56605
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.465
+AI Paddle: 0.93
+Player Paddle: 0
+
+--- Test #2 | Depth=2 | Profile=2 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7515
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.465
+AI Paddle: 0.93
+Player Paddle: 0
+
+--- Test #2 | Depth=2 | Profile=3 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7515000000000001
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.465
+AI Paddle: 0.93
+Player Paddle: 0
+
+--- Test #2 | Depth=2 | Profile=4 ---
+Initial Ball Pos: 0,0
+Initial Ball Vel: 0.2,0
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.54665
+Chosen Next Node:
+Ball Pos: 9.125,0
+Ball Vel: 0.2,-0.465
+AI Paddle: 0.93
+Player Paddle: 0
+
+--- Test #3 | Depth=1 | Profile=0 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.8498249999999999
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.0024999999999999467
+AI Paddle: -1.87
+Player Paddle: 0
+
+--- Test #3 | Depth=1 | Profile=1 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.674825
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.0024999999999999467
+AI Paddle: -1.87
+Player Paddle: 0
+
+--- Test #3 | Depth=1 | Profile=2 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.809225
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.0024999999999999467
+AI Paddle: -1.87
+Player Paddle: 0
+
+--- Test #3 | Depth=1 | Profile=3 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7812
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.0024999999999999467
+AI Paddle: -1.87
+Player Paddle: 0
+
+--- Test #3 | Depth=1 | Profile=4 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.59515
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.4525
+AI Paddle: -0.97
+Player Paddle: 0
+
+--- Test #3 | Depth=2 | Profile=0 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.795275
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.4525
+AI Paddle: -0.97
+Player Paddle: 0
+
+--- Test #3 | Depth=2 | Profile=1 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.640175
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.4525
+AI Paddle: -0.97
+Player Paddle: 0
+
+--- Test #3 | Depth=2 | Profile=2 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7596250000000001
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.4525
+AI Paddle: -0.97
+Player Paddle: 0
+
+--- Test #3 | Depth=2 | Profile=3 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7315
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.4525
+AI Paddle: -0.97
+Player Paddle: 0
+
+--- Test #3 | Depth=2 | Profile=4 ---
+Initial Ball Pos: -1,4.5
+Initial Ball Vel: 0.1,-0.3
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.5359
+Chosen Next Node:
+Ball Pos: 9.125,-1.875
+Ball Vel: 0.1,-0.4525
+AI Paddle: -0.97
+Player Paddle: 0
+
+--- Test #4 | Depth=1 | Profile=0 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.849375
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,0.0175
+AI Paddle: 0.03
+Player Paddle: 0
+
+--- Test #4 | Depth=1 | Profile=1 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.601375
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,0.0175
+AI Paddle: 0.03
+Player Paddle: 0
+
+--- Test #4 | Depth=1 | Profile=2 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.799875
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,0.0175
+AI Paddle: 0.03
+Player Paddle: 0
+
+--- Test #4 | Depth=1 | Profile=3 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.8013
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,-0.0325
+AI Paddle: 0.13
+Player Paddle: 0
+
+--- Test #4 | Depth=1 | Profile=4 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.6083999999999999
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,-0.48250000000000004
+AI Paddle: 1.03
+Player Paddle: 0
+
+--- Test #4 | Depth=2 | Profile=0 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.799875
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,-0.48250000000000004
+AI Paddle: 1.03
+Player Paddle: 0
+
+--- Test #4 | Depth=2 | Profile=1 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.568825
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,-0.48250000000000004
+AI Paddle: 1.03
+Player Paddle: 0
+
+--- Test #4 | Depth=2 | Profile=2 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.754875
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,-0.48250000000000004
+AI Paddle: 1.03
+Player Paddle: 0
+
+--- Test #4 | Depth=2 | Profile=3 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7552
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,-0.48250000000000004
+AI Paddle: 1.03
+Player Paddle: 0
+
+--- Test #4 | Depth=2 | Profile=4 ---
+Initial Ball Pos: -2,4.7
+Initial Ball Vel: 0.12,-0.05
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.5521499999999999
+Chosen Next Node:
+Ball Pos: 9.125,0.065
+Ball Vel: 0.12,-0.48250000000000004
+AI Paddle: 1.03
+Player Paddle: 0
+
+--- Test #5 | Depth=1 | Profile=0 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.9162750000000001
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
+
+--- Test #5 | Depth=1 | Profile=1 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.754675
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
+
+--- Test #5 | Depth=1 | Profile=2 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.888375
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
+
+--- Test #5 | Depth=1 | Profile=3 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.909
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
+
+--- Test #5 | Depth=1 | Profile=4 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.81065
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
+
+--- Test #5 | Depth=2 | Profile=0 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.8777750000000001
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
+
+--- Test #5 | Depth=2 | Profile=1 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.730175
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
+
+--- Test #5 | Depth=2 | Profile=2 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.853375
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
+
+--- Test #5 | Depth=2 | Profile=3 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.8740000000000001
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
+
+--- Test #5 | Depth=2 | Profile=4 ---
+Initial Ball Pos: -3,-1
+Initial Ball Vel: 0.1,0.5
+AI Paddle: 0
+Player Paddle: 0
+--- Decision ---
+Best Value: 0.7721499999999999
+Chosen Next Node:
+Ball Pos: 9.125,4.125
+Ball Vel: 0.1,0.14749999999999996
+AI Paddle: 3.83
+Player Paddle: 0
