@@ -1,63 +1,69 @@
-// services/game/pongBR-physics/src/index.js
-import { connect, JSONCodec } from 'nats';
+// services/game/pong-physics/src/index.js
+import { connect } from 'nats';
 import dotenv from 'dotenv';
 dotenv.config();
-
 import { Physics } from './Physics.js';
-import { decodeStateUpdate, encodeStateUpdate } from './binary.js';
+import {
+	decodePhysicsRequest,
+	encodePhysicsResponse,
+} from './proto/helper.js';
 
-const SERVICE_NAME = process.env.SERVICE_NAME || 'pongBR-physics';
+const SERVICE_NAME = process.env.SERVICE_NAME || 'pong-physics';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
-const jc = JSONCodec();
-
 const endedGames = new Set();
 
-async function start() {
-	const nc = await connect({ servers: NATS_URL });
-	console.log(`[${SERVICE_NAME}] connected to NATS`);
-
-	const endSub = nc.subscribe('games.ia.*.match.end');
-	(async () => {
-		for await (const msg of endSub) {
-			const { gameId } = jc.decode(msg.data);
-			endedGames.add(gameId);
-			Physics.removeGame(gameId);
-			console.log(`[${SERVICE_NAME}] Stopped processing for game ${gameId}`);
-		}
-	})();
-
-	//const inputSub = nc.subscribe('game.br.input');
-	//(async () => {
-	//	for await (const msg of inputSub) {
-	//		console.log(`[${SERVICE_NAME}] Received input message`);
-	//		const { gameId, inputs } = jc.decode(msg.data);
-	//		if (endedGames.has(gameId)) continue;
-	//
-	//		for (const { playerId, type } of inputs) {
-	//			Physics.handleImmediateInput({
-	//				gameId,
-	//				inputs: [
-	//					{ playerId, input: { type } }
-	//				]
-	//			});
-	//		}
-	//	}
-	//})();
-
-	const sub = nc.subscribe('games.br.*.physics.request');
+const handleEnd = async (sub) => {
 	for await (const msg of sub) {
-		const data = jc.decode(msg.data);
+		const [, , gameId] = msg.subject.split('.');
+		endedGames.add(gameId);
+		Physics.removeGame(gameId);
+		console.log(`[${SERVICE_NAME}] Stopped processing for game ${gameId}`);
+	}
+}
+
+const handlePhysicsRequest = async (sub) => {
+	for await (const msg of sub) {
+		const data = decodePhysicsRequest(msg.data);
 
 		if (endedGames.has(data.gameId)) {
 			console.log(`[${SERVICE_NAME}] Ignoring tick ${data.tick} for ended game ${data.gameId}`);
 			continue;
 		}
 
-		const result = Physics.processTick(data);
-		const buffer = encodeStateUpdate(result.gameId, result.tick, result.balls, result.paddles);
-		//const temp = decodeStateUpdate(buffer);
-		nc.publish('game.state', buffer);
+		const { gameId, tick, balls, paddles, events } = Physics.processTick(data);
+		let scorerId = null;
+		let goalScored = false;
+		if (events && events.length) {
+			for (const ev of events) {
+				if (ev.type === 'goal') {
+					goalScored = true;
+					scorerId = ev.playerId;
+				}
+			}
+		}
+		let goal = null;
+		if (goalScored)
+			goal = { scorerId };
+		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal });
+		msg.respond(buffer);
 	}
+};
+
+async function start() {
+	const nc = await connect({ servers: NATS_URL });
+	console.log(`[${SERVICE_NAME}] connected to NATS`);
+
+	/**
+	   * Handle game end events by tearing down state
+	   * @param {import('nats').Msg} msg
+	   */
+
+	const endBr = nc.subscribe('games.br.*.match.end');
+	handleEnd(endBr);
+
+	const subBr = nc.subscribe("games.br.*.physics.request");
+
+	handlePhysicsRequest(subBr);
 }
 
 start();

@@ -11,7 +11,7 @@ export class Game {
 		this.paddleEntities = {};
 		this.wallEntities = {};
 		this.pillarEntities = {};
-		this.options = initialState.options || {};
+		this.options = {};
 		this.players = this.options.players || [];
 		this.arenaRadius = this.calculateArenaRadius(this.options.maxPlayers || this.players.length || 2);
 
