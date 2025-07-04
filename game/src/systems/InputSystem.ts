@@ -20,10 +20,9 @@ export class InputSystem extends System {
             if (entity.hasComponent(InputComponent) && entity.hasComponent(PaddleComponent)) {
                 const input = entity.getComponent(InputComponent)!;
 				const paddle = entity.getComponent(PaddleComponent)!;
-                const speed = 0.1 * (deltaTime / 16.67);
+                let speed = 0.3;
 				if (this.inputManager.isKeyPressed("Space")) {
 					input.down = true;
-					console.log("input down: ", input.down);
                 } else if (input.down == true){
                     input.down = false;
                 }
@@ -37,12 +36,13 @@ export class InputSystem extends System {
 					let direction = targetPosition.subtract(paddle.position);
 					const distance = direction.length();
 					direction.y = paddle.position.y;
-					if (distance > 0.05)
-						paddle.rotation.y = Math.atan2(direction.x, direction.z);
-					if (distance < 0.05){
+
+					if (distance < 0.01){
 						paddle.velocity = Vector3.Zero();
 					} else {
+						paddle.rotation.y = Math.atan2(direction.x, direction.z);
 						direction.normalize();
+						speed *= Math.min(distance, 1);
 						paddle.velocity = Vector3.Lerp(paddle.velocity, direction.scale(speed), 0.5);
 					}
 				}

@@ -13,7 +13,7 @@ export class ThinInstanceSystem extends System {
     private paddleManager: ThinInstanceManager;
 	private shieldManager: ThinInstanceManager;
     private wallManager: ThinInstanceManager;
-    private pillarManager: ThinInstanceManager;
+    // private pillarManager: ThinInstanceManager;
     private camera: Camera;
     private frameCount: number = 0;
 
@@ -22,7 +22,7 @@ export class ThinInstanceSystem extends System {
         paddleManager: ThinInstanceManager,
 		shieldManager: ThinInstanceManager,
         wallManager: ThinInstanceManager,
-        pillarManager: ThinInstanceManager,
+        // pillarManager: ThinInstanceManager,
         camera: Camera
     ) {
         super();
@@ -30,7 +30,7 @@ export class ThinInstanceSystem extends System {
         this.paddleManager = paddleManager;
 		this.shieldManager = shieldManager;
         this.wallManager = wallManager;
-        this.pillarManager = pillarManager;
+        // this.pillarManager = pillarManager;
         this.camera = camera;
     }
 
@@ -38,16 +38,7 @@ export class ThinInstanceSystem extends System {
 		this.frameCount++;
 		this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
 		this.paddleManager.update(entities, PaddleComponent, this.camera, this.frameCount);
-		
-		// const shieldEntities = entities.filter(e => e.hasComponent(ShieldComponent));
-		// const activeShieldEntities = shieldEntities.filter(e => {
-		// 	const shield = e.getComponent(ShieldComponent);
-		// 	return shield && shield.isActive;
-		// });
-		
 		this.shieldManager.update(entities, ShieldComponent, this.camera, this.frameCount);
 		this.wallManager.update(entities, WallComponent, this.camera, this.frameCount);
-		this.pillarManager.update(entities, PillarComponent, this.camera, this.frameCount);
-		
 	}
 }

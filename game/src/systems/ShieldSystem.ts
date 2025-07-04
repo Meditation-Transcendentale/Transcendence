@@ -30,7 +30,6 @@ export class ShieldSystem extends System {
 		} else if (performance.now() - shield.lastInputDelay >= 500) {
 			shield.angleFactor = Math.max(0.5, shield.angleFactor - 0.01);
 		}
-
 		shield.oldAngleFactor = shield.angleFactor;
 	}
 
