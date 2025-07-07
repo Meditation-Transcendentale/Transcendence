@@ -1,6 +1,6 @@
 import { App3D } from "../3d/App";
 import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
-import { lobbyVue } from "../Vue";
+// import { lobbyVue } from "../Vue";
 import Router from "./Router";
 import { User } from "./User";
 
@@ -46,6 +46,7 @@ export default class Lobby {
 
 		App3D.setVue("lobby");
 
+		const lobbyVue = App3D.getVue('lobby');
 		lobbyVue.windowAddEvent('BACK', 'click', () => {
 			Router.nav("/play", false, true);
 		})
