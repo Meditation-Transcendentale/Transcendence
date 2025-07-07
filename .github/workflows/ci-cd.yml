@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  DOCKER_COMPOSE_FILES: -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml
+  DOCKER_COMPOSE_FILES: -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml -f ./frontend/docker-compose.yml -f ./services/game/docker-compose.dev.yml
 
 jobs:
   Docker-Services-Tests:
