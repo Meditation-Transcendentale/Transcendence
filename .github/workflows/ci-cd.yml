@@ -43,6 +43,7 @@ jobs:
           echo "FT_API_UID=u-s4t2ud-a52a0d9baca0584c24f69c90aaea3aae24b86c22f3e4e27838f8ce9249d5fd93" >> .env
           echo "FT_API_SECRET=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" >> .env
           echo "CDN_URL=https://localhost:3002/cdn" >> .env
+          echo "HOSTNAME=localhost" >> .env
 
       - name: test
         run: cat .env
