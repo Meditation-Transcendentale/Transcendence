@@ -49,3 +49,9 @@ __snapshots__/
 
 cert-database/
 stat.md
+
+metrics/grafana/plugins
+metrics/grafana/csv
+metrics/grafana/pdf
+metrics/grafana/png
+
