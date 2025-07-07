@@ -1,11 +1,10 @@
 export const weightsProfiles = [
-  { h1: 0.45, h2: 0.1, h3: 0.35, h4: 0.05, h5: 0.05 },
+  // Profile 0: Precision Blocker — exact alignment, low angle, center-weighted
+  { h1: 0.6, h2: 0.3, h3: 0.25, h4: 0.0, h5: 0.0 },
 
-  { h1: 0.35, h2: 0.4, h3: 0.2, h4: 0.0, h5: 0.05 },
+  // Profile 1: Curved Edge Attacker — maximum curve, wall-skimming, low stability
+  { h1: 0.1, h2: 0.0, h3: 0.0, h4: 0.6, h5: 0.3 },
 
-  { h1: 0.4, h2: 0.15, h3: 0.3, h4: 0.05, h5: 0.1 },
-
-  { h1: 0.3, h2: 0.1, h3: 0.45, h4: 0.1, h5: 0.05 },
-
-  { h1: 0.25, h2: 0.25, h3: 0.25, h4: 0.15, h5: 0.1 }
+  // Profile 2: Conservative Anchor — prefers center, straightness, avoids wall play
+  { h1: 0.2, h2: 0.3, h3: 0.4, h4: 0.0, h5: 0.1 }
 ];

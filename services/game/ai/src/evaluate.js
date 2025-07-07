@@ -1,31 +1,32 @@
+import {
+  h_alignment,
+  h_straightness,
+  h_stability,
+  h_curvature,
+  h_marginToWall
+} from './heuristics.js';
 import { weightsProfiles } from './weightsProfiles.js';
 
-import {
-  h_distanceToBall,
-  h_opponentMisalign,
-  h_ballDirectionFavor,
-  h_centering,
-  h_timeToCollision
-} from './heuristics.js';
-
 export function evaluateNode(stateNode, weightsIndex) {
-  const aiY = stateNode.aiPaddlePos;
-  const playerY = stateNode.playerPaddlePos;
-  const collisionY = stateNode.ballState.ballPos[1];
-  const ballDirX = stateNode.ballState.ballVel[0];
-  const framesToCollision = stateNode.framesToCollision ?? 0;
+  const myPaddle = stateNode.ballState.ballVel[0] > 0 ? stateNode.aiPaddlePos : stateNode.playerPaddlePos;
+  const targetY = stateNode.ballState.ballPos[1];
+  const velY = stateNode.futureBallState.ballVel[1];
 
-  const h1 = h_distanceToBall(aiY, collisionY);
-  const h2 = h_opponentMisalign(playerY, collisionY);
-  const h3 = h_ballDirectionFavor(ballDirX);
-  const h4 = h_centering(aiY);
-  const h5 = h_timeToCollision(framesToCollision);
+  const w = weightsProfiles[weightsIndex];
 
+  const h1 = h_alignment(myPaddle, targetY);
+  const h2 = h_straightness(velY);
+  const h3 = h_stability(myPaddle);
+  const h4 = h_curvature(velY);
+  const h5 = h_marginToWall(myPaddle);
+
+  console.log(`${stateNode.ballState.ballPos[0]}|${stateNode.ballState.ballPos[1]}|${stateNode.ballState.ballVel[0]}|${stateNode.ballState.ballVel[1]}|${stateNode.aiPaddlePos}|${stateNode.playerPaddlePos}`)
+  // console.log()
   return (
-    weightsProfiles[weightsIndex].h1 * h1 +
-    weightsProfiles[weightsIndex].h2 * h2 +
-    weightsProfiles[weightsIndex].h3 * h3 +
-    weightsProfiles[weightsIndex].h4 * h4 +
-    weightsProfiles[weightsIndex].h5 * h5
+    w.h1 * h1 +
+    w.h2 * h2 +
+    w.h3 * h3 +
+    w.h4 * h4 +
+    w.h5 * h5
   );
 }

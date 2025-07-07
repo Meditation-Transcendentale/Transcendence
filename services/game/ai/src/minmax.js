@@ -33,18 +33,23 @@ function minmax(node, depth, alpha, beta, maximizingPlayer, weightIndex, origina
     const val = losing
       ? (maximizingPlayer ? 999 : -999)
       : evaluateNode(node, weightIndex);
+    console.log("Leaf Node Evaluation:", val);
+    console.log("Ball X at leaf:", node.futureBallState.ballPos[0]);
     return { value: val, node };
   }
   
   const children = expand(node);
+  console.log("Depth:", depth, "| Children:", children.length, "| Maximizing:", maximizingPlayer);
     
   if (maximizingPlayer) {
     let best = { value: -999, node: null };
     for (const child of children) {
       const result = minmax(child, depth - 1, alpha, beta, false, weightIndex, originalDepth);
-      // console.log(`max:Child Eval: Paddle=${child.aiPaddlePos}|${child.playerPaddlePos} Value=${result.value}`);
+      if (Math.abs(result.value) != 999)
+          console.log(`Value: ${result.value}`);
       best = max(best, { value: result.value, node: child });
       alpha = Math.max(alpha, best.value);
+      console.log("Child Value:", result.value, "| Current Best:", best.value, "| Paddle:", best.node.playerPaddlePos, "|Paddle:", best.node.aiPaddlePos);
       if (alpha >= beta) {
         break;
       }
@@ -54,9 +59,9 @@ function minmax(node, depth, alpha, beta, maximizingPlayer, weightIndex, origina
     let best = { value: 999, node: null };
     for (const child of children) {
       const result = minmax(child, depth - 1, alpha, beta, true, weightIndex, originalDepth);
-      // console.log(`min:Child Eval: Paddle=${child.aiPaddlePos}|${child.playerPaddlePos} Value=${result.value}`);
       best = min(best, { value: result.value, node: child });
       beta = Math.min(beta, best.value);
+      console.log("Child Value:", result.value, "| Current Best:", best.value, "| Paddle:", best.node.playerPaddlePos, "|Paddle:", best.node.aiPaddlePos);
       if (beta <= alpha) {
         break;
       }

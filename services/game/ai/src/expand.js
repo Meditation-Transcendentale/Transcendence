@@ -15,19 +15,18 @@ function generateFullRange() {
 
 export function expand(node) {
   const children = [];
-  const isAIMove = node.ballState.ballVel[0] >= 0;
-
-  let newVelX;
+  const newVelX =
+    Math.abs(node.ballState.ballPos[0]) !== PADDLE_AI_X
+      ? node.ballState.ballVel[0]
+      : -node.ballState.ballVel[0] * BALL_ACCELERATION;
+      
+  const isAIMove = node.ballState.ballVel[0] > 0;
   const targetY = node.futureBallState.ballPos[1];
-  if (Math.abs(node.ballState.ballPos[0]) !== PADDLE_AI_X)
-    newVelX = node.ballState.ballVel[0];
-  else
-    newVelX = -node.ballState.ballVel[0] * BALL_ACCELERATION;
+
   const paddlePositions = generateFullRange();
 
   for (const paddlePos of paddlePositions) {
     const offset = targetY - paddlePos;
-
     const angleFactor = 0.5;
     const newVelY = offset * angleFactor;
 
@@ -42,17 +41,14 @@ export function expand(node) {
       ballVel: [newVelX, newVelY]
     };
 
-    const dx = Math.abs(futureBallState.ballPos[0] - node.futureBallState.ballPos[0]);
-    const vx = Math.abs(newBallVel[0]);
-    const framesToCollision = vx > 0 ? dx / vx : 0;
-
     const child = new GameStateNode(
       newBallState,
       aiPaddle,
       playerPaddle,
       futureBallState
     );
-    child.framesToCollision = framesToCollision;
+    if (!isAIMove)
+      console.log ("AAAAAAAAAAAA:", child.playerPaddlePos, "|", paddlePos);
     children.push(child);
   }
 

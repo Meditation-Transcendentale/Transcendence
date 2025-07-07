@@ -14,10 +14,10 @@ const initialBallStates = [
   { ballPos: [-3, -1], ballVel: [0.1, 0.5] }
 ];
 
-const DEPTHS = [1, 2];
-
 initialBallStates.forEach((initialBallState, ballIndex) => {
-  DEPTHS.forEach((DEPTH) => {
+    console.log(`\n--- Test #${ballIndex} | Depth=${2} | ---`);
+    console.log(`Initial Ball Pos: ${initialBallState.ballPos}`);
+    console.log(`Initial Ball Vel: ${initialBallState.ballVel}\n`);
     weightsProfiles.forEach((weights, profileIndex) => {
       const futureBallState = predictBallState(initialBallState.ballPos, initialBallState.ballVel);
 
@@ -28,13 +28,9 @@ initialBallStates.forEach((initialBallState, ballIndex) => {
         futureBallState
       );
 
-      console.log(`\n--- Test #${ballIndex} | Depth=${DEPTH} | Profile=${profileIndex} ---`);
-      console.log(`Initial Ball Pos: ${root.ballState.ballPos}`);
-      console.log(`Initial Ball Vel: ${root.ballState.ballVel}`);
-      console.log(`AI Paddle: ${root.aiPaddlePos}`);
-      console.log(`Player Paddle: ${root.playerPaddlePos}`);
+      console.log(`\nProfile=${profileIndex}`);
 
-      const best = runMinmax(root, DEPTH, true, profileIndex);
+      const best = runMinmax(root, 2, true, profileIndex);
 
       console.log(`--- Decision ---`);
       console.log(`Best Value: ${best.value}`);
@@ -44,5 +40,5 @@ initialBallStates.forEach((initialBallState, ballIndex) => {
       console.log(`AI Paddle: ${best.node.aiPaddlePos}`);
       console.log(`Player Paddle: ${best.node.playerPaddlePos}`);
     });
-  });
+    console.log("\n");
 });
