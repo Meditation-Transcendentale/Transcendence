@@ -27,7 +27,7 @@ class RouterC {
 
 	constructor() {
 		this.initRoute = null;
-		this.location = `http://${window.location.hostname}:8080`;
+		this.location = `http://${window.location.hostname}:7000`;
 		this.oldURL = "";
 		this.currentPage = null;
 		this.parser = new DOMParser();
@@ -199,7 +199,7 @@ class RouterC {
 
 	private async getHTML(path: string): Promise<HTMLDivElement> {
 		console.log("%c Fetching %s", "color: black; background-color: plum", path);
-		const url = `https://${window.location.hostname}:8080/html` + path + ".html";
+		const url = `https://${window.location.hostname}:7000/html` + path + ".html";
 		const response = await fetch(url, { redirect: "error" })
 
 		if (!response.ok) {
@@ -214,7 +214,7 @@ class RouterC {
 
 	private async getTS(path: string): Promise<{ default: any }> {
 		console.log("%c Importing %s", "color: black; background-color: orange", path);
-		const ts = await import(/* @vite-ignore */ path);
+		const ts = await import(/* @vite-ignore */ `${path}`);
 		return ts;
 	}
 }

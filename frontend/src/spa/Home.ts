@@ -1,12 +1,12 @@
 import { App3D } from "../3d/App";
-import { homeVue } from "../Vue";
+//import { homeVue } from "../Vue";
 import { meRequest, postRequest } from "./requests";
 import Router from "./Router";
 import { User } from "./User";
 import { raiseStatus } from "./utils";
 
 
-type homeHtmlReference = {
+interface homeHtmlReference {
 	info: HTMLInputElement,
 	stats: HTMLInputElement,
 	play: HTMLInputElement,
@@ -31,16 +31,35 @@ class Home {
 			quit: div.querySelector("#home-quit") as HTMLInputElement
 		};
 
+		console.log("play: ", this.ref.play);
+		console.log("jhfrkejhgrkhgerg", document.querySelector("play-frame"));
+
 		App3D.setVue('home');
+		const homeVue = App3D.getVue('home');
 		homeVue.windowAddEvent('play', 'click', () => {
+			console.log("play clicked");
 			Router.nav('/play');
 		})
 		homeVue.windowAddEvent('stats', 'click', () => {
+			console.log("stats clicked");
 			Router.nav(`/stats?u=${User.username}`)
 		})
 		homeVue.windowAddEvent('/!\\TEST/!\\', 'click', () => {
+			console.log("Test clicked");
 			Router.nav('/test')
 		})
+
+
+
+		// document.getElementById('home-play')?.addEventListener('click', () => {
+		// 	console.log('play clicked');
+		// });
+		// const playBtn = document.getElementById('home-play');
+		// 	console.log('playBtn:', playBtn);
+		// 	playBtn?.addEventListener('click', () => {
+		// 		console.log('play clicked');
+		// });
+
 
 		//this.ref.info.addEventListener("click", () => {
 		//	Router.nav("/info");
@@ -110,6 +129,32 @@ class Home {
 		//.catch(() => window.location.reload());
 		(document.querySelector("#main-container") as HTMLDivElement).innerHTML = "";
 		document.querySelector("#main-container")?.appendChild(this.div);
+
+		// const playFrame = document.getElementById('play-frame');
+		// if (playFrame) {
+		// 	playFrame.addEventListener('click', () => {
+		// 		console.log('play clicked');
+		// 		Router.nav('/play');
+		// 	});
+		// } else {
+		// 	console.warn('Play frame not found!');
+		// }
+
+		// App3D.loadVue('home');
+		// const mainContainer = document.querySelector("#main-container") as HTMLDivElement;
+		// mainContainer.innerHTML = "";
+		// mainContainer.appendChild(this.div);
+
+		// // Now the elements exist in the DOM, attach events:
+		// const playBtn = this.div.querySelector("#home-play");
+		// if (playBtn) {
+		// 	playBtn.addEventListener("click", () => {
+		// 		console.log("play clicked");
+		// 		Router.nav('/play');
+		// 	});
+		// } else {
+		// 	console.warn("Play button not found in Home view!");
+		// }
 	}
 
 	public async unload() {

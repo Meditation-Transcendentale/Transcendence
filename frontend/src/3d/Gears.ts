@@ -14,7 +14,7 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue } from "../Vue";
+import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue, Vue } from "../Vue";
 
 
 interface cssElem {
@@ -335,6 +335,7 @@ export class Gears {
 				break;
 			}
 			case 'home': {
+				console.log(homeVue);
 				homeVue.init(this.scene.getCameraByName('home') as Camera);
 				homeVue.addWindow('play', this.outer, this.outerBounding, this.outerMatrix[8]);
 				homeVue.addWindow('stats', this.outer, this.outerBounding, this.outerMatrix[9]);

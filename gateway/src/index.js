@@ -39,7 +39,7 @@ app.register(fastifyRateLimit, {
 });
 
 app.register(fastifyCORS, {
-	origin: [hostOrigin, `https://localhost:${FRONTEND_PORT}`],
+	origin: ["*"],
 	methods: ['GET', 'POST', 'PATCH', 'DELETE'],
 	allowedHeaders: ['Content-Type'],
 	credentials: true

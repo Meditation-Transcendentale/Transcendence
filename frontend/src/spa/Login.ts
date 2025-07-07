@@ -1,5 +1,5 @@
 import { App3D } from "../3d/App";
-import { loginVue } from "../Vue";
+//import { loginVue } from "../Vue";
 import Router from "./Router";
 
 import { postRequest } from "./requests";
@@ -55,6 +55,7 @@ class Login {
 		//	Router.nav("/register");
 		//})
 		App3D.setVue('login');
+		const loginVue = App3D.getVue('login');
 		loginVue.windowAddEvent('register', 'click', () => {
 			Router.nav("/register")
 		})
@@ -63,7 +64,7 @@ class Login {
 	}
 
 	public load(params: URLSearchParams) {
-		loginVue.enable();
+		App3D.loadVue('login');
 		//this.htmlReference.twofa.setAttribute("disabled", "true");
 		//this.htmlReference.username.value = "";
 		//this.htmlReference.password.value = "";
@@ -74,7 +75,7 @@ class Login {
 	};
 
 	public async unload() {
-		loginVue.disable();
+		App3D.unloadVue('login');
 		this.div.remove();
 	}
 

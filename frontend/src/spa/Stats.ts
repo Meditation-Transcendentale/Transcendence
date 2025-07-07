@@ -1,5 +1,4 @@
 import { App3D } from "../3d/App";
-import { statsVue } from "../Vue";
 import { getRequest } from "./requests";
 import { createDivception, raiseStatus } from "./utils";
 
@@ -94,6 +93,7 @@ class Stats {
 		this.initPlayerStats();
 
 		App3D.setVue('stats');
+		const statsVue = App3D.getVue('stats');
 		statsVue.windowAddEvent('pong', 'click', () => {
 			if (this.mode != 1) {
 				this.ref.brHistory.remove();
@@ -191,7 +191,7 @@ class Stats {
 
 	public load(params: URLSearchParams) {
 		if (!this.checkParams(params)) { return; }
-		statsVue.enable();
+		App3D.loadVue('stats');
 
 		this.ref.username.innerText = params.get("u") as string;
 
@@ -209,7 +209,7 @@ class Stats {
 	}
 
 	public async unload() {
-		statsVue.disable();
+		App3D.unloadVue('stats');
 		this.div.remove();
 	}
 

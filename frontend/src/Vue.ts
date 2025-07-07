@@ -26,6 +26,7 @@ class cssWindow {
 
 
 	constructor(name: string, options: vueOptions) {
+		console.log(`Creating window: ${name} with options : `, options);
 		this.name = name;
 		this.div = document.createElement('div');
 		this.div.id = `${name}-frame`;
@@ -148,7 +149,7 @@ class cssWindow {
 	}
 }
 
-class Vue {
+export class Vue {
 	public windows: cssWindow[];
 	public camera!: Camera;
 	private _enable: boolean;
@@ -188,6 +189,7 @@ class Vue {
 	public windowAddEvent(name: string, event: string, callback: any) {
 		for (let i = 0; i < this.windows.length; i++) {
 			if (this.windows[i].name == name) {
+				console.log(`Adding event ${event} to window ${name}`);
 				this.windows[i].div.addEventListener(event, callback);
 			}
 		}

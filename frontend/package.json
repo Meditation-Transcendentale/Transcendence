@@ -1,7 +1,8 @@
 {
   "name": "transcendence-frontend",
   "scripts": {
-    "build": "node esbuild.config.js",
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.watch.mjs",
     "build-nginx": "tsc && esbuild src/main.ts --bundle --minify --sourcemap --outfile=dist/app.js --target=es2020",
     "dev-nginx": "esbuild src/main.ts --bundle --sourcemap --outfile=dist/app.js --servedir=public",
     "dev": "vite --host",
@@ -13,10 +14,13 @@
     "@babylonjs/gui": "8.11.0",
     "@babylonjs/inspector": "^8.11.0",
     "@types/node": "^22.14.1",
-    "esbuild": "^0.19.11",
+    "esbuild": "^0.25.5",
     "glob": "^11.0.2",
     "protobufjs": "^7.5.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^6.3.3",
+    "ws": "^8.18.3"
+
   },
   "dependencies": {
     "transcendence-frontend": "file:",
