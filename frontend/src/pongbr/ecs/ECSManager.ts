@@ -47,6 +47,11 @@ export class ECSManager {
 		this.systems.push(system);
 	}
 
+	removeSystem(system: System): void {
+		this.systems = this.systems.filter(s => s !== system);
+	}
+
+
 	/**
 	 * Call each system's update, passing this manager and the elapsed time.
 	 */

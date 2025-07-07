@@ -9,7 +9,7 @@ export default {
 		ia: 1,
 		online: 2,
 		local: 1,
-		pongBR: 100,
+		br: 1,
 		pongIO: 20,
 	},
 };

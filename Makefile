@@ -1,5 +1,6 @@
 DOCKER_COMPOSE = docker compose
-DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml -f ./metrics/docker-compose-metrics.yml
+DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml 
+#-f ./metrics/docker-compose-metrics.yml
 
 .PHONY: all build down stop up re cleanVolumes clean reCleanData update-hostname-env
 

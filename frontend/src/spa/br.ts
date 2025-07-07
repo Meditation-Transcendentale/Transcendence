@@ -36,7 +36,10 @@ export default class br {
 		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";
 		if (!this.pongbr)
 			this.pongbr = new PongBR(document.querySelector("#canvas"), params.get("id"), App3D.scene);
-		this.pongbr.start();
+		let gameId = params.get("id");
+		if (!gameId)
+			gameId = "";
+		this.pongbr.start(gameId);
 	}
 }
 

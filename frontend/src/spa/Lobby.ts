@@ -73,7 +73,7 @@ export default class Lobby {
 	}
 
 	private setupWs(id: string) {
-		const url = `wss://${this.gameIP}:5011/lobbies?uuid=${encodeURIComponent(User.uuid as string)}&lobbyId=${encodeURIComponent(id as string)}`;
+		const url = `ws://${this.gameIP}:5011/lobbies?uuid=${encodeURIComponent(User.uuid as string)}&lobbyId=${encodeURIComponent(id as string)}`;
 		console.log("URL", url);
 		this.ws = new WebSocket(url);
 		this.ws.binaryType = "arraybuffer";

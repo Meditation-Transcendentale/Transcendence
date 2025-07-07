@@ -242,7 +242,7 @@ export class GameManager {
 				return;
 			}
 		} catch (err) {
-			console.error(`[GameManager] Tick failed for ${gameId}:`, err);
+			//console.error(`[GameManager] Tick failed for ${gameId}:`, err);
 		}
 	}
 }

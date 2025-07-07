@@ -15,7 +15,7 @@ export class Game {
 			case "online":
 				this.state = this.initializeStatePong();
 				break;
-			case "pongBR":
+			case "br":
 				this.state = this.initializeStatePongBR();
 				break;
 			case "pongIO":
