@@ -1,3 +1,6 @@
+import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
+import "@babylonjs/loaders/glTF/2.0/";
+
 export { Engine } from "@babylonjs/core/Engines/engine";
 export { Scene } from "@babylonjs/core/scene"
 export { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";

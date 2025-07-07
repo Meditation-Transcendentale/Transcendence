@@ -9,8 +9,7 @@ WORKDIR /app
 
 COPY package.json tsconfig.json ./
 RUN npm install
-COPY esbuild.config.mjs ./
-COPY esbuild.watch.mjs ./
+COPY esbuild.watch.mjs ./esbuild.watch.mjs
 
 
 COPY ./src ./src

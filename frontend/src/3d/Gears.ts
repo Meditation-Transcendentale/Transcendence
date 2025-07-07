@@ -1,8 +1,6 @@
 
-import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
-import "@babylonjs/loaders/glTF/2.0/";
 //import { GLTFFileLoader} from "@babylonjs/loaders/glTF/glTFFileLoader";
-import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue, Vue } from "../Vue";
+import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue } from "../Vue";
 import {
 	AbstractMesh,
 	Camera, CascadedShadowGenerator,

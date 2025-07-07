@@ -1,19 +1,8 @@
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Scene } from "@babylonjs/core/scene";
-import { Color3, Color4, Vector3 } from "@babylonjs/core/Maths/math";
+import { Color3, Effect, Mesh, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
 import { GameTemplateConfig } from "../templates/GameTemplate";
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-
 
 import { PaddleMaterial } from './PaddleMaterial';
-// import './Shader';
-// import { PortalMaterial } from "./PortalMaterial";
+
 Effect.ShadersRepository = "";
 
 Effect.ShadersStore["portalVertexShader"] = `

@@ -1,5 +1,5 @@
 // templates/transformBuilders.ts
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonImport";
 
 export interface TransformBundle {
 	paddle: { pos: Vector3; rot: Vector3; scale: Vector3 };

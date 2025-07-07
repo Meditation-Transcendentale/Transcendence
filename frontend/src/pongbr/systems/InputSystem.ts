@@ -1,6 +1,3 @@
-import { Scalar } from "@babylonjs/core/Maths/math.scalar";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { InputComponent } from "../components/InputComponent.js";
@@ -11,6 +8,7 @@ import { WebSocketManager } from "../network/WebSocketManager.js";
 import { localPaddleId } from "../PongBR.js";
 import { userinterface } from "../utils/proto/message.js";
 import { encodeClientMessage } from "../utils/proto/helper.js";
+import { Scalar } from "@babylonImport";
 
 export class InputSystem extends System {
 	private inputManager: InputManager;

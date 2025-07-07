@@ -1,6 +1,6 @@
 // components/GoalComponent.ts
+import { Vector3 } from "@babylonImport";
 import { Component } from "../ecs/Component";
-import { Vector3 } from "@babylonjs/core";
 export class GoalComponent implements Component {
 	/**
 	 * Marks a goal opening for a specific player segment.

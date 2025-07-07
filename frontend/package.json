@@ -1,7 +1,6 @@
 {
   "name": "transcendence-frontend",
   "scripts": {
-    "build": "node esbuild.config.mjs",
     "watch": "node esbuild.watch.mjs",
     "build-nginx": "tsc && esbuild src/main.ts --bundle --minify --sourcemap --outfile=dist/app.js --target=es2020",
     "dev-nginx": "esbuild src/main.ts --bundle --sourcemap --outfile=dist/app.js --servedir=public",
@@ -20,9 +19,9 @@
     "typescript": "^5.2.2",
     "vite": "^6.3.3",
     "ws": "^8.18.3"
-
   },
   "dependencies": {
+    "esbuild-plugin-alias": "^0.2.1",
     "transcendence-frontend": "file:",
     "vite": "^7.0.0"
   }

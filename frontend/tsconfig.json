@@ -9,7 +9,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "paths": {
-      "@babylonImport": ["src/babyImport.ts"]
+      "@babylonImport": ["./src/babyImport.ts"]
+    }
   },
   "include": ["src"]
 }
+

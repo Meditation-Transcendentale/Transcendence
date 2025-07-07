@@ -1,6 +1,6 @@
 // components/AnimationComponent.ts
 import { Component } from "../ecs/Component";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonImport";
 
 export type AnimProp = "position" | "rotation" | "scale";
 

@@ -1,4 +1,4 @@
-import { Mesh, Matrix, Vector3, Quaternion, Camera } from "@babylonjs/core";
+import { Mesh, Matrix, Vector3, Quaternion, Camera } from "@babylonImport";
 import { Entity } from "../ecs/Entity.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 

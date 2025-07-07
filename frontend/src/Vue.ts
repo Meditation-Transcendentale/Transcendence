@@ -1,7 +1,4 @@
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { AbstractMesh, Camera, Matrix, Vector3 } from "@babylonImport";
 
 
 interface vueOptions {
