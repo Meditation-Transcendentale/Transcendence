@@ -2,6 +2,12 @@ import { glob } from 'glob';
 import path from 'path';
 import { WebSocketServer } from 'ws';
 import * as esbuild from 'esbuild'
+import alias from 'esbuild-plugin-alias';
+import { fileURLToPath } from 'url';
+
+// Fix __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const spa = glob.sync("src/spa/*.ts");
 
@@ -24,22 +30,33 @@ const notifyPlugin = {
 	},
 };
 
+// Plugin that rewrites "@babylonImport" to "src/babyImport"
+const customAliasPlugin = {
+	name: 'custom-alias',
+	setup(build) {
+		build.onResolve({ filter: /^@babylonImport$/ }, args => ({
+			path: '../babyImport',
+			external: true,
+		}));
+	},
+};
 
 
 const appctx = await esbuild.context({
 	entryPoints: ['src/3d/App.ts'],
 	bundle: true,
 	outfile: "./dist/3d/App.js",
-	treeShaking: true,
+	treeShaking: false,
 	legalComments: 'none',
 	format: "esm",
-	minify: true,
-	minifySyntax: true,
-	minifyWhitespace: true,
-	minifyIdentifiers: true,
+	// minify: true,
+	// minifySyntax: true,
+	// minifyWhitespace: true,
+	// minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
-	plugins: [notifyPlugin]
+	// external: ["../babyImport"],
+	plugins: [notifyPlugin, customAliasPlugin]
 })
 
 const spactxs = [];
@@ -84,7 +101,7 @@ const pongctx = await esbuild.context({
 	bundle: true,
 	outfile: "./dist/pongbr/PongBR.js",
 	// outdir: "./dist/pongbr",
-	treeShaking: false,
+	treeShaking: true,
 	legalComments: 'none',
 	format: "esm",
 	// minify: true,
@@ -93,7 +110,7 @@ const pongctx = await esbuild.context({
 	// minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
-	plugins: [notifyPlugin]
+	plugins: [notifyPlugin, customAliasPlugin]
 })
 
 let encodectx = await esbuild.context({
@@ -110,8 +127,25 @@ let encodectx = await esbuild.context({
 	// minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
+})
+
+let babyctx = await esbuild.context({
+	entryPoints: ['src/babyImport.ts'],
+	bundle: true,
+	outfile: "./dist/babyImport.js",
+	// outdir: "./dist/pongbr",
+	treeShaking: false,
+	legalComments: 'none',
+	format: "esm",
+	// minify: true,
+	// minifySyntax: true,
+	// minifyWhitespace: true,
+	// minifyIdentifiers: true,
+	splitting: false,
+	resolveExtensions: ['.ts', '.js'],
 	plugins: [notifyPlugin]
 })
+
 
 let onRebuild = function(error, result) {
 	if (error) {
@@ -131,6 +165,7 @@ await appctx.watch();
 await mainctx.watch();
 await pongctx.watch();
 await encodectx.watch();
+await babyctx.watch();
 //console.log(spactxs);
 for (const ctx of spactxs) {
 	await Object(ctx).watch();

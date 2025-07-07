@@ -11,9 +11,8 @@ import { BallComponent } from "../components/BallComponent";
 import { DisabledComponent } from "../components/DisabledComponent";
 import { InputComponent } from "../components/InputComponent";
 import { TransformComponent } from "../components/TransformComponent";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PortalComponent } from "../components/PortalComponent";
-import { Color3, MeshBuilder, TransformNode } from "@babylonjs/core";
+import { TransformNode, Vector3 } from "@babylonImport";
 
 function intersectSegmentsXZ(
 	A: Vector3,

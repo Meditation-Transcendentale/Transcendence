@@ -1,11 +1,16 @@
-import { Scene } from "@babylonjs/core/scene"
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Gears } from "./Gears";
 import { updateVues, Vue } from "../Vue";
-import { FresnelParameters, MeshBuilder, StandardMaterial } from "@babylonjs/core";
+import {
+	ArcRotateCamera,
+	Color3,
+	Color4,
+	Engine,
+	FresnelParameters,
+	MeshBuilder,
+	Scene,
+	StandardMaterial,
+	Vector3
+} from "@babylonImport";
 
 
 export class Environment {

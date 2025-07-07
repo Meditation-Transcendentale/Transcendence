@@ -1,8 +1,8 @@
-import { ParticleSystem, Vector3, Texture, Scene, Color4 } from "@babylonjs/core";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
+import { Color4, ParticleSystem, Scene, Texture, Vector3 } from "@babylonImport";
 
 export class VisualEffectSystem extends System {
 	private scene!: Scene;

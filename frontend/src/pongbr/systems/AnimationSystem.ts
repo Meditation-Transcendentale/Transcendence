@@ -3,7 +3,6 @@ import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { AnimationComponent } from "../components/AnimationComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { PortalComponent } from "../components/PortalComponent.js";
 export class AnimationSystem implements System {

@@ -1,21 +1,11 @@
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Scene } from "@babylonjs/core/scene";
-import { Color3, Color4, Vector3 } from "@babylonjs/core/Maths/math";
+import { Color3, Effect, Mesh, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
 import { GameTemplateConfig } from "../templates/GameTemplate";
-import { Effect, Material, ShaderMaterial, TransformNode, Vector2, VertexBuffer } from "@babylonjs/core";
+
 import { PaddleMaterial } from './PaddleMaterial';
-// import { PortalMaterial } from "./PortalMaterial";
 
-function initPortalShader() {
+Effect.ShadersRepository = "";
 
-	Effect.ShadersRepository = "";
-
-
-	Effect.ShadersStore["portalVertexShader"] = `
+Effect.ShadersStore["portalVertexShader"] = `
 precision highp    float;    
 
 #define PI 3.1415926535897932384626433832795
@@ -74,7 +64,7 @@ void main() {
 }
 `
 
-	Effect.ShadersStore["portalFragmentShader"] = `
+Effect.ShadersStore["portalFragmentShader"] = `
 precision highp    float;
 
 #define M_PI 3.1415926535897932384626433832795
@@ -242,7 +232,7 @@ void main() {
     
 }
 `
-}
+
 
 //export function createCamera(scene: Scene, canvas: any, pongRoot: TransformNode): ArcRotateCamera {
 //	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0., 60, Vector3.Zero(), scene);
@@ -335,7 +325,6 @@ export function createPortalMesh(scene: Scene, config: GameTemplateConfig, pongR
 	portal.alwaysSelectAsActiveMesh = true
 
 	portal.parent = pongRoot;
-	initPortalShader();
 	const mat = new ShaderMaterial("portalMat", scene, { vertex: "portal", fragment: "portal" }, {
 		attributes: ["position", "uv", "world0", "world1", "world2", "world3", "worldPos"],
 		uniforms: ["time", "world", "viewProjection", "projection"],

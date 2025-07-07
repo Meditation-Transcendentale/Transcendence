@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonImport";
 import { Component } from "../ecs/Component.js";
 
 export class PortalComponent implements Component {

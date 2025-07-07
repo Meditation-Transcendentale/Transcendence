@@ -9,8 +9,7 @@ all: up
 
 
 build:
-	docker build -f $(DOCKERFILE) -t $(IMAGE_NAME) .
-
+	docker compose build
 up:
 	docker compose -f $(DOCKER_COMPOSE_FILE) up --build
 

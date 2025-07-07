@@ -1,9 +1,9 @@
-import { Vector3, ArcRotateCamera, Scalar } from "@babylonjs/core";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { InputComponent } from "../components/InputComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputManager } from "../input/InputManager.js";
+import { ArcRotateCamera, Scalar, Vector3 } from "@babylonImport";
 
 export class CameraFollowSystem extends System {
 	private camera: ArcRotateCamera;
