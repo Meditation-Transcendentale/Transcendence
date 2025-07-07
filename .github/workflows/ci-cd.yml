@@ -29,6 +29,20 @@ jobs:
 
       - name: 🔧 Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
+      
+      - name: Create .env file
+        run: |
+          echo "JWT_SECRETKEY=ee463b6ce265b27419e996f92012633ba62056a8b0d312717d8a265b79972b4890519c0ba14baf94be04e4590ce4fab0783b7349437a1cab35989ebd6620edfa" > .env
+          echo "DATABASE_URL=/app/data/database.sqlite" > .env
+          echo "SSL_KEY=/app/certs/server.key" > .env
+          echo "SSL_CERT=/app/certs/server.crt" > .env
+          echo "GOOGLE_CLIENT_ID=1089807862778-laga27uqspepmtq7pbp55khbbjn86sqd.apps.googleusercontent.com" > .env
+          echo "API_GATEWAY_KEY=hxbjGdbG76eHYqVqQZbtNjRlSQdYhhCJq7n4rO7JSzRMIJtFN2ZjT7lQbrpzkCIIB4FP1Nwd0jTwnEimudjCMHG98A0Zy4ZfwQfND3tAlyDxtXSudmE04ZGKILHC9MOA" > .env
+          echo "ENCRYPTION_KEY=a16590844ff80ae07cb8f2b725f138037a34961f92f29f53ee5dbcb4482e739f" > .env
+          echo "NATS_URL=nats://nats:6002" > .env
+          echo "FT_API_UID=u-s4t2ud-a52a0d9baca0584c24f69c90aaea3aae24b86c22f3e4e27838f8ce9249d5fd93" > .env
+          echo "FT_API_SECRET=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" > .env
+          echo "CDN_URL=https://localhost:3002/cdn" > .env
 
       - name: 🐳 Build up
         run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml up --build
