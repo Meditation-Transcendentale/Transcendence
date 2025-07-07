@@ -58,16 +58,18 @@ export class PongBR {
 	private uuid!: string;
 	private paddleBundles!: PaddleBundle[];
 	private pongRoot!: TransformNode;
+	private inited: boolean;
+	private networkingSystem!: NetworkingSystem;
 
 	constructor(canvas: any, gameId: any, scene: Scene) {
 		this.canvas = canvas;
 		this.gameId = gameId;
 		this.scene = scene;
 		this.engine = this.scene.getEngine() as Engine;
-		this.init();
+		this.inited = false;
 	}
 
-	private init() {
+	public async init() {
 		console.log("INIT");
 		const config = {
 			numberOfBalls: 1,
@@ -110,20 +112,12 @@ export class PongBR {
 		this.camera.parent = this.pongRoot;
 		this.camera.attachControl(this.canvas);
 		this.camera.minZ = 0.2;
-		//this.camera.fov = 80 * Math.PI / 180.0;
-		//this.camera.maxZ = 10000;
 		this.baseMeshes = this.createBaseMeshes(config, this.pongRoot);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
 
 		this.scene.clearColor = new Color4(0, 0, 0, 1);
 		this.scene.ambientColor = Color3.White();
-		//const skybox = MeshBuilder.CreateBox("skyBox", { size: 1000, sideOrientation: Mesh.BACKSIDE }, this.scene);
-		//skybox.infiniteDistance = true;
-		//const mat = new StandardMaterial('skymat', this.scene);
-		//mat.diffuseColor = Color3.White();
-		//skybox.material = mat;
-		//skybox.material.backFaceCulling = false;
 
 
 
@@ -142,7 +136,28 @@ export class PongBR {
 
 
 	}
-	public start() {
+	public async start(gameId: string) {
+		if (!this.inited) {
+			await this.init();
+		}
+		if (this.wsManager) {
+			this.wsManager.socket.close();
+			this.ecs.removeSystem(this.networkingSystem);
+		}
+		const wsUrl = `ws://${window.location.hostname}:5004?` +
+			`uuid=${encodeURIComponent(this.uuid)}&` +
+			`gameId=${encodeURIComponent(gameId)}`;
+		this.wsManager = new WebSocketManager(wsUrl);
+
+		localPaddleId = await this.waitForRegistration();
+
+		// 4) Plug networking into ECS
+		this.networkingSystem = new NetworkingSystem(
+			this.wsManager,
+			this.uuid,
+			this.scoreUI
+		);
+		this.ecs.addSystem(this.networkingSystem);
 		console.log("start");
 		//this.engine = new Engine(this.canvas, true);
 		//engine = this.engine;

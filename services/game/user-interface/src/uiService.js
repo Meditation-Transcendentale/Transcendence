@@ -15,6 +15,7 @@ import {
 	encodeGameEndMessage,
 	encodeServerMessage,
 	decodeStateMessage,
+	encodeErrorMessage,
 	// WS ← NATS state update
 } from './proto/helper.js';
 
@@ -98,20 +99,22 @@ export default class UIService {
 	handleRegisterGame(ws) {
 		const { uuid, role, gameId } = ws;
 
-		// 1) Check if game exist 
 		const setup = this.allowedByGame.get(gameId);
 		if (!setup) {
 			const errBuf = encodeErrorMessage({ message: 'Game not found' });
 			ws.send(errBuf, true);
+			console.log("GAME NOT FOUND");
 			return ws.close();
 		}
 
 		const { players, mode } = setup;
+		console.log("BR =====", mode);
 
 		// 2) Reject if this player isn’t on the whitelist
 		if (!players.includes(uuid)) {
 			const errBuf = encodeErrorMessage({ message: 'Not allowed to join this game' });
 			ws.send(errBuf, true);
+			console.log("NOT ALLOWED TO JOIN");
 			return ws.close();
 		}
 
@@ -191,8 +194,8 @@ export default class UIService {
 
 		// 1) Must already be registered
 		if (!sess) {
-			const err = encodeErrorMessage({ message: 'Session not found' });
-			ws.send(err, true);
+			//const err = encodeErrorMessage({ message: 'Session not found' });
+			//ws.send(err, true);
 			return ws.close();
 		}
 

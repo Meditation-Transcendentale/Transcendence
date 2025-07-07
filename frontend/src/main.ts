@@ -19,7 +19,7 @@ async function init() {
 		if (event.data === 'reload') window.location.reload();
 	};
 
-	//Router.AUTHENTIFICATION = false;
+	Router.AUTHENTIFICATION = false;
 
 	App3D.init()
 		.then(() => {

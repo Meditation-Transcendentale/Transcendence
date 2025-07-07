@@ -10,11 +10,11 @@ import { PaddleComponent } from "../components/PaddleComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
 import { gameEndUI } from "../utils/displayGameInfo.js";
-import { global } from "../Pong";
+import { global } from "../PongBR";
 import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
-import { localPaddleId } from "../Pong";
+import { localPaddleId } from "../PongBR";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;

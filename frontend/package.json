@@ -20,8 +20,10 @@
     "typescript": "^5.2.2",
     "vite": "^6.3.3",
     "ws": "^8.18.3"
+
   },
   "dependencies": {
-    "transcendence-frontend": "file:"
+    "transcendence-frontend": "file:",
+    "vite": "^7.0.0"
   }
 }
