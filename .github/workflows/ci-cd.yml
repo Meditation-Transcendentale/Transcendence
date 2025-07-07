@@ -51,7 +51,7 @@ jobs:
         run: ls -la
 
       - name: 🐳 Build up
-        run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml up --build
+        run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml up --build -d
 
       - name: 🐳 List running containers
         run: docker ps -a
@@ -70,5 +70,8 @@ jobs:
       - name: Health check API
         run: |
           curl --fail https://localhost:3000/health || exit 1
+
+      - name: Down services
+        run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml down
 
 
