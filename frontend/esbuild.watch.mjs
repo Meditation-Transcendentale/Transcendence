@@ -84,7 +84,7 @@ const pongctx = await esbuild.context({
 	bundle: true,
 	outfile: "./dist/pongbr/PongBR.js",
 	// outdir: "./dist/pongbr",
-	treeShaking: false,
+	treeShaking: true,
 	legalComments: 'none',
 	format: "esm",
 	// minify: true,

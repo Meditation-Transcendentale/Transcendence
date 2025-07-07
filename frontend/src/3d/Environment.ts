@@ -5,7 +5,9 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Gears } from "./Gears";
 import { updateVues, Vue } from "../Vue";
-import { FresnelParameters, MeshBuilder, StandardMaterial } from "@babylonjs/core";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 
 export class Environment {
