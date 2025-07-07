@@ -1,6 +1,7 @@
 import Router from "./Router";
 import { PongBR } from "../pongbr/PongBR";
 import { App3D } from "../3d/App";
+import { User } from "./User";
 
 
 export default class br {
@@ -37,9 +38,12 @@ export default class br {
 		if (!this.pongbr)
 			this.pongbr = new PongBR(document.querySelector("#canvas"), params.get("id"), App3D.scene);
 		let gameId = params.get("id");
+		let uuid = User.uuid;
 		if (!gameId)
 			gameId = "";
-		this.pongbr.start(gameId);
+		if (!uuid)
+			uuid = "";
+		this.pongbr.start(gameId, uuid);
 	}
 }
 
