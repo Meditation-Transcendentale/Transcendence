@@ -1,8 +1,30 @@
 DOCKER_COMPOSE = docker compose
-DOCKER_COMPOSE_FILE = -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml 
-#-f ./metrics/docker-compose-metrics.yml
 
-.PHONY: all build down stop up re cleanVolumes clean reCleanData update-hostname-env
+DOCKER_COMPOSE_USER = -f docker-compose.yml
+DOCKER_COMPOSE_STATS = -f ./services/stats/docker-compose-stats.yml
+DOCKER_COMPOSE_FRONTEND = -f ./frontend/docker-compose.yml
+DOCKER_COMPOSE_GAME = -f ./services/game/docker-compose.dev.yml
+
+TARGET ?= all
+
+ifeq ($(TARGET),user)
+    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER)
+else ifeq ($(TARGET),stats)
+    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_STATS)
+else ifeq ($(TARGET),frontend)
+    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_FRONTEND)
+else ifeq ($(TARGET),game)
+    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_GAME)
+else ifeq ($(TARGET),all)
+    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER) \
+                          $(DOCKER_COMPOSE_STATS) \
+                          $(DOCKER_COMPOSE_FRONTEND) \
+                          $(DOCKER_COMPOSE_GAME)
+else
+    $(error Unknown TARGET value '$(TARGET)')
+endif
+
+.PHONY: all build down stop up re cleanVolumes clean cleanShared reCleanData update-hostname-env
 
 # curl -u <username>:<password> ftp://<ftp_host>/chemin/vers/.env -o .env
 
@@ -21,28 +43,13 @@ stop:
 up:
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) up
 
-re:
-	$(MAKE) update-hostname-env
-	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) down
-	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) up --build
-
 cleanVolumes:
 	docker volume rm -f $$(docker volume ls)
 
-reCleanData:
+cleanShared:
 	if [ -d ./shared ]; then \
 		rm -rf ./shared; \
 	fi
-	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) down
-	docker volume rm -f $$(docker volume ls)
-	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) up --build
-
-clean:
-	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) down
-	if [ -d ./shared ]; then \
-		rm -rf ./shared; \
-	fi
-	docker volume rm -f $$(docker volume ls)
 
 update-hostname-env:
 	@if grep -q '^HOSTNAME=' .env; then \
@@ -51,3 +58,19 @@ update-hostname-env:
 		echo "" >> .env; \
 		echo "HOSTNAME=$$(hostname)" >> .env; \
 	fi
+
+re:
+	$(MAKE) down
+	$(MAKE) build
+
+reCleanData:
+	$(MAKE) cleanShared
+	$(MAKE) down
+	$(MAKE) cleanVolumes
+	$(MAKE) build
+
+clean:
+	$(MAKE) down
+	$(MAKE) cleanShared
+	$(MAKE) cleanVolumes
+
