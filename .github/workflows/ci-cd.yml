@@ -5,8 +5,11 @@ on:
     branches: [main, dev, feat/CI]
   pull_request:
 
+env:
+  DOCKER_COMPOSE_FILES: -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml
+
 jobs:
-  test-services:
+  Docker-Services-Tests:
     runs-on: ubuntu-latest
 
     # strategy:
@@ -45,17 +48,8 @@ jobs:
           echo "CDN_URL=https://localhost:3002/cdn" >> .env
           echo "HOSTNAME=localhost" >> .env
 
-      - name: test
-        run: cat .env
-
-      - name: test2
-        run: ls -la
-
       - name: 🐳 Build up
-        run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml up --build -d
-
-      - name: 🐳 List running containers
-        run: docker ps -a
+        run: docker compose $DOCKER_COMPOSE_FILES up --build -d
 
       - name: 🐳 Check container status
         run: |
@@ -66,13 +60,19 @@ jobs:
           fi
 
       - name: ⏳ Wait for services
-        run: sleep 10
+        run: sleep 15
 
       - name: Health check API
         run: |
           curl --fail --insecure https://localhost:3000/health || exit 1
+          curl --fail --insecure https://localhost:3000/stats/health || exit 1
+          curl --fail --insecure https://localhost:3000/auth/health || exit 1
+          curl --fail --insecure https://localhost:3000/friends/health || exit 1
+          curl --fail --insecure https://localhost:3000/info/health || exit 1
+          curl --fail --insecure https://localhost:3000/register/health || exit 1
+          curl --fail --insecure https://localhost:3000/update-info/health || exit 1
 
       - name: Down services
-        run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml down
+        run: docker compose $DOCKER_COMPOSE_FILES down
 
 
