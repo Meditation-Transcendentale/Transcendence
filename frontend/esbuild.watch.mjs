@@ -96,6 +96,22 @@ const pongctx = await esbuild.context({
 	plugins: [notifyPlugin]
 })
 
+let encodectx = await esbuild.context({
+	entryPoints: ['src/encode/helper.ts'],
+	bundle: true,
+	outfile: "./dist/encode/helper.js",
+	// outdir: "./dist/pongbr",
+	treeShaking: false,
+	legalComments: 'none',
+	format: "esm",
+	// minify: true,
+	// minifySyntax: true,
+	// minifyWhitespace: true,
+	// minifyIdentifiers: true,
+	splitting: false,
+	resolveExtensions: ['.ts', '.js'],
+	plugins: [notifyPlugin]
+})
 
 let onRebuild = function(error, result) {
 	if (error) {
@@ -110,9 +126,11 @@ let onRebuild = function(error, result) {
 	}
 }
 
+
 await appctx.watch();
 await mainctx.watch();
 await pongctx.watch();
+await encodectx.watch();
 //console.log(spactxs);
 for (const ctx of spactxs) {
 	await Object(ctx).watch();
