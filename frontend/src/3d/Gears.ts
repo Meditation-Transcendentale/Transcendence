@@ -1,21 +1,13 @@
 
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
-import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
 import "@babylonjs/loaders/glTF/2.0/";
 //import { GLTFFileLoader} from "@babylonjs/loaders/glTF/glTFFileLoader";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue, Vue } from "../Vue";
-
+import {
+	AbstractMesh,
+	Camera, CascadedShadowGenerator,
+	Color3, DirectionalLight, LoadAssetContainerAsync, Matrix, Mesh, PBRMaterial, Quaternion, Scene, Vector3
+} from "@babylonImport";
 
 interface cssElem {
 	div: HTMLDivElement;
