@@ -229,7 +229,7 @@ export const Physics = {
 			balls: tempstate.balls.map(b => ({ x: b.x, y: b.y, r: b.radius })),
 			paddles: tempstate.paddles.map(p => ({ x: p.x, y: p.y, h: p.height, w: p.width }))
 		};
-		console.log(JSON.stringify(debugState));
+		// console.log(JSON.stringify(debugState));
 		return { gameId, tick, balls: tempstate.balls, paddles: tempstate.paddles, events };
 		// const tempstate = game.getState();
 		// return {

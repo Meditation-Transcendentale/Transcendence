@@ -131,7 +131,7 @@ export class PongBR {
 
 
 	}
-	public async start(gameId: string) {
+	public async start(gameId: string, uuid: string) {
 		if (!this.inited) {
 			await this.init();
 		}
@@ -140,7 +140,7 @@ export class PongBR {
 			this.ecs.removeSystem(this.networkingSystem);
 		}
 		const wsUrl = `ws://${window.location.hostname}:5004?` +
-			`uuid=${encodeURIComponent(this.uuid)}&` +
+			`uuid=${uuid}&` +
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 
@@ -159,7 +159,6 @@ export class PongBR {
 		this.pongRoot.setEnabled(true);
 		this.stateManager.setter(true);
 		this.stateManager.update();
-		this.scene.debugLayer.show({ showInspector: true, embedMode: true });
 
 		//this.engine.runRenderLoop(() => {
 		//	this.scene.render();
