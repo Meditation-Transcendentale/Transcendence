@@ -8,4 +8,5 @@ COPY src ./src
 # COPY . .
 EXPOSE 5001
 EXPOSE 5011
-CMD ["npm", "run", "dev"]
+# CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]

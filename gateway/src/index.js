@@ -53,7 +53,7 @@ app.setErrorHandler((error, req, res) => {
 const verifyJWT = async (req, res) => {
 	if (req.raw.url && req.raw.url.endsWith('/metrics') || req.raw.url.endsWith('/health')) {
 		if (req.raw.url.endsWith('/health')) {
-			return res.status(200).send('OK');
+			return ;
 		}
 		const IP = req.ip || req.raw.socket.remoteAddress;
 		if (IP.startsWith('172.18.') || IP.startsWith('172.19.') || IP.startsWith('172.20.')) {
