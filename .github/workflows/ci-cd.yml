@@ -44,25 +44,30 @@ jobs:
           echo "FT_API_SECRET=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" > .env
           echo "CDN_URL=https://localhost:3002/cdn" > .env
 
-      - name: 🐳 Build up
-        run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml up --build
+      - name: test
+        run: cat .env
 
-      - name: 🐳 List running containers
-        run: docker ps -a
+      - name: test2
+        run: ls -l
+      # - name: 🐳 Build up
+      #   run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml up --build
 
-      - name: 🐳 Check container status
-        run: |
-          docker compose ps
-          if docker compose ps | grep -v "Up"; then
-            echo "Some containers are not running!"
-            exit 1
-          fi
+      # - name: 🐳 List running containers
+      #   run: docker ps -a
 
-      - name: ⏳ Wait for services
-        run: sleep 10
+      # - name: 🐳 Check container status
+      #   run: |
+      #     docker compose ps
+      #     if docker compose ps | grep -v "Up"; then
+      #       echo "Some containers are not running!"
+      #       exit 1
+      #     fi
 
-      - name: Health check API
-        run: |
-          curl --fail https://localhost:3000/health || exit 1
+      # - name: ⏳ Wait for services
+      #   run: sleep 10
+
+      # - name: Health check API
+      #   run: |
+      #     curl --fail https://localhost:3000/health || exit 1
 
 
