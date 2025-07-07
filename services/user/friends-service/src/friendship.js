@@ -276,6 +276,10 @@ app.get('/get/blocked', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ blockedUsers });
 }));
 
+app.get('/health', (req, res) => {
+	res.status(200).send('OK');
+});
+
 const start = async () => {
 	try {
 		await app.listen({ port: 4004, host: '0.0.0.0' });

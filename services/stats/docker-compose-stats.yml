@@ -2,8 +2,8 @@ services:
   nats:
     image: nats:latest
     container_name: nats
-    ports:
-      - "6002:6002"
+    # ports:
+    #   - "6002:6002"
     volumes:
       - ./services/stats/nats-server.conf:/nats-server.conf:ro
     command: ["-c", "/nats-server.conf"]

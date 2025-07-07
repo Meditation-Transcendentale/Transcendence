@@ -119,6 +119,10 @@ app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
 	res.code(statusCode.CREATED).send({ message: returnMessages.USER_CREATED });
 }));
 
+app.get('/health', (req, res) => {
+	res.status(200).send('OK');
+});
+
 const start = async () => {
 	try {
 		await app.listen({ port: 4001, host: '0.0.0.0' });

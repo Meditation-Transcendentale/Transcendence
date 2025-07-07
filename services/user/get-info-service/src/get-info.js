@@ -111,6 +111,10 @@ app.get('/status', handleErrors(async (req, res) => {
 
 }));
 
+app.get('/health', (req, res) => {
+	res.status(200).send('OK');
+});
+
 const start = async () => {
 	try {
 		await app.listen({ port: 4005, host: '0.0.0.0' });
