@@ -11,16 +11,16 @@
 #       retries: 3
 services:
   builder:
-    container_name: builder
+    container_name: builder_frontend
     user: "0:0"
     build: 
-      context: ./
+      context: ./frontend
       dockerfile: Dockerfile
       target: builder
     ports:
       - "7070:7070"
     volumes:
-      - ./src:/app/src:ro
+      - ./frontend/src:/app/src:ro
       - /app/node_modules
       - bomba:/app/dist
     networks:
@@ -36,20 +36,20 @@ services:
 
 
   server:
-    container_name: nginx
+    container_name: nginx_frontend
     user: "0:0"
     build: 
-      context: ./
+      context: ./frontend
       dockerfile: Dockerfile
       target: nginx
     ports:
       - "7000:7000"
     volumes:
       - bomba:/usr/share/nginx/html/dist
-      - ../shared/certs:/app/certs:ro
+      - ./shared/certs:/app/certs:ro
     networks:
       - front
-      - api-network
+      - transcendence-network
     restart: always
   
 volumes:
@@ -60,7 +60,7 @@ networks:
   front:
     name: front
     driver: bridge
-  api-network:
-    name: api-network
-    external: true
+  # api-network:
+  #   name: api-network
+  #   external: true
    
