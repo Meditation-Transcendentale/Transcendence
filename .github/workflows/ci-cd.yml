@@ -2,7 +2,7 @@ name: Game Services CI
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, feat/CI]
   pull_request:
 
 jobs:
@@ -60,7 +60,7 @@ jobs:
       - name: 🐳 Check container status
         run: |
           docker compose ps
-          if docker compose ps | grep -v "Up"; then
+          if docker compose ps | tail -n +2 | grep -v "Up"; then
             echo "Some containers are not running!"
             exit 1
           fi
