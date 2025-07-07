@@ -64,9 +64,7 @@ re:
 	$(MAKE) build
 
 reCleanData:
-	$(MAKE) cleanShared
-	$(MAKE) down
-	$(MAKE) cleanVolumes
+	$(MAKE) clean
 	$(MAKE) build
 
 clean:

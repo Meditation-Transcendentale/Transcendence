@@ -2,7 +2,7 @@ name: Game Services CI
 
 on:
   push:
-    branches: [main, dev, feat/CI]
+    branches: [main, dev]
   pull_request:
 
 env:
