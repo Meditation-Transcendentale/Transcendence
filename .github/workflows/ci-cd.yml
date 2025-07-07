@@ -70,7 +70,7 @@ jobs:
 
       - name: Health check API
         run: |
-          curl --fail https://localhost:3000/health || exit 1
+          curl --fail --insecure https://localhost:3000/health || exit 1
 
       - name: Down services
         run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml down
