@@ -1,5 +1,4 @@
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { AdvancedDynamicTexture, TextBlock } from "@babylonImport";
 
 export function gameScoreInterface(scoreP1: number, scoreP2: number) {
 	const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");

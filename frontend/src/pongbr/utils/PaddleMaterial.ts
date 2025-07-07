@@ -1,5 +1,4 @@
-import { CustomMaterial } from '@babylonjs/materials';
-import { Scene } from "@babylonjs/core/scene";
+import { CustomMaterial, Scene } from "@babylonImport";
 
 export class PaddleMaterial extends CustomMaterial {
 

@@ -1,4 +1,3 @@
-import { Camera } from "@babylonjs/core";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { ThinInstanceManager } from "../rendering/ThinInstanceManager.js";
@@ -8,6 +7,7 @@ import { WallComponent } from "../components/WallComponent.js";
 import { PortalComponent } from "../components/PortalComponent.js";
 import { GoalComponent } from "../components/GoalComponent.js";
 import { PillarComponent } from "../components/PillarComponent.js";
+import { Camera } from "@babylonImport";
 
 export class ThinInstanceSystem extends System {
 	private ballManager: ThinInstanceManager;

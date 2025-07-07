@@ -1,4 +1,4 @@
-import { TransformNode, Vector3 } from "@babylonjs/core";
+import { TransformNode, Vector3 } from "@babylonImport";
 import { Component } from "../ecs/Component.js";
 
 export class TransformComponent implements Component {

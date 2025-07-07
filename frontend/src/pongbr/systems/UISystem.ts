@@ -1,9 +1,4 @@
-import { Vector2 } from "@babylonjs/core/Maths/math";
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { Button } from "@babylonjs/gui/2D/controls/button";
-import { Control } from "@babylonjs/gui/2D/controls/control";
+import { AdvancedDynamicTexture, Control, Rectangle, TextBlock, Vector2 } from "@babylonImport";
 
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";

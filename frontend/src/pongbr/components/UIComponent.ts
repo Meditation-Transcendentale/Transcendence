@@ -1,4 +1,4 @@
-import { Vector2 } from "@babylonjs/core";
+import { Vector2 } from "@babylonImport";
 import { Component } from "../ecs/Component.js";
 
 export class UIComponent implements Component {

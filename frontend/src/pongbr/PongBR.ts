@@ -1,8 +1,3 @@
-import { Scene } from "@babylonjs/core/scene";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 
 
 import { ECSManager } from "./ecs/ECSManager.js";
@@ -27,11 +22,11 @@ import type { userinterface } from './utils/proto/message.js';
 import { buildPaddles, PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
 import { AnimationComponent } from "./components/AnimationComponent.js";
-import { Vector3, Vector2, TransformNode, Camera, Light, PointLight, MeshBuilder, StandardMaterial, Mesh } from "@babylonjs/core";
 import { AnimationSystem } from "./systems/AnimationSystem.js";
 import { Easing } from "./utils/Easing.js";
 import { computePaddleTransforms, TransformBundle } from "./templates/transformBuilder.js";
-import '@babylonjs/inspector';
+import { ArcRotateCamera, Camera, Color3, Color4, Engine, PointLight, Scene, TransformNode, Vector3 } from "@babylonImport";
+// import '@babylonjs/inspector';
 // import { Spector } from "spectorjs";
 
 const API_BASE = `http://${window.location.hostname}:4000`;

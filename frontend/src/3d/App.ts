@@ -1,6 +1,5 @@
-import {
-	Engine,
-} from "@babylonjs/core/Engines/engine";
+
+import { Engine } from "@babylonImport";
 
 import { Environment } from "./Environment";
 import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue, Vue } from "../Vue";
