@@ -55,6 +55,22 @@ await esbuild.build({
 	resolveExtensions: ['.ts', '.js'],
 })
 
+await esbuild.build({
+	entryPoints: ['src/pongbr/PongBR.ts'],
+	bundle: true,
+	outfile: "./dist/pongbr/PongBR.js",
+	// outdir: "./dist/pongbr",
+	treeShaking: false,
+	legalComments: 'none',
+	format: "esm",
+	// minify: true,
+	// minifySyntax: true,
+	// minifyWhitespace: true,
+	// minifyIdentifiers: true,
+	splitting: false,
+	resolveExtensions: ['.ts', '.js'],
+	plugins: [notifyPlugin]
+})
 
 //Object(spa).forEach((file) => {
 //	esbuild.build({
