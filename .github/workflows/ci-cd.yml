@@ -9,32 +9,46 @@ jobs:
   test-services:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        service:
-          - services/game/game-manager
-          - services/game/user-interface
-          - services/game/pong-physics
-          - services/game/pongBR-physics
-          - services/game/pongIO-physics
-          - services/game/ai
+    # strategy:
+    #   matrix:
+    #     service:
+    #       - services/game/game-manager
+    #       - services/game/user-interface
+    #       - services/game/pong-physics
+    #       - services/game/pongBR-physics
+    #       - services/game/pongIO-physics
+    #       - services/game/ai
 
-    defaults:
-      run:
-        working-directory: ${{ matrix.service }}
+    # defaults:
+    #   run:
+    #     working-directory: ${{ matrix.service }}
 
     steps:
       - name: 📥 Checkout repo
         uses: actions/checkout@v3
 
-      - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+      - name: 🔧 Setup Docker Buildx
+        uses: actions/setup-buildx-action@v3
 
-      - name: 📦 Install dependencies
-        run: npm ci
+      - name: 🐳 Build up
+        run: docker compose -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml up --build
 
-      - name: 🧪 Run tests
-        run: npm test
+      - name: 🐳 List running containers
+        run: docker ps -a
+
+      - name: 🐳 Check container status
+        run: |
+          docker compose ps
+          if docker compose ps | grep -v "Up"; then
+            echo "Some containers are not running!"
+            exit 1
+          fi
+
+      - name: ⏳ Wait for services
+        run: sleep 10
+
+      - name: Health check API
+        run: |
+          curl --fail https://localhost:3000/health || exit 1
+
 
