@@ -1,5 +1,5 @@
 import { Gears } from "./Gears";
-import { updateVues, Vue } from "../Vue";
+import { Vue } from "../Vue";
 import {
 	ArcRotateCamera,
 	Color3,
@@ -93,7 +93,6 @@ export class Environment {
 	}
 
 	public render() {
-		updateVues(this.frame);
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
@@ -102,16 +101,8 @@ export class Environment {
 		this.frame += 1;
 	}
 
-	public loadVue(vue: string): void {
-		this.gears.loadVue(vue);
-	}
-
-	public unloadVue(vue: string): void {
-		this.gears.unloadVue(vue);
-	}
-
-	public setVue(vue: string): void {
-		this.gears.setVue(vue);
+	public setVue(vue: string): Vue {
+		return this.gears.setVue(vue);
 	}
 
 	public dispose() {

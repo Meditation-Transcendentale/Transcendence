@@ -36,17 +36,17 @@ class Home {
 
 		App3D.setVue('home');
 		const homeVue = App3D.getVue('home');
-		homeVue.windowAddEvent('play', 'click', () => {
-			console.log("play clicked");
+		homeVue?.windowAddEvent('play', 'click', () => {
 			Router.nav('/play');
 		})
-		homeVue.windowAddEvent('stats', 'click', () => {
-			console.log("stats clicked");
+		homeVue?.windowAddEvent('stats', 'click', () => {
 			Router.nav(`/stats?u=${User.username}`)
 		})
-		homeVue.windowAddEvent('/!\\TEST/!\\', 'click', () => {
-			console.log("Test clicked");
+		homeVue?.windowAddEvent('/!\\TEST/!\\', 'click', () => {
 			Router.nav('/test')
+		})
+		homeVue?.windowAddEvent('info', 'click', () => {
+			Router.nav("/info")
 		})
 
 

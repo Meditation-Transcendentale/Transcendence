@@ -2,15 +2,8 @@ import { glob } from 'glob';
 import path from 'path';
 import { WebSocketServer } from 'ws';
 import * as esbuild from 'esbuild'
-import alias from 'esbuild-plugin-alias';
-import { fileURLToPath } from 'url';
-
-// Fix __dirname in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const spa = glob.sync("src/spa/*.ts");
-
 
 const wss = new WebSocketServer({
 	port: 7070
@@ -46,16 +39,15 @@ const appctx = await esbuild.context({
 	entryPoints: ['src/3d/App.ts'],
 	bundle: true,
 	outfile: "./dist/3d/App.js",
-	treeShaking: false,
+	treeShaking: true,
 	legalComments: 'none',
 	format: "esm",
-	// minify: true,
-	// minifySyntax: true,
-	// minifyWhitespace: true,
-	// minifyIdentifiers: true,
+	minify: true,
+	minifySyntax: true,
+	minifyWhitespace: true,
+	minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
-	// external: ["../babyImport"],
 	plugins: [notifyPlugin, customAliasPlugin]
 })
 
@@ -100,14 +92,13 @@ const pongctx = await esbuild.context({
 	entryPoints: ['src/pongbr/PongBR.ts'],
 	bundle: true,
 	outfile: "./dist/pongbr/PongBR.js",
-	// outdir: "./dist/pongbr",
 	treeShaking: true,
 	legalComments: 'none',
 	format: "esm",
-	// minify: true,
-	// minifySyntax: true,
-	// minifyWhitespace: true,
-	// minifyIdentifiers: true,
+	minify: true,
+	minifySyntax: true,
+	minifyWhitespace: true,
+	minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
 	plugins: [notifyPlugin, customAliasPlugin]
@@ -133,14 +124,13 @@ let babyctx = await esbuild.context({
 	entryPoints: ['src/babyImport.ts'],
 	bundle: true,
 	outfile: "./dist/babyImport.js",
-	// outdir: "./dist/pongbr",
 	treeShaking: false,
 	legalComments: 'none',
 	format: "esm",
-	// minify: true,
-	// minifySyntax: true,
-	// minifyWhitespace: true,
-	// minifyIdentifiers: true,
+	minify: true,
+	minifySyntax: true,
+	minifyWhitespace: true,
+	minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
 	plugins: [notifyPlugin]

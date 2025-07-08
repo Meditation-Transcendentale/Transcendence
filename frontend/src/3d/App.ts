@@ -2,7 +2,7 @@
 import { Engine } from "@babylonImport";
 
 import { Environment } from "./Environment";
-import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue, Vue } from "../Vue";
+import { Vue } from "../Vue";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -17,7 +17,8 @@ class app3d {
 
 	private fps: HTMLElement;
 
-
+	private vues: Map<string, Vue>;
+	private frame: number = 0;
 
 	constructor() {
 		console.log("eeeeee");
@@ -43,6 +44,8 @@ class app3d {
 		//
 		this.fps = document.getElementById('fps') as HTMLElement;
 
+		this.vues = new Map<string, Vue>;
+
 	}
 
 
@@ -54,9 +57,17 @@ class app3d {
 	public run() {
 		this.engine.runRenderLoop(() => {
 			this.environment.render();
+			this.updateVues();
 
-			this.fps.innerHTML = this.engine.getFps().toFixed();//(this.instru.gpuFrameTimeCounter.current * 0.000001).toFixed(2);
+			this.fps.innerHTML = this.engine.getFps().toFixed();
+			this.frame += 1;
 		})
+	}
+
+	private updateVues() {
+		for (let vue of this.vues.values()) {
+			vue.update(this.frame);
+		}
 	}
 
 	public dispose() {
@@ -64,43 +75,24 @@ class app3d {
 		this.engine?.dispose();
 	}
 
-	public loadVue(vue: string): void {
-		this.environment.loadVue(vue);
+
+	public loadVue(vue: string) {
+		this.vues.get(vue)?.enable();
 	}
 
-	public unloadVue(vue: string): void {
-		this.environment.unloadVue(vue);
+
+	public unloadVue(vue: string) {
+		this.vues.get(vue)?.disable();
 	}
 
 	public setVue(vue: string) {
-		this.environment.setVue(vue);
+		if (!this.vues.has(vue)) {
+			this.vues.set(vue, this.environment.setVue(vue));
+		}
 	}
 
-	public getVue(vue: string): Vue {
-		switch (vue) {
-			case 'play': {
-				return playVue;
-			}
-			case 'home': {
-				return homeVue;
-			}
-			case 'stats': {
-				return statsVue;
-			}
-			case 'login': {
-				return loginVue;
-			}
-			case 'register': {
-				return registerVue;
-			}
-			case 'test': {
-				return testVue;
-			}
-			case 'lobby': {
-				return lobbyVue;
-			}
-		}
-		return homeVue;
+	public getVue(vue: string): Vue | undefined {
+		return this.vues.get(vue);
 	}
 
 	public get scene() {
