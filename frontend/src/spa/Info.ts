@@ -8,6 +8,8 @@ interface infoHtmlReference {
 	securityDiv: HTMLDivElement;
 	userInpt: HTMLInputElement;
 	avatarInpt: HTMLInputElement;
+	avatarImg: HTMLImageElement;
+	userSubmit: HTMLInputElement;
 };
 
 enum popupState {
@@ -28,12 +30,36 @@ export default class Info {
 
 		this.ref = {
 			userDiv: div.querySelector("#info-user-win") as HTMLDivElement,
-			securityDiv: div.querySelector("info-security-win") as HTMLDivElement,
+			securityDiv: div.querySelector("#info-security-win") as HTMLDivElement,
 			userInpt: div.querySelector("#user-input") as HTMLInputElement,
 			avatarInpt: div.querySelector("#avatar-input") as HTMLInputElement,
+			avatarImg: div.querySelector("#avatar-img") as HTMLImageElement,
+			userSubmit: div.querySelector("#info-user-submit") as HTMLInputElement
 		}
 
-		this.ref.userDiv.remove();
+		this.ref.securityDiv.remove();
+		this.ref.userSubmit.toggleAttribute("off", true);
+
+		this.ref.avatarInpt.addEventListener('change', () => {
+			this.ref.avatarImg.src = URL.createObjectURL(this.ref.avatarInpt.files[0]);
+			this.ref.userSubmit.removeAttribute('off');
+		})
+
+		this.ref.userInpt.addEventListener("change", () => {
+			this.ref.userSubmit.removeAttribute("off");
+		})
+
+		this.ref.userSubmit.addEventListener('click', () => {
+			const body = new FormData();
+			body.append('avatar', this.ref.avatarInpt.files[0]);
+			patchRequest("update-info", body, false)
+				.then(() => {
+					this.ref.userSubmit.toggleAttribute("off", true);
+				})
+				.catch(() => {
+					console.error("Error changing avatar");
+				})
+		})
 
 		// this.ref.popup.remove();
 		//
@@ -58,6 +84,8 @@ export default class Info {
 
 	public load(params: URLSearchParams) {
 		App3D.loadVue("info");
+		this.ref.userInpt.placeholder = User.username;
+		// this.ref.avatarImg.src = URL.createObjectURL(User.avatar as string);
 		// this.ref.popup.remove();
 		// this.ref.username.placeholder = User.username as string;
 		// this.ref.edit.disabled = true;

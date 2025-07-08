@@ -36,7 +36,7 @@ export async function postRequest(path: string, body: {}): Promise<JSON> {
 	return response.json();
 }
 
-export async function patchRequest(path: string, body: {}): Promise<JSON> {
+export async function patchRequest(path: string, body: {}, stringify = true): Promise<JSON> {
 	const response = await fetch(`https://${window.location.hostname}:7000/api/${encodeURI(path)}`, {
 		method: 'PATCH',
 		headers: {
@@ -44,8 +44,7 @@ export async function patchRequest(path: string, body: {}): Promise<JSON> {
 			'Content-Type': 'application/json'
 		},
 		credentials: 'include',
-		body: JSON.stringify(body)
-
+		body: stringify ? JSON.stringify(body) : body
 	});
 
 	if (!response.ok) {
