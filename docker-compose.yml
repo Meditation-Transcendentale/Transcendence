@@ -15,6 +15,7 @@ services:
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
     depends_on:
@@ -42,6 +43,7 @@ services:
       - FT_API_SECRET=${FT_API_SECRET}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
       - CDN_URL=${CDN_URL}
     networks:
       - transcendence-network
@@ -67,6 +69,7 @@ services:
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
       - CDN_URL=${CDN_URL}
     networks:
       - transcendence-network
@@ -91,9 +94,9 @@ services:
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
-    restart: always
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
@@ -115,6 +118,7 @@ services:
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
     depends_on:
@@ -135,6 +139,7 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=${DATABASE_URL}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
     depends_on:
@@ -175,6 +180,7 @@ services:
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     ports:
       - "7001:7001"
       - "7011:7011"

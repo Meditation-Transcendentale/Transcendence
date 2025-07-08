@@ -28,7 +28,11 @@ const app = fastify({
 
 app.register(fastifyCookie);
 
-const nats = await connect({ servers: process.env.NATS_URL });
+const nats = await connect({ 
+	servers: process.env.NATS_URL,
+	token: process.env.NATS_TOKEN,
+	tls: { rejectUnauthorized: false }
+});
 const jc = JSONCodec();
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);

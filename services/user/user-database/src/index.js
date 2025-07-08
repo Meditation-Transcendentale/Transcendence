@@ -6,7 +6,11 @@ import dotenv from "dotenv";
 dotenv.config({ path: "../../../.env" });
 
 const jc = JSONCodec();
-const nats = await connect({ servers: process.env.NATS_URL });
+const nats = await connect({ 
+	servers: process.env.NATS_URL,
+	token: process.env.NATS_TOKEN,
+	tls: { rejectUnauthorized: false }
+});
 
 async function handleNatsSubscription(subject, handler) {
 	const sub = nats.subscribe(subject);
