@@ -49,7 +49,7 @@ jobs:
           echo "HOSTNAME=localhost" >> .env
           echo "NATS_GAME_URL=nats://nats_game:4222" >> .env
           echo "NATS_GAME_TOKEN=your_nats_game_token" >> .env
-          echo "NATS_TOKEN=your_nats_token" >> .
+          echo "NATS_TOKEN=your_nats_token" >> .env
 
       - name: 🐳 Build up
         run: docker compose $DOCKER_COMPOSE_FILES up --build -d
