@@ -72,3 +72,8 @@ clean:
 	$(MAKE) cleanShared
 	$(MAKE) cleanVolumes
 
+cleanCDN:
+	@if [ -d ./services/cdn/public ]; then \
+		rm -rf ./services/cdn/public/*; \
+	fi
+
