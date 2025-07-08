@@ -5,7 +5,11 @@ const SERVICE_NAME = process.env.SERVICE_NAME || 'service';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 
 async function start() {
-	const nc = await connect({ servers: NATS_URL });
+	const nc = await connect({ 
+		servers: NATS_URL,
+		token: process.env.NATS_GAME_TOKEN,
+		tls: { rejectUnauthorized: false }
+	});
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
 
 	const sub = nc.subscribe(`${SERVICE_NAME}.ping`);

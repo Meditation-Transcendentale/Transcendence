@@ -22,6 +22,7 @@
     "protobufjs": "^7.5.0",
     "fastify": "^5.3.3",
     "@fastify/cors": "^11.0.1",
+    "dotenv": "^16.0.3",
     "uuid": "11.1.0",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.52.0"
   },

@@ -80,7 +80,11 @@ app.get('/metrics', async (req, res) => {
 
 app.addHook('onRequest', verifyApiKey);
 
-const nats = await connect({ servers: process.env.NATS_URL });
+const nats = await connect({ 
+	servers: process.env.NATS_URL,
+	token: process.env.NATS_TOKEN,
+	tls: { rejectUnauthorized: false }
+});
 const jc = JSONCodec();
 
 const agent = new https.Agent({

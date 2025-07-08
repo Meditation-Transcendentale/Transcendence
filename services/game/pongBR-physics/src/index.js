@@ -50,7 +50,11 @@ const handlePhysicsRequest = async (sub) => {
 };
 
 async function start() {
-	const nc = await connect({ servers: NATS_URL });
+	const nc = await connect({ 
+		servers: NATS_URL,
+		token: process.env.NATS_GAME_TOKEN,
+		tls: { rejectUnauthorized: false }
+	});
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
 
 	/**

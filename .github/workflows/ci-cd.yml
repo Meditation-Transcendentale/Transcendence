@@ -47,6 +47,9 @@ jobs:
           echo "FT_API_SECRET=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" >> .env
           echo "CDN_URL=https://localhost:3002/cdn" >> .env
           echo "HOSTNAME=localhost" >> .env
+          echo "NATS_GAME_URL=nats://nats_game:4222" >> .env
+          echo "NATS_GAME_TOKEN=your_nats_game_token" >> .env
+          echo "NATS_TOKEN=your_nats_token" >> .env
 
       - name: 🐳 Build up
         run: docker compose $DOCKER_COMPOSE_FILES up --build -d

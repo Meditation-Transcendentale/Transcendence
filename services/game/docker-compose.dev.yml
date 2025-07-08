@@ -2,8 +2,18 @@ services:
   nats_game:
     image: nats:latest
     container_name: nats_game
-    ports:
-      - "4222:4222"
+    environment:
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+    volumes:
+      - ./services/game/nats-server.conf:/nats-server.conf:ro
+      - ./shared/certs:/etc/certs:ro
+    command: ["-c", "/nats-server.conf"]
+    networks:
+      - game-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+
 
   lobby-manager:
     container_name: lobby_manager
@@ -19,11 +29,15 @@ services:
       - nats_game
     command: npm run dev
     environment:
-      - NATS_URL=nats://nats_game:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
       - PORT=5001
     ports:
       - "5001:5001"
       - "5011:5011"
+    networks:
+      - game-network
+      - transcendence-network
 
   game-manager:
     container_name: game_manager
@@ -37,13 +51,16 @@ services:
     restart: unless-stopped
     environment:
       - SERVICE_NAME=game-manager
-      - NATS_URL=nats://nats_game:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
       - PORT=5003
     depends_on:
       - nats_game
     ports:
       - "5003:5003"
       - "5050:5050" # For metrics
+    networks:
+      - game-network
 
   user-interface:
     container_name: user_interface
@@ -61,9 +78,14 @@ services:
     restart: unless-stopped
     environment:
       - SERVICE_NAME=user-interface
-      - NATS_URL=nats://nats_game:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
     depends_on:
       - nats_game
+    networks:
+      - game-network
+      - transcendence-network
+    
 
   pong-physics:
     container_name: pong_physics
@@ -77,9 +99,12 @@ services:
     restart: unless-stopped
     environment:
       - SERVICE_NAME=pong-physics
-      - NATS_URL=nats://nats_game:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
     depends_on:
       - nats_game
+    networks:
+      - game-network
 
   pongbr-physics:
     container_name: pongBR_physics
@@ -96,9 +121,12 @@ services:
     restart: unless-stopped
     environment:
       - SERVICE_NAME=pongBR-physics
-      - NATS_URL=nats://nats_game:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
     depends_on:
       - nats_game
+    networks:
+      - game-network
 
   # pongio-physics:
   #   build: ./services/game/pongIO-physics
@@ -115,18 +143,26 @@ services:
   #   depends_on:
   #     - nats
 
-  ai:
-    container_name: ai_service
-    build: ./services/game/ai
-    volumes:
-      - ./services/game/ai/src:/app/src
-      - ./services/game/ai/test:/app/test
-      - ./services/game/ai/package.json:/app/package.json
-      - ./services/game/ai/.env.example:/app/.env
-    command: npm run dev
-    restart: unless-stopped
-    environment:
-      - SERVICE_NAME=ai
-      - NATS_URL=nats://nats_game:4222
-    depends_on:
-      - nats_game
+  # ai:
+  #   container_name: ai_service
+  #   build: ./services/game/ai
+  #   volumes:
+  #     - ./services/game/ai/src:/app/src
+  #     - ./services/game/ai/test:/app/test
+  #     - ./services/game/ai/package.json:/app/package.json
+  #     - ./services/game/ai/.env.example:/app/.env
+  #   command: npm run dev
+  #   restart: unless-stopped
+  #   environment:
+  #     - SERVICE_NAME=ai
+  #     - NATS_URL=${NATS_GAME_URL}
+  #     - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+  #   depends_on:
+  #     - nats_game
+  #   networks:
+  #     - game-network
+
+
+networks:
+  game-network:
+    driver: bridge

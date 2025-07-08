@@ -1,12 +1,19 @@
 // services/natsClient.js
 import { connect, StringCodec } from 'nats';
+import dotenv from 'dotenv';
 const sc = StringCodec();
 let nc;
+
+dotenv.config();
 
 export default {
 	/** Call once at startup */
 	async connect(url) {
-		nc = await connect({ servers: url });
+		nc = await connect({ 
+			servers: url,
+			token: process.env.NATS_GAME_TOKEN,
+			tls: { rejectUnauthorized: false }
+		});
 		return nc;
 	},
 

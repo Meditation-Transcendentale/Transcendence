@@ -15,8 +15,12 @@ const userSockets = new Map()
 
 async function start() {
   
-  const nc = await connect({ servers: process.env.NATS_URL })
-  console.log('[NATS] Connected to', process.env.NATS_URL);
+  const nc = await connect({ 
+    servers: process.env.NATS_URL,
+    token: process.env.NATS_TOKEN,
+    tls: { rejectUnauthorized: false }
+   })
+  // console.log('[NATS] Connected to', process.env.NATS_URL);
   const jc = JSONCodec()
 
   const app = Fastify({ logger: true });
