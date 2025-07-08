@@ -41,7 +41,6 @@ export async function patchRequest(path: string, body: {}, stringify = true): Pr
 		method: 'PATCH',
 		headers: {
 			'Accept': 'application/json',
-			'Content-Type': 'application/json'
 		},
 		credentials: 'include',
 		body: stringify ? JSON.stringify(body) : body
