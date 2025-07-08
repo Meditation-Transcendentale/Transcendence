@@ -8,7 +8,7 @@ import {
 	encodePhysicsResponse,
 } from './proto/helper.js';
 
-const SERVICE_NAME = process.env.SERVICE_NAME || 'pong-physics';
+const SERVICE_NAME = process.env.SERVICE_NAME || 'pongbr-physics';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 const endedGames = new Set();
 
@@ -52,11 +52,6 @@ const handlePhysicsRequest = async (sub) => {
 async function start() {
 	const nc = await connect({ servers: NATS_URL });
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
-
-	/**
-	   * Handle game end events by tearing down state
-	   * @param {import('nats').Msg} msg
-	   */
 
 	const endBr = nc.subscribe('games.br.*.match.end');
 	handleEnd(endBr);

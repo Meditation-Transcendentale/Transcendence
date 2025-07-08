@@ -35,7 +35,6 @@ export class NetworkingSystem extends System {
 	update(entities: Entity[], deltaTime: number): void {
 		const messages = this.wsManager.getMessages();
 
-		// console.log("Networking system:", performance.now());
 		messages.forEach((raw: ArrayBuffer) => {
 			let serverMsg: userinterface.ServerMessage;
 			try {
