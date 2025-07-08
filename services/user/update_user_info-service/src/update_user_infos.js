@@ -4,6 +4,8 @@ import fs from "fs";
 import bcrypt from "bcrypt";
 import axios from "axios";
 import https from "https";
+import fastifyMultipart from '@fastify/multipart';
+import { fileTypeFromStream, fileTypeFromBuffer } from 'file-type';
 import { connect, JSONCodec } from "nats";
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
@@ -21,6 +23,12 @@ const app = Fastify({
 		key: fs.readFileSync(process.env.SSL_KEY),
 		cert: fs.readFileSync(process.env.SSL_CERT)
 	}
+});
+
+app.register(fastifyMultipart, {
+	limits: {
+		fileSize: 5 * 1024 * 1024
+	} 
 });
 
 const verifyApiKey = (req, res, done) => {
@@ -116,37 +124,34 @@ async function checkPassword2FA(user, password, token) {
 	}
 }
 
-function isValidUrlAndImage(url) {
-	try {
-		new URL(url);
-		const response = axios.head(url, { httpsAgent: agent });
-		const contentType = response.headers['content-type'];
-		if (!contentType || !contentType.startsWith('image/'))
-			return false;
-		return true;
-	} catch (error) {
-		return false;
+async function removeOldAvatars(uuid) {
+	const files = fs.readdirSync('/app/cdn_data');
+	for (const file of files) {
+		if (file.startsWith(uuid + '.')) {
+			fs.unlinkSync(`/app/cdn_data/${file}`);
+		}
 	}
 }
 
 async function getAvatarCdnUrl(avatar, uuid) {
-	const response = await fetch(avatar);
-	if (response.status !== 200) {
-		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
+
+	const buffer = await avatar.toBuffer();
+	const fileType = await fileTypeFromBuffer(buffer);
+
+	if (!fileType || !fileType.mime.startsWith('image/')) {
+		throw { status: statusCode.BAD_REQUEST, message: returnMessages.INVALID_TYPE };
 	}
+	await removeOldAvatars(uuid);
 
-	const arrayBuffer = await response.arrayBuffer();
-	const buffer = Buffer.from(arrayBuffer);
-	const filename = `${uuid}.png`;
+	const filename = `${uuid}.${fileType.ext}`;
 	const fullPath = `/app/cdn_data/${filename}`;
-
 	fs.writeFileSync(fullPath, buffer);
 
 	return `${process.env.CDN_URL}/${filename}`;
 }
 
 
-app.patch('/', handleErrors(async (req, res) => {
+app.patch('/username', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 		
@@ -154,7 +159,7 @@ app.patch('/', handleErrors(async (req, res) => {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.NOTHING_TO_UPDATE };
 	}
 
-	const { username, avatar, password, token } = req.body;
+	const { username, password, token } = req.body;
 
 	if (username && USERNAME_REGEX.test(username) === false) {
 		throw { status: statusCode.BAD_REQUEST, message: returnMessages.USERNAME_INVALID };
@@ -163,14 +168,24 @@ app.patch('/', handleErrors(async (req, res) => {
 		await natsRequest(nats, jc, 'user.updateUsername', { username, userId: user.id });
 	}
 
-	if (avatar) {
-		// if (!isValidUrlAndImage(avatar))
-		// 	throw { status: statusCode.BAD_REQUEST, message: returnMessages.INVALID_AVATAR_URL };
-		// const avatarUrl = await getAvatarCdnUrl(avatar, user.uuid);
-		await natsRequest(nats, jc, 'user.updateAvatar', { avatar, userId: user.id });
+	res.code(statusCode.SUCCESS).send({ message: returnMessages.USERNAME_UPDATED });
+
+}));
+
+app.patch('/avatar', handleErrors(async (req, res) => {
+	
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
+
+	const avatar = await req.file();
+	if (!avatar) {
+		throw { status: statusCode.BAD_REQUEST, message: returnMessages.AVATAR_REQUIRED };
 	}
 
-	res.code(statusCode.SUCCESS).send({ message: returnMessages.INFO_UPDATED });
+	const cdnPath = await getAvatarCdnUrl(avatar, user.uuid);
+
+	await natsRequest(nats, jc, 'user.updateAvatar', { cdnPath, userId: user.id });
+
+	res.code(statusCode.SUCCESS).send({ message: returnMessages.AVATAR_UPDATED, data: { cdnPath }});
 
 }));
 

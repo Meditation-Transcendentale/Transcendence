@@ -142,9 +142,7 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 }));
 
 async function getAvatarCdnUrl(picture, uuid) {
-	// console.log("picture", picture);
 	const response = await fetch(picture);
-	console.log("response", response.headers);
 	if (response.status !== 200) {
 		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
 	}
