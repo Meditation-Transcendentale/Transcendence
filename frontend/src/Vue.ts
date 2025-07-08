@@ -201,20 +201,3 @@ export class Vue {
 	}
 }
 
-export const playVue = new Vue();
-export const homeVue = new Vue();
-export const statsVue = new Vue();
-export const loginVue = new Vue();
-export const registerVue = new Vue();
-export const testVue = new Vue();
-export const lobbyVue = new Vue();
-
-export function updateVues(frame: number) {
-	playVue.update(frame);
-	statsVue.update(frame);
-	homeVue.update(frame);
-	loginVue.update(frame);
-	registerVue.update(frame);
-	testVue.update(frame);
-	lobbyVue.update(frame);
-}

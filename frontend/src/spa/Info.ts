@@ -1,18 +1,13 @@
+import { App3D } from "../3d/App";
 import { deleteRequest, patchRequest, postRequest } from "./requests";
 import { User } from "./User";
 import { raiseStatus } from "./utils";
 
 interface infoHtmlReference {
-	username: HTMLInputElement,
-	avatar: HTMLImageElement,
-	edit: HTMLInputElement,
-	password: HTMLInputElement,
-	twofa: HTMLInputElement,
-	popup: HTMLDivElement,
-	popupPassword: HTMLInputElement,
-	popupNewPassword: HTMLInputElement,
-	popup2fa: HTMLInputElement
-	popupSubmit: HTMLInputElement
+	userDiv: HTMLDivElement;
+	securityDiv: HTMLDivElement;
+	userInpt: HTMLInputElement;
+	avatarInpt: HTMLInputElement;
 };
 
 enum popupState {
@@ -22,56 +17,58 @@ enum popupState {
 	changePass2fa = 4
 }
 
+
 export default class Info {
 	private div: HTMLDivElement;
 	private ref: infoHtmlReference;
+
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 
 		this.ref = {
-			username: div.querySelector("#info-username") as HTMLInputElement,
-			avatar: div.querySelector("#info-avatar") as HTMLImageElement,
-			edit: div.querySelector("#info-edit") as HTMLInputElement,
-			password: div.querySelector("#update-password") as HTMLInputElement,
-			twofa: div.querySelector("#update-2fa") as HTMLInputElement,
-			popup: div.querySelector("#info-popup") as HTMLDivElement,
-			popupPassword: div.querySelector("#info-valid-password") as HTMLInputElement,
-			popupNewPassword: div.querySelector("#info-new-password") as HTMLInputElement,
-			popup2fa: div.querySelector("#info-valid-2fa") as HTMLInputElement,
-			popupSubmit: div.querySelector("#info-valid-submit") as HTMLInputElement,
+			userDiv: div.querySelector("#info-user-win") as HTMLDivElement,
+			securityDiv: div.querySelector("info-security-win") as HTMLDivElement,
+			userInpt: div.querySelector("#user-input") as HTMLInputElement,
+			avatarInpt: div.querySelector("#avatar-input") as HTMLInputElement,
 		}
 
-		this.ref.popup.remove();
+		this.ref.userDiv.remove();
 
-		this.ref.username.addEventListener("input", () => { this.ref.edit.disabled = false });
-
-		this.ref.edit.addEventListener("click", () => {
-			this.setupPopup(User.twofa == 1 ? popupState.twofa : popupState.password, () => { this.updateInfo() })
-		})
-
-		this.ref.password.addEventListener("click", () => {
-			this.setupPopup(User.twofa == 1 ? popupState.changePass2fa : popupState.changePass, () => { this.updatePassword() })
-		})
-
-		this.ref.twofa.addEventListener("click", () => {
-			User.twofa == 1 ?
-				this.setupPopup(popupState.password, this.disable2fa) :
-				this.setupPopup(popupState.password, this.enable2fa)
-		})
+		// this.ref.popup.remove();
+		//
+		// this.ref.username.addEventListener("input", () => { this.ref.edit.disabled = false });
+		//
+		// this.ref.edit.addEventListener("click", () => {
+		// 	this.setupPopup(User.twofa == 1 ? popupState.twofa : popupState.password, () => { this.updateInfo() })
+		// })
+		//
+		// this.ref.password.addEventListener("click", () => {
+		// 	this.setupPopup(User.twofa == 1 ? popupState.changePass2fa : popupState.changePass, () => { this.updatePassword() })
+		// })
+		//
+		// this.ref.twofa.addEventListener("click", () => {
+		// 	User.twofa == 1 ?
+		// 		this.setupPopup(popupState.password, this.disable2fa) :
+		// 		this.setupPopup(popupState.password, this.enable2fa)
+		// })
+		//
+		App3D.setVue("info");
 	}
 
 	public load(params: URLSearchParams) {
-		this.ref.popup.remove();
-		this.ref.username.placeholder = User.username as string;
-		this.ref.edit.disabled = true;
-		this.ref.avatar.src = (User.avatar ? User.avatar : "default_avatar.jpg");
-		this.ref.twofa.checked = (User.twofa as number) != 0;
+		App3D.loadVue("info");
+		// this.ref.popup.remove();
+		// this.ref.username.placeholder = User.username as string;
+		// this.ref.edit.disabled = true;
+		// this.ref.avatar.src = (User.avatar ? User.avatar : "default_avatar.jpg");
+		// this.ref.twofa.checked = (User.twofa as number) != 0;
 
-		document.querySelector("#home-container")?.appendChild(this.div);
+		document.querySelector("#main-container")?.appendChild(this.div);
 	}
 
 	public async unload() {
+		App3D.unloadVue("info");
 		this.div.remove();
 	}
 

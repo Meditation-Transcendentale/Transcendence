@@ -46,6 +46,7 @@ services:
       - "7000:7000"
     volumes:
       - bomba:/usr/share/nginx/html/dist
+      - ./frontend/public:/usr/share/nginx/html/public
       - ./shared/certs:/app/certs:ro
     networks:
       - front

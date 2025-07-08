@@ -1,6 +1,6 @@
 
 //import { GLTFFileLoader} from "@babylonjs/loaders/glTF/glTFFileLoader";
-import { homeVue, lobbyVue, loginVue, playVue, registerVue, statsVue, testVue } from "../Vue";
+import { Vue } from "../Vue";
 import {
 	AbstractMesh,
 	Camera, CascadedShadowGenerator,
@@ -246,118 +246,56 @@ export class Gears {
 
 	}
 
-	public loadVue(vue: string) {
+	public setVue(vue: string): Vue {
+		const final = new Vue();
 		switch (vue) {
 			case 'play': {
-				playVue.enable();
+				final.init(this.scene.getCameraByName('menu') as Camera);
+				final.addWindow('create', this.outer, this.outerBounding, this.outerMatrix[17]);
+				final.addWindow('join', this.outer, this.outerBounding, this.outerMatrix[14]);
 				break;
 			}
 			case 'home': {
-				homeVue.enable();
+				final.init(this.scene.getCameraByName('home') as Camera);
+				final.addWindow('play', this.outer, this.outerBounding, this.outerMatrix[8]);
+				final.addWindow('stats', this.outer, this.outerBounding, this.outerMatrix[9]);
+				final.addWindow('info', this.outer, this.outerBounding, this.outerMatrix[7]);
+				final.addWindow('/!\\TEST/!\\', this.outer, this.outerBounding, this.outerMatrix[6]);
 				break;
 			}
 			case 'stats': {
-				statsVue.enable();
+				final.init(this.scene.getCameraByName('menu') as Camera);
+				final.addWindow('pong', this.outer, this.outerBounding, this.outerMatrix[17]);
+				final.addWindow('br', this.outer, this.outerBounding, this.outerMatrix[14]);
 				break;
 			}
 			case 'login': {
-				loginVue.enable();
+				final.init(this.scene.getCameraByName('home') as Camera);
+				final.addWindow('register', this.outer, this.outerBounding, this.outerMatrix[8]);
 				break;
 			}
 			case 'register': {
-				registerVue.enable();
+				final.init(this.scene.getCameraByName('menu') as Camera);
+				final.addWindow('login', this.outer, this.outerBounding, this.outerMatrix[16]);
 				break;
 			}
 			case 'test': {
-				testVue.enable();
+				final.init(this.scene.getCameraByName('br') as Camera);
 				break;
 			}
 			case 'lobby': {
-				lobbyVue.enable();
+				final.init(this.scene.getCameraByName('home') as Camera);
+				final.addWindow('BACK', this.outer, this.outerBounding, this.outerMatrix[8]);
 				break;
 			}
-
-
-		}
-	}
-
-	public unloadVue(vue: string) {
-		switch (vue) {
-			case 'play': {
-				playVue.disable();
-				break;
-			}
-			case 'home': {
-				homeVue.disable();
-				break;
-			}
-			case 'stats': {
-				statsVue.disable();
-				break;
-			}
-			case 'login': {
-				loginVue.disable();
-				break;
-			}
-			case 'register': {
-				registerVue.disable();
-				break;
-			}
-			case 'test': {
-				testVue.disable();
-				break;
-			}
-			case 'lobby': {
-				lobbyVue.disable();
-				break;
-			}
-
-		}
-
-	}
-
-	public setVue(vue: string) {
-		switch (vue) {
-			case 'play': {
-				playVue.init(this.scene.getCameraByName('menu') as Camera);
-				playVue.addWindow('create', this.outer, this.outerBounding, this.outerMatrix[17]);
-				playVue.addWindow('join', this.outer, this.outerBounding, this.outerMatrix[14]);
-				break;
-			}
-			case 'home': {
-				console.log(homeVue);
-				homeVue.init(this.scene.getCameraByName('home') as Camera);
-				homeVue.addWindow('play', this.outer, this.outerBounding, this.outerMatrix[8]);
-				homeVue.addWindow('stats', this.outer, this.outerBounding, this.outerMatrix[9]);
-				homeVue.addWindow('/!\\TEST/!\\', this.outer, this.outerBounding, this.outerMatrix[6]);
-				break;
-			}
-			case 'stats': {
-				statsVue.init(this.scene.getCameraByName('menu') as Camera);
-				statsVue.addWindow('pong', this.outer, this.outerBounding, this.outerMatrix[17]);
-				statsVue.addWindow('br', this.outer, this.outerBounding, this.outerMatrix[14]);
-				break;
-			}
-			case 'login': {
-				loginVue.init(this.scene.getCameraByName('home') as Camera);
-				loginVue.addWindow('register', this.outer, this.outerBounding, this.outerMatrix[8]);
-				break;
-			}
-			case 'register': {
-				registerVue.init(this.scene.getCameraByName('menu') as Camera);
-				registerVue.addWindow('login', this.outer, this.outerBounding, this.outerMatrix[16]);
-				break;
-			}
-			case 'test': {
-				testVue.init(this.scene.getCameraByName('br') as Camera);
-				break;
-			}
-			case 'lobby': {
-				lobbyVue.init(this.scene.getCameraByName('home') as Camera);
-				lobbyVue.addWindow('BACK', this.outer, this.outerBounding, this.outerMatrix[8]);
+			case 'info': {
+				final.init(this.scene.getCameraByName("menu") as Camera);
+				final.addWindow('user', this.outer, this.outerBounding, this.outerMatrix[16]);
+				final.addWindow('security', this.outer, this.outerBounding, this.outerMatrix[14]);
 				break;
 			}
 		}
+		return final;
 	}
 
 	public dispose() {
