@@ -74,6 +74,6 @@ clean:
 
 cleanCDN:
 	@if [ -d ./services/cdn/public ]; then \
-		rm -rf ./services/cdn/public/*; \
+		rm -rf ./services/cdn/public/*.*; \
 	fi
 
