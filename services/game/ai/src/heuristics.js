@@ -1,33 +1,32 @@
 import { MAP_HEIGHT, PADDLE_HEIGHT, WALL_SIZE } from './constants.js';
 
-// How close paddle is to expected impact
 export function h_alignment(paddleY, targetY) {
-  return 1 - Math.abs(paddleY - targetY) / MAP_HEIGHT;
+  const alignment_error = Math.abs(targetY - paddleY);
+  const alignment_score = -alignment_error;
+  return alignment_score;
 }
 
-// Prefers straight returns
-export function h_straightness(velY) {
-  const maxY = 1.5;
-  return 1 - Math.min(Math.abs(velY) / maxY, 1);
+export function h_return_quality(velY) {
+  const angle_penalty = Math.abs(velY);
+  const return_quality_score = -Math.abs(1 - angle_penalty);
+  return return_quality_score;
 }
 
-// Prefers central paddle positions
-export function h_stability(paddleY) {
-  return 1 - Math.abs(paddleY) / (MAP_HEIGHT / 2);
+export function h_opponent_difficulty(targetY, opponentPaddle) {
+  const opponent_difficulty_score = Math.abs(targetY - opponentPaddle)
+  return opponent_difficulty_score;
 }
 
-// Prefers high vertical velocity
-export function h_curvature(velY) {
-  return Math.min(Math.abs(velY) / 1.5, 1);
+export function h_centering(myPaddle) {
+  const center_bias = -Math.abs(myPaddle) * 0.5;
+  return center_bias;
 }
 
-// Measures distance from wall
-export function h_marginToWall(paddleY) {
-  const limit = (MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) / 2;
-  return Math.abs(paddleY) / limit;
-}
-
-// Signed directional movement pressure
-export function h_momentum(paddleY, targetY) {
-  return (targetY - paddleY) / MAP_HEIGHT;
+export function h_corner_target(targetY) {
+  let corner_score;
+  if (Math.abs(targetY) > (MAP_HEIGHT / 5))
+    corner_score = 10;
+  else
+    corner_score = 0;
+  return corner_score;
 }

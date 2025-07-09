@@ -1,6 +1,6 @@
 import { GameStateNode } from './GameStateNode.js';
 import { predictBallState } from './physics.js';
-import { BALL_ACCELERATION, STEP_SIZE, PADDLE_HEIGHT, MAP_HEIGHT, WALL_SIZE, PADDLE_AI_X } from './constants.js';
+import { BALL_ACCELERATION, STEP_SIZE, PADDLE_HEIGHT, MAP_HEIGHT, WALL_SIZE, PADDLE_AI_X, PADDLE_WIDTH, BALL_DIAM } from './constants.js';
 import { evaluateNode } from './evaluate.js';
 
 function generateFullRange() {
@@ -15,30 +15,26 @@ function generateFullRange() {
 
 export function expand(node) {
   const children = [];
-  const newVelX =
-    Math.abs(node.ballState.ballPos[0]) !== PADDLE_AI_X
-      ? node.ballState.ballVel[0]
-      : -node.ballState.ballVel[0] * BALL_ACCELERATION;
+  const newVelX = -node.futureBallState.ballVel[0] * BALL_ACCELERATION;
       
-  const isAIMove = node.ballState.ballVel[0] > 0;
+  const isAIMove = node.futureBallState.ballVel[0] >= 0;
   const targetY = node.futureBallState.ballPos[1];
-
   const paddlePositions = generateFullRange();
+  
+  const angleFactor = 0.5;
 
   for (const paddlePos of paddlePositions) {
     const offset = targetY - paddlePos;
-    const angleFactor = 0.5;
     const newVelY = offset * angleFactor;
 
     const newBallVel = [newVelX, newVelY];
     const futureBallState = predictBallState(node.futureBallState.ballPos, newBallVel);
-
     const aiPaddle = isAIMove ? paddlePos : node.aiPaddlePos;
     const playerPaddle = isAIMove ? node.playerPaddlePos : paddlePos;
 
     const newBallState = {
       ballPos: [...node.futureBallState.ballPos],
-      ballVel: [newVelX, newVelY]
+      ballVel: [...node.futureBallState.ballVel]
     };
 
     const child = new GameStateNode(
@@ -47,8 +43,11 @@ export function expand(node) {
       playerPaddle,
       futureBallState
     );
-    if (!isAIMove)
-      console.log ("AAAAAAAAAAAA:", child.playerPaddlePos, "|", paddlePos);
+
+//     console.log(`Init pos: ${newBallState.ballPos[0]}|${newBallState.ballPos[1]}
+//       ${newBallState.ballVel[0]}|${newBallState.ballVel[1]}
+// Future: ${futureBallState.ballPos[0]}|${futureBallState.ballPos[1]}
+//       ${futureBallState.ballVel[0]}|${futureBallState.ballVel[1]}\n`);
     children.push(child);
   }
 
