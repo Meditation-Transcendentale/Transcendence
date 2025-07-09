@@ -1,138 +1,28 @@
 import { CustomMaterial, Effect, Scene, Texture } from "@babylonImport"
 
 
-Effect.ShadersStore["cloudVertexShader"] = `
-	precision highp float;
 
-	attribute vec3 position;
-	attribute vec2	uv;
-
-	uniform float       time;
-	uniform float		ceil;
-	uniform vec2		dir;
-
-	uniform mat4 worldViewProjection;
-
-	varying vec2	vUV;
-
-	void main() {
-		vUV = uv;
-		gl_Position = worldViewProjection * vec4(position, 1.);
-	}
-`;
-
-Effect.ShadersStore["cloudFragmentShader"] = `
-precision highp    float;
-
-#define M_PI 3.1415926535897932384626433832795
-
-uniform float       time;
-uniform float		ceil;
-uniform vec2		dir;
-
-
-uniform mat4        world;
-uniform mat4        view;
-uniform mat4        projection;
-
-varying vec2    vUV;
-
-
-
-float hash(ivec2 p )  // this hash is not production ready, please
-{                         // replace this by something better
-
-    // 2D -> 1D
-    int n = p.x*3 + p.y*113;
-
-    // 1D hash by Hugo Elias
-	n = (n << 13) ^ n;
-    n = n * (n * n * 15731 + 789221) + 1376312589;
-    return -1.0+2.0*float( n & 0x0fffffff)/float(0x0fffffff);
-}
-
-float noise(vec2 p )
-{
-    ivec2 i = ivec2(floor( p ));
-    vec2 f = fract( p );
-	
-    // cubic interpolant
-    vec2 u = f*f*(3.0-2.0*f);
-
-    return mix( mix( hash( i + ivec2(0,0) ), 
-                     hash( i + ivec2(1,0) ), u.x),
-                mix( hash( i + ivec2(0,1) ), 
-                     hash( i + ivec2(1,1) ), u.x), u.y);
-}
-
-float noise_sum(vec2 p)
-{
-    float f = 0.0;
-    p = p * 4.0;
-    f += 1.0000 * noise(p); p = 2.0 * p;
-    f += 0.5000 * noise(p); p = 2.0 * p;
-	f += 0.2500 * noise(p); p = 2.0 * p;
-	f += 0.1250 * noise(p); p = 2.0 * p;
-	f += 0.0625 * noise(p); p = 2.0 * p;
-    
-    return f;
-}
-
-float noise_sum_abs(vec2 p)
-{
-    float f = 0.0;
-    p = p * 3.0;
-    f += 1.0000 * abs(noise(p)); p = 2.0 * p;
-    f += 0.5000 * abs(noise(p)); p = 2.0 * p;
-	f += 0.2500 * abs(noise(p)); p = 2.0 * p;
-	f += 0.1250 * abs(noise(p)); p = 2.0 * p;
-	f += 0.0625 * abs(noise(p)); p = 2.0 * p;
-    
-    return f;
-}
-
-float noise_sum_abs_sin(vec2 p)
-{
-    float f = noise_sum_abs(p);
-    f = sin(f * 2.5 + p.x * 5.0 - 1.5);
-    
-    return f ;
-}
-
-void main() {
-	vec2 p = vUV * SIZE * 0.01;
-
-	vec2 uv = p*vec2(5.) + time*dir;
-	
-	float f = 0.0;
-
-   	f = noise( 15.0*uv );
-     
-	f = 0.5 + 0.5*f;
-    //f = floor(f * 1.2);
-	if (f < ceil) {discard;}
-	vec3 col  = vec3(1. - f);
-	gl_FragColor = vec4(col, 1.);
-}
-`
 
 Effect.ShadersStore["shellVertexShader"] = `
 	precision highp float;
 
-	attribute vec3 position;
+	attribute vec3	position;
 	attribute vec2	uv;
+	attribute vec3	normal;
 
-	uniform float       time;
-	uniform float		ceil;
-	uniform vec2		dir;
+	uniform mat4	world;
+	uniform mat4	view;
+	uniform mat4	projection;
 
-	uniform mat4 worldViewProjection;
 
 	varying vec2	vUV;
 
 	void main() {
 		vUV = uv;
-		gl_Position = worldViewProjection * vec4(position, 1.);
+		vec4 p = vec4(position, 1.);
+		p = world * p;
+		vec3 normalW = normalize(mat3(world) * normal);
+		gl_Position = projection * view * p;
 	}
 `;
 
@@ -140,6 +30,7 @@ Effect.ShadersStore["shellFragmentShader"] = `
 precision highp    float;
 
 #define M_PI 3.1415926535897932384626433832795
+#define AA 1.
 
 uniform float       time;
 uniform float	    rand;
@@ -221,11 +112,9 @@ void main() {
 
 	f = 0.5 + 0.5*f;
 	//f = floor(f * 1.2);
-	// if (f < CEIL + t) {discard;}
+	if (f < CEIL + t) {discard;}
 	vec3 col  = vec3(min(1., (1. - f) * 2.));
-	
-	gl_FragColor = vec4(col * col, f < CEIL + t ? 0. : 1. );
-	// gl_FragColor = vec4(col * col, 1. );
+	gl_FragColor = vec4(col * col, AA);
 }`
 
 
@@ -464,6 +353,7 @@ export class GrassShader extends CustomMaterial {
 	constructor(name: string, scene?: Scene) {
 		super(name, scene);
 		this.AddUniform('time', 'float', 0.0);
+		this.AddUniform('oldTime', 'float', 0.0);
 
 		this.Vertex_Begin(
 			`
@@ -476,7 +366,7 @@ export class GrassShader extends CustomMaterial {
 
 		this.Vertex_Definitions(
 			`
-			// attribute vec4 baseColor;
+			attribute vec4 baseColor;
 			// attribute float stiffness;
 			// attribute vec2 uv;
 
@@ -493,7 +383,6 @@ export class GrassShader extends CustomMaterial {
 			  ) * v;
 			}
 
-
 			vec3 rotationY(vec3 v, float angle) {
 			  float s = sin(angle);
 			  float c = cos(angle);
@@ -504,6 +393,45 @@ export class GrassShader extends CustomMaterial {
 			    s, 0.0, c
 			  ) * v;
 			}
+
+			vec3 rotationZ(vec3 v, float angle) {
+			  float s = sin(angle);
+			  float c = cos(angle);
+
+			  return mat3(
+				c, s, 0.0,
+				-s, c, 0.0,
+				0.0, 0.0, 1.0
+			  ) * v;
+			}
+
+			uint murmurHash12(uvec2 src) {
+			  const uint M = 0x5bd1e995u;
+			  uint h = 1190494759u;
+			  src *= M; src ^= src>>24u; src *= M;
+			  h *= M; h ^= src.x; h *= M; h ^= src.y;
+			  h ^= h>>13u; h *= M; h ^= h>>15u;
+			  return h;
+			}
+
+			// 1 output, 2 inputs
+			float hash12(vec2 src) {
+			  uint h = murmurHash12(floatBitsToUint(src));
+			  return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+			}
+
+			float noise12(vec2 p) {
+			  vec2 i = floor(p);
+
+			  vec2 f = fract(p);
+			  vec2 u = smoothstep(vec2(0.0), vec2(1.0), f);
+
+				float val = mix( mix( hash12( i + vec2(0.0, 0.0) ), 
+									hash12( i + vec2(1.0, 0.0) ), u.x),
+							   mix( hash12( i + vec2(0.0, 1.0) ), 
+									hash12( i + vec2(1.0, 1.0) ), u.x), u.y);
+			  return val * 2.0 - 1.0;
+			}
 		`
 		);
 
@@ -513,21 +441,17 @@ export class GrassShader extends CustomMaterial {
 		//`
 		//)
 
+
+
+
+
 		this.Vertex_Before_NormalUpdated(
 			`
-			normalUpdated = normal;
-			normalUpdated = rotationY(normal, M_PI * 0.3 * (uv.x * 2. - 1.));
-			//normalUpdated = rotationY(normal, rot);
-			//
-			//float viewCorrection = dot(normalize(normalUpdated.xz), normalize(vEyePosition.xz));
-			//float viewCorrection = clamp(abs(dot(normalize(normalUpdated.xz), normalize(vEyePosition.xz))), 0.0, 1.);
-			//viewCorrection = (viewCorrection) * 0.2;
-
-			normalUpdated = rotationX(normalUpdated, strengh);
-			normalUpdated.y = abs(normalUpdated.y);
-			//normalUpdated = rotationY(normalUpdated, viewCorrection);
-			//
-			//positionUpdated = rotationY(positionUpdated, viewCorrection);
+				normalUpdated = normal;
+				normalUpdated.y = 0.;
+				normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
+				normalUpdated = rotationX(normalUpdated, strengh);
+				normalUpdated.y = abs(normalUpdated.y);
 			
 
 		`
@@ -535,39 +459,32 @@ export class GrassShader extends CustomMaterial {
 
 		this.Vertex_Before_PositionUpdated(
 			`
-			vec2 ndcPos = (finalWorld * vec4(0.0,0.0,0.0, 1.0)).xz * 0.08 * 0.5 +0.5;
-			vec2 pos = (finalWorld * vec4(0.0, 0.0, 0.0, 1.0)).xz;
-			// float curve = texture2D(noise, ndcPos + mod(time * 0.1, 1.0)).r;//* 2.0 - 1.0;
-			float curve = 0.;
+				vec2 pos = (finalWorld * vec4(0., 0., 0., 1.0)).xz;
+			
+				float c1 = noise12(pos * 0.25 + time) * 0.5 + 0.5;
+				float c2 = noise12(pos * 0.25 + oldTime) * 0.5 + 0.5;
 
-			//vec2 n = texture2D(noise, ndcPos + mod(time * .04, 1.0)).rg;
-			//float curve = clamp(0., 1.0, n.x * n.y);
-			//float curve = n.x;
-			//float adcurv = (smoothstep(0., 1.0, n.y) * 2.0 - 1.0) * 0.01;
+				float s1 = (c1 - 0.5) * 1.6 * M_PI * 0.5 * baseColor.a;
+				float s2 = (c2 - 0.5) * 1.6 * M_PI * 0.5 * baseColor.a;
+				float strengh = mix(s2, s1, position.y);
+	
+				float	windAngle = noise12(pos * 0.04 + time * 0.5) * M_PI;
+				vec2	windDir = vec2(cos(windAngle), sin(windAngle));
 
-			//float curve = 0.5;
-			curve = (curve < 0.5 ?  (curve -0.5) * (1.6) :  (curve - 0.5) * 1.6 );
-			float strengh = curve * M_PI * 0.5 * 1.;//* abs(noiseP(dot(ndcPos, ndcPos.xy) * time));
-
-
-
-			vec2 a = normalize(normal.xz);
-			vec2 b = normalize(pos - vEyePosition.xz);
-			float vdot = 	dot(a, b);
-			float det = a.x * b.y - a.y * b.x;
-			float rot = atan(det, vdot);
-
-			float viewCorrection = abs(dot(normalize(normal.xz), normalize(pos - vEyePosition.xz)));
-			//float rot = sign(viewCorrection) - viewCorrection;
-			float s = -sign(pos.x - vEyePosition.x);
-			s = clamp(s, 0., 1.);// * smoothstep(0.7, 1., abs(viewCorrection));
-			//viewCorrection *= smoothstep(0., 0.2, viewCorrection);
+				// vec2 viewDir = normalize(pos - vEyePosition.xz);
+				vec2 grassView = normalize(pos - vEyePosition.xz);
+				vec2 viewDir = normalize(view[2].xz);
+				
+				float viewDot = dot(grassView, viewDir);
+				float viewDet = grassView.y * viewDir.x - grassView.x * viewDir.y;
+				// float viewDot = dot(normal.xz, viewDir);
+				// float viewDet = normal.x * viewDir.y - normal.z * viewDir.x;
+				float viewCorrection = 0.;//atan(viewDet, viewDot);
 
 
-			positionUpdated = rotationY(position.xyz, (-rot));
-			//positionUpdated = rotationY(position.xyz, baseColor.a);
-			positionUpdated = rotationX(positionUpdated, strengh);
-
+				positionUpdated = rotationY(position, -viewCorrection);
+				positionUpdated = rotationX(positionUpdated, strengh * windDir.x);
+				positionUpdated = rotationZ(positionUpdated, strengh * windDir.y);
 		`);
 
 
@@ -581,12 +498,12 @@ export class GrassShader extends CustomMaterial {
 			// vColor.a = 1.0;
 		`
 		)
-		this.AddAttribute('color');
+		this.AddAttribute('baseColor');
 		this.AddAttribute('uv');
 		// this.AddAttribute('stiffness');
 
 		this.Fragment_Begin(`
-			#define VERTEXCOLOR 1
+			// #define VERTEXCOLOR 1
 			#define MAINUV1 1
 		`
 		);
@@ -744,11 +661,16 @@ export class GrassShader extends CustomMaterial {
 			}
 		`;
 
+		this.Fragment_MainEnd(`
+			gl_FragColor.rgb *= vMainUV1.y;
+		`)
+
 		//console.log(this.FragmentShader);
 
 		//this.twoSidedLighting = true;
-		this.specularPower = 1000;
+		// this.specularPower = 1000;
 		this.backFaceCulling = false;
+		this.twoSidedLighting = true;
 
 
 	}
@@ -761,4 +683,63 @@ export class GrassShader extends CustomMaterial {
 		});
 	}
 
+}
+
+export class PuddleMaterial extends CustomMaterial {
+	constructor(name: string, scene: Scene, origins: number[]) {
+		super(name, scene);
+
+		this.AddUniform("origins[40]", 'vec3', origins);
+		this.AddUniform('time', 'float', 1.0);
+
+
+		this.Vertex_Definitions(
+			`
+			float trunc_fallof( float x, float m )
+			{
+				x /= m;
+				return (x-2.0)*x+1.0;
+			}
+
+			float computeWave (vec3 origin) {
+				vec2	v = position.xz - origin.xy;
+				float	L = length(v) * 0.05;
+				float	t = time - origin.z;
+				float	l = 1.;
+			
+			 	float	freq = 250. * (L - 0.2 * t);
+				float	wave = sin(freq) / freq;
+				return wave * trunc_fallof(min(l, t), l) * float(L - 0.02 < 0.2 * t);
+			}
+
+		`);
+
+		this.Vertex_Before_PositionUpdated(`
+
+				float	totalWave = 0.;
+				for (int i = 0; i < 40; i++) {
+					totalWave += computeWave(origins[i]);
+				}
+
+				positionUpdated.y = totalWave * 0.05;
+				positionUpdated.y = clamp(positionUpdated.y, -0.3, 0.3);// * 0.2;
+		`);
+
+		this.Fragment_Before_Lights(`
+			normalW = normalize(cross(dFdy(vPositionW), dFdx(vPositionW)));
+		`)
+	}
+
+	setFloat(name: string, value: number) {
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setFloat(name, value);
+		});
+	}
+
+
+	setFloatArray3(name: string, values: number[]) {
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setFloatArray3(name, values);
+		});
+	}
 }

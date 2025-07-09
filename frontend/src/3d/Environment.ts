@@ -100,6 +100,10 @@ export class Environment {
 		//
 		await this.field.load();
 
+		this.scene.meshes.forEach((mesh) => {
+			mesh.receiveShadows = true;
+		})
+
 		// Inspector.Show(this.scene, {});
 
 	}

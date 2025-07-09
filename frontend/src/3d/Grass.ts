@@ -16,7 +16,7 @@ type _thinInstancesOptions = {
 };
 
 const _nearOptions: _thinInstancesOptions = {
-	density: 20,
+	density: 15,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.4,
@@ -100,7 +100,7 @@ export class Grass {
 		this._grassShader = new GrassShader("grass", scene);
 
 		this._grassShader.backFaceCulling = false;
-		this._grassShader.needDepthPrePass = true;
+		// this._grassShader.needDepthPrePass = false;
 		//this._grassShader.setTexture("noise", this._noiseTex);
 
 		this._tiles.push(new Tile(this._nearMesh, this._grassShader, new Vector3(0, 0, -10), this._size, this._size));
@@ -150,7 +150,7 @@ export class Grass {
 
 	public update(time: number, camera: Camera) {
 		this._grassShader.setFloat("time", time);
-		// this._grassShader.setFloat("oldTime", this._pastTime);
+		this._grassShader.setFloat("oldTime", this._pastTime);
 		// this._grassShader.setVector3("vEyePosition", camera.position);
 
 		this._pastTime = time;
@@ -167,7 +167,7 @@ export class Grass {
 		this._nearMesh.setEnabled(false);
 		console.log(this._nearMesh);
 		this._nearMesh.name = 'nearGrass';
-		// this._nearMesh.optimizeIndices();
+		this._nearMesh.optimizeIndices();
 		// this._nearMesh.position.set(0, 1, -10);
 		loaded.meshes.forEach((mesh) => {
 			// mesh.setEnabled(true);
@@ -199,7 +199,7 @@ export class Grass {
 			const posZ = (Math.floor(i / NUM_X) + 0.5) * CLUSTER_Z - depth * 0.5 + offsetZ;
 
 			const size = Math.random() * (1 - options.size) + options.size;
-			const rotation = Math.random() * Math.PI * 0.5;
+			const rotation = Math.random() * Math.PI * 0.5 - Math.PI * 0.25;
 
 			const matR = Matrix.RotationY(rotation);
 			const matS = Matrix.Scaling(
@@ -213,7 +213,7 @@ export class Grass {
 				posZ
 			);
 
-			const matrix = matR.multiply(matS.multiply(matT));
+			const matrix = matS.multiply(matT.multiply(matR));
 
 			const stiffness = Math.random() * (1 - options.stiffness) + options.stiffness;
 			const color = Color4.FromColor3(Color3.Lerp(
@@ -230,7 +230,7 @@ export class Grass {
 		}
 
 		mesh.thinInstanceSetBuffer('matrix', bufferMatrix, 16, true);
-		mesh.thinInstanceSetBuffer('color', bufferColor, 4, true);
+		mesh.thinInstanceSetBuffer('baseColor', bufferColor, 4, true);
 	}
 
 	public dispose() {

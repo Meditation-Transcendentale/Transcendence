@@ -7,6 +7,7 @@ import { Vue } from "../Vue";
 import "./Shader.ts";
 import { Sun } from "./Sun";
 import { Grass } from "./Grass";
+import { Puddle } from "./Ground";
 
 
 
@@ -18,11 +19,13 @@ export class Field {
 
 	private sun: Sun;
 	private grass: Grass;
+	private ground: Puddle;
 
 	constructor(scene: Scene) {
 		this.scene = scene;
 		this.sun = new Sun(scene);
-		this.grass = new Grass(10);
+		this.grass = new Grass(20);
+		this.ground = new Puddle(scene, 40, 300);
 
 		this.clouds = [];
 	}
@@ -31,23 +34,25 @@ export class Field {
 		const loaded = await LoadAssetContainerAsync("/assets/field.glb", this.scene);
 		loaded.addAllToScene();
 		this.scene.setActiveCameraByName("fieldCam");
+		this.scene.activeCamera.parent = undefined;
 
-		this.sunL = new DirectionalLight('sun', new Vector3(-1, -1, -1), this.scene);
-		this.sunL.intensity = 5;
+		// this.sunL = new DirectionalLight('sun', new Vector3(-1, -1, -1), this.scene);
+		// this.sunL.intensity = 5;
 
-		this.plane = MeshBuilder.CreateGround("plane", {
-			width: 20,
-			height: 20,
-			subdivisions: 100
-		}, this.scene)
-		this.plane.position.z = -10;
+		// this.plane = MeshBuilder.CreateGround("plane", {
+		// 	width: 50,
+		// 	height: 50,
+		// 	subdivisions: 100
+		// }, this.scene)
+		// this.plane.position.z = -20;
 
-		const mat = new StandardMaterial("plane", this.scene);
-		mat.wireframe = true;
-		mat.diffuseColor = new Color3(0.3, 0.3, 0.3);
-		this.plane.material = mat;
+		// const mat = new StandardMaterial("plane", this.scene);
+		// mat.wireframe = true;
+		// mat.diffuseColor = new Color3(0.3, 0.3, 0.3);
+		// this.plane.material = mat;
 
 		await this.grass.init(this.scene);
+		this.ground.init();
 
 		// const vls = new VolumetricLightScatteringPostProcess("vls",
 		// 	{ postProcessRatio: 1, passRatio: 0.5 },
@@ -66,7 +71,8 @@ export class Field {
 
 	public update(time: number) {
 		this.sun.update(time);
-		this.grass.update(time, this.scene.activeCamera as Camera)
+		this.grass.update(time, this.scene.activeCamera as Camera);
+		this.ground.update(time);
 	}
 
 	public setVue(vue: string): Vue {

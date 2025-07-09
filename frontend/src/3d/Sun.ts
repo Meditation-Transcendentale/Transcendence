@@ -1,4 +1,5 @@
-import { Color3, GlowLayer, Mesh, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, TransformNode } from "@babylonImport";
+import { CascadedShadowGenerator, Color3, DirectionalLight, Engine, Light, Mesh, MeshBuilder, PointLight, Scene, ShaderMaterial, ShadowDepthWrapper, ShadowGenerator, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
+
 
 export class Sun {
 	private root: TransformNode;
@@ -12,7 +13,11 @@ export class Sun {
 
 	private scene: Scene;
 
-	private glowLayer: GlowLayer;
+	private light: Light;
+
+	private shadow: ShadowGenerator;
+
+	// private glowLayer: GlowLayer;
 
 	constructor(scene: Scene) {
 		this.scene = scene;
@@ -33,11 +38,12 @@ export class Sun {
 		this.centerMat.diffuseColor = Color3.Black();
 
 		this.shellMat = new ShaderMaterial("cloud", this.scene, 'shell', {
-			attributes: ["position", "uv"],
+			attributes: ["position", "uv", "normal"],
 			uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "time", "direction"],
-			defines: [`#define CEIL ${0.7}`, `#define SIZE ${10}.`, `#define DIR vec2(${0.}, ${0.2})`],
-			needAlphaBlending: true
+			defines: [`#define CEIL ${0.7}`, `#define SIZE ${10}.`, `#define DIR vec2(${0}., ${0.02})`],
+			needAlphaTesting: true,
 		});
+		this.shellMat.backFaceCulling = false;
 
 
 		this.center.material = this.centerMat;
@@ -46,27 +52,32 @@ export class Sun {
 		this.center.parent = this.root;
 		this.shell.parent = this.root;
 		// this.shell.setEnabled(false);
-		this.root.position.set(50, 50, -100);
+		this.root.position.set(50, 50, 100);
 		this.root.scaling.setAll(50);
 
-		// this.glowLayer = new GlowLayer("glow", this.scene);
-		// this.glowLayer.intensity = 10.;
-		// this.glowLayer.blurKernelSize = 64;
+		this.light = new PointLight("light", Vector3.Zero(), this.scene);
+		const l = new DirectionalLight("light2", new Vector3(0, -1, 0), this.scene);
+		this.light.parent = this.root;
 
-		// this.shellMat.emmisiveColor = new Color3(1, 1, 1);
-		// this.glowLayer.addExcludedMesh(this.shell);
-		// this.glowLayer.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
-		// 	if (material === this.shellMat) {
-		// 		result.set(0, 0, 0, 1);
-		// 	} else {
-		// 		result.set(
-		// 			material.emissiveColor.r,
-		// 			material.emissiveColor.g,
-		// 			material.emissiveColor.b,
-		// 			material.alpha
-		// 		)
-		// 	}
-		// }
+		this.shadow = new ShadowGenerator(1024, this.light);
+		this.shadow.transparencyShadow = true;
+
+
+		this.shadow.setDarkness(0.1);
+		this.shadow.usePoissonSampling = true;
+		this.shadow.bias = 0.003;
+		//this.shadow.normalBias = 0.1;
+		// this.shadow.usePercentageCloserFiltering = true;
+		// this.shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
+		// this.shadow.getShadowMap()!.renderList?.push(this.shell);
+		this.shadow.addShadowCaster(this.shell);
+		// this.shadow.useAlphaTesting = true;
+
+
+		this.shellMat.shadowDepthWrapper = new ShadowDepthWrapper(this.shellMat, this.scene, {
+			remappedVariables: ["worldPos", "p", "vNormalW", "normalW"]
+		});
+
 
 	}
 
