@@ -8,20 +8,20 @@ DOCKER_COMPOSE_GAME = -f ./services/game/docker-compose.dev.yml
 TARGET ?= all
 
 ifeq ($(TARGET),user)
-    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER)
+	DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER)
 else ifeq ($(TARGET),stats)
-    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_STATS)
+	DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_STATS)
 else ifeq ($(TARGET),frontend)
-    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_FRONTEND)
+	DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_FRONTEND)
 else ifeq ($(TARGET),game)
-    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_GAME)
+	DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_GAME)
 else ifeq ($(TARGET),all)
-    DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER) \
-                          $(DOCKER_COMPOSE_STATS) \
-                          $(DOCKER_COMPOSE_FRONTEND) \
-                          $(DOCKER_COMPOSE_GAME)
+	DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER) \
+						  $(DOCKER_COMPOSE_STATS) \
+						  $(DOCKER_COMPOSE_FRONTEND) \
+						  $(DOCKER_COMPOSE_GAME)
 else
-    $(error Unknown TARGET value '$(TARGET)')
+	$(error Unknown TARGET value '$(TARGET)')
 endif
 
 .PHONY: all build down stop up re cleanVolumes clean cleanShared reCleanData update-hostname-env
