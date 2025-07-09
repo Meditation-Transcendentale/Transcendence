@@ -2,6 +2,7 @@ import { glob } from 'glob';
 import path from 'path';
 import { WebSocketServer } from 'ws';
 import * as esbuild from 'esbuild'
+import fs from 'fs';
 
 const spa = glob.sync("src/spa/*.ts");
 
@@ -20,6 +21,19 @@ const notifyPlugin = {
 				}
 			});
 		})
+	},
+};
+
+const shaderPlugin = {
+	name: 'shader-loader',
+	setup(build) {
+		build.onLoad({ filter: /\.(fx|fragment|vertex)$/ }, async (args) => {
+			const contents = await fs.promises.readFile(args.path, 'utf8');
+			return {
+				contents: `export default ${JSON.stringify(contents)};`,
+				loader: 'js',
+			};
+		});
 	},
 };
 
@@ -48,7 +62,7 @@ const appctx = await esbuild.context({
 	minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
-	plugins: [notifyPlugin, customAliasPlugin]
+	plugins: [notifyPlugin, customAliasPlugin, shaderPlugin]
 })
 
 const spactxs = [];
@@ -133,7 +147,7 @@ let babyctx = await esbuild.context({
 	minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
-	plugins: [notifyPlugin]
+	plugins: [notifyPlugin, shaderPlugin]
 })
 
 

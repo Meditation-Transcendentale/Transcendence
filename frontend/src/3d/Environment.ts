@@ -6,11 +6,14 @@ import {
 	Color4,
 	Engine,
 	FresnelParameters,
+	GlowLayer,
+	// Inspector,
 	MeshBuilder,
 	Scene,
 	StandardMaterial,
 	Vector3
 } from "@babylonImport";
+import { Field } from "./Field";
 
 
 export class Environment {
@@ -25,6 +28,9 @@ export class Environment {
 	private frame: number;
 
 	private gears!: Gears;
+
+	private field: Field;
+
 
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
@@ -60,7 +66,9 @@ export class Environment {
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
 		this.frame = 0;
-		this.gears = new Gears(this.scene);
+
+		// this.gears = new Gears(this.scene);
+		this.field = new Field(this.scene);
 
 	}
 
@@ -88,7 +96,11 @@ export class Environment {
 		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		this.camera_br.attachControl(this.canvas, true);
 
-		await this.gears.load();
+		// await this.gears.load();
+		//
+		await this.field.load();
+
+		// Inspector.Show(this.scene, {});
 
 	}
 
@@ -96,13 +108,15 @@ export class Environment {
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		this.gears.update(this.deltaTime);
+		this.field.update(time);
+		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
 	}
 
 	public setVue(vue: string): Vue {
-		return this.gears.setVue(vue);
+		// return this.gears.setVue(vue);
+		return this.field.setVue(vue);
 	}
 
 	public dispose() {

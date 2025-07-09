@@ -1,5 +1,13 @@
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import "@babylonjs/loaders/glTF/2.0/";
+import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // load shaders
+// import * as POST from "@babylonjs/core/PostProcesses";
+
+export { Inspector } from '@babylonjs/inspector';
+import {
+	VolumetricLightScatteringPostProcess
+} from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
+export { VolumetricLightScatteringPostProcess };
 
 export { Engine } from "@babylonjs/core/Engines/engine";
 export { Scene } from "@babylonjs/core/scene"
@@ -34,3 +42,5 @@ export { Button } from "@babylonjs/gui/2D/controls/button";
 export { Control } from "@babylonjs/gui/2D/controls/control";
 export { Scalar } from "@babylonjs/core/Maths/math.scalar";
 export { CustomMaterial } from '@babylonjs/materials/custom';
+export { BoundingBox } from '@babylonjs/core/Culling/boundingBox';
+export { Material } from "@babylonjs/core/Materials/material";

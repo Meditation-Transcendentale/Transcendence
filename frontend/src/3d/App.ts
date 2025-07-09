@@ -40,6 +40,7 @@ class app3d {
 		})
 
 
+
 		this.environment = new Environment(this.engine, this.canvas);
 		//
 		this.fps = document.getElementById('fps') as HTMLElement;
