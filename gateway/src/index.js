@@ -24,6 +24,14 @@ const app = fastify({
 	}
 });
 
+app.addHook('onSend', (req, reply, payload, done) => {
+	reply.header('X-Content-Type-Options', 'nosniff');
+	reply.header('X-Frame-Options', 'DENY');
+	reply.header('X-XSS-Protection', '1; mode=block');
+	reply.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+	done();
+});
+
 app.register(fastifyCookie);
 
 app.register(fastifyCompress);
