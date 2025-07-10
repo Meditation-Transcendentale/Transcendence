@@ -260,7 +260,6 @@ export function createArenaMesh(scene: Scene, config: GameTemplateConfig, pongRo
 	const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 200, height: 1, tessellation: 128 }, scene);
 	arenaMesh.parent = pongRoot;
 	const material = new StandardMaterial("arenaMaterial", scene);
-	// material.diffuseColor.set(0, 0, 0;
 	// material.specularColor.set(0, 0, 0);
 	// material.emissiveColor.set(0.2, 0.2, 0.2980392156862745);
 	arenaMesh.material = material;
@@ -273,10 +272,12 @@ export function createBallMesh(scene: Scene, config: GameTemplateConfig, pongRoo
 	ballMesh.parent = pongRoot;
 	const ballMaterial = new StandardMaterial("ballMaterial", scene);
 	ballMaterial.emissiveColor = Color3.Black();
+	ballMaterial.diffuseColor.set(1, 0, 1);
 	// ballMaterial.diffuseTexture = new Texture("moi.png", scene);
-	//ballMaterial.emissiveColor.set(1, 1, 1);
+	ballMaterial.emissiveColor.set(1, 0, 1);
 	ballMesh.setEnabled(true);
 	ballMesh.setPivotPoint(Vector3.Zero());
+	ballMesh.position.y = 1;
 	ballMesh.material = ballMaterial;
 
 	return ballMesh;
