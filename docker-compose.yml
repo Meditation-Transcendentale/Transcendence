@@ -170,10 +170,12 @@ services:
   notifications-manager:
     build:
       context: ./services/notifications/notifications-manager
+    container_name: notifications_manager
     volumes:
       - ./services/notifications/notifications-manager/src:/app/src
       - ./services/notifications/notifications-manager/package.json:/app/package.json
       - ./services/notifications/notifications-manager/.env.example:/app/.env
+      - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -193,6 +195,7 @@ services:
         condition: service_started
     networks:
       - transcendence-network
+      - metrics-network
 
   docs-service:
     build:

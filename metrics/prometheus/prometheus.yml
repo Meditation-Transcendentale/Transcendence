@@ -97,3 +97,13 @@ scrape_configs:
     basic_auth:
       username: "metrics"
       password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
+  - job_name: 'notifications-manager'
+    static_configs:
+      - targets: ['notifications_manager:7001']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
