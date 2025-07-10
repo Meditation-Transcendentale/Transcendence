@@ -1,4 +1,5 @@
 import { CascadedShadowGenerator, Color3, DirectionalLight, Engine, Light, Mesh, MeshBuilder, PointLight, Scene, ShaderMaterial, ShadowDepthWrapper, ShadowGenerator, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
+import { SpotLight } from "@babylonjs/core";
 
 
 export class Sun {
@@ -55,23 +56,25 @@ export class Sun {
 		this.root.position.set(50, 50, 100);
 		this.root.scaling.setAll(50);
 
-		this.light = new PointLight("light", Vector3.Zero(), this.scene);
-		const l = new DirectionalLight("light2", new Vector3(0, -1, 0), this.scene);
+		// this.light = new PointLight("light", Vector3.Zero(), this.scene);
+		this.light = new SpotLight("light", Vector3.Zero(), new Vector3(-50, -50, -115).normalize(), Math.PI * 0.2, 0, this.scene);
 		this.light.parent = this.root;
+		// const l = new DirectionalLight("light2", new Vector3(0, -1, 0), this.scene);
+		// this.light.parent = this.root;
 
 		this.shadow = new ShadowGenerator(1024, this.light);
 		this.shadow.transparencyShadow = true;
 
 
-		this.shadow.setDarkness(0.1);
+		this.shadow.setDarkness(0.3);
 		this.shadow.usePoissonSampling = true;
 		this.shadow.bias = 0.003;
 		//this.shadow.normalBias = 0.1;
 		// this.shadow.usePercentageCloserFiltering = true;
 		// this.shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
 		// this.shadow.getShadowMap()!.renderList?.push(this.shell);
-		this.shadow.addShadowCaster(this.shell);
 		// this.shadow.useAlphaTesting = true;
+		this.shadow.addShadowCaster(this.shell);
 
 
 		this.shellMat.shadowDepthWrapper = new ShadowDepthWrapper(this.shellMat, this.scene, {

@@ -105,7 +105,7 @@ void main() {
 	vec2 p = vUV * SIZE * 0.01;
 
 	vec2 uv = p*vec2(5.) + (time * DIR) * (1. / SIZE);
-	float t = (noise(time * 100. * p.yx) * 0.5 + 0.5) * 0.1;
+	float t = (noise(time * 10. * p.yx) * 0.5 + 0.5) * 0.1;
 	float f = 0.0;
 
    	f = noise_sum_abs( 15.0*uv );
@@ -728,6 +728,76 @@ export class PuddleMaterial extends CustomMaterial {
 		this.Fragment_Before_Lights(`
 			normalW = normalize(cross(dFdy(vPositionW), dFdx(vPositionW)));
 		`)
+	}
+
+	setFloat(name: string, value: number) {
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setFloat(name, value);
+		});
+	}
+
+
+	setFloatArray3(name: string, values: number[]) {
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setFloatArray3(name, values);
+		});
+	}
+}
+
+
+export class DitherMaterial extends CustomMaterial {
+	constructor(name: string, scene: Scene) {
+		super(name, scene);
+
+		this.AddUniform('time', 'float', 1.0);
+
+		this.AddAttribute('uv');
+
+		this.Vertex_Begin(`
+	#define MAINUV1 1
+	#define UV1 1
+
+`)
+
+		this.Fragment_Begin(`
+	#define MAINUV1 1
+`)
+
+		this.Fragment_Definitions(`
+float hash(ivec2 p )  // this hash is not production ready, please
+{                         // replace this by something better
+
+    // 2D -> 1D
+    int n = p.x*3 + p.y*113;
+
+    // 1D hash by Hugo Elias
+	n = (n << 13) ^ n;
+    n = n * (n * n * 15731 + 789221) + 1376312589;
+    return -1.0+2.0*float( n & 0x0fffffff)/float(0x0fffffff);
+}
+
+float noise(vec2 p )
+{
+    ivec2 i = ivec2(floor( p ));
+    vec2 f = fract( p );
+	
+    // cubic interpolant
+    vec2 u = f*f*(3.0-2.0*f);
+
+    return mix( mix( hash( i + ivec2(0,0) ), 
+                     hash( i + ivec2(1,0) ), u.x),
+                mix( hash( i + ivec2(0,1) ), 
+                     hash( i + ivec2(1,1) ), u.x), u.y);
+}`)
+
+		this.Fragment_MainEnd(`
+		float f = noise(vMainUV1 * 10000.) * 0.5 + 0.5;
+		vec3 dith = min(vec3(1., 1., 1.), f * 0.3 + gl_FragColor.rgb);
+		dith = floor(dith * 8. + 0.5) * (1. / 8.);
+		gl_FragColor.rgb = dith;
+		// gl_FragColor.rgb = vec3(vMainUV1, 0.);
+		`)
+
 	}
 
 	setFloat(name: string, value: number) {

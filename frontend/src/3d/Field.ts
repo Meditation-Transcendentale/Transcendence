@@ -8,6 +8,7 @@ import "./Shader.ts";
 import { Sun } from "./Sun";
 import { Grass } from "./Grass";
 import { Puddle } from "./Ground";
+import { DitherMaterial } from "./Shader.ts";
 
 
 
@@ -21,6 +22,8 @@ export class Field {
 	private grass: Grass;
 	private ground: Puddle;
 
+	private ditherMat!: DitherMaterial;
+
 	constructor(scene: Scene) {
 		this.scene = scene;
 		this.sun = new Sun(scene);
@@ -31,8 +34,21 @@ export class Field {
 	}
 
 	public async load() {
+		const mat = new StandardMaterial("white", this.scene);
+		mat.wireframe = false;
+		mat.diffuseColor = new Color3(1., 1, 1);
+
+		this.ditherMat = new DitherMaterial("dither", this.scene);
+
+
+
 		const loaded = await LoadAssetContainerAsync("/assets/field.glb", this.scene);
 		loaded.addAllToScene();
+		loaded.meshes.forEach((mesh) => {
+			mesh.material = this.ditherMat;
+			mesh.receiveShadows = true;
+			console.log(mesh);
+		})
 		this.scene.setActiveCameraByName("fieldCam");
 		this.scene.activeCamera.parent = undefined;
 
@@ -40,16 +56,11 @@ export class Field {
 		// this.sunL.intensity = 5;
 
 		// this.plane = MeshBuilder.CreateGround("plane", {
-		// 	width: 50,
-		// 	height: 50,
-		// 	subdivisions: 100
+		// 	width: 500,
+		// 	height: 500,
 		// }, this.scene)
 		// this.plane.position.z = -20;
-
-		// const mat = new StandardMaterial("plane", this.scene);
-		// mat.wireframe = true;
-		// mat.diffuseColor = new Color3(0.3, 0.3, 0.3);
-		// this.plane.material = mat;
+		//
 
 		await this.grass.init(this.scene);
 		this.ground.init();
@@ -73,6 +84,7 @@ export class Field {
 		this.sun.update(time);
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.ground.update(time);
+		this.ditherMat.setFloat("time", time);
 	}
 
 	public setVue(vue: string): Vue {
