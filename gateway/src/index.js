@@ -63,9 +63,14 @@ const verifyJWT = async (req, res) => {
 		if (req.raw.url.endsWith('/health')) {
 			return ;
 		}
-		const IP = req.ip || req.raw.socket.remoteAddress;
-		if (IP.startsWith('172.18.') || IP.startsWith('172.19.') || IP.startsWith('172.20.')) {
-			return;
+		const metricsAuth = req.headers['authorization'];
+		console.log(`Metrics Auth: ${metricsAuth}`);
+		if (metricsAuth && metricsAuth.startsWith('Basic ')) {
+			const base64Credentials = metricsAuth.split(' ')[1];
+			const [username, password] = Buffer.from(base64Credentials, 'base64').toString('utf-8').split(':');
+			if (username === 'metrics' && password === process.env.METRICS_PASSWORD) {
+				return;
+			}
 		}
 		return res.code(403).send({ message: 'Forbidden' });
 	}

@@ -13,11 +13,14 @@ services:
       - '--web.config.file=/etc/prometheus/web-config.yml'
       - '--web.listen-address=:3003'
       - '--web.enable-lifecycle'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
     networks:
       - transcendence-network
+      - metrics-network
   
   grafana:
     image: grafana/grafana:latest
