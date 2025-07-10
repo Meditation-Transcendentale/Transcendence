@@ -327,37 +327,37 @@ export const Physics = {
 	processTick({ gameId, tick, inputs }) {
 		if (!this.games.has(gameId)) {
 			const eng = new PhysicsEngine();
-			eng.initBattleRoyale({
-				numPlayers: eng.cfg.MAX_PLAYERS,
-				numBalls: eng.cfg.INITIAL_BALLS
-			});
+			eng.initBattleRoyale(
+				eng.cfg.MAX_PLAYERS,
+				eng.cfg.INITIAL_BALLS
+			);
 			this.games.set(gameId, eng);
 		}
 
 		const eng = this.games.get(gameId);
 
-		// apply paddle inputs
+		// Apply paddle inputs
 		if (Array.isArray(inputs)) {
 			for (const { playerId, move } of inputs) {
 				eng.updatePaddleInput(playerId, move);
 			}
 		}
 
-		const { balls, paddles, events } = eng.step();
-		return { gameId, tick, balls, paddles, events };
-	},
+		// Start measuring performance
+		// const startTime = performance.now();
 
-	handleImmediateInput({ gameId, inputs = [] }) {
-		const eng = this.games.get(gameId);
-		if (!eng) return;
-		for (const { playerId, input } of inputs) {
-			if (input.type === 'disableWall') {
-				// find wall ent and zero its mask bit:
-				const wEnt = [...eng.pd.mask.entries()]
-					.find(([i, m]) => m & (1 << 2) && eng.paddleIdToEnt.get(playerId) != null)?.[0];
-				if (wEnt != null) eng.pd.mask[wEnt] &= ~(1 << 2);
-			}
-			// handle other immediate inputs similarly…
+		try {
+			const { balls, paddles, events } = eng.step();
+			// End measuring performance
+			// const endTime = performance.now();
+			// const duration = endTime - startTime;
+			//
+			// console.log(`Step execution time for game ${gameId} at tick ${tick}: ${duration} milliseconds`);
+
+			return { gameId, tick, balls, paddles, events };
+		} catch (err) {
+			console.error('Physics.step() failed at tick', tick, err);
+			throw err;
 		}
 	},
 

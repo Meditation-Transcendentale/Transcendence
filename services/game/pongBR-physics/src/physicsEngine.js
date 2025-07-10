@@ -1,67 +1,62 @@
 // services/game/pong-physics/src/physicsEngine.js
 
-// ─── 1. Configuration ─────────────────────────────────────────────────────
+// Configuration
 export const CFG = {
 	TARGET_FPS: 60,
 	SUB_STEPS: 10,
 	ARENA_RADIUS: 200,
-	MAX_ENTITIES: 512,
-	INITIAL_BALLS: 200,
 	MAX_PLAYERS: 100,
+	INITIAL_BALLS: 200,
 	BALL_RADIUS: 1,
 	INITIAL_SPEED: 50,
-	WALL_HEIGHT: 10,
-	PADDLE_HEIGHT: 20,
-	PILLAR_SIZE: 5,
-	CELL_SIZE: 2,   // ~ 2 × BALL_RADIUS
-	RNG_SEED: 123456,
+	PADDLE_FILL: 3,  // fraction of cell arc used by paddle
+	PADDLE_RATIO: 1 / 40,  // paddle thickness relative to arc width
 };
 
-// ─── 2. Seeded RNG ─────────────────────────────────────────────────────────
-function createRNG(seed) {
-	let a = seed >>> 0;
-	return () => {
-		let t = (a += 0x6D2B79F5);
-		t = Math.imul(t ^ (t >>> 15), t | 1);
-		t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-	};
-}
-
-// ─── 3. Physics Data (SoA + Free List) ────────────────────────────────────
+// Physics Data (SoA)
 class PhysicsData {
-	constructor(max = CFG.MAX_ENTITIES) {
-		this.freeList = [];
+	constructor(maxEntities) {
 		this.count = 0;
-		this.max = max;
-		// Structure-of-Arrays buffers
-		this.posX = new Float32Array(max);
-		this.posY = new Float32Array(max);
-		this.velX = new Float32Array(max);
-		this.velY = new Float32Array(max);
-		this.radius = new Float32Array(max);
-		this.halfW = new Float32Array(max);
-		this.halfH = new Float32Array(max);
-		this.rot = new Float32Array(max);
-		// bit0=ball, bit1=paddle, bit2=wall, bit3=pillar
-		this.mask = new Uint8Array(max);
+		this.posX = new Float32Array(maxEntities);
+		this.posY = new Float32Array(maxEntities);
+		this.velX = new Float32Array(maxEntities);
+		this.velY = new Float32Array(maxEntities);
+		this.radius = new Float32Array(maxEntities);
+		this.halfW = new Float32Array(maxEntities);
+		this.halfH = new Float32Array(maxEntities);
+		this.rot = new Float32Array(maxEntities);
+		this.mask = new Uint8Array(maxEntities);
 	}
 
-	create() {
-		const id = this.freeList.length ? this.freeList.pop() : this.count++;
-		if (id >= this.max) throw new Error('Exceeded max entities');
-		this.mask[id] = 0;
+	create(mask) {
+		const id = this.count++;
+		this.mask[id] = mask;
 		return id;
 	}
+}
 
-	destroy(id) {
-		this.mask[id] = 0;
-		this.freeList.push(id);
+// Uniform Grid Broadphase
+class UniformGrid {
+	constructor(cellSize) {
+		this.cellSize = cellSize;
+		this.buckets = Object.create(null);
+	}
+
+	reset() {
+		this.buckets = Object.create(null);
+	}
+
+	add(id, x, y) {
+		const gx = Math.floor(x / this.cellSize);
+		const gy = Math.floor(y / this.cellSize);
+		const key = `${gx},${gy}`;
+		if (!this.buckets[key]) this.buckets[key] = [];
+		this.buckets[key].push(id);
 	}
 }
 
-// ─── 4. Integrator ────────────────────────────────────────────────────────
-function integrate(pd, dt) {
+// Movement System (Euler Integrator)
+function movementSystem(pd, dt) {
 	for (let i = 0; i < pd.count; i++) {
 		if (!pd.mask[i]) continue;
 		pd.posX[i] += pd.velX[i] * dt;
@@ -69,249 +64,227 @@ function integrate(pd, dt) {
 	}
 }
 
-// ─── 5. Uniform-Grid Broadphase ───────────────────────────────────────────
-class UniformGrid {
-	constructor(arenaRadius, cellSize) {
-		this.radius = arenaRadius;
-		this.size = cellSize;
-		this.gridW = Math.ceil((2 * arenaRadius) / cellSize);
-		this.buckets = Array.from({ length: this.gridW * this.gridW }, () => []);
-	}
-
-	reset() {
-		for (const b of this.buckets) b.length = 0;
-	}
-
-	add(id, x, y) {
-		const gx = Math.floor((x + this.radius) / this.size);
-		const gy = Math.floor((y + this.radius) / this.size);
-		const idx = gx + gy * this.gridW;
-		if (idx >= 0 && idx < this.buckets.length) {
-			this.buckets[idx].push(id);
-		}
-	}
+// Collision Detection and Response
+function collideBallBall(pd, i, j) {
+	const dx = pd.posX[j] - pd.posX[i];
+	const dy = pd.posY[j] - pd.posY[i];
+	const R = pd.radius[i] + pd.radius[j];
+	const d2 = dx * dx + dy * dy;
+	if (d2 >= R * R) return;
+	const dist = Math.sqrt(d2) || R;
+	const nx = dx / dist;
+	const ny = dy / dist;
+	const overlap = (R - dist) * 0.5;
+	pd.posX[i] -= nx * overlap;
+	pd.posY[i] -= ny * overlap;
+	pd.posX[j] += nx * overlap;
+	pd.posY[j] += ny * overlap;
+	const vi = pd.velX[i] * nx + pd.velY[i] * ny;
+	const vj = pd.velX[j] * nx + pd.velY[j] * ny;
+	pd.velX[i] -= 2 * vi * nx;
+	pd.velY[i] -= 2 * vi * ny;
+	pd.velX[j] -= 2 * vj * nx;
+	pd.velY[j] -= 2 * vj * ny;
 }
 
-// ─── 6. Collision Helpers ─────────────────────────────────────────────────
+function collideBallPaddle(pd, bi, pi) {
+	const bx = pd.posX[pi], by = pd.posY[pi];
+	const hw = pd.halfW[pi], hh = pd.halfH[pi];
+	const angle = -pd.rot[pi];
+	const cosB = Math.cos(angle), sinB = Math.sin(angle);
 
-/** Circle–Circle collision & response */
-function collideBalls(pd, grid) {
-	for (const cell of grid.buckets) {
-		const L = cell.length;
-		for (let a = 0; a < L; a++) {
-			const i = cell[a];
-			for (let b = a + 1; b < L; b++) {
-				const j = cell[b];
-				const dx = pd.posX[j] - pd.posX[i];
-				const dy = pd.posY[j] - pd.posY[i];
-				const sumR = pd.radius[i] + pd.radius[j];
-				const dist2 = dx * dx + dy * dy;
-				if (dist2 >= sumR * sumR) continue;
+	// Transform circle center into box local space
+	const cx = pd.posX[bi], cy = pd.posY[bi];
+	const dx0 = cx - bx, dy0 = cy - by;
+	const cosA = Math.cos(angle), sinA = -Math.sin(angle);
+	const lx = cosA * dx0 - sinA * dy0;
+	const ly = sinA * dx0 + cosA * dy0;
 
-				const dist = Math.sqrt(dist2) || sumR;
-				const overlap = sumR - dist;
-				const nx = dx / dist, ny = dy / dist;
+	// Clamp to box extents
+	const clx = Math.max(-hw, Math.min(lx, hw));
+	const cly = Math.max(-hh, Math.min(ly, hh));
+	const dlx = lx - clx, dly = ly - cly;
 
-				// separate
-				pd.posX[i] -= nx * overlap * 0.5;
-				pd.posY[i] -= ny * overlap * 0.5;
-				pd.posX[j] += nx * overlap * 0.5;
-				pd.posY[j] += ny * overlap * 0.5;
+	// Check for overlap
+	const dist2 = dlx * dlx + dly * dly;
+	const r = pd.radius[bi];
+	if (dist2 > r * r) return;  // no collision
 
-				// reflect velocities
-				const vi = pd.velX[i] * nx + pd.velY[i] * ny;
-				const vj = pd.velX[j] * nx + pd.velY[j] * ny;
-				pd.velX[i] -= 2 * vi * nx;
-				pd.velY[i] -= 2 * vi * ny;
-				pd.velX[j] -= 2 * vj * nx;
-				pd.velY[j] -= 2 * vj * ny;
-			}
-		}
-	}
+	// Compute penetration
+	const dist = Math.sqrt(dist2) || r;
+	const pen = r - dist;
+	// if (pen > 0) {
+	// 	console.log(`[debug collision] bi=${bi}, pi=${pi}, penetration=${pen.toFixed(2)}`);
+	// }
+
+	// Compute normals and MTV in local space
+	const nxl = dlx / dist;
+	const nyl = dly / dist;
+	const mtxl = nxl * pen, mtyl = nyl * pen;
+
+	// Convert MTV back to world space
+	const mtx = cosB * mtxl - sinB * mtyl;
+	const mty = sinB * mtxl + cosB * mtyl;
+	pd.posX[bi] += mtx;
+	pd.posY[bi] += mty;
+
+	// Reflect velocity about the world-space normal
+	const nxw = cosB * nxl - sinB * nyl;
+	const nyw = sinB * nxl + cosB * nyl;
+	const dot = pd.velX[bi] * nxw + pd.velY[bi] * nyw;
+	pd.velX[bi] -= 2 * dot * nxw;
+	pd.velY[bi] -= 2 * dot * nyw;
 }
 
-/**
- * Compute MTV & response for circle vs. oriented box
- */
-function computeCircleBoxMTV(cx, cy, radius,
-	bx, by, halfW, halfH, rotation) {
-	const cos = Math.cos(-rotation);
-	const sin = Math.sin(-rotation);
-	const localX = cos * (cx - bx) - sin * (cy - by);
-	const localY = sin * (cx - bx) + cos * (cy - by);
-
-	const closestX = Math.max(-halfW, Math.min(localX, halfW));
-	const closestY = Math.max(-halfH, Math.min(localY, halfH));
-
-	const dx = localX - closestX, dy = localY - closestY;
-	const dist2 = dx * dx + dy * dy;
-	if (dist2 === 0) return null;
-
-	const dist = Math.sqrt(dist2);
-	const penetration = radius - dist;
-	if (penetration <= 0) return null;
-
-	const nx = dx / dist, ny = dy / dist;
-	const mtvLocalX = nx * penetration, mtvLocalY = ny * penetration;
-
-	// rotate MTV back to world
-	const worldX = cos * mtvLocalX + -sin * mtvLocalY;
-	const worldY = sin * mtvLocalX + cos * mtvLocalY;
-	return { mtvX: worldX, mtvY: worldY, nx, ny };
-}
-
-/** Circle–Box collision & response for paddles, walls, pillars */
-function collideBallBoxes(pd, grid) {
-	const max = pd.count;
-	for (const cell of grid.buckets) {
-		for (const bi of cell) {
-			if ((pd.mask[bi] & 1) === 0) continue; // only balls
-			for (let be = 0; be < max; be++) {
-				const m = pd.mask[be];
-				if ((m & ((1 << 1) | (1 << 2) | (1 << 3))) === 0) continue;
-				const mtv = computeCircleBoxMTV(
-					pd.posX[bi], pd.posY[bi], pd.radius[bi],
-					pd.posX[be], pd.posY[be], pd.halfW[be], pd.halfH[be], pd.rot[be]
-				);
-				if (!mtv) continue;
-
-				// separate
-				pd.posX[bi] += mtv.mtvX;
-				pd.posY[bi] += mtv.mtvY;
-				// bounce
-				const vDot = pd.velX[bi] * mtv.nx + pd.velY[bi] * mtv.ny;
-				pd.velX[bi] -= 2 * vDot * mtv.nx;
-				pd.velY[bi] -= 2 * vDot * mtv.ny;
-			}
-		}
-	}
-}
-
-// ─── 7. Physics Engine ────────────────────────────────────────────────────
 export class PhysicsEngine {
 	constructor(cfg = CFG) {
 		this.cfg = cfg;
-		this.rng = createRNG(cfg.RNG_SEED);
-		this.pd = new PhysicsData(cfg.MAX_ENTITIES);
-		this.grid = new UniformGrid(cfg.ARENA_RADIUS, cfg.CELL_SIZE);
+		this.pd = new PhysicsData(cfg.MAX_PLAYERS + cfg.INITIAL_BALLS + 16);
 		this.dt = 1 / cfg.TARGET_FPS / cfg.SUB_STEPS;
-		this.events = [];
-
-		this.ballIdToEnt = new Map();
-		this.paddleIdToEnt = new Map();
+		this.grid = null;
+		this.paddleEnts = [];
+		this.ballEnts = [];
 	}
 
-	initBattleRoyale({ numPlayers, numBalls }) {
+	initBattleRoyale(numPlayers, numBalls) {
 		const pd = this.pd;
-		const rand = this.rng;
 		const cfg = this.cfg;
+		const angleStep = (2 * Math.PI) / numPlayers;
+		const paddleArc = angleStep * 0.25;
+		const pillarArc = angleStep * 0.1;
+		const usableArc = angleStep - pillarArc;
+		const halfUsableArc = usableArc / 2;
+		const maxOffset = halfUsableArc - paddleArc / 2;
+		const perim = 2 * Math.PI * cfg.ARENA_RADIUS;
+		const cellW = (perim / numPlayers) * cfg.PADDLE_FILL;
+		this.grid = new UniformGrid(cellW);
 
-		// Spawn balls
-		for (let bid = 0; bid < numBalls; bid++) {
-			const ent = pd.create();
-			this.ballIdToEnt.set(bid, ent);
-			pd.mask[ent] = 1 << 0;
-			pd.radius[ent] = cfg.BALL_RADIUS;
-			const r = Math.sqrt(rand()) * (cfg.ARENA_RADIUS * 0.5);
-			const θ = rand() * 2 * Math.PI;
-			pd.posX[ent] = r * Math.cos(θ);
-			pd.posY[ent] = r * Math.sin(θ);
-			const dir = rand() * 2 * Math.PI;
-			pd.velX[ent] = Math.cos(dir) * cfg.INITIAL_SPEED;
-			pd.velY[ent] = Math.sin(dir) * cfg.INITIAL_SPEED;
+		// for (let pid = 0; pid < numPlayers; pid++) {
+		// 	const sliceStart = pid * angleStep;
+		// 	const midAngle = sliceStart + pillarArc + halfUsableArc;
+		// 	const paddleYaw = -midAngle;
+		//
+		// 	const ent = pd.create(2);
+		// 	this.paddleEnts[pid] = ent;
+		//
+		// 	// Set rotation to match client-side yaw
+		// 	pd.rot[ent] = paddleYaw;
+		//
+		// 	// Calculate paddle dimensions
+		// 	pd.halfW[ent] = cellW / 2;
+		// 	pd.halfH[ent] = (cellW * cfg.PADDLE_RATIO) / 2;
+		//
+		// 	// Position the paddle on the circumference of the circle
+		// 	pd.posX[ent] = Math.cos(midAngle) * (cfg.ARENA_RADIUS);
+		// 	pd.posY[ent] = Math.sin(midAngle) * (cfg.ARENA_RADIUS);
+		//
+		// 	console.log(`Paddle ${pid}: x = ${pd.posX[ent]}, y = ${pd.posY[ent]}, rotation = ${pd.rot[ent]}`);
+		// }
+		// Initialize paddles
+		for (let pid = 0; pid < numPlayers; pid++) {
+			const ang = (2 * Math.PI / numPlayers) * pid;
+			const ent = pd.create(2);
+			this.paddleEnts[pid] = ent;
+			pd.rot[ent] = -(ang + Math.PI / 2);
+			pd.halfW[ent] = cellW / 2;
+			pd.halfH[ent] = (cellW * cfg.PADDLE_RATIO) / 2;
+			pd.posX[ent] = Math.cos(ang) * (cfg.ARENA_RADIUS + 1);
+			pd.posY[ent] = Math.sin(ang) * (cfg.ARENA_RADIUS + 1);
+			console.log(`Paddle ${pid} : x = ${pd.posX[ent]} y = ${pd.posY[ent]}`);
 		}
 
-		// Spawn paddles, walls, pillars
-		const perim = 2 * Math.PI * cfg.ARENA_RADIUS;
-		const step = (2 * Math.PI) / numPlayers;
-
-		for (let pid = 0; pid < numPlayers; pid++) {
-			const angle = step * pid;
-			const x = cfg.ARENA_RADIUS * Math.cos(angle);
-			const y = cfg.ARENA_RADIUS * Math.sin(angle);
-			const rot = angle + Math.PI / 2;
-
-			// Paddle
-			const pent = pd.create();
-			this.paddleIdToEnt.set(pid, pent);
-			pd.mask[pent] = 1 << 1;
-			pd.posX[pent] = x;
-			pd.posY[pent] = y;
-			pd.halfW[pent] = perim / (2 * numPlayers);
-			pd.halfH[pent] = cfg.PADDLE_HEIGHT;
-			pd.rot[pent] = rot;
-
-			// Wall
-			const went = pd.create();
-			pd.mask[went] = 1 << 2;
-			pd.posX[went] = x;
-			pd.posY[went] = y;
-			pd.halfW[went] = perim / (2 * numPlayers);
-			pd.halfH[went] = cfg.WALL_HEIGHT;
-			pd.rot[went] = rot;
-
-			// Pillar
-			const piet = pd.create();
-			pd.mask[piet] = 1 << 3;
-			pd.posX[piet] = x;
-			pd.posY[piet] = y;
-			pd.halfW[piet] = cfg.PILLAR_SIZE;
-			pd.halfH[piet] = cfg.PILLAR_SIZE;
-			pd.rot[piet] = rot;
+		// Initialize balls
+		for (let b = 0; b < numBalls; b++) {
+			const ent = pd.create(1);
+			this.ballEnts[b] = ent;
+			pd.radius[ent] = cfg.BALL_RADIUS;
+			const r0 = Math.sqrt(Math.random()) * (cfg.ARENA_RADIUS * 0.5);
+			const t0 = Math.random() * 2 * Math.PI;
+			pd.posX[ent] = r0 * Math.cos(t0);
+			pd.posY[ent] = r0 * Math.sin(t0);
+			const d = Math.random() * 2 * Math.PI;
+			pd.velX[ent] = Math.cos(d) * cfg.INITIAL_SPEED;
+			pd.velY[ent] = Math.sin(d) * cfg.INITIAL_SPEED;
 		}
 	}
 
-	updatePaddleInput(playerId, move) {
-		const ent = this.paddleIdToEnt.get(playerId);
+	updatePaddleInput(pid, move) {
+		const ent = this.paddleEnts[pid];
 		if (ent == null) return;
-		// convert move [-1..1] into vertical velocity:
-		this.pd.velY[ent] = move * this.cfg.INITIAL_SPEED;
+		// Adjust radial offset
+		const v = move * this.cfg.INITIAL_SPEED;
+		this.pd.velX[ent] = Math.sin(this.pd.rot[ent]) * v;
+		this.pd.velY[ent] = -Math.cos(this.pd.rot[ent]) * v;
 	}
 
 	step() {
-		this.events.length = 0;
-		const pd = this.pd, grid = this.grid;
+		const pd = this.pd;
+		// Zero paddle velocities
+		this.paddleEnts.forEach(ent => {
+			pd.velX[ent] = 0;
+			pd.velY[ent] = 0;
+		});
 
-		for (let s = 0; s < this.cfg.SUB_STEPS; s++) {
-			integrate(pd, this.dt);
+		// if (this.ballEnts.length && this.paddleEnts.length) {
+		// 	const fb = this.ballEnts[0], p0 = this.paddleEnts[0];
+		// 	const bx = pd.posX[fb], by = pd.posY[fb];
+		// 	const ang = pd.rot[p0];
+		// 	const dx = bx - pd.posX[p0], dy = by - pd.posY[p0];
+		// 	const lx = Math.cos(-ang) * dx - Math.sin(-ang) * dy;
+		// 	const ly = Math.sin(-ang) * dx + Math.cos(-ang) * dy;
+		// }
 
-			grid.reset();
+		// Sub-steps
+		for (let ss = 0; ss < this.cfg.SUB_STEPS; ss++) {
+			movementSystem(pd, this.dt);
+			this.grid.reset();
 			for (let i = 0; i < pd.count; i++) {
-				if (pd.mask[i] & (1 << 0)) {
-					grid.add(i, pd.posX[i], pd.posY[i]);
+				if (pd.mask[i] & 3) {
+					this.grid.add(i, pd.posX[i], pd.posY[i]);
 				}
 			}
 
-			collideBalls(pd, grid, this.events);
-			collideBallBoxes(pd, grid, this.events);
+			for (const key in this.grid.buckets) {
+				const ids = this.grid.buckets[key];
+				const entries = ids.map(id => ({
+					id,
+					minX: pd.posX[id] - (pd.mask[id] === 1 ? pd.radius[id] : pd.halfW[id]),
+					maxX: pd.posX[id] + (pd.mask[id] === 1 ? pd.radius[id] : pd.halfW[id])
+				}));
+				entries.sort((a, b) => a.minX - b.minX);
+				for (let i = 0; i < entries.length; i++) {
+					for (let j = i + 1; j < entries.length && entries[j].minX <= entries[i].maxX; j++) {
+						const A = entries[i].id, B = entries[j].id;
+						const ma = pd.mask[A], mb = pd.mask[B];
+						if (ma === 1 && mb === 1) {
+							collideBallBall(pd, A, B);
+						} else if (ma === 1 && mb === 2) {
+							collideBallPaddle(pd, A, B);
+						} else if (ma === 2 && mb === 1) {
+							collideBallPaddle(pd, B, A);
+						}
+					}
+				}
+			}
 		}
-
-		return this._emitState();
+		return this.getState();
 	}
 
-	_emitState() {
+	getState() {
 		const pd = this.pd;
-		const out = { balls: [], paddles: [], events: this.events };
-		for (let i = 0; i < pd.count; i++) {
-			const m = pd.mask[i];
-			if (!m) continue;
-			if (m & (1 << 0)) {
-				out.balls.push({
-					id: [...this.ballIdToEnt].find(([_, e]) => e === i)[0],
-					x: pd.posX[i],
-					y: pd.posY[i],
-					vx: pd.velX[i],
-					vy: pd.velY[i]
-				});
-			}
-			if (m & (1 << 1)) {
-				out.paddles.push({
-					id: [...this.paddleIdToEnt].find(([_, e]) => e === i)[0],
-					x: pd.posX[i],
-					y: pd.posY[i]
-				});
-			}
-		}
-		return out;
+		const balls = this.ballEnts.map((ent, i) => ({
+			id: i,
+			x: pd.posX[ent],
+			y: pd.posY[ent],
+			vx: pd.velX[ent],
+			vy: pd.velY[ent]
+		}));
+		const paddles = this.paddleEnts.map((ent, i) => ({
+			id: i,
+			x: pd.posX[ent],
+			y: pd.posY[ent],
+		}));
+		return { balls, paddles, events: [] };
 	}
 }
+
