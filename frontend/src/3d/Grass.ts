@@ -67,6 +67,7 @@ export class Grass {
 	public COLOR_B = new Color3(0.9, 0.9, 0.9);
 
 	private _pastTime = 0.0;
+	public origins!: number[];
 
 	constructor(size: number) {
 		this._size = size;
@@ -74,8 +75,10 @@ export class Grass {
 
 	}
 
-	public async init(scene: Scene) {
+	public async init(scene: Scene, origins: number[]) {
 		await this.loadAssests(scene);
+
+		this.origins = origins;
 
 		this.setThinInstances(this._nearMesh, this._size, this._size, _nearOptions);
 		// this.setThinInstances(this._midMeshR, this._size, this._size * 2, _midOptions);
@@ -98,6 +101,7 @@ export class Grass {
 		// );
 
 		this._grassShader = new GrassShader("grass", scene);
+		this._grassShader.specularPower = 64;
 
 		this._grassShader.backFaceCulling = false;
 		// this._grassShader.needDepthPrePass = false;
@@ -151,6 +155,7 @@ export class Grass {
 	public update(time: number, camera: Camera) {
 		this._grassShader.setFloat("time", time);
 		this._grassShader.setFloat("oldTime", this._pastTime);
+		this._grassShader.setFloatArray3("origins", this.origins);
 		// this._grassShader.setVector3("vEyePosition", camera.position);
 
 		this._pastTime = time;

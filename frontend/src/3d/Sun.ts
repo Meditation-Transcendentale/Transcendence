@@ -1,5 +1,4 @@
-import { CascadedShadowGenerator, Color3, DirectionalLight, Engine, Light, Mesh, MeshBuilder, PointLight, Scene, ShaderMaterial, ShadowDepthWrapper, ShadowGenerator, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
-import { SpotLight } from "@babylonjs/core";
+import { CascadedShadowGenerator, Color3, DirectionalLight, Engine, HemisphericLight, Light, Mesh, MeshBuilder, PointLight, Scene, ShaderMaterial, ShadowDepthWrapper, ShadowGenerator, SpotLight, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
 
 
 export class Sun {
@@ -15,7 +14,7 @@ export class Sun {
 	private scene: Scene;
 
 	private light: Light;
-
+	private hemish: HemisphericLight;
 	private shadow: ShadowGenerator;
 
 	// private glowLayer: GlowLayer;
@@ -53,14 +52,17 @@ export class Sun {
 		this.center.parent = this.root;
 		this.shell.parent = this.root;
 		// this.shell.setEnabled(false);
-		this.root.position.set(50, 50, 100);
+		this.root.position.set(0, 50, -15);
 		this.root.scaling.setAll(50);
 
 		// this.light = new PointLight("light", Vector3.Zero(), this.scene);
-		this.light = new SpotLight("light", Vector3.Zero(), new Vector3(-50, -50, -115).normalize(), Math.PI * 0.2, 0, this.scene);
+		this.light = new SpotLight("light", Vector3.Zero(), new Vector3(-0, -50, -15).normalize(), Math.PI * 0.4, 0, this.scene);
 		this.light.parent = this.root;
 		// const l = new DirectionalLight("light2", new Vector3(0, -1, 0), this.scene);
 		// this.light.parent = this.root;
+		// //
+		// this.hemish = new HemisphericLight("hemish", new Vector3(0, 0, 1), this.scene);
+		// this.hemish.intensity = 0.5;
 
 		this.shadow = new ShadowGenerator(1024, this.light);
 		this.shadow.transparencyShadow = true;

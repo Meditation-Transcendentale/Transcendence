@@ -15,7 +15,7 @@ export class Tile {
 		this._mesh.material = material;
 		// this._mesh.makeGeometryUnique();
 
-		// this._mesh.rotation.z = Math.PI * 0.5;
+		// this._mesh.rotation.y = Math.PI;
 
 		// const m = new StandardMaterial("gr", mesh._scene);
 		// m.backFaceCulling = false;

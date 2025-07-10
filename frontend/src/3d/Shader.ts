@@ -354,6 +354,7 @@ export class GrassShader extends CustomMaterial {
 		super(name, scene);
 		this.AddUniform('time', 'float', 0.0);
 		this.AddUniform('oldTime', 'float', 0.0);
+		this.AddUniform("origins[20]", 'vec3', null);
 
 		this.Vertex_Begin(
 			`
@@ -432,6 +433,39 @@ export class GrassShader extends CustomMaterial {
 									hash12( i + vec2(1.0, 1.0) ), u.x), u.y);
 			  return val * 2.0 - 1.0;
 			}
+
+			float trunc_fallof( float x, float m )
+			{
+				x /= m;
+				return (x-2.0)*x+1.0;
+			}
+
+			vec3 computeWave (vec3 origin, vec2 pos) {
+				vec2	v = pos - origin.xy;
+				vec2	d = normalize(v);
+				float	L = length(v);
+				float	t = time - origin.z;
+				float	l = 1.;
+			
+			 	float	freq = 250. * (L - 0.2 * t);
+				// return vec3(d, trunc_fallof(L, 10.) * 0.2 * trunc_fallof(t, 2.));
+				// float	wave = sin(freq) / freq;
+				// return d * trunc_fallof(L, 10.) * 0.2 * trunc_fallof(t, 2.);
+				return	vec3(d,  trunc_fallof(min(l, t), l) * float(L * 0.05 - 0.02 < 0.2 * t));
+			}
+
+			vec3 rotationAxis(vec3 axis, float angle, vec3 v) {
+			    float c = cos(angle);
+			    float s = sin(angle);
+			    float t = 1.0 - c;
+
+			    return mat3(
+				t*axis.x*axis.x + c,        t*axis.x*axis.y - s*axis.z,  t*axis.x*axis.z + s*axis.y,
+				t*axis.x*axis.y + s*axis.z, t*axis.y*axis.y + c,         t*axis.y*axis.z - s*axis.x,
+				t*axis.x*axis.z - s*axis.y, t*axis.y*axis.z + s*axis.x,  t*axis.z*axis.z + c
+			    ) * v;
+			} 
+
 		`
 		);
 
@@ -450,8 +484,13 @@ export class GrassShader extends CustomMaterial {
 				normalUpdated = normal;
 				normalUpdated.y = 0.;
 				normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
-				normalUpdated = rotationX(normalUpdated, strengh);
+				//normalUpdated = rotationX(normalUpdated, strengh);
+				normalUpdated = rotationX(normalUpdated, strengh * windDir.x);
+				normalUpdated = rotationZ(normalUpdated, strengh * windDir.y);
+
 				normalUpdated.y = abs(normalUpdated.y);
+				// normalUpdated.z *= -1.;
+				// normalUpdated.x *= -1.;
 			
 
 		`
@@ -461,14 +500,14 @@ export class GrassShader extends CustomMaterial {
 			`
 				vec2 pos = (finalWorld * vec4(0., 0., 0., 1.0)).xz;
 			
-				float c1 = noise12(pos * 0.25 + time) * 0.5 + 0.5;
-				float c2 = noise12(pos * 0.25 + oldTime) * 0.5 + 0.5;
+				float c1 = noise12(pos * 0.25 - time) * 0.5 + 0.5;
+				float c2 = noise12(pos * 0.25 - oldTime) * 0.5 + 0.5;
 
 				float s1 = (c1 - 0.5) * 1.6 * M_PI * 0.5 * baseColor.a;
 				float s2 = (c2 - 0.5) * 1.6 * M_PI * 0.5 * baseColor.a;
 				float strengh = mix(s2, s1, position.y);
 	
-				float	windAngle = noise12(pos * 0.04 + time * 0.5) * M_PI;
+				float	windAngle = noise12(pos * 0.04 - time * 0.5) * M_PI;
 				vec2	windDir = vec2(cos(windAngle), sin(windAngle));
 
 				// vec2 viewDir = normalize(pos - vEyePosition.xz);
@@ -481,10 +520,20 @@ export class GrassShader extends CustomMaterial {
 				// float viewDet = normal.x * viewDir.y - normal.z * viewDir.x;
 				float viewCorrection = 0.;//atan(viewDet, viewDot);
 
+				vec3 wave = vec3(0.);
+				for (int i = 0; i < 20; i++) {
+					wave = computeWave(origins[i], pos);
+					positionUpdated = rotationAxis(vec3(-wave.y, 0., -wave.x), wave.z * M_PI * 0.05, positionUpdated);
+				}
+				// wave = max(min(vec2(1.), wave), vec2(-1.));
+				
 
-				positionUpdated = rotationY(position, -viewCorrection);
+				// positionUpdated = rotationY(position, -viewCorrection);
+				// positionUpdated = rotationAxis(vec3(-pos.y, 0.1, -pos.x), strengh * M_PI * 0.3, positionUpdated);
 				positionUpdated = rotationX(positionUpdated, strengh * windDir.x);
 				positionUpdated = rotationZ(positionUpdated, strengh * windDir.y);
+				// positionUpdated = rotationX(positionUpdated, + wave.y);
+				// positionUpdated = rotationZ(positionUpdated, + wave.x);
 		`);
 
 
@@ -670,7 +719,7 @@ export class GrassShader extends CustomMaterial {
 		//this.twoSidedLighting = true;
 		// this.specularPower = 1000;
 		this.backFaceCulling = false;
-		this.twoSidedLighting = true;
+		this.twoSidedLighting = false;
 
 
 	}
@@ -683,13 +732,20 @@ export class GrassShader extends CustomMaterial {
 		});
 	}
 
+	setFloatArray3(name: string, values: number[]) {
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setFloatArray3(name, values);
+		});
+	}
+
+
 }
 
 export class PuddleMaterial extends CustomMaterial {
 	constructor(name: string, scene: Scene, origins: number[]) {
 		super(name, scene);
 
-		this.AddUniform("origins[40]", 'vec3', origins);
+		this.AddUniform("origins[20]", 'vec3', origins);
 		this.AddUniform('time', 'float', 1.0);
 
 
@@ -717,7 +773,7 @@ export class PuddleMaterial extends CustomMaterial {
 		this.Vertex_Before_PositionUpdated(`
 
 				float	totalWave = 0.;
-				for (int i = 0; i < 40; i++) {
+				for (int i = 0; i < 20; i++) {
 					totalWave += computeWave(origins[i]);
 				}
 
@@ -791,10 +847,10 @@ float noise(vec2 p )
 }`)
 
 		this.Fragment_MainEnd(`
-		float f = noise(vMainUV1 * 10000.) * 0.5 + 0.5;
+		float f = noise(vMainUV1 * 1000.) * 0.5 + 0.5;
 		vec3 dith = min(vec3(1., 1., 1.), f * 0.3 + gl_FragColor.rgb);
 		dith = floor(dith * 8. + 0.5) * (1. / 8.);
-		gl_FragColor.rgb = dith;
+		gl_FragColor.rgb = (dith - 0.5) * 1.6 + 0.5; //Apply contrast
 		// gl_FragColor.rgb = vec3(vMainUV1, 0.);
 		`)
 

@@ -28,7 +28,7 @@ export class Field {
 		this.scene = scene;
 		this.sun = new Sun(scene);
 		this.grass = new Grass(20);
-		this.ground = new Puddle(scene, 40, 300);
+		this.ground = new Puddle(scene, 40, 1);
 
 		this.clouds = [];
 	}
@@ -62,8 +62,8 @@ export class Field {
 		// this.plane.position.z = -20;
 		//
 
-		await this.grass.init(this.scene);
 		this.ground.init();
+		await this.grass.init(this.scene, this.ground.origins);
 
 		// const vls = new VolumetricLightScatteringPostProcess("vls",
 		// 	{ postProcessRatio: 1, passRatio: 0.5 },

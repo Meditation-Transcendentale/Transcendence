@@ -6,7 +6,7 @@ export class Puddle {
 	private material!: PuddleMaterial;
 	private scene: Scene;
 
-	private origins!: number[];
+	public origins!: number[];
 	private index = 0;
 	private width: number;
 
@@ -31,6 +31,8 @@ export class Puddle {
 
 		this.mesh.position.z = -10;
 
+
+
 		//const g = MeshBuilder.CreateDisc("ground", { radius: 350, tessellation: 20 }, scene);
 		//g.rotation.x = Math.PI * 0.5;
 		//g.optimizeIndices();
@@ -47,7 +49,7 @@ export class Puddle {
 		this.material.maxSimultaneousLights = 8;
 		//this.meshes[0].visibility = 0.9999;
 		this.material.specularPower = 16;
-		this.material.specularColor = new Color3(0.4, 0.4, 0.4);
+		this.material.specularColor = new Color3(0., 0., 0.);
 
 		this.mesh.material = this.material;
 
@@ -61,7 +63,7 @@ export class Puddle {
 			let delta = Math.abs(this.rayO.y) / ray.y;
 			// console.log(ray);
 
-			this.spawnWave(this.rayO.x - ray.x * delta, this.rayO.z + 10 - ray.z * delta);
+			this.spawnWave(this.rayO.x - ray.x * delta, this.rayO.z - ray.z * delta);
 		})
 	}
 
@@ -69,7 +71,7 @@ export class Puddle {
 		this.material.setFloat("time", time);
 
 		// if (this.change) {
-		this.material.setFloatArray3("origins", this.origins);
+		// this.material.setFloatArray3("origins", this.origins);
 		// }
 		// this.change = false;
 	}

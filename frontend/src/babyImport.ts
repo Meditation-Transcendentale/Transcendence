@@ -49,3 +49,4 @@ import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import "@babylonjs/core/Shaders/ShadersInclude/helperFunctions";
 export { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
+export { SpotLight } from "@babylonjs/core/Lights/spotLight";
