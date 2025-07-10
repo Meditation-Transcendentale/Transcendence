@@ -24,6 +24,9 @@ scrape_configs:
     scheme: https
     tls_config:
       insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
   - job_name: 'friends'
     static_configs:
       - targets: ['api-gateway:3000']
@@ -31,6 +34,9 @@ scrape_configs:
     scheme: https
     tls_config:
       insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
   - job_name: 'get-info'
     static_configs:
       - targets: ['api-gateway:3000']
@@ -38,6 +44,9 @@ scrape_configs:
     scheme: https
     tls_config:
       insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
   - job_name: 'update-info'
     static_configs:
       - targets: ['api-gateway:3000']
@@ -45,31 +54,46 @@ scrape_configs:
     scheme: https
     tls_config:
       insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
   - job_name: 'game-manager'
     static_configs:
-      - targets: ['host.docker.internal:5050']
+      - targets: ['game_manager:5050']
     metrics_path: '/metrics'
     scheme: https
     tls_config:
       insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
   - job_name: 'user-interface'
     static_configs:
-      - targets: ['host.docker.internal:5051']
+      - targets: ['user_interface:5051']
     metrics_path: '/metrics'
     scheme: https
     tls_config:
       insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
   - job_name: 'pong-physics'
     static_configs:
-      - targets: ['host.docker.internal:5052']
+      - targets: ['pong_physics:5052']
     metrics_path: '/metrics'
     scheme: https
     tls_config:
       insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
   - job_name: 'pongBR-physics'
     static_configs:
-      - targets: ['host.docker.internal:5053']
+      - targets: ['pongbr_physics:5053']
     metrics_path: '/metrics'
     scheme: https
     tls_config:
       insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4

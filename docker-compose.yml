@@ -160,6 +160,7 @@ services:
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - METRICS_PASSWORD=${METRICS_PASSWORD}
     networks:
       - transcendence-network
     depends_on:
@@ -285,3 +286,6 @@ networks:
   transcendence-network:
     driver: bridge
     name: api-network
+  metrics-network:
+    driver: bridge
+    name: metrics-network
