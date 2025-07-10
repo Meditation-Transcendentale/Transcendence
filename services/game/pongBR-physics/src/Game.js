@@ -13,20 +13,20 @@ export class Game {
 		this.pillarEntities = {};
 		this.options = {};
 		this.players = this.options.players || [];
-		this.arenaRadius = this.calculateArenaRadius(this.options.maxPlayers || this.players.length || 2);
+		this.arenaRadius = 200;
 
 		this.init();
 	}
 
 	calculateArenaRadius(numPlayers) {
-		const playerWidth = 7;
+		const playerWidth = 2 * Math.PI / 100;
 		const centralAngleDeg = 360 / numPlayers;
 		const halfCentralAngleRad = (centralAngleDeg / 2) * Math.PI / 180;
 		return playerWidth / (2 * Math.sin(halfCentralAngleRad));
 	}
 
 	init() {
-		const ballCount = 200 || 1;
+		const ballCount = 100;
 		for (let i = 0; i < ballCount; i++) {
 			const circleRadius = 50;
 			const r = Math.sqrt(Math.random()) * circleRadius;
@@ -41,19 +41,22 @@ export class Game {
 				.addComponent('collider', CircleCollider(config.BALL_RADIUS));
 		}
 
-		const maxPlayers = this.options.maxPlayers || this.players.length || 2;
+		const maxPlayers = 100;
+		const perimiter = 2 * Math.PI * this.arenaRadius;
 
 		for (let i = 0; i < 100; i++) {
-			const angle = (2 * Math.PI / maxPlayers) * i;
+			const angle = ((2 * Math.PI) / maxPlayers) * i;
+			console.log(angle);
 			const x = this.arenaRadius * Math.cos(angle);
 			const y = this.arenaRadius * Math.sin(angle);
+			console.log("Position x =", x, " Position y = ", y);
 			const rotationY = -(angle + Math.PI / 2);
 
 			const wallEntity = this.entityManager.createEntity();
 			wallEntity
 				.addComponent('position', Position(x, y))
 				.addComponent('wall', { id: i, rotation: rotationY, isActive: true, dirty: true })
-				.addComponent('collider', BoxCollider(config.WALL_WIDTH, config.WALL_HEIGHT, rotationY));
+				.addComponent('collider', BoxCollider(perimiter / 100, config.WALL_HEIGHT, rotationY));
 
 			this.wallEntities[i] = wallEntity;
 
@@ -65,10 +68,11 @@ export class Game {
 					speed: config.PADDLE_SPEED,
 					offset: 0,
 					maxOffset: config.MAX_OFFSET,
-					isConnected: !!this.players[i],
+					isConnected: true,
+					// isConnected: !!this.players[i],
 					dirty: true
 				})
-				.addComponent('collider', BoxCollider(config.PADDLE_WIDTH, config.PADDLE_HEIGHT, rotationY));
+				.addComponent('collider', BoxCollider(perimiter / 100, config.PADDLE_HEIGHT, rotationY));
 
 			this.paddleEntities[i] = paddleEntity;
 

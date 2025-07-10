@@ -157,6 +157,7 @@ export class PongBR {
 		//this.engine = new Engine(this.canvas, true);
 		//engine = this.engine;
 		this.pongRoot.setEnabled(true);
+		this.stateManager.set_ecs(this.ecs);
 		this.stateManager.setter(true);
 		this.stateManager.update();
 
@@ -187,7 +188,7 @@ export class PongBR {
 
 	private createInstanceManagers(baseMeshes: any) {
 		return {
-			ball: new ThinInstanceManager(baseMeshes.ball, 1, 50, 100),
+			ball: new ThinInstanceManager(baseMeshes.ball, 200, 50, 100),
 			paddle: new ThinInstanceManager(baseMeshes.paddle, 100, 50, 100),
 			wall: new ThinInstanceManager(baseMeshes.wall, 6, 50, 100),
 			portal: new ThinInstanceManager(baseMeshes.portal, 4, 50, 100),
