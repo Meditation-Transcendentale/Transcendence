@@ -3,11 +3,11 @@ import "@babylonjs/loaders/glTF/2.0/";
 import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // load shaders
 // import * as POST from "@babylonjs/core/PostProcesses";
 
-export { Inspector } from '@babylonjs/inspector';
-import {
-	VolumetricLightScatteringPostProcess
-} from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
-export { VolumetricLightScatteringPostProcess };
+// export { Inspector } from '@babylonjs/inspector';
+// import {
+// 	VolumetricLightScatteringPostProcess
+// } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
+// export { VolumetricLightScatteringPostProcess } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
 
 export { Engine } from "@babylonjs/core/Engines/engine";
 export { Scene } from "@babylonjs/core/scene"
@@ -50,3 +50,5 @@ import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import "@babylonjs/core/Shaders/ShadersInclude/helperFunctions";
 export { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
 export { SpotLight } from "@babylonjs/core/Lights/spotLight";
+export { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
+import "@babylonjs/core/Culling/ray";

@@ -10,11 +10,11 @@ export class Puddle {
 	private index = 0;
 	private width: number;
 
-	private numOrigin = 20;
+	private numOrigin = 1;
 	private rayO!: Vector3;
 	private lastO = { 'x': 0, 'z': 0, 't': 0 };
 	private deltaTime = 0.02;
-	private deltaPos = 0.3;
+	private deltaPos = 0.1;
 	private change = false;
 
 	constructor(scene: Scene, width: number, subdivision: number) {
@@ -79,9 +79,9 @@ export class Puddle {
 	public spawnWave(x: number, z: number) {
 		// if (Math.abs(x) < this.width * 0.4 && Math.abs(z) < this.width * 0.4) {
 		const t = performance.now() * 0.001;
-		if (t - this.lastO.t < this.deltaTime && Math.abs(x - this.lastO.x) < this.deltaPos && Math.abs(z - this.lastO.z) < this.deltaPos) {
-			return;
-		}
+		// if (t - this.lastO.t < this.deltaTime && Math.abs(x - this.lastO.x) < this.deltaPos && Math.abs(z - this.lastO.z) < this.deltaPos) {
+		// 	return;
+		// }
 
 		this.lastO.x = x;
 		this.lastO.z = z;

@@ -16,11 +16,11 @@ type _thinInstancesOptions = {
 };
 
 const _nearOptions: _thinInstancesOptions = {
-	density: 15,
+	density: 20,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.4,
-	scale: new Vector3(0.1, .2, 0.1)
+	scale: new Vector3(0.2, .2, 0.2)
 };
 
 // const _midOptions: _thinInstancesOptions = {
@@ -195,7 +195,6 @@ export class Grass {
 		//const c = Color3.Random();
 		console.log(NUM_X, NUM_Z, CLUSTER_Z, CLUSTER_X);
 
-
 		for (let i = 0; i < NUM_X * NUM_Z; i++) {
 			const offsetX = (Math.random() - 0.5) * CLUSTER_X;
 			const offsetZ = (Math.random() - 0.5) * CLUSTER_Z;
@@ -206,10 +205,10 @@ export class Grass {
 			const size = Math.random() * (1 - options.size) + options.size;
 			const rotation = Math.random() * Math.PI * 0.5 - Math.PI * 0.25;
 
-			const matR = Matrix.RotationY(rotation);
+			const matR = Matrix.RotationY(0);
 			const matS = Matrix.Scaling(
 				size * options.scale.x,
-				size * options.scale.y,
+				options.scale.y,
 				size * options.scale.z
 			);
 			const matT = Matrix.Translation(
@@ -218,7 +217,7 @@ export class Grass {
 				posZ
 			);
 
-			const matrix = matS.multiply(matT.multiply(matR));
+			const matrix = matR.multiply(matS.multiply(matT));
 
 			const stiffness = Math.random() * (1 - options.stiffness) + options.stiffness;
 			const color = Color4.FromColor3(Color3.Lerp(
@@ -226,7 +225,7 @@ export class Grass {
 				this.COLOR_B,
 				Math.random()
 			), stiffness);
-
+			color.r = rotation;
 			//const color = Color4.FromColor3(this.COLOR_A, stiffness);
 
 

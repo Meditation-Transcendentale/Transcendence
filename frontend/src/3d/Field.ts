@@ -1,14 +1,13 @@
 import {
 	Camera, Color3, DirectionalLight, Texture,
 	LoadAssetContainerAsync, Mesh, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, Vector2, Vector3,
-	VolumetricLightScatteringPostProcess,
 } from "@babylonImport";
 import { Vue } from "../Vue";
 import "./Shader.ts";
 import { Sun } from "./Sun";
 import { Grass } from "./Grass";
 import { Puddle } from "./Ground";
-import { DitherMaterial } from "./Shader.ts";
+import { DitherMaterial } from "./Shader";
 
 
 
@@ -47,6 +46,7 @@ export class Field {
 		loaded.meshes.forEach((mesh) => {
 			mesh.material = this.ditherMat;
 			mesh.receiveShadows = true;
+			this.sun.shadow.addShadowCaster(mesh);
 			console.log(mesh);
 		})
 		this.scene.setActiveCameraByName("fieldCam");
@@ -54,29 +54,19 @@ export class Field {
 
 		// this.sunL = new DirectionalLight('sun', new Vector3(-1, -1, -1), this.scene);
 		// this.sunL.intensity = 5;
-
+		//
 		// this.plane = MeshBuilder.CreateGround("plane", {
 		// 	width: 500,
 		// 	height: 500,
 		// }, this.scene)
 		// this.plane.position.z = -20;
-		//
+		// this.plane.position.y = 0.1;
+
 
 		this.ground.init();
 		await this.grass.init(this.scene, this.ground.origins);
 
-		// const vls = new VolumetricLightScatteringPostProcess("vls",
-		// 	{ postProcessRatio: 1, passRatio: 0.5 },
-		// 	this.scene.getCameraByName("fieldCam"),
-		// 	this.scene.getMeshByName("sunShell") as Mesh,
-		// 	40,
-		// 	Texture.NEAREST_SAMPLINGMODE,
-		// 	this.scene.getEngine(),
-		// 	false);
-		// vls.exposure = 0.2;
-		// vls.decay = 0.91815;
-		// vls.weight = 0.88767;
-		// vls.density = 0.926;
+
 
 	}
 

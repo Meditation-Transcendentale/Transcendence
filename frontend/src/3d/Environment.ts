@@ -2,11 +2,13 @@ import { Gears } from "./Gears";
 import { Vue } from "../Vue";
 import {
 	ArcRotateCamera,
+	Camera,
 	Color3,
 	Color4,
+	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
-	GlowLayer,
+	// GlowLayer,
 	// Inspector,
 	MeshBuilder,
 	Scene,
@@ -103,6 +105,12 @@ export class Environment {
 		this.scene.meshes.forEach((mesh) => {
 			mesh.receiveShadows = true;
 		})
+
+		// const pp = new DefaultRenderingPipeline("default", true, this.scene, [this.scene.activeCamera as Camera]);
+		// pp.bloomEnabled = true;
+		// pp.bloomWeight = 0.5;
+		// pp.bloomKernel = 16;
+		// pp.bloomScale = 0.25;
 
 		// Inspector.Show(this.scene, {});
 

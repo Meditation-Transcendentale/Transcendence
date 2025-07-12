@@ -1,5 +1,52 @@
-import { CustomMaterial, Effect, Scene, Texture } from "@babylonImport"
+import { CustomMaterial, Effect, Scene } from "@babylonImport"
 
+
+Effect.IncludesShadersStore["noises"] = `
+// Simplex 2D noise from patriciogonzalezvivo
+// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+//
+vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+
+float simplexNoise(vec2 v){
+  const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+           -0.577350269189626, 0.024390243902439);
+  vec2 i  = floor(v + dot(v, C.yy) );
+  vec2 x0 = v -   i + dot(i, C.xx);
+  vec2 i1;
+  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+  vec4 x12 = x0.xyxy + C.xxzz;
+  x12.xy -= i1;
+  i = mod(i, 289.0);
+  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+  + i.x + vec3(0.0, i1.x, 1.0 ));
+  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+    dot(x12.zw,x12.zw)), 0.0);
+  m = m*m ;
+  m = m*m ;
+  vec3 x = 2.0 * fract(p * C.www) - 1.0;
+  vec3 h = abs(x) - 0.5;
+  vec3 ox = floor(x + 0.5);
+  vec3 a0 = x - ox;
+  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+  vec3 g;
+  g.x  = a0.x  * x0.x  + h.x  * x0.y;
+  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+  return 130.0 * dot(m, g);
+}
+
+//Curl Noise implementation based on Emil Dziewanowski article
+//https://emildziewanowski.com/curl-noise/
+vec2	curlSimplex(vec2 v, float delta) {
+	float dX = simplexNoise(v.x + delta, v.y) - simplexNoise(v.x - delta, v.y);
+	float dY = simplexNoise(v.x, v.y + delta) - simplexNoise(v.x, v.y - delta);
+	return vec2(dY, -dX) * (1. / (2. * delta));
+}
+`;
+
+
+Effect.IncludesShadersStore["rotation"] = `
+
+`;
 
 
 
@@ -114,239 +161,10 @@ void main() {
 	//f = floor(f * 1.2);
 	if (f < CEIL + t) {discard;}
 	vec3 col  = vec3(min(1., (1. - f) * 2.));
-	gl_FragColor = vec4(col * col, AA);
+	// float alpha = f * 0.5;
+	gl_FragColor = vec4(col *col, 1.);
 }`
 
-
-Effect.ShadersStore['grassVertexShader'] = `
-			precision highp	float;	
-
-			#define M_PI 3.1415926535897932384626433832795
-			#define LIGHT_DIR		vec3(0.333, 0.333, 0.333)
-
-			attribute vec3	position;
-			attribute vec2	uv;
-			attribute vec4	color;
-			attribute vec3	normal;
-			//const vec3	normal = vec3(0.0, 0.0, -1.);
-
-			uniform mat4		viewProjection;
-			uniform mat4		view;
-			uniform mat4		projection;
-			//uniform mat4		world;
-			uniform vec3		vEyePosition;
-			//uniform sampler2D	noise;
-			uniform float		time;
-			uniform float		oldTime;
-
-			#include<instancesDeclaration>
-
-			varying vec3	vColor;
-			varying vec2	vUV;
-			varying vec3	vNormalW;
-			varying vec3	vPositionW;
-
-			const vec3 endColor = vec3(0.9, 0.9, 0.9);
-
-			vec3 rotationX(vec3 v, float angle) {
-			  float s = sin(angle);
-			  float c = cos(angle);
-
-			  return mat3(
-			    1.0, 0.0, 0.0,
-			    0.0, c, s,
-			    0.0, -s, c
-			  ) * v;
-			}
-
-			vec3 rotationY(vec3 v, float angle) {
-			  float s = sin(angle);
-			  float c = cos(angle);
-
-			  return mat3(
-			    c, 0.0, -s,
-			    0.0, 1.0, 0.0,
-			    s, 0.0, c
-			  ) * v;
-			}
-
-			vec3 rotationZ(vec3 v, float angle) {
-			  float s = sin(angle);
-			  float c = cos(angle);
-
-			  return mat3(
-				c, s, 0.0,
-				-s, c, 0.0,
-				0.0, 0.0, 1.0
-			  ) * v;
-			}
-
-			uint murmurHash12(uvec2 src) {
-			  const uint M = 0x5bd1e995u;
-			  uint h = 1190494759u;
-			  src *= M; src ^= src>>24u; src *= M;
-			  h *= M; h ^= src.x; h *= M; h ^= src.y;
-			  h ^= h>>13u; h *= M; h ^= h>>15u;
-			  return h;
-			}
-
-			// 1 output, 2 inputs
-			float hash12(vec2 src) {
-			  uint h = murmurHash12(floatBitsToUint(src));
-			  return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
-			}
-
-			float noise12(vec2 p) {
-			  vec2 i = floor(p);
-
-			  vec2 f = fract(p);
-			  vec2 u = smoothstep(vec2(0.0), vec2(1.0), f);
-
-				float val = mix( mix( hash12( i + vec2(0.0, 0.0) ), 
-									hash12( i + vec2(1.0, 0.0) ), u.x),
-							   mix( hash12( i + vec2(0.0, 1.0) ), 
-									hash12( i + vec2(1.0, 1.0) ), u.x), u.y);
-			  return val * 2.0 - 1.0;
-			}
-
-
-			void main() {
-				vUV = uv;
-			
-				#include<instancesVertex>
-
-				
-				vec3	normal = LIGHT_DIR;
-				normal.y = 0.;
-				vec2 pos = (finalWorld * vec4(0., 0., 0., 1.0)).xz;
-				//vec2 ndcPos = pos * 0.01333 * 0.5 + 0.5;
-
-				//float curve = 1.;//texture2D(noise, ndcPos + mod(time * 0.1, 1.0)).r;
-				//float strengh = (curve - 0.5) * 1.6 * M_PI * 0.5 * color.a;
-				
-				//float c1 = texture2D(noise, ndcPos + mod(time * .03, 1.0)).r;
-				//float c2 = texture2D(noise, ndcPos + mod(oldTime * .03, 1.0)).r;
-
-				float c1 = noise12(pos * 0.25 + time) * 0.5 + 0.5;
-				float c2 = noise12(pos * 0.25 + oldTime) * 0.5 + 0.5;
-
-				//float c1 = .8;
-				//float c2 = 0.8;
-				
-				float s1 = (c1 - 0.5) * 1.6 * M_PI * 0.5 * color.a;
-				float s2 = (c2 - 0.5) * 1.6 * M_PI * 0.5 * color.a;
-				float strengh = mix(s2, s1, position.y);
-				//float strengh = s1 * smoothstep(0.4, 1.4, uv.y);
-	
-				float	windAngle = noise12(pos * 0.04 + time * 0.5) * M_PI;
-				vec2	windDir = vec2(cos(windAngle), sin(windAngle));
-
-				vec2 viewDir = normalize(pos - vEyePosition.xz);
-				float viewDot = dot(normal.xz, viewDir);
-				float viewDet = normal.x * viewDir.y - normal.z * viewDir.x;
-				float viewCorrection = atan(viewDet, viewDot);
-
-
-				vec3	positionUpdated = rotationY(position, -viewCorrection);
-				positionUpdated = rotationX(positionUpdated, strengh * windDir.x);
-				positionUpdated = rotationZ(positionUpdated, strengh * windDir.y);
-				
-				vec3 normalUpdated = normal;
-				//normalUpdated = rotationY(normalUpdated, -viewCorrection);
-				normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
-				normalUpdated = rotationX(normalUpdated, strengh);
-				normalUpdated.y = abs(normalUpdated.y);
-
-
-				//FROM BABYLON DEFAULT VERTEX SHADER
-				vec4 worldPos = finalWorld * vec4(positionUpdated, 1.0);
-				mat3 normalWorld = mat3(finalWorld);
-				//vNormalW = normalUpdated / vec3(dot(normalWorld[0], normalWorld[0]), dot(normalWorld[1], normalWorld[1]), dot(normalWorld[2], normalWorld[2]));
-				//vNormalW = normalize(normalWorld * vNormalW);
-				vNormalW = normalUpdated;
-
-				vColor.rgb = mix(instanceColor.rgb, endColor, worldPos.y) * smoothstep(-0.4, 1.0, position.y);
-				//vColor.rgb = instanceColor.rgb;
-
-				vPositionW = worldPos.xyz;
-				gl_Position = viewProjection * worldPos;
-			}`;
-
-Effect.ShadersStore['grassFragmentShader'] = `
-			precision highp float;
-
-			#define LIGHT_DIR		vec3(0.333, 0.333, 0.333)
-			#define LIGHT_COLOR		vec3(0.5, 0.5, 0.5)
-			#define AMBIENT			vec3(0.3, 0.3, 0.3)
-			#define SPECULAR_POWER	64.0
-			#define SPECULAR_COLOR	vec3(0.4)
-
-			uniform vec3 vEyePosition;		
-
-			varying vec3	vColor;
-			varying vec3	vPositionW;
-			varying vec3	vNormalW;
-			varying vec2	vUV;
-
-			float lambertian(vec3 N, vec3 L) {
-				return dot(N, L);
-			}
-
-			float subsurfaceScaterring(float dotNL) {
-				return max(-dotNL * abs(vUV.x * 0.5 - 0.5), 0.0);
-			}
-
-			vec3 blinnPhong(vec3 N, vec3 V, vec3 L, vec3 color) {
-				vec3	H = normalize(L + V);
-				float specular = pow(max(dot(H, N), 0.), SPECULAR_POWER);
-
-				float lamber = abs(lambertian(N, L));
-
-				return color * lamber + SPECULAR_COLOR * specular * smoothstep(0.8, 1.0, vUV.y);
-				
-			}
-
-			vec3	bsdf(vec3 N, vec3 V, vec3 L, vec3 albedo) {
-				float NLDot = dot(N, L);
-				float NVDot = dot(-N, V);
-				float lamb = max(NLDot * NVDot, 0.3); //lambertian coef
-				float sss = smoothstep(0., 1., abs(vUV.x * 2. -1.)) * 0.6 + 0.4; //subsurface scattering
-				sss = max(mix(0., sss, pow(vUV.y, 4.)) * -NVDot, 0.);
-				sss = min(pow(sss, 1.), 1.);
-				
-
-				vec3	H = normalize(L + V);
-				float specular = pow(max(dot(H, N), 0.), SPECULAR_POWER);
-				specular *= vUV.y;
-
-				sss *= vUV.y;
-
-				//return  vec3(1., 0., 0.) * lamb + vec3(0., 1., 0.) * sss ;//+ SPECULAR_COLOR * specular;
-				return albedo * (AMBIENT + sss * vec3(1., 0.5, 0.) + lamb * LIGHT_COLOR * 2.) + LIGHT_COLOR * 0.3 * specular;
-
-			}
-
-
-			void main() {
-				//vec3 normal = normalize(vec3(vEyePosition.x, 0., vEyePosition.z));
-				//normal.y = vNormalW.y;
-				//normal = normalize(normal);
-
-				gl_FragColor.rgb = bsdf(normalize(vNormalW), normalize(vPositionW - vEyePosition), LIGHT_DIR, vColor);
-
-				//gl_FragColor.rgb = blinnPhong(vNormalW, normalize(-vPositionW), LIGHT_DIR, vColor);
-
-				//gl_FragColor.rgb = vec3(1.) * max((lambertian(-vNormalW, LIGHT_DIR)), 0.);
-		
-				//gl_FragColor.rgb = vColor.rgb * lambertian(vNormalW, normalize(vec3(-1., 1., 1.)));// + vNormalW.y * vec3(1.) * smoothstep(0.7, 1., vUV.y);
-				//gl_FragColor.rgb = vec3(lambertian(vNormalW, vec3(0., 0., 1.)));
-				//gl_FragColor.rgb = vNormalW * 0.5 + 0.5;
-				//gl_FragColor.rgb = vColor;
-				gl_FragColor.a = 1.0;
-				// gl_FragColor.rgb = vec3(1., 1., 0.);
-				// gl_FragColor.rgb = vec3(vUV, 0.);
-
-			}`;
 
 
 export class GrassShader extends CustomMaterial {
@@ -362,6 +180,8 @@ export class GrassShader extends CustomMaterial {
 			#define UV1 1
 			#define MAINUV1 1
 			#define M_PI 3.1415926535897932384626433832795
+
+			varying vec3 vPositionM;
 			`
 		)
 
@@ -445,13 +265,15 @@ export class GrassShader extends CustomMaterial {
 				vec2	d = normalize(v);
 				float	L = length(v);
 				float	t = time - origin.z;
-				float	l = 1.;
+				float	l = 1.5;
 			
 			 	float	freq = 250. * (L - 0.2 * t);
 				// return vec3(d, trunc_fallof(L, 10.) * 0.2 * trunc_fallof(t, 2.));
 				// float	wave = sin(freq) / freq;
 				// return d * trunc_fallof(L, 10.) * 0.2 * trunc_fallof(t, 2.);
-				return	vec3(d,  trunc_fallof(min(l, t), l) * float(L * 0.05 - 0.02 < 0.2 * t));
+				float dist_fall = trunc_fallof(min(2., L), 2.);
+				// dist_fall *= 2.;
+				return	vec3(d,  trunc_fallof(min(l, t), l) * dist_fall);//float(L * 0.05 - 0.02 < 0.2 * t));
 			}
 
 			vec3 rotationAxis(vec3 axis, float angle, vec3 v) {
@@ -465,6 +287,12 @@ export class GrassShader extends CustomMaterial {
 				t*axis.x*axis.z - s*axis.y, t*axis.y*axis.z + s*axis.x,  t*axis.z*axis.z + c
 			    ) * v;
 			} 
+
+			vec2	curlNoise(vec2 pos, float delta) {
+				float dX = 
+			}
+			
+
 
 		`
 		);
@@ -481,16 +309,18 @@ export class GrassShader extends CustomMaterial {
 
 		this.Vertex_Before_NormalUpdated(
 			`
-				normalUpdated = normal;
-				normalUpdated.y = 0.;
-				normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
-				//normalUpdated = rotationX(normalUpdated, strengh);
-				normalUpdated = rotationX(normalUpdated, strengh * windDir.x);
-				normalUpdated = rotationZ(normalUpdated, strengh * windDir.y);
+				// normalUpdated = normal;
+				// // normalUpdated.y = 0.;
+				// normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
+				// //normalUpdated = rotationX(normalUpdated, strengh);
+				// normalUpdated = rotationX(normalUpdated, strengh * windDir.x);
+				// normalUpdated = rotationZ(normalUpdated, strengh * windDir.y);
+				//
+				// // normalUpdated.y = abs(normalUpdated.y);
+				// // normalUpdated.z *= -1.;
+				// // normalUpdated.x *= -1.;
+				// normalUpdated.y = abs(normalUpdated.y);
 
-				normalUpdated.y = abs(normalUpdated.y);
-				// normalUpdated.z *= -1.;
-				// normalUpdated.x *= -1.;
 			
 
 		`
@@ -500,41 +330,98 @@ export class GrassShader extends CustomMaterial {
 			`
 				vec2 pos = (finalWorld * vec4(0., 0., 0., 1.0)).xz;
 			
-				float c1 = noise12(pos * 0.25 - time) * 0.5 + 0.5;
-				float c2 = noise12(pos * 0.25 - oldTime) * 0.5 + 0.5;
+				float c1 = fbm(pos * 0.05 - time * 0.5) * 0.5 + 0.5;
+				float c2 = fbm(pos * 0.05 - oldTime * 0.5) * 0.5 + 0.5;
 
 				float s1 = (c1 - 0.5) * 1.6 * M_PI * 0.5 * baseColor.a;
 				float s2 = (c2 - 0.5) * 1.6 * M_PI * 0.5 * baseColor.a;
-				float strengh = mix(s2, s1, position.y);
+				float strengh = mix(s2, s1, uv.y) * (uv.y);
 	
-				float	windAngle = noise12(pos * 0.04 - time * 0.5) * M_PI;
+				float	windAngle =   fbm(pos - time * 0.5) * M_PI;
 				vec2	windDir = vec2(cos(windAngle), sin(windAngle));
+				
+
 
 				// vec2 viewDir = normalize(pos - vEyePosition.xz);
-				vec2 grassView = normalize(pos - vEyePosition.xz);
-				vec2 viewDir = normalize(view[2].xz);
-				
-				float viewDot = dot(grassView, viewDir);
-				float viewDet = grassView.y * viewDir.x - grassView.x * viewDir.y;
-				// float viewDot = dot(normal.xz, viewDir);
-				// float viewDet = normal.x * viewDir.y - normal.z * viewDir.x;
-				float viewCorrection = 0.;//atan(viewDet, viewDot);
+				// vec2 grassView = normalize(pos - vEyePosition.xz);
+				// vec2 viewDir = normalize(view[2].xz);
+				//
+				// float viewDot = dot(grassView, viewDir);
+				// float viewDet = grassView.y * viewDir.x - grassView.x * viewDir.y;
+				// // float viewDot = dot(normal.xz, viewDir);
+				// // float viewDet = normal.x * viewDir.y - normal.z * viewDir.x;
+				// float viewCorrection = 0.;//atan(viewDet, viewDot);
 
-				vec3 wave = vec3(0.);
-				for (int i = 0; i < 20; i++) {
-					wave = computeWave(origins[i], pos);
-					positionUpdated = rotationAxis(vec3(-wave.y, 0., -wave.x), wave.z * M_PI * 0.05, positionUpdated);
+				vec3 totalWave = vec3(0.);
+				for (int i = 0; i < 1; i++) {
+					vec3 wave = computeWave(origins[i], pos);
+					// positionUpdated.y *= max(1. - wave.z * 0.2, 0.);
+					// positionUpdated.xz += vec2(-wave.x, wave.y) * wave.z * uv.y * 0.25;
+					// if (totalWave.z < wave.z) {
+					// 	totalWave = wave;
+					// }
+					totalWave = mix(totalWave, wave, step(totalWave.z, wave.z));
+					// positionUpdated = rotationAxis(vec3(-wave.y, 0., -wave.x), wave.z * M_PI * 0.05, positionUpdated);
 				}
 				// wave = max(min(vec2(1.), wave), vec2(-1.));
 				
+				positionUpdated = rotationY(positionUpdated, baseColor.r);
 
 				// positionUpdated = rotationY(position, -viewCorrection);
-				// positionUpdated = rotationAxis(vec3(-pos.y, 0.1, -pos.x), strengh * M_PI * 0.3, positionUpdated);
-				positionUpdated = rotationX(positionUpdated, strengh * windDir.x);
-				positionUpdated = rotationZ(positionUpdated, strengh * windDir.y);
-				// positionUpdated = rotationX(positionUpdated, + wave.y);
-				// positionUpdated = rotationZ(positionUpdated, + wave.x);
+				// positionUpdated.y *= max(1. - totalWave.z, 0.);
+				// positionUpdated.xz += vec2(-totalWave.x, totalWave.y) * totalWave.z * uv.y;
+				positionUpdated = rotationAxis(vec3(-totalWave.y, 0., -totalWave.x), totalWave.z * M_PI* 0.5 , positionUpdated);
+				positionUpdated = rotationAxis(vec3(windDir.y, 0., windDir.x), strengh, positionUpdated);
+
+				vPositionM = normalize(positionUpdated);
+
 		`);
+
+		this.Vertex_After_WorldPosComputed(`
+				// vec3 wave = vec3(0.);
+				// for (int i = 0; i < 10; i++) {
+				// 	wave = computeWave(origins[i], pos);
+				// 	worldPos.y *= max(1. - wave.z * 0.2, 0.);
+				// 	worldPos.xz += vec2(wave.x, wave.y) * wave.z * uv.y * 0.05;
+				// }
+			
+
+		`)
+
+		this.Fragment_Definitions(`
+			vec3 rotationY(vec3 v, float angle) {
+			  float s = sin(angle);
+			  float c = cos(angle);
+
+			  return mat3(
+			    c, 0.0, -s,
+			    0.0, 1.0, 0.0,
+			    s, 0.0, c
+			  ) * v;
+			}
+
+			vec3 rotationAxis(vec3 axis, float angle, vec3 v) {
+			    float c = cos(angle);
+			    float s = sin(angle);
+			    float t = 1.0 - c;
+
+			    return mat3(
+				t*axis.x*axis.x + c,        t*axis.x*axis.y - s*axis.z,  t*axis.x*axis.z + s*axis.y,
+				t*axis.x*axis.y + s*axis.z, t*axis.y*axis.y + c,         t*axis.y*axis.z - s*axis.x,
+				t*axis.x*axis.z - s*axis.y, t*axis.y*axis.z + s*axis.x,  t*axis.z*axis.z + c
+			    ) * v;
+			} 
+		`)
+
+		//NORMAL IN FRAGMENT
+		this.Fragment_Before_Lights(`
+			normalW = normalize(cross(dFdx(vPositionW), dFdy(vPositionW)));
+			normalW.y = abs(normalW.y);
+			// vec3 nor = rotationY(normalW, M_PI * 0.5 * (vMainUV1.x * 2. - 1.)); //Rounded Normal
+			// normalW = rotationAxis(vPositionM,M_PI * 0.1 * (vMainUV1.x * 2. - 1.), normalW );
+			// float ddt = dot(nor, normalW);
+		`)
+
 
 
 		this.Vertex_MainEnd(
@@ -554,6 +441,9 @@ export class GrassShader extends CustomMaterial {
 		this.Fragment_Begin(`
 			// #define VERTEXCOLOR 1
 			#define MAINUV1 1
+			#define M_PI 3.1415926535897932384626433832795
+
+			varying vec3 vPositionM;
 		`
 		);
 
@@ -711,7 +601,11 @@ export class GrassShader extends CustomMaterial {
 		`;
 
 		this.Fragment_MainEnd(`
-			gl_FragColor.rgb *= vMainUV1.y;
+			gl_FragColor.rgb *= vPositionW.y * 1.5 * baseColor.g;
+			// gl_FragColor.rgb = vec3(floor(gl_FragColor.r * 4. + 0.5) * (1. / 4.));
+			// gl_FragColor.rgb = vec3(vMainUV1, 0.);
+			// gl_FragColor.rgb = vec3(normalW * 0.5 + 0.5);
+			// gl_FragColor.rgb = vec3(ddt);
 		`)
 
 		//console.log(this.FragmentShader);
@@ -847,11 +741,13 @@ float noise(vec2 p )
 }`)
 
 		this.Fragment_MainEnd(`
-		float f = noise(vMainUV1 * 1000.) * 0.5 + 0.5;
-		vec3 dith = min(vec3(1., 1., 1.), f * 0.3 + gl_FragColor.rgb);
-		dith = floor(dith * 8. + 0.5) * (1. / 8.);
+		// float f = noise(vMainUV1 * 1000.) * 0.5 + 0.5;
+		vec3 dith = min(vec3(1., 1., 1.),   gl_FragColor.rgb);
+		// dith = floor(dith * 8. + 0.5) * (1. / 8.);
 		gl_FragColor.rgb = (dith - 0.5) * 1.6 + 0.5; //Apply contrast
 		// gl_FragColor.rgb = vec3(vMainUV1, 0.);
+		
+			// gl_FragColor.rgb = vec3(vNormalW * 0.5 + 0.5);
 		`)
 
 	}
