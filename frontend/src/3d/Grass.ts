@@ -101,9 +101,7 @@ export class Grass {
 		// );
 
 		this._grassShader = new GrassShader("grass", scene);
-		this._grassShader.specularPower = 64;
 
-		this._grassShader.backFaceCulling = false;
 		// this._grassShader.needDepthPrePass = false;
 		//this._grassShader.setTexture("noise", this._noiseTex);
 
@@ -164,6 +162,10 @@ export class Grass {
 		// for (let i = 0; i < this._tiles.length; i++) {
 		// 	this._tiles[i].isInFrustrum(camera._frustumPlanes);
 		// }
+	}
+
+	public getMesh(): Mesh {
+		return this._tiles[0]._mesh;
 	}
 
 	private async loadAssests(scene: Scene) {

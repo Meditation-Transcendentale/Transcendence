@@ -363,70 +363,67 @@ export class GrassShader extends CustomMaterial {
 				// dist_fall *= 2.;
 				return	vec3(d,  trunc_fallof(min(l, t), l) * dist_fall);
 			}
+
+			float gain( float x, float k ) 
+			{
+			    float a = 0.5*pow(2.0*((x<0.5)?x:1.0-x), k);
+			    return (x<0.5)?a:1.0-a;
+			}
+
+			float tone( float x, float k )
+			{
+			    return (k+1.0)/(1.0+k*x);
+			}
 		`
 		);
-
-		this.Vertex_Before_NormalUpdated(
-			`
-				// normalUpdated = normal;
-				// // normalUpdated.y = 0.;
-				// normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
-				// //normalUpdated = rotationX(normalUpdated, strengh);
-				// normalUpdated = rotationX(normalUpdated, strengh * windDir.x);
-				// normalUpdated = rotationZ(normalUpdated, strengh * windDir.y);
-				//
-				// // normalUpdated.y = abs(normalUpdated.y);
-				// // normalUpdated.z *= -1.;
-				// // normalUpdated.x *= -1.;
-				// normalUpdated.y = abs(normalUpdated.y);
-		`
-		)
 
 		this.Vertex_Before_PositionUpdated(
 			`
 				vec2 pos = (finalWorld * vec4(0., 0., 0., 1.0)).xz;
 			
-				// float c1 = noise12(pos * 0.05 - time * 0.5) * 0.5 + 0.5;
-				// float c2 = noise12(pos * 0.05 - oldTime * 0.5) * 0.5 + 0.5;
-				//
-				// float s1 = (c1 - 0.5) * 1.6 * M_PI * 0.5 * baseColor.a;
-				// float s2 = (c2 - 0.5) * 1.6 * M_PI * 0.5 * baseColor.a;
-				// float strengh = mix(s2, s1, uv.y) * (uv.y);
-				//
-				// float	windAngle =   noise12(pos - time * 0.5) * M_PI;
-				// vec2	windDir = vec2(cos(windAngle), sin(windAngle));
-				// vec2 curl = curlSimplex(pos * 0.05 - time * 0.05, 1.);
-				// vPositionM.rg = simplexNoise(pos * 0.5 - time * 0.05) * 0.5 +0.5;
-				vec2 curl = curlSimplex(pos * 0.1 - time * 0.2, 1.);
-				// vec2 curl = curlSimplex3D(vec3(pos * 0.2,time ), 1.);
-				// curl = vPositionM.rg;
-				// vPositionM.rg = vPositionM.rg * 0.5 + 0.5;
+				vec2 curl = curlSimplex(pos * 0.1 - vec2(time * 0.2, 0.), 1.);
 				float strengh = length(curl);
 				vec2 windDir = curl / strengh;
-				strengh *= uv.y;
+				strengh *= uv.y;// * uv.y ;
+				// strengh *= gain(uv.y, 3.);
+
+				strengh *= abs(dot(rotationY(normal, baseColor.r).xz, windDir)) * 0.5 + 0.5; // grass parallel to wind are less bend
+				strengh *= baseColor.a; //apply blade stiffness
 				
 				vec3 totalWave = vec3(0.);
 				for (int i = 0; i < 1; i++) {
 					vec3 wave = computeWave(origins[i], pos);
 					totalWave = mix(totalWave, wave, step(totalWave.z, wave.z));
 				}
-				// wave = max(min(vec2(1.), wave), vec2(-1.));
-				
+
 				positionUpdated = rotationY(positionUpdated, baseColor.r);
 
-				// positionUpdated.y *= max(1. - totalWave.z, 0.);
-				// positionUpdated.xz += vec2(-totalWave.x, totalWave.y) * totalWave.z * uv.y;
-				positionUpdated = rotationAxis(positionUpdated, totalWave.z * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
+				// positionUpdated.y *= max(1. - totalWave.z, 0.) * baseColor.a;
+				// positionUpdated.xz += vec2(-totalWave.x, totalWave.y) * totalWave.z * uv.y * baseColor.a;
+				positionUpdated = rotationAxis(positionUpdated, totalWave.z * baseColor.a * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
 				positionUpdated = rotationAxis(positionUpdated, strengh, vec3(windDir.y, 0., windDir.x));
 
 				vPositionM = normalize(positionUpdated);
 
 		`);
 
+		this.Vertex_Before_NormalUpdated(
+			`
+				vec3 viewDir = vEyePosition.xyz - vec3(pos.x, 0., pos.y) ;
+				normalUpdated = normalize(vec3(viewDir.x, 0., viewDir.z));
+				normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
+				// normalUpdated = rotationAxis(normalUpdated, totalWave.z * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
+				// normalUpdated = rotationAxis(normalUpdated, totalWave.z * baseColor.a * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
+				normalUpdated = rotationAxis(normalUpdated, strengh, vec3(windDir.y, 0., windDir.x));
+				normalUpdated.y = abs(normalUpdated.y);
+		`
+		)
+
+
 		//NORMAL IN FRAGMENT
 		this.Fragment_Before_Lights(`
-			normalW = normalize(cross(dFdx(vPositionW), dFdy(vPositionW)));
-			normalW.y = abs(normalW.y);
+			// normalW = normalize(cross(dFdx(vPositionW), dFdy(vPositionW)));
+			// normalW.y = abs(normalW.y);
 			// vec3 nor = rotationY(normalW, M_PI * 0.5 * (vMainUV1.x * 2. - 1.)); //Rounded Normal
 			// normalW = rotationAxis(vPositionM,M_PI * 0.1 * (vMainUV1.x * 2. - 1.), normalW );
 			// float ddt = dot(nor, normalW);
@@ -609,8 +606,10 @@ export class GrassShader extends CustomMaterial {
 		this.backFaceCulling = false;
 		this.twoSidedLighting = false;
 
-		this.emissiveColor = new Color3(0.3, 0.3, 0.3);
+		// this.emissiveColor = new Color3(0.3, 0.3, 0.3);
 
+		this.specularPower = 16;
+		// this.specularColor = new Color3(2., 2., 2.);
 
 	}
 

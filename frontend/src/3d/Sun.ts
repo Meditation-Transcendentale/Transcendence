@@ -54,14 +54,14 @@ export class Sun {
 		this.center.parent = this.root;
 		this.shell.parent = this.root;
 		// this.shell.setEnabled(false);
-		this.root.position.set(0, 50, -10);
+		this.root.position.set(0, 50, 0);
 		this.root.scaling.setAll(50);
 
 		// this.light = new PointLight("light", Vector3.Zero(), this.scene);
-		this.light = new SpotLight("light", Vector3.Zero(), new Vector3(-0, -50, 0).normalize(), Math.PI * 0.2, 0, this.scene);
-		const li = new SpotLight("fake light", Vector3.Zero(), new Vector3(-0, -50, 0).normalize(), Math.PI * 0.2, 0, this.scene);
-		li.parent = this.root;
-		li.intensity = 0.5;
+		this.light = new SpotLight("light", Vector3.Zero(), new Vector3(-0, -50, -10).normalize(), Math.PI * 0.3, 0, this.scene);
+		// const li = new SpotLight("fake light", Vector3.Zero(), new Vector3(-0, -50, 0).normalize(), Math.PI * 0.2, 0, this.scene);
+		// li.parent = this.root;
+		// li.intensity = 0.5;
 		this.light.parent = this.root;
 		this.light.intensity = 1.;
 		// const l = new DirectionalLight("light2", new Vector3(0, -1, 0), this.scene);
@@ -83,7 +83,7 @@ export class Sun {
 		// this.shadow.useAlphaTest = true;
 		// this.shadow.usePoissonSampling = true;
 		// this.shadow.normalBias = 0.1;
-		this.shadow.usePercentageCloserFiltering = true;
+		// this.shadow.usePercentageCloserFiltering = true;
 		// this.shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
 		// this.shadow.getShadowMap()!.renderList?.push(this.shell);
 		// this.shadow.useAlphaTesting = true;

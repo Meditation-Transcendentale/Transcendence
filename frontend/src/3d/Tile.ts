@@ -1,7 +1,7 @@
 import { AbstractMesh, Vector3, Material, Mesh, BoundingBox, StandardMaterial, Color3, CustomMaterial } from "@babylonImport";
 
 export class Tile {
-	private _mesh!: Mesh;
+	public _mesh!: Mesh;
 	private _boundingBox: BoundingBox;
 
 	private static __id = 0;
