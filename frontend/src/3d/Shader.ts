@@ -785,8 +785,8 @@ export class ButterflyMaterial extends CustomMaterial {
 			#define UV1 1
 			#define M_PI 3.1415926535897932384626433832795
 
-			attribute vec3 move;
-			attribute vec2 direction;
+			attribute vec3	move;
+			attribute vec2	direction;
 		`)
 
 		this.Vertex_Definitions(`

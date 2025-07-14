@@ -10,26 +10,13 @@ export class Butterfly {
 	private material: ButterflyMaterial;
 	private scene: Scene;
 
-	private oldTime: number = 0;
-
-	private position: Vector3;
-	private oldPosition: Vector3;
-
-	private angleVariance = Math.PI * 0.5 * 0.1;
-	private alpha: number = 0;
-	private beta: number = 0;
-	private dir!: Vector3;
-
 	private once = 0;
 
 	private moves!: Float32Array;
-	private dirs: Array<Vector3>;
 
 	private positions: Array<Vector3>;
-	private newPositions: Array<Vector3>;
 
 	private velocities: Array<Vector3>;
-	private newVelocities: Array<Vector3>;
 
 	private directions!: Float32Array;
 	private flying!: Float32Array;
@@ -54,24 +41,14 @@ export class Butterfly {
 		this.material = new ButterflyMaterial("butterfly", this.scene);
 		this.glowMat = new ButterflyMaterial("butterfly", this.scene);
 
-		this.position = new Vector3(0, 0, 0);
-		this.oldPosition = new Vector3(0, 0, 0);
-		this.angles = new Float32Array(2);
-
 		this.root = new TransformNode("butterflyRoot", this.scene);
 		this.root.position = new Vector3(0, 1, -10);
 		this.root.scaling = new Vector3(2, 2, 2);
 
-		this.dir = new Vector3(0, 0, 0);
-
 		this.octree = new OctreeBlock(5, new Vector3(0, 1, 0), 11);
 
 		this.positions = new Array();
-		this.newPositions = new Array();
 		this.velocities = new Array();
-		this.newVelocities = new Array();
-
-
 	}
 
 	public async init() {
@@ -88,10 +65,8 @@ export class Butterfly {
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
 		this.thinInstance(this.n, 1);
-		// this.octree.print();
 		this.octree.print();
 		this.glowLayer = new GlowLayer("glow", this.scene);
-		// this.glowLayer.referenceMeshToUseItsOwnMaterial(this.mesh);
 		this.glowLayer.setMaterialForRendering(this.mesh, this.glowMat);
 
 		this.glowLayer.intensity = 0.5;
@@ -114,22 +89,10 @@ export class Butterfly {
 		this.material.setFloat("time", time);
 		this.glowMat.setFloat("time", time);
 		this.applyForces();
-		// this.material.setFloat("oldTime", this.oldTime);
-		// this.updatePosition();
-		// this.newDirection();
 	}
 
-	//repel  force based on dist 
-	//force follow id O 
 	private applyForces() {
 		const v0 = Vector3.Zero();
-		// const p0 = this.newPositions[0];
-
-		// const FLOCK = new Vector3();
-		// for (let i = 0; i < this.n; i++) {
-		// 	FLOCK.addInPlace(this.newPositions[i]);
-		// }
-		// FLOCK.scaleInPlace(1 / this.n);
 		for (let i = 0; i < this.n; i++) {
 
 			const entries = this.octree.leaf(i) as number[];
@@ -137,33 +100,22 @@ export class Butterfly {
 			const align = new Vector3();
 			const flock = new Vector3();
 
-			const bp = this.newPositions[i];
-			const bv = this.newVelocities[i];
+			const bp = this.positions[i];
+			const bv = this.velocities[i];
 
 			let rr = 0;
 			let ff = 0;
 			for (let j = 0; j < entries.length; j++) {
 				let index = entries[j];
-				let bbp = this.newPositions[index];
+				let bbp = this.positions[index];
 				let r = bp.subtract(bbp);
 				if (r.dot(bv) > 0.) {
 					flock.addInPlace(bbp);
-					align.addInPlace(this.newVelocities[index]);
+					align.addInPlace(this.velocities[index]);
 					ff += 1;
 					repel.addInPlace((r.length() < 0.05 + this.disperse ? r : v0));
 				}
 			}
-
-			// if (i != 0) {
-			// 	flock.addInPlace(p0);
-			// 	ff++;
-			// }
-			// repel.addInPlace((Math.abs(bp.x) > 9 ? new Vector3(0.1 * -Math.sign(bp.x), 0, 0) : v0));
-			// repel.addInPlace((Math.abs(bp.y) > 0.5 ? new Vector3(0, 0.1 * -Math.sign(bp.y), 0) : v0));
-			// repel.addInPlace((Math.abs(bp.z) > 9 ? new Vector3(0, 0, 0.1 * -Math.sign(bp.z)) : v0));
-			// v.y = (Math.abs(p.y) > 0.5 ? (this.speed * -Math.sign(p.y)) * 0.5 : v.y);
-			// v.z = (Math.abs(p.z) > 9 ? (this.speed * -Math.sign(p.z)) * 0.5 : v.z);
-
 
 			if (ff > 0) {
 				flock.scaleInPlace(1 / ff);
@@ -171,7 +123,6 @@ export class Butterfly {
 				flock.subtractInPlace(bp);
 				align.subtractInPlace(bv);
 			}
-			// const flock = FLOCK.subtract(bp);
 			flock.scaleInPlace(this.speed * 0.01 * this.flock);
 			align.scaleInPlace(0.1);
 			repel.scaleInPlace(0.5);
@@ -224,9 +175,6 @@ export class Butterfly {
 	}
 
 	private bound(v: Vector3, p: Vector3) {
-		// v.x = (Math.abs(p.x) > 9 ? (Math.abs(v.x) * -Math.sign(p.x)) : v.x);
-		// v.y = (Math.abs(p.y) > 3 ? (Math.abs(v.y) * -Math.sign(p.y)) : v.y);
-		// v.z = (Math.abs(p.z) > 9 ? (Math.abs(v.z) * -Math.sign(p.z)) : v.z);
 		v.x = (Math.abs(p.x) > 9 ? (this.speed * -Math.sign(p.x)) * 0.5 : v.x);
 		v.y = (Math.abs(p.y) > 0.5 ? (this.speed * -Math.sign(p.y)) * 0.5 : v.y);
 		v.z = (Math.abs(p.z) > 9 ? (this.speed * -Math.sign(p.z)) * 0.5 : v.z);
@@ -244,36 +192,17 @@ export class Butterfly {
 		for (let i = 0; i < n; i++) {
 
 			this.flying[i] = 1;
-			const alpha = Math.random() * Math.PI * 2.;
-			const beta = Math.random() * Math.PI * 2.;
-
-			// const matT = Matrix.Translation(
-			// 	Math.cos(alpha) * Math.cos(beta) * radius,
-			// 	Math.sin(beta) * radius,
-			// 	Math.sin(alpha) * Math.cos(beta) * radius
-			// );
 
 			const matT = Matrix.Identity();
 
 			const matrix = matT;
 
 			let parameter: Vector3;
-			// if (i == 0) {
-			// 	parameter = new Vector3(0.01, 0.01, 0.01);
-			// }
-			// else {
-			const r = (Math.random() * 2 - 1.) * radius;
 			parameter = new Vector3(
 				(Math.random() * 2 - 1.) * radius,
 				(Math.random() * 2 - 1.) * radius,
 				(Math.random() * 2 - 1.) * radius,
 			);
-			// parameter = new Vector3(
-			// 	Math.cos(alpha) * Math.cos(beta) * radius,
-			// 	Math.sin(beta) * radius,
-			// 	Math.sin(alpha) * Math.cos(beta) * radius
-			// )
-			// }
 
 			matrix.copyToArray(bufferMatrix, i * 16);
 			parameter.toArray(this.moves, i * 3);
@@ -284,11 +213,8 @@ export class Butterfly {
 			);
 			v.normalize().scaleInPlace(this.speed);
 
-			// this.dirs.push(parameter.scale(0.00001));
-			this.newPositions.push(parameter);
-			this.positions.push(new Vector3(parameter.x, parameter.y, parameter.z));
+			this.positions.push(parameter);
 			this.velocities.push(v);
-			this.newVelocities.push(new Vector3(v.x, v.y, v.z));
 			this.octree.add(i, parameter);
 			this.directions[i * 2] = v.x;
 			this.directions[i * 2 + 1] = v.z;
@@ -299,34 +225,6 @@ export class Butterfly {
 		this.mesh.thinInstanceSetBuffer('direction', this.directions, 2, false);
 	}
 }
-function betaRandom(): number {
-	const unif = Math.random();
-	return Math.pow(Math.sin(unif * Math.PI * 0.5), 2);
-}
-function betaLeft(): number {
-	const beta = betaRandom();
-	return (beta < 0.5 ? (2 * beta) : 2 * (1 - beta))
-}
-
-function betaRight(): number {
-	const beta = betaRandom();
-	return (beta > 0.5 ? (2 * beta - 1) : (2 * (1 - beta) - 1))
-}
-
-// function curlNoise(x: number, y: number, delta: number, noise: Noise): [number, number] {
-// 	const dX = noise.simplex2(x + delta, y) - noise.simplex2(x - delta, y);
-// 	const dY = noise.simplex2(x, y + delta) - noise.simplex2(x, y - delta);
-//
-// 	return [
-// 		dY / (1),
-// 		-dX / (1)
-// 	];
-// }
-//
-//
-//
-//
-
 
 
 class OctreeBlock {

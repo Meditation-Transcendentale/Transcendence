@@ -16,7 +16,7 @@ type _thinInstancesOptions = {
 };
 
 const _nearOptions: _thinInstancesOptions = {
-	density: 20,
+	density: 10,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.4,
