@@ -43,13 +43,13 @@ export class ThinInstanceSystem extends System {
 		this.frameCount++;
 		this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
 
-		const paddleEntities = entities.filter(e => e.hasComponent(PaddleComponent));
-		const activePaddleEntities = paddleEntities.filter(e => {
-			const paddle = e.getComponent(PaddleComponent);
-			return paddle;
-		});
+		// const paddleEntities = entities.filter(e => e.hasComponent(PaddleComponent));
+		// const activePaddleEntities = paddleEntities.filter(e => {
+		// 	const paddle = e.getComponent(PaddleComponent);
+		// 	return paddle;
+		// });
 
-		this.paddleManager.update(activePaddleEntities, PaddleComponent, this.camera, this.frameCount);
+		this.paddleManager.update(entities, PaddleComponent, this.camera, this.frameCount);
 		this.wallManager.update(entities, WallComponent, this.camera, this.frameCount);
 		this.portalManager.update(entities, PortalComponent, this.camera, this.frameCount);
 		this.goalManager.update(entities, GoalComponent, this.camera, this.frameCount);

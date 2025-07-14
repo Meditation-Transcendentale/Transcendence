@@ -13,6 +13,7 @@ import { InputComponent } from "../components/InputComponent";
 import { TransformComponent } from "../components/TransformComponent";
 import { PortalComponent } from "../components/PortalComponent";
 import { TransformNode, Vector3 } from "@babylonImport";
+import { ECSManager } from "../../pong/ecs/ECSManager";
 
 function intersectSegmentsXZ(
 	A: Vector3,
@@ -72,7 +73,7 @@ export function buildScoreUI(ecs: any): Entity {
 }
 
 export function buildPaddles(
-	ecs: any,
+	ecs: ECSManager,
 	playerCount: number,
 	pongRoot: TransformNode
 ): PaddleBundle[] {
@@ -338,9 +339,10 @@ export function buildPortal(ecs: any, pongRoot: TransformNode) {
 		ecs.addEntity(portal);
 	}
 	return;
+
 }
 // ─── 5. Assemble Game Template ─────────────────────────────────────
-export function createGameTemplate(ecs: any, playerCount: number, pongRoot: TransformNode): PaddleBundle[] {
+export function createGameTemplate(ecs: ECSManager, playerCount: number, pongRoot: TransformNode): PaddleBundle[] {
 	const config = DEFAULT_CONFIG;
 	buildScoreUI(ecs);
 	const bundles = buildPaddles(ecs, playerCount, pongRoot);

@@ -157,7 +157,7 @@ export class PongBR {
 		//this.engine = new Engine(this.canvas, true);
 		//engine = this.engine;
 		this.pongRoot.setEnabled(true);
-		this.stateManager.set_ecs(this.ecs);
+		// this.stateManager.set_ecs(this.ecs);
 		this.stateManager.setter(true);
 		this.stateManager.update();
 

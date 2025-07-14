@@ -7,6 +7,7 @@ export class TransformComponent implements Component {
 	public rotation: Vector3;
 	public scale: Vector3;
 	public parent: TransformNode;
+	public static key = "TransformComponent";
 
 	constructor(
 		position: Vector3,

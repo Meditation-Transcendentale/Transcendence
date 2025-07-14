@@ -6,6 +6,7 @@ export type AnimProp = "position" | "rotation" | "scale";
 
 export class AnimationComponent implements Component {
 	elapsed = 0;
+	public static key = "AnimationComponent";
 	constructor(
 		/** seconds */
 		public readonly duration: number,

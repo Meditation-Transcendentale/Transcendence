@@ -5,5 +5,6 @@ import { Component } from "../ecs/Component";
  * Remove or toggle this component to enable the entity.
  */
 export class DisabledComponent implements Component {
+	public static key = "DisabledComponent";
 	constructor(public isEnabled: boolean = false) { }
 }
