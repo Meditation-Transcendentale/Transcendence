@@ -16,6 +16,7 @@ export class Puddle {
 	private deltaTime = 0.02;
 	private deltaPos = 0.1;
 	private change = false;
+	public origin: Vector3;
 
 	constructor(scene: Scene, width: number, subdivision: number) {
 
@@ -30,6 +31,8 @@ export class Puddle {
 			}, scene);
 
 		this.mesh.position.z = -10;
+
+		this.origin = new Vector3();
 
 
 
@@ -87,6 +90,10 @@ export class Puddle {
 		this.lastO.z = z;
 		this.lastO.t = t;
 
+		this.origin.x = x;
+		this.origin.y = 0;
+		this.origin.z = z + 10;
+		// console.log(this.origin);
 		this.origins[this.index * 3] = x;
 		this.origins[this.index * 3 + 1] = z;
 		this.origins[this.index * 3 + 2] = t;

@@ -34,9 +34,12 @@ export class Butterfly {
 	private glowLayer!: GlowLayer;
 	private glowMat!: ButterflyMaterial;
 
+	public origin: Vector3;
 
-	constructor(scene: Scene) {
+
+	constructor(scene: Scene, origin: Vector3) {
 		this.scene = scene;
+		this.origin = origin;
 
 		this.material = new ButterflyMaterial("butterfly", this.scene);
 		this.glowMat = new ButterflyMaterial("butterfly", this.scene);
@@ -117,6 +120,10 @@ export class Butterfly {
 				}
 			}
 
+			// flock.x += this.origin.x;
+			// flock.z += this.origin.z;
+			// ff++;
+
 			if (ff > 0) {
 				flock.scaleInPlace(1 / ff);
 				align.scaleInPlace(1. / ff);
@@ -127,8 +134,11 @@ export class Butterfly {
 			align.scaleInPlace(0.1);
 			repel.scaleInPlace(0.5);
 
+			const cursor = this.origin.subtract(bp);
+			const cursorL = cursor.length();
+			cursor.scaleInPlace(cursorL < 2 ? this.speed / cursorL : 0.);
 
-			bv.addInPlace(align).addInPlace(flock).addInPlace(repel);
+			bv.addInPlace(align).addInPlace(flock).addInPlace(repel).addInPlace(cursor);
 			const l = bv.length();
 			if (l > this.speed * 2) {
 				bv.scaleInPlace(this.speed * 1.2 / l)

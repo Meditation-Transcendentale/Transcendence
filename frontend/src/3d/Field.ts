@@ -30,7 +30,7 @@ export class Field {
 		this.sun = new Sun(scene);
 		this.grass = new Grass(20);
 		this.ground = new Puddle(scene, 40, 1);
-		this.butterfly = new Butterfly(scene);
+		this.butterfly = new Butterfly(scene, this.ground.origin);
 
 		this.clouds = [];
 	}
