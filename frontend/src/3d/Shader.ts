@@ -775,11 +775,10 @@ export class ButterflyMaterial extends CustomMaterial {
 		super(name, scene);
 
 		this.AddUniform('time', 'float', 1.0);
-		this.AddUniform('alpha', 'float', 1.0);
 
 		this.AddAttribute('uv');
 		this.AddAttribute('move');
-		this.AddAttribute('diff');
+		this.AddAttribute('direction');
 
 		this.Vertex_Begin(`
 			#define MAINUV1 1
@@ -787,19 +786,19 @@ export class ButterflyMaterial extends CustomMaterial {
 			#define M_PI 3.1415926535897932384626433832795
 
 			attribute vec3 move;
-			attribute float diff;
+			attribute vec2 direction;
 		`)
 
 		this.Vertex_Definitions(`
 			#include<rotations>
+			#include<noises>
 		`)
 
 		this.Vertex_Before_PositionUpdated(`
-			// positionUpdated.y = sin(time * 20.) * abs(position.z);
-			positionUpdated.xyz = rotationX(positionUpdated.xyz, sin((time + float(gl_InstanceID)) * 15.) * sign(position.z) * M_PI * 0.5);
-			positionUpdated = rotationY(positionUpdated, -alpha - M_PI * 0.5);
-			// vec2 dir = curlSimplex(vec2(time), 0.2);
-			// positionUpdated.xz += dir;
+			float flap = sin((time + hash12(vec2(float(gl_InstanceID)))) * 15. + position.x * 2.);
+			positionUpdated.xyz = rotationX(positionUpdated.xyz, flap * sign(position.z) * M_PI * 0.5);
+			float alpha = atan(direction.x, dot(direction, vec2(.0, 1.)));
+			positionUpdated = rotationY(positionUpdated, alpha + M_PI * 0.5);
 		`)
 
 		this.Vertex_After_WorldPosComputed(`

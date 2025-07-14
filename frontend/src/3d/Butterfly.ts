@@ -1,4 +1,4 @@
-import { LoadAssetContainerAsync, Matrix, Mesh, Scene, TransformNode, Vector3, Vector4 } from "@babylonImport";
+import { GlowLayer, LoadAssetContainerAsync, Matrix, Mesh, Scene, TransformNode, Vector3, Vector4 } from "@babylonImport";
 import { ButterflyMaterial } from "./Shader";
 import { Noise } from "./Noise";
 
@@ -23,36 +23,59 @@ export class Butterfly {
 	private once = 0;
 
 	private moves!: Float32Array;
+	private dirs: Array<Vector3>;
+
 	private positions: Array<Vector3>;
+	private newPositions: Array<Vector3>;
+
+	private velocities: Array<Vector3>;
+	private newVelocities: Array<Vector3>;
+
+	private directions!: Float32Array;
+	private flying!: Float32Array;
+
+
 	private deltas!: Float32Array;
-	private n: number = 10;
+	private n: number = 300;
 
 	private speed = 0.01;
 
 	private octree: OctreeBlock;
+	private flock: number = 1;
+	private disperse: number = 0;
+
+	private glowLayer!: GlowLayer;
+	private glowMat!: ButterflyMaterial;
 
 
 	constructor(scene: Scene) {
 		this.scene = scene;
 
 		this.material = new ButterflyMaterial("butterfly", this.scene);
+		this.glowMat = new ButterflyMaterial("butterfly", this.scene);
 
 		this.position = new Vector3(0, 0, 0);
 		this.oldPosition = new Vector3(0, 0, 0);
 		this.angles = new Float32Array(2);
 
 		this.root = new TransformNode("butterflyRoot", this.scene);
-		this.root.position = new Vector3(0, 2, -10);
+		this.root.position = new Vector3(0, 1, -10);
+		this.root.scaling = new Vector3(2, 2, 2);
 
 		this.dir = new Vector3(0, 0, 0);
 
-		this.octree = new OctreeBlock(2, new Vector3(0, 3, 0), 5);
+		this.octree = new OctreeBlock(5, new Vector3(0, 1, 0), 11);
+
 		this.positions = new Array();
+		this.newPositions = new Array();
+		this.velocities = new Array();
+		this.newVelocities = new Array();
+
 
 	}
 
 	public async init() {
-		const loaded = await LoadAssetContainerAsync("/assets/butterfly.glb", this.scene);
+		const loaded = await LoadAssetContainerAsync("/assets/butterfly2.glb", this.scene);
 		this.mesh = loaded.meshes[1] as Mesh;
 		this.mesh.name = 'butterfly';
 		this.mesh.optimizeIndices();
@@ -67,17 +90,29 @@ export class Butterfly {
 		this.thinInstance(this.n, 1);
 		// this.octree.print();
 		this.octree.print();
+		this.glowLayer = new GlowLayer("glow", this.scene);
+		// this.glowLayer.referenceMeshToUseItsOwnMaterial(this.mesh);
+		this.glowLayer.setMaterialForRendering(this.mesh, this.glowMat);
+
+		this.glowLayer.intensity = 0.5;
 
 
 	}
 
+	f() {
+		console.log("OCTREEE");
+		this.octree.printRoot();
+		setTimeout(() => (this.f()), 3000);
+	}
+
 	public update(time: number) {
 		if (this.once == 0) {
-			setTimeout(() => { this.newDeltas() }, 500);
+			// setTimeout(() => { this.f(); }, 500);
+			this.activeFlock();
 			this.once = 1;
 		}
 		this.material.setFloat("time", time);
-		this.material.setFloat("alpha", this.alpha)
+		this.glowMat.setFloat("time", time);
 		this.applyForces();
 		// this.material.setFloat("oldTime", this.oldTime);
 		// this.updatePosition();
@@ -87,182 +122,115 @@ export class Butterfly {
 	//repel  force based on dist 
 	//force follow id O 
 	private applyForces() {
-		const p0 = this.positions[0];
-		for (let i = 0; i < this.n; i++) {
-			const entries = this.octree.leaf(i) as Vector3[];
-			const repel = new Vector3();
-			const follow = new Vector3();
-			for (let j = 0; j < entries.length; j++) {
-				let v = entries[j].subtract(this.positions[i]);
-				v.scaleInPlace(1 / v.length());
-				follow.addInPlace(v);
-			}
-			if (i > 0) {
-				follow.addInPlace(p0.subtract(this.positions[i]).normalize().scaleInPlace(0.1))
-			}
-			follow.normalize();
-			this.positions[i].addInPlace(follow.scaleInPlace(0.01));
-			this.positions[i].toArray(this.moves, i * 3);
-		}
-		this.mesh.thinInstanceBufferUpdated("move");
-		this.octree.update();
+		const v0 = Vector3.Zero();
+		// const p0 = this.newPositions[0];
 
-	}
-
-	private newDeltas() {
-		for (let i = 1; i < this.n; i++) {
-			this.deltas[i * 3] = Math.random() * 2 - 1;
-			this.deltas[i * 3 + 1] = Math.random() * 2 - 1;
-			this.deltas[i * 3 + 2] = Math.random() * 2 - 1;
-		}
-
-
-		// setTimeout(() => { this.newDeltas() }, 500);
-
-
-	}
-
-	private newDirection() {
-		let alpha = (betaRandom() * 2. - 1.) * this.angleVariance + this.alpha;
-		let beta = (betaRandom() * 2. - 1.) * this.angleVariance * 0.2 + this.beta;
-
-
-		//
-		const f = 0.02;
-
-		this.oldTime = performance.now() * 0.001;
-		// const cb = Math.cos(this.beta);
-		// let x = Math.cos(this.alpha) * cb * f;
-		// let y = Math.sin(this.beta) * f;
-		// let z = Math.sin(this.alpha) * cb * f;
-		let ca = Math.cos(this.alpha);
-		let x = -Math.sin(this.alpha) * f;
-		let y = Math.sin(this.beta) * ca * f;
-		let z = Math.cos(this.beta) * ca * f;
-		// while (Math.abs(this.moves[0] + x) > 5 || Math.abs(this.moves[0] + x) > 5 || Math.abs(this.moves[1] + y - 2.5) > 2.5) {
-		// 	alpha = (betaRandom() * 2. - 1.) * this.angleVariance + this.alpha;
-		// 	ca = Math.cos(alpha);
-		// 	while (Math.abs(this.moves[1] + y - 2.5) > 2.5) {
-		// 		beta = (betaRandom() * 2. - 1.) * this.angleVariance * 0.2 + this.beta;
-		// 		x = -Math.sin(alpha) * f;
-		// 		y = Math.sin(beta) * ca * f;
-		// 		z = Math.cos(beta) * ca * f;
-		// 	}
-		// }
-
-		this.alpha = alpha % (Math.PI * 2.);
-		this.beta = beta % (Math.PI * 2.);
-
-
-		//
-		if (Math.abs(this.moves[0] + x) > 5) {
-			x *= -1;
-			// this.alpha = -(this.alpha + Math.PI);
-			this.alpha *= -1;
-		}
-		if (Math.abs(this.moves[1] + y - 2.5) > 2.5) {
-			y *= -1;
-			this.beta *= -1;
-		}
-		if (Math.abs(this.moves[2] + z) > 5) {
-			z *= -1;
-			this.alpha = -(this.alpha + Math.PI);
-			// this.alpha;
-		}
-		this.dir.set(
-			x, y, z);
+		// const FLOCK = new Vector3();
 		// for (let i = 0; i < this.n; i++) {
-		// 	this.moves[3 * i] += this.dir.x * this.deltas[i * 3]; //(Math.random() * 0.5 + 0.5);
-		// 	this.moves[3 * i + 1] += this.dir.y * this.deltas[i * 3 + 1];//(Math.random() * 0.5 + 0.5);
-		// 	this.moves[3 * i + 2] += this.dir.z * this.deltas[i * 3 + 2];//(Math.random() * 0.5 + 0.5);
+		// 	FLOCK.addInPlace(this.newPositions[i]);
 		// }
-		//
-		// this.moves[0] += this.dir.x;
-		// this.moves[1] += this.dir.y;
-		// this.moves[2] += this.dir.z;
-
-		for (let i = 1; i < this.n; i++) {
-			x = this.moves[0] - this.moves[3 * i] + this.deltas[i * 3];
-			y = this.moves[1] - this.moves[3 * i + 1] + this.deltas[i * 3 + 1];
-			z = this.moves[2] - this.moves[3 * i + 2] + this.deltas[i * 3 + 2];
-			let s = Math.sqrt(x * x + y * y + z * z);
-			// this.moves[3 * i] += (this.moves[0] - this.moves[3 * i]) * s * this.deltas[i];
-			// this.moves[3 * i + 1] += (this.moves[1] - this.moves[3 * i + 1]) * s * this.deltas[i];
-			// this.moves[3 * i + 2] += (this.moves[2] - this.moves[3 * i + 2]) * s * this.deltas[i];
-
-			this.moves[3 * i] += (x / s) * f;
-			this.moves[3 * i + 1] += (y / s) * f;
-			this.moves[3 * i + 2] += (z / s) * f;
-		}
-		this.mesh.thinInstanceBufferUpdated("move");
-		this.moves[0] += this.dir.x;
-		this.moves[1] += this.dir.y;
-		this.moves[2] += this.dir.z;
-
-		// for (let i = 1; i < this.n; i++) {
-		// 	this.deltas[i * 3] = Math.random() * 0.5 + 0.5;
-		// 	this.deltas[i * 3 + 1] = Math.random() * 0.5 + 0.5;
-		// 	this.deltas[i * 3 + 2] = Math.random() * 0.5 + 0.5;
-		// }
-
-		// setTimeout(() => { this.newDirection() }, 500);
-	}
-
-	private updatePosition() {
+		// FLOCK.scaleInPlace(1 / this.n);
 		for (let i = 0; i < this.n; i++) {
-			this.moves[3 * i] += this.dir.x * this.deltas[3 * i];
-			this.moves[3 * i + 1] += this.dir.y * this.deltas[3 * i + 1];
-			this.moves[3 * i + 2] += this.dir.z * this.deltas[3 * i + 2];
-		}
 
+			const entries = this.octree.leaf(i) as number[];
+			const repel = new Vector3();
+			const align = new Vector3();
+			const flock = new Vector3();
+
+			const bp = this.newPositions[i];
+			const bv = this.newVelocities[i];
+
+			let rr = 0;
+			let ff = 0;
+			for (let j = 0; j < entries.length; j++) {
+				let index = entries[j];
+				let bbp = this.newPositions[index];
+				let r = bp.subtract(bbp);
+				if (r.dot(bv) > 0.) {
+					flock.addInPlace(bbp);
+					align.addInPlace(this.newVelocities[index]);
+					ff += 1;
+					repel.addInPlace((r.length() < 0.05 + this.disperse ? r : v0));
+				}
+			}
+
+			// if (i != 0) {
+			// 	flock.addInPlace(p0);
+			// 	ff++;
+			// }
+			// repel.addInPlace((Math.abs(bp.x) > 9 ? new Vector3(0.1 * -Math.sign(bp.x), 0, 0) : v0));
+			// repel.addInPlace((Math.abs(bp.y) > 0.5 ? new Vector3(0, 0.1 * -Math.sign(bp.y), 0) : v0));
+			// repel.addInPlace((Math.abs(bp.z) > 9 ? new Vector3(0, 0, 0.1 * -Math.sign(bp.z)) : v0));
+			// v.y = (Math.abs(p.y) > 0.5 ? (this.speed * -Math.sign(p.y)) * 0.5 : v.y);
+			// v.z = (Math.abs(p.z) > 9 ? (this.speed * -Math.sign(p.z)) * 0.5 : v.z);
+
+
+			if (ff > 0) {
+				flock.scaleInPlace(1 / ff);
+				align.scaleInPlace(1. / ff);
+				flock.subtractInPlace(bp);
+				align.subtractInPlace(bv);
+			}
+			// const flock = FLOCK.subtract(bp);
+			flock.scaleInPlace(this.speed * 0.01 * this.flock);
+			align.scaleInPlace(0.1);
+			repel.scaleInPlace(0.5);
+
+
+			bv.addInPlace(align).addInPlace(flock).addInPlace(repel);
+			const l = bv.length();
+			if (l > this.speed * 2) {
+				bv.scaleInPlace(this.speed * 1.2 / l)
+			} else if (l < this.speed) [
+				bv.scaleInPlace(this.speed / l)
+			]
+			this.bound(bv, bp);
+
+			bp.addInPlace(bv.scale(Math.min(1., this.flying[i])));
+			bp.toArray(this.moves, i * 3);
+			this.directions[i * 2] = bv.x;
+			this.directions[i * 2 + 1] = bv.z;
+			this.perching(bp, i);
+		}
 		this.mesh.thinInstanceBufferUpdated("move");
-		// this.mesh.thinInstanceSetBuffer('move', this.moves, 3, false);
+		this.mesh.thinInstanceBufferUpdated("direction");
+		// for (let i = 0; i < this.n; i++) {
+		// 	this.velocities[i].copyFrom(this.newVelocities[i]);
+		// 	this.positions[i].copyFrom(this.newPositions[i]);
+		// }
+		this.octree.update();
 	}
 
-	private move() {
-		const alpha = (betaRandom() * 2. - 1.) * this.angleVariance + this.alpha;
-		const beta = (betaRandom() * 2. - 1.) * this.angleVariance + this.beta;
-
-		this.alpha = alpha % (Math.PI * 2.);
-		this.beta = beta % (Math.PI * 2.);
-
-		//
-		const f = 0.1;
-
-		this.oldTime = performance.now() * 0.001;
-		this.oldPosition.set(this.position.x, this.position.y, this.position.z);
-		const cb = Math.cos(this.beta);
-
-		let x = Math.cos(this.alpha) * cb * f;
-		let y = Math.sin(this.beta) * f;
-		let z = Math.sin(this.alpha) * cb * f;
-
-		if (Math.abs(this.mesh.position.x + x) > 5) {
-			x *= -1;
-			this.alpha = -(this.alpha + Math.PI);
-		}
-		if (Math.abs(this.mesh.position.z + z) > 5) {
-			z *= -1;
-			this.alpha *= -1;
-		}
-		if (Math.abs(this.mesh.position.y + y - 2.5) > 2.5) {
-			y *= -1;
-			this.beta *= -1;
-		}
-
-		this.dir.addInPlaceFromFloats(
-			x, y, z);
-		// console.log(Math.cos(this.alpha) * f, Math.sin(this.alpha) * f);
-
-		setTimeout(() => { this.move() }, 100);
+	private activeFlock() {
+		this.flock = 1;
+		this.disperse = 0;
+		setTimeout(() => { this.disbaleFlock() }, (Math.random() * 0.5 + 0.5) * 3000);
 	}
 
-	private lerpPos(a: number) {
-		// this.mesh.position.set(
-		// 	this.oldPosition.x * (1 - a) + this.position.x * a,
-		// 	this.oldPosition.y * (1 - a) + this.position.y * a,
-		// 	this.oldPosition.z * (1 - a) + this.position.z * a
-		// )
+	private disbaleFlock() {
+		this.flock = 0.;
+		this.disperse = 0.3;
+		setTimeout(() => { this.disbaleFlock() }, (Math.random() * 0.5 + 0.5) * 100);
+	}
+
+	private perching(bp: Vector3, index: number) {
+		if (bp.y < -0.4 && this.flying[index] > 100) {
+			this.flying[index] = 0;
+			setTimeout(() => { this.flying[index] = 0.1 }, (Math.random() * 0.5 + 0.5) * 1000);
+		} else {
+			this.flying[index] = this.flying[index] * 1.01;
+		}
+
+	}
+
+	private bound(v: Vector3, p: Vector3) {
+		// v.x = (Math.abs(p.x) > 9 ? (Math.abs(v.x) * -Math.sign(p.x)) : v.x);
+		// v.y = (Math.abs(p.y) > 3 ? (Math.abs(v.y) * -Math.sign(p.y)) : v.y);
+		// v.z = (Math.abs(p.z) > 9 ? (Math.abs(v.z) * -Math.sign(p.z)) : v.z);
+		v.x = (Math.abs(p.x) > 9 ? (this.speed * -Math.sign(p.x)) * 0.5 : v.x);
+		v.y = (Math.abs(p.y) > 0.5 ? (this.speed * -Math.sign(p.y)) * 0.5 : v.y);
+		v.z = (Math.abs(p.z) > 9 ? (this.speed * -Math.sign(p.z)) * 0.5 : v.z);
+
 	}
 
 	private thinInstance(n: number, radius: number) {
@@ -270,13 +238,12 @@ export class Butterfly {
 
 		const bufferMatrix = new Float32Array(16 * n);
 		this.moves = new Float32Array(3 * n);
-		this.deltas = new Float32Array(3 * n);
-		this.deltas[0] = .75;
-		this.deltas[1] = .75;
-		this.deltas[2] = .75;
-
+		this.directions = new Float32Array(2 * n);
+		this.flying = new Float32Array(n);
 
 		for (let i = 0; i < n; i++) {
+
+			this.flying[i] = 1;
 			const alpha = Math.random() * Math.PI * 2.;
 			const beta = Math.random() * Math.PI * 2.;
 
@@ -291,25 +258,45 @@ export class Butterfly {
 			const matrix = matT;
 
 			let parameter: Vector3;
-			if (i == 0) {
-				parameter = new Vector3(0.01, 0.01, 0.01);
-			}
-			else {
-				parameter = new Vector3(
-					Math.cos(alpha) * Math.cos(beta) * radius,
-					Math.sin(beta) * radius,
-					Math.sin(alpha) * Math.cos(beta) * radius
-				)
-			}
+			// if (i == 0) {
+			// 	parameter = new Vector3(0.01, 0.01, 0.01);
+			// }
+			// else {
+			const r = (Math.random() * 2 - 1.) * radius;
+			parameter = new Vector3(
+				(Math.random() * 2 - 1.) * radius,
+				(Math.random() * 2 - 1.) * radius,
+				(Math.random() * 2 - 1.) * radius,
+			);
+			// parameter = new Vector3(
+			// 	Math.cos(alpha) * Math.cos(beta) * radius,
+			// 	Math.sin(beta) * radius,
+			// 	Math.sin(alpha) * Math.cos(beta) * radius
+			// )
+			// }
 
 			matrix.copyToArray(bufferMatrix, i * 16);
 			parameter.toArray(this.moves, i * 3);
-			this.positions.push(parameter);
+			const v = new Vector3(
+				Math.random() * 2. - 1,
+				Math.random() * 2 - 1,
+				Math.random() * 2 - 1
+			);
+			v.normalize().scaleInPlace(this.speed);
+
+			// this.dirs.push(parameter.scale(0.00001));
+			this.newPositions.push(parameter);
+			this.positions.push(new Vector3(parameter.x, parameter.y, parameter.z));
+			this.velocities.push(v);
+			this.newVelocities.push(new Vector3(v.x, v.y, v.z));
 			this.octree.add(i, parameter);
+			this.directions[i * 2] = v.x;
+			this.directions[i * 2 + 1] = v.z;
 		}
 
 		this.mesh.thinInstanceSetBuffer('matrix', bufferMatrix, 16, true);
 		this.mesh.thinInstanceSetBuffer('move', this.moves, 3, false);
+		this.mesh.thinInstanceSetBuffer('direction', this.directions, 2, false);
 	}
 }
 function betaRandom(): number {
@@ -393,7 +380,7 @@ class OctreeBlock {
 		}
 	}
 
-	public leaf(key: number): Vector3[] | void {
+	public leaf(key: number): number[] | void {
 		if (this.blocks.length == 0) {
 			return this.allButOne(key);
 		}
@@ -410,11 +397,11 @@ class OctreeBlock {
 		return this.entries.has(key);
 	}
 
-	public allButOne(key: number): Vector3[] {
-		const final: Vector3[] = [];
+	public allButOne(key: number): number[] {
+		const final: number[] = [];
 		for (let i of this.entries.keys()) {
 			if (i != key) {
-				final.push(this.entries.get(i) as Vector3)
+				final.push(i);
 			}
 		}
 		return final;

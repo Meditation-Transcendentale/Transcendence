@@ -8,7 +8,6 @@ import {
 	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
-	// GlowLayer,
 	// Inspector,
 	MeshBuilder,
 	Scene,
@@ -32,6 +31,7 @@ export class Environment {
 	private gears!: Gears;
 
 	private field: Field;
+
 
 
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
@@ -105,6 +105,7 @@ export class Environment {
 		this.scene.meshes.forEach((mesh) => {
 			mesh.receiveShadows = true;
 		})
+
 
 		// const pp = new DefaultRenderingPipeline("default", true, this.scene, [this.scene.activeCamera as Camera]);
 		// pp.bloomEnabled = true;
