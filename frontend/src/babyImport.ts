@@ -3,7 +3,7 @@ import "@babylonjs/loaders/glTF/2.0/";
 import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // load shaders
 // import * as POST from "@babylonjs/core/PostProcesses";
 
-// export { Inspector } from '@babylonjs/inspector';
+export { Inspector } from '@babylonjs/inspector';
 // import {
 // 	VolumetricLightScatteringPostProcess
 // } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
@@ -13,7 +13,7 @@ export { Engine } from "@babylonjs/core/Engines/engine";
 export { Scene } from "@babylonjs/core/scene"
 export { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 export { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-export { Vector3, Vector2 } from "@babylonjs/core/Maths/math.vector";
+export { Vector3, Vector2, Vector4 } from "@babylonjs/core/Maths/math.vector";
 export { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 export { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
 export { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";

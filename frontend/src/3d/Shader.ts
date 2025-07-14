@@ -1,4 +1,4 @@
-import { Color3, CustomMaterial, Effect, Scene } from "@babylonImport"
+import { Color3, CustomMaterial, Effect, Scene, Vector3 } from "@babylonImport"
 
 
 Effect.IncludesShadersStore["noises"] = `
@@ -374,6 +374,10 @@ export class GrassShader extends CustomMaterial {
 			{
 			    return (k+1.0)/(1.0+k*x);
 			}
+
+			float simplexOctave(vec2 v) {
+				return (simplexNoise(v) + 0.5 * simplexNoise(v * 2.) + 0.25 * simplexNoise(v * 4.)) * (1. / 1.75);
+			}
 		`
 		);
 
@@ -381,11 +385,15 @@ export class GrassShader extends CustomMaterial {
 			`
 				vec2 pos = (finalWorld * vec4(0., 0., 0., 1.0)).xz;
 			
-				vec2 curl = curlSimplex(pos * 0.1 - vec2(time * 0.2, 0.), 1.);
-				float strengh = length(curl);
-				vec2 windDir = curl / strengh;
+				// vec2 curl = curlSimplex(pos * 0.1 - vec2(time * 0.2, 0.), 1.);
+				// float strengh = length(curl);
+				// vec2 windDir = curl / strengh;
+
+				vec2 windDir = vec2(1., 0.);
+				float strengh = simplexOctave(pos * 0.1 - time * windDir * 0.3);
 				strengh *= uv.y;// * uv.y ;
 				// strengh *= gain(uv.y, 3.);
+				
 
 				strengh *= abs(dot(rotationY(normal, baseColor.r).xz, windDir)) * 0.5 + 0.5; // grass parallel to wind are less bend
 				strengh *= baseColor.a; //apply blade stiffness
@@ -699,41 +707,41 @@ export class DitherMaterial extends CustomMaterial {
 		this.AddAttribute('uv');
 
 		this.Vertex_Begin(`
-	#define MAINUV1 1
-	#define UV1 1
+			#define MAINUV1 1
+			#define UV1 1
 
-`)
+		`)
 
 		this.Fragment_Begin(`
-	#define MAINUV1 1
-`)
+			#define MAINUV1 1
+		`)
 
 		this.Fragment_Definitions(`
-float hash(ivec2 p )  // this hash is not production ready, please
-{                         // replace this by something better
+			float hash(ivec2 p )  // this hash is not production ready, please
+			{                         // replace this by something better
 
-    // 2D -> 1D
-    int n = p.x*3 + p.y*113;
+			    // 2D -> 1D
+			    int n = p.x*3 + p.y*113;
 
-    // 1D hash by Hugo Elias
-	n = (n << 13) ^ n;
-    n = n * (n * n * 15731 + 789221) + 1376312589;
-    return -1.0+2.0*float( n & 0x0fffffff)/float(0x0fffffff);
-}
+			    // 1D hash by Hugo Elias
+				n = (n << 13) ^ n;
+			    n = n * (n * n * 15731 + 789221) + 1376312589;
+			    return -1.0+2.0*float( n & 0x0fffffff)/float(0x0fffffff);
+			}
 
-float noise(vec2 p )
-{
-    ivec2 i = ivec2(floor( p ));
-    vec2 f = fract( p );
-	
-    // cubic interpolant
-    vec2 u = f*f*(3.0-2.0*f);
+			float noise(vec2 p )
+			{
+			    ivec2 i = ivec2(floor( p ));
+			    vec2 f = fract( p );
+				
+			    // cubic interpolant
+			    vec2 u = f*f*(3.0-2.0*f);
 
-    return mix( mix( hash( i + ivec2(0,0) ), 
-                     hash( i + ivec2(1,0) ), u.x),
-                mix( hash( i + ivec2(0,1) ), 
-                     hash( i + ivec2(1,1) ), u.x), u.y);
-}`)
+			    return mix( mix( hash( i + ivec2(0,0) ), 
+					     hash( i + ivec2(1,0) ), u.x),
+					mix( hash( i + ivec2(0,1) ), 
+					     hash( i + ivec2(1,1) ), u.x), u.y);
+			}`)
 
 		this.Fragment_MainEnd(`
 		// float f = noise(vMainUV1 * 1000.) * 0.5 + 0.5;
@@ -760,3 +768,72 @@ float noise(vec2 p )
 		});
 	}
 }
+
+
+export class ButterflyMaterial extends CustomMaterial {
+	constructor(name: string, scene: Scene) {
+		super(name, scene);
+
+		this.AddUniform('time', 'float', 1.0);
+		this.AddUniform('alpha', 'float', 1.0);
+
+		this.AddAttribute('uv');
+		this.AddAttribute('move');
+		this.AddAttribute('diff');
+
+		this.Vertex_Begin(`
+			#define MAINUV1 1
+			#define UV1 1
+			#define M_PI 3.1415926535897932384626433832795
+
+			attribute vec3 move;
+			attribute float diff;
+		`)
+
+		this.Vertex_Definitions(`
+			#include<rotations>
+		`)
+
+		this.Vertex_Before_PositionUpdated(`
+			// positionUpdated.y = sin(time * 20.) * abs(position.z);
+			positionUpdated.xyz = rotationX(positionUpdated.xyz, sin((time + float(gl_InstanceID)) * 20. ) * sign(position.z) * M_PI * 0.5);
+			positionUpdated = rotationY(positionUpdated, -alpha - M_PI * 0.5);
+			// vec2 dir = curlSimplex(vec2(time), 0.2);
+			// positionUpdated.xz += dir;
+		`)
+
+		this.Vertex_After_WorldPosComputed(`
+			worldPos.xyz += move;
+		`)
+
+
+		this.Fragment_Begin(`
+			#define MAINUV1 1
+		`)
+
+		this.emissiveColor = new Color3(0.5, 0.5, 0.5);
+		this.backFaceCulling = false;
+	}
+
+	setFloat(name: string, value: number) {
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setFloat(name, value);
+		});
+	}
+
+
+	setFloatArray3(name: string, values: number[]) {
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setFloatArray3(name, values);
+		});
+	}
+
+	setVec3(name: string, value: Vector3) {
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setVector3(name, value);
+		});
+
+	}
+}
+
+

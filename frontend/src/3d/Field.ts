@@ -8,6 +8,7 @@ import { Sun } from "./Sun";
 import { Grass } from "./Grass";
 import { Puddle } from "./Ground";
 import { DitherMaterial } from "./Shader";
+import { Butterfly } from "./Butterfly";
 
 
 
@@ -20,6 +21,7 @@ export class Field {
 	private sun: Sun;
 	private grass: Grass;
 	private ground: Puddle;
+	private butterfly: Butterfly;
 
 	private ditherMat!: DitherMaterial;
 
@@ -28,6 +30,7 @@ export class Field {
 		this.sun = new Sun(scene);
 		this.grass = new Grass(20);
 		this.ground = new Puddle(scene, 40, 1);
+		this.butterfly = new Butterfly(scene);
 
 		this.clouds = [];
 	}
@@ -47,7 +50,6 @@ export class Field {
 			mesh.material = this.ditherMat;
 			mesh.receiveShadows = true;
 			this.sun.shadow.addShadowCaster(mesh);
-			console.log(mesh);
 		})
 		this.scene.setActiveCameraByName("fieldCam");
 		this.scene.activeCamera.parent = undefined;
@@ -65,6 +67,7 @@ export class Field {
 
 		this.ground.init();
 		await this.grass.init(this.scene, this.ground.origins);
+		await this.butterfly.init();
 
 
 
@@ -76,6 +79,7 @@ export class Field {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.ground.update(time);
 		this.ditherMat.setFloat("time", time);
+		this.butterfly.update(time);
 	}
 
 	public setVue(vue: string): Vue {
