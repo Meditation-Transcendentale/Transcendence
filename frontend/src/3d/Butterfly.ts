@@ -23,6 +23,7 @@ export class Butterfly {
 	private once = 0;
 
 	private moves!: Float32Array;
+	private positions: Array<Vector3>;
 	private deltas!: Float32Array;
 	private n: number = 10;
 
@@ -45,7 +46,8 @@ export class Butterfly {
 
 		this.dir = new Vector3(0, 0, 0);
 
-		this.octree = new OctreeBlock(6, new Vector3(0, 5, 0), 5);
+		this.octree = new OctreeBlock(2, new Vector3(0, 3, 0), 5);
+		this.positions = new Array();
 
 	}
 
@@ -54,6 +56,7 @@ export class Butterfly {
 		this.mesh = loaded.meshes[1] as Mesh;
 		this.mesh.name = 'butterfly';
 		this.mesh.optimizeIndices();
+		loaded.addAllToScene();
 		this.mesh.parent = this.root;
 
 		this.mesh.position.set(0, 0, 0);
@@ -63,10 +66,9 @@ export class Butterfly {
 
 		this.thinInstance(this.n, 1);
 		// this.octree.print();
-		this.octree.printRoot();
+		this.octree.print();
 
 
-		loaded.addAllToScene();
 	}
 
 	public update(time: number) {
@@ -76,9 +78,35 @@ export class Butterfly {
 		}
 		this.material.setFloat("time", time);
 		this.material.setFloat("alpha", this.alpha)
+		this.applyForces();
 		// this.material.setFloat("oldTime", this.oldTime);
 		// this.updatePosition();
-		this.newDirection();
+		// this.newDirection();
+	}
+
+	//repel  force based on dist 
+	//force follow id O 
+	private applyForces() {
+		const p0 = this.positions[0];
+		for (let i = 0; i < this.n; i++) {
+			const entries = this.octree.leaf(i) as Vector3[];
+			const repel = new Vector3();
+			const follow = new Vector3();
+			for (let j = 0; j < entries.length; j++) {
+				let v = entries[j].subtract(this.positions[i]);
+				v.scaleInPlace(1 / v.length());
+				follow.addInPlace(v);
+			}
+			if (i > 0) {
+				follow.addInPlace(p0.subtract(this.positions[i]).normalize().scaleInPlace(0.1))
+			}
+			follow.normalize();
+			this.positions[i].addInPlace(follow.scaleInPlace(0.01));
+			this.positions[i].toArray(this.moves, i * 3);
+		}
+		this.mesh.thinInstanceBufferUpdated("move");
+		this.octree.update();
+
 	}
 
 	private newDeltas() {
@@ -89,7 +117,7 @@ export class Butterfly {
 		}
 
 
-		setTimeout(() => { this.newDeltas() }, 500);
+		// setTimeout(() => { this.newDeltas() }, 500);
 
 
 	}
@@ -264,7 +292,7 @@ export class Butterfly {
 
 			let parameter: Vector3;
 			if (i == 0) {
-				parameter = new Vector3();
+				parameter = new Vector3(0.01, 0.01, 0.01);
 			}
 			else {
 				parameter = new Vector3(
@@ -276,6 +304,7 @@ export class Butterfly {
 
 			matrix.copyToArray(bufferMatrix, i * 16);
 			parameter.toArray(this.moves, i * 3);
+			this.positions.push(parameter);
 			this.octree.add(i, parameter);
 		}
 
@@ -330,27 +359,88 @@ class OctreeBlock {
 		this.center = center;
 	}
 
+	public update() {
+		this.clean();
+		if (this.entries.size < 2) { return };
+		for (let k of this.entries.keys()) {
+			let v = this.entries.get(k) as Vector3;
+			for (let i = 0; i < 8; i++) {
+				this.blocks[i].add(k, v);
+			}
+		}
+	}
+
+	public clean() {
+		for (let k of this.entries.keys()) {
+			let v = this.entries.get(k) as Vector3;
+			if (!this.in(v)) {
+				this.remove(k);
+			}
+		}
+		for (let i = 0; i < this.blocks.length; i++) {
+			this.blocks[i].clean();
+		}
+	}
+
+	public leafs(final: Array<OctreeBlock>) {
+		if (this.entries.size == 0) { return; }
+		if (this.blocks.length == 0) {
+			final.push(this);
+			return;
+		}
+		for (let i = 0; i < 8; i++) {
+			this.blocks[i].leafs(final);
+		}
+	}
+
+	public leaf(key: number): Vector3[] | void {
+		if (this.blocks.length == 0) {
+			return this.allButOne(key);
+		}
+		for (let i = 0; i < this.blocks.length; i++) {
+			if (this.blocks[i].has(key)) {
+				return this.blocks[i].leaf(key);
+			}
+		}
+
+		return [];
+	}
+
+	public has(key: number) {
+		return this.entries.has(key);
+	}
+
+	public allButOne(key: number): Vector3[] {
+		const final: Vector3[] = [];
+		for (let i of this.entries.keys()) {
+			if (i != key) {
+				final.push(this.entries.get(i) as Vector3)
+			}
+		}
+		return final;
+	}
+
 	public add(key: number, value: Vector3): boolean {
 		if (!this.in(value)) {
 			this.remove(key);
 			return false;
 		}
 
-		// if (this.entries.size > 1) { this.split() }
+		if (this.entries.size > 1) { this.split() }
 		this.entries.set(key, value);
-		// if (this.depth == 0 || this.entries.size == 1) { return true; }
-		// if (this.split()) {
-		// 	for (let k of this.entries.keys()) {
-		// 		let v = this.entries.get(k) as Vector3;
-		// 		for (let j = 0; j < 8; j++) {
-		// 			this.blocks[j].add(k, v);
-		// 		}
-		// 	}
-		// 	return true;
-		// }
-		// for (let i = 0; i < 8; i++) {
-		// 	this.blocks[i].add(key, value);
-		// }
+		if (this.depth == 0 || this.entries.size == 1) { return true; }
+		if (this.split()) {
+			for (let k of this.entries.keys()) {
+				let v = this.entries.get(k) as Vector3;
+				for (let j = 0; j < 8; j++) {
+					this.blocks[j].add(k, v);
+				}
+			}
+			return true;
+		}
+		for (let i = 0; i < 8; i++) {
+			this.blocks[i].add(key, value);
+		}
 		return true;
 	}
 
@@ -430,11 +520,11 @@ class OctreeBlock {
 	}
 
 	public in(v: Vector3): boolean {
-		const b = Math.abs(v.z - this.center.z) < this.radius &&
+		return Math.abs(v.x - this.center.x) < this.radius &&
 			Math.abs(v.y - this.center.y) < this.radius &&
 			Math.abs(v.z - this.center.z) < this.radius;
-		console.log('inn', b);
-		return b;
+		// console.log('inn', b, v);
+		// return b;
 	}
 
 	public print() {
@@ -443,14 +533,15 @@ class OctreeBlock {
 				this.blocks[i].print();
 			}
 		} else if (this.entries.size > 0) {
+			// this.printRoot();
 			console.log(`depth: ${this.depth}::
 				-center: ${this.center}, radius: ${this.radius}
-				-entries: ${this.entries.size}`)
+				-entries: ${this.entries.size}::`, this.entries)
 		}
 	}
 
 	public printRoot() {
-		console.log(this.entries);
+		console.log(this.depth, this.entries);
 	}
 
 }

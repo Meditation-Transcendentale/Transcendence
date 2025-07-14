@@ -796,7 +796,7 @@ export class ButterflyMaterial extends CustomMaterial {
 
 		this.Vertex_Before_PositionUpdated(`
 			// positionUpdated.y = sin(time * 20.) * abs(position.z);
-			positionUpdated.xyz = rotationX(positionUpdated.xyz, sin((time + float(gl_InstanceID)) * 20. ) * sign(position.z) * M_PI * 0.5);
+			positionUpdated.xyz = rotationX(positionUpdated.xyz, sin((time + float(gl_InstanceID)) * 15.) * sign(position.z) * M_PI * 0.5);
 			positionUpdated = rotationY(positionUpdated, -alpha - M_PI * 0.5);
 			// vec2 dir = curlSimplex(vec2(time), 0.2);
 			// positionUpdated.xz += dir;
