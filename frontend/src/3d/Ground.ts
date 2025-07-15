@@ -64,6 +64,11 @@ export class Puddle {
 		window.addEventListener("mousemove", (ev) => {
 			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
 			let delta = Math.abs(this.rayO.y) / ray.y;
+			let dd = Math.abs(this.rayO.y - 1) / ray.y;
+
+			this.origin.x = this.rayO.x - ray.x * dd;
+			this.origin.y = 0;
+			this.origin.z = this.rayO.z - ray.z * dd + 10;
 			// console.log(ray);
 
 			this.spawnWave(this.rayO.x - ray.x * delta, this.rayO.z - ray.z * delta);
@@ -90,9 +95,9 @@ export class Puddle {
 		this.lastO.z = z;
 		this.lastO.t = t;
 
-		this.origin.x = x;
-		this.origin.y = 0;
-		this.origin.z = z + 10;
+		// this.origin.x = x;
+		// this.origin.y = 0;
+		// this.origin.z = z + 10;
 		// console.log(this.origin);
 		this.origins[this.index * 3] = x;
 		this.origins[this.index * 3 + 1] = z;

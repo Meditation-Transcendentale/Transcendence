@@ -130,13 +130,15 @@ export class Butterfly {
 				flock.subtractInPlace(bp);
 				align.subtractInPlace(bv);
 			}
-			flock.scaleInPlace(this.speed * 0.01 * this.flock);
-			align.scaleInPlace(0.1);
-			repel.scaleInPlace(0.5);
 
 			const cursor = this.origin.subtract(bp);
 			const cursorL = cursor.length();
-			cursor.scaleInPlace(cursorL < 2 ? this.speed / cursorL : 0.);
+			cursor.scaleInPlace(cursorL < 1 ? 0.001 : 0.);
+			const cursorField = cursorL < 1.5 ? 0 : 1.;
+
+			flock.scaleInPlace(this.speed * 0.01 * this.flock * cursorField);
+			align.scaleInPlace(0.1);
+			repel.scaleInPlace(0.5);
 
 			bv.addInPlace(align).addInPlace(flock).addInPlace(repel).addInPlace(cursor);
 			const l = bv.length();
@@ -240,6 +242,7 @@ export class Butterfly {
 class OctreeBlock {
 	public entries: Map<number, Vector3>;
 	public blocks: Array<OctreeBlock>;
+	public blocksLength: number;
 	public depth: number;
 
 	public center: Vector3;
@@ -252,6 +255,9 @@ class OctreeBlock {
 		this.blocks = new Array();
 		this.radius = radius;
 		this.center = center;
+
+		this.blocksLength = 0;
+		this.split();
 	}
 
 	public update() {
@@ -272,14 +278,14 @@ class OctreeBlock {
 				this.remove(k);
 			}
 		}
-		for (let i = 0; i < this.blocks.length; i++) {
+		for (let i = 0; i < this.blocksLength; i++) {
 			this.blocks[i].clean();
 		}
 	}
 
 	public leafs(final: Array<OctreeBlock>) {
 		if (this.entries.size == 0) { return; }
-		if (this.blocks.length == 0) {
+		if (this.blocksLength == 0) {
 			final.push(this);
 			return;
 		}
@@ -289,10 +295,10 @@ class OctreeBlock {
 	}
 
 	public leaf(key: number): number[] | void {
-		if (this.blocks.length == 0) {
+		if (this.blocksLength == 0) {
 			return this.allButOne(key);
 		}
-		for (let i = 0; i < this.blocks.length; i++) {
+		for (let i = 0; i < this.blocksLength; i++) {
 			if (this.blocks[i].has(key)) {
 				return this.blocks[i].leaf(key);
 			}
@@ -321,10 +327,10 @@ class OctreeBlock {
 			return false;
 		}
 
-		if (this.entries.size > 1) { this.split() }
+		// if (this.entries.size > 1) { this.virtualSplit() }
 		this.entries.set(key, value);
 		if (this.depth == 0 || this.entries.size == 1) { return true; }
-		if (this.split()) {
+		if (this.virtualSplit()) {
 			for (let k of this.entries.keys()) {
 				let v = this.entries.get(k) as Vector3;
 				for (let j = 0; j < 8; j++) {
@@ -343,17 +349,23 @@ class OctreeBlock {
 		if (!this.entries.has(key)) { return false; }
 		this.entries.delete(key);
 		let br: boolean = true;
-		for (let i = 0; i < this.blocks.length; i++) {
+		for (let i = 0; i < this.blocksLength; i++) {
 			br = br && this.blocks[i].remove(key);
 		}
 		if (br || this.entries.size == 1) {
-			this.blocks = [];
+			this.blocksLength = 0;
 		}
 		return this.entries.size == 0;
 	}
 
-	public split(): boolean {
-		if (this.depth == 0 || this.blocks.length > 0) { return false; }
+	public virtualSplit(): boolean {
+		if (this.depth == 0 || this.blocksLength > 0) { return false; }
+		this.blocksLength = 8;
+		return true;
+	}
+
+	public split() {
+		if (this.depth == 0) { return; }
 		const radius = this.radius * 0.5;
 		this.blocks.push(
 			new OctreeBlock(this.depth - 1,
@@ -411,7 +423,6 @@ class OctreeBlock {
 					this.center.y + radius,
 					this.center.z - radius,
 				), radius));
-		return true;
 	}
 
 	public in(v: Vector3): boolean {
@@ -423,7 +434,7 @@ class OctreeBlock {
 	}
 
 	public print() {
-		if (this.blocks.length > 0) {
+		if (this.blocksLength > 0) {
 			for (let i = 0; i < 8; i++) {
 				this.blocks[i].print();
 			}

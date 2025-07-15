@@ -406,10 +406,14 @@ export class GrassShader extends CustomMaterial {
 
 				positionUpdated = rotationY(positionUpdated, baseColor.r);
 
+				// float waveHeightFactor = ((1. - uv.y) * 0.5 + 0.5) * float(uv.y > 0.01);
 				// positionUpdated.y *= max(1. - totalWave.z, 0.) * baseColor.a;
 				// positionUpdated.xz += vec2(-totalWave.x, totalWave.y) * totalWave.z * uv.y * baseColor.a;
-				positionUpdated = rotationAxis(positionUpdated, totalWave.z * baseColor.a * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
+				positionUpdated = rotationAxis(positionUpdated,  totalWave.z * baseColor.a * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
 				positionUpdated = rotationAxis(positionUpdated, strengh, vec3(windDir.y, 0., windDir.x));
+
+
+				positionUpdated.y += (simplexOctave(pos * 0.2) * 0.5 + 0.5) * 2.5;
 
 				vPositionM = normalize(positionUpdated);
 
