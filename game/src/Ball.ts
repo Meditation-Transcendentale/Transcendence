@@ -1,10 +1,12 @@
 import { MeshBuilder, Scene, Vector3, Vector2, Mesh, StandardMaterial } from "@babylonjs/core";
 import { Player } from "../.oldPongIO/Player";
 
+
 export class Ball {
 	public ball: Mesh;
 	public velocity: Vector3 = new Vector3(0, 0, 0);
-	private speed: number = 20;
+	private speed: number = 10;
+	private speedScale: number = 1;
 	private touched: boolean = false;
 	private scene: Scene;
 	private matUntouched: StandardMaterial;
@@ -40,13 +42,15 @@ export class Ball {
 					this.touched = true;
 					this.ball.material = this.matTouched;
 					const newOrientation = new Vector3(ballPosition.x - playerGoalPos.x , 0, ballPosition.z - playerGoalPos.z).normalize();
-					this.velocity.set(newOrientation.x * this.speed, 0, newOrientation.z * this.speed);
+					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
+					this.speedScale = Math.min(this.speedScale * 1.1, 5);
+					console.log(this.speedScale);
 				} else if (collideGoal) {
 					this.touched = false;
 					this.ball.material = this.matUntouched;
 					player.die();
 					const newOrientation = new Vector3(ballPosition.x - playerGoalPos.x , 0, ballPosition.z - playerGoalPos.z).normalize();
-					this.velocity.set(newOrientation.x * this.speed, 0, newOrientation.z * this.speed);
+					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
 				}
 			}
 			this.hitBrick(10, cols, layers, bricks);
