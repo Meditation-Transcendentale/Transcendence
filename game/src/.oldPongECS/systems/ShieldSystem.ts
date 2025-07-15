@@ -33,4 +33,5 @@ export class ShieldSystem extends System {
 		shield.oldAngleFactor = shield.angleFactor;
 	}
 
+	
 }

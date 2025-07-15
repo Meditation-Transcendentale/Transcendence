@@ -9,6 +9,8 @@ export class MovementSystem extends System {
         entities.forEach(entity => {
             if (entity.hasComponent(BallComponent)) {
                 const ball = entity.getComponent(BallComponent)!;
+
+				//rebond ball
                 ball.position.addInPlace(ball.velocity.scale(deltaTime / 1000));
             }
 			if (entity.hasComponent(PaddleComponent)){
@@ -16,8 +18,8 @@ export class MovementSystem extends System {
 				const transform = entity.getComponent(TransformComponent)!;
 				player.position.addInPlace(player.velocity.scale(deltaTime / 100));
 				const distance = Math.hypot(player.position.x, player.position.z);
-				if ( distance > 10 - 0.5){
-					const factor = (10 - 0.5) / distance;
+				if ( distance > 5 - 0.5){
+					const factor = (5 - 0.5) / distance;
 					player.position.x *= factor;
 					player.position.z *= factor;
 				}

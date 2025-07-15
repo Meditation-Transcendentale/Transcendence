@@ -20,5 +20,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "src/.oldPongECS/templates", "src/.oldPongECS/main.ts", "src/.oldPongECS/state", "src/.oldPongECS/systems", "src/.oldPongECS/rendering", "src/.oldPongECS/network", "src/.oldPongECS/input", "src/.oldPongECS/ecs", "src/.oldPongECS/components"]
 }

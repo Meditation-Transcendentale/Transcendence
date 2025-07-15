@@ -16,6 +16,7 @@
     "@babylonjs/core": "^7.49.0",
     "@babylonjs/gui": "^7.49.0",
     "@babylonjs/inspector": "^7.49.0",
-    "@babylonjs/loaders": "^7.49.0"
+    "@babylonjs/loaders": "^7.49.0",
+    "earcut": "^3.0.1"
   }
 }
