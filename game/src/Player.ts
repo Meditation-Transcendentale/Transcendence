@@ -1,15 +1,17 @@
 import { MeshBuilder, Scene, Vector3, Vector2, Mesh, StandardMaterial, Color3, Matrix, ShaderMaterial, Effect, VertexBuffer } from "@babylonjs/core";
+import { Game } from './main.ts'
 
 export class Player {
-	private goal: Mesh;
-	private shield: Mesh;
+	public goal: Mesh;
+	public shield: Mesh;
+	private game: Game;
 	private isAlive: boolean = true;
 	private materialGoal: StandardMaterial;
 	private materialShield: StandardMaterial;
 	private velocity: Vector3;
 	
 	private angleFactor: number;
-	private oldAngleFactor: number;
+	// private oldAngleFactor: number;
 	private lastInputDelay: number;
 	private isActive: number = 0.0;
 	private inputDown: boolean = false;
@@ -24,8 +26,9 @@ export class Player {
 
 	private deltaTime: number = 1000/60;
 	
-	constructor(scene: Scene, position: Vector3) {
+	constructor(scene: Scene, position: Vector3, game: Game) {
 		this.scene = scene;
+		this.game = game;
 
 		this.goal = MeshBuilder.CreateCylinder("goal", {height: 0.5, diameter:1, subdivisions:16}, this.scene);
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
@@ -41,7 +44,7 @@ export class Player {
 		this.shield.material = this.materialShield;
 
 		this.angleFactor = 0.5;
-		this.oldAngleFactor = 0.5;
+		// this.oldAngleFactor = 0.5;
 		this.isActive = 0.0;
 		this.lastInputDelay = performance.now();
 
@@ -121,7 +124,7 @@ export class Player {
 		this.goal.visibility = 0;
 		this.shield.visibility = 0;
 		this.isAlive = false;
-		//game ending;
+		this.game.dispose();
 	}
 
 	update(): void {
@@ -166,7 +169,6 @@ export class Player {
 		} else if (performance.now() - this.lastInputDelay >= 500) {
 			this.angleFactor = Math.max(0.5, this.angleFactor - 0.01);
 		}
-		this.oldAngleFactor = this.angleFactor;
 	}
 
 	public getPlayerGoal(): Mesh{
@@ -220,7 +222,7 @@ export class Player {
 				this.velocity = Vector3.Lerp(this.velocity, direction.scale(speed), 0.5);
 			}
 		}
-		this.updatePosition();   
+		this.updatePosition();
 	}
     
 	private updatePosition(){
