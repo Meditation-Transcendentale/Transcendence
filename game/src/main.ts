@@ -1,6 +1,7 @@
 import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4 } from "@babylonjs/core";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
+import { Inspector } from '@babylonjs/inspector';
 import earcut from "earcut";
 
 let resizeTimeout: number;
@@ -15,12 +16,15 @@ export class Game {
 	private player: Player;
 	private ball: Ball;
 	private arena: Mesh;
+	private light: HemisphericLight;
 
 	constructor(canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
 		this.engine = new Engine(canvas, true);
 		engine = this.engine;
 		this.scene = new Scene(this.engine);
+
+		// Inspector.Show(this.scene, {});
 
 		this.setupCamera();
 		this.setupLight();
@@ -66,7 +70,7 @@ export class Game {
 	}
 
 	private setupLight() {
-		new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
+		this.light = new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
 	}
 
 	private createArena() {
@@ -106,9 +110,6 @@ export class Game {
 				const radIn = radius - (width * (j + 1) * 2);
 				let points: Vector2[] = [];
 				let vert;
-				// if (i == 0){
-				// 	console.log("l", j, ":", radIn);
-				// }
 
 				for (let k = (arenaSubdv / cols) - 1; k >= 0; --k) {
 					vert = k + (arenaSubdv / cols) * i;
@@ -135,6 +136,7 @@ export class Game {
 		this.ball.ball.dispose();
 		this.player.goal.dispose();
 		this.player.shield.dispose();
+		this.player.pointerSurface.dispose();
 		this.arena.dispose();
 
 		this.bricks.forEach(brickCol => {
@@ -144,6 +146,7 @@ export class Game {
 		});
 
 		this.camera.dispose();
+		this.light.dispose();
 		this.engine.clear(new Color4(1, 1, 1, 1), true, true);
 		this.engine.stopRenderLoop();
 

@@ -4,6 +4,7 @@ import { Game } from './main.ts'
 export class Player {
 	public goal: Mesh;
 	public shield: Mesh;
+	public pointerSurface: Mesh;
 	private game: Game;
 	private isAlive: boolean = true;
 	private materialGoal: StandardMaterial;
@@ -21,8 +22,6 @@ export class Player {
 	private pointer: Vector2 = new Vector2(0, 0);
 
 	private scene: Scene;
-
-	private pointerSurface: Mesh;
 
 	private deltaTime: number = 1000/60;
 	
@@ -64,7 +63,7 @@ export class Player {
 		const invMat = new StandardMaterial("surfaceMat", this.scene);
 		invMat.diffuseColor.set(0, 0, 0);
 		invMat.alpha = 0;
-		this.pointerSurface.position.y = 5;
+		this.pointerSurface.position.y = 0;
 		this.pointerSurface.material = invMat;
 		this.pointerSurface.rotation.x = Math.PI / 2;
 		this.pointerSurface.isPickable = true;
@@ -124,6 +123,7 @@ export class Player {
 		this.goal.visibility = 0;
 		this.shield.visibility = 0;
 		this.isAlive = false;
+		//interface de fin de game
 		this.game.dispose();
 	}
 

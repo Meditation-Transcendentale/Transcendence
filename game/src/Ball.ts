@@ -1,4 +1,4 @@
-import { MeshBuilder, Scene, Vector3, Vector2, Mesh, StandardMaterial } from "@babylonjs/core";
+import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial } from "@babylonjs/core";
 import { Player } from "../.oldPongIO/Player";
 
 
