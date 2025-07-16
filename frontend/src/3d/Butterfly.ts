@@ -154,6 +154,7 @@ export class Butterfly {
 			this.directions[i * 2] = bv.x;
 			this.directions[i * 2 + 1] = bv.z;
 			this.perching(bp, i);
+
 		}
 		this.mesh.thinInstanceBufferUpdated("move");
 		this.mesh.thinInstanceBufferUpdated("direction");
@@ -449,9 +450,96 @@ class OctreeBlock {
 	public printRoot() {
 		console.log(this.depth, this.entries);
 	}
-
 }
 
-// class Octree {
-// 	private entries:
-// }
+
+class thinVector3 {
+	public x: number;
+	public y: number;
+	public z: number;
+
+	constructor(x = 0, y = 0, z = 0) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
+	addInPlace(x: number, y: number, z: number) {
+		this.x += x;
+		this.y += y;
+		this.z += z;
+	}
+
+	subtractInPlace(x: number, y: number, z: number) {
+		this.x -= x;
+		this.y -= y;
+		this.z -= z;
+	}
+
+	normalize() {
+		const l = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+		this.x /= l;
+		this.y /= l;
+		this.z /= l;
+	}
+
+	length(): number {
+		return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+	}
+
+	dot(v: thinVector3): number {
+		return this.x * v.x + this.y * v.y + this.z * v.z;
+	}
+}
+
+interface Cell {
+	indexes: Int16Array, //after calculating new pos need to set index to -1 if leave the cell;
+	empty: boolean
+}
+interface grid3doptions {
+	width: number,
+	height: number,
+	depth: number,
+	cellSize: number,
+	maxPerCell: number
+}
+
+class Grid3D {
+	public cells: Array<Cell>;
+
+	public width: number;
+	public height: number;
+	public depth: number;
+	public cellSize: number;
+	public maxPerCell: number;
+
+	private v: thinVector3;
+
+
+	constructor(options: grid3doptions) {
+		this.width = options.width;
+		this.height = options.height;
+		this.depth = options.depth;
+		this.cellSize = options.cellSize;
+		this.maxPerCell = options.maxPerCell;
+
+		this.v = new thinVector3();
+
+		this.cells = new Array<Cell>((this.width + this.height + this.depth) / this.cellSize);
+		for (let i = 0; i < this.cells.length; i++) {
+			this.cells[i].empty = true;
+		}
+	}
+
+	add(index: number, position: thinVector3) {
+
+	}
+
+	update(index: number, newPosition: thinVector3, oldPosition: thinVector3) {
+
+	}
+
+	get(index: number, position: thinVector3): Int16Array {
+
+	}
+}
