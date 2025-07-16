@@ -570,6 +570,8 @@ class Grid3D {
 	private readonly planeCount: number;
 	private readonly cellCount: number;
 
+	private usedCell: Set<number>;
+
 
 	private currentCell: number;
 
@@ -598,6 +600,7 @@ class Grid3D {
 			this.cells[i].indexes.fill(-1);
 		}
 		this.currentCell = 0;
+		this.usedCell = new Set<number>();
 	}
 
 	public add(index: number, position: Vector3) {
@@ -608,19 +611,28 @@ class Grid3D {
 	}
 
 	public addArray(positions: Vector3[]) {
+
+
 		for (let i = 0; i < positions.length; i++) {
 			this.add(i, positions[i]);
 		}
 	}
 
 	public nextCell(): Cell | null {
-		for (let i = this.currentCell; i < this.cells.length; i++) {
+		for (let i of this.usedCell) {
 			let cell = this.cells[i];
-			if (cell.count > 0) {
-				this.currentCell = i + 1;
-				return cell;
-			}
+			this.usedCell.delete(i);
+			return cell;
 		}
+		// for (let i = this.currentCell; i < this.cells.length; i++) {
+		// 	let cell = this.cells[i];
+		// 	if (cell.count > 0) {
+		// 		this.currentCell = i + 1;
+		// 		return cell;
+		// 	}
+		// }
+		//
+		this.usedCell.clear();
 		this.currentCell = 0;
 		return null;
 	}
@@ -637,6 +649,10 @@ class Grid3D {
 		x += z + y;
 		if (x > this.cellCount) {
 			alert("Out of BOUND wtf!!!!!");
+		}
+
+		if (!this.usedCell.has(x)) { //Maybe put it somewhere else;
+			this.usedCell.add(x);
 		}
 
 		return this.cells[x];
