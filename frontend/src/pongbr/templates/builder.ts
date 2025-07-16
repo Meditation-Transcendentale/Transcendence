@@ -89,10 +89,8 @@ export function buildPaddles(
 	const angleStep = (2 * Math.PI) / playerCount;
 	const paddleArc = angleStep * 0.25;
 	const halfArc = paddleArc / 2;
-
 	const y = paddleHeight / 2 + 1;
 	const goalRadius = arenaRadius + wallWidth / 2 + goalDepth / 2;
-
 	const pillarArc = angleStep * 0.1;
 	const pillarSize = arenaRadius * pillarArc;
 	const usableArc = angleStep - pillarArc;
@@ -102,27 +100,46 @@ export function buildPaddles(
 	for (let i = 0; i < playerCount; i++) {
 		const sliceStart = i * angleStep;
 		const midAngle = sliceStart + pillarArc + halfUsableArc;
-		const paddleYaw = -midAngle;
-		const scene = pongRoot.getScene()
-		//const debugLine = MeshBuilder.CreateLines("line", {
-		//	points: [
-		//		Vector3.Zero(),
-		//		new Vector3(Math.cos(midAngle) * 300, 0, Math.sin(midAngle) * 300),
-		//	],
-		//}, scene);
-		//debugLine.parent = pongRoot;
+
+		// Match physics engine positioning exactly
+		const paddleAngle = midAngle;  // Same as physics
+
+		// Calculate position like physics engine does
+		const paddleX = Math.cos(paddleAngle) * arenaRadius;
+		const paddleZ = Math.sin(paddleAngle) * arenaRadius;  // Note: Z in Babylon.js, Y in physics
+
+		// Calculate rotation to face inward (same as physics)
+		const paddleRotY = -paddleAngle;  // Face inward
+
+		const scene = pongRoot.getScene();
+
+		// Debug: Log the values to compare with physics
+		// console.log(`Paddle ${i}: angle=${(paddleAngle * 180 / Math.PI).toFixed(1)}° pos=(${paddleX.toFixed(1)}, ${paddleZ.toFixed(1)}) rot=${(paddleRotY * 180 / Math.PI).toFixed(1)}°`);
+
+		// Optional: Debug line to visualize paddle direction
+		// const debugLine = MeshBuilder.CreateLines("line", {
+		// 	points: [
+		// 		Vector3.Zero(),
+		// 		new Vector3(paddleX, 0, paddleZ),
+		// 	],
+		// }, scene);
+		// debugLine.parent = pongRoot;
+
 		// ---- Paddle ----
-		console.log(`Paddle ${i} : yaw = ${paddleYaw}`);
 		const paddle = new Entity();
 		paddle.addComponent(
-			new PaddleComponent(i, Vector3.Zero(), 0, maxOffset, paddleYaw, playerCount / 4)
+			new PaddleComponent(i, Vector3.Zero(), 0, maxOffset, paddleRotY, playerCount / 4)
 		);
 		paddle.addComponent(new InputComponent(true));
 		paddle.addComponent(
-			new TransformComponent(Vector3.Zero(), new Vector3(0, paddleYaw, 0), Vector3.One(), pongRoot)
+			new TransformComponent(
+				new Vector3(0, y, 0),  // Position at arena boundary
+				new Vector3(0, paddleRotY, 0),     // Rotation to face inward
+				Vector3.One(),
+				pongRoot
+			)
 		);
 		ecs.addEntity(paddle);
-
 		// ---- Goal & Death Wall ----
 		const goalPos = new Vector3(
 			Math.cos(midAngle) * goalRadius,
@@ -133,12 +150,12 @@ export function buildPaddles(
 
 		const goal = new Entity();
 		goal.addComponent(new GoalComponent(i, goalPos));
-		goal.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleYaw, 0), goalSize, pongRoot));
+		goal.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleRotY, 0), goalSize, pongRoot));
 		ecs.addEntity(goal);
 
 		const deathWall = new Entity();
 		deathWall.addComponent(new WallComponent(i, goalPos));
-		deathWall.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleYaw, 0), new Vector3(paddleWidth, 1, goalSize.z), pongRoot));
+		deathWall.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleRotY, 0), new Vector3(paddleWidth, 1, goalSize.z), pongRoot));
 		deathWall.addComponent(new DisabledComponent());
 		ecs.addEntity(deathWall);
 
