@@ -14,7 +14,7 @@ function generateFullRange() {
   return range;
 }
 
-export function expand(root, node) {
+export function expand(node) {
   const children = [];
   const newVelX = -node.futureBallState.ballVel[0] * BALL_ACCELERATION;
       
@@ -45,11 +45,6 @@ export function expand(root, node) {
       futureBallState
     );
 
-    root.i += 1;
-//     console.log(`Init pos: ${newBallState.ballPos[0]}|${newBallState.ballPos[1]}
-//       ${newBallState.ballVel[0]}|${newBallState.ballVel[1]}
-// Future: ${futureBallState.ballPos[0]}|${futureBallState.ballPos[1]}
-//       ${futureBallState.ballVel[0]}|${futureBallState.ballVel[1]}\n`);
     children.push(child);
   }
 

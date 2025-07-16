@@ -17,15 +17,14 @@ function isLosing(node) {
   const diff = Math.abs(impactY - receiverY);
   const expectedX = Math.abs(PADDLE_PLAYER_X + (PADDLE_WIDTH + BALL_DIAM) * 0.5);
   const isAtPaddle = Math.abs(Math.abs(node.ballState.ballPos[0]) - expectedX) < 0.01;
-  // console.log(node.ballState.ballVel[0], isAtPaddle, Math.abs(Math.abs(node.ballState.ballPos[0]) - expectedX), diff, PADDLE_HEIGHT * 0.5);
   return isAtPaddle && diff > PADDLE_HEIGHT * 0.5;
-}
+} 
 
 export function runMinmax(rootNode, depth, maximizingPlayer, weightIndex) {
-  return minmax(rootNode, depth, maximizingPlayer, weightIndex, depth);
+  return minmax(rootNode, rootNode, depth, -999, 999, maximizingPlayer, weightIndex, depth);
 }
 
-function minmax(node, depth, maximizingPlayer, weightIndex, originalDepth) {
+function minmax(root, node, depth, alpha, beta, maximizingPlayer, weightIndex, originalDepth) {
   const losing = isLosing(node);
   const terminal = depth === 0 || (depth !== originalDepth && losing);
 
@@ -36,24 +35,33 @@ function minmax(node, depth, maximizingPlayer, weightIndex, originalDepth) {
     return { value: val, node };
   }
   
-  const children = expand(node);
+ const children = expand(root, node);
+
     
   if (maximizingPlayer) {
     let best = { value: -999, node: null };
     for (const child of children) {
-      const result = minmax(child, depth - 1, false, weightIndex, originalDepth);
+      const result = minmax(root, child, depth - 1, alpha, beta, false, weightIndex, originalDepth);
       const value = -result.value;
       // console.log (`MAX: ${best.value}| ${value}`);
       best = max(best, { value, node: child });
+      // console.log(`alpha=${alpha}|best=${best.value}|value=${value}|beta=${beta}`);
+      alpha = Math.max(alpha, best.value);
+      // if (alpha >= beta)
+      //   break;
     }
     return best;
   } else {
     let best = { value: 999, node: null };
     for (const child of children) {
-      const result = minmax(child, depth - 1, true, weightIndex, originalDepth);
+      const result = minmax(root, child, depth - 1, alpha, beta, true, weightIndex, originalDepth);
       const value = -result.value;
       // console.log (`MIN: ${best.value}| ${value}`);
       best = min(best, { value, node: child });
+      // console.log(`beta=${beta}|best=${best.value}|value=${value}|alpha=${alpha}`);
+      beta = Math.min(beta, best.value);
+      // if (beta <= alpha)
+      //   break;
     }
     return best;
   }

@@ -1,9 +1,9 @@
 import { weightsProfiles } from './weightsProfiles.js';
 import { GameStateNode } from './GameStateNode.js';
 import { predictBallState } from './physics.js';
-import { expand } from './expand.js';
 import { runMinmax } from './minmax.js';
-import { evaluateNode } from './evaluate.js';
+
+export let i = 0;
 
 const initialBallStates = [
   { ballPos: [-2, 3], ballVel: [0.15, 0.1] },
@@ -28,7 +28,7 @@ initialBallStates.forEach((initialBallState, ballIndex) => {
         0, // Player paddle position
         futureBallState
       );
-
+      root.i = 0;
       console.log(`\nProfile=${profileIndex}`);
 
       const best = runMinmax(root, 2, initialBallState.ballVel[0] >= 0, profileIndex);
@@ -40,6 +40,11 @@ initialBallStates.forEach((initialBallState, ballIndex) => {
       console.log(`Ball Vel: ${best.node.ballState.ballVel}`);
       console.log(`AI Paddle: ${best.node.aiPaddlePos}`);
       console.log(`Player Paddle: ${best.node.playerPaddlePos}`);
+      console.log(`Ball Pos: ${best.node.futureBallState.ballPos}`);
+      console.log(`Ball Vel: ${best.node.futureBallState.ballVel}`);
+
+
+      console.log(`Number of node: ${root.i}`);
     });
     console.log("\n");
 });
