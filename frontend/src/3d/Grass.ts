@@ -1,7 +1,7 @@
 
 // import { Tile } from "./Tile";
 
-import { Camera, Color3, Color4, CustomMaterial, LoadAssetContainerAsync, Matrix, Mesh, Scene, ShaderMaterial, Vector3 } from "@babylonImport";
+import { Camera, Color3, Color4, CustomMaterial, Engine, LoadAssetContainerAsync, Matrix, Mesh, ProceduralTexture, Scene, ShaderMaterial, Texture, Vector3 } from "@babylonImport";
 import { Tile } from "./Tile";
 import { GrassShader } from "./Shader";
 
@@ -20,7 +20,7 @@ const _nearOptions: _thinInstancesOptions = {
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.4,
-	scale: new Vector3(0.2, .2, 0.2)
+	scale: new Vector3(0.2, .4, 0.2)
 };
 
 // const _midOptions: _thinInstancesOptions = {
@@ -54,6 +54,8 @@ export class Grass {
 
 	private _grassShader!: GrassShader;
 
+	private noiseTexture!: ProceduralTexture;
+
 	private _nearMesh!: Mesh;
 	// private _midMeshR!: Mesh;
 	// private _midMeshR2!: Mesh;
@@ -67,7 +69,7 @@ export class Grass {
 	public COLOR_B = new Color3(0.9, 0.9, 0.9);
 
 	private _pastTime = 0.0;
-	public origins!: number[];
+	public origin!: Vector3;
 
 	constructor(size: number) {
 		this._size = size;
@@ -75,10 +77,16 @@ export class Grass {
 
 	}
 
-	public async init(scene: Scene, origins: number[]) {
+	public async init(scene: Scene, origin: Vector3) {
 		await this.loadAssests(scene);
 
-		this.origins = origins;
+		this.noiseTexture = new ProceduralTexture("noise", 1024, "WindHeight", scene);
+		this.noiseTexture.refreshRate = 0;
+		//this.noiseTexture.textureFormat = Engine.TEXTURETYPE_HALF_FLOAT;
+		//this.noiseTexture.render(false);
+
+
+		this.origin = origin;
 
 		this.setThinInstances(this._nearMesh, this._size, this._size, _nearOptions);
 		// this.setThinInstances(this._midMeshR, this._size, this._size * 2, _midOptions);
@@ -100,12 +108,18 @@ export class Grass {
 		// 	}
 		// );
 
-		this._grassShader = new GrassShader("grass", scene);
+		this._grassShader = new GrassShader("grass", scene, this.noiseTexture);
 
 		// this._grassShader.needDepthPrePass = false;
 		//this._grassShader.setTexture("noise", this._noiseTex);
 
-		this._tiles.push(new Tile(this._nearMesh, this._grassShader, new Vector3(0, 0, -10), this._size, this._size));
+		const o = new Vector3(0, -0.5, -10);
+		this._tiles.push(new Tile(this._nearMesh, this._grassShader, o, this._size, this._size));
+		//for (let x = -1; x < 1; x++) {
+		//	for (let z = 0; z < 2; z++) {
+		//		this._tiles.push(new Tile(this._nearMesh, this._grassShader, o.add(new Vector3(x * this._size, 0, - z * this._size)), this._size, this._size));
+		//	}
+		//}
 
 
 		// for (let i = -1; i < 2; i++) {
@@ -153,7 +167,7 @@ export class Grass {
 	public update(time: number, camera: Camera) {
 		this._grassShader.setFloat("time", time);
 		this._grassShader.setFloat("oldTime", this._pastTime);
-		this._grassShader.setFloatArray3("origins", this.origins);
+		this._grassShader.setVec3("origin", this.origin);
 		// this._grassShader.setVector3("vEyePosition", camera.position);
 
 		this._pastTime = time;
@@ -175,6 +189,8 @@ export class Grass {
 		console.log(this._nearMesh);
 		this._nearMesh.name = 'nearGrass';
 		this._nearMesh.optimizeIndices();
+		this._nearMesh.doNotSyncBoundingInfo = true;
+		this._nearMesh.alwaysSelectAsActiveMesh = true;
 		// this._nearMesh.position.set(0, 1, -10);
 		loaded.meshes.forEach((mesh) => {
 			// mesh.setEnabled(true);

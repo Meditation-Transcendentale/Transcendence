@@ -1,4 +1,4 @@
-import { Color3, CustomMaterial, Effect, Scene, Vector3 } from "@babylonImport"
+import { Color3, CustomMaterial, Effect, Scene, Texture, Vector3 } from "@babylonImport"
 
 
 Effect.IncludesShadersStore["noises"] = `
@@ -149,6 +149,96 @@ vec2	curlSimplex3D(vec3 v, float delta) {
 	float dX = simplexNoise3D(vec3(v.x + delta, v.y, v.z)) - simplexNoise3D(vec3(v.x - delta, v.y, v.z));
 	float dY = simplexNoise3D(vec3(v.x, v.y + delta, v.z)) - simplexNoise3D(vec3(v.x, v.y - delta, v.z));
 	return vec2(dY, -dX) * (1. / (2. * delta));
+}
+
+
+// hash based 3d value noise
+// function taken from https://www.shadertoy.com/view/XslGRr
+// Created by inigo quilez - iq/2013
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+
+// ported from GLSL to HLSL
+
+float hashPerlin( float n )
+{
+    return fract(sin(n)*43758.5453);
+}
+
+float perlinNoise( vec3 x )
+{
+    // The noise function returns a value in the range -1.0f -> 1.0f
+
+    vec3 p = floor(x);
+    vec3 f = fract(x);
+
+    f = f*f*(3.0-2.0*f);
+    float n = p.x + p.y*57.0 + 113.0*p.z;
+
+    return mix(mix(mix( hashPerlin(n+0.0), hashPerlin(n+1.0),f.x),
+                   mix( hashPerlin(n+57.0), hashPerlin(n+58.0),f.x),f.y),
+               mix(mix( hashPerlin(n+113.0), hashPerlin(n+114.0),f.x),
+                   mix( hashPerlin(n+170.0), hashPerlin(n+171.0),f.x),f.y),f.z);
+}
+
+// Hash by David_Hoskins
+#define UI0 1597334673U
+#define UI1 3812015801U
+#define UI2 uvec2(UI0, UI1)
+#define UI3 uvec3(UI0, UI1, 2798796415U)
+#define UIF (1.0 / float(0xffffffffU))
+
+vec3 hash33(vec3 p)
+{
+	uvec3 q = uvec3(ivec3(p)) * UI3;
+	q = (q.x ^ q.y ^ q.z)*UI3;
+	return -1. + 2. * vec3(q) * UIF;
+}
+
+float remap(float x, float a, float b, float c, float d)
+{
+    return (((x - a) / (b - a)) * (d - c)) + c;
+}
+
+// Gradient noise by iq (modified to be tileable)
+float gradientNoise(vec3 x, float freq)
+{
+    // grid
+    vec3 p = floor(x);
+    vec3 w = fract(x);
+    
+    // quintic interpolant
+    vec3 u = w * w * w * (w * (w * 6. - 15.) + 10.);
+
+    
+    // gradients
+    vec3 ga = hash33(mod(p + vec3(0., 0., 0.), freq));
+    vec3 gb = hash33(mod(p + vec3(1., 0., 0.), freq));
+    vec3 gc = hash33(mod(p + vec3(0., 1., 0.), freq));
+    vec3 gd = hash33(mod(p + vec3(1., 1., 0.), freq));
+    vec3 ge = hash33(mod(p + vec3(0., 0., 1.), freq));
+    vec3 gf = hash33(mod(p + vec3(1., 0., 1.), freq));
+    vec3 gg = hash33(mod(p + vec3(0., 1., 1.), freq));
+    vec3 gh = hash33(mod(p + vec3(1., 1., 1.), freq));
+    
+    // projections
+    float va = dot(ga, w - vec3(0., 0., 0.));
+    float vb = dot(gb, w - vec3(1., 0., 0.));
+    float vc = dot(gc, w - vec3(0., 1., 0.));
+    float vd = dot(gd, w - vec3(1., 1., 0.));
+    float ve = dot(ge, w - vec3(0., 0., 1.));
+    float vf = dot(gf, w - vec3(1., 0., 1.));
+    float vg = dot(gg, w - vec3(0., 1., 1.));
+    float vh = dot(gh, w - vec3(1., 1., 1.));
+	
+    // interpolation
+    return va + 
+           u.x * (vb - va) + 
+           u.y * (vc - va) + 
+           u.z * (ve - va) + 
+           u.x * u.y * (va - vb - vc + vd) + 
+           u.y * u.z * (va - vc - ve + vg) + 
+           u.z * u.x * (va - vb - ve + vf) + 
+           u.x * u.y * u.z * (-va + vb + vc - vd + ve - vf - vg + vh);
 }
 `;
 
@@ -315,19 +405,43 @@ void main() {
 	vec3 col  = vec3(min(1., (1. - f) * 2.));
 	// float alpha = f * 0.5;
 	gl_FragColor = vec4(col *col, 1.);
-}`
+}`;
+
+
+Effect.ShadersStore['WindHeightPixelShader'] = `
+precision highp float;
+
+#include<noises>
+
+float height(vec3 v) {
+	return (gradientNoise(v * 4., 4.) + 0.25 * gradientNoise(v * 8., 8.) + 0.5 * gradientNoise(v * 16., 16.)) * (1. / 1.75);
+}
+
+float wind(vec3 v) {
+	return (gradientNoise(v * 4., 4.) + 0.5 * gradientNoise(v * 8., 8.) + 0.25 * gradientNoise(v * 16., 16.)) * (1. / 1.75);
+}
+
+varying vec2 vUV;
+void main(void) {
+	vec3 uv = vec3(vUV.x, 0, vUV.y);
+	gl_FragColor = vec4(wind(uv) * 0.5 +0.5, height(uv + vec3(173437.,0., 3348.)) * 0.5 + 0.5, 0.0, 1.);
+	//gl_FragColor = vec4(height(uv) * 0.5 +0.5, height(uv) * 0.5 + 0.5, 0.0, 1.);
+}
+`
 
 
 
 export class GrassShader extends CustomMaterial {
-	constructor(name: string, scene?: Scene) {
+	constructor(name: string, scene: Scene, texture: Texture) {
 		super(name, scene);
 		this.AddUniform('time', 'float', 0.0);
 		this.AddUniform('oldTime', 'float', 0.0);
-		this.AddUniform("origins[20]", 'vec3', null);
+		this.AddUniform("origin", 'vec3', null);
+		this.AddUniform('tNoise', 'sampler2D', texture);
 
 		this.AddAttribute('baseColor');
 		this.AddAttribute('uv');
+
 
 		this.Vertex_Begin(
 			`
@@ -342,7 +456,7 @@ export class GrassShader extends CustomMaterial {
 		this.Vertex_Definitions(
 			`
 			attribute vec4 baseColor;
-			#include<noises>
+			//#include<noises>
 			#include<rotations>
 
 			float trunc_fallof( float x, float m )
@@ -375,22 +489,26 @@ export class GrassShader extends CustomMaterial {
 			    return (k+1.0)/(1.0+k*x);
 			}
 
-			float simplexOctave(vec2 v) {
-				return (simplexNoise(v) + 0.5 * simplexNoise(v * 2.) + 0.25 * simplexNoise(v * 4.)) * (1. / 1.75);
-			}
+			//float simplexOctave(vec2 v) {
+			//	return (simplexNoise(v) + 0.5 * simplexNoise(v * 2.) + 0.25 * simplexNoise(v * 4.)) * (1. / 1.75);
+			//}
 		`
 		);
 
 		this.Vertex_Before_PositionUpdated(
 			`
 				vec2 pos = (finalWorld * vec4(0., 0., 0., 1.0)).xz;
+				vec2 windDir = vec2(1., 0.);
+
+				vec4 noiseA = texture2D(tNoise, pos * 0.05 - time * windDir * 0.3);
+				vec4 noiseB = texture2D(tNoise, pos * 0.04);
 			
 				// vec2 curl = curlSimplex(pos * 0.1 - vec2(time * 0.2, 0.), 1.);
 				// float strengh = length(curl);
 				// vec2 windDir = curl / strengh;
 
-				vec2 windDir = vec2(1., 0.);
-				float strengh = simplexOctave(pos * 0.1 - time * windDir * 0.3);
+				//float strengh = simplexOctave(pos * 0.1 - time * windDir * 0.3);
+				float strengh = noiseA.r * 2. - 1.;
 				strengh *= uv.y;// * uv.y ;
 				// strengh *= gain(uv.y, 3.);
 				
@@ -399,10 +517,10 @@ export class GrassShader extends CustomMaterial {
 				strengh *= baseColor.a; //apply blade stiffness
 				
 				vec3 totalWave = vec3(0.);
-				for (int i = 0; i < 1; i++) {
-					vec3 wave = computeWave(origins[i], pos);
+				//for (int i = 0; i < 1; i++) {
+					vec3 wave = computeWave(origin, pos);
 					totalWave = mix(totalWave, wave, step(totalWave.z, wave.z));
-				}
+				//}
 
 				positionUpdated = rotationY(positionUpdated, baseColor.r);
 
@@ -413,7 +531,7 @@ export class GrassShader extends CustomMaterial {
 				positionUpdated = rotationAxis(positionUpdated, strengh, vec3(windDir.y, 0., windDir.x));
 
 
-				positionUpdated.y += (simplexOctave(pos * 0.2) * 0.5 + 0.5) * 2.5;
+				positionUpdated.y += noiseB.g * 2.5;
 
 				vPositionM = normalize(positionUpdated);
 
@@ -629,9 +747,17 @@ export class GrassShader extends CustomMaterial {
 
 		this.onBindObservable.addOnce(() => {
 			this.getEffect().setFloat(name, value);
+		});
+	}
+
+	setVec3(name: string, value: Vector3) {
+
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setVector3(name, value);
 			//console.log(this.getEffect().defines);
 		});
 	}
+
 
 	setFloatArray3(name: string, values: number[]) {
 		this.onBindObservable.addOnce(() => {
@@ -814,7 +940,11 @@ export class ButterflyMaterial extends CustomMaterial {
 			#define MAINUV1 1
 		`)
 
-		this.emissiveColor = new Color3(0.5, 0.5, 0.5);
+		this.Fragment_MainEnd(`
+			gl_FragColor.rgb *= (vPositionW.y < 0.6 ? vec3(1., 0.1, 0.1) : vec3(1.));
+		`)
+
+		this.emissiveColor = new Color3(0.5, 0.1, 0.1);
 		this.backFaceCulling = false;
 	}
 

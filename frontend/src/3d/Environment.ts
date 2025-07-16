@@ -8,7 +8,7 @@ import {
 	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
-	// Inspector,
+	//Inspector,
 	MeshBuilder,
 	Scene,
 	StandardMaterial,
@@ -113,7 +113,7 @@ export class Environment {
 		// pp.bloomKernel = 16;
 		// pp.bloomScale = 0.25;
 
-		// Inspector.Show(this.scene, {});
+		//Inspector.Show(this.scene, {});
 
 	}
 

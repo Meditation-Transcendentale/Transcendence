@@ -91,7 +91,7 @@ export class Sun {
 		// this.sunShadow.transparencyShadow = true;
 		// this.sunShadow.setDarkness(0.2);
 		// this.sunShadow.bias = 0.0003;
-		// this.shadow.addShadowCaster(this.shell);
+		//this.shadow.addShadowCaster(this.shell);
 
 
 		this.shellMat.shadowDepthWrapper = new ShadowDepthWrapper(this.shellMat, this.scene, {

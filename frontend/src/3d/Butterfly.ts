@@ -25,7 +25,7 @@ export class Butterfly {
 	private deltas!: Float32Array;
 	private n: number = 300;
 
-	private speed = 0.01;
+	private speed = 0.015;
 
 	private octree: OctreeBlock;
 	private flock: number = 1;
@@ -35,6 +35,10 @@ export class Butterfly {
 	private glowMat!: ButterflyMaterial;
 
 	public origin: Vector3;
+
+	private grid!: Grid3D;
+
+	private fps: HTMLElement;
 
 
 	constructor(scene: Scene, origin: Vector3) {
@@ -49,9 +53,22 @@ export class Butterfly {
 		this.root.scaling = new Vector3(2, 2, 2);
 
 		this.octree = new OctreeBlock(5, new Vector3(0, 1, 0), 11);
+		this.grid = new Grid3D({
+			width: 12,
+			depth: 12,
+			height: 2,
+			minPerCell: 100,
+			cellSize: 0.4
+		})
 
 		this.positions = new Array();
 		this.velocities = new Array();
+
+
+
+
+		this.fps = document.getElementById('fps') as HTMLElement;
+
 	}
 
 	public async init() {
@@ -67,19 +84,17 @@ export class Butterfly {
 		this.mesh.material = this.material
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
-		this.thinInstance(this.n, 1);
-		this.octree.print();
+		this.thinInstance(this.n, 6);
+		//this.octree.print();
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.setMaterialForRendering(this.mesh, this.glowMat);
 
 		this.glowLayer.intensity = 0.5;
-
-
 	}
 
 	f() {
 		console.log("OCTREEE");
-		this.octree.printRoot();
+		//this.octree.printRoot();
 		setTimeout(() => (this.f()), 3000);
 	}
 
@@ -91,10 +106,82 @@ export class Butterfly {
 		}
 		this.material.setFloat("time", time);
 		this.glowMat.setFloat("time", time);
-		this.applyForces();
+		//const bf = performance.now();
+		this.applyForcesGrid();
+		//const af = performance.now();
+		//this.fps.innerText = (af - bf).toFixed();
 	}
 
-	private applyForces() {
+	private applyForcesGrid() {
+		const v0 = Vector3.Zero();
+		let cell = this.grid.nextCell();
+		const repel = new Vector3();
+		const align = new Vector3();
+		const flock = new Vector3();
+		const cursor = new Vector3();
+
+		const r = new Vector3();
+		while (cell != null) {
+			for (let i = 0; i < cell!.count; i++) {
+				const ii = cell.indexes[i];
+				const ip = this.positions[ii];
+				const iv = this.velocities[ii];
+				let ff = 0;
+				for (let j = 0; j < cell!.count; j++) {
+					const jj = cell.indexes[j];
+					if (j != i) {
+						const jp = this.positions[jj];
+						ip.subtractToRef(jp, r);
+						if (r.dot(iv) > 0.) {
+							flock.addInPlace(jp);
+							align.addInPlace(this.velocities[jj]);
+							ff++;
+							repel.addInPlace((r.length() < 0.05 + this.disperse ? r : v0));
+						}
+					}
+				}
+				flock.scaleInPlace(ff > 0 ? 1 / ff : 1);
+				align.scaleInPlace(ff > 0 ? 1. / ff : 1);
+				flock.subtractInPlace(ff > 0 ? ip : v0);
+				align.subtractInPlace(ff > 0 ? iv : v0);
+
+				this.origin.subtractToRef(ip, cursor);
+				const cursorL = cursor.length();
+				cursor.scaleInPlace(cursorL < 1 ? 0.004 : 0.);
+				const cursorField = cursorL < 1.5 ? 0 : 1.;
+
+				flock.scaleInPlace(this.speed * 0.01 * this.flock * cursorField);
+				align.scaleInPlace(0.1);
+				repel.scaleInPlace(0.5);
+
+				iv.addInPlace(align).addInPlace(flock).addInPlace(repel).addInPlace(cursor);
+				const l = iv.length();
+				//iv.scaleInPlace((l > this.speed * 2 ? this.speed * 1.2 / l : 1) * (l < this.speed ? this.speed / l : 1));
+				if (l > this.speed * 2) {
+					iv.scaleInPlace(this.speed * 1.2 / l)
+				} else if (l < this.speed) {
+					iv.scaleInPlace(this.speed / l)
+				}
+
+				this.bound(iv, ip);
+
+				ip.addInPlace(iv.scale(Math.min(1., this.flying[ii])));
+				ip.toArray(this.moves, ii * 3);
+				this.directions[ii * 2] = iv.x;
+				this.directions[ii * 2 + 1] = iv.z;
+				this.perching(ip, ii);
+			}
+			cell.indexes.fill(-1, 0, cell.count);
+			cell.count = 0;
+			cell = this.grid.nextCell();
+		}
+		this.mesh.thinInstanceBufferUpdated("move");
+		this.mesh.thinInstanceBufferUpdated("direction");
+
+		this.grid.addArray(this.positions);
+	}
+
+	private applyForcesOc() {
 		const v0 = Vector3.Zero();
 		for (let i = 0; i < this.n; i++) {
 
@@ -133,7 +220,7 @@ export class Butterfly {
 
 			const cursor = this.origin.subtract(bp);
 			const cursorL = cursor.length();
-			cursor.scaleInPlace(cursorL < 1 ? 0.001 : 0.);
+			cursor.scaleInPlace(cursorL < 1 ? 0.002 : 0.);
 			const cursorField = cursorL < 1.5 ? 0 : 1.;
 
 			flock.scaleInPlace(this.speed * 0.01 * this.flock * cursorField);
@@ -210,15 +297,14 @@ export class Butterfly {
 
 			const matrix = matT;
 
-			let parameter: Vector3;
-			parameter = new Vector3(
+			const position = new Vector3(
 				(Math.random() * 2 - 1.) * radius,
-				(Math.random() * 2 - 1.) * radius,
+				(Math.random() * 2 - 1.) * 0.5,
 				(Math.random() * 2 - 1.) * radius,
 			);
 
 			matrix.copyToArray(bufferMatrix, i * 16);
-			parameter.toArray(this.moves, i * 3);
+			position.toArray(this.moves, i * 3);
 			const v = new Vector3(
 				Math.random() * 2. - 1,
 				Math.random() * 2 - 1,
@@ -226,11 +312,12 @@ export class Butterfly {
 			);
 			v.normalize().scaleInPlace(this.speed);
 
-			this.positions.push(parameter);
+			this.positions.push(position);
 			this.velocities.push(v);
-			this.octree.add(i, parameter);
+			this.octree.add(i, position);
 			this.directions[i * 2] = v.x;
 			this.directions[i * 2 + 1] = v.z;
+			this.grid.add(i, position);
 		}
 
 		this.mesh.thinInstanceSetBuffer('matrix', bufferMatrix, 16, true);
@@ -453,67 +540,38 @@ class OctreeBlock {
 }
 
 
-class thinVector3 {
-	public x: number;
-	public y: number;
-	public z: number;
-
-	constructor(x = 0, y = 0, z = 0) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-
-	addInPlace(x: number, y: number, z: number) {
-		this.x += x;
-		this.y += y;
-		this.z += z;
-	}
-
-	subtractInPlace(x: number, y: number, z: number) {
-		this.x -= x;
-		this.y -= y;
-		this.z -= z;
-	}
-
-	normalize() {
-		const l = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-		this.x /= l;
-		this.y /= l;
-		this.z /= l;
-	}
-
-	length(): number {
-		return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-	}
-
-	dot(v: thinVector3): number {
-		return this.x * v.x + this.y * v.y + this.z * v.z;
-	}
-}
 
 interface Cell {
 	indexes: Int16Array, //after calculating new pos need to set index to -1 if leave the cell;
-	empty: boolean
+	count: number
 }
 interface grid3doptions {
 	width: number,
 	height: number,
 	depth: number,
 	cellSize: number,
-	maxPerCell: number
+	minPerCell: number
 }
 
 class Grid3D {
-	public cells: Array<Cell>;
+	public cells: Array<Cell>; //May change to Array<int16Array>
 
-	public width: number;
-	public height: number;
-	public depth: number;
-	public cellSize: number;
-	public maxPerCell: number;
+	public readonly width: number;
+	public readonly depth: number;
+	public readonly height: number;
+	public readonly cellSize: number;
+	public readonly minPerCell: number;
 
-	private v: thinVector3;
+	private readonly width2: number;
+	private readonly depth2: number;
+	private readonly height2: number;
+
+	private readonly widthCount: number;
+	private readonly planeCount: number;
+	private readonly cellCount: number;
+
+
+	private currentCell: number;
 
 
 	constructor(options: grid3doptions) {
@@ -521,25 +579,66 @@ class Grid3D {
 		this.height = options.height;
 		this.depth = options.depth;
 		this.cellSize = options.cellSize;
-		this.maxPerCell = options.maxPerCell;
+		this.minPerCell = options.minPerCell;
 
-		this.v = new thinVector3();
+		this.width2 = this.width * 0.5;
+		this.height2 = this.height * 0.5;
+		this.depth2 = this.depth * 0.5;
 
-		this.cells = new Array<Cell>((this.width + this.height + this.depth) / this.cellSize);
-		for (let i = 0; i < this.cells.length; i++) {
-			this.cells[i].empty = true;
+		this.widthCount = Math.ceil(this.width / this.cellSize);
+		this.planeCount = this.widthCount * Math.ceil(this.depth / this.cellSize);
+		this.cellCount = this.planeCount * Math.ceil(this.height / this.cellSize);
+
+		this.cells = new Array<Cell>(this.cellCount);
+		for (let i = 0; i < this.cellCount; i++) {
+			this.cells[i] = {
+				indexes: new Int16Array(this.minPerCell),
+				count: 0
+			}
+			this.cells[i].indexes.fill(-1);
+		}
+		this.currentCell = 0;
+	}
+
+	public add(index: number, position: Vector3) {
+		const cell = this.getCellFromPosition(position);
+
+		cell.indexes[cell.count] = index;
+		cell.count++;
+	}
+
+	public addArray(positions: Vector3[]) {
+		for (let i = 0; i < positions.length; i++) {
+			this.add(i, positions[i]);
 		}
 	}
 
-	add(index: number, position: thinVector3) {
-
+	public nextCell(): Cell | null {
+		for (let i = this.currentCell; i < this.cells.length; i++) {
+			let cell = this.cells[i];
+			if (cell.count > 0) {
+				this.currentCell = i + 1;
+				return cell;
+			}
+		}
+		this.currentCell = 0;
+		return null;
 	}
 
-	update(index: number, newPosition: thinVector3, oldPosition: thinVector3) {
+	private getCellFromPosition(position: Vector3): Cell {
+		let x = ((position.x + this.width2) / this.cellSize) << 0; //similar to Math.trunc() but with bitshift, work for number < MAX_INT
+		let y = ((position.y + this.height2) / this.cellSize) << 0;
+		let z = ((position.z + this.depth2) / this.cellSize) << 0;
 
-	}
+		//console.log(position.x, position.y, position.z);
+		z *= this.widthCount;
+		y *= this.planeCount;
 
-	get(index: number, position: thinVector3): Int16Array {
+		x += z + y;
+		if (x > this.cellCount) {
+			alert("Out of BOUND wtf!!!!!");
+		}
 
+		return this.cells[x];
 	}
 }

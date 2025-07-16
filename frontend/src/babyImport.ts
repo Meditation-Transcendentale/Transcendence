@@ -51,4 +51,7 @@ import "@babylonjs/core/Shaders/ShadersInclude/helperFunctions";
 export { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
 export { SpotLight } from "@babylonjs/core/Lights/spotLight";
 export { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
+export { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+
 import "@babylonjs/core/Culling/ray";
+

@@ -25,12 +25,14 @@ export class Field {
 
 	private ditherMat!: DitherMaterial;
 
+
 	constructor(scene: Scene) {
 		this.scene = scene;
 		this.sun = new Sun(scene);
 		this.grass = new Grass(20);
 		this.ground = new Puddle(scene, 40, 1);
 		this.butterfly = new Butterfly(scene, this.ground.origin);
+
 
 		this.clouds = [];
 	}
@@ -66,7 +68,7 @@ export class Field {
 
 
 		this.ground.init();
-		await this.grass.init(this.scene, this.ground.origins);
+		await this.grass.init(this.scene, this.ground.originGrass);
 		await this.butterfly.init();
 
 

@@ -17,6 +17,7 @@ export class Puddle {
 	private deltaPos = 0.1;
 	private change = false;
 	public origin: Vector3;
+	public originGrass: Vector3;
 
 	constructor(scene: Scene, width: number, subdivision: number) {
 
@@ -31,8 +32,10 @@ export class Puddle {
 			}, scene);
 
 		this.mesh.position.z = -10;
+		this.mesh.position.y = -1;
 
 		this.origin = new Vector3();
+		this.originGrass = new Vector3();
 
 
 
@@ -63,15 +66,20 @@ export class Puddle {
 
 		window.addEventListener("mousemove", (ev) => {
 			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
-			let delta = Math.abs(this.rayO.y) / ray.y;
-			let dd = Math.abs(this.rayO.y - 1) / ray.y;
+			let delta = Math.abs(this.rayO.y - 0.5) / ray.y;
+			//let dd = Math.abs(this.rayO.y - 0.5) / ray.y;
 
-			this.origin.x = this.rayO.x - ray.x * dd;
+			this.origin.x = this.rayO.x - ray.x * delta;
 			this.origin.y = 0;
-			this.origin.z = this.rayO.z - ray.z * dd + 10;
+			this.origin.z = this.rayO.z - ray.z * delta + 10;
+
+			this.originGrass.x = this.rayO.x - ray.x * delta;
+			this.originGrass.y = this.rayO.z - ray.z * delta;
+			this.originGrass.z = performance.now() * 0.001;
+
 			// console.log(ray);
 
-			this.spawnWave(this.rayO.x - ray.x * delta, this.rayO.z - ray.z * delta);
+			//this.spawnWave(this.rayO.x - ray.x * delta, this.rayO.z - ray.z * delta);
 		})
 	}
 
