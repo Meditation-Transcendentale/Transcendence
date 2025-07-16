@@ -23,15 +23,15 @@ export const Physics = {
 		}
 
 		// Start measuring performance
-		// const startTime = performance.now();
+		//const startTime = performance.now();
 
 		try {
 			const { balls, paddles, events } = eng.step();
 			// End measuring performance
-			// const endTime = performance.now();
-			// const duration = endTime - startTime;
+			//const endTime = performance.now();
+			//const duration = endTime - startTime;
 			//
-			// console.log(`Step execution time for game ${gameId} at tick ${tick}: ${duration} milliseconds`);
+			//console.log(`Step execution time for game ${gameId} at tick ${tick}: ${duration} milliseconds`);
 
 			return { gameId, tick, balls, paddles, events };
 		} catch (err) {
