@@ -25,7 +25,6 @@ services:
       - bomba:/app/dist
     networks:
       - front
-    restart: always
     healthcheck:
       test: ["CMD-SHELL", "ls"]
       start_period: 3s
@@ -51,7 +50,6 @@ services:
     networks:
       - front
       - transcendence-network
-    restart: always
   
 volumes:
   bomba:
