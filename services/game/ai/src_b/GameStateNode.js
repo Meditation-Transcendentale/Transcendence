@@ -12,7 +12,9 @@ export class GameStateNode {
     };
     this.children = [];
     this.parent = null;
-    this.alpha = 0;
-    this.beta = 0;
+    this.evaluation = {
+      alpha: 0,
+      beta: 0
+    }
   }
 }
