@@ -4,10 +4,10 @@ export const CFG = {
 	ARENA_RADIUS: 200,
 	MAX_PLAYERS: 100,
 	INITIAL_BALLS: 200,
-	BALL_RADIUS: 0.5,
+	BALL_RADIUS: 0.25,
 	INITIAL_SPEED: 50,
 	PADDLE_FILL: 0.25,  // fraction of cell arc used by paddle
-	PADDLE_RATIO: 1 / 20,  // paddle thickness relative to arc width
+	PADDLE_RATIO: 1 / 5,  // paddle thickness relative to arc width
 
 	// Precision settings
 	COLLISION_EPSILON: 1e-6,  // Minimum distance for collision calculations
@@ -56,6 +56,75 @@ class UniformGrid {
 		if (!this.buckets[key]) this.buckets[key] = [];
 		this.buckets[key].push(id);
 	}
+}
+
+// Utility function for rotating a point around origin
+function rotatePoint(x, y, angle) {
+	const cos = Math.cos(angle);
+	const sin = Math.sin(angle);
+	return {
+		x: x * cos - y * sin,
+		y: x * sin + y * cos
+	};
+}
+
+// Square (Oriented Bounding Box) vs Circle collision detection
+function collideCircleWithOBB(circleX, circleY, circleRadius, rectX, rectY, rectHalfW, rectHalfH, rectAngle) {
+	// Transform circle center to rectangle's local coordinate system
+	const dx = circleX - rectX;
+	const dy = circleY - rectY;
+
+	// Rotate the circle center to align with the rectangle's axes
+	const localPoint = rotatePoint(dx, dy, -rectAngle);
+	const localX = localPoint.x;
+	const localY = localPoint.y;
+
+	// Find the closest point on the rectangle to the circle center
+	const closestX = Math.max(-rectHalfW, Math.min(rectHalfW, localX));
+	const closestY = Math.max(-rectHalfH, Math.min(rectHalfH, localY));
+
+	// Calculate distance from circle center to closest point
+	const distX = localX - closestX;
+	const distY = localY - closestY;
+	const distanceSquared = distX * distX + distY * distY;
+
+	// Check if collision occurred
+	if (distanceSquared <= circleRadius * circleRadius) {
+		const distance = Math.sqrt(distanceSquared);
+
+		// Calculate collision normal in local space
+		let normalX, normalY;
+
+		if (distance < 1e-6) {
+			// Circle center is inside rectangle, push out along shortest axis
+			if (rectHalfW - Math.abs(localX) < rectHalfH - Math.abs(localY)) {
+				normalX = localX > 0 ? 1 : -1;
+				normalY = 0;
+			} else {
+				normalX = 0;
+				normalY = localY > 0 ? 1 : -1;
+			}
+		} else {
+			// Normal points from closest point to circle center
+			normalX = distX / distance;
+			normalY = distY / distance;
+		}
+
+		// Transform normal back to world space
+		const worldNormal = rotatePoint(normalX, normalY, rectAngle);
+
+		// Calculate penetration depth
+		const penetration = circleRadius - distance;
+
+		return {
+			collision: true,
+			normalX: worldNormal.x,
+			normalY: worldNormal.y,
+			penetration: Math.max(0, penetration)
+		};
+	}
+
+	return { collision: false };
 }
 
 // Movement System (Euler Integrator)
@@ -112,82 +181,7 @@ function collideBallBall(pd, i, j) {
 	}
 }
 
-// Paddle Collision System (no arena boundary)
-function handlePaddleCollisions(pd, ballEnts, paddleEnts, cfg) {
-	const numPlayers = paddleEnts.length;
-	const angleStep = (2 * Math.PI) / numPlayers;
-
-	for (let i = 0; i < ballEnts.length; i++) {
-		const ent = ballEnts[i];
-		const ballX = pd.posX[ent];
-		const ballY = pd.posY[ent];
-		const ballRadius = pd.radius[ent];
-		const distFromCenter = Math.sqrt(ballX * ballX + ballY * ballY);
-
-		const collisionDistance = cfg.ARENA_RADIUS - ballRadius;
-
-		if (distFromCenter >= collisionDistance && distFromCenter <= cfg.ARENA_RADIUS + 1) {
-			const nx = ballX / distFromCenter;
-			const ny = ballY / distFromCenter;
-			const velocityDotNormal = pd.velX[ent] * nx + pd.velY[ent] * ny;
-
-			if (velocityDotNormal <= 0) continue;
-
-			const ballAngle = Math.atan2(ballY, ballX);
-			let normalizedBallAngle = ballAngle;
-			while (normalizedBallAngle < 0) normalizedBallAngle += 2 * Math.PI;
-			while (normalizedBallAngle >= 2 * Math.PI) normalizedBallAngle -= 2 * Math.PI;
-
-			let collisionOccurred = false;
-
-			for (let paddleIndex = 0; paddleIndex < numPlayers; paddleIndex++) {
-				const pillarArc = angleStep * 0.1;
-				const usableArc = angleStep - pillarArc;
-				const halfUsableArc = usableArc / 2;
-				const sliceStart = paddleIndex * angleStep;
-				const paddleCenterAngle = sliceStart + pillarArc + halfUsableArc;
-
-				const arcWidth = angleStep * cfg.PADDLE_FILL;
-				const startAngle = paddleCenterAngle - arcWidth / 2;
-				const endAngle = paddleCenterAngle + arcWidth / 2;
-
-				// Normalize angles
-				let normalizedStart = startAngle;
-				let normalizedEnd = endAngle;
-
-				while (normalizedStart < 0) normalizedStart += 2 * Math.PI;
-				while (normalizedStart >= 2 * Math.PI) normalizedStart -= 2 * Math.PI;
-				while (normalizedEnd < 0) normalizedEnd += 2 * Math.PI;
-				while (normalizedEnd >= 2 * Math.PI) normalizedEnd -= 2 * Math.PI;
-
-				let withinSlice = false;
-				if (normalizedStart <= normalizedEnd) {
-					withinSlice = normalizedBallAngle >= normalizedStart && normalizedBallAngle <= normalizedEnd;
-				} else {
-					withinSlice = normalizedBallAngle >= normalizedStart || normalizedBallAngle <= normalizedEnd;
-				}
-
-				if (withinSlice) {
-					// Paddle collision
-					pd.posX[ent] = nx * collisionDistance;
-					pd.posY[ent] = ny * collisionDistance;
-
-					const dot = pd.velX[ent] * nx + pd.velY[ent] * ny;
-					pd.velX[ent] -= 2 * dot * nx;
-					pd.velY[ent] -= 2 * dot * ny;
-
-					pd.velX[ent] *= cfg.VELOCITY_DAMPING;
-					pd.velY[ent] *= cfg.VELOCITY_DAMPING;
-
-					collisionOccurred = true;
-					break;
-				}
-			}
-		}
-	}
-}
-
-// Pillar Collision System
+// Updated Pillar Collision System - Now uses square collision detection
 function handlePillarCollisions(pd, ballEnts, pillarEnts, cfg) {
 	for (let i = 0; i < ballEnts.length; i++) {
 		const ballEnt = ballEnts[i];
@@ -199,28 +193,25 @@ function handlePillarCollisions(pd, ballEnts, pillarEnts, cfg) {
 			const pillarEnt = pillarEnts[j];
 			const pillarX = pd.posX[pillarEnt];
 			const pillarY = pd.posY[pillarEnt];
-			const pillarRadius = pd.radius[pillarEnt]; // Treat pillar as circular for collision
+			const pillarHalfW = pd.halfW[pillarEnt];
+			const pillarHalfH = pd.halfH[pillarEnt];
+			const pillarAngle = pd.rot[pillarEnt];
 
-			// Calculate distance between ball and pillar center
-			const dx = ballX - pillarX;
-			const dy = ballY - pillarY;
-			const distance = Math.sqrt(dx * dx + dy * dy);
-			const minDistance = ballRadius + pillarRadius;
+			// Use square collision detection
+			const collision = collideCircleWithOBB(
+				ballX, ballY, ballRadius,
+				pillarX, pillarY, pillarHalfW, pillarHalfH, pillarAngle
+			);
 
-			if (distance < minDistance && distance > cfg.COLLISION_EPSILON) {
-				// Collision detected - bounce ball off pillar
-				const nx = dx / distance; // Normal vector from pillar to ball
-				const ny = dy / distance;
-
+			if (collision.collision) {
 				// Separate ball from pillar
-				const overlap = minDistance - distance;
-				pd.posX[ballEnt] += nx * overlap;
-				pd.posY[ballEnt] += ny * overlap;
+				pd.posX[ballEnt] += collision.normalX * collision.penetration;
+				pd.posY[ballEnt] += collision.normalY * collision.penetration;
 
 				// Reflect velocity (elastic collision)
-				const dot = pd.velX[ballEnt] * nx + pd.velY[ballEnt] * ny;
-				pd.velX[ballEnt] -= 2 * dot * nx;
-				pd.velY[ballEnt] -= 2 * dot * ny;
+				const dot = pd.velX[ballEnt] * collision.normalX + pd.velY[ballEnt] * collision.normalY;
+				pd.velX[ballEnt] -= 2 * dot * collision.normalX;
+				pd.velY[ballEnt] -= 2 * dot * collision.normalY;
 
 				// Apply damping
 				pd.velX[ballEnt] *= cfg.VELOCITY_DAMPING;
@@ -233,12 +224,16 @@ function handlePillarCollisions(pd, ballEnts, pillarEnts, cfg) {
 export class PhysicsEngine {
 	constructor(cfg = CFG) {
 		this.cfg = cfg;
-		this.pd = new PhysicsData(cfg.MAX_PLAYERS + cfg.INITIAL_BALLS + cfg.MAX_PLAYERS + 16); // Extra space for pillars
+		this.pd = new PhysicsData(cfg.MAX_PLAYERS + cfg.INITIAL_BALLS + cfg.MAX_PLAYERS + 16);
 		this.dt = 1 / cfg.TARGET_FPS / cfg.SUB_STEPS;
 		this.grid = null;
 		this.paddleEnts = [];
 		this.ballEnts = [];
-		this.pillarEnts = []; // Add pillar tracking
+		this.pillarEnts = [];
+
+		this.paddleOffsets = [];     // Current offset of each paddle from center
+		this.paddleMaxOffsets = [];  // Maximum allowed offset for each paddle
+		this.paddleCenterAngles = []; // Base angle for each paddle (center of usable arc)
 	}
 
 	initBattleRoyale(numPlayers, numBalls) {
@@ -250,18 +245,22 @@ export class PhysicsEngine {
 		this.paddleEnts = [];
 		this.ballEnts = [];
 		this.pillarEnts = [];
+		this.paddleOffsets = [];
+		this.paddleMaxOffsets = [];
+		this.paddleCenterAngles = [];
 
 		// Grid for ball-ball collisions
 		const gridCellSize = cfg.BALL_RADIUS * 4;
 		this.grid = new UniformGrid(gridCellSize);
 
 		// Initialize paddles and pillars
-		const angleStep = (2 * Math.PI) / numPlayers; // Fixed: use numPlayers instead of hardcoded 100
+		const angleStep = (2 * Math.PI) / numPlayers;
 		const paddleArc = angleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
 		const pillarArc = angleStep * 0.1;
 		const usableArc = angleStep - pillarArc;
 		const halfUsableArc = usableArc / 2;
+		const maxOffsets = halfUsableArc - halfArc;
 
 		for (let pid = 0; pid < numPlayers; pid++) {
 			// ---- Create Paddle ----
@@ -271,6 +270,10 @@ export class PhysicsEngine {
 			const sliceStart = pid * angleStep;
 			const midAngle = sliceStart + pillarArc + halfUsableArc;
 			const paddleAngle = midAngle;
+
+			this.paddleCenterAngles[pid] = midAngle;
+			this.paddleMaxOffsets[pid] = maxOffsets;
+			this.paddleOffsets[pid] = 0;
 
 			pd.posX[paddleEnt] = Math.cos(paddleAngle) * cfg.ARENA_RADIUS;
 			pd.posY[paddleEnt] = Math.sin(paddleAngle) * cfg.ARENA_RADIUS;
@@ -302,15 +305,15 @@ export class PhysicsEngine {
 
 			pd.posX[pillarEnt] = baseX - tx * halfThickness;
 			pd.posY[pillarEnt] = baseY - ty * halfThickness;
-			pd.rot[pillarEnt] = -pillarAngle;
+			pd.rot[pillarEnt] = pillarAngle;
 
-			// Set pillar collision radius (approximate as circle)
-			pd.radius[pillarEnt] = pillarSize / 2; // Use half the pillar size as collision radius
-			pd.halfW[pillarEnt] = pillarSize / 2;
-			pd.halfH[pillarEnt] = pillarSize / 2;
+			// Set pillar dimensions for square collision
+			pd.halfW[pillarEnt] = pillarSize / 2;  // Half width
+			pd.halfH[pillarEnt] = pillarSize / 2;  // Half height
+			pd.radius[pillarEnt] = pillarSize / 2; // Keep radius for visualization/debug
 
 			console.log(`Paddle ${pid}: angle=${(paddleAngle * 180 / Math.PI).toFixed(1)}° pos=(${pd.posX[paddleEnt].toFixed(1)}, ${pd.posY[paddleEnt].toFixed(1)})`);
-			console.log(`Pillar ${pid}: angle=${(pillarAngle * 180 / Math.PI).toFixed(1)}° pos=(${pd.posX[pillarEnt].toFixed(1)}, ${pd.posY[pillarEnt].toFixed(1)}) radius=${pd.radius[pillarEnt].toFixed(1)}`);
+			console.log(`Pillar ${pid}: angle=${(pillarAngle * 180 / Math.PI).toFixed(1)}° pos=(${pd.posX[pillarEnt].toFixed(1)}, ${pd.posY[pillarEnt].toFixed(1)}) size=${pillarSize.toFixed(1)}`);
 		}
 
 		// Initialize balls (unchanged)
@@ -334,24 +337,118 @@ export class PhysicsEngine {
 		}
 	}
 
-	updatePaddleInput(pid, move) {
-		const ent = this.paddleEnts[pid];
-		if (ent == null) return;
+	// FIXED: Paddle collision detection moved inside class as method
+	handlePaddleCollisions(pd, ballEnts, paddleEnts, cfg) {
+		const numPlayers = paddleEnts.length;
+		const angleStep = (2 * Math.PI) / numPlayers;
 
-		// Move paddle tangentially around the arena
-		const v = move * this.cfg.INITIAL_SPEED;
-		this.pd.velX[ent] = Math.sin(this.pd.rot[ent]) * v;
-		this.pd.velY[ent] = -Math.cos(this.pd.rot[ent]) * v;
+		for (let i = 0; i < ballEnts.length; i++) {
+			const ent = ballEnts[i];
+			const ballX = pd.posX[ent];
+			const ballY = pd.posY[ent];
+			const ballRadius = pd.radius[ent];
+			const distFromCenter = Math.sqrt(ballX * ballX + ballY * ballY);
+
+			const collisionDistance = cfg.ARENA_RADIUS - ballRadius;
+
+			if (distFromCenter >= collisionDistance && distFromCenter <= cfg.ARENA_RADIUS + 1) {
+				const nx = ballX / distFromCenter;
+				const ny = ballY / distFromCenter;
+				const velocityDotNormal = pd.velX[ent] * nx + pd.velY[ent] * ny;
+
+				if (velocityDotNormal <= 0) continue;
+
+				const ballAngle = Math.atan2(ballY, ballX);
+				let normalizedBallAngle = ballAngle;
+				while (normalizedBallAngle < 0) normalizedBallAngle += 2 * Math.PI;
+				while (normalizedBallAngle >= 2 * Math.PI) normalizedBallAngle -= 2 * Math.PI;
+
+				let collisionOccurred = false;
+
+				for (let paddleIndex = 0; paddleIndex < numPlayers; paddleIndex++) {
+					// NOW this.paddleCenterAngles works because it's inside the class
+					const currentPaddleAngle = this.paddleCenterAngles[paddleIndex] + this.paddleOffsets[paddleIndex];
+					const arcWidth = angleStep * cfg.PADDLE_FILL;
+					const startAngle = currentPaddleAngle - arcWidth / 2;
+					const endAngle = currentPaddleAngle + arcWidth / 2;
+
+					// Normalize angles
+					let normalizedStart = startAngle;
+					let normalizedEnd = endAngle;
+
+					while (normalizedStart < 0) normalizedStart += 2 * Math.PI;
+					while (normalizedStart >= 2 * Math.PI) normalizedStart -= 2 * Math.PI;
+					while (normalizedEnd < 0) normalizedEnd += 2 * Math.PI;
+					while (normalizedEnd >= 2 * Math.PI) normalizedEnd -= 2 * Math.PI;
+
+					let withinSlice = false;
+					if (normalizedStart <= normalizedEnd) {
+						withinSlice = normalizedBallAngle >= normalizedStart && normalizedBallAngle <= normalizedEnd;
+					} else {
+						withinSlice = normalizedBallAngle >= normalizedStart || normalizedBallAngle <= normalizedEnd;
+					}
+
+					if (withinSlice) {
+						// Paddle collision
+						pd.posX[ent] = nx * collisionDistance;
+						pd.posY[ent] = ny * collisionDistance;
+
+						const dot = pd.velX[ent] * nx + pd.velY[ent] * ny;
+						pd.velX[ent] -= 2 * dot * nx;
+						pd.velY[ent] -= 2 * dot * ny;
+
+						pd.velX[ent] *= cfg.VELOCITY_DAMPING;
+						pd.velY[ent] *= cfg.VELOCITY_DAMPING;
+
+						collisionOccurred = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	updatePaddleInput(pid, moveInput) {
+		if (pid >= this.paddleEnts.length) return;
+
+		const paddleEnt = this.paddleEnts[pid];
+		if (paddleEnt == null) return;
+
+		const cfg = this.cfg;
+		const dt = this.dt * this.cfg.SUB_STEPS; // Full frame time step
+
+		// Movement speed (adjust as needed)
+		const moveSpeed = 2.0; // radians per second
+		const deltaOffset = moveInput * moveSpeed * dt;
+
+		// Update offset with constraints
+		const newOffset = this.paddleOffsets[pid] + deltaOffset;
+		const maxOffset = this.paddleMaxOffsets[pid];
+
+		// Clamp offset to valid range
+		this.paddleOffsets[pid] = Math.max(-maxOffset, Math.min(maxOffset, newOffset));
+		console.log(`deltaOffset = ${deltaOffset}, newOffset = ${newOffset}, maxOffset = ${maxOffset}`);
+
+		// Calculate new paddle position
+		const centerAngle = this.paddleCenterAngles[pid];
+		const currentAngle = centerAngle + this.paddleOffsets[pid];
+
+		// Update paddle physics data
+		const pd = this.pd;
+		pd.posX[paddleEnt] = Math.cos(currentAngle) * cfg.ARENA_RADIUS;
+		pd.posY[paddleEnt] = Math.sin(currentAngle) * cfg.ARENA_RADIUS;
+		pd.rot[paddleEnt] = currentAngle - Math.PI / 2; // Face inward
+
+		// Set velocity for smooth movement (optional, for visual smoothness)
+		pd.velX[paddleEnt] = 0; // Paddles move instantly to new position
+		pd.velY[paddleEnt] = 0;
+
+		// Debug output
+		console.log(`Paddle ${pid}: offset=${(this.paddleOffsets[pid] * 180 / Math.PI).toFixed(1)}° angle=${(currentAngle * 180 / Math.PI).toFixed(1)}°`);
 	}
 
 	step() {
 		const pd = this.pd;
-
-		// Zero paddle velocities (they'll be set by input)
-		this.paddleEnts.forEach(ent => {
-			pd.velX[ent] = 0;
-			pd.velY[ent] = 0;
-		});
 
 		// Zero pillar velocities (pillars are static)
 		this.pillarEnts.forEach(ent => {
@@ -366,10 +463,10 @@ export class PhysicsEngine {
 			// 1. Move all entities
 			movementSystem(pd, subDt);
 
-			// 2. Handle paddle collisions
-			handlePaddleCollisions(pd, this.ballEnts, this.paddleEnts, this.cfg);
+			// 2. Handle paddle collisions (now using class method)
+			this.handlePaddleCollisions(pd, this.ballEnts, this.paddleEnts, this.cfg);
 
-			// 3. Handle pillar collisions
+			// 3. Handle pillar collisions (now with square collision)
 			handlePillarCollisions(pd, this.ballEnts, this.pillarEnts, this.cfg);
 
 			// 4. Handle ball-ball collisions
@@ -401,22 +498,6 @@ export class PhysicsEngine {
 					}
 				}
 			}
-
-			// 5. Optional: Remove balls that are too far from arena (performance optimization)
-			/*
-			for (let i = this.ballEnts.length - 1; i >= 0; i--) {
-				const ent = this.ballEnts[i];
-				const ballX = pd.posX[ent];
-				const ballY = pd.posY[ent];
-				const distFromCenter = Math.sqrt(ballX * ballX + ballY * ballY);
-				
-				// Remove balls that are very far from arena (escaped)
-				if (distFromCenter > this.cfg.ARENA_RADIUS * 3) {
-					this.ballEnts.splice(i, 1);
-					pd.mask[ent] = 0; // Mark as inactive
-				}
-			}
-			*/
 		}
 
 		return this.getState();
@@ -436,25 +517,23 @@ export class PhysicsEngine {
 
 		const paddles = this.paddleEnts.map((ent, i) => ({
 			id: i,
-			x: pd.posX[ent],
-			y: pd.posY[ent],
-			rot: pd.rot[ent],
-			radius: pd.radius[ent]
+			offset: this.paddleOffsets[i]
 		}));
 
-		// Include pillars in the state for debugging/visualization
 		const pillars = this.pillarEnts.map((ent, i) => ({
 			id: i,
 			x: pd.posX[ent],
 			y: pd.posY[ent],
 			rot: pd.rot[ent],
-			radius: pd.radius[ent]
+			radius: pd.radius[ent],
+			halfW: pd.halfW[ent], // Add dimensions for visualization
+			halfH: pd.halfH[ent]
 		}));
 
 		return {
 			balls,
 			paddles,
-			pillars, // Add pillars to state
+			pillars,
 			events: [],
 			arenaCenter: { x: pd.arenaX, y: pd.arenaY },
 			config: this.cfg,

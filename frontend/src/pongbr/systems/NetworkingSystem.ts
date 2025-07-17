@@ -64,6 +64,7 @@ export class NetworkingSystem extends System {
 				});
 
 				// 2. Paddle updates
+				console.log(paddles);
 				paddles.forEach(p => {
 					// if (p.id === localPaddleId) return;
 
@@ -74,6 +75,7 @@ export class NetworkingSystem extends System {
 					if (!e) return;
 
 					const paddleComp = e.getComponent(PaddleComponent)!;
+					console.log(p.offset, paddleComp.maxoffset);
 					paddleComp.offset = p.offset; // update direction
 
 					const tf = e.getComponent(TransformComponent)!;

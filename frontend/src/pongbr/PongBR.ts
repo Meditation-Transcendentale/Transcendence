@@ -55,6 +55,7 @@ export class PongBR {
 	private pongRoot!: TransformNode;
 	private inited: boolean;
 	private networkingSystem!: NetworkingSystem;
+	private inputSystem!: InputSystem;
 
 	constructor(canvas: any, gameId: any, scene: Scene) {
 		this.canvas = canvas;
@@ -137,6 +138,7 @@ export class PongBR {
 		}
 		if (this.wsManager) {
 			this.wsManager.socket.close();
+			this.ecs.removeSystem(this.inputSystem);
 			this.ecs.removeSystem(this.networkingSystem);
 		}
 		const wsUrl = `ws://${window.location.hostname}:5004?` +
@@ -147,6 +149,8 @@ export class PongBR {
 		localPaddleId = await this.waitForRegistration();
 
 		// 4) Plug networking into ECS
+		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
+		this.ecs.addSystem(this.inputSystem);
 		this.networkingSystem = new NetworkingSystem(
 			this.wsManager,
 			this.uuid,
@@ -200,9 +204,9 @@ export class PongBR {
 	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string, pongRoot: TransformNode) {
 		this.ecs = new ECSManager();
 		this.ecs.addSystem(new MovementSystem());
-		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
+		//this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
 		this.ecs.addSystem(new AnimationSystem());
-		// this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid, this.scoreUI));
+		//this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid, this.scoreUI));
 		this.ecs.addSystem(new ThinInstanceSystem(
 			instanceManagers.ball,
 			instanceManagers.paddle,

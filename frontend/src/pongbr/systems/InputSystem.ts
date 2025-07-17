@@ -64,10 +64,10 @@ export class InputSystem extends System {
 				};
 
 				const buffer = encodeClientMessage(payload);
-				// this.wsManager.socket.send(buffer);
+				this.wsManager.socket.send(buffer);
 				this.lastSentMove = this.move;
 
-				// console.log("Sent move to server: move =", this.move, "offset = ", paddle.offset);
+				console.log("Sent move to server: move =", this.move, "offset = ", paddle.offset);
 			}
 		}
 	}

@@ -20,6 +20,8 @@ let showVelocities = false;
 let showCollisionLog = false;
 let showBallIDs = false;
 let showPaddleIDs = false;
+let showPillars = true;  // NEW: Toggle for pillar visualization
+let showPillarIDs = false;  // NEW: Toggle for pillar IDs
 
 // Debug data
 let collisionLog = [];
@@ -85,9 +87,14 @@ function drawPaddleSlice(paddleIndex) {
 	const arenaCenter = toScreen(0, 0);
 	const arenaRadius = cfg.ARENA_RADIUS * ZOOM;
 
-	// Calculate slice boundaries
+	// Calculate slice boundaries using the same logic as physics
 	const angleStep = (2 * Math.PI) / NUM_PLAYERS;
-	const paddleCenterAngle = paddleIndex * angleStep;
+	const pillarArc = angleStep * 0.1;
+	const usableArc = angleStep - pillarArc;
+	const halfUsableArc = usableArc / 2;
+	const sliceStart = paddleIndex * angleStep;
+	const paddleCenterAngle = sliceStart + pillarArc + halfUsableArc;
+
 	const arcWidth = angleStep * cfg.PADDLE_FILL;
 	const startAngle = paddleCenterAngle - arcWidth / 2;
 	const endAngle = paddleCenterAngle + arcWidth / 2;
@@ -206,14 +213,86 @@ function drawPaddles(paddles) {
 	}
 }
 
-function drawCollisionDebug(balls) {
+// NEW: Draw pillars
+function drawPillars(pillars) {
+	if (!showPillars || !pillars) return;
+
+	for (let i = 0; i < pillars.length; i++) {
+		const pillar = pillars[i];
+		const pos = toScreen(pillar.x, pillar.y);
+
+		// Calculate pillar dimensions based on physics data
+		const cfg = engine.cfg;
+		const angleStep = (2 * Math.PI) / NUM_PLAYERS;
+		const pillarArc = angleStep * 0.1;
+		const pillarSize = cfg.ARENA_RADIUS * pillarArc;
+
+		// Scale to screen coordinates
+		const pillarWidth = Math.max(6, pillarSize * ZOOM);
+		const pillarHeight = Math.max(6, pillarSize * ZOOM);
+		const rotationDegrees = pillar.rot * (180 / Math.PI);
+
+		// Draw pillar as a filled rectangle
+		raylib.DrawRectanglePro(
+			{ x: pos.x, y: pos.y, width: pillarWidth, height: pillarHeight },
+			{ x: pillarWidth / 2, y: pillarHeight / 2 }, // Center the rectangle
+			rotationDegrees,
+			raylib.PURPLE
+		);
+
+		// Draw pillar outline manually using lines (since DrawRectangleLinesPro doesn't exist)
+		const halfW = pillarWidth / 2;
+		const halfH = pillarHeight / 2;
+		const cos = Math.cos(pillar.rot);
+		const sin = Math.sin(pillar.rot);
+
+		// Calculate the 4 corners of the rotated rectangle
+		const corners = [
+			{ x: -halfW, y: -halfH }, // Top-left
+			{ x: halfW, y: -halfH },  // Top-right
+			{ x: halfW, y: halfH },   // Bottom-right
+			{ x: -halfW, y: halfH }   // Bottom-left
+		];
+
+		// Rotate and translate corners to world position
+		const worldCorners = corners.map(corner => ({
+			x: pos.x + (corner.x * cos - corner.y * sin),
+			y: pos.y + (corner.x * sin + corner.y * cos)
+		}));
+
+		// Draw the 4 edges of the rectangle
+		for (let j = 0; j < 4; j++) {
+			const start = worldCorners[j];
+			const end = worldCorners[(j + 1) % 4];
+			raylib.DrawLine(start.x, start.y, end.x, end.y, raylib.MAGENTA);
+		}
+
+		// Draw collision radius (circle showing physics collision area)
+		const pillarRadius = pillar.radius * ZOOM;
+		raylib.DrawCircleLines(pos.x, pos.y, pillarRadius, raylib.Color(255, 0, 255, 80));
+
+		// Draw pillar direction indicator (small line showing rotation)
+		const lineLength = Math.max(pillarWidth, pillarHeight) / 2 + 8;
+		const dirX = pos.x + Math.cos(pillar.rot) * lineLength;
+		const dirY = pos.y + Math.sin(pillar.rot) * lineLength;
+		raylib.DrawLine(pos.x, pos.y, dirX, dirY, raylib.YELLOW);
+
+		// Draw pillar ID when enabled
+		if (showPillarIDs) {
+			drawText(`PL${i}`, pos.x + pillarWidth / 2 + 5, pos.y - 10, 10, raylib.MAGENTA);
+		}
+	}
+}
+
+function drawCollisionDebug(balls, pillars) {
 	if (!showCollisionLog) return;
 
 	const cfg = engine.cfg;
 	let activeCollisions = 0;
+	let pillarCollisions = 0;
 
-	// Check for balls near boundary
-	for (let i = 0; i < Math.min(balls.length, 50); i++) { // Limit checks for performance
+	// Check for balls near boundary (existing paddle collision logic)
+	for (let i = 0; i < Math.min(balls.length, 50); i++) {
 		const ball = balls[i];
 		const distFromCenter = Math.sqrt(ball.x * ball.x + ball.y * ball.y);
 		const ballRadius = ball.radius;
@@ -234,15 +313,48 @@ function drawCollisionDebug(balls) {
 		}
 	}
 
+	// NEW: Check for balls near pillars
+	if (pillars && showPillars) {
+		for (let i = 0; i < Math.min(balls.length, 20); i++) { // Limit for performance
+			const ball = balls[i];
+			const ballPos = toScreen(ball.x, ball.y);
+
+			for (let j = 0; j < pillars.length; j++) {
+				const pillar = pillars[j];
+				const dx = ball.x - pillar.x;
+				const dy = ball.y - pillar.y;
+				const distance = Math.sqrt(dx * dx + dy * dy);
+				const minDistance = ball.radius + pillar.radius;
+
+				// If ball is near pillar, draw collision indicator
+				if (distance < minDistance + 5) { // Add some buffer for "near collision"
+					const pillarPos = toScreen(pillar.x, pillar.y);
+
+					// Draw line between ball and pillar
+					const lineColor = distance < minDistance ? raylib.RED : raylib.ORANGE;
+					raylib.DrawLine(ballPos.x, ballPos.y, pillarPos.x, pillarPos.y, lineColor);
+
+					// Draw collision indicator
+					if (distance < minDistance) {
+						raylib.DrawCircle(ballPos.x, ballPos.y, 6, raylib.Color(255, 0, 0, 150));
+						pillarCollisions++;
+						logEvent(`Ball ${i} colliding with Pillar ${j} (${distance.toFixed(1)}/${minDistance.toFixed(1)})`, raylib.RED);
+					}
+				}
+			}
+		}
+	}
+
 	// Limit log spam
-	if (activeCollisions === 0 && Math.random() < 0.98) return; // Only log occasionally when no collisions
+	if (activeCollisions === 0 && pillarCollisions === 0 && Math.random() < 0.98) return;
 }
 
 function drawUI() {
 	const cfg = engine.cfg;
+	const state = engine.getState();
 
 	// Background for UI
-	raylib.DrawRectangle(10, 10, 400, HEIGHT - 20, raylib.Color(0, 0, 0, 150));
+	raylib.DrawRectangle(10, 10, 450, HEIGHT - 20, raylib.Color(0, 0, 0, 150));
 
 	let yOffset = 20;
 	const lineHeight = 22;
@@ -255,7 +367,9 @@ function drawUI() {
 	drawText(`Players: ${NUM_PLAYERS} | Balls: ${engine.ballEnts.length}`, 20, yOffset, 14);
 	yOffset += lineHeight;
 
-	drawText(`Paddle Fill: ${cfg.PADDLE_FILL} (${((cfg.PADDLE_FILL / NUM_PLAYERS) * 360).toFixed(1)}° per paddle)`, 20, yOffset, 14);
+	// NEW: Show pillar count
+	const pillarCount = state.pillars ? state.pillars.length : 0;
+	drawText(`Pillars: ${pillarCount} | Paddle Fill: ${cfg.PADDLE_FILL}`, 20, yOffset, 14);
 	yOffset += lineHeight;
 
 	drawText(`Ball Radius: ${cfg.BALL_RADIUS} | Arena: ${cfg.ARENA_RADIUS}`, 20, yOffset, 14);
@@ -278,6 +392,8 @@ function drawUI() {
 		"C: Toggle Collision Debug",
 		"B: Toggle Ball IDs",
 		"P: Toggle Paddle IDs",
+		"L: Toggle Pillars",          // NEW
+		"K: Toggle Pillar IDs",       // NEW
 		"R: Reset Simulation",
 		"Arrows: Move Camera",
 		"I/O: Zoom In/Out"
@@ -288,16 +404,39 @@ function drawUI() {
 		yOffset += lineHeight * 0.8;
 	});
 
+	// Toggle status indicators
+	yOffset += 10;
+	drawText("=== TOGGLE STATUS ===", 20, yOffset, 14, raylib.CYAN);
+	yOffset += lineHeight;
+
+	const toggles = [
+		{ name: "Debug Info", active: showDebug },
+		{ name: "Paddle Slices", active: showPaddleSlices },
+		{ name: "Velocities", active: showVelocities },
+		{ name: "Collision Log", active: showCollisionLog },
+		{ name: "Ball IDs", active: showBallIDs },
+		{ name: "Paddle IDs", active: showPaddleIDs },
+		{ name: "Pillars", active: showPillars },           // NEW
+		{ name: "Pillar IDs", active: showPillarIDs }        // NEW
+	];
+
+	toggles.forEach(toggle => {
+		const color = toggle.active ? raylib.GREEN : raylib.RED;
+		const status = toggle.active ? "ON" : "OFF";
+		drawText(`${toggle.name}: ${status}`, 20, yOffset, 11, color);
+		yOffset += lineHeight * 0.7;
+	});
+
 	// Collision log
 	if (showCollisionLog && collisionLog.length > 0) {
 		yOffset += 10;
 		drawText("=== COLLISION LOG ===", 20, yOffset, 14, raylib.YELLOW);
 		yOffset += lineHeight;
 
-		const recentLogs = collisionLog.slice(-8);
+		const recentLogs = collisionLog.slice(-6); // Reduced to fit UI
 		recentLogs.forEach(log => {
-			drawText(log.message, 20, yOffset, 11, log.color);
-			yOffset += lineHeight * 0.7;
+			drawText(log.message, 20, yOffset, 10, log.color);
+			yOffset += lineHeight * 0.6;
 		});
 	}
 
@@ -317,12 +456,15 @@ function handleInput() {
 	if (raylib.IsKeyPressed(raylib.KEY_C)) showCollisionLog = !showCollisionLog;
 	if (raylib.IsKeyPressed(raylib.KEY_B)) showBallIDs = !showBallIDs;
 	if (raylib.IsKeyPressed(raylib.KEY_P)) showPaddleIDs = !showPaddleIDs;
+	if (raylib.IsKeyPressed(raylib.KEY_L)) showPillars = !showPillars;           // NEW
+	if (raylib.IsKeyPressed(raylib.KEY_K)) showPillarIDs = !showPillarIDs;       // NEW
 
 	// Reset simulation
 	if (raylib.IsKeyPressed(raylib.KEY_R)) {
 		engine.pd.count = 0;
 		engine.paddleEnts = [];
 		engine.ballEnts = [];
+		engine.pillarEnts = [];  // NEW: Reset pillars too
 		engine.initBattleRoyale(NUM_PLAYERS, NUM_BALLS);
 		camX = 0;
 		camY = 0;
@@ -353,7 +495,7 @@ while (!raylib.WindowShouldClose()) {
 		engine.step();
 	}
 
-	const { balls, paddles } = engine.getState();
+	const { balls, paddles, pillars } = engine.getState();  // NEW: Get pillars from state
 
 	raylib.BeginDrawing();
 	raylib.ClearBackground(raylib.BLACK);
@@ -362,10 +504,11 @@ while (!raylib.WindowShouldClose()) {
 	drawArena();
 	drawBalls(balls);
 	drawPaddles(paddles);
+	drawPillars(pillars);  // NEW: Draw pillars
 
 	// Debug visualization
 	if (showCollisionLog) {
-		drawCollisionDebug(balls);
+		drawCollisionDebug(balls, pillars);  // NEW: Pass pillars to collision debug
 	}
 
 	// UI overlay

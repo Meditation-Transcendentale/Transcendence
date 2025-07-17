@@ -167,6 +167,7 @@ export class GameManager {
 			match.inputs[targetTick] = [];
 		}
 
+		console.log(`GameId: ${gameId}, paddleId: ${paddleId}, ${move}`);
 		match.inputs[targetTick].push({
 			id: paddleId,
 			move,
@@ -242,7 +243,7 @@ export class GameManager {
 				return;
 			}
 		} catch (err) {
-			console.error(`[GameManager] Tick failed for ${gameId}:`, err);
+			//console.error(`[GameManager] Tick failed for ${gameId}:`, err);
 			return;
 		}
 	}

@@ -17,8 +17,9 @@ export const Physics = {
 
 		// Apply paddle inputs
 		if (Array.isArray(inputs)) {
-			for (const { playerId, move } of inputs) {
-				eng.updatePaddleInput(playerId, move);
+			for (const { id, move } of inputs) {
+				console.log(`Handling input for player: ${id}`);
+				eng.updatePaddleInput(id, move);
 			}
 		}
 

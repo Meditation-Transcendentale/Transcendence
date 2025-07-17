@@ -89,7 +89,7 @@ export function buildPaddles(
 	const angleStep = (2 * Math.PI) / playerCount;
 	const paddleArc = angleStep * 0.25;
 	const halfArc = paddleArc / 2;
-	const y = paddleHeight / 2 + 1;
+	const y = paddleHeight / 2;
 	const goalRadius = arenaRadius + wallWidth / 2 + goalDepth / 2;
 	const pillarArc = angleStep * 0.1;
 	const pillarSize = arenaRadius * pillarArc;
@@ -133,7 +133,7 @@ export function buildPaddles(
 		paddle.addComponent(new InputComponent(true));
 		paddle.addComponent(
 			new TransformComponent(
-				new Vector3(0, y, 0),  // Position at arena boundary
+				new Vector3(0, 0, 0),  // Position at arena boundary
 				new Vector3(0, paddleRotY, 0),     // Rotation to face inward
 				Vector3.One(),
 				pongRoot
