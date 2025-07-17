@@ -8,7 +8,7 @@ import {
 	encodePhysicsResponse,
 } from './proto/helper.js';
 
-const SERVICE_NAME = process.env.SERVICE_NAME || 'pong-physics';
+const SERVICE_NAME = process.env.SERVICE_NAME || 'pongbr-physics';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 const endedGames = new Set();
 
@@ -57,11 +57,6 @@ async function start() {
 	});
 	console.log(`[${SERVICE_NAME}] connected to NATS`);
 
-	/**
-	   * Handle game end events by tearing down state
-	   * @param {import('nats').Msg} msg
-	   */
-
 	const endBr = nc.subscribe('games.br.*.match.end');
 	handleEnd(endBr);
 
@@ -71,3 +66,37 @@ async function start() {
 }
 
 start();
+
+
+// -------------------------------------------------------------------------------
+//                              Metrics server
+
+import Fastify from 'fastify';
+import client from 'prom-client';
+import fs from 'fs';
+
+const app = Fastify({
+	logger: true,
+	https: {
+		key: fs.readFileSync(process.env.SSL_KEY),
+		cert: fs.readFileSync(process.env.SSL_CERT)
+	}
+});
+
+client.collectDefaultMetrics();
+
+app.get('/metrics', async (req, res) => {
+	res.type('text/plain');
+	res.send(await client.register.metrics());
+});
+
+const startF = async () => {
+	try {
+		await app.listen({ port: 5053, host: '0.0.0.0' });
+	} catch (err) {
+		app.log.error(err);
+		process.exit(1);
+	}
+};
+
+startF();

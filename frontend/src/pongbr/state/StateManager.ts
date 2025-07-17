@@ -5,11 +5,12 @@ export class StateManager {
 	private lastUpdate: number = performance.now();
 	private accumulatedTime: number = 0;
 	private readonly timestep: number = 16.67; // ~60 updates per second
-	private start: boolean = true;
+	private start: boolean;
 	private id: number = 0;
 
 	constructor(ecs: ECSManager) {
 		this.ecs = ecs;
+		this.start = true;
 	}
 
 	update(): void {
@@ -19,13 +20,17 @@ export class StateManager {
 		this.ecs.update(deltaTime / 1000);
 		this.id = requestAnimationFrame(() => this.update());
 		if (!this.start) {
-			console.log(this.id);
+			console.log("Cancel Animation Fram :", this.id);
 			cancelAnimationFrame(this.id);
+			return;
 		}
 	}
 
 	setter(value: boolean): void {
 		console.log("change start");
 		this.start = value;
+	}
+	set_ecs(ecs: ECSManager) {
+		this.ecs = ecs;
 	}
 }

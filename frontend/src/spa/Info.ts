@@ -52,7 +52,7 @@ export default class Info {
 		this.ref.userSubmit.addEventListener('click', () => {
 			const body = new FormData();
 			body.append('avatar', this.ref.avatarInpt.files[0]);
-			patchRequest("update-info", body, false)
+			patchRequest("update-info/avatar", body, false)
 				.then(() => {
 					this.ref.userSubmit.toggleAttribute("off", true);
 				})

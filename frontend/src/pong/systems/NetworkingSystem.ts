@@ -44,6 +44,7 @@ export class NetworkingSystem extends System {
 
 		const now = performance.now();
 
+		console.log("called");
 		messages.forEach((raw: ArrayBuffer) => {
 			let serverMsg: userinterface.ServerMessage;
 			try {
@@ -61,6 +62,7 @@ export class NetworkingSystem extends System {
 				const paddles = state.paddles ?? [];
 				const score = state.score ?? [];
 				// 1. Ball updates
+				console.log(balls);
 				balls.forEach(b => {
 					const e = entities.find(e =>
 						e.hasComponent(BallComponent) &&
@@ -71,7 +73,7 @@ export class NetworkingSystem extends System {
 					ball.serverPosition.set(b.x, 0.5, b.y);
 					ball.lastServerUpdate = performance.now();
 					// console.log();
-					if (b.vx != this.oldVelX || b.vy != this.oldVelY){
+					if (b.vx != this.oldVelX || b.vy != this.oldVelY) {
 						ball.velocity.set(b.vx, 0, b.vy);
 						this.oldVelX = b.vx!;
 						this.oldVelY = b.vy!;
@@ -87,7 +89,7 @@ export class NetworkingSystem extends System {
 				// 		(e.getComponent(PaddleComponent)!.id === p.id || e.getComponent(PaddleComponent)!.id - 2 === p.id)
 				// 	);
 				// 	if (!e) return;
-					
+
 				// 	const paddleComp = e.getComponent(PaddleComponent)!;
 				// 	const inputComp = e.getComponent(InputComponent)!;
 				// 	console.log(paddleComp.id);
@@ -110,13 +112,12 @@ export class NetworkingSystem extends System {
 						(e.getComponent(PaddleComponent)!.id === p.id || e.getComponent(PaddleComponent)!.id - 2 === p.id)
 					);
 					if (!matchedEntities) return;
-					
+
 					matchedEntities.forEach(e => {
 						const paddleComp = e.getComponent(PaddleComponent)!;
 						const inputComp = e.getComponent(InputComponent)!;
 						// console.log(paddleComp.id);
-						if (inputComp.gameMode === "online" && !inputComp.isLocal)
-						{
+						if (inputComp.gameMode === "online" && !inputComp.isLocal) {
 							paddleComp.offset = p.offset;
 						}
 

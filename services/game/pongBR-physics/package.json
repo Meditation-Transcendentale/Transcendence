@@ -4,12 +4,13 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "node --inspect=0.0.0.0:9229 src/index.js",
+    "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "vitest"
   },
   "dependencies": {
     "blessed": "^0.1.81",
+    "fastify": "^5.2.1",
     "blessed-contrib": "^4.11.0",
     "dotenv": "^16.0.3",
     "nats": "^2.29.3",

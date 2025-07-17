@@ -24,6 +24,14 @@ const app = fastify({
 	}
 });
 
+app.addHook('onSend', (req, reply, payload, done) => {
+	reply.header('X-Content-Type-Options', 'nosniff');
+	reply.header('X-Frame-Options', 'DENY');
+	reply.header('X-XSS-Protection', '1; mode=block');
+	reply.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+	done();
+});
+
 app.register(fastifyCookie);
 
 app.register(fastifyCompress);
@@ -55,9 +63,14 @@ const verifyJWT = async (req, res) => {
 		if (req.raw.url.endsWith('/health')) {
 			return ;
 		}
-		const IP = req.ip || req.raw.socket.remoteAddress;
-		if (IP.startsWith('172.18.') || IP.startsWith('172.19.') || IP.startsWith('172.20.')) {
-			return;
+		const metricsAuth = req.headers['authorization'];
+		console.log(`Metrics Auth: ${metricsAuth}`);
+		if (metricsAuth && metricsAuth.startsWith('Basic ')) {
+			const base64Credentials = metricsAuth.split(' ')[1];
+			const [username, password] = Buffer.from(base64Credentials, 'base64').toString('utf-8').split(':');
+			if (username === 'metrics' && password === process.env.METRICS_PASSWORD) {
+				return;
+			}
 		}
 		return res.code(403).send({ message: 'Forbidden' });
 	}

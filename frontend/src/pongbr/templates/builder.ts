@@ -111,6 +111,7 @@ export function buildPaddles(
 		//}, scene);
 		//debugLine.parent = pongRoot;
 		// ---- Paddle ----
+		console.log(`Paddle ${i} : yaw = ${paddleYaw}`);
 		const paddle = new Entity();
 		paddle.addComponent(
 			new PaddleComponent(i, Vector3.Zero(), 0, maxOffset, paddleYaw, playerCount / 4)
@@ -315,13 +316,15 @@ export function buildWalls(ecs: any, config: GameTemplateConfig, pongRoot: Trans
 }
 
 // ─── 4. Build Ball ─────────────────────────────────────────────────
-export function buildBall(ecs: any, pongRoot: TransformNode): Entity {
-	const ball = new Entity();
-	const startPos = new Vector3(0, 5., 0);
-	ball.addComponent(new BallComponent(0, startPos, Vector3.Zero()));
-	ball.addComponent(new TransformComponent(startPos, Vector3.Zero(), Vector3.One(), pongRoot));
-	ecs.addEntity(ball);
-	return ball;
+export function buildBall(ecs: any, pongRoot: TransformNode) {
+	for (let i = 0; i < 200; i++) {
+		const ball = new Entity();
+		const startPos = new Vector3(0, 10, 0);
+		ball.addComponent(new BallComponent(i, startPos, Vector3.Zero()));
+		ball.addComponent(new TransformComponent(startPos, Vector3.Zero(), Vector3.One(), pongRoot));
+		ecs.addEntity(ball);
+	}
+	return;
 }
 
 export function buildPortal(ecs: any, pongRoot: TransformNode) {

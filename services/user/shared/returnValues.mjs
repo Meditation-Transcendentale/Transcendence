@@ -36,7 +36,7 @@ const returnMessages = {
 	ADD_BLOCKED_USER: 'You cannot add a blocked user as a friend',
 	NO_BLOCKED_USERS: 'You have no blocked users',
 	NOTHING_TO_UPDATE: 'Nothing to update',
-	INFO_UPDATED: 'User info updated',
+	USERNAME_UPDATED: 'User info updated',
 	PASSWORD_UPDATED: 'Password updated successfully',
 	PASSWORD_REQUIRED: 'Password is required',
 	NEW_PASSWORD_REQUIRED: 'New password is required',
@@ -63,7 +63,10 @@ const returnMessages = {
 	PLAYER_INACTIVE: 'Player not in a lobby or a game',
 	SELF_RESEARCH: 'You cannot search for yourself',
 	CANT_ENABLE_2FA: 'You cannot enable 2FA for this account',
-	INVALID_AVATAR_URL: 'Invalid avatar URL'
+	INVALID_AVATAR_URL: 'Invalid avatar URL',
+	AVATAR_REQUIRED: 'No avatar file provided',
+	AVATAR_UPDATED: 'Avatar updated successfully',
+	INVALID_TYPE: 'Invalid image type',
 
 }
 
