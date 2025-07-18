@@ -447,6 +447,7 @@ export class GrassShader extends CustomMaterial {
 			`
 			#define UV1 1
 			#define MAINUV1 1
+			#define NORMAL
 			#define M_PI 3.1415926535897932384626433832795
 
 			varying vec3 vPositionM;
@@ -456,7 +457,7 @@ export class GrassShader extends CustomMaterial {
 		this.Vertex_Definitions(
 			`
 			attribute vec4 baseColor;
-			//#include<noises>
+			#include<noises>
 			#include<rotations>
 
 			float trunc_fallof( float x, float m )
@@ -489,9 +490,9 @@ export class GrassShader extends CustomMaterial {
 			    return (k+1.0)/(1.0+k*x);
 			}
 
-			//float simplexOctave(vec2 v) {
-			//	return (simplexNoise(v) + 0.5 * simplexNoise(v * 2.) + 0.25 * simplexNoise(v * 4.)) * (1. / 1.75);
-			//}
+			float simplexOctave(vec2 v) {
+				return (simplexNoise(v) + 0.5 * simplexNoise(v * 2.) + 0.25 * simplexNoise(v * 4.)) * (1. / 1.75);
+			}
 		`
 		);
 
@@ -500,21 +501,23 @@ export class GrassShader extends CustomMaterial {
 				vec2 pos = (finalWorld * vec4(0., 0., 0., 1.0)).xz;
 				vec2 windDir = vec2(1., 0.);
 
-				vec4 noiseA = texture2D(tNoise, pos * 0.05 - time * windDir * 0.3);
+				vec4 noiseA = texture2D(tNoise, pos * 0.02 - time * windDir * 0.3);
 				vec4 noiseB = texture2D(tNoise, pos * 0.04);
 			
 				// vec2 curl = curlSimplex(pos * 0.1 - vec2(time * 0.2, 0.), 1.);
 				// float strengh = length(curl);
 				// vec2 windDir = curl / strengh;
 
-				//float strengh = simplexOctave(pos * 0.1 - time * windDir * 0.3);
-				float strengh = noiseA.r * 2. - 1.;
-				strengh *= uv.y;// * uv.y ;
+				float strengh = simplexOctave(pos * 0.05 - time * windDir * 0.3);
+				// float strengh = noiseA.r * 2. - 1.;
+				// strengh *= uv.y;// * uv.y ;
 				// strengh *= gain(uv.y, 3.);
+				strengh *= position.y;
 				
 
-				strengh *= abs(dot(rotationY(normal, baseColor.r).xz, windDir)) * 0.5 + 0.5; // grass parallel to wind are less bend
+				// strengh *= abs(dot(rotationY(normal, baseColor.r).xz, windDir)) * 0.5 + 0.5; // grass parallel to wind are less bend
 				strengh *= baseColor.a; //apply blade stiffness
+				// strengh *= M_PI * 0.5;
 				
 				vec3 totalWave = vec3(0.);
 				//for (int i = 0; i < 1; i++) {
@@ -528,20 +531,23 @@ export class GrassShader extends CustomMaterial {
 				// positionUpdated.y *= max(1. - totalWave.z, 0.) * baseColor.a;
 				// positionUpdated.xz += vec2(-totalWave.x, totalWave.y) * totalWave.z * uv.y * baseColor.a;
 				positionUpdated = rotationAxis(positionUpdated,  totalWave.z * baseColor.a * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
-				positionUpdated = rotationAxis(positionUpdated, strengh, vec3(windDir.y, 0., windDir.x));
+				positionUpdated = (position.y > 0.1 ? rotationAxis(positionUpdated, strengh, vec3(windDir.y, 0., windDir.x)) : positionUpdated);
 
 
-				positionUpdated.y += noiseB.g * 2.5;
 
-				vPositionM = normalize(positionUpdated);
+				vPositionM = position;
 
 		`);
+
+		this.Vertex_After_WorldPosComputed(`
+				worldPos.y += noiseB.g * 1.5;
+		`)
 
 		this.Vertex_Before_NormalUpdated(
 			`
 				vec3 viewDir = vEyePosition.xyz - vec3(pos.x, 0., pos.y) ;
 				normalUpdated = normalize(vec3(viewDir.x, 0., viewDir.z));
-				normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
+				// normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
 				// normalUpdated = rotationAxis(normalUpdated, totalWave.z * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
 				// normalUpdated = rotationAxis(normalUpdated, totalWave.z * baseColor.a * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
 				normalUpdated = rotationAxis(normalUpdated, strengh, vec3(windDir.y, 0., windDir.x));
@@ -559,7 +565,9 @@ export class GrassShader extends CustomMaterial {
 			// float ddt = dot(nor, normalW);
 		`)
 
+		this.name = "grass";
 		this.Fragment_Begin(`
+			#define NORMAL
 			#define MAINUV1 1
 			#define M_PI 3.1415926535897932384626433832795
 
@@ -721,12 +729,16 @@ export class GrassShader extends CustomMaterial {
 		`;
 
 		this.Fragment_MainEnd(`
-			gl_FragColor.rgb *= vPositionW.y * 1.5 * baseColor.g;
+			// gl_FragColor.rgb *= vPositionM.y * 1.5 * baseColor.g;
 			// gl_FragColor.rgb = vec3(floor(gl_FragColor.r * 4. + 0.5) * (1. / 4.));
 			// gl_FragColor.rgb = vec3(vMainUV1, 0.);
 			// gl_FragColor.rgb = vec3(normalW * 0.5 + 0.5);
 			// gl_FragColor.rgb = vec3(ddt);
 			// gl_FragColor.rgb = vec3(vPositionM.rg, 0.);
+		`)
+
+		this.Fragment_Before_Fog(`
+			color.rgb *= vPositionM.y * 1. * baseColor.g;
 		`)
 
 		//console.log(this.FragmentShader);

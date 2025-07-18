@@ -9,6 +9,7 @@ import { Grass } from "./Grass";
 import { Puddle } from "./Ground";
 import { DitherMaterial } from "./Shader";
 import { Butterfly } from "./Butterfly";
+import { Portal } from "./Portal";
 
 
 
@@ -22,6 +23,7 @@ export class Field {
 	private grass: Grass;
 	private ground: Puddle;
 	private butterfly: Butterfly;
+	private portal: Portal;
 
 	private ditherMat!: DitherMaterial;
 
@@ -30,8 +32,9 @@ export class Field {
 		this.scene = scene;
 		this.sun = new Sun(scene);
 		this.grass = new Grass(20);
-		this.ground = new Puddle(scene, 40, 1);
+		this.ground = new Puddle(scene, 100, 1);
 		this.butterfly = new Butterfly(scene, this.ground.origin);
+		this.portal = new Portal(scene);
 
 
 		this.clouds = [];
@@ -50,8 +53,8 @@ export class Field {
 		loaded.addAllToScene();
 		loaded.meshes.forEach((mesh) => {
 			mesh.material = this.ditherMat;
-			mesh.receiveShadows = true;
-			this.sun.shadow.addShadowCaster(mesh);
+			// mesh.receiveShadows = true;
+			// this.sun.shadow.addShadowCaster(mesh);
 		})
 		this.scene.setActiveCameraByName("fieldCam");
 		this.scene.activeCamera.parent = undefined;
@@ -68,20 +71,20 @@ export class Field {
 
 
 		this.ground.init();
-		await this.grass.init(this.scene, this.ground.originGrass);
 		await this.butterfly.init();
+		await this.grass.init(this.scene, this.ground.originGrass, this.butterfly.glowLayer);
 
 
 
 
 	}
 
-	public update(time: number) {
+	public update(time: number, deltaTime: number) {
 		this.sun.update(time);
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.ground.update(time);
 		this.ditherMat.setFloat("time", time);
-		this.butterfly.update(time);
+		this.butterfly.update(time, deltaTime);
 	}
 
 	public setVue(vue: string): Vue {

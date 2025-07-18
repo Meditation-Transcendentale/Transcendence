@@ -58,27 +58,29 @@ export class Sun {
 		this.root.scaling.setAll(50);
 
 		// this.light = new PointLight("light", Vector3.Zero(), this.scene);
-		this.light = new SpotLight("light", Vector3.Zero(), new Vector3(-0, -50, -10).normalize(), Math.PI * 0.3, 0, this.scene);
+		// this.light = new SpotLight("light", Vector3.Zero(), new Vector3(-0, -50, -10).normalize(), Math.PI * 0.3, 0, this.scene);
 		// const li = new SpotLight("fake light", Vector3.Zero(), new Vector3(-0, -50, 0).normalize(), Math.PI * 0.2, 0, this.scene);
 		// li.parent = this.root;
 		// li.intensity = 0.5;
-		this.light.parent = this.root;
-		this.light.intensity = 1.;
-		// const l = new DirectionalLight("light2", new Vector3(0, -1, 0), this.scene);
+		// this.light.parent = this.root;
+		// this.light.intensity = 1.;
+		const l = new DirectionalLight("light2", new Vector3(0, -1, -1), this.scene);
+		l.intensity = 0.5;
 		// this.light.parent = this.root;
 		// //
 		this.hemish = new HemisphericLight("hemish", new Vector3(1, 1, 1), this.scene);
 		this.hemish.intensity = 0.2;
 
-		this.shadow = new ShadowGenerator(1024, this.light);
+		// this.shadow = new ShadowGenerator(1024, this.light);
 
-		this.shadow.transparencyShadow = true;
+		// this.shadow.transparencyShadow = true;
+		//
 		// this.shadow.enableSoftTransparentShadow = true;
 		// this.shadow.useBlurExponentialShadowMap = true;
 		// this.shadow.blurKernel = 2;
 
-		this.shadow.setDarkness(0.);
-		this.shadow.bias = 0.0003;
+		// this.shadow.setDarkness(0.);
+		// this.shadow.bias = 0.0003;
 
 		// this.shadow.useAlphaTest = true;
 		// this.shadow.usePoissonSampling = true;
@@ -94,9 +96,9 @@ export class Sun {
 		//this.shadow.addShadowCaster(this.shell);
 
 
-		this.shellMat.shadowDepthWrapper = new ShadowDepthWrapper(this.shellMat, this.scene, {
-			remappedVariables: ["worldPos", "p", "vNormalW", "normalW"]
-		});
+		// this.shellMat.shadowDepthWrapper = new ShadowDepthWrapper(this.shellMat, this.scene, {
+		// 	remappedVariables: ["worldPos", "p", "vNormalW", "normalW"]
+		// });
 
 		// const vls = new VolumetricLightScatteringPostProcess("vls",
 		// 	{ postProcessRatio: 1, passRatio: 0.5 },

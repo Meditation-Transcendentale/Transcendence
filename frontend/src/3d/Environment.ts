@@ -106,6 +106,12 @@ export class Environment {
 			mesh.receiveShadows = true;
 		})
 
+		this.scene.fogMode = Scene.FOGMODE_LINEAR;
+		this.scene.fogDensity = 0.2;
+		this.scene.fogStart = 100;
+		this.scene.fogEnd = 120;
+		this.scene.fogColor = new Color3(.4, .43, .45);
+		this.scene.clearColor = this.scene.fogColor.toColor4();
 
 		// const pp = new DefaultRenderingPipeline("default", true, this.scene, [this.scene.activeCamera as Camera]);
 		// pp.bloomEnabled = true;
@@ -121,7 +127,7 @@ export class Environment {
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		this.field.update(time);
+		this.field.update(time, this.deltaTime);
 		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;

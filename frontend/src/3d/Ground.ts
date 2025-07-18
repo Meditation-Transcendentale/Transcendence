@@ -31,8 +31,8 @@ export class Puddle {
 				subdivisions: subdivision,
 			}, scene);
 
-		this.mesh.position.z = -10;
-		this.mesh.position.y = -1;
+		this.mesh.position.z = -25;
+		this.mesh.position.y = 0;
 
 		this.origin = new Vector3();
 		this.originGrass = new Vector3();
@@ -71,7 +71,7 @@ export class Puddle {
 
 			this.origin.x = this.rayO.x - ray.x * delta;
 			this.origin.y = 0;
-			this.origin.z = this.rayO.z - ray.z * delta + 10;
+			this.origin.z = this.rayO.z - ray.z * delta + 30;
 
 			this.originGrass.x = this.rayO.x - ray.x * delta;
 			this.originGrass.y = this.rayO.z - ray.z * delta;
