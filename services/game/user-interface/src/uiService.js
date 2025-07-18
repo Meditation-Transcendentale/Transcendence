@@ -143,7 +143,6 @@ export default class UIService {
 	handlePaddleUpdate(ws, { paddleId, move }) {
 		// TODO maybe check if the paddle id is valid
 		const sess = this.sessions.get(ws.uuid);
-		console.log(paddleId, move, sess.mode);
 		const topic = `games.${sess.mode}.${sess.gameId}.match.input`;
 		natsClient.publish(topic, encodeMatchInput({ paddleId, move }));
 	}

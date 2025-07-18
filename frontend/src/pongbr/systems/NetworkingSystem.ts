@@ -64,9 +64,8 @@ export class NetworkingSystem extends System {
 				});
 
 				// 2. Paddle updates
-				console.log(paddles);
 				paddles.forEach(p => {
-					// if (p.id === localPaddleId) return;
+					//if (p.id === localPaddleId) return;
 
 					const e = entities.find(e =>
 						e.hasComponent(PaddleComponent) &&
@@ -75,16 +74,17 @@ export class NetworkingSystem extends System {
 					if (!e) return;
 
 					const paddleComp = e.getComponent(PaddleComponent)!;
-					console.log(p.offset, paddleComp.maxoffset);
+					//console.log(`Received server offset =${p.offset}`);
 					paddleComp.offset = p.offset; // update direction
 
-					const tf = e.getComponent(TransformComponent)!;
-					const rot = tf.rotation;
-					const right = Vector3.TransformCoordinates(
-						new Vector3(1, 0, 0),
-						Matrix.RotationYawPitchRoll(rot.y, rot.x, rot.z)
-					);
-					tf.position.copyFrom(tf.basePosition.add(right.scale(paddleComp.offset)));
+					const transform = e.getComponent(TransformComponent)!;
+					transform.rotation.y = paddleComp.baseRotation + p.offset;
+					//const rot = tf.rotation;
+					//const right = Vector3.TransformCoordinates(
+					//	new Vector3(0, 0, 0),
+					//	Matrix.RotationYawPitchRoll(rot.y, rot.x, rot.z)
+					//);
+					//tf.position.copyFrom(tf.basePosition.add(right.scale(paddleComp.offset)));
 				});
 
 				// 3. Score update

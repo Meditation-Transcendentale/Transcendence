@@ -167,7 +167,6 @@ export class GameManager {
 			match.inputs[targetTick] = [];
 		}
 
-		console.log(`GameId: ${gameId}, paddleId: ${paddleId}, ${move}`);
 		match.inputs[targetTick].push({
 			id: paddleId,
 			move,

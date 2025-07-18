@@ -248,6 +248,7 @@ export class PhysicsEngine {
 		this.paddleOffsets = [];
 		this.paddleMaxOffsets = [];
 		this.paddleCenterAngles = [];
+		this.paddleInputStates = new Array(numPlayers).fill(0);
 
 		// Grid for ball-ball collisions
 		const gridCellSize = cfg.BALL_RADIUS * 4;
@@ -312,8 +313,8 @@ export class PhysicsEngine {
 			pd.halfH[pillarEnt] = pillarSize / 2;  // Half height
 			pd.radius[pillarEnt] = pillarSize / 2; // Keep radius for visualization/debug
 
-			console.log(`Paddle ${pid}: angle=${(paddleAngle * 180 / Math.PI).toFixed(1)}° pos=(${pd.posX[paddleEnt].toFixed(1)}, ${pd.posY[paddleEnt].toFixed(1)})`);
-			console.log(`Pillar ${pid}: angle=${(pillarAngle * 180 / Math.PI).toFixed(1)}° pos=(${pd.posX[pillarEnt].toFixed(1)}, ${pd.posY[pillarEnt].toFixed(1)}) size=${pillarSize.toFixed(1)}`);
+			//console.log(`Paddle ${pid}: angle=${(paddleAngle * 180 / Math.PI).toFixed(1)}° pos=(${pd.posX[paddleEnt].toFixed(1)}, ${pd.posY[paddleEnt].toFixed(1)}), maxoffset=${maxOffsets * 180 / Math.PI}`);
+			//console.log(`Pillar ${pid}: angle=${(pillarAngle * 180 / Math.PI).toFixed(1)}° pos=(${pd.posX[pillarEnt].toFixed(1)}, ${pd.posY[pillarEnt].toFixed(1)}) size=${pillarSize.toFixed(1)}`);
 		}
 
 		// Initialize balls (unchanged)
@@ -367,7 +368,7 @@ export class PhysicsEngine {
 
 				for (let paddleIndex = 0; paddleIndex < numPlayers; paddleIndex++) {
 					// NOW this.paddleCenterAngles works because it's inside the class
-					const currentPaddleAngle = this.paddleCenterAngles[paddleIndex] + this.paddleOffsets[paddleIndex];
+					const currentPaddleAngle = this.paddleCenterAngles[paddleIndex] - this.paddleOffsets[paddleIndex];
 					const arcWidth = angleStep * cfg.PADDLE_FILL;
 					const startAngle = currentPaddleAngle - arcWidth / 2;
 					const endAngle = currentPaddleAngle + arcWidth / 2;
@@ -408,44 +409,99 @@ export class PhysicsEngine {
 		}
 	}
 
-	updatePaddleInput(pid, moveInput) {
-		if (pid >= this.paddleEnts.length) return;
+	updatePaddleInputState(pid, moveInput) {
+		if (pid >= this.paddleInputStates.length) return;
 
-		const paddleEnt = this.paddleEnts[pid];
-		if (paddleEnt == null) return;
-
-		const cfg = this.cfg;
-		const dt = this.dt * this.cfg.SUB_STEPS; // Full frame time step
-
-		// Movement speed (adjust as needed)
-		const moveSpeed = 2.0; // radians per second
-		const deltaOffset = moveInput * moveSpeed * dt;
-
-		// Update offset with constraints
-		const newOffset = this.paddleOffsets[pid] + deltaOffset;
-		const maxOffset = this.paddleMaxOffsets[pid];
-
-		// Clamp offset to valid range
-		this.paddleOffsets[pid] = Math.max(-maxOffset, Math.min(maxOffset, newOffset));
-		console.log(`deltaOffset = ${deltaOffset}, newOffset = ${newOffset}, maxOffset = ${maxOffset}`);
-
-		// Calculate new paddle position
-		const centerAngle = this.paddleCenterAngles[pid];
-		const currentAngle = centerAngle + this.paddleOffsets[pid];
-
-		// Update paddle physics data
-		const pd = this.pd;
-		pd.posX[paddleEnt] = Math.cos(currentAngle) * cfg.ARENA_RADIUS;
-		pd.posY[paddleEnt] = Math.sin(currentAngle) * cfg.ARENA_RADIUS;
-		pd.rot[paddleEnt] = currentAngle - Math.PI / 2; // Face inward
-
-		// Set velocity for smooth movement (optional, for visual smoothness)
-		pd.velX[paddleEnt] = 0; // Paddles move instantly to new position
-		pd.velY[paddleEnt] = 0;
-
-		// Debug output
-		console.log(`Paddle ${pid}: offset=${(this.paddleOffsets[pid] * 180 / Math.PI).toFixed(1)}° angle=${(currentAngle * 180 / Math.PI).toFixed(1)}°`);
+		// Store the current input state
+		this.paddleInputStates[pid] = moveInput;
+		//console.log(`Player ${pid} input state updated to: ${moveInput}`);
 	}
+
+	// MODIFIED: Apply movement based on current input states (called every frame)
+	updatePaddleMovement() {
+		const cfg = this.cfg;
+		const dt = 0.01667; // Full frame time step
+		const moveSpeed = 100 / 4; // radians per second
+
+		for (let pid = 0; pid < this.paddleEnts.length; pid++) {
+			const paddleEnt = this.paddleEnts[pid];
+			if (paddleEnt == null) continue;
+
+			// Get current input state for this paddle
+			const moveInput = this.paddleInputStates[pid] || 0;
+
+			// Skip if no input
+			if (moveInput === 0) continue;
+
+			const deltaOffset = moveInput * 1.2 / moveSpeed * dt;
+
+			// Update offset with constraints
+			const newOffset = this.paddleOffsets[pid] + deltaOffset;
+			const maxOffset = this.paddleMaxOffsets[pid];
+
+			// Clamp offset to valid range
+			this.paddleOffsets[pid] = Math.max(-maxOffset, Math.min(maxOffset, newOffset));
+
+			// Calculate new paddle position
+			const centerAngle = this.paddleCenterAngles[pid];
+			const currentAngle = centerAngle + this.paddleOffsets[pid];
+
+			// Update paddle physics data
+			const pd = this.pd;
+			pd.posX[paddleEnt] = Math.cos(currentAngle) * cfg.ARENA_RADIUS;
+			pd.posY[paddleEnt] = Math.sin(currentAngle) * cfg.ARENA_RADIUS;
+			pd.rot[paddleEnt] = currentAngle - Math.PI / 2; // Face inward
+
+			// Set velocity for smooth movement (optional, for visual smoothness)
+			pd.velX[paddleEnt] = 0; // Paddles move instantly to new position
+			pd.velY[paddleEnt] = 0;
+
+			// Debug output (only when moving)
+			//if (moveInput !== 0) {
+			//	console.log(`Paddle ${pid}: input=${moveInput} offset=${(this.paddleOffsets[pid] * 180 / Math.PI).toFixed(1)}° angle=${(currentAngle * 180 / Math.PI).toFixed(1)}°`);
+		}
+	}
+
+
+
+	//updatePaddleInput(pid, moveInput) {
+	//	if (pid >= this.paddleEnts.length) return;
+	//
+	//	const paddleEnt = this.paddleEnts[pid];
+	//	if (paddleEnt == null) return;
+	//
+	//	const cfg = this.cfg;
+	//	const dt = this.dt * this.cfg.SUB_STEPS; // Full frame time step
+	//
+	//	// Movement speed (adjust as needed)
+	//	const moveSpeed = this.cfg.MAX_PLAYERS / 4; // radians per second
+	//	const deltaOffset = moveInput * 1.2 / moveSpeed * dt;
+	//
+	//	// Update offset with constraints
+	//	const newOffset = this.paddleOffsets[pid] + deltaOffset;
+	//	const maxOffset = this.paddleMaxOffsets[pid];
+	//
+	//	// Clamp offset to valid range
+	//	this.paddleOffsets[pid] = Math.max(-maxOffset, Math.min(maxOffset, newOffset));
+	//	//console.log(`deltaOffset = ${deltaOffset}, newOffset = ${newOffset}, maxOffset = ${maxOffset}`);
+	//
+	//	// Calculate new paddle position
+	//	const centerAngle = this.paddleCenterAngles[pid];
+	//	const currentAngle = centerAngle + this.paddleOffsets[pid];
+	//
+	//	// Update paddle physics data
+	//	const pd = this.pd;
+	//	pd.posX[paddleEnt] = Math.cos(currentAngle) * cfg.ARENA_RADIUS;
+	//	pd.posY[paddleEnt] = Math.sin(currentAngle) * cfg.ARENA_RADIUS;
+	//	pd.rot[paddleEnt] = currentAngle - Math.PI / 2; // Face inward
+	//
+	//	// Set velocity for smooth movement (optional, for visual smoothness)
+	//	pd.velX[paddleEnt] = 0; // Paddles move instantly to new position
+	//	pd.velY[paddleEnt] = 0;
+	//
+	//	// Debug output
+	//	//console.log(`Paddle ${pid}: offset=${(this.paddleOffsets[pid] * 180 / Math.PI).toFixed(1)}° angle=${(currentAngle * 180 / Math.PI).toFixed(1)}°`);
+	//}
 
 	step() {
 		const pd = this.pd;
@@ -456,6 +512,7 @@ export class PhysicsEngine {
 			pd.velY[ent] = 0;
 		});
 
+		this.updatePaddleMovement();
 		// Sub-steps for numerical stability
 		const subDt = this.dt;
 

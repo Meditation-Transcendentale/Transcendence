@@ -114,7 +114,7 @@ export function buildPaddles(
 		const scene = pongRoot.getScene();
 
 		// Debug: Log the values to compare with physics
-		// console.log(`Paddle ${i}: angle=${(paddleAngle * 180 / Math.PI).toFixed(1)}° pos=(${paddleX.toFixed(1)}, ${paddleZ.toFixed(1)}) rot=${(paddleRotY * 180 / Math.PI).toFixed(1)}°`);
+		console.log(`Paddle ${i}: angle=${(paddleAngle * 180 / Math.PI).toFixed(1)}° pos=(${paddleX.toFixed(1)}, ${paddleZ.toFixed(1)}) rot=${(paddleRotY * 180 / Math.PI).toFixed(1)}°, maxoffset=${maxOffset * 180 / Math.PI}`);
 
 		// Optional: Debug line to visualize paddle direction
 		// const debugLine = MeshBuilder.CreateLines("line", {
@@ -130,7 +130,10 @@ export function buildPaddles(
 		paddle.addComponent(
 			new PaddleComponent(i, Vector3.Zero(), 0, maxOffset, paddleRotY, playerCount / 4)
 		);
-		paddle.addComponent(new InputComponent(true));
+		if (i == 0)
+			paddle.addComponent(new InputComponent(true));
+		else
+			paddle.addComponent(new InputComponent(false));
 		paddle.addComponent(
 			new TransformComponent(
 				new Vector3(0, 0, 0),  // Position at arena boundary
