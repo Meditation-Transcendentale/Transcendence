@@ -1,4 +1,4 @@
-import { Mesh, Matrix, Vector3, Quaternion, Camera} from "@babylonjs/core";
+import { Camera, Vector3, Mesh, Matrix, Quaternion } from "@babylonImport";
 import { Entity } from "../ecs/Entity.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
@@ -22,8 +22,8 @@ export class ThinInstanceManager {
 		this.updateThreshold = updateThreshold;
 		this.cullThreshold = cullThreshold;
 		this.instanceColors = new Float32Array(capacity * 4);
-		for(let i = 0; i < capacity; i++) {
-			if (i === 0 || i === 1){
+		for (let i = 0; i < capacity; i++) {
+			if (i === 0 || i === 1) {
 				this.instanceColors[i * 4 + 0] = 1; // rouge
 				this.instanceColors[i * 4 + 1] = 1;
 				this.instanceColors[i * 4 + 2] = 1;

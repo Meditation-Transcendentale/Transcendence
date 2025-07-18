@@ -1,4 +1,4 @@
-import { ParticleSystem, Vector3, Texture, Scene, Color4 } from "@babylonjs/core";
+import { Vector3, ParticleSystem, Texture, Scene, Color4 } from "@babylonImport";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
@@ -20,8 +20,6 @@ export class VisualEffectSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
-		const now = performance.now();
-		// console.log("vfx: ", now);
 
 		for (const entity of entities) {
 			if (

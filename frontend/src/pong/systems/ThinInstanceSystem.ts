@@ -1,4 +1,4 @@
-import { Camera } from "@babylonjs/core";
+import { Camera } from "@babylonImport";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { ThinInstanceManager } from "../rendering/ThinInstanceManager.js";

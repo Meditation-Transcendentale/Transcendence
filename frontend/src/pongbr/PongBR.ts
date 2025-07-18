@@ -90,7 +90,7 @@ export class PongBR {
 				}
 			}
 		});
-		this.pongRoot = new TransformNode("pongRoot", this.scene);
+		this.pongRoot = new TransformNode("pongbrRoot", this.scene);
 		this.pongRoot.position.set(-2200, -3500, -3500);
 		const light = new PointLight('lightBr', new Vector3(-300, 25, 0), this.scene)
 		light.parent = this.pongRoot;
@@ -119,8 +119,6 @@ export class PongBR {
 
 
 		this.uuid = getOrCreateUUID();
-		// const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		// this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
 		// localPaddleId = await this.waitForRegistration();
@@ -129,6 +127,7 @@ export class PongBR {
 
 		this.stateManager = new StateManager(this.ecs);
 		this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
+		this.inited = true;
 
 
 	}

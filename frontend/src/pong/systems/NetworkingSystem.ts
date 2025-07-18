@@ -1,7 +1,5 @@
-import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Vector2 } from "@babylonjs/core";
-import { Matrix } from "@babylonjs/core/Maths/math";
 
+import { Vector3, Matrix } from "@babylonImport";
 // src/systems/NetworkingSystem.ts
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";

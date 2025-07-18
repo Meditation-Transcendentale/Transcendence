@@ -1,6 +1,4 @@
-import { Scalar } from "@babylonjs/core/Maths/math.scalar";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Vector3, Scalar, Matrix } from "@babylonImport";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { InputComponent } from "../components/InputComponent.js";
@@ -50,8 +48,8 @@ export class InputSystem extends System {
 			let offsetChange = 0;
 			let upKeys = [];
 			let downKeys = [];
-			if (input.gameMode === "online" || input.gameMode === "ia"){
-				if (paddle.id == 0){
+			if (input.gameMode === "online" || input.gameMode === "ia") {
+				if (paddle.id == 0) {
 					upKeys = ["KeyW", "ArrowUp"];
 					downKeys = ["KeyS", "ArrowDown"];
 				} else {
@@ -59,23 +57,23 @@ export class InputSystem extends System {
 					upKeys = ["KeyS", "ArrowDown"];
 				}
 			} else {
-				if (paddle.id == 0){
+				if (paddle.id == 0) {
 					upKeys = ["KeyW"];
 					downKeys = ["KeyS"];
-				} else if (paddle.id == 1){
+				} else if (paddle.id == 1) {
 					upKeys = ["ArrowDown"];
 					downKeys = ["ArrowUp"];
 				}
 			}
-			
+
 			let UpPressed = upKeys.some(key => this.inputManager.isKeyPressed(key));
 			let DownPressed = downKeys.some(key => this.inputManager.isKeyPressed(key));
 
 			paddle.move = 0;
-			if (UpPressed && !DownPressed){
+			if (UpPressed && !DownPressed) {
 				paddle.move = 1;
 			}
-			else if (DownPressed && !UpPressed){
+			else if (DownPressed && !UpPressed) {
 				paddle.move = -1;
 			}
 

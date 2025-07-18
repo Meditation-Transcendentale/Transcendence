@@ -1,27 +1,11 @@
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { StandardMaterial, MeshBuilder, Scene, Vector3, TransformNode, Mesh } from "@babylonImport";
 import { GameTemplateConfig } from "../templates/GameTemplate";
 import { ThinInstanceManager } from "../rendering/ThinInstanceManager.js";
-import { ShaderMaterial } from "@babylonjs/core";
-import { Effect } from "@babylonjs/core/Materials/effect";
 
-export function createCamera(scene: Scene, canvas: any, localPaddleId: number, gameMode: string): ArcRotateCamera {
-	const camera = new ArcRotateCamera("camera", Math.PI / 2, 0., 60, Vector3.Zero(), scene);
-	if (localPaddleId >= 2 && gameMode === "online")
-		camera.attachControl(canvas, true);
-	new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-
-	return camera;
-}
-
-function createWallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+function createWallMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: config.wallWidth, height: 1, depth: 20 }, scene);
 	const wallMaterial = new StandardMaterial("wallMaterial", scene);
+	wallMesh.parent = pongRoot;
 	wallMaterial.diffuseColor.set(0, 0, 0);
 	wallMaterial.emissiveColor.set(1, 1, 1);
 	wallMesh.material = wallMaterial;
@@ -31,9 +15,10 @@ function createWallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
 	return wallMesh;
 }
 
-function createArenaMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+function createArenaMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const arenaMesh = MeshBuilder.CreateBox("arenaBox", { width: config.arenaSizeX, height: config.arenaSizeZ, depth: 1 }, scene);
 	const material = new StandardMaterial("arenaMaterial", scene);
+	arenaMesh.parent = pongRoot;
 	material.diffuseColor.set(0, 0, 0);
 	material.specularColor.set(0, 0, 0);
 	material.emissiveColor.set(0.2, 0.2, 0.2980392156862745);
@@ -44,9 +29,10 @@ function createArenaMesh(scene: Scene, config: GameTemplateConfig): Mesh {
 	return arenaMesh;
 }
 
-function createBallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+function createBallMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 1 }, scene);
 	const ballMaterial = new StandardMaterial("ballMaterial", scene);
+	ballMesh.parent = pongRoot;
 	ballMaterial.diffuseColor.set(1, 1, 1);
 	ballMaterial.emissiveColor.set(1, 1, 1);
 	ballMesh.setEnabled(true);
@@ -56,9 +42,10 @@ function createBallMesh(scene: Scene, config: GameTemplateConfig): Mesh {
 	return ballMesh;
 }
 
-function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh {
+function createPaddleMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
 	const paddleMesh = MeshBuilder.CreateBox("paddleBase", { width: 3, height: 0.4, depth: 0.4 }, scene);
 	const paddleMaterial = new StandardMaterial("paddleMaterial", scene);
+	paddleMesh.parent = pongRoot;
 	paddleMaterial.diffuseColor.set(0, 0, 0);
 	paddleMaterial.emissiveColor.set(1, 1, 1);
 	paddleMesh.material = paddleMaterial;
@@ -68,12 +55,12 @@ function createPaddleMesh(scene: Scene, config: GameTemplateConfig): Mesh {
 	return paddleMesh;
 }
 
-export function createBaseMeshes(scene: Scene, config: GameTemplateConfig) {
+export function createBaseMeshes(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode) {
 	return {
-		arena: createArenaMesh(scene, config),
-		ball: createBallMesh(scene, config),
-		paddle: createPaddleMesh(scene, config),
-		wall: createWallMesh(scene, config)
+		arena: createArenaMesh(scene, config, pongRoot),
+		ball: createBallMesh(scene, config, pongRoot),
+		paddle: createPaddleMesh(scene, config, pongRoot),
+		wall: createWallMesh(scene, config, pongRoot)
 	}
 }
 

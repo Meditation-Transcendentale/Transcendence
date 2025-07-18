@@ -1,9 +1,4 @@
-import { Vector2 } from "@babylonjs/core/Maths/math";
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { Button } from "@babylonjs/gui/2D/controls/button";
-import { Control } from "@babylonjs/gui/2D/controls/control";
+import { Vector2, AdvancedDynamicTexture, TextBlock, Rectangle, Button, Control } from "@babylonImport";
 
 import { Pong } from "../Pong"
 import { System } from "../ecs/System.js";
@@ -109,7 +104,7 @@ export class UISystem extends System {
 		quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
 		quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
 		quitButton.top = "-20px";
-		
+
 		quitButton.onPointerUpObservable.add(() => {
 			advancedTexture.dispose();
 			this.endUI.dispose();
