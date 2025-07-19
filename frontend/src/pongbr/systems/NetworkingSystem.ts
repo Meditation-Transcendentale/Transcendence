@@ -1,18 +1,12 @@
-import { Matrix, Vector3 } from "@babylonImport";
 // src/systems/NetworkingSystem.ts
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
-import { InputComponent } from "../components/InputComponent.js";
 import { BallComponent } from "../components/BallComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
-import { gameEndUI } from "../utils/displayGameInfo.js";
-import { global } from "../PongBR";
 import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
-import { UIComponent } from "../components/UIComponent.js";
-import { localPaddleId } from "../PongBR";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -50,7 +44,6 @@ export class NetworkingSystem extends System {
 
 				const balls = state.balls ?? [];
 				const paddles = state.paddles ?? [];
-				const score = state.score ?? [];
 				// 1. Ball updates
 				balls.forEach(b => {
 					const e = entities.find(e =>
@@ -74,38 +67,20 @@ export class NetworkingSystem extends System {
 					if (!e) return;
 
 					const paddleComp = e.getComponent(PaddleComponent)!;
-					//console.log(`Received server offset =${p.offset}`);
-					paddleComp.offset = p.offset; // update direction
+					paddleComp.offset = p.offset as number; // update direction
 
 					const transform = e.getComponent(TransformComponent)!;
 					transform.rotation.y = paddleComp.baseRotation + p.offset;
-					//const rot = tf.rotation;
-					//const right = Vector3.TransformCoordinates(
-					//	new Vector3(0, 0, 0),
-					//	Matrix.RotationYawPitchRoll(rot.y, rot.x, rot.z)
-					//);
-					//tf.position.copyFrom(tf.basePosition.add(right.scale(paddleComp.offset)));
 				});
-
-				// 3. Score update
-				if (score) {
-					//console.log(score);
-					const myScore = score[localPaddleId] ?? 0;
-					const otherId = score
-						.map((_, i) => i)
-						.find(i => i !== localPaddleId)!;
-					const theirScore = score[otherId] ?? 0;
-					//this.scoreUI.update(myScore, theirScore);
-				}
 			}
 
 			// === Game End ===
 			if (serverMsg.end) {
 				console.log("Received GameEndMessage");
-				const scores = serverMsg.end.score as number[];
-				const myScore = scores[localPaddleId] ?? 0;
-				const other = scores.find((_, i) => i !== localPaddleId) ?? 0;
-				global.endUI = gameEndUI(myScore < other);
+				// const scores = serverMsg.end.score as number[];
+				// const myScore = scores[localPaddleId] ?? 0;
+				// const other = scores.find((_, i) => i !== localPaddleId) ?? 0;
+				// global.endUI = gameEndUI(myScore < other);
 			}
 		});
 	}
