@@ -90,7 +90,7 @@ export class Environment {
 		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		this.camera_br.attachControl(this.canvas, true);
 		this.camera_pong = new ArcRotateCamera('pong', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
-		this.scene.debugLayer.show();
+		// this.scene.debugLayer.show();
 
 		await this.gears.load();
 
