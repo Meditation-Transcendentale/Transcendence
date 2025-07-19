@@ -66,7 +66,7 @@ export class Pong {
 		};
 
 		this.pongRoot = new TransformNode("pongRoot", this.scene);
-		this.pongRoot.position.set(-2200, -3500, -3500);
+		this.pongRoot.position.set(2000, -3500, -3500);
 		this.cam = this.scene.getCameraByName('pong') as ArcRotateCamera;
 		this.cam.parent = this.pongRoot;
 		this.cam.minZ = 0.2;
@@ -74,11 +74,11 @@ export class Pong {
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
 		this.uuid = getOrCreateUUID();
 
-		const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		this.wsManager = new WebSocketManager(wsUrl);
+		// const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		// this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
-		localPaddleId = await this.waitForRegistration();
+		// localPaddleId = await this.waitForRegistration();
 		//this.camera = createCamera(this.scene, this.canvas, localPaddleId, this.gameMode);
 		this.initECS(config, this.instanceManagers, this.uuid);
 		this.stateManager = new StateManager(this.ecs);
@@ -97,11 +97,12 @@ export class Pong {
 		}
 		console.log("UU", uuid)
 		const wsUrl = `ws://${window.location.hostname}:5004?` +
-			`uuid=${uuid.toString()}&` +
+			`uuid=${encodeURIComponent(uuid)}&` +
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 
-		localPaddleId = 0;
+		// localPaddleId = 0;
+		localPaddleId = await this.waitForRegistration();
 
 		// 4) Plug networking into ECS
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
@@ -148,7 +149,7 @@ export class Pong {
 
 	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
 		this.ecs = new ECSManager();
-		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
+		// this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
 		this.ecs.addSystem(new ThinInstanceSystem(
 			instanceManagers.ball,
 			instanceManagers.paddle,
@@ -161,7 +162,7 @@ export class Pong {
 		this.uiSystem = new UISystem(this);
 		this.scoreUI = this.uiSystem.scoreUI;
 		this.ecs.addSystem(this.uiSystem);
-		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid));
+		// this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid));
 
 		createGameTemplate(this.ecs, config, localPaddleId, this.gameMode);
 	}
