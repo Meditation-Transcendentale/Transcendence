@@ -234,13 +234,13 @@ void main() {
 
 
 export function createWallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
-	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: 1, height: 1, depth: 2 }, scene);
+	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: 1, height: 1, depth: 1 }, scene);
 	wallMesh.parent = pongRoot;
 	const wallMaterial = new StandardMaterial("wallMaterial", scene);
-	wallMaterial.diffuseColor.set(0, 0, 0);
+	wallMaterial.diffuseColor.set(1, 0, 0);
 	wallMaterial.emissiveColor.set(1, 0, 1);
 	wallMesh.material = wallMaterial;
-	wallMesh.setEnabled(false);
+	//wallMesh.setEnabled(true);
 	wallMesh.setPivotPoint(Vector3.Zero());
 
 	return wallMesh;

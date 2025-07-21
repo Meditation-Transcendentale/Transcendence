@@ -18,7 +18,7 @@ import { ECSManager } from "../ecs/ECSManager";
 // ─── In-File Default Configuration ─────────────────────────────────────
 const DEFAULT_CONFIG = {
 	arenaRadius: 200,    // circle radius
-	wallWidth: 10,       // thickness of walls and death walls
+	wallWidth: 1,       // thickness of walls and death walls
 	paddleWidth: 1,       // thickness of walls and death walls
 	paddleHeight: 1,    // vertical size of paddles and goals
 	paddleDepth: 1,   // radial thickness of paddle
@@ -111,8 +111,10 @@ export function buildPaddles(
 
 		const deathWall = new Entity();
 		deathWall.addComponent(new WallComponent(i, goalPos));
-		deathWall.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleRotY, 0), new Vector3(paddleWidth, 1, goalSize.z), pongRoot));
-		deathWall.addComponent(new DisabledComponent());
+		deathWall.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleRotY, 0), new Vector3(goalSize.z, 1, 2 * Math.PI * 200 / 100), pongRoot));
+		const transform = deathWall.getComponent(TransformComponent);
+		transform?.disable();
+		//deathWall.addComponent(new DisabledComponent());
 		ecs.addEntity(deathWall);
 
 		// ---- Pillars ----
@@ -201,7 +203,7 @@ export function createGameTemplate(ecs: ECSManager, playerCount: number, pongRoo
 	const config = DEFAULT_CONFIG;
 	buildScoreUI(ecs);
 	const bundles = buildPaddles(ecs, playerCount, pongRoot);
-	buildWalls(ecs, config, pongRoot);
+	//buildWalls(ecs, config, pongRoot);
 	buildBall(ecs, pongRoot);
 	buildPortal(ecs, pongRoot);
 	return bundles;

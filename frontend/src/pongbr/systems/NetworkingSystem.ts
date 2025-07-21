@@ -7,6 +7,7 @@ import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
 import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
+import { WallComponent } from "../components/WallComponent.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -64,13 +65,29 @@ export class NetworkingSystem extends System {
 						e.hasComponent(PaddleComponent) &&
 						e.getComponent(PaddleComponent)!.id === p.id
 					);
+					const w = entities.find(e =>
+						e.hasComponent(WallComponent) &&
+						e.getComponent(WallComponent)!.id === p.id
+					);
+
 					if (!e) return;
+					if (p.dead) {
+						if (!w)
+							return;
+						const paddle = e.getComponent(TransformComponent);
+						const wall = w.getComponent(TransformComponent);
+						paddle?.disable();
+						wall?.enable();
 
-					const paddleComp = e.getComponent(PaddleComponent)!;
-					paddleComp.offset = p.offset as number; // update direction
+					}
+					else {
 
-					const transform = e.getComponent(TransformComponent)!;
-					transform.rotation.y = paddleComp.baseRotation + p.offset;
+						const paddleComp = e.getComponent(PaddleComponent)!;
+						paddleComp.offset = p.offset as number; // update direction
+
+						const transform = e.getComponent(TransformComponent)!;
+						transform.rotation.y = paddleComp.baseRotation + p.offset;
+					}
 				});
 			}
 

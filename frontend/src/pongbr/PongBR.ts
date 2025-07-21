@@ -124,6 +124,7 @@ export class PongBR {
 
 	}
 	public stop(): void {
+
 		this.camera.detachControl();
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
@@ -135,7 +136,7 @@ export class PongBR {
 		return {
 			ball: new ThinInstanceManager(baseMeshes.ball, 200, 50, 100),
 			paddle: new ThinInstanceManager(baseMeshes.paddle, 100, 50, 100),
-			wall: new ThinInstanceManager(baseMeshes.wall, 6, 50, 100),
+			wall: new ThinInstanceManager(baseMeshes.wall, 100, 50, 100),
 			portal: new ThinInstanceManager(baseMeshes.portal, 4, 50, 100),
 			pillar: new ThinInstanceManager(baseMeshes.pillar, /* capacity */ 200, 50, 100),
 			goal: new ThinInstanceManager(baseMeshes.goal,   /* capacity */ 100, 50, 100),
