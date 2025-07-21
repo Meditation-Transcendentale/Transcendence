@@ -7,6 +7,7 @@ import { WallComponent } from "../components/WallComponent.js";
 import { PortalComponent } from "../components/PortalComponent.js";
 import { GoalComponent } from "../components/GoalComponent.js";
 import { PillarComponent } from "../components/PillarComponent.js";
+import { TransformComponent } from "../components/TransformComponent.js";
 import { Camera } from "@babylonImport";
 
 export class ThinInstanceSystem extends System {
@@ -39,20 +40,33 @@ export class ThinInstanceSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
-		// console.log("Thin instance system:", performance.now());
 		this.frameCount++;
 		this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
-
-		// const paddleEntities = entities.filter(e => e.hasComponent(PaddleComponent));
-		// const activePaddleEntities = paddleEntities.filter(e => {
-		// 	const paddle = e.getComponent(PaddleComponent);
-		// 	return paddle;
-		// });
-
 		this.paddleManager.update(entities, PaddleComponent, this.camera, this.frameCount);
 		this.wallManager.update(entities, WallComponent, this.camera, this.frameCount);
 		this.portalManager.update(entities, PortalComponent, this.camera, this.frameCount);
 		this.goalManager.update(entities, GoalComponent, this.camera, this.frameCount);
 		this.pillarManager.update(entities, PillarComponent, this.camera, this.frameCount);
+	}
+
+	reset(entities: Entity[]): void {
+		const paddleEntities = entities.filter(e => e.hasComponent(PaddleComponent));
+		paddleEntities.forEach(entity => {
+			const transform = entity.getComponent(TransformComponent);
+			if (transform) {
+				transform.enable();
+				transform.position = transform.basePosition.clone();
+			}
+		});
+
+		const wallEntities = entities.filter(e => e.hasComponent(WallComponent));
+		wallEntities.forEach(entity => {
+			const transform = entity.getComponent(TransformComponent);
+			if (transform) {
+				transform.disable();
+			}
+		});
+
+		this.frameCount = 0;
 	}
 }

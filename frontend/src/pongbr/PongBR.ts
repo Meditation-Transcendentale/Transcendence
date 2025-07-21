@@ -33,6 +33,7 @@ export class PongBR {
 	private inited: boolean;
 	private networkingSystem!: NetworkingSystem;
 	private inputSystem!: InputSystem;
+	private thinInstanceSystem!: ThinInstanceSystem;
 
 	constructor(canvas: any, scene: Scene) {
 		this.canvas = canvas;
@@ -96,6 +97,7 @@ export class PongBR {
 			this.wsManager.socket.close();
 			this.ecs.removeSystem(this.inputSystem);
 			this.ecs.removeSystem(this.networkingSystem);
+			this.thinInstanceSystem.reset(this.ecs.getAllEntities());
 		}
 		const wsUrl = `ws://${window.location.hostname}:5004?` +
 			`uuid=${uuid}&` +
@@ -147,7 +149,7 @@ export class PongBR {
 		this.ecs = new ECSManager();
 		this.ecs.addSystem(new MovementSystem());
 		this.ecs.addSystem(new AnimationSystem());
-		this.ecs.addSystem(new ThinInstanceSystem(
+		this.thinInstanceSystem = new ThinInstanceSystem(
 			instanceManagers.ball,
 			instanceManagers.paddle,
 			instanceManagers.wall,
@@ -155,7 +157,8 @@ export class PongBR {
 			instanceManagers.goal,
 			instanceManagers.pillar,
 			this.camera
-		));
+		);
+		this.ecs.addSystem(this.thinInstanceSystem);
 		// this.ecs.addSystem(new VisualEffectSystem(this.scene));
 		//this.ecs.addSystem(new UISystem());
 		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot);
