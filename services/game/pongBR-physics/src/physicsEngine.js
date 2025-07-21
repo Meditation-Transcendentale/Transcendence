@@ -425,14 +425,12 @@ export class PhysicsEngine {
 
 			pd.radius[ballEnt] = cfg.BALL_RADIUS;
 
-			// Random spawn position
 			const maxSpawnRadius = cfg.ARENA_RADIUS * 0.6;
 			const r0 = Math.sqrt(Math.random()) * maxSpawnRadius;
 			const t0 = Math.random() * 2 * Math.PI;
 			pd.posX[ballEnt] = r0 * Math.cos(t0);
 			pd.posY[ballEnt] = r0 * Math.sin(t0);
 
-			// Random initial velocity
 			const d = Math.random() * 2 * Math.PI;
 			pd.velX[ballEnt] = Math.cos(d) * cfg.INITIAL_SPEED;
 			pd.velY[ballEnt] = Math.sin(d) * cfg.INITIAL_SPEED;
@@ -471,7 +469,6 @@ export class PhysicsEngine {
 	}
 
 	findPlayerByAngle(ballAngle) {
-		// Normalize angle to [0, 2π)
 		let normalizedAngle = ballAngle;
 		while (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
 		while (normalizedAngle >= 2 * Math.PI) normalizedAngle -= 2 * Math.PI;
@@ -482,11 +479,9 @@ export class PhysicsEngine {
 		for (let pid = 0; pid < numPlayers; pid++) {
 			if (this.playerStates.eliminated.has(pid)) continue;
 
-			// Use existing paddle data instead of duplicating calculations
 			const centerAngle = this.paddleData.centerAngles[pid];
 			const sliceStart = (pid * angleStep);
 			const sliceEnd = ((pid + 1) * angleStep);
-			// Handle angle wrapping
 			let normalizedStart = sliceStart;
 			let normalizedEnd = sliceEnd;
 
