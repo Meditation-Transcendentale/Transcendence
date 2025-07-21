@@ -23,7 +23,7 @@ export class Butterfly {
 
 
 	private deltas!: Float32Array;
-	private n: number = 300;
+	private n: number = 100;
 
 	private speed = 0.8;
 
@@ -49,16 +49,16 @@ export class Butterfly {
 		this.glowMat = new ButterflyMaterial("butterfly", this.scene);
 
 		this.root = new TransformNode("butterflyRoot", this.scene);
-		this.root.position = new Vector3(0, 1, -30);
+		this.root.position = new Vector3(0, 1, -10);
 		this.root.scaling = new Vector3(2, 2, 2);
 
 		this.octree = new OctreeBlock(5, new Vector3(0, 1, 0), 11);
 		this.grid = new Grid2D({
-			width: 70,
-			depth: 70,
+			width: 20,
+			depth: 20,
 			height: 10,
 			minPerCell: 100,
-			cellSize: 6
+			cellSize: 1
 		})
 
 		this.positions = new Array();
@@ -84,7 +84,7 @@ export class Butterfly {
 		this.mesh.material = this.material
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
-		this.thinInstance(this.n, 25);
+		this.thinInstance(this.n, 9);
 		//this.octree.print();
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.setMaterialForRendering(this.mesh, this.glowMat);
@@ -130,8 +130,8 @@ export class Butterfly {
 				const ip = this.positions[ii];
 				const iv = this.velocities[ii];
 				let ff = 0;
-				flock.setAll(0.),
-					align.setAll(0.);
+				flock.setAll(0.);
+				align.setAll(0.);
 				repel.setAll(0.);
 				for (let j = 0; j < cell!.count; j++) {
 					const jj = cell.indexes[j];
@@ -154,8 +154,8 @@ export class Butterfly {
 
 				this.origin.subtractToRef(ip, cursor);
 				const cursorL = cursor.length();
-				cursor.scaleInPlace(cursorL < 3 ? 0.02 : 0.);
-				const cursorField = cursorL < 4 ? 0 : 1.;
+				cursor.scaleInPlace(cursorL < 1 ? 0.02 : 0.);
+				const cursorField = cursorL < 1.5 ? 0 : 1.;
 
 				flock.scaleInPlace(0.5 * speed * this.flock * cursorField);
 				// flock.subtractInPlace(onEdge == true ? ip.scale(speed)  : v0);
@@ -183,81 +183,35 @@ export class Butterfly {
 			cell.count = 0;
 			cell = this.grid.nextCell();
 		}
+		cell = this.grid.outCell;
+		for (let i = 0; i < cell!.count; i++) {
+			const ii = cell.indexes[i];
+			const ip = this.positions[ii];
+			const iv = this.velocities[ii];
+			flock.setAll(0.);
+			flock.subtractInPlace(ip);
+
+			flock.scaleInPlace(speed * 0.005);
+
+			iv.addInPlace(flock);
+			const l = iv.length();
+			if (l > speed * 2) {
+				iv.scaleInPlace(speed * 1.2 / l)
+			} else if (l < speed) {
+				iv.scaleInPlace(speed / l)
+			}
+			ip.addInPlace(iv);
+			ip.toArray(this.moves, ii * 3);
+			this.directions[ii * 2] = iv.x;
+			this.directions[ii * 2 + 1] = iv.z;
+		}
+		cell.indexes.fill(-1, 0, cell.count);
+		cell.count = 0;
+
 		this.mesh.thinInstanceBufferUpdated("move");
 		this.mesh.thinInstanceBufferUpdated("direction");
 
 		this.grid.addArray(this.positions);
-	}
-
-	private applyForcesOc() {
-		const v0 = Vector3.Zero();
-		for (let i = 0; i < this.n; i++) {
-
-			const entries = this.octree.leaf(i) as number[];
-			const repel = new Vector3();
-			const align = new Vector3();
-			const flock = new Vector3();
-
-			const bp = this.positions[i];
-			const bv = this.velocities[i];
-
-			let rr = 0;
-			let ff = 0;
-			for (let j = 0; j < entries.length; j++) {
-				let index = entries[j];
-				let bbp = this.positions[index];
-				let r = bp.subtract(bbp);
-				if (r.dot(bv) > 0.) {
-					flock.addInPlace(bbp);
-					align.addInPlace(this.velocities[index]);
-					ff += 1;
-					repel.addInPlace((r.length() < 0.05 + this.disperse ? r : v0));
-				}
-			}
-
-			// flock.x += this.origin.x;
-			// flock.z += this.origin.z;
-			// ff++;
-
-			if (ff > 0) {
-				flock.scaleInPlace(1 / ff);
-				align.scaleInPlace(1. / ff);
-				flock.subtractInPlace(bp);
-				align.subtractInPlace(bv);
-			}
-
-			const cursor = this.origin.subtract(bp);
-			const cursorL = cursor.length();
-			cursor.scaleInPlace(cursorL < 1 ? 0.002 : 0.);
-			const cursorField = cursorL < 1.5 ? 0 : 1.;
-
-			flock.scaleInPlace(this.speed * 0.01 * this.flock * cursorField);
-			align.scaleInPlace(0.1);
-			repel.scaleInPlace(0.5);
-
-			bv.addInPlace(align).addInPlace(flock).addInPlace(repel).addInPlace(cursor);
-			const l = bv.length();
-			if (l > this.speed * 2) {
-				bv.scaleInPlace(this.speed * 1.2 / l)
-			} else if (l < this.speed) [
-				bv.scaleInPlace(this.speed / l)
-			]
-			this.bound(bv, bp, this.speed);
-
-			bp.addInPlace(bv.scale(Math.min(1., this.flying[i])));
-			bp.toArray(this.moves, i * 3);
-			this.directions[i * 2] = bv.x;
-			this.directions[i * 2 + 1] = bv.z;
-			this.perching(bp, i);
-
-		}
-		this.mesh.thinInstanceBufferUpdated("move");
-		this.mesh.thinInstanceBufferUpdated("direction");
-		// for (let i = 0; i < this.n; i++) {
-		// 	this.velocities[i].copyFrom(this.newVelocities[i]);
-		// 	this.positions[i].copyFrom(this.newPositions[i]);
-		// }
-		this.octree.update();
 	}
 
 	private activeFlock() {
@@ -273,7 +227,7 @@ export class Butterfly {
 	}
 
 	private perching(bp: Vector3, index: number) {
-		if (bp.y < -0.4 && this.flying[index] > 100) {
+		if (bp.y < 0.1 && this.flying[index] > 100) {
 			this.flying[index] = 0;
 			setTimeout(() => { this.flying[index] = 0.1 }, (Math.random() * 0.5 + 0.5) * 1000);
 		} else {
@@ -283,9 +237,9 @@ export class Butterfly {
 	}
 
 	private bound(v: Vector3, p: Vector3, speed: number) {
-		v.x = (Math.abs(p.x) > 29 ? (speed * -Math.sign(p.x)) * 0.5 : v.x);
-		v.y = (Math.abs(p.y) > 0.5 ? (speed * -Math.sign(p.y)) * 0.5 : v.y);
-		v.z = (Math.abs(p.z) > 29 ? (speed * -Math.sign(p.z)) * 0.5 : v.z);
+		// v.x = (Math.abs(p.x) > 9 ? (speed * -Math.sign(p.x)) * 0.5 : v.x);
+		v.y = (p.y > 1. || p.y < 0 ? (speed * -Math.sign(p.y)) * 0.5 : v.y);
+		// v.z = (Math.abs(p.z) > 9 ? (speed * -Math.sign(p.z)) * 0.5 : v.z);
 
 	}
 
@@ -334,6 +288,252 @@ export class Butterfly {
 	}
 }
 
+
+
+
+
+interface Cell {
+	indexes: Int16Array, //after calculating new pos need to set index to -1 if leave the cell;
+	count: number
+}
+interface gridoptions {
+	width: number,
+	height?: number,
+	depth: number,
+	cellSize: number,
+	minPerCell: number
+}
+
+
+class Grid2D {
+	public cells: Array<Cell>; //May change to Array<int16Array>
+	public outCell: Cell;
+
+	public readonly width: number;
+	public readonly depth: number;
+	public readonly cellSize: number;
+	public readonly minPerCell: number;
+
+	private readonly width2: number;
+	private readonly depth2: number;
+
+	private readonly widthCount: number;
+	private readonly depthCount: number;
+	private readonly cellCount: number;
+
+	private usedCell: Set<number>;
+
+
+	public currentCell: number;
+
+
+	constructor(options: gridoptions) {
+		this.width = options.width;
+		this.depth = options.depth;
+		this.cellSize = options.cellSize;
+		this.minPerCell = options.minPerCell;
+
+		this.width2 = this.width * 0.5;
+		this.depth2 = this.depth * 0.5;
+
+		this.widthCount = Math.ceil(this.width / this.cellSize);
+		this.depthCount = Math.ceil(this.depth / this.cellSize);
+		this.cellCount = this.widthCount * Math.ceil(this.depth / this.cellSize);
+
+		this.cells = new Array<Cell>(this.cellCount)
+		console.log(this.cellCount);
+		for (let i = 0; i < this.cellCount; i++) {
+			this.cells[i] = {
+				indexes: new Int16Array(this.minPerCell),
+				count: 0
+			}
+			this.cells[i].indexes.fill(-1);
+		}
+		this.currentCell = 0;
+		this.usedCell = new Set<number>();
+
+		this.outCell = {
+			indexes: new Int16Array(this.minPerCell),
+			count: 0
+		};
+	}
+
+	public add(index: number, position: Vector3) {
+		const cell = this.getCellFromPosition(position);
+
+		cell.indexes[cell.count] = index;
+		cell.count++;
+	}
+
+	public addArray(positions: Vector3[]) {
+		console.log(positions.length);
+		for (let i = 0; i < positions.length; i++) {
+			this.add(i, positions[i]);
+		}
+	}
+
+	public nextCell(): Cell | null {
+		for (let i = this.currentCell; i < this.cells.length; i++) {
+			let cell = this.cells[i];
+			if (cell.count > 0) {
+				this.currentCell = i + 1;
+				return cell;
+			}
+		}
+		this.currentCell = 0;
+		return null;
+	}
+
+	private getCellFromPosition(position: Vector3): Cell {
+		let x = ((position.x + this.width2) / this.cellSize) << 0; //similar to Math.trunc() but with bitshift, work for number < MAX_INT
+		let z = ((position.z + this.depth2) / this.cellSize) << 0;
+
+		//console.log(position.x, position.y, position.z);
+
+		if (x >= this.widthCount || x < 0 || z >= this.depthCount || z < 0) { // WHEN freeze fucking break
+			// console.warn(position, x);
+			// alert("OUT OF BOUND")
+			// x = 0;
+			return this.outCell;
+		}
+
+		z *= this.widthCount;
+		x += z;
+		// if (!this.usedCell.has(x)) { //Maybe put it somewhere else;
+		// 	this.usedCell.add(x);
+		// }
+
+		return this.cells[x];
+	}
+
+	cellOnEdge(cellIndex: number): boolean {
+		const cx = cellIndex % this.widthCount;
+		const cz = (cellIndex / this.widthCount) << 0;
+		return (
+			cx == 0 || cx == this.widthCount - 1
+			|| cz == 0 || cz == this.depth - 1
+		)
+	}
+}
+
+
+// class Grid3D {
+// 	public cells: Array<Cell>; //May change to Array<int16Array>
+//
+// 	public readonly width: number;
+// 	public readonly depth: number;
+// 	public readonly height: number;
+// 	public readonly cellSize: number;
+// 	public readonly minPerCell: number;
+//
+// 	private readonly width2: number;
+// 	private readonly depth2: number;
+// 	private readonly height2: number;
+//
+// 	private readonly widthCount: number;
+// 	private readonly planeCount: number;
+// 	private readonly cellCount: number;
+//
+// 	private usedCell: Set<number>;
+//
+//
+// 	public currentCell: number;
+//
+//
+// 	constructor(options: gridoptions) {
+// 		this.width = options.width;
+// 		this.height = options.height!;
+// 		this.depth = options.depth;
+// 		this.cellSize = options.cellSize;
+// 		this.minPerCell = options.minPerCell;
+//
+// 		this.width2 = this.width * 0.5;
+// 		this.height2 = this.height * 0.5;
+// 		this.depth2 = this.depth * 0.5;
+//
+// 		this.widthCount = Math.ceil(this.width / this.cellSize);
+// 		this.planeCount = this.widthCount * Math.ceil(this.depth / this.cellSize);
+// 		this.cellCount = this.planeCount * Math.ceil(this.height / this.cellSize);
+//
+// 		this.cells = new Array<Cell>(this.cellCount)
+// 		console.log(this.cellCount);
+// 		for (let i = 0; i < this.cellCount; i++) {
+// 			this.cells[i] = {
+// 				indexes: new Int16Array(this.minPerCell),
+// 				count: 0
+// 			}
+// 			this.cells[i].indexes.fill(-1);
+// 		}
+// 		this.currentCell = 0;
+// 		this.usedCell = new Set<number>();
+// 	}
+//
+// 	public add(index: number, position: Vector3) {
+// 		const cell = this.getCellFromPosition(position);
+//
+// 		cell.indexes[cell.count] = index;
+// 		cell.count++;
+// 	}
+//
+// 	public addArray(positions: Vector3[]) {
+//
+//
+// 		for (let i = 0; i < positions.length; i++) {
+// 			this.add(i, positions[i]);
+// 		}
+// 	}
+//
+// 	public nextCell(): Cell | null {
+// 		// for (let i of this.usedCell) {
+// 		// 	let cell = this.cells[i];
+// 		// 	this.usedCell.delete(i);
+// 		// 	return cell;
+// 		// }
+// 		for (let i = this.currentCell; i < this.cells.length; i++) {
+// 			let cell = this.cells[i];
+// 			if (cell.count > 0) {
+// 				this.currentCell = i + 1;
+// 				return cell;
+// 			}
+// 		}
+// 		//
+// 		// this.usedCell.clear();
+// 		this.currentCell = 0;
+// 		return null;
+// 	}
+//
+// 	private getCellFromPosition(position: Vector3): Cell {
+// 		let x = ((position.x + this.width2) / this.cellSize) << 0; //similar to Math.trunc() but with bitshift, work for number < MAX_INT
+// 		let y = ((position.y + this.height2) / this.cellSize) << 0;
+// 		let z = ((position.z + this.depth2) / this.cellSize) << 0;
+//
+// 		//console.log(position.x, position.y, position.z);
+// 		z *= this.widthCount;
+// 		y *= this.planeCount;
+//
+// 		x += z + y;
+// 		if (x > this.cellCount) { // WHEN freeze fucking break
+// 			console.warn(position, x);
+// 			x = 0;
+// 		}
+//
+// 		// if (!this.usedCell.has(x)) { //Maybe put it somewhere else;
+// 		// 	this.usedCell.add(x);
+// 		// }
+//
+// 		return this.cells[x];
+// 	}
+//
+// 	cellOnEdge(cellIndex: number): boolean {
+// 		const cx = cellIndex % this.widthCount;
+// 		const cz = ((cellIndex % this.planeCount) / this.widthCount) << 0;
+// 		return (
+// 			cellIndex < this.planeCount * 3 || cellIndex > this.cellCount - this.planeCount
+// 			|| cx == 0 || cx == this.widthCount - 1
+// 			|| cz == 0 || cz == this.depth - 1
+// 		)
+// 	}
+// }
 
 class OctreeBlock {
 	public entries: Map<number, Vector3>;
@@ -547,244 +747,3 @@ class OctreeBlock {
 	}
 }
 
-
-
-interface Cell {
-	indexes: Int16Array, //after calculating new pos need to set index to -1 if leave the cell;
-	count: number
-}
-interface gridoptions {
-	width: number,
-	height?: number,
-	depth: number,
-	cellSize: number,
-	minPerCell: number
-}
-
-class Grid3D {
-	public cells: Array<Cell>; //May change to Array<int16Array>
-
-	public readonly width: number;
-	public readonly depth: number;
-	public readonly height: number;
-	public readonly cellSize: number;
-	public readonly minPerCell: number;
-
-	private readonly width2: number;
-	private readonly depth2: number;
-	private readonly height2: number;
-
-	private readonly widthCount: number;
-	private readonly planeCount: number;
-	private readonly cellCount: number;
-
-	private usedCell: Set<number>;
-
-
-	public currentCell: number;
-
-
-	constructor(options: gridoptions) {
-		this.width = options.width;
-		this.height = options.height!;
-		this.depth = options.depth;
-		this.cellSize = options.cellSize;
-		this.minPerCell = options.minPerCell;
-
-		this.width2 = this.width * 0.5;
-		this.height2 = this.height * 0.5;
-		this.depth2 = this.depth * 0.5;
-
-		this.widthCount = Math.ceil(this.width / this.cellSize);
-		this.planeCount = this.widthCount * Math.ceil(this.depth / this.cellSize);
-		this.cellCount = this.planeCount * Math.ceil(this.height / this.cellSize);
-
-		this.cells = new Array<Cell>(this.cellCount)
-		console.log(this.cellCount);
-		for (let i = 0; i < this.cellCount; i++) {
-			this.cells[i] = {
-				indexes: new Int16Array(this.minPerCell),
-				count: 0
-			}
-			this.cells[i].indexes.fill(-1);
-		}
-		this.currentCell = 0;
-		this.usedCell = new Set<number>();
-	}
-
-	public add(index: number, position: Vector3) {
-		const cell = this.getCellFromPosition(position);
-
-		cell.indexes[cell.count] = index;
-		cell.count++;
-	}
-
-	public addArray(positions: Vector3[]) {
-
-
-		for (let i = 0; i < positions.length; i++) {
-			this.add(i, positions[i]);
-		}
-	}
-
-	public nextCell(): Cell | null {
-		// for (let i of this.usedCell) {
-		// 	let cell = this.cells[i];
-		// 	this.usedCell.delete(i);
-		// 	return cell;
-		// }
-		for (let i = this.currentCell; i < this.cells.length; i++) {
-			let cell = this.cells[i];
-			if (cell.count > 0) {
-				this.currentCell = i + 1;
-				return cell;
-			}
-		}
-		//
-		// this.usedCell.clear();
-		this.currentCell = 0;
-		return null;
-	}
-
-	private getCellFromPosition(position: Vector3): Cell {
-		let x = ((position.x + this.width2) / this.cellSize) << 0; //similar to Math.trunc() but with bitshift, work for number < MAX_INT
-		let y = ((position.y + this.height2) / this.cellSize) << 0;
-		let z = ((position.z + this.depth2) / this.cellSize) << 0;
-
-		//console.log(position.x, position.y, position.z);
-		z *= this.widthCount;
-		y *= this.planeCount;
-
-		x += z + y;
-		if (x > this.cellCount) { // WHEN freeze fucking break
-			console.warn(position, x);
-			x = 0;
-		}
-
-		// if (!this.usedCell.has(x)) { //Maybe put it somewhere else;
-		// 	this.usedCell.add(x);
-		// }
-
-		return this.cells[x];
-	}
-
-	cellOnEdge(cellIndex: number): boolean {
-		const cx = cellIndex % this.widthCount;
-		const cz = ((cellIndex % this.planeCount) / this.widthCount) << 0;
-		return (
-			cellIndex < this.planeCount * 3 || cellIndex > this.cellCount - this.planeCount
-			|| cx == 0 || cx == this.widthCount - 1
-			|| cz == 0 || cz == this.depth - 1
-		)
-	}
-}
-
-class Grid2D {
-	public cells: Array<Cell>; //May change to Array<int16Array>
-
-	public readonly width: number;
-	public readonly depth: number;
-	public readonly cellSize: number;
-	public readonly minPerCell: number;
-
-	private readonly width2: number;
-	private readonly depth2: number;
-
-	private readonly widthCount: number;
-	private readonly cellCount: number;
-
-	private usedCell: Set<number>;
-
-
-	public currentCell: number;
-
-
-	constructor(options: gridoptions) {
-		this.width = options.width;
-		this.depth = options.depth;
-		this.cellSize = options.cellSize;
-		this.minPerCell = options.minPerCell;
-
-		this.width2 = this.width * 0.5;
-		this.depth2 = this.depth * 0.5;
-
-		this.widthCount = Math.ceil(this.width / this.cellSize);
-		this.cellCount = this.widthCount * Math.ceil(this.depth / this.cellSize);
-
-		this.cells = new Array<Cell>(this.cellCount)
-		console.log(this.cellCount);
-		for (let i = 0; i < this.cellCount; i++) {
-			this.cells[i] = {
-				indexes: new Int16Array(this.minPerCell),
-				count: 0
-			}
-			this.cells[i].indexes.fill(-1);
-		}
-		this.currentCell = 0;
-		this.usedCell = new Set<number>();
-	}
-
-	public add(index: number, position: Vector3) {
-		const cell = this.getCellFromPosition(position);
-
-		cell.indexes[cell.count] = index;
-		cell.count++;
-	}
-
-	public addArray(positions: Vector3[]) {
-
-
-		for (let i = 0; i < positions.length; i++) {
-			this.add(i, positions[i]);
-		}
-	}
-
-	public nextCell(): Cell | null {
-		// for (let i of this.usedCell) {
-		// 	let cell = this.cells[i];
-		// 	this.usedCell.delete(i);
-		// 	return cell;
-		// }
-		for (let i = this.currentCell; i < this.cells.length; i++) {
-			let cell = this.cells[i];
-			if (cell.count > 0) {
-				this.currentCell = i + 1;
-				return cell;
-			}
-		}
-		//
-		// this.usedCell.clear();
-		this.currentCell = 0;
-		return null;
-	}
-
-	private getCellFromPosition(position: Vector3): Cell {
-		let x = ((position.x + this.width2) / this.cellSize) << 0; //similar to Math.trunc() but with bitshift, work for number < MAX_INT
-		let z = ((position.z + this.depth2) / this.cellSize) << 0;
-
-		//console.log(position.x, position.y, position.z);
-		z *= this.widthCount;
-
-		x += z;
-		if (x > this.cellCount) { // WHEN freeze fucking break
-			console.warn(position, x);
-			alert("OUT OF BOUND")
-			x = 0;
-		}
-
-		// if (!this.usedCell.has(x)) { //Maybe put it somewhere else;
-		// 	this.usedCell.add(x);
-		// }
-
-		return this.cells[x];
-	}
-
-	cellOnEdge(cellIndex: number): boolean {
-		const cx = cellIndex % this.widthCount;
-		const cz = (cellIndex / this.widthCount) << 0;
-		return (
-			cx == 0 || cx == this.widthCount - 1
-			|| cz == 0 || cz == this.depth - 1
-		)
-	}
-}

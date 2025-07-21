@@ -52,7 +52,7 @@ const optionsE: _thinInstancesOptions = {
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 1,
-	scale: new Vector3(3, 1.1, 3)
+	scale: new Vector3(1.5, 0.9, 1.5)
 };
 
 // const _midOptions: _thinInstancesOptions = {
