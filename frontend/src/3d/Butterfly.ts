@@ -4,7 +4,7 @@ import { Noise } from "./Noise";
 
 export class Butterfly {
 
-	private root: TransformNode;
+	public root: TransformNode;
 
 	private mesh!: Mesh;
 	private material: ButterflyMaterial;
@@ -14,7 +14,7 @@ export class Butterfly {
 
 	private moves!: Float32Array;
 
-	private positions: Array<Vector3>;
+	public positions: Array<Vector3>;
 
 	private velocities: Array<Vector3>;
 
@@ -366,7 +366,7 @@ class Grid2D {
 	}
 
 	public addArray(positions: Vector3[]) {
-		console.log(positions.length);
+		//console.log(positions.length);
 		for (let i = 0; i < positions.length; i++) {
 			this.add(i, positions[i]);
 		}

@@ -845,6 +845,7 @@ export class DitherMaterial extends CustomMaterial {
 		super(name, scene);
 
 		this.AddUniform('time', 'float', 1.0);
+		this.AddUniform('on', 'float', 0.);
 
 		this.AddAttribute('uv');
 
@@ -859,37 +860,16 @@ export class DitherMaterial extends CustomMaterial {
 		`)
 
 		this.Fragment_Definitions(`
-			float hash(ivec2 p )  // this hash is not production ready, please
-			{                         // replace this by something better
+			#include<noises>
 
-			    // 2D -> 1D
-			    int n = p.x*3 + p.y*113;
-
-			    // 1D hash by Hugo Elias
-				n = (n << 13) ^ n;
-			    n = n * (n * n * 15731 + 789221) + 1376312589;
-			    return -1.0+2.0*float( n & 0x0fffffff)/float(0x0fffffff);
-			}
-
-			float noise(vec2 p )
-			{
-			    ivec2 i = ivec2(floor( p ));
-			    vec2 f = fract( p );
-				
-			    // cubic interpolant
-			    vec2 u = f*f*(3.0-2.0*f);
-
-			    return mix( mix( hash( i + ivec2(0,0) ), 
-					     hash( i + ivec2(1,0) ), u.x),
-					mix( hash( i + ivec2(0,1) ), 
-					     hash( i + ivec2(1,1) ), u.x), u.y);
-			}`)
+			`)
 
 		this.Fragment_MainEnd(`
 		// float f = noise(vMainUV1 * 1000.) * 0.5 + 0.5;
-		vec3 dith = min(vec3(1., 1., 1.),   gl_FragColor.rgb);
+		gl_FragColor.rgb = (on > 0. ? vec3(0.,0.,gradientNoise(vPositionW.xyz + time * 1000., 4.) * 0.5 +0.5) : gl_FragColor.rgb);
+		//vec3 dith = min(vec3(1., 1., 1.),   gl_FragColor.rgb);
 		// dith = floor(dith * 8. + 0.5) * (1. / 8.);
-		gl_FragColor.rgb = (dith - 0.5) * 1.6 + 0.5; //Apply contrast
+		//gl_FragColor.rgb = (dith - 0.5) * 1.6 + 0.5; //Apply contrast
 		// gl_FragColor.rgb = vec3(vMainUV1, 0.);
 		
 			// gl_FragColor.rgb = vec3(vNormalW * 0.5 + 0.5);

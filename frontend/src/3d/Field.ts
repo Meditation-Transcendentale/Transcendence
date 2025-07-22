@@ -10,6 +10,7 @@ import { Puddle } from "./Ground";
 import { DitherMaterial } from "./Shader";
 import { Butterfly } from "./Butterfly";
 import { Portal } from "./Portal";
+import { BoundingInfo, Matrix } from "@babylonjs/core";
 
 
 
@@ -26,6 +27,11 @@ export class Field {
 	private portal: Portal;
 
 	private ditherMat!: DitherMaterial;
+	private vueBounding!: Array<Vector3>;
+
+	private cube0!: Mesh;
+	private cube1!: Mesh;
+	private cube2!: Mesh;
 
 
 	constructor(scene: Scene) {
@@ -35,6 +41,8 @@ export class Field {
 		this.ground = new Puddle(scene, 100, 1);
 		this.butterfly = new Butterfly(scene, this.ground.origin);
 		this.portal = new Portal(scene);
+
+		this.initVueBounding();
 
 
 		this.clouds = [];
@@ -53,30 +61,48 @@ export class Field {
 		loaded.addAllToScene();
 		loaded.meshes.forEach((mesh) => {
 			mesh.material = this.ditherMat;
+			if (mesh.name === 'Cube' || mesh.name === "Cube.001" || mesh.name === "Cube.002") {
+				mesh.material = new DitherMaterial("dither", this.scene);
+			}
 			// mesh.receiveShadows = true;
 			// this.sun.shadow.addShadowCaster(mesh);
 		})
 		this.scene.setActiveCameraByName("fieldCam");
 		this.scene.activeCamera.parent = undefined;
 
-		// this.sunL = new DirectionalLight('sun', new Vector3(-1, -1, -1), this.scene);
-		// this.sunL.intensity = 5;
-		//
-		// this.plane = MeshBuilder.CreateGround("plane", {
-		// 	width: 500,
-		// 	height: 500,
-		// }, this.scene)
-		// this.plane.position.z = -20;
-		// this.plane.position.y = 0.1;
-
+		this.cube0 = this.scene.getMeshByName("Cube") as Mesh;
+		this.cube1 = this.scene.getMeshByName("Cube.001") as Mesh;
+		this.cube2 = this.scene.getMeshByName("Cube.002") as Mesh;
 
 		this.ground.init();
 		await this.butterfly.init();
 		await this.grass.init(this.scene, this.ground.originGrass, this.butterfly.glowLayer);
 
+		///////
+		//
+		///////
+		const cub = MeshBuilder.CreateBox("tempo", { size: 0.4 });
+		cub.refreshBoundingInfo();
+		const bounding = new Array<Vector3>(8);
+		const b = cub.getBoundingInfo().boundingBox.vectors;
+		for (let i = 0; i < b.length; i++) {
+			bounding[i] = b[i].clone().add(new Vector3(0, 1, -10));
+		}
+		console.log("bouding:", b);
+		cub.dispose();
 
+		Vue.addButterfly(this.butterfly.positions, 100, bounding);
+	}
 
-
+	private initVueBounding() {
+		const cub = MeshBuilder.CreateBox("tempo", { size: 1 });
+		cub.refreshBoundingInfo();
+		this.vueBounding = new Array<Vector3>(8);
+		const b = cub.getBoundingInfo().boundingBox.vectors;
+		for (let i = 0; i < b.length; i++) {
+			this.vueBounding[i] = (b[i].clone());
+		}
+		cub.dispose();
 	}
 
 	public update(time: number, deltaTime: number) {
@@ -84,6 +110,9 @@ export class Field {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.ground.update(time);
 		this.ditherMat.setFloat("time", time);
+		(this.cube0.material as DitherMaterial).setFloat('time', time);
+		(this.cube1.material as DitherMaterial).setFloat('time', time);
+		(this.cube2.material as DitherMaterial).setFloat('time', time);
 		this.butterfly.update(time, deltaTime);
 	}
 
@@ -92,34 +121,50 @@ export class Field {
 		switch (vue) {
 			case 'play': {
 				final.init(this.scene.getCameraByName('fieldCam') as Camera);
+				final.addWindow('create', this.cube0, this.vueBounding, Matrix.Identity());
+				final.addWindow('join', this.cube1, this.vueBounding, Matrix.Identity());
 				break;
 			}
 			case 'home': {
 				final.init(this.scene.getCameraByName('fieldCam') as Camera);
+				final.addWindow('play', this.cube0, this.vueBounding, Matrix.Identity());
+				final.addWindow('info', this.cube1, this.vueBounding, Matrix.Identity());
+				final.addWindow('stats', this.cube2, this.vueBounding, Matrix.Identity());
 				break;
 			}
 			case 'stats': {
 				final.init(this.scene.getCameraByName('fieldCam') as Camera);
+				final.addWindow('pong', this.cube0, this.vueBounding, Matrix.Identity());
+				final.addWindow('br', this.cube1, this.vueBounding, Matrix.Identity());
 				break;
 			}
 			case 'login': {
 				final.init(this.scene.getCameraByName('fieldCam') as Camera);
+				final.addWindow('register', this.cube1, this.vueBounding, Matrix.Identity());
 				break;
 			}
 			case 'register': {
 				final.init(this.scene.getCameraByName('fieldCam') as Camera);
+				final.addWindow('login', this.cube0, this.vueBounding, Matrix.Identity());
+
 				break;
 			}
 			case 'test': {
 				final.init(this.scene.getCameraByName('br') as Camera);
+
 				break;
 			}
 			case 'lobby': {
 				final.init(this.scene.getCameraByName('fieldCam') as Camera);
+				final.addWindow('back', this.cube1, this.vueBounding, Matrix.Identity());
+
 				break;
 			}
 			case 'info': {
 				final.init(this.scene.getCameraByName("fieldCam") as Camera);
+				final.addWindow('user', this.cube0, this.vueBounding, Matrix.Identity());
+				final.addWindow('security', this.cube1, this.vueBounding, Matrix.Identity());
+
 				break;
 			}
 		}

@@ -76,6 +76,14 @@ class app3d {
 		this.engine?.dispose();
 	}
 
+	public enableHome() {
+		this.environment.enableHome();
+	}
+
+	public disableHome() {
+		this.environment.disableHome();
+	}
+
 
 	public loadVue(vue: string) {
 		this.vues.get(vue)?.enable();

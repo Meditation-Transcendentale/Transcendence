@@ -118,6 +118,15 @@ canvas {
 	z-index: 2;
 }
 
+.frame-butterfly {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 2px solid var(--frame-color);
+	overflow: hidden;
+	z-index: 2;
+}
+
 .frame-text {
 	position: absolute;
 	left: 0;

@@ -32,6 +32,8 @@ export class Environment {
 
 	private field: Field;
 
+	private updateHome: boolean = true;
+
 
 
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
@@ -127,10 +129,21 @@ export class Environment {
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		this.field.update(time, this.deltaTime);
+		if (this.updateHome) {
+			this.field.update(time, this.deltaTime);
+		}
 		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
+	}
+
+	public enableHome() {
+		this.updateHome = true;
+
+	}
+
+	public disableHome() {
+		this.updateHome = false;
 	}
 
 	public setVue(vue: string): Vue {
@@ -139,7 +152,7 @@ export class Environment {
 	}
 
 	public dispose() {
-		this.gears?.dispose();
+		//this.gears?.dispose();
 		this.camera?.dispose();
 		this.scene?.dispose();
 	}

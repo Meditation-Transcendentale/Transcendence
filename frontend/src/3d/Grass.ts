@@ -16,7 +16,7 @@ type _thinInstancesOptions = {
 };
 
 const optionsA: _thinInstancesOptions = {
-	density: 8,
+	density: 6,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 1,
@@ -201,11 +201,11 @@ export class Grass {
 		this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(size * 6, 0, -size * 5)), this._size * 2, this._size * 2));
 		this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(-size * 6, 0, -size * 5)), this._size * 2, this._size * 2));
 
-		this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
-		this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
-		this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
-		this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
-
+		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
+		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
+		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
+		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
+		//
 
 
 
@@ -283,7 +283,7 @@ export class Grass {
 
 	private async loadAssests(scene: Scene) {
 		const loaded = await LoadAssetContainerAsync("/assets/grassLOD.glb", scene);
-		this.meshA = loaded.meshes[1] as Mesh;
+		this.meshA = loaded.meshes[2] as Mesh;
 		this.meshA.setEnabled(false);
 		console.log(this.meshA);
 		this.meshA.name = 'nearGrass';
@@ -292,13 +292,18 @@ export class Grass {
 
 		console.log("VERT:", this.meshA.getTotalIndices());
 
-		this.meshB = loaded.meshes[2] as Mesh;
-		this.meshC = loaded.meshes[3] as Mesh;
 		this.meshD = loaded.meshes[4] as Mesh;
+		//this.meshB = loaded.meshes[2] as Mesh;
+
+		//this.meshC = loaded.meshes[3] as Mesh;
+		this.meshC = this.meshD.clone();
+		this.meshB = this.meshD.clone();
 		this.meshD1 = this.meshD.clone();
 		this.meshE = this.meshD.clone();
 
 		this.meshD1.makeGeometryUnique();
+		this.meshB.makeGeometryUnique();
+		this.meshC.makeGeometryUnique();
 		this.meshE.makeGeometryUnique();
 		this.meshB.setEnabled(false);
 		this.meshC.setEnabled(false);
