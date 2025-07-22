@@ -71,7 +71,7 @@ export class Puddle {
 
 			this.origin.x = this.rayO.x - ray.x * delta;
 			this.origin.y = 0;
-			this.origin.z = this.rayO.z - ray.z * delta + 10;
+			this.origin.z = this.rayO.z - ray.z * delta + 20;
 
 			this.originGrass.x = this.rayO.x - ray.x * delta;
 			this.originGrass.y = this.rayO.z - ray.z * delta;

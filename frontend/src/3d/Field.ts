@@ -86,12 +86,12 @@ export class Field {
 		const bounding = new Array<Vector3>(8);
 		const b = cub.getBoundingInfo().boundingBox.vectors;
 		for (let i = 0; i < b.length; i++) {
-			bounding[i] = b[i].clone().add(new Vector3(0, 1, -10));
+			bounding[i] = b[i].clone().add(new Vector3(0, 1, -20));
 		}
 		console.log("bouding:", b);
 		cub.dispose();
 
-		Vue.addButterfly(this.butterfly.positions, 100, bounding);
+		Vue.addButterfly(this.butterfly.positions, 300, bounding);
 	}
 
 	private initVueBounding() {

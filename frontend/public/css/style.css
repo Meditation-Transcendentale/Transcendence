@@ -236,3 +236,10 @@ input[on] {
 	text-transform: none;
 	letter-spacing: normal;
 }
+
+.line {
+	position: absolute;
+	height: 0.1vh;
+	background-color: blue;
+	z-index: 0;
+}

@@ -26,7 +26,11 @@ class cssWindow {
 	private static butterflyBounding: Array<Vector3>;
 	private static currentButterfly: number = 0;
 	private static butterflyDiv: Array<HTMLDivElement>;
+	private static butterflyLine: Array<HTMLDivElement>;
 	private matrixId: Matrix = Matrix.Identity();
+
+	private lastPos: Float32Array;
+	private framePos: Float32Array;
 
 	private camera!: Camera;
 
@@ -65,17 +69,23 @@ class cssWindow {
 
 		this.frameUpdateCount = Math.floor(Math.random() * 16 + 10);
 
+		this.lastPos = new Float32Array(2);
+		this.framePos = new Float32Array(3);
+
 	}
 
 	public static addButterfly(positions: Array<Vector3>, quantity: number, boudingBox: Array<Vector3>) {
 		cssWindow.butterflies = new Array<Vector3>(quantity);
 		cssWindow.butterflyDiv = new Array<HTMLDivElement>(quantity);
+		cssWindow.butterflyLine = new Array<HTMLDivElement>(quantity);
 		for (let i = 0; i < quantity; i++) {
 			cssWindow.butterflies[i] = positions[i];
 			cssWindow.butterflyDiv[i] = document.createElement("div") as HTMLDivElement;
 			cssWindow.butterflyDiv[i].className = "frame-butterfly";
 			cssWindow.butterflyDiv[i].style.borderColor = "blue";
 			cssWindow.butterflyDiv[i].style.zIndex = "0";
+			cssWindow.butterflyLine[i] = document.createElement("div") as HTMLDivElement;
+			cssWindow.butterflyLine[i].className = "line";
 		}
 		cssWindow.butterflyBounding = new Array<Vector3>(8);
 		for (let i = 0; i < boudingBox.length; i++) {
@@ -107,9 +117,12 @@ class cssWindow {
 			this.pos[0] = Math.min(this.pos[0], p.x);
 			this.pos[1] = Math.min(this.pos[1], p.y);
 			this.pos[2] = Math.max(this.pos[2], p.x);
-			this.pos[3] = Math.max(this.pos[3], p.y);
+			this.pos[3] = Math.max(this.pos[3], p.y)
 		}
 		//}
+		this.framePos[0] = this.pos[0] + ((this.pos[2] - this.pos[0]) * 0.5);
+		this.framePos[1] = this.pos[1] + ((this.pos[3] - this.pos[1]) * 0.5);
+		this.framePos[2] = Math.min(((this.pos[2] - this.pos[0])) * 2, 0.3);
 		this.div.style.top = `${this.pos[1] * 100 - 3 + (true ? Math.random() * 0.1 : 0)}%`;
 		this.div.style.left = `${this.pos[0] * 100 + (true ? Math.random() * 0.1 : 0)}%`;
 		this.div.style.width = `${(this.pos[2] - this.pos[0]) * 100 + (true ? Math.random() * 0.1 : 0)}%`;
@@ -186,17 +199,48 @@ class cssWindow {
 				final[3] = Math.max(final[3], p.y);
 			}
 
+			if (Math.abs(final[0] - this.framePos[0]) > this.framePos[2] || Math.abs(final[1] - this.framePos[1]) > this.framePos[2]) {
+				cssWindow.currentButterfly = (cssWindow.currentButterfly + 1) % cssWindow.butterflies.length;
+				fn();
+				return;
+			}
 			const div = cssWindow.butterflyDiv[cssWindow.currentButterfly];
 			div.style.top = `${final[1] * 100}%`;
 			div.style.left = `${final[0] * 100}%`;
 			div.style.width = `${(final[2] - final[0]) * 100}%`;
 			div.style.height = `${(final[3] - final[1]) * 100}%`;
+
+			const line = cssWindow.butterflyLine[cssWindow.currentButterfly];
+
+			const x = (final[0] < this.lastPos[0] ? final[0] : this.lastPos[0]);
+			const y = (final[0] < this.lastPos[0] ? final[1] : this.lastPos[1]);
+			const x1 = x;
+			const y1 = y * (window.innerHeight / window.innerWidth);
+			const x2 = (final[0] >= this.lastPos[0] ? final[0] : this.lastPos[0]);
+			const y2 = (final[0] >= this.lastPos[0] ? final[1] : this.lastPos[1]) * (window.innerHeight / window.innerWidth);
+			const len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+			const angle = Math.atan2(y2 - y1, (x2 - x1)) * (180 / Math.PI);
+			line.style.top = `${y * 100}%`;
+			line.style.left = `${x * 100}%`;
+			line.style.width = `${len * 100}%`;
+			line.style.transformOrigin = `left center`
+			line.style.transform = `rotate(${angle}deg)`;
+
+
+			this.lastPos[0] = final[2];
+			this.lastPos[1] = final[1];
+
 			document.body.appendChild(div);
+			if (g > 0) {
+				document.body.appendChild(line);
+			}
+			g++;
 			cssWindow.currentButterfly = (cssWindow.currentButterfly + Math.ceil(Math.random() * 10)) % cssWindow.butterflies.length;
-			setTimeout(() => { div.remove(); }, 99);
+			setTimeout(() => { div.remove(); line.remove(); }, 100);
 			setTimeout(() => { fn() }, 1);
 		}
 		this.hover = true;
+		let g = 0;
 		(this.mesh.material as DitherMaterial).setFloat('on', 1.);
 		this.div.addEventListener('mouseleave', () => {
 			this.hover = false;

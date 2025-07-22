@@ -23,7 +23,7 @@ export class Butterfly {
 
 
 	private deltas!: Float32Array;
-	private n: number = 100;
+	private n: number = 300;
 
 	private speed = 0.8;
 
@@ -49,13 +49,13 @@ export class Butterfly {
 		this.glowMat = new ButterflyMaterial("butterfly", this.scene);
 
 		this.root = new TransformNode("butterflyRoot", this.scene);
-		this.root.position = new Vector3(0, 1, -10);
+		this.root.position = new Vector3(0, 1, -20);
 		this.root.scaling = new Vector3(2, 2, 2);
 
 		this.octree = new OctreeBlock(5, new Vector3(0, 1, 0), 11);
 		this.grid = new Grid2D({
-			width: 20,
-			depth: 20,
+			width: 42,
+			depth: 42,
 			height: 10,
 			minPerCell: 100,
 			cellSize: 1
@@ -84,7 +84,7 @@ export class Butterfly {
 		this.mesh.material = this.material
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
-		this.thinInstance(this.n, 9);
+		this.thinInstance(this.n, 16);
 		//this.octree.print();
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.setMaterialForRendering(this.mesh, this.glowMat);
