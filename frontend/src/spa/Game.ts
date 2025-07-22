@@ -1,5 +1,7 @@
 import Router from "./Router";
 import { Pong } from "../pong/Pong";
+import { App3D } from "../3d/App";
+import { User } from "./User";
 
 
 export default class Game {
@@ -13,24 +15,35 @@ export default class Game {
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 		this.pong = null;
-		Pong.INIT();
+		App3D.setVue('game');
 		this.mod = null;
 		this.map = null;
 		this.id = null;
 	}
 
-	public load(params: URLSearchParams) {
-		if (!params.has("id") || !params.has("mod") || !params.has("map")) {
-			alert("Game url error");
-			return;
-		}
-		this.pong?.dispose();
-		this.pong = new Pong(document.querySelector("#canvas"), params.get("id"), params.get("mod"));
-		this.pong.start();
+	public unload() {
+		App3D.unloadVue('game');
+		//document.querySelector("canvas")?.blur();
+		this.pong?.stop();
+		//this.pongbr?.dispose();
+		//this.div.remove();
+		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "0";
 	}
 
-	public async unload() {
-		// this.pong?.dispose();
-		// this.div.remove();
+	public load(params: URLSearchParams) {
+		App3D.loadVue('game');
+		//document.querySelector("canvas")?.focus();
+		// this.pongbr?.dispose();
+		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";
+		if (!this.pong)
+			this.pong = new Pong(document.querySelector("#canvas"), params.get("id"), params.get("mod"), App3D.scene);
+		let gameId = params.get("id");
+		let uuid = User.uuid;
+		if (!gameId)
+			gameId = "";
+		if (!uuid)
+			uuid = "";
+		this.pong.start(gameId, uuid);
 	}
+
 }

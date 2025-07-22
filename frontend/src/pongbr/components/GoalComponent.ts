@@ -7,6 +7,7 @@ export class GoalComponent implements Component {
 	 * @param segmentIndex which goal segment (player) this is
 	 * @param position     world position of the goal center
 	 */
+	public static key = "GoalComponent";
 	constructor(
 		public readonly segmentIndex: number,
 		public readonly position: Vector3

@@ -30,7 +30,7 @@ const handlePhysicsRequest = async (sub) => {
 			continue;
 		}
 
-		const { gameId, tick, balls, paddles, events } = Physics.processTick(data);
+		const { gameId, tick, balls, paddles, events } = Physics.processTick({ gameId: data.gameId, tick: data.tick, inputs: data.input });
 		let scorerId = null;
 		let goalScored = false;
 		if (events && events.length) {
@@ -44,13 +44,14 @@ const handlePhysicsRequest = async (sub) => {
 		let goal = null;
 		if (goalScored)
 			goal = { scorerId };
+		//console.log(paddles);
 		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal });
 		msg.respond(buffer);
 	}
 };
 
 async function start() {
-	const nc = await connect({ 
+	const nc = await connect({
 		servers: NATS_URL,
 		token: process.env.NATS_GAME_TOKEN,
 		tls: { rejectUnauthorized: false }

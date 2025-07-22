@@ -11,4 +11,4 @@ COPY test ./test
 
 EXPOSE 5053
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]

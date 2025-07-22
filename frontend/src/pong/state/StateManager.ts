@@ -26,4 +26,8 @@ export class StateManager {
 	setter(value: boolean): void {
 		this.start = value;
 	}
+	set_ecs(ecs: ECSManager) {
+		this.ecs = ecs;
+	}
+
 }

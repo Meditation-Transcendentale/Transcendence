@@ -9,36 +9,34 @@ import "google/protobuf/empty.proto";
 // -----------------------------------------------------------------------------
 message Ball {
   int32 id = 1;
-  float x  = 2;
-  float y  = 3;
+  float x = 2;
+  float y = 3;
   float vx = 4;
   float vy = 5;
 }
 
 message Paddle {
-  int32 id   = 1;
+  int32 id = 1;
   int32 move = 2; // -1: left, 0: none, 1: right
-  float offset = 3; 
-  bool  dead = 4; // Used in battle‐royale mode, false otherwise
+  float offset = 3;
+  bool dead = 4; // Used in battle‐royale mode, false otherwise
 }
 
 message PaddleInput {
-  int32 id   = 1;
+  int32 id = 1;
   int32 move = 2;
 }
 
-message Goal {
-  int32 scorerId = 1;
-}
+message Goal { int32 scorerId = 1; }
 
 message MatchState {
-  string       gameId   = 1;
-  int64        tick     = 2;
-  repeated Ball balls   = 3; // One ball for classic, multiple for BR
+  string gameId = 1;
+  int64 tick = 2;
+  repeated Ball balls = 3; // One ball for classic, multiple for BR
   repeated Paddle paddles = 4;
-  repeated int32 score   = 5; // Classic: scores per player
-  repeated int32 ranks   = 6; // BR: ranking per player
-  int32        stage    = 7; // BR: current stage; others: ignored
+  repeated int32 score = 5; // Classic: scores per player
+  repeated int32 ranks = 6; // BR: ranking per player
+  int32 stage = 7;          // BR: current stage; others: ignored
 }
 
 message MatchCreateRequest {
@@ -55,30 +53,26 @@ message MatchSetup {
 
 message MatchInput {
   int32 paddleId = 1;
-  int32 move     = 2;
+  int32 move = 2;
 }
 
-message MatchQuit {
-  string uuid = 1;
-}
+message MatchQuit { string uuid = 1; }
 
 message MatchStart {}
 
-message MatchEnd {
-  int32 winner = 1;
-}
+message MatchEnd { int32 winner = 1; }
 
 message PhysicsRequest {
-  string        gameId = 1;
-  int64         tick   = 2;
+  string gameId = 1;
+  int64 tick = 2;
   repeated PaddleInput input = 3;
-  int32         stage  = 4; // BR mode stage; others: ignored
+  int32 stage = 4; // BR mode stage; others: ignored
 }
 
 message PhysicsResponse {
-  string       gameId  = 1;
-  int64        tick    = 2;
-  repeated Ball balls   = 3;
+  string gameId = 1;
+  int64 tick = 2;
+  repeated Ball balls = 3;
   repeated Paddle paddles = 4;
-  Goal         goal    = 5; // Classic mode goal event; empty otherwise
+  Goal goal = 5; // Classic mode goal event; empty otherwise
 }

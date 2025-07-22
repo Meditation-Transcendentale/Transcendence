@@ -34,3 +34,4 @@ export { Button } from "@babylonjs/gui/2D/controls/button";
 export { Control } from "@babylonjs/gui/2D/controls/control";
 export { Scalar } from "@babylonjs/core/Maths/math.scalar";
 export { CustomMaterial } from '@babylonjs/materials/custom';
+export { Inspector } from '@babylonjs/inspector';

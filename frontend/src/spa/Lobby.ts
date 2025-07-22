@@ -110,7 +110,10 @@ export default class Lobby {
 				console.log("Everyone is ready");
 				const gameId = payload.start.gameId;
 				const map = "default"; //payload.start.map;
-				Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
+				if (this.mode === 'br')
+					Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
+				else
+					Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
 				this.ws?.close();
 			}
 		}
