@@ -1,4 +1,5 @@
-import { AbstractMesh, Camera, Matrix, Vector3 } from "@babylonImport";
+import { AbstractMesh, Camera, Matrix, ShaderMaterial, Vector3 } from "@babylonImport";
+import { DitherMaterial } from "./3d/Shader";
 
 
 interface vueOptions {
@@ -20,6 +21,18 @@ class cssWindow {
 	public _enable: boolean;
 
 	private frameUpdateCount: number;
+
+	private static butterflies: Array<Vector3>;
+	private static butterflyBounding: Array<Vector3>;
+	private static currentButterfly: number = 0;
+	private static butterflyDiv: Array<HTMLDivElement>;
+	private static butterflyLine: Array<HTMLDivElement>;
+	private matrixId: Matrix = Matrix.Identity();
+
+	private lastPos: Float32Array;
+	private framePos: Float32Array;
+
+	private camera!: Camera;
 
 
 	constructor(name: string, options: vueOptions) {
@@ -51,42 +64,69 @@ class cssWindow {
 		});
 
 		this.div.addEventListener('mouseover', () => {
-			this.onHover();
+			this.onHoverButterfly();
 		})
 
 		this.frameUpdateCount = Math.floor(Math.random() * 16 + 10);
+
+		this.lastPos = new Float32Array(2);
+		this.framePos = new Float32Array(3);
+
+	}
+
+	public static addButterfly(positions: Array<Vector3>, quantity: number, boudingBox: Array<Vector3>) {
+		cssWindow.butterflies = new Array<Vector3>(quantity);
+		cssWindow.butterflyDiv = new Array<HTMLDivElement>(quantity);
+		cssWindow.butterflyLine = new Array<HTMLDivElement>(quantity);
+		for (let i = 0; i < quantity; i++) {
+			cssWindow.butterflies[i] = positions[i];
+			cssWindow.butterflyDiv[i] = document.createElement("div") as HTMLDivElement;
+			cssWindow.butterflyDiv[i].className = "frame-butterfly";
+			cssWindow.butterflyDiv[i].style.borderColor = "blue";
+			cssWindow.butterflyDiv[i].style.zIndex = "0";
+			cssWindow.butterflyLine[i] = document.createElement("div") as HTMLDivElement;
+			cssWindow.butterflyLine[i].className = "line";
+		}
+		cssWindow.butterflyBounding = new Array<Vector3>(8);
+		for (let i = 0; i < boudingBox.length; i++) {
+			cssWindow.butterflyBounding[i] = boudingBox[i].clone();
+		}
 
 	}
 
 	public update(camera: Camera, frame: number) {
 		if (!this._enable) { return; }
+		this.camera = camera;
 		//console.log(this.matrix);
 		const model = this.matrix.multiply(this.mesh.worldMatrixFromCache);
 		const scene = camera._scene.getTransformMatrix();
 		const viewport = camera.viewport;
 
-		if (frame % this.frameUpdateCount == 0) {
-			this.pos[0] = 2;
-			this.pos[1] = 2;
-			this.pos[2] = -1;
-			this.pos[3] = -1;
-			for (let i = 0; i < this.bounding.length; i++) {
-				const p = Vector3.Project(
-					this.bounding[i],
-					model,
-					scene,
-					viewport
-				);
-				this.pos[0] = Math.min(this.pos[0], p.x);
-				this.pos[1] = Math.min(this.pos[1], p.y);
-				this.pos[2] = Math.max(this.pos[2], p.x);
-				this.pos[3] = Math.max(this.pos[3], p.y);
-			}
+		//if (frame % this.frameUpdateCount == 0) {
+		this.pos[0] = 2;
+		this.pos[1] = 2;
+		this.pos[2] = -1;
+		this.pos[3] = -1;
+		for (let i = 0; i < this.bounding.length; i++) {
+			const p = Vector3.Project(
+				this.bounding[i],
+				model,
+				scene,
+				viewport
+			);
+			this.pos[0] = Math.min(this.pos[0], p.x);
+			this.pos[1] = Math.min(this.pos[1], p.y);
+			this.pos[2] = Math.max(this.pos[2], p.x);
+			this.pos[3] = Math.max(this.pos[3], p.y)
 		}
-		this.div.style.top = `${this.pos[1] * 100 - 3 + (true ? Math.random() * 2 : 0)}%`;
-		this.div.style.left = `${this.pos[0] * 100 + (true ? Math.random() * 0.5 : 0)}%`;
-		this.div.style.width = `${(this.pos[2] - this.pos[0]) * 100 + (true ? Math.random() * 0.5 : 0)}%`;
-		this.div.style.height = `${(this.pos[3] - this.pos[1]) * 100 + 3 + (true ? Math.random() * 0.5 : 0)}%`;
+		//}
+		this.framePos[0] = this.pos[0] + ((this.pos[2] - this.pos[0]) * 0.5);
+		this.framePos[1] = this.pos[1] + ((this.pos[3] - this.pos[1]) * 0.5);
+		this.framePos[2] = Math.min(((this.pos[2] - this.pos[0])) * 2, 0.3);
+		this.div.style.top = `${this.pos[1] * 100 - 3 + (true ? Math.random() * 0.1 : 0)}%`;
+		this.div.style.left = `${this.pos[0] * 100 + (true ? Math.random() * 0.1 : 0)}%`;
+		this.div.style.width = `${(this.pos[2] - this.pos[0]) * 100 + (true ? Math.random() * 0.1 : 0)}%`;
+		this.div.style.height = `${(this.pos[3] - this.pos[1]) * 100 + 3 + (true ? Math.random() * 0.1 : 0)}%`;
 	}
 
 	private onHover() {
@@ -134,6 +174,81 @@ class cssWindow {
 		fn();
 	}
 
+	private onHoverButterfly() {
+		const scene = this.camera._scene.getTransformMatrix();
+		const viewport = this.camera.viewport;
+
+		const fn = () => {
+			if (!this.hover) { return; }
+			const final = new Float32Array(4);
+
+			final[0] = 2;
+			final[1] = 2;
+			final[2] = -1;
+			final[3] = -1;
+			for (let i = 0; i < 8; i++) {
+				const p = Vector3.Project(
+					cssWindow.butterflyBounding[i].add(cssWindow.butterflies[cssWindow.currentButterfly]),
+					this.matrixId,
+					scene,
+					viewport
+				);
+				final[0] = Math.min(final[0], p.x);
+				final[1] = Math.min(final[1], p.y);
+				final[2] = Math.max(final[2], p.x);
+				final[3] = Math.max(final[3], p.y);
+			}
+
+			if (Math.abs(final[0] - this.framePos[0]) > this.framePos[2] || Math.abs(final[1] - this.framePos[1]) > this.framePos[2]) {
+				cssWindow.currentButterfly = (cssWindow.currentButterfly + 1) % cssWindow.butterflies.length;
+				fn();
+				return;
+			}
+			const div = cssWindow.butterflyDiv[cssWindow.currentButterfly];
+			div.style.top = `${final[1] * 100}%`;
+			div.style.left = `${final[0] * 100}%`;
+			div.style.width = `${(final[2] - final[0]) * 100}%`;
+			div.style.height = `${(final[3] - final[1]) * 100}%`;
+
+			const line = cssWindow.butterflyLine[cssWindow.currentButterfly];
+
+			const x = (final[0] < this.lastPos[0] ? final[0] : this.lastPos[0]);
+			const y = (final[0] < this.lastPos[0] ? final[1] : this.lastPos[1]);
+			const x1 = x;
+			const y1 = y * (window.innerHeight / window.innerWidth);
+			const x2 = (final[0] >= this.lastPos[0] ? final[0] : this.lastPos[0]);
+			const y2 = (final[0] >= this.lastPos[0] ? final[1] : this.lastPos[1]) * (window.innerHeight / window.innerWidth);
+			const len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+			const angle = Math.atan2(y2 - y1, (x2 - x1)) * (180 / Math.PI);
+			line.style.top = `${y * 100}%`;
+			line.style.left = `${x * 100}%`;
+			line.style.width = `${len * 100}%`;
+			line.style.transformOrigin = `left center`
+			line.style.transform = `rotate(${angle}deg)`;
+
+
+			this.lastPos[0] = final[2];
+			this.lastPos[1] = final[1];
+
+			document.body.appendChild(div);
+			if (g > 0) {
+				document.body.appendChild(line);
+			}
+			g++;
+			cssWindow.currentButterfly = (cssWindow.currentButterfly + Math.ceil(Math.random() * 10)) % cssWindow.butterflies.length;
+			setTimeout(() => { div.remove(); line.remove(); }, 100);
+			setTimeout(() => { fn() }, 1);
+		}
+		this.hover = true;
+		let g = 0;
+		(this.mesh.material as DitherMaterial).setFloat('on', 1.);
+		this.div.addEventListener('mouseleave', () => {
+			this.hover = false;
+			(this.mesh.material as DitherMaterial).setFloat('on', 0.);
+		}, { once: true });
+		fn();
+	}
+
 	public enable() {
 		this._enable = true;
 		document.body.appendChild(this.div);
@@ -142,6 +257,7 @@ class cssWindow {
 	public disable() {
 		this._enable = false;
 		this.hover = false;
+		(this.mesh.material as DitherMaterial).setFloat('on', 0.);
 		this.div.remove();
 	}
 }
@@ -198,6 +314,10 @@ export class Vue {
 		for (let i = 0; i < this.windows.length; i++) {
 			this.windows[i].disable();
 		}
+	}
+
+	public static addButterfly(positions: Array<Vector3>, quantity: number, boudingBox: Array<Vector3>) {
+		cssWindow.addButterfly(positions, quantity, boudingBox);
 	}
 }
 

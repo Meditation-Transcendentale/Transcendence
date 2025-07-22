@@ -2,10 +2,13 @@ import { Gears } from "./Gears";
 import { Vue } from "../Vue";
 import {
 	ArcRotateCamera,
+	Camera,
 	Color3,
 	Color4,
+	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
+	//Inspector,
 	MeshBuilder,
 	Scene,
 	StandardMaterial,
@@ -13,6 +16,7 @@ import {
 	Inspector,
 	LoadAssetContainerAsync
 } from "@babylonImport";
+import { Field } from "./Field";
 
 
 export class Environment {
@@ -28,6 +32,12 @@ export class Environment {
 	private frame: number;
 
 	private gears!: Gears;
+
+	private field: Field;
+
+	private updateHome: boolean = true;
+
+
 
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
@@ -63,7 +73,9 @@ export class Environment {
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
 		this.frame = 0;
-		this.gears = new Gears(this.scene);
+
+		// this.gears = new Gears(this.scene);
+		this.field = new Field(this.scene);
 
 	}
 
@@ -97,7 +109,28 @@ export class Environment {
 
 		//this.scene.debugLayer.show();
 
-		await this.gears.load();
+		// await this.gears.load();
+		//
+		await this.field.load();
+
+		this.scene.meshes.forEach((mesh) => {
+			mesh.receiveShadows = true;
+		})
+
+		this.scene.fogMode = Scene.FOGMODE_LINEAR;
+		this.scene.fogDensity = 0.2;
+		this.scene.fogStart = 100;
+		this.scene.fogEnd = 120;
+		this.scene.fogColor = new Color3(.4, .43, .45);
+		this.scene.clearColor = this.scene.fogColor.toColor4();
+
+		// const pp = new DefaultRenderingPipeline("default", true, this.scene, [this.scene.activeCamera as Camera]);
+		// pp.bloomEnabled = true;
+		// pp.bloomWeight = 0.5;
+		// pp.bloomKernel = 16;
+		// pp.bloomScale = 0.25;
+
+		//Inspector.Show(this.scene, {});
 
 	}
 
@@ -105,17 +138,30 @@ export class Environment {
 		const time = performance.now() * 0.001;
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		this.gears.update(this.deltaTime);
+		if (this.updateHome) {
+			this.field.update(time, this.deltaTime);
+		}
+		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
 	}
 
+	public enableHome() {
+		this.updateHome = true;
+
+	}
+
+	public disableHome() {
+		this.updateHome = false;
+	}
+
 	public setVue(vue: string): Vue {
-		return this.gears.setVue(vue);
+		// return this.gears.setVue(vue);
+		return this.field.setVue(vue);
 	}
 
 	public dispose() {
-		this.gears?.dispose();
+		//this.gears?.dispose();
 		this.camera?.dispose();
 		this.scene?.dispose();
 	}

@@ -12,6 +12,7 @@
     "@babylonjs/core": "8.11.0",
     "@babylonjs/gui": "8.11.0",
     "@babylonjs/inspector": "8.11.0",
+    "@babylonjs/post-processes": "8.11.0",
     "@types/node": "^22.14.1",
     "esbuild": "^0.25.5",
     "glob": "^11.0.2",
@@ -22,6 +23,7 @@
   },
   "dependencies": {
     "esbuild-plugin-alias": "^0.2.1",
+    "simplex-noise": "^4.0.3",
     "transcendence-frontend": "file:",
     "vite": "^7.0.0"
   }

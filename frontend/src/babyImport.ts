@@ -1,11 +1,19 @@
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import "@babylonjs/loaders/glTF/2.0/";
+import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // load shaders
+// import * as POST from "@babylonjs/core/PostProcesses";
+
+export { Inspector } from '@babylonjs/inspector';
+// import {
+// 	VolumetricLightScatteringPostProcess
+// } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
+// export { VolumetricLightScatteringPostProcess } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
 
 export { Engine } from "@babylonjs/core/Engines/engine";
 export { Scene } from "@babylonjs/core/scene"
 export { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 export { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-export { Vector3, Vector2 } from "@babylonjs/core/Maths/math.vector";
+export { Vector3, Vector2, Vector4 } from "@babylonjs/core/Maths/math.vector";
 export { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 export { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
 export { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
@@ -34,4 +42,17 @@ export { Button } from "@babylonjs/gui/2D/controls/button";
 export { Control } from "@babylonjs/gui/2D/controls/control";
 export { Scalar } from "@babylonjs/core/Maths/math.scalar";
 export { CustomMaterial } from '@babylonjs/materials/custom';
-export { Inspector } from '@babylonjs/inspector';
+export { BoundingBox } from '@babylonjs/core/Culling/boundingBox';
+export { Material } from "@babylonjs/core/Materials/material";
+export { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
+import "@babylonjs/core/Rendering/depthRendererSceneComponent";
+import "@babylonjs/core/Shaders/ShadersInclude/helperFunctions";
+export { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
+export { SpotLight } from "@babylonjs/core/Lights/spotLight";
+export { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
+export { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+// export { DeepImmutable} from "@babylonjs/core";
+export { Plane } from "@babylonjs/core/Maths/math.plane";
+
+import "@babylonjs/core/Culling/ray";
+

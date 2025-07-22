@@ -40,6 +40,7 @@ class app3d {
 		})
 
 
+
 		this.environment = new Environment(this.engine, this.canvas);
 		//
 		this.fps = document.getElementById('fps') as HTMLElement;
@@ -73,6 +74,14 @@ class app3d {
 	public dispose() {
 		this.environment?.dispose();
 		this.engine?.dispose();
+	}
+
+	public enableHome() {
+		this.environment.enableHome();
+	}
+
+	public disableHome() {
+		this.environment.disableHome();
 	}
 
 

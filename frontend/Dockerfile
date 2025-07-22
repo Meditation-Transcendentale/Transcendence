@@ -28,10 +28,16 @@ WORKDIR /app
 
 # USER nginx
 
-COPY package.json tsconfig.json ./
+COPY package.json tsconfig.json  ./
 
 
 # COPY --from=builder /app/dist /usr/share/nginx/html/dist
+
+RUN  rm	-rf  /usr/share/nginx/html/public
+
+COPY public/ /usr/share/nginx/html/public
+
+# COPY index.html /usr/share/nginx/html/index.html
 COPY public/ /usr/share/nginx/html
 COPY index.html /usr/share/nginx/html/index.html
 # COPY nginx.conf /etc/nginx/nginx.conf

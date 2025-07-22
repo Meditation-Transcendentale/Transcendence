@@ -118,6 +118,15 @@ canvas {
 	z-index: 2;
 }
 
+.frame-butterfly {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 2px solid var(--frame-color);
+	overflow: hidden;
+	z-index: 2;
+}
+
 .frame-text {
 	position: absolute;
 	left: 0;
@@ -226,4 +235,11 @@ input[on] {
 	font: var(--font-readable);
 	text-transform: none;
 	letter-spacing: normal;
+}
+
+.line {
+	position: absolute;
+	height: 0.1vh;
+	background-color: blue;
+	z-index: 0;
 }
