@@ -13,7 +13,7 @@ import type { userinterface } from './utils/proto/message.js';
 import { buildPaddles, PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
 import { AnimationSystem } from "./systems/AnimationSystem.js";
-import { ArcRotateCamera, Color3, Color4, PointLight, Scene, TransformNode, Vector3, Engine } from "@babylonImport";
+import { ArcRotateCamera, Color3, Color4, PointLight, Scene, TransformNode, Vector3, Engine, Mesh } from "@babylonImport";
 
 export let localPaddleId: any = null;
 export class PongBR {
@@ -55,14 +55,14 @@ export class PongBR {
 		});
 		this.pongRoot = new TransformNode("pongbrRoot", this.scene);
 		this.pongRoot.position.set(-2200, -3500, -3500);
-		const light = new PointLight('lightBr', new Vector3(-300, 25, 0), this.scene)
-		light.parent = this.pongRoot;
-		const light2 = new PointLight('lightBr2', new Vector3(+300, 25, 0), this.scene)
-		light2.parent = this.pongRoot;
-		const light4 = new PointLight('lightBr4', new Vector3(0, 25, -300), this.scene)
-		light4.parent = this.pongRoot;
-		const light3 = new PointLight('lightBr3', new Vector3(0, 25, 300), this.scene)
-		light3.parent = this.pongRoot;
+		//const light = new PointLight('lightBr', new Vector3(-300, 25, 0), this.scene)
+		//light.parent = this.pongRoot;
+		//const light2 = new PointLight('lightBr2', new Vector3(+300, 25, 0), this.scene)
+		//light2.parent = this.pongRoot;
+		//const light4 = new PointLight('lightBr4', new Vector3(0, 25, -300), this.scene)
+		//light4.parent = this.pongRoot;
+		//const light3 = new PointLight('lightBr3', new Vector3(0, 25, 300), this.scene)
+		//light3.parent = this.pongRoot;
 		this.pongRoot.rotation.z -= 30.9000;
 		this.pongRoot.scaling.set(1, 1, 1);
 		this.camera = this.scene.getCameraByName('br') as ArcRotateCamera;
@@ -75,6 +75,12 @@ export class PongBR {
 		this.scene.clearColor = new Color4(0, 0, 0, 1);
 		this.scene.ambientColor = Color3.White();
 
+
+		const statue = this.scene.getMeshByName('Version NoSmile.006') as Mesh;
+		statue.parent = this.pongRoot;
+		statue.position.set(-750, -350, 0);
+		statue.rotation.set(0, Math.PI, 0);
+		statue.scaling.setAll(70);
 
 
 

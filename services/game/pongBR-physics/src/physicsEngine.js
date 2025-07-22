@@ -11,17 +11,12 @@ export const CFG = {
 	COLLISION_EPSILON: 1e-6,
 	VELOCITY_DAMPING: 0.9999,
 	GOAL_DETECTION_MARGIN: 1,
-
-	GRID_CELL_SIZE_MULTIPLIER: 4, // Ball radius multiplier for grid cells
-	MAX_BROAD_PHASE_CHECKS: 64,   // Limit broad phase checks per cell
+	GRID_CELL_SIZE_MULTIPLIER: 4,
+	MAX_BROAD_PHASE_CHECKS: 64,
 };
 
 const ENTITY_MASKS = {
-	NONE: 0,
-	BALL: 1,
-	PADDLE: 2,
-	PILLAR: 4,
-	STATIC: 8
+	NONE: 0, BALL: 1, PADDLE: 2, PILLAR: 4, STATIC: 8
 };
 
 class PhysicsData {
@@ -29,30 +24,25 @@ class PhysicsData {
 		this.maxEntities = maxEntities;
 		this.count = 0;
 
-		// Position and velocity 
+		// Position and velocity arrays
 		this.posX = new Float32Array(maxEntities);
 		this.posY = new Float32Array(maxEntities);
 		this.velX = new Float32Array(maxEntities);
 		this.velY = new Float32Array(maxEntities);
 
-		// Collision data 
+		// Collision data
 		this.radius = new Float32Array(maxEntities);
 		this.mask = new Uint8Array(maxEntities);
-
 		this.isEliminated = new Uint8Array(maxEntities);
 
-		// Transform data 
+		// Transform data for rectangles
 		this.halfW = new Float32Array(maxEntities);
 		this.halfH = new Float32Array(maxEntities);
 		this.rot = new Float32Array(maxEntities);
 
-		// Arena offset 
-		this.arenaX = 0;
-		this.arenaY = 0;
-
-		// Free list for entity recycling
+		// Entity recycling
 		this.freeList = [];
-		this.generation = new Uint16Array(maxEntities); // For entity versioning
+		this.generation = new Uint16Array(maxEntities);
 	}
 
 	create(mask) {
@@ -61,9 +51,7 @@ class PhysicsData {
 			id = this.freeList.pop();
 			this.generation[id]++;
 		} else {
-			if (this.count >= this.maxEntities) {
-				throw new Error('Maximum entities exceeded');
-			}
+			if (this.count >= this.maxEntities) throw new Error('Maximum entities exceeded');
 			id = this.count++;
 			this.generation[id] = 0;
 		}
@@ -71,11 +59,9 @@ class PhysicsData {
 		this.mask[id] = mask;
 		this.posX[id] = this.posY[id] = 0;
 		this.velX[id] = this.velY[id] = 0;
-		this.radius[id] = 1;
-		this.halfW[id] = this.halfH[id] = 1;
+		this.radius[id] = this.halfW[id] = this.halfH[id] = 1;
 		this.rot[id] = 0;
 		this.isEliminated[id] = 0;
-
 		return id;
 	}
 
@@ -98,13 +84,8 @@ class UniformGrid {
 		this.buckets = new Map();
 	}
 
-	reset() {
-		this.buckets.clear();
-	}
-
-	getKey(gx, gy) {
-		return (gx << 16) | (gy & 0xFFFF);
-	}
+	reset() { this.buckets.clear(); }
+	getKey(gx, gy) { return (gx << 16) | (gy & 0xFFFF); }
 
 	add(id, x, y, radius = 0) {
 		const minGx = Math.floor((x - radius) * this.invCellSize);
@@ -126,51 +107,14 @@ class UniformGrid {
 			}
 		}
 	}
-
-	query(x, y, radius, callback) {
-		const minGx = Math.floor((x - radius) * this.invCellSize);
-		const maxGx = Math.floor((x + radius) * this.invCellSize);
-		const minGy = Math.floor((y - radius) * this.invCellSize);
-		const maxGy = Math.floor((y + radius) * this.invCellSize);
-
-		for (let gx = minGx; gx <= maxGx; gx++) {
-			for (let gy = minGy; gy <= maxGy; gy++) {
-				const key = this.getKey(gx, gy);
-				const bucket = this.buckets.get(key);
-				if (bucket) {
-					for (const id of bucket) {
-						callback(id);
-					}
-				}
-			}
-		}
-	}
 }
-
-const MathUtils = {
-	rotatePoint(x, y, cos, sin) {
-		return {
-			x: x * cos - y * sin,
-			y: x * sin + y * cos
-		};
-	},
-
-	fastSqrt(x) {
-		return Math.sqrt(x);
-	},
-
-	fastInvSqrt(x) {
-		return 1.0 / Math.sqrt(x);
-	}
-};
 
 function collideCircleWithOBB(circleX, circleY, circleRadius, rectX, rectY, rectHalfW, rectHalfH, rectCos, rectSin) {
 	const dx = circleX - rectX;
 	const dy = circleY - rectY;
 
-	const localPoint = MathUtils.rotatePoint(dx, dy, rectCos, -rectSin);
-	const localX = localPoint.x;
-	const localY = localPoint.y;
+	const localX = dx * rectCos + dy * rectSin;
+	const localY = -dx * rectSin + dy * rectCos;
 
 	const closestX = Math.max(-rectHalfW, Math.min(rectHalfW, localX));
 	const closestY = Math.max(-rectHalfH, Math.min(rectHalfH, localY));
@@ -178,35 +122,27 @@ function collideCircleWithOBB(circleX, circleY, circleRadius, rectX, rectY, rect
 	const distX = localX - closestX;
 	const distY = localY - closestY;
 	const distanceSquared = distX * distX + distY * distY;
-	const radiusSquared = circleRadius * circleRadius;
 
-	if (distanceSquared <= radiusSquared) {
+	if (distanceSquared <= circleRadius * circleRadius) {
 		const distance = Math.sqrt(distanceSquared);
-
 		let normalX, normalY;
 
 		if (distance < CFG.COLLISION_EPSILON) {
-			if (rectHalfW - Math.abs(localX) < rectHalfH - Math.abs(localY)) {
-				normalX = localX > 0 ? 1 : -1;
-				normalY = 0;
-			} else {
-				normalX = 0;
-				normalY = localY > 0 ? 1 : -1;
-			}
+			normalX = rectHalfW - Math.abs(localX) < rectHalfH - Math.abs(localY) ? (localX > 0 ? 1 : -1) : 0;
+			normalY = normalX === 0 ? (localY > 0 ? 1 : -1) : 0;
 		} else {
-			const invDistance = 1.0 / distance;
-			normalX = distX * invDistance;
-			normalY = distY * invDistance;
+			normalX = distX / distance;
+			normalY = distY / distance;
 		}
 
-		const worldNormal = MathUtils.rotatePoint(normalX, normalY, rectCos, rectSin);
-		const penetration = circleRadius - distance;
+		const worldNormalX = normalX * rectCos - normalY * rectSin;
+		const worldNormalY = normalX * rectSin + normalY * rectCos;
 
 		return {
 			collision: true,
-			normalX: worldNormal.x,
-			normalY: worldNormal.y,
-			penetration: Math.max(0, penetration)
+			normalX: worldNormalX,
+			normalY: worldNormalY,
+			penetration: Math.max(0, circleRadius - distance)
 		};
 	}
 
@@ -216,8 +152,7 @@ function collideCircleWithOBB(circleX, circleY, circleRadius, rectX, rectY, rect
 class PhysicsSystems {
 	static movement(pd, dt, mask = ENTITY_MASKS.BALL) {
 		for (let i = 0; i < pd.count; i++) {
-			if ((pd.mask[i] & mask) === 0) continue;
-			if (pd.isEliminated[i] === 1) continue;
+			if ((pd.mask[i] & mask) === 0 || pd.isEliminated[i] === 1) continue;
 			pd.posX[i] += pd.velX[i] * dt;
 			pd.posY[i] += pd.velY[i] * dt;
 		}
@@ -228,22 +163,17 @@ class PhysicsSystems {
 		const dy = pd.posY[j] - pd.posY[i];
 		const R = pd.radius[i] + pd.radius[j];
 		const d2 = dx * dx + dy * dy;
-		const R2 = R * R;
 
-		if (d2 >= R2) return false;
+		if (d2 >= R * R) return false;
 
 		const dist = Math.sqrt(d2);
-
 		if (dist < CFG.COLLISION_EPSILON) {
 			const angle = Math.random() * 2 * Math.PI;
 			const separation = R * 0.5;
-			const cos = Math.cos(angle);
-			const sin = Math.sin(angle);
-
-			pd.posX[i] += cos * separation;
-			pd.posY[i] += sin * separation;
-			pd.posX[j] -= cos * separation;
-			pd.posY[j] -= sin * separation;
+			pd.posX[i] += Math.cos(angle) * separation;
+			pd.posY[i] += Math.sin(angle) * separation;
+			pd.posX[j] -= Math.cos(angle) * separation;
+			pd.posY[j] -= Math.sin(angle) * separation;
 			return true;
 		}
 
@@ -260,7 +190,6 @@ class PhysicsSystems {
 
 		const vi = pd.velX[i] * nx + pd.velY[i] * ny;
 		const vj = pd.velX[j] * nx + pd.velY[j] * ny;
-
 		if (vi - vj > 0) {
 			pd.velX[i] -= 2 * vi * nx;
 			pd.velY[i] -= 2 * vi * ny;
@@ -272,22 +201,10 @@ class PhysicsSystems {
 	}
 
 	static ballStaticCollision(pd, ballId, staticId, cfg) {
-		const ballX = pd.posX[ballId];
-		const ballY = pd.posY[ballId];
-		const ballRadius = pd.radius[ballId];
-
-		const staticX = pd.posX[staticId];
-		const staticY = pd.posY[staticId];
-		const staticHalfW = pd.halfW[staticId];
-		const staticHalfH = pd.halfH[staticId];
-		const staticAngle = pd.rot[staticId];
-
-		const cos = Math.cos(staticAngle);
-		const sin = Math.sin(staticAngle);
-
 		const collision = collideCircleWithOBB(
-			ballX, ballY, ballRadius,
-			staticX, staticY, staticHalfW, staticHalfH, cos, sin
+			pd.posX[ballId], pd.posY[ballId], pd.radius[ballId],
+			pd.posX[staticId], pd.posY[staticId], pd.halfW[staticId], pd.halfH[staticId],
+			Math.cos(pd.rot[staticId]), Math.sin(pd.rot[staticId])
 		);
 
 		if (collision.collision) {
@@ -298,7 +215,6 @@ class PhysicsSystems {
 			if (dot > 0) {
 				pd.velX[ballId] -= 2 * dot * collision.normalX;
 				pd.velY[ballId] -= 2 * dot * collision.normalY;
-
 				pd.velX[ballId] *= cfg.VELOCITY_DAMPING;
 				pd.velY[ballId] *= cfg.VELOCITY_DAMPING;
 			}
@@ -317,42 +233,48 @@ export class PhysicsEngine {
 		const gridCellSize = this.cfg.BALL_RADIUS * this.cfg.GRID_CELL_SIZE_MULTIPLIER;
 		this.ballGrid = new UniformGrid(gridCellSize);
 
-		this.entities = {
-			balls: [],
-			paddles: [],
-			pillars: []
+		this.entities = { balls: [], paddles: [], pillars: [] };
+		this.paddleData = {
+			offsets: [], maxOffsets: [], centerAngles: [],
+			inputStates: [], dead: []
 		};
+
 		this.playerStates = {
 			eliminated: new Set(),
 			activePlayers: new Set(),
 			eliminationOrder: []
 		};
 
-
-		this.paddleData = {
-			offsets: [],
-			maxOffsets: [],
-			centerAngles: [],
-			inputStates: [],
-			dead: [] // Add dead status tracking
-		};
-
-		this.paddleTrig = {
-			cos: [],
-			sin: []
-		};
-
 		this.currentPhase = 'Phase 1';
-		this.phaseHistory = [];
+		this.isRebuilding = false;
+		this.rebuildStartTime = 0;
+		this.rebuildDuration = 3000;
+		this.playerMapping = {};
+		this.originalPlayerCount = 0;
 
 		this.gameEvents = [];
 	}
 
+	getPhaseConfig(phase = this.currentPhase) {
+		const configs = {
+			'Phase 1': { playerCount: 100, minPlayers: 51 },
+			'Phase 2': { playerCount: 50, minPlayers: 26 },
+			'Phase 3': { playerCount: 25, minPlayers: 13 },
+			'Phase 4': { playerCount: 12, minPlayers: 7 },
+			'Final Phase': { playerCount: 3, minPlayers: 2 }
+		};
+		return configs[phase] || configs['Phase 1'];
+	}
+
+	getPhasePaddleSize(phase = this.currentPhase) {
+		const perim = 2 * Math.PI * this.cfg.ARENA_RADIUS;
+		const playerCount = this.getPhaseConfig(phase).playerCount;
+		return (perim / playerCount) * this.cfg.PADDLE_FILL;
+	}
+
 	initBattleRoyale(numPlayers, numBalls) {
 		this.reset();
-
-		const cfg = this.cfg;
-		const pd = this.pd;
+		this.originalPlayerCount = numPlayers;
 
 		this.paddleData.offsets = new Float32Array(numPlayers);
 		this.paddleData.maxOffsets = new Float32Array(numPlayers);
@@ -360,9 +282,21 @@ export class PhysicsEngine {
 		this.paddleData.inputStates = new Int8Array(numPlayers);
 		this.paddleData.dead = new Uint8Array(numPlayers);
 
-		this.paddleTrig.cos = new Float32Array(numPlayers);
-		this.paddleTrig.sin = new Float32Array(numPlayers);
+		this.createPaddles(numPlayers);
+		this.createBalls(numBalls);
 
+		this.playerStates.eliminated.clear();
+		this.playerStates.activePlayers.clear();
+		this.playerStates.eliminationOrder = [];
+		for (let pid = 0; pid < numPlayers; pid++) {
+			this.playerStates.activePlayers.add(pid);
+			this.paddleData.dead[pid] = 0;
+		}
+	}
+
+	createPaddles(numPlayers) {
+		const cfg = this.cfg;
+		const pd = this.pd;
 		const angleStep = (2 * Math.PI) / numPlayers;
 		const paddleArc = angleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
@@ -382,10 +316,9 @@ export class PhysicsEngine {
 			this.paddleData.maxOffsets[pid] = maxOffsets;
 			this.paddleData.offsets[pid] = 0;
 
-			const paddleAngle = midAngle;
-			pd.posX[paddleEnt] = Math.cos(paddleAngle) * cfg.ARENA_RADIUS;
-			pd.posY[paddleEnt] = Math.sin(paddleAngle) * cfg.ARENA_RADIUS;
-			pd.rot[paddleEnt] = paddleAngle - Math.PI / 2;
+			pd.posX[paddleEnt] = Math.cos(midAngle) * cfg.ARENA_RADIUS;
+			pd.posY[paddleEnt] = Math.sin(midAngle) * cfg.ARENA_RADIUS;
+			pd.rot[paddleEnt] = midAngle - Math.PI / 2;
 
 			const perim = 2 * Math.PI * cfg.ARENA_RADIUS;
 			const cellW = (perim / numPlayers) * cfg.PADDLE_FILL;
@@ -393,32 +326,23 @@ export class PhysicsEngine {
 			pd.halfH[paddleEnt] = (cellW * cfg.PADDLE_RATIO) / 2;
 			pd.radius[paddleEnt] = cellW / 2;
 
-			this.paddleTrig.cos[pid] = Math.cos(paddleAngle - Math.PI / 2);
-			this.paddleTrig.sin[pid] = Math.sin(paddleAngle - Math.PI / 2);
-
 			const pillarEnt = pd.create(ENTITY_MASKS.PILLAR | ENTITY_MASKS.STATIC);
 			this.entities.pillars[pid] = pillarEnt;
 
 			const pillarAngle = midAngle - maxOffsets - halfArc;
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
-			const baseX = Math.cos(pillarAngle) * cfg.ARENA_RADIUS;
-			const baseY = Math.sin(pillarAngle) * cfg.ARENA_RADIUS;
-
-			const tx = -Math.sin(pillarAngle);
-			const ty = Math.cos(pillarAngle);
-			const halfThickness = pillarSize / 2;
-
-			pd.posX[pillarEnt] = baseX - tx * halfThickness;
-			pd.posY[pillarEnt] = baseY - ty * halfThickness;
+			pd.posX[pillarEnt] = Math.cos(pillarAngle) * cfg.ARENA_RADIUS;
+			pd.posY[pillarEnt] = Math.sin(pillarAngle) * cfg.ARENA_RADIUS;
 			pd.rot[pillarEnt] = pillarAngle;
-
-			pd.halfW[pillarEnt] = pillarSize / 2;
-			pd.halfH[pillarEnt] = pillarSize / 2;
-			pd.radius[pillarEnt] = pillarSize / 2;
+			pd.halfW[pillarEnt] = pd.halfH[pillarEnt] = pd.radius[pillarEnt] = pillarSize / 2;
 		}
+	}
 
-		// Create balls
+	createBalls(numBalls) {
+		const cfg = this.cfg;
+		const pd = this.pd;
+
 		for (let b = 0; b < numBalls; b++) {
 			const ballEnt = pd.create(ENTITY_MASKS.BALL);
 			this.entities.balls[b] = ballEnt;
@@ -426,31 +350,24 @@ export class PhysicsEngine {
 			pd.radius[ballEnt] = cfg.BALL_RADIUS;
 
 			const maxSpawnRadius = cfg.ARENA_RADIUS * 0.6;
-			const r0 = Math.sqrt(Math.random()) * maxSpawnRadius;
-			const t0 = Math.random() * 2 * Math.PI;
-			pd.posX[ballEnt] = r0 * Math.cos(t0);
-			pd.posY[ballEnt] = r0 * Math.sin(t0);
+			const r = Math.sqrt(Math.random()) * maxSpawnRadius;
+			const theta = Math.random() * 2 * Math.PI;
+			pd.posX[ballEnt] = r * Math.cos(theta);
+			pd.posY[ballEnt] = r * Math.sin(theta);
 
-			const d = Math.random() * 2 * Math.PI;
-			pd.velX[ballEnt] = Math.cos(d) * cfg.INITIAL_SPEED;
-			pd.velY[ballEnt] = Math.sin(d) * cfg.INITIAL_SPEED;
-		}
-		this.playerStates.eliminated.clear();
-		this.playerStates.activePlayers.clear();
-		this.playerStates.eliminationOrder = [];
-
-		for (let pid = 0; pid < numPlayers; pid++) {
-			this.playerStates.activePlayers.add(pid);
-			this.paddleData.dead[pid] = 0;
+			const dir = Math.random() * 2 * Math.PI;
+			pd.velX[ballEnt] = Math.cos(dir) * cfg.INITIAL_SPEED;
+			pd.velY[ballEnt] = Math.sin(dir) * cfg.INITIAL_SPEED;
 		}
 	}
+
 	checkGoalCollisions() {
 		const pd = this.pd;
 		const cfg = this.cfg;
 
 		for (let ballIndex = this.entities.balls.length - 1; ballIndex >= 0; ballIndex--) {
 			const ballEnt = this.entities.balls[ballIndex];
-			if (!pd.isActive(ballEnt)) continue;
+			if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
 
 			const ballX = pd.posX[ballEnt];
 			const ballY = pd.posY[ballEnt];
@@ -469,72 +386,46 @@ export class PhysicsEngine {
 	}
 
 	findPlayerByAngle(ballAngle) {
-		let normalizedAngle = ballAngle;
-		while (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
-		while (normalizedAngle >= 2 * Math.PI) normalizedAngle -= 2 * Math.PI;
+		while (ballAngle < 0) ballAngle += 2 * Math.PI;
+		while (ballAngle >= 2 * Math.PI) ballAngle -= 2 * Math.PI;
 
 		const numPlayers = this.entities.paddles.length;
 		const angleStep = (2 * Math.PI) / numPlayers;
 
 		for (let pid = 0; pid < numPlayers; pid++) {
-			if (this.playerStates.eliminated.has(pid)) continue;
+			const sliceStart = pid * angleStep;
+			const sliceEnd = (pid + 1) * angleStep;
 
-			const centerAngle = this.paddleData.centerAngles[pid];
-			const sliceStart = (pid * angleStep);
-			const sliceEnd = ((pid + 1) * angleStep);
-			let normalizedStart = sliceStart;
-			let normalizedEnd = sliceEnd;
-
-			while (normalizedStart < 0) normalizedStart += 2 * Math.PI;
-			while (normalizedStart >= 2 * Math.PI) normalizedStart -= 2 * Math.PI;
-			while (normalizedEnd < 0) normalizedEnd += 2 * Math.PI;
-			while (normalizedEnd >= 2 * Math.PI) normalizedEnd -= 2 * Math.PI;
-
-			let withinGoal = false;
-			if (normalizedStart <= normalizedEnd) {
-				withinGoal = normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
+			let withinSlice;
+			if (sliceStart <= sliceEnd) {
+				withinSlice = ballAngle >= sliceStart && ballAngle <= sliceEnd;
 			} else {
-				withinGoal = normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd;
+				withinSlice = ballAngle >= sliceStart || ballAngle <= sliceEnd;
 			}
 
-			if (withinGoal) {
+			if (withinSlice) {
+				if (this.playerMapping && Object.keys(this.playerMapping).length > 0) {
+					const reverseMapping = Object.entries(this.playerMapping).find(([origId, newIdx]) => newIdx === pid);
+					return reverseMapping ? parseInt(reverseMapping[0]) : pid;
+				}
 				return pid;
 			}
 		}
-
 		return -1;
 	}
 
 	eliminatePlayer(playerId, ballIndex) {
-		const pd = this.pd;
-
 		// Mark player as eliminated
 		this.playerStates.eliminated.add(playerId);
 		this.playerStates.activePlayers.delete(playerId);
 		this.paddleData.dead[playerId] = 1;
 		this.playerStates.eliminationOrder.push({
-			playerId,
-			timestamp: Date.now(),
-			ballIndex
+			playerId, timestamp: Date.now(), ballIndex
 		});
 
-		// Remove the ball that scored the goal
 		this.disableBall(ballIndex);
-
 		this.convertPaddleToWall(playerId);
-		// Keep paddle and pillar active but mark as eliminated for rendering
-		// They stay in place for future phase transitions
-		const paddleEnt = this.entities.paddles[playerId];
-		const pillarEnt = this.entities.pillars[playerId];
 
-		if (pd.isActive(paddleEnt)) {
-			pd.isEliminated[paddleEnt] = 1; // Visual marker only
-		}
-		if (pd.isActive(pillarEnt)) {
-			pd.isEliminated[pillarEnt] = 1; // Visual marker only
-		}
-
-		// Create elimination event
 		this.gameEvents.push({
 			type: 'PLAYER_ELIMINATED',
 			playerId,
@@ -543,66 +434,39 @@ export class PhysicsEngine {
 		});
 
 		console.log(`Player ${playerId} eliminated! ${this.playerStates.activePlayers.size} players remaining.`);
-
-		// Check for phase transition instead of immediate game end
 		this.checkPhaseTransition();
 	}
 
 	convertPaddleToWall(playerId) {
 		const pd = this.pd;
-		const cfg = this.cfg;
 		const paddleEnt = this.entities.paddles[playerId];
 		const pillarEnt = this.entities.pillars[playerId];
 
-		if (!pd.isActive(paddleEnt)) return;
-
-		const numPlayers = this.entities.paddles.length;
-		const angleStep = (2 * Math.PI) / numPlayers;
-		const centerAngle = this.paddleData.centerAngles[playerId];
-
-		const wallArc = angleStep; // Full slice width
-		const wallAngle = centerAngle;
-
-		pd.posX[paddleEnt] = Math.cos(wallAngle) * cfg.ARENA_RADIUS;
-		pd.posY[paddleEnt] = Math.sin(wallAngle) * cfg.ARENA_RADIUS;
-		pd.rot[paddleEnt] = wallAngle - Math.PI / 2;
-
-		const perim = 2 * Math.PI * cfg.ARENA_RADIUS;
-		const wallWidth = (perim / numPlayers);
-		pd.halfW[paddleEnt] = wallWidth / 2;
-		pd.halfH[paddleEnt] = (wallWidth * cfg.PADDLE_RATIO) / 2;
-
-		pd.isEliminated[paddleEnt] = 1;
-
+		if (pd.isActive(paddleEnt)) {
+			// Keep paddle in place as static wall
+			pd.isEliminated[paddleEnt] = 1;
+			this.paddleData.offsets[playerId] = 0;
+		}
 		if (pd.isActive(pillarEnt)) {
 			pd.isEliminated[pillarEnt] = 1;
 		}
-
-		this.paddleData.offsets[playerId] = 0;
 	}
 
 	checkPhaseTransition() {
 		const remainingPlayers = this.playerStates.activePlayers.size;
-		const totalPlayers = this.entities.paddles.length;
-
-		const phaseThresholds = [
-			{ minPlayers: 50, name: 'Phase 1' },
-			{ minPlayers: 25, name: 'Phase 2' },
-			{ minPlayers: 12, name: 'Phase 3' },
-			{ minPlayers: 6, name: 'Phase 4' },
-			{ minPlayers: 3, name: 'Final Phase' }
-		];
-
-		let currentPhase = null;
-		for (const phase of phaseThresholds) {
-			if (remainingPlayers >= phase.minPlayers) {
-				currentPhase = phase;
-				break;
-			}
+		let targetPhase = this.currentPhase;
+		if (remainingPlayers <= 1) {
+			this.endGame();
 		}
 
-		if (currentPhase && this.currentPhase !== currentPhase.name) {
-			this.triggerPhaseTransition(currentPhase);
+		if (remainingPlayers <= 3 && remainingPlayers > 1) targetPhase = 'Final Phase';
+		else if (remainingPlayers <= 12) targetPhase = 'Phase 4';
+		else if (remainingPlayers <= 25) targetPhase = 'Phase 3';
+		else if (remainingPlayers <= 50) targetPhase = 'Phase 2';
+		else targetPhase = 'Phase 1';
+
+		if (this.currentPhase !== targetPhase) {
+			this.triggerPhaseTransition({ name: targetPhase });
 		} else if (remainingPlayers <= 1) {
 			this.endGame();
 		}
@@ -610,7 +474,6 @@ export class PhysicsEngine {
 
 	triggerPhaseTransition(newPhase) {
 		this.currentPhase = newPhase.name;
-
 		this.gameEvents.push({
 			type: 'PHASE_TRANSITION',
 			phase: newPhase.name,
@@ -619,33 +482,393 @@ export class PhysicsEngine {
 		});
 
 		console.log(`Phase Transition: ${newPhase.name} - ${this.playerStates.activePlayers.size} players remaining`);
-
-		// Future:  rebuild the arena
+		this.startArenaRebuild();
 	}
 
-	rebuildArenaForPhase(phaseName) {
-		const activePlayers = Array.from(this.playerStates.activePlayers);
+	startArenaRebuild() {
+		this.isRebuilding = true;
+		this.rebuildStartTime = Date.now();
 
-		// Future implementation:
-		// 1. Calculate new arena size/configuration
-		// 2. Reposition active players
-		// 3. Remove eliminated players' entities
-		// 4. Adjust ball physics if needed
+		// Move balls away immediately when rebuild starts
+		this.moveAllBallsAway();
 
-		console.log(`Rebuilding arena for ${phaseName} with ${activePlayers.length} players`);
+		console.log(`Starting arena rebuild for ${this.currentPhase}...`);
+	}
 
-		this.gameEvents.push({
-			type: 'ARENA_REBUILT',
-			phase: phaseName,
-			activePlayers: [...activePlayers],
-			timestamp: Date.now()
+	checkRebuildComplete() {
+		if (!this.isRebuilding) return false;
+
+		const elapsed = Date.now() - this.rebuildStartTime;
+		if (elapsed >= this.rebuildDuration) {
+			this.completeArenaRebuild();
+			return true;
+		}
+		return false;
+	}
+
+	completeArenaRebuild() {
+		console.log(`Completing arena rebuild for ${this.currentPhase}`);
+
+		const eliminatedPlayerIds = Array.from(this.playerStates.eliminated);
+		eliminatedPlayerIds.forEach(playerId => {
+			if (this.entities.paddles[playerId] !== undefined && this.pd.isActive(this.entities.paddles[playerId])) {
+				this.pd.destroy(this.entities.paddles[playerId]);
+			}
+			if (this.entities.pillars[playerId] !== undefined && this.pd.isActive(this.entities.pillars[playerId])) {
+				this.pd.destroy(this.entities.pillars[playerId]);
+			}
 		});
+
+		this.redistributeSurvivingPlayers();
+		this.resetBallsForNewPhase();
+
+		this.isRebuilding = false;
+		this.playerStates.eliminated.clear();
+
+		console.log(`Arena rebuild complete! ${this.playerStates.activePlayers.size} players remaining.`);
+	}
+
+	moveAllBallsAway() {
+		const pd = this.pd;
+		const farDistance = this.cfg.ARENA_RADIUS * 10;
+
+		for (const ballEnt of this.entities.balls) {
+			if (pd.isActive(ballEnt)) {
+				pd.posX[ballEnt] = farDistance;
+				pd.posY[ballEnt] = farDistance;
+				pd.velX[ballEnt] = 0;
+				pd.velY[ballEnt] = 0;
+			}
+		}
+		console.log(`Moved ${this.entities.balls.length} balls away from arena`);
+	}
+
+	redistributeSurvivingPlayers() {
+		const pd = this.pd;
+		const cfg = this.cfg;
+		const activePlayers = Array.from(this.playerStates.activePlayers).sort((a, b) => a - b);
+		const numActivePlayers = activePlayers.length;
+
+		if (numActivePlayers === 0) return;
+
+		const newAngleStep = (2 * Math.PI) / numActivePlayers;
+		const phaseConfig = this.getPhaseConfig();
+		const phaseAngleStep = (2 * Math.PI) / phaseConfig.playerCount;
+		const paddleArc = phaseAngleStep * cfg.PADDLE_FILL;
+		const halfArc = paddleArc / 2;
+		const pillarArc = phaseAngleStep * 0.1;
+		const usableArc = phaseAngleStep - pillarArc;
+		const halfUsableArc = usableArc / 2;
+		const maxOffsets = halfUsableArc - halfArc;
+
+		const phaseCellW = this.getPhasePaddleSize();
+		const paddleHalfW = phaseCellW / 2;
+		const paddleHalfH = (phaseCellW * cfg.PADDLE_RATIO) / 2;
+
+		const newPaddles = [];
+		const newPillars = [];
+		const newPaddleData = {
+			offsets: new Float32Array(numActivePlayers),
+			maxOffsets: new Float32Array(numActivePlayers),
+			centerAngles: new Float32Array(numActivePlayers),
+			inputStates: new Int8Array(numActivePlayers),
+			dead: new Uint8Array(numActivePlayers)
+		};
+
+		activePlayers.forEach((originalPlayerId, newIndex) => {
+			const midAngle = newIndex * newAngleStep + newAngleStep / 2;
+
+			const paddleEnt = pd.create(ENTITY_MASKS.PADDLE);
+			newPaddles[newIndex] = paddleEnt;
+
+			newPaddleData.centerAngles[newIndex] = midAngle;
+			newPaddleData.maxOffsets[newIndex] = maxOffsets;
+			newPaddleData.offsets[newIndex] = 0;
+			newPaddleData.inputStates[newIndex] = 0;
+			newPaddleData.dead[newIndex] = 0;
+
+			pd.posX[paddleEnt] = Math.cos(midAngle) * cfg.ARENA_RADIUS;
+			pd.posY[paddleEnt] = Math.sin(midAngle) * cfg.ARENA_RADIUS;
+			pd.rot[paddleEnt] = midAngle - Math.PI / 2;
+			pd.halfW[paddleEnt] = paddleHalfW;
+			pd.halfH[paddleEnt] = paddleHalfH;
+			pd.radius[paddleEnt] = paddleHalfW;
+			pd.isEliminated[paddleEnt] = 0;
+
+			const pillarEnt = pd.create(ENTITY_MASKS.PILLAR | ENTITY_MASKS.STATIC);
+			newPillars[newIndex] = pillarEnt;
+
+			const pillarAngle = midAngle - maxOffsets - halfArc;
+			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
+
+			pd.posX[pillarEnt] = Math.cos(pillarAngle) * cfg.ARENA_RADIUS;
+			pd.posY[pillarEnt] = Math.sin(pillarAngle) * cfg.ARENA_RADIUS;
+			pd.rot[pillarEnt] = pillarAngle;
+			pd.halfW[pillarEnt] = pd.halfH[pillarEnt] = pd.radius[pillarEnt] = pillarSize / 2;
+			pd.isEliminated[pillarEnt] = 0;
+		});
+
+		this.entities.paddles = newPaddles;
+		this.entities.pillars = newPillars;
+		this.paddleData = newPaddleData;
+
+		this.playerMapping = {};
+		activePlayers.forEach((originalId, newIndex) => {
+			this.playerMapping[originalId] = newIndex;
+		});
+
+		console.log(`Redistributed ${numActivePlayers} surviving players with ${this.currentPhase} paddle sizes`);
+	}
+
+	resetBallsForNewPhase() {
+		const pd = this.pd;
+		const cfg = this.cfg;
+		const numActivePlayers = this.playerStates.activePlayers.size;
+
+		const ballsPerPlayer = Math.floor(cfg.INITIAL_BALLS / cfg.MAX_PLAYERS);
+		const newBallCount = Math.max(ballsPerPlayer * numActivePlayers, 20);
+
+		this.entities.balls.forEach(ballEnt => {
+			if (pd.isActive(ballEnt)) pd.destroy(ballEnt);
+		});
+		this.entities.balls = [];
+
+		this.createBalls(newBallCount);
+		console.log(`Reset balls: created ${newBallCount} new balls`);
+	}
+
+	updatePaddleInputState(originalPlayerId, moveInput) {
+		if (this.isRebuilding) return;
+
+		const newIndex = this.playerMapping ? this.playerMapping[originalPlayerId] : originalPlayerId;
+		if (newIndex !== undefined && newIndex >= 0 && newIndex < this.paddleData.inputStates.length) {
+			if (!this.playerStates.eliminated.has(originalPlayerId)) {
+				this.paddleData.inputStates[newIndex] = Math.max(-1, Math.min(1, moveInput));
+			}
+		}
+	}
+
+	updatePaddleMovement() {
+		const cfg = this.cfg;
+		const pd = this.pd;
+		const dt = 1 / this.cfg.TARGET_FPS;
+		const moveSpeed = 10;
+		const numPlayers = this.entities.paddles.length;
+
+		for (let pid = 0; pid < numPlayers; pid++) {
+			const paddleEnt = this.entities.paddles[pid];
+			if (!pd.isActive(paddleEnt) || this.paddleData.inputStates[pid] === 0) continue;
+
+			const deltaOffset = this.paddleData.inputStates[pid] * moveSpeed / numPlayers / 4 * dt;
+			const newOffset = this.paddleData.offsets[pid] + deltaOffset;
+			const maxOffset = this.paddleData.maxOffsets[pid];
+
+			this.paddleData.offsets[pid] = Math.max(-maxOffset, Math.min(maxOffset, newOffset));
+
+			const centerAngle = this.paddleData.centerAngles[pid];
+			const currentAngle = centerAngle + this.paddleData.offsets[pid];
+
+			pd.posX[paddleEnt] = Math.cos(currentAngle) * cfg.ARENA_RADIUS;
+			pd.posY[paddleEnt] = Math.sin(currentAngle) * cfg.ARENA_RADIUS;
+			pd.rot[paddleEnt] = currentAngle - Math.PI / 2;
+
+			pd.velX[paddleEnt] = pd.velY[paddleEnt] = 0;
+		}
+	}
+
+	handleArenaCollisions() {
+		const pd = this.pd;
+		const cfg = this.cfg;
+		const numPlayers = this.entities.paddles.length;
+		const angleStep = (2 * Math.PI) / numPlayers;
+
+		for (const ballEnt of this.entities.balls) {
+			if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
+
+			const ballX = pd.posX[ballEnt];
+			const ballY = pd.posY[ballEnt];
+			const distFromCenter = Math.sqrt(ballX * ballX + ballY * ballY);
+			const collisionDistance = cfg.ARENA_RADIUS - pd.radius[ballEnt];
+
+			if (distFromCenter >= collisionDistance && distFromCenter <= cfg.ARENA_RADIUS + 1) {
+				const invDist = 1.0 / distFromCenter;
+				const nx = ballX * invDist;
+				const ny = ballY * invDist;
+				const velocityDotNormal = pd.velX[ballEnt] * nx + pd.velY[ballEnt] * ny;
+
+				if (velocityDotNormal <= 0) continue;
+
+				const ballAngle = Math.atan2(ballY, ballX);
+				let normalizedBallAngle = ballAngle;
+				while (normalizedBallAngle < 0) normalizedBallAngle += 2 * Math.PI;
+				while (normalizedBallAngle >= 2 * Math.PI) normalizedBallAngle -= 2 * Math.PI;
+
+				for (let paddleIndex = 0; paddleIndex < numPlayers; paddleIndex++) {
+					let currentPaddleAngle, arcWidth;
+
+					if (this.playerStates.eliminated.has(paddleIndex)) {
+						currentPaddleAngle = this.paddleData.centerAngles[paddleIndex];
+						arcWidth = angleStep;
+					} else {
+						currentPaddleAngle = this.paddleData.centerAngles[paddleIndex] + this.paddleData.offsets[paddleIndex];
+						arcWidth = angleStep * cfg.PADDLE_FILL;
+					}
+
+					const startAngle = currentPaddleAngle - arcWidth / 2;
+					const endAngle = currentPaddleAngle + arcWidth / 2;
+
+					let normalizedStart = startAngle;
+					let normalizedEnd = endAngle;
+					while (normalizedStart < 0) normalizedStart += 2 * Math.PI;
+					while (normalizedStart >= 2 * Math.PI) normalizedStart -= 2 * Math.PI;
+					while (normalizedEnd < 0) normalizedEnd += 2 * Math.PI;
+					while (normalizedEnd >= 2 * Math.PI) normalizedEnd -= 2 * Math.PI;
+
+					let withinSlice;
+					if (normalizedStart <= normalizedEnd) {
+						withinSlice = normalizedBallAngle >= normalizedStart && normalizedBallAngle <= normalizedEnd;
+					} else {
+						withinSlice = normalizedBallAngle >= normalizedStart || normalizedBallAngle <= normalizedEnd;
+					}
+
+					if (withinSlice) {
+						pd.posX[ballEnt] = nx * collisionDistance;
+						pd.posY[ballEnt] = ny * collisionDistance;
+
+						const dot = pd.velX[ballEnt] * nx + pd.velY[ballEnt] * ny;
+						pd.velX[ballEnt] -= 2 * dot * nx;
+						pd.velY[ballEnt] -= 2 * dot * ny;
+						pd.velX[ballEnt] *= cfg.VELOCITY_DAMPING;
+						pd.velY[ballEnt] *= cfg.VELOCITY_DAMPING;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	step() {
+		if (this.gameOver) return this.getState();
+
+		this.checkRebuildComplete();
+		if (this.isRebuilding) return this.getState();
+
+		const pd = this.pd;
+		const cfg = this.cfg;
+
+		this.updatePaddleMovement();
+
+		for (let ss = 0; ss < cfg.SUB_STEPS; ss++) {
+			PhysicsSystems.movement(pd, this.dt, ENTITY_MASKS.BALL);
+			this.handleArenaCollisions();
+
+			for (const ballEnt of this.entities.balls) {
+				if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
+				for (const pillarEnt of this.entities.pillars) {
+					if (!pd.isActive(pillarEnt)) continue;
+					PhysicsSystems.ballStaticCollision(pd, ballEnt, pillarEnt, cfg);
+				}
+			}
+
+			this.ballGrid.reset();
+			for (const ballEnt of this.entities.balls) {
+				if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
+				this.ballGrid.add(ballEnt, pd.posX[ballEnt], pd.posY[ballEnt], pd.radius[ballEnt]);
+			}
+
+			const processedPairs = new Set();
+			for (const bucket of this.ballGrid.buckets.values()) {
+				if (bucket.length < 2) continue;
+
+				for (let i = 0; i < bucket.length; i++) {
+					for (let j = i + 1; j < bucket.length; j++) {
+						const idA = bucket[i];
+						const idB = bucket[j];
+						const pairKey = idA < idB ? `${idA},${idB}` : `${idB},${idA}`;
+						if (processedPairs.has(pairKey)) continue;
+						processedPairs.add(pairKey);
+						PhysicsSystems.ballBallCollision(pd, idA, idB);
+					}
+				}
+			}
+		}
+
+		this.checkGoalCollisions();
+		return this.getState();
+	}
+
+	getState() {
+		const pd = this.pd;
+
+		const balls = this.entities.balls
+			.filter(ent => pd.isActive(ent) && pd.isEliminated[ent] !== 1)
+			.map((ent, i) => ({
+				id: i,
+				x: pd.posX[ent], y: pd.posY[ent],
+				vx: pd.velX[ent], vy: pd.velY[ent],
+				radius: pd.radius[ent]
+			}));
+
+		const paddles = this.entities.paddles
+			.filter(ent => ent !== undefined && pd.isActive(ent))
+			.map((ent, i) => ({
+				id: i,
+				move: this.paddleData.inputStates[i] || 0,
+				offset: this.paddleData.offsets[i] || 0,
+				dead: this.paddleData.dead[i] === 1
+			}));
+
+		const events = [...this.gameEvents];
+		this.gameEvents = [];
+
+		return {
+			balls, paddles,
+			score: [],
+			ranks: this.calculatePlayerRanks(),
+			stage: this.getStageFromPhase(),
+			events,
+			gameState: {
+				activePlayers: Array.from(this.playerStates.activePlayers),
+				eliminatedPlayers: Array.from(this.playerStates.eliminated),
+				currentPhase: this.currentPhase,
+				isRebuilding: this.isRebuilding,
+				rebuildTimeRemaining: this.isRebuilding ?
+					Math.max(0, this.rebuildDuration - (Date.now() - this.rebuildStartTime)) : 0,
+				playerMapping: this.playerMapping,
+				isGameOver: this.gameOver || this.playerStates.activePlayers.size <= 1,
+				winner: this.playerStates.activePlayers.size === 1
+					? Array.from(this.playerStates.activePlayers)[0] : null
+			},
+			config: this.cfg,
+			frameStats: {
+				activeBalls: balls.length,
+				activePaddles: paddles.length,
+				totalPlayers: this.entities.paddles.length
+			}
+		};
+	}
+
+	calculatePlayerRanks() {
+		const ranks = new Array(this.originalPlayerCount).fill(0);
+		this.playerStates.eliminationOrder.forEach((elimination, index) => {
+			ranks[elimination.playerId] = this.originalPlayerCount - index;
+		});
+		this.playerStates.activePlayers.forEach(playerId => {
+			ranks[playerId] = 1;
+		});
+		return ranks;
+	}
+
+	getStageFromPhase() {
+		const stages = { 'Phase 1': 1, 'Phase 2': 2, 'Phase 3': 3, 'Phase 4': 4, 'Final Phase': 5 };
+		return stages[this.currentPhase] || 1;
 	}
 
 	endGame() {
-		const winner = this.playerStates.activePlayers.size === 1
-			? Array.from(this.playerStates.activePlayers)[0]
-			: null;
+		const activePlayers = Array.from(this.playerStates.activePlayers);
+		const winner = activePlayers.length === 1 ? activePlayers[0] : null;
+
+		this.gameOver = true;
 
 		this.gameEvents.push({
 			type: 'GAME_END',
@@ -665,282 +888,21 @@ export class PhysicsEngine {
 		this.entities.pillars.length = 0;
 	}
 
-	updatePaddleInputState(pid, moveInput) {
-		if (pid >= 0 && pid < this.paddleData.inputStates.length) {
-			this.paddleData.inputStates[pid] = Math.max(-1, Math.min(1, moveInput));
-		}
-	}
-
-	updatePaddleMovement() {
-		const cfg = this.cfg;
-		const pd = this.pd;
-		const dt = 1 / this.cfg.TARGET_FPS; // Full frame time
-		const moveSpeed = 10.;
-		const numPlayers = this.entities.paddles.length;
-
-		for (let pid = 0; pid < numPlayers; pid++) {
-			if (this.playerStates.eliminated.has(pid)) continue;
-			const paddleEnt = this.entities.paddles[pid];
-			if (!pd.isActive(paddleEnt)) continue;
-
-			const moveInput = this.paddleData.inputStates[pid];
-			if (moveInput === 0) continue;
-
-			const deltaOffset = moveInput * moveSpeed / numPlayers / 4 * dt;
-			const newOffset = this.paddleData.offsets[pid] + deltaOffset;
-			const maxOffset = this.paddleData.maxOffsets[pid];
-
-			this.paddleData.offsets[pid] = Math.max(-maxOffset, Math.min(maxOffset, newOffset));
-
-			const centerAngle = this.paddleData.centerAngles[pid];
-			const currentAngle = centerAngle + this.paddleData.offsets[pid];
-
-			pd.posX[paddleEnt] = Math.cos(currentAngle) * cfg.ARENA_RADIUS;
-			pd.posY[paddleEnt] = Math.sin(currentAngle) * cfg.ARENA_RADIUS;
-			pd.rot[paddleEnt] = currentAngle - Math.PI / 2;
-
-			// Update precomputed trigonometry
-			this.paddleTrig.cos[pid] = Math.cos(pd.rot[paddleEnt]);
-			this.paddleTrig.sin[pid] = Math.sin(pd.rot[paddleEnt]);
-
-			pd.velX[paddleEnt] = 0;
-			pd.velY[paddleEnt] = 0;
-		}
-	}
-
-	handleArenaCollisions() {
-		const pd = this.pd;
-		const cfg = this.cfg;
-		const numPlayers = this.entities.paddles.length;
-		const angleStep = (2 * Math.PI) / numPlayers;
-
-		for (const ballEnt of this.entities.balls) {
-			if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
-
-			const ballX = pd.posX[ballEnt];
-			const ballY = pd.posY[ballEnt];
-			const ballRadius = pd.radius[ballEnt];
-			const distFromCenter = Math.sqrt(ballX * ballX + ballY * ballY);
-
-			const collisionDistance = cfg.ARENA_RADIUS - ballRadius;
-
-			if (distFromCenter >= collisionDistance && distFromCenter <= cfg.ARENA_RADIUS + 1) {
-				const invDist = 1.0 / distFromCenter;
-				const nx = ballX * invDist;
-				const ny = ballY * invDist;
-				const velocityDotNormal = pd.velX[ballEnt] * nx + pd.velY[ballEnt] * ny;
-
-				if (velocityDotNormal <= 0) continue;
-
-				const ballAngle = Math.atan2(ballY, ballX);
-				let normalizedBallAngle = ballAngle;
-				while (normalizedBallAngle < 0) normalizedBallAngle += 2 * Math.PI;
-				while (normalizedBallAngle >= 2 * Math.PI) normalizedBallAngle -= 2 * Math.PI;
-
-				// Check paddle collisions
-				for (let paddleIndex = 0; paddleIndex < numPlayers; paddleIndex++) {
-					let currentPaddleAngle, arcWidth;
-
-					if (this.playerStates.eliminated.has(paddleIndex)) {
-						// Eliminated player - treat as full wall
-						currentPaddleAngle = this.paddleData.centerAngles[paddleIndex];
-						arcWidth = angleStep; // Full arc width
-					} else {
-						// Active player - normal paddle
-						currentPaddleAngle = this.paddleData.centerAngles[paddleIndex] + this.paddleData.offsets[paddleIndex];
-						arcWidth = angleStep * cfg.PADDLE_FILL;
-					}
-
-					const startAngle = currentPaddleAngle - arcWidth / 2;
-					const endAngle = currentPaddleAngle + arcWidth / 2;
-
-					let normalizedStart = startAngle;
-					let normalizedEnd = endAngle;
-
-					while (normalizedStart < 0) normalizedStart += 2 * Math.PI;
-					while (normalizedStart >= 2 * Math.PI) normalizedStart -= 2 * Math.PI;
-					while (normalizedEnd < 0) normalizedEnd += 2 * Math.PI;
-					while (normalizedEnd >= 2 * Math.PI) normalizedEnd -= 2 * Math.PI;
-
-					let withinSlice = false;
-					if (normalizedStart <= normalizedEnd) {
-						withinSlice = normalizedBallAngle >= normalizedStart && normalizedBallAngle <= normalizedEnd;
-					} else {
-						withinSlice = normalizedBallAngle >= normalizedStart || normalizedBallAngle <= normalizedEnd;
-					}
-
-					if (withinSlice) {
-						// Position correction
-						pd.posX[ballEnt] = nx * collisionDistance;
-						pd.posY[ballEnt] = ny * collisionDistance;
-
-						// Velocity reflection
-						const dot = pd.velX[ballEnt] * nx + pd.velY[ballEnt] * ny;
-						pd.velX[ballEnt] -= 2 * dot * nx;
-						pd.velY[ballEnt] -= 2 * dot * ny;
-
-						pd.velX[ballEnt] *= cfg.VELOCITY_DAMPING;
-						pd.velY[ballEnt] *= cfg.VELOCITY_DAMPING;
-						break;
-					}
-				}
-			}
-		}
-	}
-	step() {
-		const pd = this.pd;
-		const cfg = this.cfg;
-
-		for (const pillarEnt of this.entities.pillars) {
-			if (pd.isActive(pillarEnt)) {
-				pd.velX[pillarEnt] = 0;
-				pd.velY[pillarEnt] = 0;
-			}
-		}
-
-		this.updatePaddleMovement();
-
-		const subDt = this.dt;
-
-		for (let ss = 0; ss < cfg.SUB_STEPS; ss++) {
-			PhysicsSystems.movement(pd, subDt, ENTITY_MASKS.BALL);
-
-			this.handleArenaCollisions();
-
-			for (const ballEnt of this.entities.balls) {
-				if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
-
-				for (const pillarEnt of this.entities.pillars) {
-					if (!pd.isActive(pillarEnt)) continue;
-					PhysicsSystems.ballStaticCollision(pd, ballEnt, pillarEnt, cfg);
-				}
-			}
-
-			this.ballGrid.reset();
-
-			for (const ballEnt of this.entities.balls) {
-				if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
-
-				this.ballGrid.add(ballEnt, pd.posX[ballEnt], pd.posY[ballEnt], pd.radius[ballEnt]);
-			}
-
-			const processedPairs = new Set();
-
-			for (const bucket of this.ballGrid.buckets.values()) {
-				if (bucket.length < 2) continue;
-
-				const entries = bucket.map(id => ({
-					id,
-					minX: pd.posX[id] - pd.radius[id],
-					maxX: pd.posX[id] + pd.radius[id]
-				}));
-				entries.sort((a, b) => a.minX - b.minX);
-
-				for (let i = 0; i < entries.length; i++) {
-					for (let j = i + 1; j < entries.length; j++) {
-						if (entries[j].minX > entries[i].maxX) break;
-
-						const idA = entries[i].id;
-						const idB = entries[j].id;
-
-						const pairKey = idA < idB ? `${idA},${idB}` : `${idB},${idA}`;
-						if (processedPairs.has(pairKey)) continue;
-						processedPairs.add(pairKey);
-
-						PhysicsSystems.ballBallCollision(pd, idA, idB);
-					}
-				}
-			}
-		}
-
-		this.checkGoalCollisions();
-		return this.getState();
-	}
-
-	getState() {
-		const pd = this.pd;
-
-		const balls = this.entities.balls
-			.filter(ent => pd.isActive(ent))
-			.map((ent, i) => ({
-				id: i,
-				x: pd.posX[ent],
-				y: pd.posY[ent],
-				vx: pd.velX[ent],
-				vy: pd.velY[ent],
-				radius: pd.radius[ent]
-			}));
-
-		const paddles = this.entities.paddles
-			.filter(ent => pd.isActive(ent))
-			.map((ent, i) => ({
-				id: i,
-				offset: this.paddleData.offsets[i],
-				x: pd.posX[ent],
-				y: pd.posY[ent],
-				dead: this.paddleData.dead[i] === 1,
-				rot: pd.rot[ent]
-			}));
-
-		const pillars = this.entities.pillars
-			.filter(ent => pd.isActive(ent))
-			.map((ent, i) => ({
-				id: i,
-				x: pd.posX[ent],
-				y: pd.posY[ent],
-				rot: pd.rot[ent],
-				radius: pd.radius[ent],
-				halfW: pd.halfW[ent],
-				halfH: pd.halfH[ent]
-			}));
-
-		return {
-			balls,
-			paddles,
-			pillars,
-			events: [],
-			arenaCenter: { x: pd.arenaX, y: pd.arenaY },
-			config: this.cfg,
-			numPlayers: this.entities.paddles.length,
-			frameStats: {
-				activeBalls: balls.length,
-				activePaddles: paddles.length,
-				activePillars: pillars.length
-			}
-		};
-	}
-
 	disableBall(ballIndex) {
 		if (ballIndex < 0 || ballIndex >= this.entities.balls.length) return false;
-
 		const ballEnt = this.entities.balls[ballIndex];
+		if (!this.pd.isActive(ballEnt)) return false;
+
 		const pd = this.pd;
-
-		if (!pd.isActive(ballEnt)) return false;
-
-		const farDistance = this.cfg.ARENA_RADIUS * 10;
-		pd.posX[ballEnt] = farDistance;
-		pd.posY[ballEnt] = farDistance;
-
-		pd.velX[ballEnt] = 0;
-		pd.velY[ballEnt] = 0;
-
+		pd.posX[ballEnt] = pd.posY[ballEnt] = this.cfg.ARENA_RADIUS * 10;
+		pd.velX[ballEnt] = pd.velY[ballEnt] = 0;
 		pd.isEliminated[ballEnt] = 1;
-
 		return true;
 	}
 
-	isPlayerEliminated(playerId) {
-		return this.playerStates.eliminated.has(playerId);
-	}
-
-	getRemainingPlayers() {
-		return Array.from(this.playerStates.activePlayers);
-	}
-
-	getEliminationOrder() {
-		return [...this.playerStates.eliminationOrder];
-	}
+	isPlayerEliminated(playerId) { return this.playerStates.eliminated.has(playerId); }
+	getRemainingPlayers() { return Array.from(this.playerStates.activePlayers); }
+	getEliminationOrder() { return [...this.playerStates.eliminationOrder]; }
 
 	resetGame() {
 		this.reset();
@@ -948,31 +910,13 @@ export class PhysicsEngine {
 		this.playerStates.activePlayers.clear();
 		this.playerStates.eliminationOrder = [];
 		this.gameEvents = [];
-		if (this.paddleData.dead) {
-			this.paddleData.dead.fill(0);
-		}
-	}
-	addBall(x, y, vx, vy, radius = null) {
-		const pd = this.pd;
-		const ballEnt = pd.create(ENTITY_MASKS.BALL);
-
-		pd.posX[ballEnt] = x;
-		pd.posY[ballEnt] = y;
-		pd.velX[ballEnt] = vx;
-		pd.velY[ballEnt] = vy;
-		pd.radius[ballEnt] = radius || this.cfg.BALL_RADIUS;
-
-		this.entities.balls.push(ballEnt);
-		return ballEnt;
-	}
-
-	removeBall(ballIndex) {
-		if (ballIndex < 0 || ballIndex >= this.entities.balls.length) return false;
-
-		const ballEnt = this.entities.balls[ballIndex];
-		this.pd.destroy(ballEnt);
-		this.entities.balls.splice(ballIndex, 1);
-		return true;
+		this.currentPhase = 'Phase 1';
+		this.isRebuilding = false;
+		this.rebuildStartTime = 0;
+		this.playerMapping = {};
+		this.originalPlayerCount = 0;
+		this.gameOver = false;
+		if (this.paddleData.dead) this.paddleData.dead.fill(0);
 	}
 
 	getPerformanceStats() {
