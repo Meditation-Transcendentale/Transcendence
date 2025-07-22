@@ -49,11 +49,6 @@ class RouterC {
 			ts: "./Home",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
-		// this.routes.set("/game", {
-		// 	html: "/game",
-		// 	ts: "./Game",
-		// 	callback: (url: URL) => { this.loadInMain(url) }
-		// } as routePage);
 		this.routes.set("/info", {
 			html: "/info",
 			ts: "./Info",

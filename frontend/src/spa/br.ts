@@ -23,6 +23,7 @@ export default class br {
 
 	public unload() {
 		App3D.unloadVue('test');
+		App3D.enableHome();
 		//document.querySelector("canvas")?.blur();
 		this.pongbr?.stop();
 		//this.pongbr?.dispose();
@@ -32,6 +33,7 @@ export default class br {
 
 	public load(params: URLSearchParams) {
 		App3D.loadVue('test');
+		App3D.disableHome();
 		//document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
 		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";

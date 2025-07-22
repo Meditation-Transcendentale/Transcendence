@@ -80,7 +80,7 @@ export class Butterfly {
 		this.mesh.parent = this.root;
 
 		this.mesh.position.set(0, 0, 0);
-		this.mesh.scaling.set(0.1, 0.1, 0.1);
+		this.mesh.scaling.setAll(0.13);
 		this.mesh.material = this.material
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
@@ -90,6 +90,8 @@ export class Butterfly {
 		this.glowLayer.setMaterialForRendering(this.mesh, this.glowMat);
 
 		this.glowLayer.intensity = 0.5;
+		this.glowLayer.isEnabled = false;
+
 	}
 
 	f() {
@@ -154,8 +156,8 @@ export class Butterfly {
 
 				this.origin.subtractToRef(ip, cursor);
 				const cursorL = cursor.length();
-				cursor.scaleInPlace(cursorL < 1 ? 0.02 : 0.);
-				const cursorField = cursorL < 1.5 ? 0 : 1.;
+				cursor.scaleInPlace(cursorL < 4 ? 0.02 : 0.);
+				const cursorField = cursorL < 5.5 ? 0 : 1.;
 
 				flock.scaleInPlace(0.5 * speed * this.flock * cursorField);
 				// flock.subtractInPlace(onEdge == true ? ip.scale(speed)  : v0);

@@ -72,8 +72,8 @@ export class PongBR {
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
 
-		this.scene.clearColor = new Color4(0, 0, 0, 1);
-		this.scene.ambientColor = Color3.White();
+		//this.scene.clearColor = new Color4(0, 0, 0, 1);
+		//this.scene.ambientColor = Color3.White();
 
 
 		const statue = this.scene.getMeshByName('Version NoSmile.006') as Mesh;

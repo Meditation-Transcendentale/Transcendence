@@ -68,6 +68,8 @@ export class Field {
 			// this.sun.shadow.addShadowCaster(mesh);
 		})
 		this.scene.setActiveCameraByName("fieldCam");
+		let cam = this.scene.getCameraByName("fieldCam");
+		cam?.position.set(-2, 4, 3);
 		this.scene.activeCamera.parent = undefined;
 
 		this.cube0 = this.scene.getMeshByName("Cube") as Mesh;
@@ -167,6 +169,11 @@ export class Field {
 
 				break;
 			}
+			case 'game': {
+				final.init(this.scene.getCameraByName('pong') as Camera);
+				break;
+			}
+
 		}
 		return final;
 	}
