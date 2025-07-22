@@ -105,6 +105,7 @@ export class Environment {
 		this.camera_pong = new ArcRotateCamera('pong', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
 		loaded.addAllToScene();
+		loaded.meshes[1].setEnabled(false);
 
 
 		//this.scene.debugLayer.show();
@@ -148,11 +149,13 @@ export class Environment {
 
 	public enableHome() {
 		this.updateHome = true;
+		this.scene.fogMode = Scene.FOGMODE_LINEAR;
 
 	}
 
 	public disableHome() {
 		this.updateHome = false;
+		this.scene.fogMode = Scene.FOGMODE_NONE;
 	}
 
 	public setVue(vue: string): Vue {
