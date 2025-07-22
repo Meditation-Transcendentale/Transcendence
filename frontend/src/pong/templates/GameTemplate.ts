@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonImport";
 import { ECSManager } from "../ecs/ECSManager.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
@@ -30,7 +30,7 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.25, 0), 0));
 		if (i === localPaddleId || gameMode == "local")
 			paddleEntity.addComponent(new InputComponent(true, gameMode));
-		else 
+		else
 			paddleEntity.addComponent(new InputComponent(false, gameMode));
 		paddleEntity.addComponent(new TransformComponent(
 			new Vector3(x, 0.25, 0),

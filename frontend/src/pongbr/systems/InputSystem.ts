@@ -52,9 +52,9 @@ export class InputSystem extends System {
 			if (leftPressed && !rightPressed) this.move = 1;
 			else if (rightPressed && !leftPressed) this.move = -1;
 
-			offsetChange = this.move * 1.2 / paddle.speed * dt;
-			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -paddle.maxoffset, paddle.maxoffset);
-			transform.rotation.y = paddle.baseRotation + paddle.offset;
+			//offsetChange = this.move * 1.2 / paddle.speed * dt;
+			//paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -paddle.maxoffset, paddle.maxoffset);
+			//transform.rotation.y = paddle.baseRotation + paddle.offset;
 			if (this.move != this.lastSentMove) {
 				const payload: userinterface.IClientMessage = {
 					paddleUpdate: {
@@ -64,10 +64,10 @@ export class InputSystem extends System {
 				};
 
 				const buffer = encodeClientMessage(payload);
-				// this.wsManager.socket.send(buffer);
+				this.wsManager.socket.send(buffer);
 				this.lastSentMove = this.move;
 
-				// console.log("Sent move to server: move =", this.move, "offset = ", paddle.offset);
+				//console.log("Sent move to server: move =", this.move, "offset = ", paddle.offset);
 			}
 		}
 	}

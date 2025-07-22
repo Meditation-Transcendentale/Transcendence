@@ -45,7 +45,6 @@ export { CustomMaterial } from '@babylonjs/materials/custom';
 export { BoundingBox } from '@babylonjs/core/Culling/boundingBox';
 export { Material } from "@babylonjs/core/Materials/material";
 export { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
-import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import "@babylonjs/core/Shaders/ShadersInclude/helperFunctions";
 export { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";

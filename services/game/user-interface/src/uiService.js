@@ -108,7 +108,7 @@ export default class UIService {
 		}
 
 		const { players, mode } = setup;
-		console.log("BR =====", mode);
+		console.log("uuid=", uuid);
 
 		// 2) Reject if this player isn’t on the whitelist
 		if (!players.includes(uuid)) {

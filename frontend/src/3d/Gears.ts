@@ -283,6 +283,11 @@ export class Gears {
 				final.init(this.scene.getCameraByName('br') as Camera);
 				break;
 			}
+			case 'game': {
+				final.init(this.scene.getCameraByName('pong') as Camera);
+				break;
+			}
+
 			case 'lobby': {
 				final.init(this.scene.getCameraByName('home') as Camera);
 				final.addWindow('BACK', this.outer, this.outerBounding, this.outerMatrix[8]);

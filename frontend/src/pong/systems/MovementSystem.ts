@@ -1,7 +1,7 @@
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonImport";
 
 export class MovementSystem extends System {
 
@@ -24,7 +24,7 @@ export class MovementSystem extends System {
 				const now = performance.now();
 				const age = now - ball.lastServerUpdate;
 
-				if (age < 17){
+				if (age < 17) {
 					const dist = Vector3.Distance(ball.position, ball.serverPosition);
 					if (dist > 0 && dist < 1) {
 						const corrected = Vector3.Lerp(ball.position, ball.serverPosition, 0.1);

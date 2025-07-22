@@ -8,6 +8,7 @@ export class PaddleComponent implements Component {
 	public maxoffset: number;
 	public baseRotation: number   // <— new
 	public speed: number   // <— new
+	public static key = "PaddleComponent";
 	// public displayAsWall: boolean;
 
 	constructor(id: number, position: Vector3, offset: number = 0, maxoffset: number, baseRotation: number, speed: number) {

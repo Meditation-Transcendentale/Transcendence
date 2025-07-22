@@ -1,4 +1,4 @@
-import { Vector3, ArcRotateCamera, Scalar } from "@babylonjs/core";
+import { Vector3, ArcRotateCamera, Scalar } from "@babylonImport";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { InputComponent } from "../components/InputComponent.js";

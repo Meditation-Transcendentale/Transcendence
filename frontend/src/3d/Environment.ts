@@ -12,7 +12,9 @@ import {
 	MeshBuilder,
 	Scene,
 	StandardMaterial,
-	Vector3
+	Vector3,
+	Inspector,
+	LoadAssetContainerAsync
 } from "@babylonImport";
 import { Field } from "./Field";
 
@@ -23,6 +25,7 @@ export class Environment {
 
 	private camera!: ArcRotateCamera;
 	private camera_br!: ArcRotateCamera;
+	private camera_pong!: ArcRotateCamera;
 
 	private lastTime: number;
 	private deltaTime: number;
@@ -99,6 +102,12 @@ export class Environment {
 		this.createMesh();
 		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		this.camera_br.attachControl(this.canvas, true);
+		this.camera_pong = new ArcRotateCamera('pong', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
+		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
+		loaded.addAllToScene();
+
+
+		//this.scene.debugLayer.show();
 
 		// await this.gears.load();
 		//

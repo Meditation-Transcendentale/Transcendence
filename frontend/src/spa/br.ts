@@ -36,7 +36,7 @@ export default class br {
 		// this.pongbr?.dispose();
 		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";
 		if (!this.pongbr)
-			this.pongbr = new PongBR(document.querySelector("#canvas"), params.get("id"), App3D.scene);
+			this.pongbr = new PongBR(document.querySelector("#canvas"), App3D.scene);
 		let gameId = params.get("id");
 		let uuid = User.uuid;
 		if (!gameId)

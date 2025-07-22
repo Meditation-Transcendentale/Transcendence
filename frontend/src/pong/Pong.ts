@@ -1,8 +1,5 @@
-import { Scene } from "@babylonjs/core/scene";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
+import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, Inspector } from "@babylonImport";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -27,17 +24,17 @@ let resizeTimeout: NodeJS.Timeout;
 
 export class Pong {
 	private engine!: Engine;
-	private scene!: Scene;
-	private camera!: ArcRotateCamera;
+	private scene: Scene;
+	private cam!: ArcRotateCamera;
 
 	private ecs!: ECSManager;
 	public stateManager!: StateManager;
 	private wsManager!: WebSocketManager;
 	private inputManager!: InputManager;
-	
+
 	private visualEffectSystem!: VisualEffectSystem;
 	private uiSystem!: UISystem;
-	
+
 	private uuid!: string;
 	private baseMeshes: any;
 	private instanceManagers: any;
@@ -46,18 +43,21 @@ export class Pong {
 	private canvas;
 	private gameId;
 	private gameMode: string;
+	private pongRoot!: TransformNode;
+	private inited: boolean;
+	private networkingSystem!: NetworkingSystem;
+	private inputSystem!: InputSystem;
 
-	constructor(canvas: any, gameId: any, gameMode: any) {
+	constructor(canvas: any, gameId: any, gameMode: any, scene: Scene) {
 		this.canvas = canvas;
+		this.scene = scene;
 		this.gameId = gameId;
 		this.gameMode = gameMode;
+		this.engine = this.scene.getEngine() as Engine;
+		this.inited = false;
 	}
 
-	async start() {
-		this.engine = new Engine(this.canvas, true);
-		engine = this.engine;
-		this.scene = new Scene(this.engine);
-		
+	public async init() {
 		const config = {
 			numberOfBalls: 1,
 			arenaSizeX: 30,
@@ -65,34 +65,96 @@ export class Pong {
 			wallWidth: 1
 		};
 
-		
-		this.baseMeshes = createBaseMeshes(this.scene, config);
+		this.pongRoot = new TransformNode("pongRoot", this.scene);
+		this.pongRoot.position.set(2000, -3500, -3500);
+		this.cam = this.scene.getCameraByName('pong') as ArcRotateCamera;
+		this.cam.parent = this.pongRoot;
+		this.cam.minZ = 0.2;
+		this.baseMeshes = createBaseMeshes(this.scene, config, this.pongRoot);
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
-		this.uuid = await getOrCreateUUID();
-		
-		const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		this.wsManager = new WebSocketManager(wsUrl);
+		this.uuid = getOrCreateUUID();
+
+		// const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		// this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
-		
-		localPaddleId = await this.waitForRegistration();
-		this.camera = createCamera(this.scene, this.canvas, localPaddleId, this.gameMode);
+
+		// localPaddleId = await this.waitForRegistration();
+		//this.camera = createCamera(this.scene, this.canvas, localPaddleId, this.gameMode);
 		this.initECS(config, this.instanceManagers, this.uuid);
 		this.stateManager = new StateManager(this.ecs);
+		this.inited = true;
+
+
+	}
+	public async start(gameId: string, uuid: string) {
+		if (!this.inited) {
+			await this.init();
+		}
+		if (this.wsManager) {
+			this.wsManager.socket.close();
+			this.ecs.removeSystem(this.inputSystem);
+			this.ecs.removeSystem(this.networkingSystem);
+		}
+		console.log("UU", uuid)
+		const wsUrl = `ws://${window.location.hostname}:5004?` +
+			`uuid=${encodeURIComponent(uuid)}&` +
+			`gameId=${encodeURIComponent(gameId)}`;
+		this.wsManager = new WebSocketManager(wsUrl);
+
+		// localPaddleId = 0;
+		localPaddleId = await this.waitForRegistration();
+
+		// 4) Plug networking into ECS
+		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
+		this.ecs.addSystem(this.inputSystem);
+		this.networkingSystem = new NetworkingSystem(
+			this.wsManager,
+			this.uuid
+		);
+		this.ecs.addSystem(this.networkingSystem);
+		console.log("start");
+		//this.engine = new Engine(this.canvas, true);
+		//engine = this.engine;
+		this.pongRoot.setEnabled(true);
+		// this.stateManager.set_ecs(this.ecs);
+		this.stateManager.setter(true);
 		this.stateManager.update();
 
-		this.engine.runRenderLoop(() => {
-			this.scene.render();
-		});
+		//this.engine.runRenderLoop(() => {
+		//	this.scene.render();
+		//this.scene.onBeforeRenderObservable.add(() => {
+		//	// called _before_ every frame is drawn
+		//	this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
+		//});
+		//	//this.baseMeshes.portal.material.enableResolutionUniform();
+		//});
+
 	}
+	public stop(): void {
+		//if (this.engine) {
+		//	this.engine.stopRenderLoop();
+		//}
+
+		//if (this.scene) {
+		//  this.scene.detachControl();
+		//}
+
+		this.pongRoot.setEnabled(false);
+		this.stateManager.setter(false);
+
+		console.log("render loop stopped and game paused");
+	}
+
+
 
 	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
 		this.ecs = new ECSManager();
-		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
+		// this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
 		this.ecs.addSystem(new ThinInstanceSystem(
 			instanceManagers.ball,
 			instanceManagers.paddle,
 			instanceManagers.wall,
-			this.camera
+			this.cam
 		));
 		this.ecs.addSystem(new MovementSystem());
 		this.visualEffectSystem = new VisualEffectSystem(this.scene);
@@ -100,11 +162,11 @@ export class Pong {
 		this.uiSystem = new UISystem(this);
 		this.scoreUI = this.uiSystem.scoreUI;
 		this.ecs.addSystem(this.uiSystem);
-		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid));
-	
+		// this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid));
+
 		createGameTemplate(this.ecs, config, localPaddleId, this.gameMode);
 	}
-	
+
 
 	private waitForRegistration(): Promise<number> {
 		return new Promise((resolve, reject) => {
@@ -157,7 +219,7 @@ export class Pong {
 			mesh.material?.dispose?.();
 			mesh.dispose?.();
 		});
-		this.camera.dispose();
+		this.cam.dispose();
 		this.engine.clear(new Color4(1, 1, 1, 1), true, true);
 		this.engine.stopRenderLoop();
 
