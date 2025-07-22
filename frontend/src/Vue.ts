@@ -34,6 +34,8 @@ class cssWindow {
 
 	private camera!: Camera;
 
+	private spawnDelay: number = 100;
+
 
 	constructor(name: string, options: vueOptions) {
 		console.log(`Creating window: ${name} with options : `, options);
@@ -49,7 +51,7 @@ class cssWindow {
 		this.div.appendChild(this.header.cloneNode(true));
 		this.header.className = 'frame-hover';
 
-		this.pos = new Float32Array(4);
+		this.pos = new Float32Array(5);
 		this.bounding = [];
 		this.hover = false;
 		this._enable = false;
@@ -82,7 +84,6 @@ class cssWindow {
 			cssWindow.butterflies[i] = positions[i];
 			cssWindow.butterflyDiv[i] = document.createElement("div") as HTMLDivElement;
 			cssWindow.butterflyDiv[i].className = "frame-butterfly";
-			cssWindow.butterflyDiv[i].style.borderColor = "blue";
 			cssWindow.butterflyDiv[i].style.zIndex = "0";
 			cssWindow.butterflyLine[i] = document.createElement("div") as HTMLDivElement;
 			cssWindow.butterflyLine[i].className = "line";
@@ -107,6 +108,7 @@ class cssWindow {
 		this.pos[1] = 2;
 		this.pos[2] = -1;
 		this.pos[3] = -1;
+		this.pos[4] = 100;
 		for (let i = 0; i < this.bounding.length; i++) {
 			const p = Vector3.Project(
 				this.bounding[i],
@@ -117,12 +119,13 @@ class cssWindow {
 			this.pos[0] = Math.min(this.pos[0], p.x);
 			this.pos[1] = Math.min(this.pos[1], p.y);
 			this.pos[2] = Math.max(this.pos[2], p.x);
-			this.pos[3] = Math.max(this.pos[3], p.y)
+			this.pos[3] = Math.max(this.pos[3], p.y);
+			this.pos[4] = Math.min(this.pos[4], p.z);
 		}
 		//}
 		this.framePos[0] = this.pos[0] + ((this.pos[2] - this.pos[0]) * 0.5);
 		this.framePos[1] = this.pos[1] + ((this.pos[3] - this.pos[1]) * 0.5);
-		this.framePos[2] = Math.min(((this.pos[2] - this.pos[0])) * 2, 0.3);
+		this.framePos[2] = Math.min(((this.pos[2] - this.pos[0])), 0.3);
 		this.div.style.top = `${this.pos[1] * 100 - 3 + (true ? Math.random() * 0.1 : 0)}%`;
 		this.div.style.left = `${this.pos[0] * 100 + (true ? Math.random() * 0.1 : 0)}%`;
 		this.div.style.width = `${(this.pos[2] - this.pos[0]) * 100 + (true ? Math.random() * 0.1 : 0)}%`;
@@ -180,12 +183,13 @@ class cssWindow {
 
 		const fn = () => {
 			if (!this.hover) { return; }
-			const final = new Float32Array(4);
+			const final = new Float32Array(5);
 
 			final[0] = 2;
 			final[1] = 2;
 			final[2] = -1;
 			final[3] = -1;
+			final[4] = 0;
 			for (let i = 0; i < 8; i++) {
 				const p = Vector3.Project(
 					cssWindow.butterflyBounding[i].add(cssWindow.butterflies[cssWindow.currentButterfly]),
@@ -197,9 +201,12 @@ class cssWindow {
 				final[1] = Math.min(final[1], p.y);
 				final[2] = Math.max(final[2], p.x);
 				final[3] = Math.max(final[3], p.y);
+				final[4] = Math.max(final[4], p.z);
 			}
 
-			if (Math.abs(final[0] - this.framePos[0]) > this.framePos[2] || Math.abs(final[1] - this.framePos[1]) > this.framePos[2]) {
+			if (Math.abs(final[0] - this.framePos[0]) > this.framePos[2] * 2 || Math.abs(final[1] - this.framePos[1]) > this.framePos[2] * 2
+				|| ((Math.abs(final[0] - this.framePos[0]) < this.framePos[2] * 0.5 || Math.abs(final[1] - this.framePos[1]) < this.framePos[2] * 0.5)
+					&& final[4] > this.pos[4])) {
 				cssWindow.currentButterfly = (cssWindow.currentButterfly + 1) % cssWindow.butterflies.length;
 				fn();
 				return;
@@ -228,19 +235,21 @@ class cssWindow {
 
 
 			this.lastPos[0] = final[2];
-			this.lastPos[1] = final[1];
+			this.lastPos[1] = final[3];
 
 			document.body.appendChild(div);
-			if (g > 0) {
+			if (g > 1) {
 				document.body.appendChild(line);
 			}
 			g++;
 			cssWindow.currentButterfly = (cssWindow.currentButterfly + Math.ceil(Math.random() * 10)) % cssWindow.butterflies.length;
-			setTimeout(() => { div.remove(); line.remove(); }, 100);
-			setTimeout(() => { fn() }, 1);
+			setTimeout(() => { div.remove(); line.remove(); }, 300 + this.spawnDelay);
+			setTimeout(() => { fn() }, this.spawnDelay);
+			this.spawnDelay = Math.max(20, this.spawnDelay * Math.pow(0.95, Math.min(g, 105)));
 		}
 		this.hover = true;
-		let g = 0;
+		let g = 1;
+		this.spawnDelay = 50;
 		(this.mesh.material as DitherMaterial).setFloat('on', 1.);
 		this.div.addEventListener('mouseleave', () => {
 			this.hover = false;

@@ -28,7 +28,7 @@ const optionsB: _thinInstancesOptions = {
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 1,
-	scale: new Vector3(0.8, .8, 0.8)
+	scale: new Vector3(1, .8, 1)
 };
 
 const optionsC: _thinInstancesOptions = {

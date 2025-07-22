@@ -867,9 +867,10 @@ export class DitherMaterial extends CustomMaterial {
 		this.Fragment_MainEnd(`
 		// float f = noise(vMainUV1 * 1000.) * 0.5 + 0.5;
 		gl_FragColor.rgb = (on > 0. ? vec3(0.,0.,gradientNoise(vPositionW.xyz + time * 1000., 4.) * 0.5 +0.5) : gl_FragColor.rgb);
-		//vec3 dith = min(vec3(1., 1., 1.),   gl_FragColor.rgb);
-		// dith = floor(dith * 8. + 0.5) * (1. / 8.);
-		//gl_FragColor.rgb = (dith - 0.5) * 1.6 + 0.5; //Apply contrast
+		gl_FragColor.rgb = (on > 0. ? vec3(gradientNoise(vPositionW.xyz + time * 1000., 4.) * 0.5 +0.5) * vec3(0., 0.0625, 0.62109375) : gl_FragColor.rgb);
+		vec3 dith = min(vec3(1., 1., 1.),   gl_FragColor.rgb);
+		 dith = floor(dith * 8. + 0.5) * (1. / 8.);
+		gl_FragColor.rgb = (dith - 0.5) * 1.2 + 0.5; //Apply contrast
 		// gl_FragColor.rgb = vec3(vMainUV1, 0.);
 		
 			// gl_FragColor.rgb = vec3(vNormalW * 0.5 + 0.5);
@@ -908,18 +909,20 @@ export class ButterflyMaterial extends CustomMaterial {
 			#define M_PI 3.1415926535897932384626433832795
 
 			attribute vec3	move;
-			attribute vec2	direction;
+			attribute vec3	direction;
 		`)
 
 		this.Vertex_Definitions(`
 			#include<rotations>
 			#include<noises>
+
+			varying vec3 vFly;
 		`)
 
 		this.Vertex_Before_PositionUpdated(`
 			float flap = sin((time + hash12(vec2(float(gl_InstanceID)))) * 15. + position.x * 2.);
 			positionUpdated.xyz = rotationX(positionUpdated.xyz, flap * sign(position.z) * M_PI * 0.5);
-			float alpha = atan(direction.x, dot(direction, vec2(.0, 1.)));
+			float alpha = atan(direction.x, dot(direction.xy, vec2(.0, 1.)));
 			positionUpdated = rotationY(positionUpdated, alpha + M_PI * 0.5);
 		`)
 
@@ -927,9 +930,17 @@ export class ButterflyMaterial extends CustomMaterial {
 			worldPos.xyz += move;
 		`)
 
+		this.Vertex_MainEnd(`
+			//vFly = vec3(0., vec2(1. - clamp(direction.z, 0.0, 1.)));
+		`)
+
 
 		this.Fragment_Begin(`
 			#define MAINUV1 1
+		`)
+
+		this.Fragment_Definitions(`
+			varying vec3 vFly;
 		`)
 
 		this.Fragment_MainEnd(`

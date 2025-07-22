@@ -17,8 +17,11 @@ body {
 	height: 100%;
 	width: 100%;
 
-	--frame-color: #8E1616;
+	/*--frame-color: #8E1616;*/
+	--frame-color: #a498fe;
 	--frame-text-color: #000;
+
+	--frame-butterfly-color: #dedafe;
 
 	--text-color: #000;
 	--text-background: #fff;
@@ -115,15 +118,6 @@ canvas {
 		top 2s,
 		left 2s,
 		width 5s, 0.3s height 5s, 0.3s;
-	z-index: 2;
-}
-
-.frame-butterfly {
-	position: absolute;
-	top: 0;
-	left: 0;
-	border: 2px solid var(--frame-color);
-	overflow: hidden;
 	z-index: 2;
 }
 
@@ -237,9 +231,18 @@ input[on] {
 	letter-spacing: normal;
 }
 
+.frame-butterfly {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 1px solid var(--frame-butterfly-color);
+	overflow: hidden;
+	z-index: 2;
+}
+
 .line {
 	position: absolute;
-	height: 0.1vh;
-	background-color: blue;
+	height: 1px;
+	background-color: var(--frame-butterfly-color);
 	z-index: 0;
 }
