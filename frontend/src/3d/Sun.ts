@@ -1,4 +1,4 @@
-import { CascadedShadowGenerator, Color3, DirectionalLight, Engine, HemisphericLight, Light, Mesh, MeshBuilder, PointLight, Scene, ShaderMaterial, ShadowDepthWrapper, ShadowGenerator, SpotLight, StandardMaterial, Texture, TransformNode, Vector3 } from "@babylonImport";
+import { CascadedShadowGenerator, Color3, DirectionalLight, Engine, HemisphericLight, Light, Material, Mesh, MeshBuilder, PointLight, ProceduralTexture, Scene, ShaderMaterial, ShadowDepthWrapper, ShadowGenerator, SpotLight, StandardMaterial, Texture, TransformNode, Vector3 } from "@babylonImport";
 
 
 export class Sun {
@@ -17,7 +17,10 @@ export class Sun {
 	private hemish: HemisphericLight;
 	private sunShadow: ShadowGenerator;
 	public shadow: ShadowGenerator;
+	public cloud: Mesh;
+	public cloudMat: StandardMaterial;
 
+	private cloudTexture: ProceduralTexture;
 	// private glowLayer: GlowLayer;
 
 	constructor(scene: Scene) {
@@ -71,6 +74,23 @@ export class Sun {
 		this.hemish = new HemisphericLight("hemish", new Vector3(1, 1, 1), this.scene);
 		this.hemish.intensity = 0.2;
 
+		// this.cloudMat = new ShaderMaterial("cloud2", this.scene, 'cloud', {
+		// 	attributes: ["position", "uv", "normal"],
+		// 	uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "time"],
+		// });
+		//
+		// this.cloudTexture = new ProceduralTexture("cloud", 1024, "cloud", scene);
+		// this.cloudMat = new StandardMaterial("cloud2", this.scene);
+		// this.cloudMat.cullBackFaces = false;
+		// this.cloudMat.diffuseTexture = this.cloudTexture;
+		//
+		// this.cloud = MeshBuilder.CreateGround("cloud", { width: 1500, height: 1500 });
+		// this.cloud.position.z = -700;
+		// this.cloud.material = this.cloudMat;
+		// this.cloud.position.y = 30;
+		// this.cloudMat.cullBackFaces = false;
+
+
 		// this.shadow = new ShadowGenerator(1024, this.light);
 
 		// this.shadow.transparencyShadow = true;
@@ -119,5 +139,6 @@ export class Sun {
 	public update(time: number) {
 		this.shellMat.setFloat("time", time);
 		this.shellMat.setFloat("rand", Math.random() * 0.005)
+		// this.cloudTexture.setFloat('time', time);
 	}
 }

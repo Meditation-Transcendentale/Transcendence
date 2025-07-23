@@ -8,6 +8,10 @@ interface vueOptions {
 	bounding: Vector3[];
 }
 
+function signRandom() {
+	return Math.random() * 2. - 1.;
+}
+
 class cssWindow {
 	public readonly name: string;
 	public readonly div: HTMLDivElement;
@@ -40,6 +44,8 @@ class cssWindow {
 
 	private spawnDelay: number = 100;
 
+	private div2: HTMLDivElement;
+
 
 	constructor(name: string, options: vueOptions) {
 		console.log(`Creating window: ${name} with options : `, options);
@@ -47,6 +53,10 @@ class cssWindow {
 		this.div = document.createElement('div');
 		this.div.id = `${name}-frame`;
 		this.div.className = `frame`;
+		this.div2 = document.createElement('div');
+		this.div2.id = `${name}-frame-clone`;
+		this.div2.className = `frame`;
+		this.div2.style.zIndex = "0";
 
 		this.header = document.createElement('div');
 		this.header.className = 'frame-text';
@@ -134,10 +144,16 @@ class cssWindow {
 		this.framePos[0] = this.pos[0] + ((this.pos[2] - this.pos[0]) * 0.5);
 		this.framePos[1] = this.pos[1] + ((this.pos[3] - this.pos[1]) * 0.5);
 		this.framePos[2] = Math.min(((this.pos[2] - this.pos[0])), 0.3);
-		this.div.style.top = `${this.pos[1] * 100 - 3 + (true ? Math.random() * 0.1 : 0)}%`;
-		this.div.style.left = `${this.pos[0] * 100 + (true ? Math.random() * 0.1 : 0)}%`;
-		this.div.style.width = `${(this.pos[2] - this.pos[0]) * 100 + (true ? Math.random() * 0.1 : 0)}%`;
-		this.div.style.height = `${(this.pos[3] - this.pos[1]) * 100 + 3 + (true ? Math.random() * 0.1 : 0)}%`;
+		this.div.style.top = `${this.pos[1] * 100 - 3}%`;
+		this.div.style.left = `${this.pos[0] * 100}%`;
+		this.div.style.width = `${(this.pos[2] - this.pos[0]) * 100}%`;
+		this.div.style.height = `${(this.pos[3] - this.pos[1]) * 100 + 3}%`;
+		if (this.hover) {
+			this.div.style.top = `${this.pos[1] * 100 - 3 + signRandom() * 1}%`;
+			this.div.style.left = `${this.pos[0] * 100 + signRandom() * 1}%`;
+			this.div.style.width = `${(this.pos[2] - this.pos[0]) * 100 + signRandom() * 1}%`;
+			this.div.style.height = `${(this.pos[3] - this.pos[1]) * 100 + 3 + signRandom() * 1}%`;
+		}
 	}
 
 	private onHover() {
@@ -261,13 +277,16 @@ class cssWindow {
 		let g = 1;
 		this.spawnDelay = 50;
 		(this.mesh.material as DitherMaterial).setFloat('on', 1.);
+
+		// document.body.appendChild(this.div2);
 		this.div.addEventListener('mouseleave', () => {
+			this.div2.remove();
 			this.hover = false;
 			(this.mesh.material as DitherMaterial).setFloat('on', 0.);
 			cssWindow.glitchOrigin.z = 0;
 			cssWindow.glitchPost.autoClear = true;
 		}, { once: true });
-		fn();
+		// fn();
 	}
 
 	public enable() {

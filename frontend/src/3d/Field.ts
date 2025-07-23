@@ -86,7 +86,7 @@ export class Field {
 		///////
 		//
 		///////
-		const cub = MeshBuilder.CreateBox("tempo", { size: 0.4 });
+		const cub = MeshBuilder.CreateBox("tempo", { size: 2 });
 		cub.refreshBoundingInfo();
 		const bounding = new Array<Vector3>(8);
 		const b = cub.getBoundingInfo().boundingBox.vectors;
@@ -98,13 +98,13 @@ export class Field {
 
 		Vue.addButterfly(this.butterfly.positions, 300, bounding);
 
-		this.glitchPost = new PostProcess("glitch", "glitch", ["origin", "time"], null, 1., cam);
+		this.glitchPost = new PostProcess("glitch", "glitch", ["origin", "time", "ratio"], null, 1., cam);
 		this.glitchPost.autoClear = true;
 		Vue.refGlitch(this.glitchPost, this.glitchOrigin);
 		this.glitchPost.onApply = (effect) => {
 			effect.setVector3("origin", this.glitchOrigin);
 			effect.setFloat("time", performance.now() * 0.001);
-
+			effect.setFloat("ratio", window.innerWidth / window.innerHeight);
 		}
 	}
 

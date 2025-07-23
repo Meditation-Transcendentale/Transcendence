@@ -91,7 +91,7 @@ export class Butterfly {
 		this.glowLayer.setMaterialForRendering(this.mesh, this.glowMat);
 
 		this.glowLayer.intensity = 0.5;
-		//this.glowLayer.isEnabled = false;
+		// this.glowLayer.isEnabled = false;
 
 	}
 

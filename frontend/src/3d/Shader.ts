@@ -436,6 +436,7 @@ varying vec2		vUV;
 uniform sampler2D	textureSampler;
 uniform vec3		origin;
 uniform float		time;
+uniform float		ratio;
 
 #include<noises>
 
@@ -447,6 +448,23 @@ const vec2 LARGE_BLOCK = vec2(0.12f, 0.016f);
 float	sdfBox(vec2 p, vec2 b) {
 	vec2 d = abs(p)-b;
 	return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
+}
+
+float sdfCircle(vec2 p, float r) {
+	return length(p) - r;
+}
+
+float getContrast(vec2 pos) {
+	
+	vec2 p = pos - origin.xy;
+	p.x *= ratio;
+	float r = (time - origin.z) * 0.5;
+	r *= r;
+	r += 0.05;
+	float n = 0.2 * noise12(p * 10000. + p);
+	p += n * normalize(p);
+	float c = sdfCircle(p, r);
+	return step(c,0.);
 }
 
 float Block(vec2 pos, vec2 size, float time, float t1, float t2)
@@ -501,11 +519,161 @@ void main() {
 	// finalColor = (finalColor.x < 0.1 && finalColor.y < 0.1 && finalColor.z < 0.1 ? vec3(1.) : finalColor);
 	//
 	// gl_FragColor.rgb *= finalColor;
-	float contrast = 1. + time - origin.z;
+	float contrast = 1. + (1. + time - origin.z) * getContrast(uv);
 	contrast *= contrast;
 	gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * contrast + 0.5;
+	float dith = max(2., 256. - (time - origin.z));
+	// gl_FragColor.rgb = floor(gl_FragColor.rgb * dith + 0.5) * (1. / dith);
+	gl_FragColor = min(gl_FragColor, vec4(1.));
 }
 `;
+
+Effect.ShadersStore["cloudVertexShader"] = `
+	precision highp float;
+
+	attribute vec3	position;
+	attribute vec2	uv;
+	attribute vec3	normal;
+
+	uniform mat4	world;
+	uniform mat4	view;
+	uniform mat4	projection;
+
+
+	varying vec2	vUV;
+	varying vec3	vPositionW;
+
+	void main() {
+		vUV = uv;
+		vec4 p = vec4(position, 1.);
+		p = world * p;
+		vPositionW = p.xyz;
+		
+		vec3 normalW = normalize(mat3(world) * normal);
+		gl_Position = projection * view * p;
+	}
+
+`
+
+Effect.ShadersStore["cloudPixelShader"] = `
+// https://www.shadertoy.com/view/WdXBW4
+
+	precision highp float;
+ 
+uniform float	time;
+varying vec2	vUV;
+
+const float cloudscale = 1.1;
+const float speed = 0.03;
+const float clouddark = 0.5;
+const float cloudlight = 0.3;
+const float cloudcover = 0.2;
+const float cloudalpha = 8.0;
+const float skytint = 0.5;
+const vec3 skycolour1 = vec3(0.2, 0.4, 0.6);
+const vec3 skycolour2 = vec3(0.4, 0.7, 1.0);
+
+const mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
+
+vec2 hash( vec2 p ) {
+	p = vec2(dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)));
+	return -1.0 + 2.0*fract(sin(p)*43758.5453123);
+}
+
+float noise( in vec2 p ) {
+    const float K1 = 0.366025404; // (sqrt(3)-1)/2;
+    const float K2 = 0.211324865; // (3-sqrt(3))/6;
+	vec2 i = floor(p + (p.x+p.y)*K1);	
+    vec2 a = p - i + (i.x+i.y)*K2;
+    vec2 o = (a.x>a.y) ? vec2(1.0,0.0) : vec2(0.0,1.0); //vec2 of = 0.5 + 0.5*vec2(sign(a.x-a.y), sign(a.y-a.x));
+    vec2 b = a - o + K2;
+	vec2 c = a - 1.0 + 2.0*K2;
+    vec3 h = max(0.5-vec3(dot(a,a), dot(b,b), dot(c,c) ), 0.0 );
+	vec3 n = h*h*h*h*vec3( dot(a,hash(i+0.0)), dot(b,hash(i+o)), dot(c,hash(i+1.0)));
+    return dot(n, vec3(70.0));	
+}
+
+float fbm(vec2 n) {
+	float total = 0.0, amplitude = 0.1;
+	for (int i = 0; i < 7; i++) {
+		total += noise(n) * amplitude;
+		n = m * n;
+		amplitude *= 0.4;
+	}
+	return total;
+}
+
+// -----------------------------------------------
+
+void main() {
+	vec2 p = vUV * 10.;
+	vec2 uv = p;
+	float mTime = time * speed;
+    float q = fbm(uv * cloudscale * 0.5);
+    
+    //ridged noise shape
+	float r = 0.0;
+	uv *= cloudscale;
+    uv -= q - mTime;
+    float weight = 0.8;
+    for (int i=0; i<8; i++){
+		r += abs(weight*noise( uv ));
+        uv = m*uv + mTime;
+		weight *= 0.7;
+    }
+    
+    //noise shape
+	float f = 0.0;
+	uv = p; 
+	uv *= cloudscale;
+    uv -= q - mTime;
+    weight = 0.7;
+    for (int i=0; i<8; i++){
+		f += weight*noise( uv );
+        uv = m*uv + mTime;
+		weight *= 0.6;
+    }
+    
+    f *= r + f;
+    
+    //noise colour
+    float c = 0.0;
+    mTime = time * speed * 2.0;
+	uv = p; 
+	uv *= cloudscale*2.0;
+    uv -= q - mTime;
+    weight = 0.4;
+    for (int i=0; i<7; i++){
+		c += weight*noise( uv );
+        uv = m*uv + mTime;
+		weight *= 0.6;
+    }
+    
+    //noise ridge colour
+    float c1 = 0.0;
+    mTime  *= 3.0;
+    uv = p;
+	uv *= cloudscale*3.0;
+    uv -= q - mTime;
+    weight = 0.4;
+    for (int i=0; i<7; i++){
+		c1 += abs(weight*noise( uv ));
+        uv = m*uv + mTime;
+		weight *= 0.6;
+    }
+	
+    c += c1;
+    
+    vec3 skycolour = mix(skycolour2, skycolour1, 1.);
+    vec3 cloudcolour = vec3(1.1, 1.1, 0.9) * clamp((clouddark + cloudlight*c), 0.0, 1.0);
+   
+    f = cloudcover + cloudalpha*f*r;
+    
+    vec3 result = mix(skycolour, clamp(skytint * skycolour + cloudcolour, 0.0, 1.0), clamp(f + c, 0.0, 1.0));
+    
+	gl_FragColor = vec4( result, 1.0 );
+}
+`
 
 
 
@@ -828,7 +996,7 @@ export class GrassShader extends CustomMaterial {
 
 		// this.emissiveColor = new Color3(0.3, 0.3, 0.3);
 
-		this.specularPower = 16;
+		this.specularPower = 96;
 		// this.specularColor = new Color3(2., 2., 2.);
 
 	}
