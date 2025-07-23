@@ -13,7 +13,7 @@ import type { userinterface } from './utils/proto/message.js';
 import { buildPaddles, PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
 import { AnimationSystem } from "./systems/AnimationSystem.js";
-import { ArcRotateCamera, Color3, Color4, PointLight, Scene, TransformNode, Vector3, Engine, Mesh } from "@babylonImport";
+import { ArcRotateCamera, Color3, Color4, PointLight, Scene, TransformNode, Vector3, Engine, Mesh, UniversalCamera } from "@babylonImport";
 import { BallComponent } from "./components/BallComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
 import { WallComponent } from "./components/WallComponent.js";
@@ -26,7 +26,7 @@ export class PongBR {
 	public stateManager!: StateManager;
 	private wsManager!: WebSocketManager;
 	private inputManager!: InputManager;
-	private camera!: ArcRotateCamera;
+	private camera!: UniversalCamera;
 	private canvas;
 	private scoreUI: any;
 	private baseMeshes: any;
@@ -51,7 +51,7 @@ export class PongBR {
 		this.pongRoot.position.set(-2200, -3500, -3500);
 		this.pongRoot.rotation.z -= 30.9000;
 		this.pongRoot.scaling.set(1, 1, 1);
-		this.camera = this.scene.getCameraByName('br') as ArcRotateCamera;
+		this.camera = this.scene.getCameraByName('br') as UniversalCamera;
 		this.camera.parent = this.pongRoot;
 		this.camera.minZ = 0.2;
 		this.baseMeshes = createBaseMeshes(this.scene, this.pongRoot);
@@ -92,6 +92,10 @@ export class PongBR {
 		this.wsManager = new WebSocketManager(wsUrl);
 
 		localPaddleId = await this.waitForRegistration();
+		const angle = (2 * Math.PI) / 100 * localPaddleId;
+		this.camera.position.set(Math.cos(-angle) * 210, 15, Math.sin(-angle) * 210);
+		this.camera.setTarget(new Vector3(0, 0, 0));
+		//this.camera.rotation.set(0, , 0);
 
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
 		this.ecs.addSystem(this.inputSystem);
@@ -106,7 +110,7 @@ export class PongBR {
 		this.pongRoot.setEnabled(true);
 		this.stateManager.setter(true);
 		this.stateManager.update();
-		this.camera.attachControl(this.canvas);
+		//this.camera.attachControl(this.canvas);
 
 		this.scene.onBeforeRenderObservable.add(() => {
 			this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
@@ -115,7 +119,7 @@ export class PongBR {
 	}
 	public stop(): void {
 
-		this.camera.detachControl();
+		//this.camera.detachControl();
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
 

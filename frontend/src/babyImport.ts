@@ -51,6 +51,7 @@ export { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper
 export { SpotLight } from "@babylonjs/core/Lights/spotLight";
 export { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 export { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+export { UniversalCamera } from "@babylonjs/core";
 // export { DeepImmutable} from "@babylonjs/core";
 export { Plane } from "@babylonjs/core/Maths/math.plane";
 

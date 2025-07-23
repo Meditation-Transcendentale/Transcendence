@@ -14,6 +14,7 @@ import {
 	StandardMaterial,
 	Vector3,
 	Inspector,
+	UniversalCamera,
 	LoadAssetContainerAsync
 } from "@babylonImport";
 import { Field } from "./Field";
@@ -24,7 +25,7 @@ export class Environment {
 	public scene!: Scene;
 
 	private camera!: ArcRotateCamera;
-	private camera_br!: ArcRotateCamera;
+	private camera_br!: UniversalCamera;
 	private camera_pong!: ArcRotateCamera;
 
 	private lastTime: number;
@@ -100,8 +101,9 @@ export class Environment {
 	public async init() {
 
 		this.createMesh();
-		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
-		this.camera_br.attachControl(this.canvas, true);
+		//this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
+		this.camera_br = new UniversalCamera('br', Vector3.Zero(), this.scene);
+		//this.camera_br.attachControl(this.canvas, true);
 		this.camera_pong = new ArcRotateCamera('pong', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
 		loaded.addAllToScene();
