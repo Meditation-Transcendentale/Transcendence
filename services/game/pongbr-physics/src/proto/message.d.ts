@@ -1608,14 +1608,8 @@ export namespace physics {
         /** PhysicsResponse goal */
         goal?: (shared.IGoal|null);
 
-        /** PhysicsResponse ranks */
-        ranks?: (number[]|null);
-
         /** PhysicsResponse stage */
         stage?: (number|null);
-
-        /** PhysicsResponse end */
-        end?: (boolean|null);
     }
 
     /** Represents a PhysicsResponse. */
@@ -1642,14 +1636,8 @@ export namespace physics {
         /** PhysicsResponse goal. */
         public goal?: (shared.IGoal|null);
 
-        /** PhysicsResponse ranks. */
-        public ranks: number[];
-
         /** PhysicsResponse stage. */
         public stage: number;
-
-        /** PhysicsResponse end. */
-        public end: boolean;
 
         /**
          * Creates a new PhysicsResponse instance using the specified properties.

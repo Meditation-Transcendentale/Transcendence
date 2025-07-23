@@ -27,6 +27,7 @@ export const shared = $root.shared = (() => {
          * @property {number|null} [y] Ball y
          * @property {number|null} [vx] Ball vx
          * @property {number|null} [vy] Ball vy
+         * @property {boolean|null} [disabled] Ball disabled
          */
 
         /**
@@ -85,6 +86,14 @@ export const shared = $root.shared = (() => {
         Ball.prototype.vy = 0;
 
         /**
+         * Ball disabled.
+         * @member {boolean} disabled
+         * @memberof shared.Ball
+         * @instance
+         */
+        Ball.prototype.disabled = false;
+
+        /**
          * Creates a new Ball instance using the specified properties.
          * @function create
          * @memberof shared.Ball
@@ -118,6 +127,8 @@ export const shared = $root.shared = (() => {
                 writer.uint32(/* id 4, wireType 5 =*/37).float(message.vx);
             if (message.vy != null && Object.hasOwnProperty.call(message, "vy"))
                 writer.uint32(/* id 5, wireType 5 =*/45).float(message.vy);
+            if (message.disabled != null && Object.hasOwnProperty.call(message, "disabled"))
+                writer.uint32(/* id 6, wireType 0 =*/48).bool(message.disabled);
             return writer;
         };
 
@@ -174,6 +185,10 @@ export const shared = $root.shared = (() => {
                         message.vy = reader.float();
                         break;
                     }
+                case 6: {
+                        message.disabled = reader.bool();
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -224,6 +239,9 @@ export const shared = $root.shared = (() => {
             if (message.vy != null && message.hasOwnProperty("vy"))
                 if (typeof message.vy !== "number")
                     return "vy: number expected";
+            if (message.disabled != null && message.hasOwnProperty("disabled"))
+                if (typeof message.disabled !== "boolean")
+                    return "disabled: boolean expected";
             return null;
         };
 
@@ -249,6 +267,8 @@ export const shared = $root.shared = (() => {
                 message.vx = Number(object.vx);
             if (object.vy != null)
                 message.vy = Number(object.vy);
+            if (object.disabled != null)
+                message.disabled = Boolean(object.disabled);
             return message;
         };
 
@@ -271,6 +291,7 @@ export const shared = $root.shared = (() => {
                 object.y = 0;
                 object.vx = 0;
                 object.vy = 0;
+                object.disabled = false;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
@@ -282,6 +303,8 @@ export const shared = $root.shared = (() => {
                 object.vx = options.json && !isFinite(message.vx) ? String(message.vx) : message.vx;
             if (message.vy != null && message.hasOwnProperty("vy"))
                 object.vy = options.json && !isFinite(message.vy) ? String(message.vy) : message.vy;
+            if (message.disabled != null && message.hasOwnProperty("disabled"))
+                object.disabled = message.disabled;
             return object;
         };
 
@@ -3247,367 +3270,6 @@ export const shared = $root.shared = (() => {
         return PhysicsRequest;
     })();
 
-    shared.PhysicsResponse = (function() {
-
-        /**
-         * Properties of a PhysicsResponse.
-         * @memberof shared
-         * @interface IPhysicsResponse
-         * @property {string|null} [gameId] PhysicsResponse gameId
-         * @property {number|Long|null} [tick] PhysicsResponse tick
-         * @property {Array.<shared.IBall>|null} [balls] PhysicsResponse balls
-         * @property {Array.<shared.IPaddle>|null} [paddles] PhysicsResponse paddles
-         * @property {shared.IGoal|null} [goal] PhysicsResponse goal
-         */
-
-        /**
-         * Constructs a new PhysicsResponse.
-         * @memberof shared
-         * @classdesc Represents a PhysicsResponse.
-         * @implements IPhysicsResponse
-         * @constructor
-         * @param {shared.IPhysicsResponse=} [properties] Properties to set
-         */
-        function PhysicsResponse(properties) {
-            this.balls = [];
-            this.paddles = [];
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PhysicsResponse gameId.
-         * @member {string} gameId
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.gameId = "";
-
-        /**
-         * PhysicsResponse tick.
-         * @member {number|Long} tick
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.tick = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-        /**
-         * PhysicsResponse balls.
-         * @member {Array.<shared.IBall>} balls
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.balls = $util.emptyArray;
-
-        /**
-         * PhysicsResponse paddles.
-         * @member {Array.<shared.IPaddle>} paddles
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.paddles = $util.emptyArray;
-
-        /**
-         * PhysicsResponse goal.
-         * @member {shared.IGoal|null|undefined} goal
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.goal = null;
-
-        /**
-         * Creates a new PhysicsResponse instance using the specified properties.
-         * @function create
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {shared.IPhysicsResponse=} [properties] Properties to set
-         * @returns {shared.PhysicsResponse} PhysicsResponse instance
-         */
-        PhysicsResponse.create = function create(properties) {
-            return new PhysicsResponse(properties);
-        };
-
-        /**
-         * Encodes the specified PhysicsResponse message. Does not implicitly {@link shared.PhysicsResponse.verify|verify} messages.
-         * @function encode
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {shared.IPhysicsResponse} message PhysicsResponse message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        PhysicsResponse.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.gameId != null && Object.hasOwnProperty.call(message, "gameId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.gameId);
-            if (message.tick != null && Object.hasOwnProperty.call(message, "tick"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int64(message.tick);
-            if (message.balls != null && message.balls.length)
-                for (let i = 0; i < message.balls.length; ++i)
-                    $root.shared.Ball.encode(message.balls[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            if (message.paddles != null && message.paddles.length)
-                for (let i = 0; i < message.paddles.length; ++i)
-                    $root.shared.Paddle.encode(message.paddles[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-            if (message.goal != null && Object.hasOwnProperty.call(message, "goal"))
-                $root.shared.Goal.encode(message.goal, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PhysicsResponse message, length delimited. Does not implicitly {@link shared.PhysicsResponse.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {shared.IPhysicsResponse} message PhysicsResponse message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        PhysicsResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PhysicsResponse message from the specified reader or buffer.
-         * @function decode
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {shared.PhysicsResponse} PhysicsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        PhysicsResponse.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.PhysicsResponse();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.gameId = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.tick = reader.int64();
-                        break;
-                    }
-                case 3: {
-                        if (!(message.balls && message.balls.length))
-                            message.balls = [];
-                        message.balls.push($root.shared.Ball.decode(reader, reader.uint32()));
-                        break;
-                    }
-                case 4: {
-                        if (!(message.paddles && message.paddles.length))
-                            message.paddles = [];
-                        message.paddles.push($root.shared.Paddle.decode(reader, reader.uint32()));
-                        break;
-                    }
-                case 5: {
-                        message.goal = $root.shared.Goal.decode(reader, reader.uint32());
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PhysicsResponse message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {shared.PhysicsResponse} PhysicsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        PhysicsResponse.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PhysicsResponse message.
-         * @function verify
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PhysicsResponse.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.gameId != null && message.hasOwnProperty("gameId"))
-                if (!$util.isString(message.gameId))
-                    return "gameId: string expected";
-            if (message.tick != null && message.hasOwnProperty("tick"))
-                if (!$util.isInteger(message.tick) && !(message.tick && $util.isInteger(message.tick.low) && $util.isInteger(message.tick.high)))
-                    return "tick: integer|Long expected";
-            if (message.balls != null && message.hasOwnProperty("balls")) {
-                if (!Array.isArray(message.balls))
-                    return "balls: array expected";
-                for (let i = 0; i < message.balls.length; ++i) {
-                    let error = $root.shared.Ball.verify(message.balls[i]);
-                    if (error)
-                        return "balls." + error;
-                }
-            }
-            if (message.paddles != null && message.hasOwnProperty("paddles")) {
-                if (!Array.isArray(message.paddles))
-                    return "paddles: array expected";
-                for (let i = 0; i < message.paddles.length; ++i) {
-                    let error = $root.shared.Paddle.verify(message.paddles[i]);
-                    if (error)
-                        return "paddles." + error;
-                }
-            }
-            if (message.goal != null && message.hasOwnProperty("goal")) {
-                let error = $root.shared.Goal.verify(message.goal);
-                if (error)
-                    return "goal." + error;
-            }
-            return null;
-        };
-
-        /**
-         * Creates a PhysicsResponse message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {shared.PhysicsResponse} PhysicsResponse
-         */
-        PhysicsResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.shared.PhysicsResponse)
-                return object;
-            let message = new $root.shared.PhysicsResponse();
-            if (object.gameId != null)
-                message.gameId = String(object.gameId);
-            if (object.tick != null)
-                if ($util.Long)
-                    (message.tick = $util.Long.fromValue(object.tick)).unsigned = false;
-                else if (typeof object.tick === "string")
-                    message.tick = parseInt(object.tick, 10);
-                else if (typeof object.tick === "number")
-                    message.tick = object.tick;
-                else if (typeof object.tick === "object")
-                    message.tick = new $util.LongBits(object.tick.low >>> 0, object.tick.high >>> 0).toNumber();
-            if (object.balls) {
-                if (!Array.isArray(object.balls))
-                    throw TypeError(".shared.PhysicsResponse.balls: array expected");
-                message.balls = [];
-                for (let i = 0; i < object.balls.length; ++i) {
-                    if (typeof object.balls[i] !== "object")
-                        throw TypeError(".shared.PhysicsResponse.balls: object expected");
-                    message.balls[i] = $root.shared.Ball.fromObject(object.balls[i]);
-                }
-            }
-            if (object.paddles) {
-                if (!Array.isArray(object.paddles))
-                    throw TypeError(".shared.PhysicsResponse.paddles: array expected");
-                message.paddles = [];
-                for (let i = 0; i < object.paddles.length; ++i) {
-                    if (typeof object.paddles[i] !== "object")
-                        throw TypeError(".shared.PhysicsResponse.paddles: object expected");
-                    message.paddles[i] = $root.shared.Paddle.fromObject(object.paddles[i]);
-                }
-            }
-            if (object.goal != null) {
-                if (typeof object.goal !== "object")
-                    throw TypeError(".shared.PhysicsResponse.goal: object expected");
-                message.goal = $root.shared.Goal.fromObject(object.goal);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PhysicsResponse message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {shared.PhysicsResponse} message PhysicsResponse
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PhysicsResponse.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (options.arrays || options.defaults) {
-                object.balls = [];
-                object.paddles = [];
-            }
-            if (options.defaults) {
-                object.gameId = "";
-                if ($util.Long) {
-                    let long = new $util.Long(0, 0, false);
-                    object.tick = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                } else
-                    object.tick = options.longs === String ? "0" : 0;
-                object.goal = null;
-            }
-            if (message.gameId != null && message.hasOwnProperty("gameId"))
-                object.gameId = message.gameId;
-            if (message.tick != null && message.hasOwnProperty("tick"))
-                if (typeof message.tick === "number")
-                    object.tick = options.longs === String ? String(message.tick) : message.tick;
-                else
-                    object.tick = options.longs === String ? $util.Long.prototype.toString.call(message.tick) : options.longs === Number ? new $util.LongBits(message.tick.low >>> 0, message.tick.high >>> 0).toNumber() : message.tick;
-            if (message.balls && message.balls.length) {
-                object.balls = [];
-                for (let j = 0; j < message.balls.length; ++j)
-                    object.balls[j] = $root.shared.Ball.toObject(message.balls[j], options);
-            }
-            if (message.paddles && message.paddles.length) {
-                object.paddles = [];
-                for (let j = 0; j < message.paddles.length; ++j)
-                    object.paddles[j] = $root.shared.Paddle.toObject(message.paddles[j], options);
-            }
-            if (message.goal != null && message.hasOwnProperty("goal"))
-                object.goal = $root.shared.Goal.toObject(message.goal, options);
-            return object;
-        };
-
-        /**
-         * Converts this PhysicsResponse to JSON.
-         * @function toJSON
-         * @memberof shared.PhysicsResponse
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PhysicsResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for PhysicsResponse
-         * @function getTypeUrl
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        PhysicsResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/shared.PhysicsResponse";
-        };
-
-        return PhysicsResponse;
-    })();
-
     return shared;
 })();
 
@@ -4143,6 +3805,9 @@ export const physics = $root.physics = (() => {
          * @property {Array.<shared.IBall>|null} [balls] PhysicsResponse balls
          * @property {Array.<shared.IPaddle>|null} [paddles] PhysicsResponse paddles
          * @property {shared.IGoal|null} [goal] PhysicsResponse goal
+         * @property {Array.<number>|null} [ranks] PhysicsResponse ranks
+         * @property {number|null} [stage] PhysicsResponse stage
+         * @property {boolean|null} [end] PhysicsResponse end
          */
 
         /**
@@ -4156,6 +3821,7 @@ export const physics = $root.physics = (() => {
         function PhysicsResponse(properties) {
             this.balls = [];
             this.paddles = [];
+            this.ranks = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -4203,6 +3869,30 @@ export const physics = $root.physics = (() => {
         PhysicsResponse.prototype.goal = null;
 
         /**
+         * PhysicsResponse ranks.
+         * @member {Array.<number>} ranks
+         * @memberof physics.PhysicsResponse
+         * @instance
+         */
+        PhysicsResponse.prototype.ranks = $util.emptyArray;
+
+        /**
+         * PhysicsResponse stage.
+         * @member {number} stage
+         * @memberof physics.PhysicsResponse
+         * @instance
+         */
+        PhysicsResponse.prototype.stage = 0;
+
+        /**
+         * PhysicsResponse end.
+         * @member {boolean} end
+         * @memberof physics.PhysicsResponse
+         * @instance
+         */
+        PhysicsResponse.prototype.end = false;
+
+        /**
          * Creates a new PhysicsResponse instance using the specified properties.
          * @function create
          * @memberof physics.PhysicsResponse
@@ -4238,6 +3928,16 @@ export const physics = $root.physics = (() => {
                     $root.shared.Paddle.encode(message.paddles[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             if (message.goal != null && Object.hasOwnProperty.call(message, "goal"))
                 $root.shared.Goal.encode(message.goal, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+            if (message.ranks != null && message.ranks.length) {
+                writer.uint32(/* id 6, wireType 2 =*/50).fork();
+                for (let i = 0; i < message.ranks.length; ++i)
+                    writer.int32(message.ranks[i]);
+                writer.ldelim();
+            }
+            if (message.stage != null && Object.hasOwnProperty.call(message, "stage"))
+                writer.uint32(/* id 7, wireType 0 =*/56).int32(message.stage);
+            if (message.end != null && Object.hasOwnProperty.call(message, "end"))
+                writer.uint32(/* id 8, wireType 0 =*/64).bool(message.end);
             return writer;
         };
 
@@ -4296,6 +3996,25 @@ export const physics = $root.physics = (() => {
                     }
                 case 5: {
                         message.goal = $root.shared.Goal.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 6: {
+                        if (!(message.ranks && message.ranks.length))
+                            message.ranks = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.ranks.push(reader.int32());
+                        } else
+                            message.ranks.push(reader.int32());
+                        break;
+                    }
+                case 7: {
+                        message.stage = reader.int32();
+                        break;
+                    }
+                case 8: {
+                        message.end = reader.bool();
                         break;
                     }
                 default:
@@ -4362,6 +4081,19 @@ export const physics = $root.physics = (() => {
                 if (error)
                     return "goal." + error;
             }
+            if (message.ranks != null && message.hasOwnProperty("ranks")) {
+                if (!Array.isArray(message.ranks))
+                    return "ranks: array expected";
+                for (let i = 0; i < message.ranks.length; ++i)
+                    if (!$util.isInteger(message.ranks[i]))
+                        return "ranks: integer[] expected";
+            }
+            if (message.stage != null && message.hasOwnProperty("stage"))
+                if (!$util.isInteger(message.stage))
+                    return "stage: integer expected";
+            if (message.end != null && message.hasOwnProperty("end"))
+                if (typeof message.end !== "boolean")
+                    return "end: boolean expected";
             return null;
         };
 
@@ -4413,6 +4145,17 @@ export const physics = $root.physics = (() => {
                     throw TypeError(".physics.PhysicsResponse.goal: object expected");
                 message.goal = $root.shared.Goal.fromObject(object.goal);
             }
+            if (object.ranks) {
+                if (!Array.isArray(object.ranks))
+                    throw TypeError(".physics.PhysicsResponse.ranks: array expected");
+                message.ranks = [];
+                for (let i = 0; i < object.ranks.length; ++i)
+                    message.ranks[i] = object.ranks[i] | 0;
+            }
+            if (object.stage != null)
+                message.stage = object.stage | 0;
+            if (object.end != null)
+                message.end = Boolean(object.end);
             return message;
         };
 
@@ -4432,6 +4175,7 @@ export const physics = $root.physics = (() => {
             if (options.arrays || options.defaults) {
                 object.balls = [];
                 object.paddles = [];
+                object.ranks = [];
             }
             if (options.defaults) {
                 object.gameId = "";
@@ -4441,6 +4185,8 @@ export const physics = $root.physics = (() => {
                 } else
                     object.tick = options.longs === String ? "0" : 0;
                 object.goal = null;
+                object.stage = 0;
+                object.end = false;
             }
             if (message.gameId != null && message.hasOwnProperty("gameId"))
                 object.gameId = message.gameId;
@@ -4461,6 +4207,15 @@ export const physics = $root.physics = (() => {
             }
             if (message.goal != null && message.hasOwnProperty("goal"))
                 object.goal = $root.shared.Goal.toObject(message.goal, options);
+            if (message.ranks && message.ranks.length) {
+                object.ranks = [];
+                for (let j = 0; j < message.ranks.length; ++j)
+                    object.ranks[j] = message.ranks[j];
+            }
+            if (message.stage != null && message.hasOwnProperty("stage"))
+                object.stage = message.stage;
+            if (message.end != null && message.hasOwnProperty("end"))
+                object.end = message.end;
             return object;
         };
 

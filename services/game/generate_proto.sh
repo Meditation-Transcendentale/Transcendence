@@ -28,24 +28,39 @@ fi
 # 3. Shared directory containing all .proto files
 SHARED_PROTO_DIR="./proto"
 
-# 4. List of service names (must match your folders under ./services/)
+# 4. List of service names (backend services + frontend games)
 SERVICES=(
   "game-manager"
   "pong-physics"
+  "pongBR-physics"
   "user-interface"
   "lobby-manager"
+  "frontend-pong"
+  "frontend-pongbr"
 )
 
 echo "🛠 Starting protobuf generation for all services..."
 
 for svc in "${SERVICES[@]}"; do
-  OUT_DIR="$svc/src/proto"
+  # 5. Determine output directory based on service type
+  case "$svc" in
+    frontend-pong)
+      OUT_DIR="../../frontend/src/pong/utils/proto"
+      ;;
+    frontend-pongbr)
+      OUT_DIR="../../frontend/src/pongbr/utils/proto"
+      ;;
+    *)
+      OUT_DIR="$svc/src/proto"
+      ;;
+  esac
+  
   echo "📦 Generating for service: $svc → $OUT_DIR"
   
   # Ensure output directory exists
   mkdir -p "$OUT_DIR"
   
-  # 5. Decide which .proto sources each service needs:
+  # 6. Decide which .proto sources each service needs:
   case "$svc" in
     "game-manager")
       # game-manager needs shared types + physics + its own match messages
@@ -58,6 +73,13 @@ for svc in "${SERVICES[@]}"; do
       ;;
     "pong-physics")
       # pong-physics only cares about physics messages (and shared types)
+      PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/shared.proto"
+        "$SHARED_PROTO_DIR/physics.proto"
+      )
+      ;;
+    "pongBR-physics")
+      # pongbr-physics needs shared types + physics messages for battle royale
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/physics.proto"
@@ -77,13 +99,20 @@ for svc in "${SERVICES[@]}"; do
         "$SHARED_PROTO_DIR/lobby.proto"
       )
       ;;
+    "frontend-pong"|"frontend-pongbr")
+      # Frontend games need shared types + UI messages
+      PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/shared.proto"
+        "$SHARED_PROTO_DIR/ui.proto"
+      )
+      ;;
     *)
       echo "❌ Unknown service: $svc"
       exit 1
       ;;
   esac
 
-  # 6. Check if all proto files exist
+  # 7. Check if all proto files exist
   for proto_file in "${PROTO_SOURCES[@]}"; do
     if [ ! -f "$proto_file" ]; then
       echo "❌ Proto file not found: $proto_file"
@@ -91,7 +120,7 @@ for svc in "${SERVICES[@]}"; do
     fi
   done
 
-  # 7. Run pbjs & pbts directly (they come with protobufjs package)
+  # 8. Run pbjs & pbts directly (they come with protobufjs package)
   echo "   Running pbjs for $svc..."
   npx pbjs \
     -t static-module \
@@ -105,7 +134,7 @@ for svc in "${SERVICES[@]}"; do
     -o "$OUT_DIR/message.d.ts" \
     "$OUT_DIR/message.js"
 
-  # 8. Patch the generated code:
+  # 9. Patch the generated code:
   #    a) Fix the import so Node.js ESM finds minimal.js
   echo "   Patching generated files..."
   if [[ "$OSTYPE" == "darwin"* ]]; then

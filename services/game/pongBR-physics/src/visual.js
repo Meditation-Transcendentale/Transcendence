@@ -7,37 +7,23 @@ const WIDTH = 1920;
 const HEIGHT = 1080;
 const CENTER = { x: WIDTH / 2, y: HEIGHT / 2 };
 
-// Camera and UI state
+// Simple state
 let ZOOM = 2.0;
 let camX = 0;
 let camY = 0;
 let paused = false;
 
-// Debug visualization toggles
-let showDebug = true;
-let showPaddleSlices = true;
-let showVelocities = false;
-let showCollisionLog = false;
-let showBallIDs = false;
-let showPaddleIDs = false;
-let showPillars = true;
-let showPillarIDs = false;
-let showEliminatedPlayers = true;
-let showPhaseInfo = true;
-let showPaddleSizes = true; // New: Show actual paddle sizes
-
-// Debug data
-let collisionLog = [];
-const MAX_LOG_ENTRIES = 15;
-let lastGameTick = 0;
+// Event log for key events only
+let eventLog = [];
+const MAX_EVENTS = 8;
 
 // Physics setup
-const NUM_PLAYERS = 100;
+const NUM_PLAYERS = 100; // Smaller for easier visualization
 const NUM_BALLS = 200;
 const engine = new PhysicsEngine();
 engine.initBattleRoyale(NUM_PLAYERS, NUM_BALLS);
 
-raylib.InitWindow(WIDTH, HEIGHT, "Battle Royale Physics Debugger");
+raylib.InitWindow(WIDTH, HEIGHT, "Phase Transition Debugger");
 raylib.SetTargetFPS(60);
 
 // === UTILITY FUNCTIONS ===
@@ -54,13 +40,13 @@ function drawText(text, x, y, size = 16, color = raylib.WHITE) {
 }
 
 function logEvent(message, color = raylib.WHITE) {
-	collisionLog.push({ message, color, time: Date.now() });
-	if (collisionLog.length > MAX_LOG_ENTRIES) {
-		collisionLog.shift();
+	eventLog.push({ message, color, time: Date.now() });
+	if (eventLog.length > MAX_EVENTS) {
+		eventLog.shift();
 	}
 }
 
-// === VISUALIZATION FUNCTIONS ===
+// === DRAWING FUNCTIONS ===
 
 function drawArena() {
 	const arenaCenter = toScreen(0, 0);
@@ -69,112 +55,54 @@ function drawArena() {
 	// Arena boundary
 	raylib.DrawCircleLines(arenaCenter.x, arenaCenter.y, arenaRadius, raylib.WHITE);
 
-	// Goal detection boundary
-	const goalRadius = (engine.cfg.ARENA_RADIUS + engine.cfg.GOAL_DETECTION_MARGIN) * ZOOM;
-	raylib.DrawCircleLines(arenaCenter.x, arenaCenter.y, goalRadius, raylib.Color(255, 255, 0, 100));
-
-	// Arena center point
+	// Center point
 	raylib.DrawCircle(arenaCenter.x, arenaCenter.y, 3, raylib.RED);
-
-	// Player division lines (if debug enabled)
-	if (showDebug) {
-		const numActivePlayers = engine.playerStates.activePlayers.size;
-		const totalPaddles = engine.entities.paddles.length;
-
-		// Show current player divisions
-		if (numActivePlayers > 0 && totalPaddles > 0) {
-			const angleStep = (2 * Math.PI) / totalPaddles;
-			for (let i = 0; i < Math.min(totalPaddles, 32); i++) {
-				const angle = i * angleStep;
-				const lineX = arenaCenter.x + Math.cos(angle) * arenaRadius;
-				const lineY = arenaCenter.y + Math.sin(angle) * arenaRadius;
-				raylib.DrawLine(arenaCenter.x, arenaCenter.y, lineX, lineY, raylib.Color(128, 128, 128, 100));
-			}
-		}
-	}
-}
-
-function drawPaddleSlice(paddleIndex, centerAngle, offset, isEliminated = false) {
-	const cfg = engine.cfg;
-	const arenaCenter = toScreen(0, 0);
-	const arenaRadius = cfg.ARENA_RADIUS * ZOOM;
-
-	if (centerAngle === undefined || centerAngle === null) return;
-
-	// Get current paddle angle
-	const currentAngle = centerAngle + (offset || 0);
-
-	// Calculate arc width - after rebuild, all paddles are active
-	const numPaddles = engine.entities.paddles.length;
-	const angleStep = (2 * Math.PI) / numPaddles;
-	const arcWidth = angleStep * cfg.PADDLE_FILL;
-
-	const startAngle = currentAngle - arcWidth / 2;
-	const endAngle = currentAngle + arcWidth / 2;
-
-	// Generate color
-	const hue = (paddleIndex * 360 / Math.max(NUM_PLAYERS, numPaddles)) % 360;
-	const saturation = isEliminated ? 0.3 : 0.8;
-	const value = isEliminated ? 0.4 : 0.9;
-	const color = raylib.ColorFromHSV(hue, saturation, value);
-	const alpha = isEliminated ? 50 : 100;
-	const transparentColor = raylib.Color(color.r, color.g, color.b, alpha);
-
-	// Draw arc
-	const segments = Math.max(8, Math.floor(arcWidth * 50));
-	const innerRadius = arenaRadius - 15;
-	const outerRadius = arenaRadius + 5;
-
-	for (let i = 0; i < segments; i++) {
-		const angle1 = startAngle + (i / segments) * arcWidth;
-		const angle2 = startAngle + ((i + 1) / segments) * arcWidth;
-
-		const inner1X = arenaCenter.x + Math.cos(angle1) * innerRadius;
-		const inner1Y = arenaCenter.y + Math.sin(angle1) * innerRadius;
-		const outer1X = arenaCenter.x + Math.cos(angle1) * outerRadius;
-		const outer1Y = arenaCenter.y + Math.sin(angle1) * outerRadius;
-
-		const inner2X = arenaCenter.x + Math.cos(angle2) * innerRadius;
-		const inner2Y = arenaCenter.y + Math.sin(angle2) * innerRadius;
-		const outer2X = arenaCenter.x + Math.cos(angle2) * outerRadius;
-		const outer2Y = arenaCenter.y + Math.sin(angle2) * outerRadius;
-
-		raylib.DrawTriangle(
-			{ x: inner1X, y: inner1Y },
-			{ x: outer1X, y: outer1Y },
-			{ x: inner2X, y: inner2Y },
-			transparentColor
-		);
-		raylib.DrawTriangle(
-			{ x: outer1X, y: outer1Y },
-			{ x: outer2X, y: outer2Y },
-			{ x: inner2X, y: inner2Y },
-			transparentColor
-		);
-	}
 }
 
 function drawBalls(balls) {
-	for (let i = 0; i < balls.length; i++) {
-		const ball = balls[i];
+	for (const ball of balls) {
 		const pos = toScreen(ball.x, ball.y);
 		const ballRadius = Math.max(2, ball.radius * ZOOM);
-
-		// Draw ball
 		raylib.DrawCircle(pos.x, pos.y, ballRadius, raylib.RED);
+	}
+}
 
-		// Draw velocity vector
-		if (showVelocities) {
-			const velScale = 0.05;
-			const velEndX = pos.x + ball.vx * velScale * ZOOM;
-			const velEndY = pos.y + ball.vy * velScale * ZOOM;
-			raylib.DrawLine(pos.x, pos.y, velEndX, velEndY, raylib.BLUE);
-		}
+function drawPillars() {
+	// Get pillars from engine directly
+	for (let i = 0; i < engine.entities.pillars.length; i++) {
+		const pillarEnt = engine.entities.pillars[i];
+		if (pillarEnt === undefined || !engine.pd.isActive(pillarEnt)) continue;
 
-		// Draw ball ID
-		if (showBallIDs) {
-			drawText(`${ball.id}`, pos.x + 5, pos.y - 10, 10, raylib.WHITE);
-		}
+		const x = engine.pd.posX[pillarEnt];
+		const y = engine.pd.posY[pillarEnt];
+		const rot = engine.pd.rot[pillarEnt];
+		const halfW = engine.pd.halfW[pillarEnt];
+		const halfH = engine.pd.halfH[pillarEnt];
+		const isEliminated = engine.pd.isEliminated[pillarEnt];
+
+		const pos = toScreen(x, y);
+		const pillarWidth = Math.max(4, halfW * 2 * ZOOM);
+		const pillarHeight = Math.max(4, halfH * 2 * ZOOM);
+		const rotationDegrees = rot * (180 / Math.PI);
+
+		// Color: purple for active, dark gray for eliminated
+		const pillarColor = isEliminated ? raylib.DARKGRAY : raylib.PURPLE;
+
+		// Draw pillar
+		raylib.DrawRectanglePro(
+			{ x: pos.x, y: pos.y, width: pillarWidth, height: pillarHeight },
+			{ x: pillarWidth / 2, y: pillarHeight / 2 },
+			rotationDegrees,
+			pillarColor
+		);
+
+		// Simple outline
+		const outlineColor = isEliminated ? raylib.GRAY : raylib.MAGENTA;
+		raylib.DrawRectangleLinesEx(
+			{ x: pos.x - pillarWidth / 2, y: pos.y - pillarHeight / 2, width: pillarWidth, height: pillarHeight },
+			1,
+			outlineColor
+		);
 	}
 }
 
@@ -185,7 +113,7 @@ function drawPaddles(paddles) {
 
 		if (!paddleEnt || !engine.pd.isActive(paddleEnt)) continue;
 
-		// Get paddle data from physics engine
+		// Get actual paddle data from physics
 		const x = engine.pd.posX[paddleEnt];
 		const y = engine.pd.posY[paddleEnt];
 		const rot = engine.pd.rot[paddleEnt];
@@ -197,11 +125,10 @@ function drawPaddles(paddles) {
 		const paddleHeight = halfH * 2 * ZOOM;
 		const rotationDegrees = rot * (180 / Math.PI);
 
-		// Determine if paddle is eliminated (dead)
-		const isEliminated = paddle.dead;
-		const paddleColor = isEliminated ? raylib.GRAY : raylib.BLUE;
+		// Color based on status: Blue=alive, Gray=dead
+		const paddleColor = paddle.dead ? raylib.GRAY : raylib.BLUE;
 
-		// Draw paddle rectangle with actual physics dimensions
+		// Draw paddle
 		raylib.DrawRectanglePro(
 			{ x: pos.x, y: pos.y, width: paddleWidth, height: paddleHeight },
 			{ x: paddleWidth / 2, y: paddleHeight / 2 },
@@ -209,431 +136,169 @@ function drawPaddles(paddles) {
 			paddleColor
 		);
 
-		// Draw paddle slice when enabled
-		if (showPaddleSlices && i < engine.paddleData.centerAngles.length) {
-			const centerAngle = engine.paddleData.centerAngles[i];
-			const offset = engine.paddleData.offsets[i] || 0;
-			drawPaddleSlice(i, centerAngle, offset, isEliminated);
-		}
+		// Simple status indicator
+		const statusColor = paddle.dead ? raylib.RED : raylib.GREEN;
+		raylib.DrawCircle(pos.x - 20, pos.y, 5, statusColor);
 
-		// Draw paddle size info
-		if (showPaddleSizes) {
-			const sizeText = `${(halfW * 2).toFixed(1)}x${(halfH * 2).toFixed(1)}`;
-			drawText(sizeText, pos.x + 15, pos.y - 25, 10, raylib.CYAN);
-		}
-
-		// Draw paddle ID and status
-		if (showPaddleIDs) {
-			// Map to original player ID if after rebuild
-			let displayId = i;
-			if (engine.playerMapping && Object.keys(engine.playerMapping).length > 0) {
-				const reverseMapping = Object.entries(engine.playerMapping).find(([origId, newIdx]) => newIdx === i);
-				displayId = reverseMapping ? parseInt(reverseMapping[0]) : i;
-			}
-
-			const status = isEliminated ? "DEAD" : "ALIVE";
-			const textColor = isEliminated ? raylib.RED : raylib.WHITE;
-			drawText(`P${displayId} ${status}`, pos.x + 15, pos.y - 15, 12, textColor);
-
-			// Show move input
-			const move = paddle.move || 0;
-			if (move !== 0) {
-				const moveText = move > 0 ? "→" : "←";
-				drawText(moveText, pos.x - 25, pos.y, 14, raylib.YELLOW);
-			}
-		}
-	}
-}
-
-function drawPillars(state) {
-	if (!showPillars) return;
-
-	// Get pillars from engine directly
-	const pillars = [];
-	for (let i = 0; i < engine.entities.pillars.length; i++) {
-		const pillarEnt = engine.entities.pillars[i];
-		if (pillarEnt !== undefined && engine.pd.isActive(pillarEnt)) {
-			pillars.push({
-				id: i,
-				x: engine.pd.posX[pillarEnt],
-				y: engine.pd.posY[pillarEnt],
-				rot: engine.pd.rot[pillarEnt],
-				radius: engine.pd.radius[pillarEnt],
-				halfW: engine.pd.halfW[pillarEnt],
-				halfH: engine.pd.halfH[pillarEnt],
-				isEliminated: engine.pd.isEliminated[pillarEnt]
-			});
-		}
-	}
-
-	for (let i = 0; i < pillars.length; i++) {
-		const pillar = pillars[i];
-		const pos = toScreen(pillar.x, pillar.y);
-
-		const pillarWidth = Math.max(6, pillar.halfW * 2 * ZOOM);
-		const pillarHeight = Math.max(6, pillar.halfH * 2 * ZOOM);
-		const rotationDegrees = pillar.rot * (180 / Math.PI);
-
-		// Color based on elimination status
-		const pillarColor = pillar.isEliminated ? raylib.Color(128, 0, 128, 100) : raylib.PURPLE;
-
-		// Draw pillar
-		raylib.DrawRectanglePro(
-			{ x: pos.x, y: pos.y, width: pillarWidth, height: pillarHeight },
-			{ x: pillarWidth / 2, y: pillarHeight / 2 },
-			rotationDegrees,
-			pillarColor
-		);
-
-		// Draw pillar outline
-		const halfW = pillarWidth / 2;
-		const halfH = pillarHeight / 2;
-		const cos = Math.cos(pillar.rot);
-		const sin = Math.sin(pillar.rot);
-
-		const corners = [
-			{ x: -halfW, y: -halfH },
-			{ x: halfW, y: -halfH },
-			{ x: halfW, y: halfH },
-			{ x: -halfW, y: halfH }
-		];
-
-		const worldCorners = corners.map(corner => ({
-			x: pos.x + (corner.x * cos - corner.y * sin),
-			y: pos.y + (corner.x * sin + corner.y * cos)
-		}));
-
-		const outlineColor = pillar.isEliminated ? raylib.Color(255, 0, 255, 100) : raylib.MAGENTA;
-		for (let j = 0; j < 4; j++) {
-			const start = worldCorners[j];
-			const end = worldCorners[(j + 1) % 4];
-			raylib.DrawLine(start.x, start.y, end.x, end.y, outlineColor);
-		}
-
-		// Draw collision radius
-		const pillarRadius = pillar.radius * ZOOM;
-		raylib.DrawCircleLines(pos.x, pos.y, pillarRadius, raylib.Color(255, 0, 255, 80));
-
-		// Draw pillar ID
-		if (showPillarIDs) {
-			const statusText = pillar.isEliminated ? " (DEAD)" : "";
-			drawText(`PL${i}${statusText}`, pos.x + pillarWidth / 2 + 5, pos.y - 10, 10, raylib.MAGENTA);
-		}
+		// Show player ID and paddle size
+		drawText(`P${i}`, pos.x + 15, pos.y - 15, 12, raylib.WHITE);
+		drawText(`${(halfW * 2).toFixed(0)}`, pos.x + 15, pos.y, 10, raylib.CYAN);
 	}
 }
 
 function drawPhaseInfo() {
-	if (!showPhaseInfo) return;
-
 	const state = engine.getState();
 	const gameState = state.gameState;
 
-	// Phase info box
-	const boxX = WIDTH - 350;
+	// Simple info box
+	const boxX = WIDTH - 300;
 	const boxY = 10;
-	const boxW = 330;
-	const boxH = 280;
+	const boxW = 280;
+	const boxH = 150;
 
-	raylib.DrawRectangle(boxX, boxY, boxW, boxH, raylib.Color(0, 0, 0, 150));
+	raylib.DrawRectangle(boxX, boxY, boxW, boxH, raylib.Color(0, 0, 0, 180));
 	raylib.DrawRectangleLines(boxX, boxY, boxW, boxH, raylib.YELLOW);
 
-	let yOffset = boxY + 10;
-	const lineHeight = 18;
+	let yOffset = boxY + 15;
+	const lineHeight = 20;
 
-	// Phase title
-	drawText("=== BATTLE ROYALE STATUS ===", boxX + 10, yOffset, 14, raylib.YELLOW);
-	yOffset += lineHeight * 1.5;
+	// Phase and player count
+	drawText(`${gameState.currentPhase}`, boxX + 15, yOffset, 18, raylib.YELLOW);
+	yOffset += lineHeight * 1.2;
 
-	// Current phase
-	drawText(`Phase: ${gameState.currentPhase}`, boxX + 10, yOffset, 14, raylib.WHITE);
-	yOffset += lineHeight;
-
-	// Player counts
 	const activeCount = gameState.activePlayers.length;
-	const eliminatedCount = gameState.eliminatedPlayers.length;
 	const totalCount = engine.originalPlayerCount || NUM_PLAYERS;
-
-	drawText(`Active Players: ${activeCount}/${totalCount}`, boxX + 10, yOffset, 12, raylib.GREEN);
+	drawText(`Players: ${activeCount}/${totalCount}`, boxX + 15, yOffset, 14, raylib.WHITE);
 	yOffset += lineHeight;
 
-	drawText(`Eliminated: ${eliminatedCount}`, boxX + 10, yOffset, 12, raylib.RED);
-	yOffset += lineHeight;
-
-	// Paddle count vs player count
-	const paddleCount = engine.entities.paddles.length;
-	drawText(`Paddles in Arena: ${paddleCount}`, boxX + 10, yOffset, 12, raylib.CYAN);
-	yOffset += lineHeight;
-
-	// Phase sizing info
-	const phaseConfig = engine.getPhaseConfig();
+	// Phase paddle size
 	const phasePaddleSize = engine.getPhasePaddleSize();
-	drawText(`Phase Target: ${phaseConfig.playerCount} players`, boxX + 10, yOffset, 12, raylib.LIGHTGRAY);
-	yOffset += lineHeight;
-	drawText(`Phase Paddle Size: ${phasePaddleSize.toFixed(1)}`, boxX + 10, yOffset, 12, raylib.LIGHTGRAY);
+	drawText(`Paddle Size: ${phasePaddleSize.toFixed(1)}`, boxX + 15, yOffset, 12, raylib.CYAN);
 	yOffset += lineHeight;
 
-	// Rebuild status
+	// Status
 	if (gameState.isRebuilding) {
 		const timeLeft = Math.ceil(gameState.rebuildTimeRemaining / 1000);
-		drawText(`REBUILDING... ${timeLeft}s`, boxX + 10, yOffset, 12, raylib.ORANGE);
-		yOffset += lineHeight;
-	}
-
-	// Player mapping info
-	if (gameState.playerMapping && Object.keys(gameState.playerMapping).length > 0) {
-		drawText("Player Remapping Active", boxX + 10, yOffset, 12, raylib.ORANGE);
-		yOffset += lineHeight;
-
-		// Show first few mappings
-		const mappings = Object.entries(gameState.playerMapping).slice(0, 3);
-		mappings.forEach(([origId, newIdx]) => {
-			drawText(`  P${origId} → Slot${newIdx}`, boxX + 10, yOffset, 10, raylib.LIGHTGRAY);
-			yOffset += lineHeight * 0.8;
-		});
-
-		if (Object.keys(gameState.playerMapping).length > 3) {
-			drawText(`  ... and ${Object.keys(gameState.playerMapping).length - 3} more`, boxX + 10, yOffset, 10, raylib.LIGHTGRAY);
-			yOffset += lineHeight * 0.8;
-		}
-	}
-
-	// Game over status
-	if (gameState.isGameOver) {
+		drawText(`REBUILDING... ${timeLeft}s`, boxX + 15, yOffset, 12, raylib.ORANGE);
+	} else if (gameState.isGameOver) {
 		const winner = gameState.winner;
-		const winText = winner !== null ? `Winner: Player ${winner}` : "No Winner";
-		drawText(`GAME OVER: ${winText}`, boxX + 10, yOffset, 12, raylib.GOLD);
-		yOffset += lineHeight;
-	}
-
-	// Stage info
-	if (state.stage) {
-		drawText(`Stage: ${state.stage}`, boxX + 10, yOffset, 12, raylib.CYAN);
-		yOffset += lineHeight;
-	}
-
-	// Performance stats
-	if (state.frameStats) {
-		yOffset += 5;
-		drawText("=== PERFORMANCE ===", boxX + 10, yOffset, 12, raylib.YELLOW);
-		yOffset += lineHeight;
-
-		const stats = state.frameStats;
-		drawText(`Entities: ${engine.pd.count}`, boxX + 10, yOffset, 10, raylib.WHITE);
+		const winText = winner !== null ? `Winner: P${winner}` : "No Winner";
+		drawText(`GAME OVER`, boxX + 15, yOffset, 14, raylib.GOLD);
 		yOffset += lineHeight * 0.8;
-		drawText(`Free: ${engine.pd.freeList.length}`, boxX + 10, yOffset, 10, raylib.WHITE);
-		yOffset += lineHeight * 0.8;
-		drawText(`Grid Buckets: ${engine.ballGrid.buckets.size}`, boxX + 10, yOffset, 10, raylib.WHITE);
-	}
-}
-
-function drawCollisionDebug(balls, state) {
-	if (!showCollisionLog) return;
-
-	const cfg = engine.cfg;
-
-	// Check balls near arena boundary
-	for (let i = 0; i < Math.min(balls.length, 20); i++) {
-		const ball = balls[i];
-		const distFromCenter = Math.sqrt(ball.x * ball.x + ball.y * ball.y);
-
-		if (distFromCenter >= cfg.ARENA_RADIUS - ball.radius * 2) {
-			const pos = toScreen(ball.x, ball.y);
-			const atBoundary = distFromCenter >= cfg.ARENA_RADIUS - ball.radius;
-			const inGoal = distFromCenter > cfg.ARENA_RADIUS + cfg.GOAL_DETECTION_MARGIN;
-
-			let color = raylib.YELLOW;
-			if (inGoal) color = raylib.RED;
-			else if (atBoundary) color = raylib.GREEN;
-
-			raylib.DrawCircle(pos.x, pos.y, 8, raylib.Color(color.r, color.g, color.b, 100));
-
-			if (inGoal) {
-				logEvent(`Ball ${i} in GOAL area (${distFromCenter.toFixed(1)})`, raylib.RED);
-			} else if (atBoundary) {
-				logEvent(`Ball ${i} at boundary (${distFromCenter.toFixed(1)})`, raylib.GREEN);
-			}
-		}
+		drawText(winText, boxX + 15, yOffset, 12, raylib.GOLD);
 	}
 }
 
 function drawUI() {
-	const cfg = engine.cfg;
 	const state = engine.getState();
 
-	// Background for UI
-	raylib.DrawRectangle(10, 10, 500, HEIGHT - 20, raylib.Color(0, 0, 0, 150));
+	// Simple UI panel
+	raylib.DrawRectangle(10, 10, 350, HEIGHT - 20, raylib.Color(0, 0, 0, 150));
 
 	let yOffset = 20;
 	const lineHeight = 22;
 
 	// Title
-	drawText("=== BATTLE ROYALE DEBUGGER ===", 20, yOffset, 20, raylib.YELLOW);
+	drawText("Phase Transition Debugger", 20, yOffset, 18, raylib.YELLOW);
 	yOffset += lineHeight * 1.5;
 
-	// Stats
-	drawText(`Total Players: ${NUM_PLAYERS} | Active: ${engine.playerStates.activePlayers.size}`, 20, yOffset, 14);
+	// Basic info
+	drawText(`Active: ${engine.playerStates.activePlayers.size}`, 20, yOffset, 14);
+	yOffset += lineHeight;
+	drawText(`Balls: ${state.balls.length}`, 20, yOffset, 14);
 	yOffset += lineHeight;
 
-	drawText(`Balls: ${state.balls.length} | Paddles: ${engine.entities.paddles.length}`, 20, yOffset, 14);
-	yOffset += lineHeight;
-
-	drawText(`Arena: ${cfg.ARENA_RADIUS} | Ball Radius: ${cfg.BALL_RADIUS}`, 20, yOffset, 14);
-	yOffset += lineHeight;
-
+	// Status
 	const status = paused ? "PAUSED" : "RUNNING";
 	const statusColor = paused ? raylib.RED : raylib.GREEN;
 	drawText(`Status: ${status}`, 20, yOffset, 16, statusColor);
 	yOffset += lineHeight * 1.5;
 
-	// Controls
-	drawText("=== CONTROLS ===", 20, yOffset, 16, raylib.CYAN);
+	// Simple controls
+	drawText("=== CONTROLS ===", 20, yOffset, 14, raylib.CYAN);
 	yOffset += lineHeight;
 
 	const controls = [
 		"SPACE: Pause/Resume",
-		"D: Toggle Debug Info",
-		"S: Toggle Paddle Slices",
-		"V: Toggle Velocities",
-		"C: Toggle Collision Debug",
-		"B: Toggle Ball IDs",
-		"P: Toggle Paddle IDs",
-		"L: Toggle Pillars",
-		"K: Toggle Pillar IDs",
-		"E: Toggle Eliminated Players",
-		"F: Toggle Phase Info",
-		"Z: Toggle Paddle Sizes",
-		"R: Reset Simulation",
-		"T: Test Elimination",
-		"1-5: Force Phase Transition",
+		"T: Eliminate Random Player",
+		"R: Reset Game",
+		"1-5: Force Phase",
 		"Arrows: Move Camera",
-		"I/O: Zoom In/Out"
+		"I/O: Zoom"
 	];
 
 	controls.forEach(control => {
 		drawText(control, 20, yOffset, 12, raylib.LIGHTGRAY);
-		yOffset += lineHeight * 0.8;
+		yOffset += lineHeight * 0.9;
 	});
 
-	// Toggle status
-	yOffset += 10;
-	drawText("=== TOGGLE STATUS ===", 20, yOffset, 14, raylib.CYAN);
-	yOffset += lineHeight;
-
-	const toggles = [
-		{ name: "Debug Info", active: showDebug },
-		{ name: "Paddle Slices", active: showPaddleSlices },
-		{ name: "Velocities", active: showVelocities },
-		{ name: "Collision Log", active: showCollisionLog },
-		{ name: "Ball IDs", active: showBallIDs },
-		{ name: "Paddle IDs", active: showPaddleIDs },
-		{ name: "Pillars", active: showPillars },
-		{ name: "Pillar IDs", active: showPillarIDs },
-		{ name: "Eliminated", active: showEliminatedPlayers },
-		{ name: "Phase Info", active: showPhaseInfo },
-		{ name: "Paddle Sizes", active: showPaddleSizes }
-	];
-
-	toggles.forEach(toggle => {
-		const color = toggle.active ? raylib.GREEN : raylib.RED;
-		const status = toggle.active ? "ON" : "OFF";
-		drawText(`${toggle.name}: ${status}`, 20, yOffset, 11, color);
-		yOffset += lineHeight * 0.7;
-	});
-
-	// Event log
-	if (showCollisionLog && collisionLog.length > 0) {
-		yOffset += 10;
-		drawText("=== EVENT LOG ===", 20, yOffset, 14, raylib.YELLOW);
+	// Event log - only important events
+	if (eventLog.length > 0) {
+		yOffset += 20;
+		drawText("=== RECENT EVENTS ===", 20, yOffset, 14, raylib.YELLOW);
 		yOffset += lineHeight;
 
-		const recentLogs = collisionLog.slice(-8);
-		recentLogs.forEach(log => {
-			drawText(log.message, 20, yOffset, 10, log.color);
-			yOffset += lineHeight * 0.6;
+		eventLog.forEach(event => {
+			drawText(event.message, 20, yOffset, 11, event.color);
+			yOffset += lineHeight * 0.8;
 		});
 	}
 
 	// Camera info
-	drawText(`Zoom: ${ZOOM.toFixed(1)}x`, WIDTH - 150, HEIGHT - 60, 14);
-	drawText(`Camera: (${camX.toFixed(0)}, ${camY.toFixed(0)})`, WIDTH - 150, HEIGHT - 40, 14);
+	drawText(`Zoom: ${ZOOM.toFixed(1)}x`, WIDTH - 150, HEIGHT - 40, 12);
 }
 
 // === INPUT HANDLING ===
 
 function handleInput() {
-	// Toggle controls
+	// Basic controls
 	if (raylib.IsKeyPressed(raylib.KEY_SPACE)) paused = !paused;
-	if (raylib.IsKeyPressed(raylib.KEY_D)) showDebug = !showDebug;
-	if (raylib.IsKeyPressed(raylib.KEY_S)) showPaddleSlices = !showPaddleSlices;
-	if (raylib.IsKeyPressed(raylib.KEY_V)) showVelocities = !showVelocities;
-	if (raylib.IsKeyPressed(raylib.KEY_C)) showCollisionLog = !showCollisionLog;
-	if (raylib.IsKeyPressed(raylib.KEY_B)) showBallIDs = !showBallIDs;
-	if (raylib.IsKeyPressed(raylib.KEY_P)) showPaddleIDs = !showPaddleIDs;
-	if (raylib.IsKeyPressed(raylib.KEY_L)) showPillars = !showPillars;
-	if (raylib.IsKeyPressed(raylib.KEY_K)) showPillarIDs = !showPillarIDs;
-	if (raylib.IsKeyPressed(raylib.KEY_E)) showEliminatedPlayers = !showEliminatedPlayers;
-	if (raylib.IsKeyPressed(raylib.KEY_F)) showPhaseInfo = !showPhaseInfo;
-	if (raylib.IsKeyPressed(raylib.KEY_Z)) showPaddleSizes = !showPaddleSizes;
 
-	// Force phase transitions for testing
-	if (raylib.IsKeyPressed(raylib.KEY_ONE)) {
-		engine.currentPhase = 'Phase 1';
-		engine.startArenaRebuild();
-		logEvent("Forced Phase 1 transition", raylib.CYAN);
-	}
-	if (raylib.IsKeyPressed(raylib.KEY_TWO)) {
-		engine.currentPhase = 'Phase 2';
-		engine.startArenaRebuild();
-		logEvent("Forced Phase 2 transition", raylib.CYAN);
-	}
-	if (raylib.IsKeyPressed(raylib.KEY_THREE)) {
-		engine.currentPhase = 'Phase 3';
-		engine.startArenaRebuild();
-		logEvent("Forced Phase 3 transition", raylib.CYAN);
-	}
-	if (raylib.IsKeyPressed(raylib.KEY_FOUR)) {
-		engine.currentPhase = 'Phase 4';
-		engine.startArenaRebuild();
-		logEvent("Forced Phase 4 transition", raylib.CYAN);
-	}
-	if (raylib.IsKeyPressed(raylib.KEY_FIVE)) {
-		engine.currentPhase = 'Final Phase';
-		engine.startArenaRebuild();
-		logEvent("Forced Final Phase transition", raylib.CYAN);
-	}
-
-	// Test elimination (eliminate a random active player)
+	// Test elimination - this is the main feature
 	if (raylib.IsKeyPressed(raylib.KEY_T)) {
 		const activePlayers = Array.from(engine.playerStates.activePlayers);
 		if (activePlayers.length > 1) {
 			const randomPlayer = activePlayers[Math.floor(Math.random() * activePlayers.length)];
 			const randomBall = Math.floor(Math.random() * engine.entities.balls.length);
 			engine.eliminatePlayer(randomPlayer, randomBall);
-			logEvent(`TEST: Eliminated Player ${randomPlayer}`, raylib.ORANGE);
+			logEvent(`Eliminated Player ${randomPlayer}`, raylib.ORANGE);
 		}
 	}
 
-	// Reset simulation
+	// Reset
 	if (raylib.IsKeyPressed(raylib.KEY_R)) {
 		engine.resetGame();
 		engine.initBattleRoyale(NUM_PLAYERS, NUM_BALLS);
 		camX = 0;
 		camY = 0;
-		collisionLog = [];
-		logEvent("Simulation reset!", raylib.GREEN);
+		eventLog = [];
+		logEvent("Game reset!", raylib.GREEN);
 	}
 
-	// Camera controls
-	const camSpeed = 10 / ZOOM;
+	// Force phases for testing
+	if (raylib.IsKeyPressed(raylib.KEY_ONE)) forcePhase('Phase 1');
+	if (raylib.IsKeyPressed(raylib.KEY_TWO)) forcePhase('Phase 2');
+	if (raylib.IsKeyPressed(raylib.KEY_THREE)) forcePhase('Phase 3');
+	if (raylib.IsKeyPressed(raylib.KEY_FOUR)) forcePhase('Phase 4');
+	if (raylib.IsKeyPressed(raylib.KEY_FIVE)) forcePhase('Final Phase');
+
+	// Camera
+	const camSpeed = 8 / ZOOM;
 	if (raylib.IsKeyDown(raylib.KEY_RIGHT)) camX += camSpeed;
 	if (raylib.IsKeyDown(raylib.KEY_LEFT)) camX -= camSpeed;
 	if (raylib.IsKeyDown(raylib.KEY_UP)) camY -= camSpeed;
 	if (raylib.IsKeyDown(raylib.KEY_DOWN)) camY += camSpeed;
 
-	// Zoom controls
+	// Zoom
 	if (raylib.IsKeyDown(raylib.KEY_I)) ZOOM *= 1.02;
 	if (raylib.IsKeyDown(raylib.KEY_O)) ZOOM *= 0.98;
-	ZOOM = Math.max(0.5, Math.min(ZOOM, 10));
+	ZOOM = Math.max(0.8, Math.min(ZOOM, 6));
+}
+
+function forcePhase(phaseName) {
+	engine.currentPhase = phaseName;
+	engine.startArenaRebuild();
+	logEvent(`Forced ${phaseName}`, raylib.CYAN);
 }
 
 // === MAIN LOOP ===
@@ -641,38 +306,35 @@ function handleInput() {
 while (!raylib.WindowShouldClose()) {
 	handleInput();
 
-	// Step simulation
+	// Step physics
 	if (!paused) {
 		const state = engine.step();
-		lastGameTick++;
 
-		// Log events from physics engine
+		// Log only key events
 		if (state.events) {
 			state.events.forEach(event => {
 				let color = raylib.WHITE;
-				let message = `${event.type}`;
+				let message = "";
 
 				switch (event.type) {
 					case 'PLAYER_ELIMINATED':
 						color = raylib.RED;
-						message = `Player ${event.playerId} eliminated! ${event.remainingPlayers} left`;
+						message = `P${event.playerId} eliminated! (${event.remainingPlayers} left)`;
 						break;
 					case 'PHASE_TRANSITION':
 						color = raylib.YELLOW;
-						message = `${event.phase} - ${event.remainingPlayers} players`;
-						break;
-					case 'ARENA_REBUILD_START':
-						color = raylib.ORANGE;
-						message = `Arena rebuild started for ${event.phase}`;
+						message = `${event.phase} started!`;
 						break;
 					case 'ARENA_REBUILD_COMPLETE':
 						color = raylib.GREEN;
-						message = `Arena rebuild complete - ${event.activePlayers.length} active`;
+						message = `Arena rebuilt - ${event.activePlayers.length} survivors`;
 						break;
 					case 'GAME_END':
 						color = raylib.GOLD;
-						message = event.winner ? `Winner: Player ${event.winner}!` : 'Game Over - No winner';
+						message = event.winner ? `Winner: P${event.winner}!` : 'Game Over!';
 						break;
+					default:
+						return; // Skip other events
 				}
 				logEvent(message, color);
 			});
@@ -681,21 +343,17 @@ while (!raylib.WindowShouldClose()) {
 
 	const state = engine.getState();
 
+	// Render
 	raylib.BeginDrawing();
 	raylib.ClearBackground(raylib.BLACK);
 
-	// Draw game world
+	// Draw game world - focus on the key elements
 	drawArena();
 	drawBalls(state.balls);
 	drawPaddles(state.paddles);
-	drawPillars(state);
+	drawPillars(); // Show pillars to see complete arena structure
 
-	// Debug visualization
-	if (showCollisionLog) {
-		drawCollisionDebug(state.balls, state);
-	}
-
-	// UI overlays
+	// Simple UI
 	drawUI();
 	drawPhaseInfo();
 

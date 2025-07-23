@@ -3805,9 +3805,7 @@ export const physics = $root.physics = (() => {
          * @property {Array.<shared.IBall>|null} [balls] PhysicsResponse balls
          * @property {Array.<shared.IPaddle>|null} [paddles] PhysicsResponse paddles
          * @property {shared.IGoal|null} [goal] PhysicsResponse goal
-         * @property {Array.<number>|null} [ranks] PhysicsResponse ranks
          * @property {number|null} [stage] PhysicsResponse stage
-         * @property {boolean|null} [end] PhysicsResponse end
          */
 
         /**
@@ -3821,7 +3819,6 @@ export const physics = $root.physics = (() => {
         function PhysicsResponse(properties) {
             this.balls = [];
             this.paddles = [];
-            this.ranks = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -3869,28 +3866,12 @@ export const physics = $root.physics = (() => {
         PhysicsResponse.prototype.goal = null;
 
         /**
-         * PhysicsResponse ranks.
-         * @member {Array.<number>} ranks
-         * @memberof physics.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.ranks = $util.emptyArray;
-
-        /**
          * PhysicsResponse stage.
          * @member {number} stage
          * @memberof physics.PhysicsResponse
          * @instance
          */
         PhysicsResponse.prototype.stage = 0;
-
-        /**
-         * PhysicsResponse end.
-         * @member {boolean} end
-         * @memberof physics.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.end = false;
 
         /**
          * Creates a new PhysicsResponse instance using the specified properties.
@@ -3928,16 +3909,8 @@ export const physics = $root.physics = (() => {
                     $root.shared.Paddle.encode(message.paddles[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             if (message.goal != null && Object.hasOwnProperty.call(message, "goal"))
                 $root.shared.Goal.encode(message.goal, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-            if (message.ranks != null && message.ranks.length) {
-                writer.uint32(/* id 6, wireType 2 =*/50).fork();
-                for (let i = 0; i < message.ranks.length; ++i)
-                    writer.int32(message.ranks[i]);
-                writer.ldelim();
-            }
             if (message.stage != null && Object.hasOwnProperty.call(message, "stage"))
-                writer.uint32(/* id 7, wireType 0 =*/56).int32(message.stage);
-            if (message.end != null && Object.hasOwnProperty.call(message, "end"))
-                writer.uint32(/* id 8, wireType 0 =*/64).bool(message.end);
+                writer.uint32(/* id 6, wireType 0 =*/48).int32(message.stage);
             return writer;
         };
 
@@ -3999,22 +3972,7 @@ export const physics = $root.physics = (() => {
                         break;
                     }
                 case 6: {
-                        if (!(message.ranks && message.ranks.length))
-                            message.ranks = [];
-                        if ((tag & 7) === 2) {
-                            let end2 = reader.uint32() + reader.pos;
-                            while (reader.pos < end2)
-                                message.ranks.push(reader.int32());
-                        } else
-                            message.ranks.push(reader.int32());
-                        break;
-                    }
-                case 7: {
                         message.stage = reader.int32();
-                        break;
-                    }
-                case 8: {
-                        message.end = reader.bool();
                         break;
                     }
                 default:
@@ -4081,19 +4039,9 @@ export const physics = $root.physics = (() => {
                 if (error)
                     return "goal." + error;
             }
-            if (message.ranks != null && message.hasOwnProperty("ranks")) {
-                if (!Array.isArray(message.ranks))
-                    return "ranks: array expected";
-                for (let i = 0; i < message.ranks.length; ++i)
-                    if (!$util.isInteger(message.ranks[i]))
-                        return "ranks: integer[] expected";
-            }
             if (message.stage != null && message.hasOwnProperty("stage"))
                 if (!$util.isInteger(message.stage))
                     return "stage: integer expected";
-            if (message.end != null && message.hasOwnProperty("end"))
-                if (typeof message.end !== "boolean")
-                    return "end: boolean expected";
             return null;
         };
 
@@ -4145,17 +4093,8 @@ export const physics = $root.physics = (() => {
                     throw TypeError(".physics.PhysicsResponse.goal: object expected");
                 message.goal = $root.shared.Goal.fromObject(object.goal);
             }
-            if (object.ranks) {
-                if (!Array.isArray(object.ranks))
-                    throw TypeError(".physics.PhysicsResponse.ranks: array expected");
-                message.ranks = [];
-                for (let i = 0; i < object.ranks.length; ++i)
-                    message.ranks[i] = object.ranks[i] | 0;
-            }
             if (object.stage != null)
                 message.stage = object.stage | 0;
-            if (object.end != null)
-                message.end = Boolean(object.end);
             return message;
         };
 
@@ -4175,7 +4114,6 @@ export const physics = $root.physics = (() => {
             if (options.arrays || options.defaults) {
                 object.balls = [];
                 object.paddles = [];
-                object.ranks = [];
             }
             if (options.defaults) {
                 object.gameId = "";
@@ -4186,7 +4124,6 @@ export const physics = $root.physics = (() => {
                     object.tick = options.longs === String ? "0" : 0;
                 object.goal = null;
                 object.stage = 0;
-                object.end = false;
             }
             if (message.gameId != null && message.hasOwnProperty("gameId"))
                 object.gameId = message.gameId;
@@ -4207,15 +4144,8 @@ export const physics = $root.physics = (() => {
             }
             if (message.goal != null && message.hasOwnProperty("goal"))
                 object.goal = $root.shared.Goal.toObject(message.goal, options);
-            if (message.ranks && message.ranks.length) {
-                object.ranks = [];
-                for (let j = 0; j < message.ranks.length; ++j)
-                    object.ranks[j] = message.ranks[j];
-            }
             if (message.stage != null && message.hasOwnProperty("stage"))
                 object.stage = message.stage;
-            if (message.end != null && message.hasOwnProperty("end"))
-                object.end = message.end;
             return object;
         };
 

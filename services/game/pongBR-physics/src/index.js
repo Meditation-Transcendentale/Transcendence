@@ -5,6 +5,7 @@ dotenv.config();
 import { Physics } from './Physics.js';
 import {
 	decodePhysicsRequest,
+	decodePhysicsResponse,
 	encodePhysicsResponse,
 } from './proto/helper.js';
 
@@ -30,22 +31,9 @@ const handlePhysicsRequest = async (sub) => {
 			continue;
 		}
 
-		const { gameId, tick, balls, paddles, events } = Physics.processTick({ gameId: data.gameId, tick: data.tick, inputs: data.input });
-		let scorerId = null;
-		let goalScored = false;
-		if (events && events.length) {
-			for (const ev of events) {
-				if (ev.type === 'goal') {
-					goalScored = true;
-					scorerId = ev.playerId;
-				}
-			}
-		}
+		const { gameId, tick, balls, paddles, stage, ranks, end, events } = Physics.processTick({ gameId: data.gameId, tick: data.tick, inputs: data.input });
 		let goal = null;
-		if (goalScored)
-			goal = { scorerId };
-		//console.log(paddles);
-		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal });
+		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal, ranks, stage, end });
 		msg.respond(buffer);
 	}
 };

@@ -8,6 +8,7 @@ import { WebSocketManager } from "../network/WebSocketManager.js";
 import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { WallComponent } from "../components/WallComponent.js";
+import { PongBR } from "../PongBR.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -15,16 +16,20 @@ export class NetworkingSystem extends System {
 	private scoreUI: any;
 	private myScore: number;
 	private opponentScore: number;
+	private stage: number;
+	private game: PongBR;
 	// private endUI = globalEndUI;
 
 
-	constructor(wsManager: WebSocketManager, uuid: string, scoreUI: any) {
+	constructor(wsManager: WebSocketManager, uuid: string, scoreUI: any, game: PongBR) {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
 		this.scoreUI = scoreUI;
 		this.myScore = 0;
 		this.opponentScore = 0;
+		this.stage = 1;
+		this.game = game;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -45,6 +50,27 @@ export class NetworkingSystem extends System {
 
 				const balls = state.balls ?? [];
 				const paddles = state.paddles ?? [];
+				const stage = state.stage;
+				console.log(`Stage= ${stage}`)
+				if (stage != this.stage) {
+					console.log(`Stage changed to ${stage}`)
+					switch (stage) {
+						case 2:
+							this.game.transitionToRound(50, entities);
+							break;
+						case 3:
+							this.game.transitionToRound(25, entities);
+							break;
+						case 4:
+							this.game.transitionToRound(12, entities);
+							break;
+						case 5:
+							this.game.transitionToRound(3, entities);
+							break;
+					}
+					this.stage = stage as number;
+
+				}
 				// 1. Ball updates
 				balls.forEach(b => {
 					const e = entities.find(e =>
@@ -52,9 +78,15 @@ export class NetworkingSystem extends System {
 						e.getComponent(BallComponent)!.id === b.id
 					);
 					if (!e) return;
-					const ball = e.getComponent(BallComponent)!;
-					ball.position.set(b.x, 0.5, b.y);
-					ball.velocity.set(b.vx, 0, b.vy);
+					const transform = e.getComponent(TransformComponent);
+					if (b.disabled == true)
+						transform?.disable();
+					else {
+						const ball = e.getComponent(BallComponent)!;
+						transform?.enable();
+						ball.position.set(b.x, 0.5, b.y);
+						ball.velocity.set(b.vx, 0, b.vy);
+					}
 				});
 
 				// 2. Paddle updates
@@ -71,11 +103,11 @@ export class NetworkingSystem extends System {
 					);
 
 					if (!e) return;
+					const paddle = e.getComponent(TransformComponent);
+					const wall = w.getComponent(TransformComponent);
 					if (p.dead) {
 						if (!w)
 							return;
-						const paddle = e.getComponent(TransformComponent);
-						const wall = w.getComponent(TransformComponent);
 						paddle?.disable();
 						wall?.enable();
 
@@ -87,6 +119,8 @@ export class NetworkingSystem extends System {
 
 						const transform = e.getComponent(TransformComponent)!;
 						transform.rotation.y = paddleComp.baseRotation + p.offset;
+						paddle?.enable();
+						wall?.disable();
 					}
 				});
 			}

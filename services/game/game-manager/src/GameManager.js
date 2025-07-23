@@ -213,6 +213,8 @@ export class GameManager {
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles;
+			newState.stage = resp.stage;
+			newState.ranks = resp.ranks;
 			if (resp.goal) {
 				newState.score[resp.goal.scorerId] = (newState.score[resp.goal.scorerId] || 0) + 1;
 
@@ -237,12 +239,12 @@ export class GameManager {
 				`games.${match.mode}.${gameId}.match.state`,
 				buf
 			);
-			if (match.state.isGameOver) {
+			if (match.state.isGameOver || resp.end) {
 				this.endMatch(gameId);
 				return;
 			}
 		} catch (err) {
-			//console.error(`[GameManager] Tick failed for ${gameId}:`, err);
+			console.error(`[GameManager] Tick failed for ${gameId}:`, err);
 			return;
 		}
 	}
