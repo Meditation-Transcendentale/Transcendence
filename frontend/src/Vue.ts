@@ -1,4 +1,4 @@
-import { AbstractMesh, Camera, Matrix, ShaderMaterial, Vector3 } from "@babylonImport";
+import { AbstractMesh, Camera, Matrix, PostProcess, ShaderMaterial, Vector3 } from "@babylonImport";
 import { DitherMaterial } from "./3d/Shader";
 
 
@@ -28,6 +28,10 @@ class cssWindow {
 	private static butterflyDiv: Array<HTMLDivElement>;
 	private static butterflyLine: Array<HTMLDivElement>;
 	private matrixId: Matrix = Matrix.Identity();
+
+
+	public static glitchOrigin: Vector3;
+	public static glitchPost: PostProcess;
 
 	private lastPos: Float32Array;
 	private framePos: Float32Array;
@@ -123,6 +127,10 @@ class cssWindow {
 			this.pos[4] = Math.min(this.pos[4], p.z);
 		}
 		//}
+		if (this.hover) {
+			cssWindow.glitchOrigin.x = this.pos[0] + (this.pos[2] - this.pos[0]) * 0.5;
+			cssWindow.glitchOrigin.y = 1. - (this.pos[1] + (this.pos[3] - this.pos[1]) * 0.5);
+		}
 		this.framePos[0] = this.pos[0] + ((this.pos[2] - this.pos[0]) * 0.5);
 		this.framePos[1] = this.pos[1] + ((this.pos[3] - this.pos[1]) * 0.5);
 		this.framePos[2] = Math.min(((this.pos[2] - this.pos[0])), 0.3);
@@ -248,12 +256,16 @@ class cssWindow {
 			this.spawnDelay = Math.max(20, this.spawnDelay * Math.pow(0.95, Math.min(g, 105)));
 		}
 		this.hover = true;
+		cssWindow.glitchOrigin.z = performance.now() * 0.001;
+		cssWindow.glitchPost.autoClear = false;
 		let g = 1;
 		this.spawnDelay = 50;
 		(this.mesh.material as DitherMaterial).setFloat('on', 1.);
 		this.div.addEventListener('mouseleave', () => {
 			this.hover = false;
 			(this.mesh.material as DitherMaterial).setFloat('on', 0.);
+			cssWindow.glitchOrigin.z = 0;
+			cssWindow.glitchPost.autoClear = true;
 		}, { once: true });
 		fn();
 	}
@@ -327,6 +339,12 @@ export class Vue {
 
 	public static addButterfly(positions: Array<Vector3>, quantity: number, boudingBox: Array<Vector3>) {
 		cssWindow.addButterfly(positions, quantity, boudingBox);
+	}
+
+
+	public static refGlitch(process: PostProcess, origin: Vector3) {
+		cssWindow.glitchPost = process;
+		cssWindow.glitchOrigin = origin;
 	}
 }
 

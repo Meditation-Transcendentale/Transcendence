@@ -1,6 +1,7 @@
 import {
 	Camera, Color3, DirectionalLight, Texture,
-	LoadAssetContainerAsync, Mesh, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, Vector2, Vector3,
+	LoadAssetContainerAsync, Mesh, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, Vector2, Vector3, Matrix,
+	PostProcess,
 } from "@babylonImport";
 import { Vue } from "../Vue";
 import "./Shader.ts";
@@ -10,7 +11,6 @@ import { Puddle } from "./Ground";
 import { DitherMaterial } from "./Shader";
 import { Butterfly } from "./Butterfly";
 import { Portal } from "./Portal";
-import { BoundingInfo, Matrix } from "@babylonjs/core";
 
 
 
@@ -33,6 +33,9 @@ export class Field {
 	private cube1!: Mesh;
 	private cube2!: Mesh;
 
+	public glitchPost!: PostProcess;
+	public glitchOrigin: Vector3;
+
 
 	constructor(scene: Scene) {
 		this.scene = scene;
@@ -43,7 +46,7 @@ export class Field {
 		this.portal = new Portal(scene);
 
 		this.initVueBounding();
-
+		this.glitchOrigin = new Vector3(0.);
 
 		this.clouds = [];
 	}
@@ -94,6 +97,15 @@ export class Field {
 		cub.dispose();
 
 		Vue.addButterfly(this.butterfly.positions, 300, bounding);
+
+		this.glitchPost = new PostProcess("glitch", "glitch", ["origin", "time"], null, 1., cam);
+		this.glitchPost.autoClear = true;
+		Vue.refGlitch(this.glitchPost, this.glitchOrigin);
+		this.glitchPost.onApply = (effect) => {
+			effect.setVector3("origin", this.glitchOrigin);
+			effect.setFloat("time", performance.now() * 0.001);
+
+		}
 	}
 
 	private initVueBounding() {

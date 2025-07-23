@@ -114,10 +114,10 @@ canvas {
 	min-height: 100px;
 	min-width: 100px;
 	overflow: hidden;
-	transition:
-		top 2s,
-		left 2s,
-		width 5s, 0.3s height 5s, 0.3s;
+	/* transition: */
+	/* 	top 2s, */
+	/* 	left 2s, */
+	/* 	width 5s, 0.3s height 5s, 0.3s; */
 	z-index: 2;
 }
 

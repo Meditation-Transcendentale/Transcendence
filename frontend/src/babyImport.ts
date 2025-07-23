@@ -53,6 +53,7 @@ export { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPi
 export { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 // export { DeepImmutable} from "@babylonjs/core";
 export { Plane } from "@babylonjs/core/Maths/math.plane";
+export { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 
 import "@babylonjs/core/Culling/ray";
 

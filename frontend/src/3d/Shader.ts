@@ -427,7 +427,85 @@ void main(void) {
 	gl_FragColor = vec4(wind(uv) * 0.5 +0.5, height(uv + vec3(173437.,0., 3348.)) * 0.5 + 0.5, 0.0, 1.);
 	//gl_FragColor = vec4(height(uv) * 0.5 +0.5, height(uv) * 0.5 + 0.5, 0.0, 1.);
 }
-`
+`;
+
+Effect.ShadersStore['glitchFragmentShader'] = `
+precision highp float;
+
+varying vec2		vUV;
+uniform sampler2D	textureSampler;
+uniform vec3		origin;
+uniform float		time;
+
+#include<noises>
+
+
+const vec2 SMALL_BLOCK = vec2(0.03f, 0.008f);
+const vec2 MEDIUM_BLOCK = vec2(0.07f, 0.011f);
+const vec2 LARGE_BLOCK = vec2(0.12f, 0.016f);
+
+float	sdfBox(vec2 p, vec2 b) {
+	vec2 d = abs(p)-b;
+	return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
+}
+
+float Block(vec2 pos, vec2 size, float time, float t1, float t2)
+{
+	if(time < t1 || time > t2)
+	{
+		return 0.;
+	}
+
+	float b = sdfBox(pos, size);
+	return step(b, 0.);
+}
+
+void main() {
+	vec2 uv = vUV;
+	vec2 centre = uv - origin.xy;
+
+	gl_FragColor = texture2D(textureSampler, uv);
+	if (origin.z == 0.) {
+		return ;
+	}
+	
+	vec3	color = vec3(0.);
+	float t = fract(time);
+	
+	// color.r += Block(centre, MEDIUM_BLOCK, t, 0.1f, 0.2f);
+	// color.r += Block(centre + vec2(-0.08f, -0.11f), LARGE_BLOCK, t, 0.3f, 0.4f);
+	// color.r += Block(centre + vec2(0.07f, 0.12f), SMALL_BLOCK, t, 0.5f, 0.6f);
+	// color.r += Block(centre + vec2(-0.04f, -0.08f), MEDIUM_BLOCK, t, 0.7f, 0.8f);
+	// color.r += Block(centre + vec2(0.0f, 0.11f), LARGE_BLOCK, t, 0.85f, 0.95f);
+	//
+	// // Create green blocks
+	// float greenBlocks = 0.0f;
+	// color.g += Block(centre + vec2(0.03f, 0.07f), SMALL_BLOCK, t, 0.1f, 0.2f);
+	// color.g += Block(centre + vec2(-0.06f, -0.18f), MEDIUM_BLOCK, t, 0.3f, 0.4f);
+	// color.g += Block(centre + vec2(0.1f, 0.05f), LARGE_BLOCK, t, 0.5f, 0.6f);
+	// color.g += Block(centre + vec2(-0.08f, -0.11f), LARGE_BLOCK, t, 0.7f, 0.8f);
+	// color.g += Block(centre + vec2(0.03f, 0.07f), MEDIUM_BLOCK, t, 0.85f, 0.95f);
+	//
+	// // Create blue blocks
+	// float blueBlocks = 0.0f;
+	// color.b += Block(centre + vec2(0.017f, -0.03f), LARGE_BLOCK, t, 0.1f, 0.2f);
+	// color.b += Block(centre + vec2(-0.027f, 0.21f), MEDIUM_BLOCK, t, 0.3f, 0.4f);
+	// color.b += Block(centre + vec2(-0.13f, 0.08f), MEDIUM_BLOCK, t, 0.5f, 0.6f);
+	// color.b += Block(centre + vec2(-0.027f, 0.17f), LARGE_BLOCK, t, 0.7f, 0.8f);
+	// color.b += Block(centre + vec2(-0.07f, -0.11f), SMALL_BLOCK, t, 0.85f, 0.95f);
+	//
+	// vec3 finalColor = color.r * vec3(0.7, 0.1, 0.2);
+	// finalColor += color.g * vec3(0.1, 0.7, 0.2);
+	// finalColor += color.b * vec3(0., 0.1, 0.7);
+	//
+	// finalColor = (finalColor.x < 0.1 && finalColor.y < 0.1 && finalColor.z < 0.1 ? vec3(1.) : finalColor);
+	//
+	// gl_FragColor.rgb *= finalColor;
+	float contrast = 1. + time - origin.z;
+	contrast *= contrast;
+	gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * contrast + 0.5;
+}
+`;
 
 
 

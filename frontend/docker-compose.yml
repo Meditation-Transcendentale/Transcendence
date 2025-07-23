@@ -47,7 +47,7 @@ services:
     volumes:
       - bomba:/usr/share/nginx/html/dist
       - ./shared/certs:/app/certs:ro
-      # - ./frontend/public:/usr/share/nginx/html/public
+      - ./frontend/public:/usr/share/nginx/html/public
     networks:
       - front
       - transcendence-network
