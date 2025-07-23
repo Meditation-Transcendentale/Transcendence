@@ -56,16 +56,16 @@ export class NetworkingSystem extends System {
 					console.log(`Stage changed to ${stage}`)
 					switch (stage) {
 						case 2:
-							this.game.transitionToRound(50);
+							this.game.transitionToRound(50, entities);
 							break;
 						case 3:
-							this.game.transitionToRound(25);
+							this.game.transitionToRound(25, entities);
 							break;
 						case 4:
-							this.game.transitionToRound(12);
+							this.game.transitionToRound(12, entities);
 							break;
 						case 5:
-							this.game.transitionToRound(3);
+							this.game.transitionToRound(3, entities);
 							break;
 					}
 					this.stage = stage as number;
@@ -103,11 +103,11 @@ export class NetworkingSystem extends System {
 					);
 
 					if (!e) return;
+					const paddle = e.getComponent(TransformComponent);
+					const wall = w.getComponent(TransformComponent);
 					if (p.dead) {
 						if (!w)
 							return;
-						const paddle = e.getComponent(TransformComponent);
-						const wall = w.getComponent(TransformComponent);
 						paddle?.disable();
 						wall?.enable();
 
@@ -119,6 +119,8 @@ export class NetworkingSystem extends System {
 
 						const transform = e.getComponent(TransformComponent)!;
 						transform.rotation.y = paddleComp.baseRotation + p.offset;
+						paddle?.enable();
+						wall?.disable();
 					}
 				});
 			}

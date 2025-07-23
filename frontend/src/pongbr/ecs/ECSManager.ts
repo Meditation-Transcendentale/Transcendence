@@ -7,7 +7,7 @@ import { System } from "./System.js";
  * Allows querying by component and system-driven updates.
  */
 export class ECSManager {
-	private entities: Entity[] = [];
+	public entities: Entity[] = [];
 	private systems: System[] = [];
 
 	/**

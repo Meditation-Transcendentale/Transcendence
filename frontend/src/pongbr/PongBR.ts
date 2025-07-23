@@ -14,6 +14,10 @@ import { buildPaddles, PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
 import { AnimationSystem } from "./systems/AnimationSystem.js";
 import { ArcRotateCamera, Color3, Color4, PointLight, Scene, TransformNode, Vector3, Engine, Mesh } from "@babylonImport";
+import { BallComponent } from "./components/BallComponent.js";
+import { TransformComponent } from "./components/TransformComponent.js";
+import { WallComponent } from "./components/WallComponent.js";
+import { Entity } from "./ecs/Entity.js";
 
 export let localPaddleId: any = null;
 export class PongBR {
@@ -43,25 +47,8 @@ export class PongBR {
 
 	public async init() {
 		console.log("INIT");
-		//window.addEventListener("keydown", (e) => {
-		//	if (e.key.toLowerCase() === "t") {
-		//		const raw = prompt("Next round player count?");
-		//		const next = raw ? parseInt(raw, 10) : NaN;
-		//		if (!isNaN(next)) {
-		//			this.transitionToRound(next);
-		//		}
-		//	}
-		//});
 		this.pongRoot = new TransformNode("pongbrRoot", this.scene);
 		this.pongRoot.position.set(-2200, -3500, -3500);
-		//const light = new PointLight('lightBr', new Vector3(-300, 25, 0), this.scene)
-		//light.parent = this.pongRoot;
-		//const light2 = new PointLight('lightBr2', new Vector3(+300, 25, 0), this.scene)
-		//light2.parent = this.pongRoot;
-		//const light4 = new PointLight('lightBr4', new Vector3(0, 25, -300), this.scene)
-		//light4.parent = this.pongRoot;
-		//const light3 = new PointLight('lightBr3', new Vector3(0, 25, 300), this.scene)
-		//light3.parent = this.pongRoot;
 		this.pongRoot.rotation.z -= 30.9000;
 		this.pongRoot.scaling.set(1, 1, 1);
 		this.camera = this.scene.getCameraByName('br') as ArcRotateCamera;
@@ -69,11 +56,6 @@ export class PongBR {
 		this.camera.minZ = 0.2;
 		this.baseMeshes = createBaseMeshes(this.scene, this.pongRoot);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
-
-
-		//this.scene.clearColor = new Color4(0, 0, 0, 1);
-		//this.scene.ambientColor = Color3.White();
-
 
 		const statue = this.scene.getMeshByName('Version NoSmile.006') as Mesh;
 		statue.parent = this.pongRoot;
@@ -170,79 +152,26 @@ export class PongBR {
 		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot);
 	}
 
-	public async transitionToRound(nextCount: number) {
-		// reuse the same config you used at startup
+	public transitionToRound(nextCount: number, entities: Entity[]) {
 		const cfg = { arenaRadius: 100, wallWidth: 1, paddleHeight: 1, paddleDepth: 1, goalDepth: 1 };
 		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
 		const targets: PaddleBundle[] = buildPaddles(this.ecs, nextCount, this.pongRoot);
 
-		// survivors & eliminated logic as before…
 		const survivors = this.paddleBundles.filter(b => b.sliceIndex < nextCount);
 		const eliminated = this.paddleBundles.filter(b => b.sliceIndex >= nextCount);
-		// Animate survivors, now including pillars:
-		// survivors.forEach((bundle, i) => {
-		// 	const T = targets[i];
-		// 	console.log("Round target for index", i, "→", T);
-		//
-		// 	const tween = (
-		// 		ent: Entity,
-		// 		prop: "position" | "scale" | "rotation",
-		// 		from: Vector3,
-		// 		to?: Vector3,
-		// 		duration = 1.2
-		// 	) => {
-		// 		if (!to) {
-		// 			console.warn(`Missing target for ${prop} on`, ent);
-		// 			return;
-		// 		}
-		// 		ent.addComponent(new AnimationComponent(
-		// 			duration,
-		// 			prop,
-		// 			from.clone(),
-		// 			to.clone(),
-		// 			Easing.easeInOutCubic
-		// 		));
-		// 	};
-		//
-		// 	const pTx = bundle.paddle.getComponent(TransformComponent)!;
-		// 	tween(bundle.paddle, "position", pTx.position, T.paddle.pos);
-		// 	tween(bundle.paddle, "scale", pTx.scale, T.paddle.scale);
-		//
-		// 	const gTx = bundle.goal.getComponent(TransformComponent)!;
-		// 	tween(bundle.goal, "position", gTx.position, T.goal.pos);
-		// 	tween(bundle.goal, "scale", gTx.scale, T.goal.scale);
-		//
-		// 	const dTx = bundle.deathWall.getComponent(TransformComponent)!;
-		// 	tween(bundle.deathWall, "position", dTx.position, T.deathWall.pos);
-		// 	tween(bundle.deathWall, "scale", dTx.scale, T.deathWall.scale);
-		//
-		// 	bundle.pillars.forEach((pillarEnt, j) => {
-		// 		const PT = T.pillars[j];
-		// 		const pillTx = pillarEnt.getComponent(TransformComponent)!;
-		// 		tween(pillarEnt, "position", pillTx.position, PT?.pos);
-		// 		tween(pillarEnt, "rotation", pillTx.rotation, PT?.rot);
-		// 		tween(pillarEnt, "scale", pillTx.scale, PT?.scale);
-		// 	});
-		// });		// 4) Animate eliminated → shrink away
-		// eliminated.forEach(bundle => {
-		// 	const p = bundle.paddle.getComponent(TransformComponent)!;
-		// 	bundle.paddle.addComponent(new AnimationComponent(
-		// 		2, "scale", p.scale.clone(), Vector3.Zero(), Easing.easeInOutQuad
-		// 	));
-		// 	const g = bundle.goal.getComponent(TransformComponent)!;
-		// 	bundle.goal.addComponent(new AnimationComponent(
-		// 		2, "scale", g.scale.clone(), Vector3.Zero(), Easing.easeInOutQuad
-		// 	));
-		// });
-		//
-		// await new Promise<void>(res => {
-		// 	const check = () => {
-		// 		if (this.ecs.entitiesWith(AnimationComponent).length === 0)
-		// 			return res();
-		// 		requestAnimationFrame(check);
-		// 	};
-		// 	requestAnimationFrame(check);
-		// });
+
+		for (const entity of entities) {
+			if (
+				!entity.hasComponent(BallComponent) ||
+				!entity.hasComponent(TransformComponent)
+			) {
+				continue;
+			}
+			const transform = entity.getComponent(TransformComponent)!;
+			transform.baseScale = new Vector3(25 / nextCount, 25 / nextCount, 25 / nextCount);
+
+		}
+
 
 		eliminated.forEach(b => {
 			this.ecs.removeEntity(b.paddle);
@@ -257,6 +186,16 @@ export class PongBR {
 			this.ecs.removeEntity(b.pillar);
 		});
 
+		for (const entity of entities) {
+			if (
+				!entity.hasComponent(WallComponent) ||
+				!entity.hasComponent(TransformComponent)
+			) {
+				continue;
+			}
+			const transform = entity.getComponent(TransformComponent);
+			transform?.disable();
+		}
 		this.paddleBundles = targets;
 	}
 
