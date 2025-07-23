@@ -156,21 +156,6 @@ services:
       - game-network
       - metrics-network
 
-  # pongio-physics:
-  #   build: ./services/game/pongIO-physics
-  #   volumes:
-  #     - ./services/game/pongIO-physics/src:/app/src
-  #     - ./services/game/pongIO-physics/test:/app/test
-  #     - ./services/game/pongIO-physics/package.json:/app/package.json
-  #     - ./services/game/pongIO-physics/.env.example:/app/.env
-  #   command: npm run dev
-  #   restart: unless-stopped
-  #   environment:
-  #     - SERVICE_NAME=pongIO-physics
-  #     - NATS_URL=nats://nats:4222
-  #   depends_on:
-  #     - nats
-
   # ai:
   #   container_name: ai_service
   #   build: ./services/game/ai

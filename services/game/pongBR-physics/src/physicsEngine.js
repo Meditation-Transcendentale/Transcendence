@@ -490,7 +490,6 @@ export class PhysicsEngine {
 		this.isRebuilding = true;
 		this.rebuildStartTime = Date.now();
 
-		// Move balls away immediately when rebuild starts
 		this.moveAllBallsAway();
 
 		console.log(`Starting arena rebuild for ${this.currentPhase}...`);
@@ -801,9 +800,8 @@ export class PhysicsEngine {
 	getState() {
 		const pd = this.pd;
 
-		// Include ALL balls (active and disabled) but mark their state
 		const balls = this.entities.balls
-			.filter(ent => pd.isActive(ent)) // Only filter out completely destroyed entities
+			.filter(ent => pd.isActive(ent))
 			.map((ent, i) => ({
 				id: i,
 				x: pd.posX[ent],
@@ -811,7 +809,7 @@ export class PhysicsEngine {
 				vx: pd.velX[ent],
 				vy: pd.velY[ent],
 				radius: pd.radius[ent],
-				disabled: pd.isEliminated[ent] === 1 // Add disabled flag
+				disabled: pd.isEliminated[ent] === 1
 			}));
 
 		const paddles = this.entities.paddles
@@ -830,9 +828,9 @@ export class PhysicsEngine {
 			balls,
 			paddles,
 			score: [],
-			ranks: this.calculatePlayerRanks(), // Already matches proto format
+			ranks: this.calculatePlayerRanks(),
 			stage: this.getStageFromPhase(),
-			end: this.gameOver || this.playerStates.activePlayers.size <= 1, // New: matches proto bool end field
+			end: this.gameOver || this.playerStates.activePlayers.size <= 1,
 			events,
 			gameState: {
 				activePlayers: Array.from(this.playerStates.activePlayers),
@@ -848,7 +846,7 @@ export class PhysicsEngine {
 			},
 			config: this.cfg,
 			frameStats: {
-				activeBalls: balls.filter(ball => !ball.disabled).length, // Count only non-disabled balls
+				activeBalls: balls.filter(ball => !ball.disabled).length,
 				activePaddles: paddles.length,
 				totalPlayers: this.entities.paddles.length
 			}
