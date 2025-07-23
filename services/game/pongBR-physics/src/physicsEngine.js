@@ -367,6 +367,7 @@ export class PhysicsEngine {
 
 		for (let ballIndex = this.entities.balls.length - 1; ballIndex >= 0; ballIndex--) {
 			const ballEnt = this.entities.balls[ballIndex];
+			// Skip disabled balls
 			if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
 
 			const ballX = pd.posX[ballEnt];
@@ -384,7 +385,6 @@ export class PhysicsEngine {
 			}
 		}
 	}
-
 	findPlayerByAngle(ballAngle) {
 		while (ballAngle < 0) ballAngle += 2 * Math.PI;
 		while (ballAngle >= 2 * Math.PI) ballAngle -= 2 * Math.PI;
@@ -457,6 +457,7 @@ export class PhysicsEngine {
 		let targetPhase = this.currentPhase;
 		if (remainingPlayers <= 1) {
 			this.endGame();
+			return;
 		}
 
 		if (remainingPlayers <= 3 && remainingPlayers > 1) targetPhase = 'Final Phase';
@@ -800,13 +801,17 @@ export class PhysicsEngine {
 	getState() {
 		const pd = this.pd;
 
+		// Include ALL balls (active and disabled) but mark their state
 		const balls = this.entities.balls
-			.filter(ent => pd.isActive(ent) && pd.isEliminated[ent] !== 1)
+			.filter(ent => pd.isActive(ent)) // Only filter out completely destroyed entities
 			.map((ent, i) => ({
 				id: i,
-				x: pd.posX[ent], y: pd.posY[ent],
-				vx: pd.velX[ent], vy: pd.velY[ent],
-				radius: pd.radius[ent]
+				x: pd.posX[ent],
+				y: pd.posY[ent],
+				vx: pd.velX[ent],
+				vy: pd.velY[ent],
+				radius: pd.radius[ent],
+				disabled: pd.isEliminated[ent] === 1 // Add disabled flag
 			}));
 
 		const paddles = this.entities.paddles
@@ -822,10 +827,12 @@ export class PhysicsEngine {
 		this.gameEvents = [];
 
 		return {
-			balls, paddles,
+			balls,
+			paddles,
 			score: [],
-			ranks: this.calculatePlayerRanks(),
+			ranks: this.calculatePlayerRanks(), // Already matches proto format
 			stage: this.getStageFromPhase(),
+			end: this.gameOver || this.playerStates.activePlayers.size <= 1, // New: matches proto bool end field
 			events,
 			gameState: {
 				activePlayers: Array.from(this.playerStates.activePlayers),
@@ -841,7 +848,7 @@ export class PhysicsEngine {
 			},
 			config: this.cfg,
 			frameStats: {
-				activeBalls: balls.length,
+				activeBalls: balls.filter(ball => !ball.disabled).length, // Count only non-disabled balls
 				activePaddles: paddles.length,
 				totalPlayers: this.entities.paddles.length
 			}
@@ -894,9 +901,9 @@ export class PhysicsEngine {
 		if (!this.pd.isActive(ballEnt)) return false;
 
 		const pd = this.pd;
+		pd.isEliminated[ballEnt] = 1;
 		pd.posX[ballEnt] = pd.posY[ballEnt] = this.cfg.ARENA_RADIUS * 10;
 		pd.velX[ballEnt] = pd.velY[ballEnt] = 0;
-		pd.isEliminated[ballEnt] = 1;
 		return true;
 	}
 

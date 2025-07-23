@@ -50,7 +50,7 @@ export function encodePhysicsRequest(payload) {
 }
 
 export function decodePhysicsResponse(buffer) {
-	return Proto.shared.PhysicsResponse.decode(buffer);
+	return Proto.physics.PhysicsResponse.decode(buffer);
 }
 
 /**

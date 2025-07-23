@@ -13,6 +13,7 @@ message Ball {
   float y = 3;
   float vx = 4;
   float vy = 5;
+  bool disabled = 6;
 }
 
 message Paddle {
@@ -67,12 +68,4 @@ message PhysicsRequest {
   int64 tick = 2;
   repeated PaddleInput input = 3;
   int32 stage = 4; // BR mode stage; others: ignored
-}
-
-message PhysicsResponse {
-  string gameId = 1;
-  int64 tick = 2;
-  repeated Ball balls = 3;
-  repeated Paddle paddles = 4;
-  Goal goal = 5; // Classic mode goal event; empty otherwise
 }

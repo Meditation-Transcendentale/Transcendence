@@ -43,16 +43,15 @@ export class PongBR {
 
 	public async init() {
 		console.log("INIT");
-		window.addEventListener("keydown", (e) => {
-			if (e.key.toLowerCase() === "t") {
-				const raw = prompt("Next round player count?");
-				const next = raw ? parseInt(raw, 10) : NaN;
-				if (!isNaN(next)) {
-					this.baseMeshes.paddle.material.setUniform("playerCount", next);
-					this.transitionToRound(next);
-				}
-			}
-		});
+		//window.addEventListener("keydown", (e) => {
+		//	if (e.key.toLowerCase() === "t") {
+		//		const raw = prompt("Next round player count?");
+		//		const next = raw ? parseInt(raw, 10) : NaN;
+		//		if (!isNaN(next)) {
+		//			this.transitionToRound(next);
+		//		}
+		//	}
+		//});
 		this.pongRoot = new TransformNode("pongbrRoot", this.scene);
 		this.pongRoot.position.set(-2200, -3500, -3500);
 		//const light = new PointLight('lightBr', new Vector3(-300, 25, 0), this.scene)
@@ -117,7 +116,8 @@ export class PongBR {
 		this.networkingSystem = new NetworkingSystem(
 			this.wsManager,
 			this.uuid,
-			this.scoreUI
+			this.scoreUI,
+			this
 		);
 		this.ecs.addSystem(this.networkingSystem);
 		console.log("start");
@@ -170,9 +170,10 @@ export class PongBR {
 		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot);
 	}
 
-	async transitionToRound(nextCount: number) {
+	public async transitionToRound(nextCount: number) {
 		// reuse the same config you used at startup
 		const cfg = { arenaRadius: 100, wallWidth: 1, paddleHeight: 1, paddleDepth: 1, goalDepth: 1 };
+		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
 		const targets: PaddleBundle[] = buildPaddles(this.ecs, nextCount, this.pongRoot);
 
 		// survivors & eliminated logic as before…

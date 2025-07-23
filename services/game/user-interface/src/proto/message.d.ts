@@ -20,6 +20,9 @@ export namespace shared {
 
         /** Ball vy */
         vy?: (number|null);
+
+        /** Ball disabled */
+        disabled?: (boolean|null);
     }
 
     /** Represents a Ball. */
@@ -45,6 +48,9 @@ export namespace shared {
 
         /** Ball vy. */
         public vy: number;
+
+        /** Ball disabled. */
+        public disabled: boolean;
 
         /**
          * Creates a new Ball instance using the specified properties.
@@ -1360,127 +1366,6 @@ export namespace shared {
 
         /**
          * Gets the default type url for PhysicsRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    /** Properties of a PhysicsResponse. */
-    interface IPhysicsResponse {
-
-        /** PhysicsResponse gameId */
-        gameId?: (string|null);
-
-        /** PhysicsResponse tick */
-        tick?: (number|Long|null);
-
-        /** PhysicsResponse balls */
-        balls?: (shared.IBall[]|null);
-
-        /** PhysicsResponse paddles */
-        paddles?: (shared.IPaddle[]|null);
-
-        /** PhysicsResponse goal */
-        goal?: (shared.IGoal|null);
-    }
-
-    /** Represents a PhysicsResponse. */
-    class PhysicsResponse implements IPhysicsResponse {
-
-        /**
-         * Constructs a new PhysicsResponse.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: shared.IPhysicsResponse);
-
-        /** PhysicsResponse gameId. */
-        public gameId: string;
-
-        /** PhysicsResponse tick. */
-        public tick: (number|Long);
-
-        /** PhysicsResponse balls. */
-        public balls: shared.IBall[];
-
-        /** PhysicsResponse paddles. */
-        public paddles: shared.IPaddle[];
-
-        /** PhysicsResponse goal. */
-        public goal?: (shared.IGoal|null);
-
-        /**
-         * Creates a new PhysicsResponse instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PhysicsResponse instance
-         */
-        public static create(properties?: shared.IPhysicsResponse): shared.PhysicsResponse;
-
-        /**
-         * Encodes the specified PhysicsResponse message. Does not implicitly {@link shared.PhysicsResponse.verify|verify} messages.
-         * @param message PhysicsResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: shared.IPhysicsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PhysicsResponse message, length delimited. Does not implicitly {@link shared.PhysicsResponse.verify|verify} messages.
-         * @param message PhysicsResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: shared.IPhysicsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PhysicsResponse message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PhysicsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PhysicsResponse;
-
-        /**
-         * Decodes a PhysicsResponse message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PhysicsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PhysicsResponse;
-
-        /**
-         * Verifies a PhysicsResponse message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PhysicsResponse message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PhysicsResponse
-         */
-        public static fromObject(object: { [k: string]: any }): shared.PhysicsResponse;
-
-        /**
-         * Creates a plain object from a PhysicsResponse message. Also converts values to other types if specified.
-         * @param message PhysicsResponse
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: shared.PhysicsResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PhysicsResponse to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for PhysicsResponse
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */

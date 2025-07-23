@@ -111,7 +111,7 @@ export function buildPaddles(
 
 		const deathWall = new Entity();
 		deathWall.addComponent(new WallComponent(i, goalPos));
-		deathWall.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleRotY, 0), new Vector3(goalSize.z, 1, 2 * Math.PI * 200 / 100), pongRoot));
+		deathWall.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleRotY, 0), new Vector3(goalSize.z, 1, 2 * Math.PI * 200 / playerCount), pongRoot));
 		const transform = deathWall.getComponent(TransformComponent);
 		transform?.disable();
 		//deathWall.addComponent(new DisabledComponent());
@@ -146,31 +146,6 @@ export function buildPaddles(
 
 
 	return bundles;
-}
-
-// ─── 3. Build Arena Walls ───────────────────────────────────────────
-export function buildWalls(ecs: any, config: GameTemplateConfig, pongRoot: TransformNode): Entity[] {
-	const walls: Entity[] = [];
-	const R = config.arenaRadius + config.wallWidth / 2;
-	const positions = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2];
-	positions.forEach(angle => {
-		const length = 2 * Math.PI * R / 4; // quarter circle length
-		const x = Math.cos(angle) * R;
-		const z = Math.sin(angle) * R;
-		const wall = new Entity();
-		wall.addComponent(new WallComponent(0, new Vector3(x, 0, z)));
-		wall.addComponent(
-			new TransformComponent(
-				new Vector3(x, 0, z),
-				new Vector3(0, angle, 0),
-				new Vector3(angle % Math.PI ? config.wallWidth : length, 1, angle % Math.PI ? length : config.wallWidth),
-				pongRoot
-			)
-		);
-		ecs.addEntity(wall);
-		walls.push(wall);
-	});
-	return walls;
 }
 
 // ─── 4. Build Ball ─────────────────────────────────────────────────
