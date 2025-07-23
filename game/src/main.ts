@@ -40,8 +40,8 @@ export class Game {
 		this.ball = new Ball(this.scene, ballMaterial);
 		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
 
-		this.ball.updatePosition(1, 1);
-		this.ball.setVelocity(new Vector3(5, 0, 0));
+		this.ball.updatePosition(0, 1);
+		this.ball.setVelocity(new Vector3(0, 0, 0));
 		let lastTime = performance.now();
 
 		this.engine.runRenderLoop(() => {

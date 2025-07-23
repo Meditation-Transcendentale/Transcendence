@@ -1,5 +1,5 @@
-import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial } from "@babylonjs/core";
-import { Player } from "../.oldPongIO/Player";
+import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2 } from "@babylonjs/core";
+import { Player } from "./Player";
 
 
 export class Ball {
@@ -44,6 +44,7 @@ export class Ball {
 				if (collideShield){
 					this.touched = true;
 					this.ball.material = this.matTouched;
+					console.log("touch shield");
 					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x , 0, this.newposition.z - playerGoalPos.z).normalize();
 					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
 					this.speedScale = Math.min(this.speedScale * 1.1, 5);
@@ -135,15 +136,19 @@ export class Ball {
 		const ballRadius = 0.25;
 
 		const v1 = new Vector3(ballPosition.x-shieldPosition.x, 0, ballPosition.z-shieldPosition.z);
-		const ballLen = v1.length();
-		v1.normalize();
-		const v2 = new Vector3(Math.sin(shieldRotation), 0, Math.cos(shieldRotation));
+		const len = Math.sqrt(v1.x * v1.x + v1.z * v1.z);
+		const ballAngle = Math.atan2(v1.z, v1.x);
+		const v2 = new Vector3(Math.cos(shieldRotation + ballAngle)* len, 0, Math.sin(shieldRotation + ballAngle)* len);
+		const c = new Vector2(Math.sin(shieldAngle / 2 * Math.PI), Math.cos(shieldAngle / 2 * Math.PI));
+		const bx = Math.abs(v2.x);
+		const l = Math.sqrt((bx * bx) + (v2.z * v2.z)) - shieldRadius;
+		const clamp = Math.min(Math.max((bx * c.x) + (v2.z * c.y), 0), shieldRadius);
+		const m = Math.sqrt((bx - (c.x * clamp)) * (bx - (c.x * clamp)) + (v2.z - (c.y * clamp)) * (v2.z - (c.y * clamp)));
+		const distance = Math.max(l, m * Math.sign((c.y * bx) - (c.x * v2.z)));
+		console.log("distance", distance);
+		console.log("shieldAngle", shieldAngle);
 
-		const dot = (v1.x * v2.x) + (v1.z * v2.z);
-		const det = (v1.x * v2.z) - (v1.z * v2.x);
-		const angle = Math.atan2(det, dot);
-
-		return (Math.abs(angle) <= shieldAngle) && (shieldAngle > 0) && (ballLen - ballRadius <= shieldRadius) && (ballLen - ballRadius > 0.5) && (player.getPlayerShield().visibility == 1);
+		return distance <= ballRadius;
 	}
 
 	public getMesh(): Mesh {

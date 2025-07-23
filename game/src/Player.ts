@@ -1,5 +1,5 @@
 import { MeshBuilder, Scene, Vector3, Vector2, Mesh, StandardMaterial, Color3, Matrix, ShaderMaterial, Effect, VertexBuffer } from "@babylonjs/core";
-import { Game } from './main.ts'
+import { Game } from './main'
 
 export class Player {
 	public goal: Mesh;
@@ -24,6 +24,7 @@ export class Player {
 	private scene: Scene;
 
 	private deltaTime: number = 1000/60;
+
 	
 	constructor(scene: Scene, position: Vector3, game: Game) {
 		this.scene = scene;
@@ -51,7 +52,7 @@ export class Player {
 
 		window.addEventListener("keydown", (e) => {
 			this.keysPressed.add(e.code);
-			console.log(e.code);
+			// console.log(e.code);
 		});
 		window.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
 		window.addEventListener("pointermove", (e) => {
@@ -224,7 +225,7 @@ export class Player {
 		}
 		this.updatePosition();
 	}
-    
+
 	private updatePosition(){
 		this.goal.position.addInPlace(this.velocity.scale(this.deltaTime / 100));
 		const distance = Math.hypot(this.goal.position.x, this.goal.position.z);
