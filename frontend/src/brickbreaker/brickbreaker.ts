@@ -1,13 +1,12 @@
-import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4 } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4 } from "@babylonImport";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
-import { Inspector } from '@babylonjs/inspector';
 import earcut from "earcut";
 
 let resizeTimeout: number;
 let engine: any;
 
-export class Game {
+export class BrickBreaker {
 	private engine: Engine;
 	private scene: Scene;
 	private camera: ArcRotateCamera;
@@ -18,13 +17,11 @@ export class Game {
 	private arena: Mesh;
 	private light: HemisphericLight;
 
-	constructor(canvas: HTMLCanvasElement) {
+	constructor(canvas: HTMLCanvasElement, scene: Scene) {
 		this.canvas = canvas;
-		this.engine = new Engine(canvas, true);
-		engine = this.engine;
-		this.scene = new Scene(this.engine);
+		this.scene = scene;
+		this.engine = scene.getEngine() as Engine;
 
-		// Inspector.Show(this.scene, {});
 
 		this.setupCamera();
 		this.setupLight();
@@ -169,5 +166,5 @@ export class Game {
 	}
 }
 
-const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-new Game(canvas);
+//const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
+//new Game(canvas);

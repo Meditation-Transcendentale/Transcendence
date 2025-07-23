@@ -26,6 +26,7 @@ export class Environment {
 
 	private camera!: ArcRotateCamera;
 	private camera_br!: UniversalCamera;
+	private camera_brick!: UniversalCamera;
 	private camera_pong!: ArcRotateCamera;
 
 	private lastTime: number;
@@ -103,6 +104,7 @@ export class Environment {
 		this.createMesh();
 		//this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		this.camera_br = new UniversalCamera('br', Vector3.Zero(), this.scene);
+		this.camera_brick = new UniversalCamera('brick', Vector3.Zero(), this.scene);
 		//this.camera_br.attachControl(this.canvas, true);
 		this.camera_pong = new ArcRotateCamera('pong', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
