@@ -56,6 +56,7 @@ export { UniversalCamera } from "@babylonjs/core";
 export { Plane } from "@babylonjs/core/Maths/math.plane";
 export { PolygonMeshBuilder } from "@babylonjs/core";
 export { Observer } from "@babylonjs/core";
+export { VertexBuffer } from "@babylonjs/core";
 
 import "@babylonjs/core/Culling/ray";
 

@@ -1,4 +1,4 @@
-import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2 } from "@babylonjs/core";
+import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2 } from "@babylonImport";
 import { Player } from "./Player";
 
 
@@ -36,23 +36,23 @@ export class Ball {
 			this.delta = delta;
 			this.newposition.addInPlace(this.velocity.scale(this.delta));
 
-			if (player.getAlive()){
+			if (player.getAlive()) {
 				const playerGoalPos = player.getPlayerGoal().position;
 				const collideGoal = Vector3.Distance(playerGoalPos, this.newposition) - 0.25 < 0.5;
 				const collideShield = this.detectCollisionShield(player);
 
-				if (collideShield){
+				if (collideShield) {
 					this.touched = true;
 					this.ball.material = this.matTouched;
 					console.log("touch shield");
-					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x , 0, this.newposition.z - playerGoalPos.z).normalize();
+					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x, 0, this.newposition.z - playerGoalPos.z).normalize();
 					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
 					this.speedScale = Math.min(this.speedScale * 1.1, 5);
 				} else if (collideGoal) {
 					this.touched = false;
 					this.ball.material = this.matUntouched;
 					player.die();
-					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x , 0, this.newposition.z - playerGoalPos.z).normalize();
+					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x, 0, this.newposition.z - playerGoalPos.z).normalize();
 					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
 				}
 			}
@@ -62,7 +62,7 @@ export class Ball {
 		}
 	}
 
-	private hitBrick(radius: number, cols: number, layers: number, bricks: Mesh[][]){
+	private hitBrick(radius: number, cols: number, layers: number, bricks: Mesh[][]) {
 		const dx = this.newposition.x;
 		const dz = this.newposition.z;
 		const distance = Math.sqrt(dx * dx + dz * dz);
@@ -72,7 +72,7 @@ export class Ball {
 		const sectorAngle = 2 * Math.PI / cols;
 		const colIndex = Math.floor(anglePositive / sectorAngle);
 
-		const brickThickness  = 0.8;
+		const brickThickness = 0.8;
 		const layerIndex = Math.floor((radius - (distance + 0.25)) / brickThickness);
 
 		const radIn = radius - (brickThickness * layerIndex) - brickThickness;
@@ -84,7 +84,7 @@ export class Ball {
 		) {
 			const target = bricks[colIndex][layerIndex];
 			if (target && target.isEnabled()) {
-				if (this.touched){
+				if (this.touched) {
 					target.setEnabled(false);
 					this.ball.material = this.matUntouched;
 					this.touched = false;
@@ -93,7 +93,7 @@ export class Ball {
 				const dot = this.velocity.dot(normal);
 				const reflect = this.velocity.subtract(normal.scale(2 * dot));
 				this.velocity.copyFrom(reflect);
-	
+
 				const insidePos = normal.scale(radIn - 0.25 - 0.001);
 				this.newposition.x = insidePos.x;
 				this.newposition.z = insidePos.z;
@@ -109,7 +109,7 @@ export class Ball {
 		const dist = Math.sqrt(pos.x * pos.x + pos.z * pos.z);
 
 		if (dist + ballRadius >= arenaRadius) {
-			if (this.touched){
+			if (this.touched) {
 				this.ball.material = this.matUntouched;
 				this.touched = false;
 			}
@@ -117,7 +117,7 @@ export class Ball {
 			const dot = this.velocity.dot(normal);
 			const reflect = this.velocity.subtract(normal.scale(2 * dot));
 			this.velocity.copyFrom(reflect);
-  
+
 			const insidePos = normal.scale(arenaRadius - ballRadius - 0.001);
 			pos.x = insidePos.x;
 			pos.z = insidePos.z;
@@ -135,10 +135,10 @@ export class Ball {
 		const shieldRadius = 0.825;
 		const ballRadius = 0.25;
 
-		const v1 = new Vector3(ballPosition.x-shieldPosition.x, 0, ballPosition.z-shieldPosition.z);
+		const v1 = new Vector3(ballPosition.x - shieldPosition.x, 0, ballPosition.z - shieldPosition.z);
 		const len = Math.sqrt(v1.x * v1.x + v1.z * v1.z);
 		const ballAngle = Math.atan2(v1.z, v1.x);
-		const v2 = new Vector3(Math.cos(shieldRotation + ballAngle)* len, 0, Math.sin(shieldRotation + ballAngle)* len);
+		const v2 = new Vector3(Math.cos(shieldRotation + ballAngle) * len, 0, Math.sin(shieldRotation + ballAngle) * len);
 		const c = new Vector2(Math.sin(shieldAngle / 2 * Math.PI), Math.cos(shieldAngle / 2 * Math.PI));
 		const bx = Math.abs(v2.x);
 		const l = Math.sqrt((bx * bx) + (v2.z * v2.z)) - shieldRadius;

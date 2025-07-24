@@ -4,7 +4,7 @@ import { User } from "./User";
 import { BrickBreaker } from "../brickbreaker/brickbreaker";
 
 
-export default class br {
+export default class brick {
 	private div: HTMLDivElement;
 	private game: BrickBreaker | null;
 

@@ -134,6 +134,21 @@ const pongctx = await esbuild.context({
 	plugins: [notifyPlugin, customAliasPlugin]
 })
 
+const brickctx = await esbuild.context({
+	entryPoints: ['src/brickbreaker/brickbreaker.ts'],
+	bundle: true,
+	outfile: "./dist/brickbreaker/brickbreaker.js",
+	treeShaking: true,
+	legalComments: 'none',
+	format: "esm",
+	minify: true,
+	minifySyntax: true,
+	minifyWhitespace: true,
+	minifyIdentifiers: true,
+	splitting: false,
+	resolveExtensions: ['.ts', '.js'],
+	plugins: [notifyPlugin, customAliasPlugin]
+})
 let encodectx = await esbuild.context({
 	entryPoints: ['src/encode/helper.ts'],
 	bundle: true,
@@ -185,6 +200,7 @@ await appctx.watch();
 await mainctx.watch();
 await pongctx.watch();
 await pongbrctx.watch();
+await brickctx.watch();
 await encodectx.watch();
 await babyctx.watch();
 //console.log(spactxs);

@@ -1,16 +1,16 @@
-import { MeshBuilder, Scene, Vector3, Vector2, Mesh, StandardMaterial, Color3, Matrix, ShaderMaterial, Effect, VertexBuffer } from "@babylonjs/core";
-import { Game } from './main'
+import { MeshBuilder, Scene, Vector3, Vector2, Mesh, StandardMaterial, Color3, Matrix, ShaderMaterial, Effect, VertexBuffer } from "@babylonImport";
+import { BrickBreaker } from './brickbreaker'
 
 export class Player {
 	public goal: Mesh;
 	public shield: Mesh;
 	public pointerSurface: Mesh;
-	private game: Game;
+	private game: BrickBreaker;
 	private isAlive: boolean = true;
 	private materialGoal: StandardMaterial;
 	private materialShield: StandardMaterial;
 	private velocity: Vector3;
-	
+
 	private angleFactor: number;
 	// private oldAngleFactor: number;
 	private lastInputDelay: number;
@@ -23,21 +23,21 @@ export class Player {
 
 	private scene: Scene;
 
-	private deltaTime: number = 1000/60;
+	private deltaTime: number = 1000 / 60;
 
-	
-	constructor(scene: Scene, position: Vector3, game: Game) {
+
+	constructor(scene: Scene, position: Vector3, game: BrickBreaker) {
 		this.scene = scene;
 		this.game = game;
 
-		this.goal = MeshBuilder.CreateCylinder("goal", {height: 0.5, diameter:1, subdivisions:16}, this.scene);
+		this.goal = MeshBuilder.CreateCylinder("goal", { height: 0.5, diameter: 1, subdivisions: 16 }, this.scene);
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
 		this.materialGoal.diffuseColor = new Color3(1, 0, 0);
 		this.goal.material = this.materialGoal;
 		this.goal.setAbsolutePosition(position);
 		this.velocity = new Vector3(0, 0, 0);
 
-		this.shield = MeshBuilder.CreateCylinder("shield", {height: 0.25, diameter: 1.65, tessellation: 64, arc: 0.5, enclose: true, updatable: true}, this.scene);
+		this.shield = MeshBuilder.CreateCylinder("shield", { height: 0.25, diameter: 1.65, tessellation: 64, arc: 0.5, enclose: true, updatable: true }, this.scene);
 		this.shield.rotation.y = Math.PI;
 		this.materialShield = new StandardMaterial("shieldMat", this.scene);
 		this.materialShield.diffuseColor = new Color3(0, 1, 0);
@@ -60,7 +60,7 @@ export class Player {
 			this.pointer.y = e.clientY;
 		});
 
-		this.pointerSurface = MeshBuilder.CreatePlane("surface", {size: 40, sideOrientation: Mesh.DOUBLESIDE}, this.scene);
+		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
 		const invMat = new StandardMaterial("surfaceMat", this.scene);
 		invMat.diffuseColor.set(0, 0, 0);
 		invMat.alpha = 0;
@@ -172,35 +172,35 @@ export class Player {
 		}
 	}
 
-	public getPlayerGoal(): Mesh{
+	public getPlayerGoal(): Mesh {
 		return this.goal;
 	}
-	
+
 	public getShieldAngle(): number {
 		return this.angleFactor;
 	}
 
-	public getPlayerShield(): Mesh{
+	public getPlayerShield(): Mesh {
 		return this.shield;
 	}
 
-	public getAlive(): boolean{
+	public getAlive(): boolean {
 		return this.isAlive;
 	}
 
-	public getShieldActive(): number{
+	public getShieldActive(): number {
 		return this.isActive;
 	}
 
 	isKeyPressed(keyCode: string): boolean {
 		return this.keysPressed.has(keyCode);
-	} 
+	}
 
 	private movePlayer() {
 		let speed = 0.3;
 		if (this.isKeyPressed("Space")) {
 			this.inputDown = true;
-		} else if (this.inputDown == true){
+		} else if (this.inputDown == true) {
 			this.inputDown = false;
 		}
 		this.inputPointer = this.pointer;
@@ -214,7 +214,7 @@ export class Player {
 			const distance = direction.length();
 			direction.y = this.goal.position.y;
 
-			if (distance < 0.01){
+			if (distance < 0.01) {
 				this.velocity = Vector3.Zero();
 			} else {
 				this.goal.rotation.y = Math.atan2(direction.x, direction.z);
@@ -226,13 +226,13 @@ export class Player {
 		this.updatePosition();
 	}
 
-	private updatePosition(){
+	private updatePosition() {
 		this.goal.position.addInPlace(this.velocity.scale(this.deltaTime / 100));
 		const distance = Math.hypot(this.goal.position.x, this.goal.position.z);
-		if ( distance > 5 - 0.5){
+		if (distance > 5 - 0.5) {
 			const factor = (5 - 0.5) / distance;
 			this.goal.position.x *= factor;
 			this.goal.position.z *= factor;
-		} 
+		}
 	}
 }
