@@ -112,6 +112,8 @@ export default class Lobby {
 				const map = "default"; //payload.start.map;
 				if (this.mode === 'br')
 					Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
+				if (this.mode === 'tournament')
+					Router.nav(encodeURI(`/brick`), false, true);
 				else
 					Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
 				this.ws?.close();

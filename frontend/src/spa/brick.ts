@@ -11,12 +11,12 @@ export default class br {
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
-		App3D.setVue('test');
+		App3D.setVue('brick');
 		this.game = null;
 	}
 
 	public unload() {
-		App3D.unloadVue('test');
+		App3D.unloadVue('brick');
 		App3D.enableHome();
 		//document.querySelector("canvas")?.blur();
 		this.game?.stop();
@@ -26,20 +26,14 @@ export default class br {
 	}
 
 	public load(params: URLSearchParams) {
-		App3D.loadVue('test');
+		App3D.loadVue('brick');
 		App3D.disableHome();
 		//document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
 		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";
 		if (!this.game)
-			this.game = new BrickBreaker(document.querySelector("#canvas"), App3D.scene);
-		let gameId = params.get("id");
-		let uuid = User.uuid;
-		if (!gameId)
-			gameId = "";
-		if (!uuid)
-			uuid = "";
-		this.game.start(gameId, uuid);
+			this.game = new BrickBreaker(document.querySelector("#canvas") as HTMLCanvasElement, App3D.scene);
+		this.game.start();
 	}
 }
 
