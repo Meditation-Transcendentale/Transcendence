@@ -32,6 +32,7 @@ body {
 	--font-window-bar: bold small-caps 2vh de-valancia;
 	--font-window-content: de-valancia 2vh 100;
 	--font-readable: normal normal 2vh dotrice;
+	--font-speak: normal normal 3vh ydmyungjo;
 
 	--input-on-color: white;
 	--input-on-background: blue;
@@ -158,7 +159,6 @@ canvas {
 	animation-timing-function: step-start;
 }
 
-.sub-container>span,
 .text {
 	vertical-align: top;
 	display: inline;
@@ -215,7 +215,7 @@ input[off] {
 
 #main-container {
 	position: absolute;
-	width: 50%;
+	width: 100%;
 	height: 100%;
 	right: 0;
 	z-index: 0;
@@ -257,4 +257,16 @@ input[on] {
 	height: 4px;
 	background-color: var(--frame-butterfly-color);
 	z-index: 0;
+}
+
+.speak {
+	font: var(--font-speak);
+}
+
+.speak::before {
+	content: "<<";
+}
+
+.speak::after {
+	content: ">>";
 }
