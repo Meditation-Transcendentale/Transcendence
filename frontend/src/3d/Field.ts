@@ -173,6 +173,10 @@ export class Field {
 				final.init(this.scene.getCameraByName('pong') as Camera);
 				break;
 			}
+			case 'brick': {
+				final.init(this.scene.getCameraByName('brick') as Camera);
+				break;
+			}
 
 		}
 		return final;
