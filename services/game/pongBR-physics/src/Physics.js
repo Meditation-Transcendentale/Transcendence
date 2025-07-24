@@ -1,4 +1,4 @@
-import { PhysicsEngine } from './physicsEngine.js';
+import { PhysicsEngine } from './physics-engine.js';
 
 export const Physics = {
 	games: new Map(),

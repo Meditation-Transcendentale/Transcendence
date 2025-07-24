@@ -26,7 +26,7 @@ export class PongBR {
 	public stateManager!: StateManager;
 	private wsManager!: WebSocketManager;
 	private inputManager!: InputManager;
-	private camera!: UniversalCamera;
+	private camera!: ArcRotateCamera;
 	private canvas;
 	private scoreUI: any;
 	private baseMeshes: any;
@@ -51,7 +51,7 @@ export class PongBR {
 		this.pongRoot.position.set(-2200, -3500, -3500);
 		this.pongRoot.rotation.z -= 30.9000;
 		this.pongRoot.scaling.set(1, 1, 1);
-		this.camera = this.scene.getCameraByName('br') as UniversalCamera;
+		this.camera = this.scene.getCameraByName('br') as ArcRotateCamera;
 		this.camera.parent = this.pongRoot;
 		this.camera.minZ = 0.2;
 		this.baseMeshes = createBaseMeshes(this.scene, this.pongRoot);
@@ -93,8 +93,8 @@ export class PongBR {
 
 		localPaddleId = await this.waitForRegistration();
 		const angle = (2 * Math.PI) / 100 * localPaddleId;
-		this.camera.position.set(Math.cos(-angle) * 210, 15, Math.sin(-angle) * 210);
-		this.camera.setTarget(new Vector3(0, 0, 0));
+		//this.camera.position.set(Math.cos(-angle) * 210, 15, Math.sin(-angle) * 210);
+		//this.camera.setTarget(new Vector3(0, 0, 0));
 		//this.camera.rotation.set(0, , 0);
 
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
@@ -222,12 +222,10 @@ export class PongBR {
 					return;
 				}
 
-				// Check for the welcome case
 				if (serverMsg.welcome?.paddleId != null) {
 					const paddleId = serverMsg.welcome.paddleId;
 					console.log('Received WelcomeMessage:', paddleId);
 
-					// Create and send a “ready” ClientMessage via helper
 					const readyPayload: userinterface.IClientMessage = { ready: {} };
 					const readyBuf = encodeClientMessage(readyPayload);
 					socket.send(readyBuf);
@@ -239,7 +237,6 @@ export class PongBR {
 
 			socket.addEventListener('message', listener);
 
-			// Timeout guard
 			setTimeout(() => {
 				socket.removeEventListener('message', listener);
 				reject(new Error('Timed out waiting for WelcomeMessage'));

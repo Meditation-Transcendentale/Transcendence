@@ -136,6 +136,9 @@ export namespace shared {
         /** Paddle id */
         id?: (number|null);
 
+        /** Paddle playerId */
+        playerId?: (number|null);
+
         /** Paddle move */
         move?: (number|null);
 
@@ -157,6 +160,9 @@ export namespace shared {
 
         /** Paddle id. */
         public id: number;
+
+        /** Paddle playerId. */
+        public playerId: number;
 
         /** Paddle move. */
         public move: number;

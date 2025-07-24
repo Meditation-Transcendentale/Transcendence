@@ -95,11 +95,11 @@ export class NetworkingSystem extends System {
 
 					const e = entities.find(e =>
 						e.hasComponent(PaddleComponent) &&
-						e.getComponent(PaddleComponent)!.id === p.id
+						e.getComponent(PaddleComponent)!.id === p.playerId
 					);
 					const w = entities.find(e =>
 						e.hasComponent(WallComponent) &&
-						e.getComponent(WallComponent)!.id === p.id
+						e.getComponent(WallComponent)!.id === p.playerId
 					);
 
 					if (!e) return;

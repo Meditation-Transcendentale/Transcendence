@@ -344,6 +344,7 @@ export const shared = $root.shared = (() => {
          * @memberof shared
          * @interface IPaddle
          * @property {number|null} [id] Paddle id
+         * @property {number|null} [playerId] Paddle playerId
          * @property {number|null} [move] Paddle move
          * @property {number|null} [offset] Paddle offset
          * @property {boolean|null} [dead] Paddle dead
@@ -371,6 +372,14 @@ export const shared = $root.shared = (() => {
          * @instance
          */
         Paddle.prototype.id = 0;
+
+        /**
+         * Paddle playerId.
+         * @member {number} playerId
+         * @memberof shared.Paddle
+         * @instance
+         */
+        Paddle.prototype.playerId = 0;
 
         /**
          * Paddle move.
@@ -422,12 +431,14 @@ export const shared = $root.shared = (() => {
                 writer = $Writer.create();
             if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
+            if (message.playerId != null && Object.hasOwnProperty.call(message, "playerId"))
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.playerId);
             if (message.move != null && Object.hasOwnProperty.call(message, "move"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.move);
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.move);
             if (message.offset != null && Object.hasOwnProperty.call(message, "offset"))
-                writer.uint32(/* id 3, wireType 5 =*/29).float(message.offset);
+                writer.uint32(/* id 4, wireType 5 =*/37).float(message.offset);
             if (message.dead != null && Object.hasOwnProperty.call(message, "dead"))
-                writer.uint32(/* id 4, wireType 0 =*/32).bool(message.dead);
+                writer.uint32(/* id 5, wireType 0 =*/40).bool(message.dead);
             return writer;
         };
 
@@ -469,14 +480,18 @@ export const shared = $root.shared = (() => {
                         break;
                     }
                 case 2: {
-                        message.move = reader.int32();
+                        message.playerId = reader.int32();
                         break;
                     }
                 case 3: {
-                        message.offset = reader.float();
+                        message.move = reader.int32();
                         break;
                     }
                 case 4: {
+                        message.offset = reader.float();
+                        break;
+                    }
+                case 5: {
                         message.dead = reader.bool();
                         break;
                     }
@@ -518,6 +533,9 @@ export const shared = $root.shared = (() => {
             if (message.id != null && message.hasOwnProperty("id"))
                 if (!$util.isInteger(message.id))
                     return "id: integer expected";
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                if (!$util.isInteger(message.playerId))
+                    return "playerId: integer expected";
             if (message.move != null && message.hasOwnProperty("move"))
                 if (!$util.isInteger(message.move))
                     return "move: integer expected";
@@ -544,6 +562,8 @@ export const shared = $root.shared = (() => {
             let message = new $root.shared.Paddle();
             if (object.id != null)
                 message.id = object.id | 0;
+            if (object.playerId != null)
+                message.playerId = object.playerId | 0;
             if (object.move != null)
                 message.move = object.move | 0;
             if (object.offset != null)
@@ -568,12 +588,15 @@ export const shared = $root.shared = (() => {
             let object = {};
             if (options.defaults) {
                 object.id = 0;
+                object.playerId = 0;
                 object.move = 0;
                 object.offset = 0;
                 object.dead = false;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                object.playerId = message.playerId;
             if (message.move != null && message.hasOwnProperty("move"))
                 object.move = message.move;
             if (message.offset != null && message.hasOwnProperty("offset"))
