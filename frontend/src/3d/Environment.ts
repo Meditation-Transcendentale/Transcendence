@@ -37,6 +37,12 @@ export class Environment {
 
 	private updateHome: boolean = true;
 
+	private cameraDiv: HTMLDivElement;
+	private perspective!: number;
+
+	private width: number;
+	private height: number;
+
 
 
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
@@ -47,7 +53,6 @@ export class Environment {
 		this.scene.clearColor = new Color4(0., 0., 0., 1);
 
 		this.scene.setRenderingAutoClearDepthStencil(0, true);
-
 
 		window.addEventListener("keydown", (ev) => {
 			// Alt+I
@@ -69,6 +74,8 @@ export class Environment {
 			}
 		});
 
+		// this.scene.useRightHandedSystem = true;
+
 
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
@@ -76,7 +83,13 @@ export class Environment {
 
 		// this.gears = new Gears(this.scene);
 		this.field = new Field(this.scene);
+		this.width = engine.getRenderWidth();
+		this.height = engine.getRenderHeight();
 
+		// const perspec = this.scene.getEngine().getRenderHeight() * 0.5 * cam!.getProjectionMatrix().m[5];
+		this.cameraDiv = document.querySelector("#camera") as HTMLDivElement;
+		this.cameraDiv.style.width = `${this.width}px`;
+		this.cameraDiv.style.height = `${this.height}px`;
 	}
 
 	private createMesh() {
@@ -132,7 +145,8 @@ export class Environment {
 		// pp.bloomScale = 0.25;
 
 		//Inspector.Show(this.scene, {});
-
+		this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
+		document.body.style.perspective = `${this.perspective}px`;
 	}
 
 	public render() {
@@ -145,6 +159,14 @@ export class Environment {
 		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
+		this.updateCameraDiv();
+	}
+
+	private updateCameraDiv() {
+		const world = this.scene.activeCamera?.getWorldMatrix();
+		const r = world!.getRotationMatrix().transpose().m;
+		const m = world!.m;
+		this.cameraDiv.style.transform = `translateZ(${this.perspective}px) matrix3d(${m[0]},${-r[1]},${-r[2]},${m[3]},${-r[4]},${-m[5]},${-r[6]},${m[7]},${-r[8]},${r[9]},${m[10]},${m[11]},${m[12]},${-m[13]},${m[14]},${m[15]}) translate(${this.width * 0.5}px, ${this.height * 0.5}px)`;
 	}
 
 	public enableHome() {

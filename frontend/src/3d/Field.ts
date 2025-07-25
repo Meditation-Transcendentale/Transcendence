@@ -2,6 +2,7 @@ import {
 	Camera, Color3, DirectionalLight, Texture,
 	LoadAssetContainerAsync, Mesh, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, Vector2, Vector3, Matrix,
 	PostProcess,
+	Engine,
 } from "@babylonImport";
 import { Vue } from "../Vue";
 import "./Shader.ts";
@@ -13,6 +14,16 @@ import { Butterfly } from "./Butterfly";
 import { Portal } from "./Portal";
 
 
+const playdiv = document.createElement("div");
+playdiv.className = "frame-new";
+playdiv.innerText = "PLAY";
+
+const face = [
+	new Vector3(-1, 1, 0),
+	new Vector3(1, -1, 0),
+	new Vector3(1, 1, 0),
+	new Vector3(1, -1, 0),
+]
 
 export class Field {
 	private scene: Scene;
@@ -35,6 +46,8 @@ export class Field {
 
 	public glitchPost!: PostProcess;
 	public glitchOrigin: Vector3;
+
+	public test!: Mesh;
 
 
 	constructor(scene: Scene) {
@@ -96,16 +109,28 @@ export class Field {
 		console.log("bouding:", b);
 		cub.dispose();
 
-		Vue.addButterfly(this.butterfly.positions, 300, bounding);
+		// Vue.addButterfly(this.butterfly.positions, 300, bounding);
 
 		this.glitchPost = new PostProcess("glitch", "glitch", ["origin", "time", "ratio"], null, 1., cam);
 		this.glitchPost.autoClear = true;
-		Vue.refGlitch(this.glitchPost, this.glitchOrigin);
+		this.glitchPost.renderTargetSamplingMode = Engine.TEXTURE_TRILINEAR_SAMPLINGMODE;
+		// Vue.refGlitch(this.glitchPost, this.glitchOrigin);
 		this.glitchPost.onApply = (effect) => {
 			effect.setVector3("origin", this.glitchOrigin);
 			effect.setFloat("time", performance.now() * 0.001);
 			effect.setFloat("ratio", window.innerWidth / window.innerHeight);
 		}
+
+		this.test = MeshBuilder.CreatePlane("test", { size: 2 }, this.scene);
+		this.test.material = new StandardMaterial("test", this.scene);
+		this.test.material.backFaceCulling = false;
+		// this.test.setEnabled(false);
+		this.test.position.set(0, 4, 0);
+		this.test.rotation.y = 1 * Math.PI;
+		// console.log("perspective", (2 * Math.tan(cam.fov * 0.2)));
+		const perspec = this.scene.getEngine().getRenderHeight() * 0.5 * cam!.getProjectionMatrix().m[5];
+		// document.body.style.perspective = `${perspec}px`
+		// document.body.style.transform = `translateZ(${perspec}px)`;
 	}
 
 	private initVueBounding() {
@@ -133,58 +158,64 @@ export class Field {
 	public setVue(vue: string): Vue {
 		const final = new Vue();
 		switch (vue) {
-			case 'play': {
-				final.init(this.scene.getCameraByName('fieldCam') as Camera);
-				final.addWindow('create', this.cube0, this.vueBounding, Matrix.Identity());
-				final.addWindow('join', this.cube1, this.vueBounding, Matrix.Identity());
-				break;
-			}
+			// case 'play': {
+			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
+			// 	final.addWindow('create', this.cube0, this.vueBounding, Matrix.Identity());
+			// 	final.addWindow('join', this.cube1, this.vueBounding, Matrix.Identity());
+			// 	break;
+			// }
 			case 'home': {
 				final.init(this.scene.getCameraByName('fieldCam') as Camera);
-				final.addWindow('play', this.cube0, this.vueBounding, Matrix.Identity());
-				final.addWindow('info', this.cube1, this.vueBounding, Matrix.Identity());
-				final.addWindow('stats', this.cube2, this.vueBounding, Matrix.Identity());
-				break;
-			}
-			case 'stats': {
-				final.init(this.scene.getCameraByName('fieldCam') as Camera);
-				final.addWindow('pong', this.cube0, this.vueBounding, Matrix.Identity());
-				final.addWindow('br', this.cube1, this.vueBounding, Matrix.Identity());
-				break;
-			}
-			case 'login': {
-				final.init(this.scene.getCameraByName('fieldCam') as Camera);
-				final.addWindow('register', this.cube1, this.vueBounding, Matrix.Identity());
-				break;
-			}
-			case 'register': {
-				final.init(this.scene.getCameraByName('fieldCam') as Camera);
-				final.addWindow('login', this.cube0, this.vueBounding, Matrix.Identity());
+				final.addWindow('play', {
+					face: face,
+					div: playdiv,
+					matrix: this.test.getWorldMatrix(),
+					onHoverCallback: (status: boolean) => { console.log("Hover:", status) }
 
+				});
+				// final.addWindow('info', this.cube1, this.vueBounding, Matrix.Identity());
+				// final.addWindow('stats', this.cube2, this.vueBounding, Matrix.Identity());
 				break;
 			}
-			case 'test': {
-				final.init(this.scene.getCameraByName('br') as Camera);
-
-				break;
-			}
-			case 'lobby': {
-				final.init(this.scene.getCameraByName('fieldCam') as Camera);
-				final.addWindow('back', this.cube1, this.vueBounding, Matrix.Identity());
-
-				break;
-			}
-			case 'info': {
-				final.init(this.scene.getCameraByName("fieldCam") as Camera);
-				final.addWindow('user', this.cube0, this.vueBounding, Matrix.Identity());
-				final.addWindow('security', this.cube1, this.vueBounding, Matrix.Identity());
-
-				break;
-			}
-			case 'game': {
-				final.init(this.scene.getCameraByName('pong') as Camera);
-				break;
-			}
+			// case 'stats': {
+			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
+			// 	final.addWindow('pong', this.cube0, this.vueBounding, Matrix.Identity());
+			// 	final.addWindow('br', this.cube1, this.vueBounding, Matrix.Identity());
+			// 	break;
+			// }
+			// case 'login': {
+			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
+			// 	final.addWindow('register', this.cube1, this.vueBounding, Matrix.Identity());
+			// 	break;
+			// }
+			// case 'register': {
+			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
+			// 	final.addWindow('login', this.cube0, this.vueBounding, Matrix.Identity());
+			//
+			// 	break;
+			// }
+			// case 'test': {
+			// 	final.init(this.scene.getCameraByName('br') as Camera);
+			//
+			// 	break;
+			// }
+			// case 'lobby': {
+			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
+			// 	final.addWindow('back', this.cube1, this.vueBounding, Matrix.Identity());
+			//
+			// 	break;
+			// }
+			// case 'info': {
+			// 	final.init(this.scene.getCameraByName("fieldCam") as Camera);
+			// 	final.addWindow('user', this.cube0, this.vueBounding, Matrix.Identity());
+			// 	final.addWindow('security', this.cube1, this.vueBounding, Matrix.Identity());
+			//
+			// 	break;
+			// }
+			// case 'game': {
+			// 	final.init(this.scene.getCameraByName('pong') as Camera);
+			// 	break;
+			// }
 
 		}
 		return final;
