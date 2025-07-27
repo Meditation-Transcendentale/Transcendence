@@ -8,12 +8,11 @@ import {
 	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
-	//Inspector,
+	// Inspector,
 	MeshBuilder,
 	Scene,
 	StandardMaterial,
 	Vector3,
-	Inspector,
 	LoadAssetContainerAsync
 } from "@babylonImport";
 import { Field } from "./Field";
@@ -112,12 +111,12 @@ export class Environment {
 	}
 	public async init() {
 
-		this.createMesh();
+		// this.createMesh();
 		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		this.camera_br.attachControl(this.canvas, true);
 		this.camera_pong = new ArcRotateCamera('pong', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
-		loaded.addAllToScene();
+		// loaded.addAllToScene();
 		loaded.meshes[1].setEnabled(false);
 
 
@@ -135,8 +134,8 @@ export class Environment {
 		this.scene.fogDensity = 0.2;
 		this.scene.fogStart = 100;
 		this.scene.fogEnd = 120;
-		this.scene.fogColor = new Color3(.4, .43, .45);
-		this.scene.clearColor = this.scene.fogColor.toColor4();
+		this.scene.fogColor = new Color3(0., 0., 0.);
+		this.scene.clearColor = new Color4(0., 0., 0., 0.);
 
 		// const pp = new DefaultRenderingPipeline("default", true, this.scene, [this.scene.activeCamera as Camera]);
 		// pp.bloomEnabled = true;
@@ -144,7 +143,7 @@ export class Environment {
 		// pp.bloomKernel = 16;
 		// pp.bloomScale = 0.25;
 
-		//Inspector.Show(this.scene, {});
+		// Inspector.Show(this.scene, {});
 		this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
 		document.body.style.perspective = `${this.perspective}px`;
 	}

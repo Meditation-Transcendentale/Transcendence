@@ -441,15 +441,6 @@ uniform float		ratio;
 #include<noises>
 
 
-const vec2 SMALL_BLOCK = vec2(0.03f, 0.008f);
-const vec2 MEDIUM_BLOCK = vec2(0.07f, 0.011f);
-const vec2 LARGE_BLOCK = vec2(0.12f, 0.016f);
-
-float	sdfBox(vec2 p, vec2 b) {
-	vec2 d = abs(p)-b;
-	return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
-}
-
 float sdfCircle(vec2 p, float r) {
 	return length(p) - r;
 }
@@ -467,17 +458,6 @@ float getContrast(vec2 pos) {
 	return step(c,0.);
 }
 
-float Block(vec2 pos, vec2 size, float time, float t1, float t2)
-{
-	if(time < t1 || time > t2)
-	{
-		return 0.;
-	}
-
-	float b = sdfBox(pos, size);
-	return step(b, 0.);
-}
-
 void main() {
 	vec2 uv = vUV;
 	vec2 centre = uv - origin.xy;
@@ -490,43 +470,80 @@ void main() {
 	vec3	color = vec3(0.);
 	float t = fract(time);
 	
-	// color.r += Block(centre, MEDIUM_BLOCK, t, 0.1f, 0.2f);
-	// color.r += Block(centre + vec2(-0.08f, -0.11f), LARGE_BLOCK, t, 0.3f, 0.4f);
-	// color.r += Block(centre + vec2(0.07f, 0.12f), SMALL_BLOCK, t, 0.5f, 0.6f);
-	// color.r += Block(centre + vec2(-0.04f, -0.08f), MEDIUM_BLOCK, t, 0.7f, 0.8f);
-	// color.r += Block(centre + vec2(0.0f, 0.11f), LARGE_BLOCK, t, 0.85f, 0.95f);
-	//
-	// // Create green blocks
-	// float greenBlocks = 0.0f;
-	// color.g += Block(centre + vec2(0.03f, 0.07f), SMALL_BLOCK, t, 0.1f, 0.2f);
-	// color.g += Block(centre + vec2(-0.06f, -0.18f), MEDIUM_BLOCK, t, 0.3f, 0.4f);
-	// color.g += Block(centre + vec2(0.1f, 0.05f), LARGE_BLOCK, t, 0.5f, 0.6f);
-	// color.g += Block(centre + vec2(-0.08f, -0.11f), LARGE_BLOCK, t, 0.7f, 0.8f);
-	// color.g += Block(centre + vec2(0.03f, 0.07f), MEDIUM_BLOCK, t, 0.85f, 0.95f);
-	//
-	// // Create blue blocks
-	// float blueBlocks = 0.0f;
-	// color.b += Block(centre + vec2(0.017f, -0.03f), LARGE_BLOCK, t, 0.1f, 0.2f);
-	// color.b += Block(centre + vec2(-0.027f, 0.21f), MEDIUM_BLOCK, t, 0.3f, 0.4f);
-	// color.b += Block(centre + vec2(-0.13f, 0.08f), MEDIUM_BLOCK, t, 0.5f, 0.6f);
-	// color.b += Block(centre + vec2(-0.027f, 0.17f), LARGE_BLOCK, t, 0.7f, 0.8f);
-	// color.b += Block(centre + vec2(-0.07f, -0.11f), SMALL_BLOCK, t, 0.85f, 0.95f);
-	//
-	// vec3 finalColor = color.r * vec3(0.7, 0.1, 0.2);
-	// finalColor += color.g * vec3(0.1, 0.7, 0.2);
-	// finalColor += color.b * vec3(0., 0.1, 0.7);
-	//
-	// finalColor = (finalColor.x < 0.1 && finalColor.y < 0.1 && finalColor.z < 0.1 ? vec3(1.) : finalColor);
-	//
-	// gl_FragColor.rgb *= finalColor;
 	float contrast = 1. + (1. + time - origin.z) * getContrast(uv);
 	contrast *= contrast;
 	gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * contrast + 0.5;
 	float dith = max(2., 256. - (time - origin.z));
-	// gl_FragColor.rgb = floor(gl_FragColor.rgb * dith + 0.5) * (1. / dith);
 	gl_FragColor = min(gl_FragColor, vec4(1.));
 }
 `;
+
+Effect.ShadersStore['combineFragmentShader'] = `
+	precision highp float;
+
+	uniform sampler2D	textureSampler;
+	uniform sampler2D	cloudSampler;
+	uniform sampler2D	grassSampler;
+	uniform vec2		resolution;
+
+	varying vec2		vUV;
+
+	mat4 M4 = (1.0 / 16.0) * mat4(
+	     0.0, 12.0,  3.0, 15.0,  // Column 0
+	     8.0,  4.0, 11.0,  7.0,  // Column 1
+	     2.0, 14.0,  1.0, 13.0,  // Column 2
+	    10.0,  6.0,  9.0,  5.0   // Column 3
+	);
+	
+	void main() {
+		vec4 cloud = texture2D(cloudSampler, vUV);
+		ivec2 n = ivec2(mod(floor(vUV * resolution * 0.5), 4.));
+		float weight = M4[n.x][n.y]- 0.5;
+		cloud.rgb -= 0.3;
+		cloud.rgb = cloud.rgb + 0.9 * weight;
+		cloud.rgb = floor(cloud.rgb * 4. + 0.5) * (1. / 4.);
+		cloud.rgb = (cloud.rgb - 0.5) * 2.5 + 0.5;
+
+		vec4 color = texture2D(textureSampler, vUV);
+		vec4 grass = texture2D(grassSampler, vUV);
+
+		n = ivec2(mod(floor(vUV * resolution), 4.));
+		weight = M4[n.x][n.y]- 0.7;
+		grass.rgb = grass.rgb + 0.5 * weight;
+		grass.rgb = (grass.rgb - 0.5) * 3.9 + 0.5;
+
+		
+		float a = clamp(2. * (grass.a - color.a), 0., 1.);
+		color = mix(grass, color, 1. - a);
+
+		gl_FragColor = mix(cloud, color, min(color.a * 2., 1.));
+	}
+`
+
+Effect.ShadersStore["sharpenFragmentShader"] = `
+	precision highp float;
+
+	#define LENGTH 1.
+
+	uniform sampler2D	textureSampler;
+	uniform vec2		resolution;
+
+	varying vec2 vUV;
+
+	void main() {
+		// Adapted from https://igortrindade.wordpress.com/2010/04/23/fun-with-opengl-and-shaders/
+		float dx = 1.0 / resolution.x;
+		float dy = 1.0 / resolution.y;
+		vec4 sum = vec4(0.0);
+		sum += -1. * texture2D(textureSampler, vUV + vec2( -LENGTH * dx , 0.0 ));
+		sum += -1. * texture2D(textureSampler, vUV + vec2( 0.0 , -LENGTH * dy));
+		sum += 5. * texture2D(textureSampler, vUV );
+		sum += -1. * texture2D(textureSampler, vUV + vec2( 0.0 , LENGTH * dy));
+		sum += -1. * texture2D(textureSampler, vUV + vec2( LENGTH * dx , 0.0 ));
+		
+		gl_FragColor = sum;
+	}
+`
 
 Effect.ShadersStore["cloudVertexShader"] = `
 	precision highp float;
@@ -570,8 +587,8 @@ const float cloudlight = 0.3;
 const float cloudcover = 0.2;
 const float cloudalpha = 8.0;
 const float skytint = 0.5;
-const vec3 skycolour1 = vec3(0.2, 0.4, 0.6);
-const vec3 skycolour2 = vec3(0.4, 0.7, 1.0);
+const vec3 skycolour1 = vec3(0., 0., 0.);
+const vec3 skycolour2 = vec3(0., 0., .0);
 
 const mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
 
@@ -606,7 +623,7 @@ float fbm(vec2 n) {
 // -----------------------------------------------
 
 void main() {
-	vec2 p = vUV * 10.;
+	vec2 p = vUV * vec2(2., 5.);
 	vec2 uv = p;
 	float mTime = time * speed;
     float q = fbm(uv * cloudscale * 0.5);
@@ -992,7 +1009,7 @@ export class GrassShader extends CustomMaterial {
 		//this.twoSidedLighting = true;
 		// this.specularPower = 1000;
 		this.backFaceCulling = false;
-		this.twoSidedLighting = false;
+		// this.twoSidedLighting = true;
 
 		// this.emissiveColor = new Color3(0.3, 0.3, 0.3);
 
@@ -1112,15 +1129,17 @@ export class DitherMaterial extends CustomMaterial {
 
 		this.Fragment_MainEnd(`
 		// float f = noise(vMainUV1 * 1000.) * 0.5 + 0.5;
-		gl_FragColor.rgb = (on > 0. ? vec3(0.,0.,gradientNoise(vPositionW.xyz + time * 1000., 4.) * 0.5 +0.5) : gl_FragColor.rgb);
+		// gl_FragColor.rgb = (on > 0. ? vec3(0.,0.,gradientNoise(vPositionW.xyz + time * 1000., 4.) * 0.5 +0.5) : gl_FragColor.rgb);
 		gl_FragColor.rgb = (on > 0. ? vec3(gradientNoise(vPositionW.xyz + time * 1000., 4.) * 0.5 +0.5) * vec3(0., 0.0625, 0.62109375) : gl_FragColor.rgb);
 		vec3 dith = min(vec3(1., 1., 1.),   gl_FragColor.rgb);
-		 dith = floor(dith * 8. + 0.5) * (1. / 8.);
+		 // dith = floor(dith * 8. + 0.5) * (1. / 8.);
 		gl_FragColor.rgb = (dith - 0.5) * 1.2 + 0.5; //Apply contrast
 		// gl_FragColor.rgb = vec3(vMainUV1, 0.);
 		
 			// gl_FragColor.rgb = vec3(vNormalW * 0.5 + 0.5);
+			gl_FragColor.a = 0.5;
 		`)
+
 
 	}
 
@@ -1191,9 +1210,10 @@ export class ButterflyMaterial extends CustomMaterial {
 
 		this.Fragment_MainEnd(`
 			gl_FragColor.rgb *= (vPositionW.y < 0.6 ? vec3(1., 0.1, 0.1) : vec3(1.));
+			gl_FragColor.a = 1.;
 		`)
 
-		this.emissiveColor = new Color3(0.5, 0.1, 0.1);
+		this.emissiveColor = new Color3(0.8, 0.1, 0.1);
 		this.backFaceCulling = false;
 	}
 

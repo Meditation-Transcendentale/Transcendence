@@ -10,6 +10,7 @@ export class Tile {
 	constructor(mesh: Mesh, material: CustomMaterial, position: Vector3, width: number, depth: number) {
 		this._mesh = mesh.clone(mesh.name + Tile.__id, null, false, false);
 		this._mesh.setEnabled(true);
+		this._mesh.layerMask = 0x100000000;
 
 		this._mesh.position.copyFrom(position);
 		this._mesh.material = material;

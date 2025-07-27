@@ -1,12 +1,11 @@
-import { GlowLayer, LoadAssetContainerAsync, Matrix, Mesh, Scene, TransformNode, Vector3, Vector4 } from "@babylonImport";
+import { GlowLayer, LoadAssetContainerAsync, Matrix, Mesh, Scene, TransformNode, Vector3 } from "@babylonImport";
 import { ButterflyMaterial } from "./Shader";
-import { Noise } from "./Noise";
 
 export class Butterfly {
 
 	public root: TransformNode;
 
-	private mesh!: Mesh;
+	public mesh!: Mesh;
 	private material: ButterflyMaterial;
 	private scene: Scene;
 
@@ -31,8 +30,7 @@ export class Butterfly {
 	private flock: number = 1;
 	private disperse: number = 0;
 
-	public glowLayer!: GlowLayer;
-	private glowMat!: ButterflyMaterial;
+	public glowMat!: ButterflyMaterial;
 
 	public origin: Vector3;
 
@@ -82,15 +80,12 @@ export class Butterfly {
 
 		this.mesh.position.set(0, 0, 0);
 		this.mesh.scaling.setAll(0.13);
-		this.mesh.material = this.material
+		this.mesh.material = this.material;
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
 		this.thinInstance(this.n, 16);
 		//this.octree.print();
-		this.glowLayer = new GlowLayer("glow", this.scene);
-		this.glowLayer.setMaterialForRendering(this.mesh, this.glowMat);
 
-		this.glowLayer.intensity = 0.5;
 		// this.glowLayer.isEnabled = false;
 
 	}

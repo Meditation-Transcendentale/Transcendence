@@ -54,6 +54,8 @@ export { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedural
 // export { DeepImmutable} from "@babylonjs/core";
 export { Plane } from "@babylonjs/core/Maths/math.plane";
 export { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+export { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+export { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
 
 import "@babylonjs/core/Culling/ray";
 
