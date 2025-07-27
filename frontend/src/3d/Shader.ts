@@ -575,9 +575,14 @@ Effect.ShadersStore["cloudVertexShader"] = `
 Effect.ShadersStore["cloudPixelShader"] = `
 // https://www.shadertoy.com/view/WdXBW4
 
-	precision highp float;
+precision highp float;
+
+#define M_PI 3.1415926535897932384626433832795
  
 uniform float	time;
+uniform vec2	coord;
+uniform float	ratio;
+
 varying vec2	vUV;
 
 const float cloudscale = 1.1;
@@ -623,9 +628,19 @@ float fbm(vec2 n) {
 // -----------------------------------------------
 
 void main() {
-	vec2 p = vUV * vec2(2., 5.);
+	vec2 v = vUV * 2. - 1.;
+	vec2 p2 = coord + v.yx * vec2(-0.4, -ratio * 0.4);
+	vec2 p = vec2(cos(p2.y), sin(p2.y)) * sin(p2.x);
+	float red = 0.1 / max(cos(p2.x), 0.001);
+	p *= red;
+	p = p.yx - vec2(100., 100.);
+	// p = p * 0.001 + 0.5;
+	// p = p * 0.5 + 0.5;
+	vec2 j = p;
+	// vec2 p = p2 * vec2(10.);
+	// vec2 p = vUV * vec2(2., 5.);
 	vec2 uv = p;
-	float mTime = time * speed;
+	float mTime =  time * speed;
     float q = fbm(uv * cloudscale * 0.5);
     
     //ridged noise shape
@@ -655,7 +670,7 @@ void main() {
     
     //noise colour
     float c = 0.0;
-    mTime = time * speed * 2.0;
+    mTime = time * speed * 2.0;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	uv = p; 
 	uv *= cloudscale*2.0;
     uv -= q - mTime;
@@ -687,8 +702,13 @@ void main() {
     f = cloudcover + cloudalpha*f*r;
     
     vec3 result = mix(skycolour, clamp(skytint * skycolour + cloudcolour, 0.0, 1.0), clamp(f + c, 0.0, 1.0));
-    
-	gl_FragColor = vec4( result, 1.0 );
+	
+	red = max(0.,1. - red * 0.03);
+	red = red * red * red;
+	gl_FragColor = vec4( result * red, 1.0 );
+	// gl_FragColor.r = j.x;
+	// gl_FragColor.g = j.y;
+	// gl_FragColor.b = 0.;
 }
 `
 

@@ -40,18 +40,22 @@ export class Pipeline {
 		this.glitch.renderTargetSamplingMode = Engine.TEXTURE_TRILINEAR_SAMPLINGMODE;
 		// Vue.refGlitch(this.glitch, this.glitchOrigin);
 		this.glitch.onApply = (effect) => {
-			// effect.setFloat3("origin", 0.5, 0.5, 0.1);
+			// effect.setFloat3("origin", 0.5, 0.5, 0.1;
 			effect.setFloat("time", performance.now() * 0.001);
 			effect.setFloat("ratio", window.innerWidth / window.innerHeight);
 		}
+
+		console.log("FOV", this.camera.fov);
 	}
 
 	public update(time: number) {
 		const ray = this.camera.getForwardRay().direction;
-		this.ray.x = Math.acos(ray.z);
-		this.ray.y = Math.atan(ray.y / ray.x)
+		// console.log(ray);
+		this.ray.x = Math.acos(ray.y);
+		this.ray.y = Math.atan2(ray.z, ray.x)
 
 		this.cloudTexture.setFloat('time', time);
-		// this.cloudTexture.setVector2("coord", this.ray);
+		this.cloudTexture.setFloat('ratio', window.innerWidth / window.innerHeight);
+		this.cloudTexture.setVector2("coord", this.ray);
 	}
 }
