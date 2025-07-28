@@ -20,8 +20,8 @@ else ifeq ($(TARGET),all)
 	DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER) \
 						  $(DOCKER_COMPOSE_STATS) \
 						  $(DOCKER_COMPOSE_FRONTEND) \
-						  $(DOCKER_COMPOSE_GAME) \
-						  $(DOCKER_COMPOSE_METRICS)
+						  $(DOCKER_COMPOSE_GAME)
+						  # $(DOCKER_COMPOSE_METRICS)
 else
 	$(error Unknown TARGET value '$(TARGET)')
 endif
