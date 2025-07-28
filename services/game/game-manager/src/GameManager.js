@@ -215,6 +215,8 @@ export class GameManager {
 			newState.paddles = resp.paddles;
 			newState.stage = resp.stage;
 			newState.ranks = resp.ranks;
+			newState.events = resp.events || [];        // ADD THIS
+			newState.gameState = resp.gameState || {};
 			if (resp.goal) {
 				newState.score[resp.goal.scorerId] = (newState.score[resp.goal.scorerId] || 0) + 1;
 
@@ -234,7 +236,10 @@ export class GameManager {
 				score: newState.score,
 				ranks: newState.ranks,
 				stage: newState.stage,
+				events: newState.events,
+				gameState: newState.gameState
 			});
+
 			this.nc.publish(
 				`games.${match.mode}.${gameId}.match.state`,
 				buf

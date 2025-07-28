@@ -31,9 +31,9 @@ const handlePhysicsRequest = async (sub) => {
 			continue;
 		}
 
-		const { gameId, tick, balls, paddles, stage, ranks, end, events } = Physics.processTick({ gameId: data.gameId, tick: data.tick, inputs: data.input });
+		const { gameId, tick, balls, paddles, stage, ranks, end, events, gameState } = Physics.processTick({ gameId: data.gameId, tick: data.tick, inputs: data.input });
 		let goal = null;
-		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal, ranks, stage, end });
+		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal, ranks, stage, end, events, gameState });
 		msg.respond(buffer);
 	}
 };

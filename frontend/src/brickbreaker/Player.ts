@@ -64,6 +64,7 @@ export class Player {
 
 		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
 		this.pointerSurface.parent = game.root;
+		console.log(`pointer pos= ${this.pointerSurface.position}`)
 		const invMat = new StandardMaterial("surfaceMat", this.scene);
 		invMat.diffuseColor.set(0, 0, 0);
 		invMat.alpha = 0;
@@ -211,7 +212,9 @@ export class Player {
 		const hit = this.scene.pickWithRay(ray);
 		if (hit?.pickedMesh) {
 			let targetPosition = hit.pickedPoint!;
+			targetPosition.x -= this.game.root.position.x;
 			targetPosition.y = this.goal.position.y;
+			targetPosition.z -= this.game.root.position.z;
 
 			let direction = targetPosition.subtract(this.goal.position);
 			const distance = direction.length();

@@ -1069,6 +1069,875 @@ export const shared = $root.shared = (() => {
         return Goal;
     })();
 
+    shared.GameEvent = (function() {
+
+        /**
+         * Properties of a GameEvent.
+         * @memberof shared
+         * @interface IGameEvent
+         * @property {string|null} [type] GameEvent type
+         * @property {string|null} [phase] GameEvent phase
+         * @property {number|null} [remainingPlayers] GameEvent remainingPlayers
+         * @property {number|Long|null} [timestamp] GameEvent timestamp
+         * @property {Array.<number>|null} [activePlayers] GameEvent activePlayers
+         * @property {Object.<string,number>|null} [playerMapping] GameEvent playerMapping
+         */
+
+        /**
+         * Constructs a new GameEvent.
+         * @memberof shared
+         * @classdesc Represents a GameEvent.
+         * @implements IGameEvent
+         * @constructor
+         * @param {shared.IGameEvent=} [properties] Properties to set
+         */
+        function GameEvent(properties) {
+            this.activePlayers = [];
+            this.playerMapping = {};
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GameEvent type.
+         * @member {string} type
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.type = "";
+
+        /**
+         * GameEvent phase.
+         * @member {string} phase
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.phase = "";
+
+        /**
+         * GameEvent remainingPlayers.
+         * @member {number} remainingPlayers
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.remainingPlayers = 0;
+
+        /**
+         * GameEvent timestamp.
+         * @member {number|Long} timestamp
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.timestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * GameEvent activePlayers.
+         * @member {Array.<number>} activePlayers
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.activePlayers = $util.emptyArray;
+
+        /**
+         * GameEvent playerMapping.
+         * @member {Object.<string,number>} playerMapping
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.playerMapping = $util.emptyObject;
+
+        /**
+         * Creates a new GameEvent instance using the specified properties.
+         * @function create
+         * @memberof shared.GameEvent
+         * @static
+         * @param {shared.IGameEvent=} [properties] Properties to set
+         * @returns {shared.GameEvent} GameEvent instance
+         */
+        GameEvent.create = function create(properties) {
+            return new GameEvent(properties);
+        };
+
+        /**
+         * Encodes the specified GameEvent message. Does not implicitly {@link shared.GameEvent.verify|verify} messages.
+         * @function encode
+         * @memberof shared.GameEvent
+         * @static
+         * @param {shared.IGameEvent} message GameEvent message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameEvent.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.type != null && Object.hasOwnProperty.call(message, "type"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.type);
+            if (message.phase != null && Object.hasOwnProperty.call(message, "phase"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.phase);
+            if (message.remainingPlayers != null && Object.hasOwnProperty.call(message, "remainingPlayers"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.remainingPlayers);
+            if (message.timestamp != null && Object.hasOwnProperty.call(message, "timestamp"))
+                writer.uint32(/* id 4, wireType 0 =*/32).int64(message.timestamp);
+            if (message.activePlayers != null && message.activePlayers.length) {
+                writer.uint32(/* id 5, wireType 2 =*/42).fork();
+                for (let i = 0; i < message.activePlayers.length; ++i)
+                    writer.int32(message.activePlayers[i]);
+                writer.ldelim();
+            }
+            if (message.playerMapping != null && Object.hasOwnProperty.call(message, "playerMapping"))
+                for (let keys = Object.keys(message.playerMapping), i = 0; i < keys.length; ++i)
+                    writer.uint32(/* id 6, wireType 2 =*/50).fork().uint32(/* id 1, wireType 0 =*/8).int32(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.playerMapping[keys[i]]).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GameEvent message, length delimited. Does not implicitly {@link shared.GameEvent.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.GameEvent
+         * @static
+         * @param {shared.IGameEvent} message GameEvent message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameEvent.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GameEvent message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.GameEvent
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.GameEvent} GameEvent
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameEvent.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.GameEvent(), key, value;
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.type = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.phase = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.remainingPlayers = reader.int32();
+                        break;
+                    }
+                case 4: {
+                        message.timestamp = reader.int64();
+                        break;
+                    }
+                case 5: {
+                        if (!(message.activePlayers && message.activePlayers.length))
+                            message.activePlayers = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.activePlayers.push(reader.int32());
+                        } else
+                            message.activePlayers.push(reader.int32());
+                        break;
+                    }
+                case 6: {
+                        if (message.playerMapping === $util.emptyObject)
+                            message.playerMapping = {};
+                        let end2 = reader.uint32() + reader.pos;
+                        key = 0;
+                        value = 0;
+                        while (reader.pos < end2) {
+                            let tag2 = reader.uint32();
+                            switch (tag2 >>> 3) {
+                            case 1:
+                                key = reader.int32();
+                                break;
+                            case 2:
+                                value = reader.int32();
+                                break;
+                            default:
+                                reader.skipType(tag2 & 7);
+                                break;
+                            }
+                        }
+                        message.playerMapping[key] = value;
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GameEvent message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.GameEvent
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.GameEvent} GameEvent
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameEvent.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GameEvent message.
+         * @function verify
+         * @memberof shared.GameEvent
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GameEvent.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.type != null && message.hasOwnProperty("type"))
+                if (!$util.isString(message.type))
+                    return "type: string expected";
+            if (message.phase != null && message.hasOwnProperty("phase"))
+                if (!$util.isString(message.phase))
+                    return "phase: string expected";
+            if (message.remainingPlayers != null && message.hasOwnProperty("remainingPlayers"))
+                if (!$util.isInteger(message.remainingPlayers))
+                    return "remainingPlayers: integer expected";
+            if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                if (!$util.isInteger(message.timestamp) && !(message.timestamp && $util.isInteger(message.timestamp.low) && $util.isInteger(message.timestamp.high)))
+                    return "timestamp: integer|Long expected";
+            if (message.activePlayers != null && message.hasOwnProperty("activePlayers")) {
+                if (!Array.isArray(message.activePlayers))
+                    return "activePlayers: array expected";
+                for (let i = 0; i < message.activePlayers.length; ++i)
+                    if (!$util.isInteger(message.activePlayers[i]))
+                        return "activePlayers: integer[] expected";
+            }
+            if (message.playerMapping != null && message.hasOwnProperty("playerMapping")) {
+                if (!$util.isObject(message.playerMapping))
+                    return "playerMapping: object expected";
+                let key = Object.keys(message.playerMapping);
+                for (let i = 0; i < key.length; ++i) {
+                    if (!$util.key32Re.test(key[i]))
+                        return "playerMapping: integer key{k:int32} expected";
+                    if (!$util.isInteger(message.playerMapping[key[i]]))
+                        return "playerMapping: integer{k:int32} expected";
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GameEvent message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.GameEvent
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.GameEvent} GameEvent
+         */
+        GameEvent.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.GameEvent)
+                return object;
+            let message = new $root.shared.GameEvent();
+            if (object.type != null)
+                message.type = String(object.type);
+            if (object.phase != null)
+                message.phase = String(object.phase);
+            if (object.remainingPlayers != null)
+                message.remainingPlayers = object.remainingPlayers | 0;
+            if (object.timestamp != null)
+                if ($util.Long)
+                    (message.timestamp = $util.Long.fromValue(object.timestamp)).unsigned = false;
+                else if (typeof object.timestamp === "string")
+                    message.timestamp = parseInt(object.timestamp, 10);
+                else if (typeof object.timestamp === "number")
+                    message.timestamp = object.timestamp;
+                else if (typeof object.timestamp === "object")
+                    message.timestamp = new $util.LongBits(object.timestamp.low >>> 0, object.timestamp.high >>> 0).toNumber();
+            if (object.activePlayers) {
+                if (!Array.isArray(object.activePlayers))
+                    throw TypeError(".shared.GameEvent.activePlayers: array expected");
+                message.activePlayers = [];
+                for (let i = 0; i < object.activePlayers.length; ++i)
+                    message.activePlayers[i] = object.activePlayers[i] | 0;
+            }
+            if (object.playerMapping) {
+                if (typeof object.playerMapping !== "object")
+                    throw TypeError(".shared.GameEvent.playerMapping: object expected");
+                message.playerMapping = {};
+                for (let keys = Object.keys(object.playerMapping), i = 0; i < keys.length; ++i)
+                    message.playerMapping[keys[i]] = object.playerMapping[keys[i]] | 0;
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GameEvent message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.GameEvent
+         * @static
+         * @param {shared.GameEvent} message GameEvent
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GameEvent.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults)
+                object.activePlayers = [];
+            if (options.objects || options.defaults)
+                object.playerMapping = {};
+            if (options.defaults) {
+                object.type = "";
+                object.phase = "";
+                object.remainingPlayers = 0;
+                if ($util.Long) {
+                    let long = new $util.Long(0, 0, false);
+                    object.timestamp = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.timestamp = options.longs === String ? "0" : 0;
+            }
+            if (message.type != null && message.hasOwnProperty("type"))
+                object.type = message.type;
+            if (message.phase != null && message.hasOwnProperty("phase"))
+                object.phase = message.phase;
+            if (message.remainingPlayers != null && message.hasOwnProperty("remainingPlayers"))
+                object.remainingPlayers = message.remainingPlayers;
+            if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                if (typeof message.timestamp === "number")
+                    object.timestamp = options.longs === String ? String(message.timestamp) : message.timestamp;
+                else
+                    object.timestamp = options.longs === String ? $util.Long.prototype.toString.call(message.timestamp) : options.longs === Number ? new $util.LongBits(message.timestamp.low >>> 0, message.timestamp.high >>> 0).toNumber() : message.timestamp;
+            if (message.activePlayers && message.activePlayers.length) {
+                object.activePlayers = [];
+                for (let j = 0; j < message.activePlayers.length; ++j)
+                    object.activePlayers[j] = message.activePlayers[j];
+            }
+            let keys2;
+            if (message.playerMapping && (keys2 = Object.keys(message.playerMapping)).length) {
+                object.playerMapping = {};
+                for (let j = 0; j < keys2.length; ++j)
+                    object.playerMapping[keys2[j]] = message.playerMapping[keys2[j]];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this GameEvent to JSON.
+         * @function toJSON
+         * @memberof shared.GameEvent
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GameEvent.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GameEvent
+         * @function getTypeUrl
+         * @memberof shared.GameEvent
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GameEvent.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.GameEvent";
+        };
+
+        return GameEvent;
+    })();
+
+    shared.GameStateInfo = (function() {
+
+        /**
+         * Properties of a GameStateInfo.
+         * @memberof shared
+         * @interface IGameStateInfo
+         * @property {Array.<number>|null} [activePlayers] GameStateInfo activePlayers
+         * @property {Array.<number>|null} [eliminatedPlayers] GameStateInfo eliminatedPlayers
+         * @property {string|null} [currentPhase] GameStateInfo currentPhase
+         * @property {boolean|null} [isRebuilding] GameStateInfo isRebuilding
+         * @property {number|Long|null} [rebuildTimeRemaining] GameStateInfo rebuildTimeRemaining
+         * @property {Object.<string,number>|null} [playerMapping] GameStateInfo playerMapping
+         * @property {boolean|null} [isGameOver] GameStateInfo isGameOver
+         * @property {number|null} [winner] GameStateInfo winner
+         */
+
+        /**
+         * Constructs a new GameStateInfo.
+         * @memberof shared
+         * @classdesc Represents a GameStateInfo.
+         * @implements IGameStateInfo
+         * @constructor
+         * @param {shared.IGameStateInfo=} [properties] Properties to set
+         */
+        function GameStateInfo(properties) {
+            this.activePlayers = [];
+            this.eliminatedPlayers = [];
+            this.playerMapping = {};
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GameStateInfo activePlayers.
+         * @member {Array.<number>} activePlayers
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.activePlayers = $util.emptyArray;
+
+        /**
+         * GameStateInfo eliminatedPlayers.
+         * @member {Array.<number>} eliminatedPlayers
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.eliminatedPlayers = $util.emptyArray;
+
+        /**
+         * GameStateInfo currentPhase.
+         * @member {string} currentPhase
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.currentPhase = "";
+
+        /**
+         * GameStateInfo isRebuilding.
+         * @member {boolean} isRebuilding
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.isRebuilding = false;
+
+        /**
+         * GameStateInfo rebuildTimeRemaining.
+         * @member {number|Long} rebuildTimeRemaining
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.rebuildTimeRemaining = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * GameStateInfo playerMapping.
+         * @member {Object.<string,number>} playerMapping
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.playerMapping = $util.emptyObject;
+
+        /**
+         * GameStateInfo isGameOver.
+         * @member {boolean} isGameOver
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.isGameOver = false;
+
+        /**
+         * GameStateInfo winner.
+         * @member {number} winner
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.winner = 0;
+
+        /**
+         * Creates a new GameStateInfo instance using the specified properties.
+         * @function create
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {shared.IGameStateInfo=} [properties] Properties to set
+         * @returns {shared.GameStateInfo} GameStateInfo instance
+         */
+        GameStateInfo.create = function create(properties) {
+            return new GameStateInfo(properties);
+        };
+
+        /**
+         * Encodes the specified GameStateInfo message. Does not implicitly {@link shared.GameStateInfo.verify|verify} messages.
+         * @function encode
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {shared.IGameStateInfo} message GameStateInfo message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameStateInfo.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.activePlayers != null && message.activePlayers.length) {
+                writer.uint32(/* id 1, wireType 2 =*/10).fork();
+                for (let i = 0; i < message.activePlayers.length; ++i)
+                    writer.int32(message.activePlayers[i]);
+                writer.ldelim();
+            }
+            if (message.eliminatedPlayers != null && message.eliminatedPlayers.length) {
+                writer.uint32(/* id 2, wireType 2 =*/18).fork();
+                for (let i = 0; i < message.eliminatedPlayers.length; ++i)
+                    writer.int32(message.eliminatedPlayers[i]);
+                writer.ldelim();
+            }
+            if (message.currentPhase != null && Object.hasOwnProperty.call(message, "currentPhase"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.currentPhase);
+            if (message.isRebuilding != null && Object.hasOwnProperty.call(message, "isRebuilding"))
+                writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isRebuilding);
+            if (message.rebuildTimeRemaining != null && Object.hasOwnProperty.call(message, "rebuildTimeRemaining"))
+                writer.uint32(/* id 5, wireType 0 =*/40).int64(message.rebuildTimeRemaining);
+            if (message.playerMapping != null && Object.hasOwnProperty.call(message, "playerMapping"))
+                for (let keys = Object.keys(message.playerMapping), i = 0; i < keys.length; ++i)
+                    writer.uint32(/* id 6, wireType 2 =*/50).fork().uint32(/* id 1, wireType 0 =*/8).int32(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.playerMapping[keys[i]]).ldelim();
+            if (message.isGameOver != null && Object.hasOwnProperty.call(message, "isGameOver"))
+                writer.uint32(/* id 7, wireType 0 =*/56).bool(message.isGameOver);
+            if (message.winner != null && Object.hasOwnProperty.call(message, "winner"))
+                writer.uint32(/* id 8, wireType 0 =*/64).int32(message.winner);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GameStateInfo message, length delimited. Does not implicitly {@link shared.GameStateInfo.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {shared.IGameStateInfo} message GameStateInfo message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameStateInfo.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GameStateInfo message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.GameStateInfo} GameStateInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameStateInfo.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.GameStateInfo(), key, value;
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.activePlayers && message.activePlayers.length))
+                            message.activePlayers = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.activePlayers.push(reader.int32());
+                        } else
+                            message.activePlayers.push(reader.int32());
+                        break;
+                    }
+                case 2: {
+                        if (!(message.eliminatedPlayers && message.eliminatedPlayers.length))
+                            message.eliminatedPlayers = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.eliminatedPlayers.push(reader.int32());
+                        } else
+                            message.eliminatedPlayers.push(reader.int32());
+                        break;
+                    }
+                case 3: {
+                        message.currentPhase = reader.string();
+                        break;
+                    }
+                case 4: {
+                        message.isRebuilding = reader.bool();
+                        break;
+                    }
+                case 5: {
+                        message.rebuildTimeRemaining = reader.int64();
+                        break;
+                    }
+                case 6: {
+                        if (message.playerMapping === $util.emptyObject)
+                            message.playerMapping = {};
+                        let end2 = reader.uint32() + reader.pos;
+                        key = 0;
+                        value = 0;
+                        while (reader.pos < end2) {
+                            let tag2 = reader.uint32();
+                            switch (tag2 >>> 3) {
+                            case 1:
+                                key = reader.int32();
+                                break;
+                            case 2:
+                                value = reader.int32();
+                                break;
+                            default:
+                                reader.skipType(tag2 & 7);
+                                break;
+                            }
+                        }
+                        message.playerMapping[key] = value;
+                        break;
+                    }
+                case 7: {
+                        message.isGameOver = reader.bool();
+                        break;
+                    }
+                case 8: {
+                        message.winner = reader.int32();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GameStateInfo message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.GameStateInfo} GameStateInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameStateInfo.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GameStateInfo message.
+         * @function verify
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GameStateInfo.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.activePlayers != null && message.hasOwnProperty("activePlayers")) {
+                if (!Array.isArray(message.activePlayers))
+                    return "activePlayers: array expected";
+                for (let i = 0; i < message.activePlayers.length; ++i)
+                    if (!$util.isInteger(message.activePlayers[i]))
+                        return "activePlayers: integer[] expected";
+            }
+            if (message.eliminatedPlayers != null && message.hasOwnProperty("eliminatedPlayers")) {
+                if (!Array.isArray(message.eliminatedPlayers))
+                    return "eliminatedPlayers: array expected";
+                for (let i = 0; i < message.eliminatedPlayers.length; ++i)
+                    if (!$util.isInteger(message.eliminatedPlayers[i]))
+                        return "eliminatedPlayers: integer[] expected";
+            }
+            if (message.currentPhase != null && message.hasOwnProperty("currentPhase"))
+                if (!$util.isString(message.currentPhase))
+                    return "currentPhase: string expected";
+            if (message.isRebuilding != null && message.hasOwnProperty("isRebuilding"))
+                if (typeof message.isRebuilding !== "boolean")
+                    return "isRebuilding: boolean expected";
+            if (message.rebuildTimeRemaining != null && message.hasOwnProperty("rebuildTimeRemaining"))
+                if (!$util.isInteger(message.rebuildTimeRemaining) && !(message.rebuildTimeRemaining && $util.isInteger(message.rebuildTimeRemaining.low) && $util.isInteger(message.rebuildTimeRemaining.high)))
+                    return "rebuildTimeRemaining: integer|Long expected";
+            if (message.playerMapping != null && message.hasOwnProperty("playerMapping")) {
+                if (!$util.isObject(message.playerMapping))
+                    return "playerMapping: object expected";
+                let key = Object.keys(message.playerMapping);
+                for (let i = 0; i < key.length; ++i) {
+                    if (!$util.key32Re.test(key[i]))
+                        return "playerMapping: integer key{k:int32} expected";
+                    if (!$util.isInteger(message.playerMapping[key[i]]))
+                        return "playerMapping: integer{k:int32} expected";
+                }
+            }
+            if (message.isGameOver != null && message.hasOwnProperty("isGameOver"))
+                if (typeof message.isGameOver !== "boolean")
+                    return "isGameOver: boolean expected";
+            if (message.winner != null && message.hasOwnProperty("winner"))
+                if (!$util.isInteger(message.winner))
+                    return "winner: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a GameStateInfo message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.GameStateInfo} GameStateInfo
+         */
+        GameStateInfo.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.GameStateInfo)
+                return object;
+            let message = new $root.shared.GameStateInfo();
+            if (object.activePlayers) {
+                if (!Array.isArray(object.activePlayers))
+                    throw TypeError(".shared.GameStateInfo.activePlayers: array expected");
+                message.activePlayers = [];
+                for (let i = 0; i < object.activePlayers.length; ++i)
+                    message.activePlayers[i] = object.activePlayers[i] | 0;
+            }
+            if (object.eliminatedPlayers) {
+                if (!Array.isArray(object.eliminatedPlayers))
+                    throw TypeError(".shared.GameStateInfo.eliminatedPlayers: array expected");
+                message.eliminatedPlayers = [];
+                for (let i = 0; i < object.eliminatedPlayers.length; ++i)
+                    message.eliminatedPlayers[i] = object.eliminatedPlayers[i] | 0;
+            }
+            if (object.currentPhase != null)
+                message.currentPhase = String(object.currentPhase);
+            if (object.isRebuilding != null)
+                message.isRebuilding = Boolean(object.isRebuilding);
+            if (object.rebuildTimeRemaining != null)
+                if ($util.Long)
+                    (message.rebuildTimeRemaining = $util.Long.fromValue(object.rebuildTimeRemaining)).unsigned = false;
+                else if (typeof object.rebuildTimeRemaining === "string")
+                    message.rebuildTimeRemaining = parseInt(object.rebuildTimeRemaining, 10);
+                else if (typeof object.rebuildTimeRemaining === "number")
+                    message.rebuildTimeRemaining = object.rebuildTimeRemaining;
+                else if (typeof object.rebuildTimeRemaining === "object")
+                    message.rebuildTimeRemaining = new $util.LongBits(object.rebuildTimeRemaining.low >>> 0, object.rebuildTimeRemaining.high >>> 0).toNumber();
+            if (object.playerMapping) {
+                if (typeof object.playerMapping !== "object")
+                    throw TypeError(".shared.GameStateInfo.playerMapping: object expected");
+                message.playerMapping = {};
+                for (let keys = Object.keys(object.playerMapping), i = 0; i < keys.length; ++i)
+                    message.playerMapping[keys[i]] = object.playerMapping[keys[i]] | 0;
+            }
+            if (object.isGameOver != null)
+                message.isGameOver = Boolean(object.isGameOver);
+            if (object.winner != null)
+                message.winner = object.winner | 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GameStateInfo message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {shared.GameStateInfo} message GameStateInfo
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GameStateInfo.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults) {
+                object.activePlayers = [];
+                object.eliminatedPlayers = [];
+            }
+            if (options.objects || options.defaults)
+                object.playerMapping = {};
+            if (options.defaults) {
+                object.currentPhase = "";
+                object.isRebuilding = false;
+                if ($util.Long) {
+                    let long = new $util.Long(0, 0, false);
+                    object.rebuildTimeRemaining = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.rebuildTimeRemaining = options.longs === String ? "0" : 0;
+                object.isGameOver = false;
+                object.winner = 0;
+            }
+            if (message.activePlayers && message.activePlayers.length) {
+                object.activePlayers = [];
+                for (let j = 0; j < message.activePlayers.length; ++j)
+                    object.activePlayers[j] = message.activePlayers[j];
+            }
+            if (message.eliminatedPlayers && message.eliminatedPlayers.length) {
+                object.eliminatedPlayers = [];
+                for (let j = 0; j < message.eliminatedPlayers.length; ++j)
+                    object.eliminatedPlayers[j] = message.eliminatedPlayers[j];
+            }
+            if (message.currentPhase != null && message.hasOwnProperty("currentPhase"))
+                object.currentPhase = message.currentPhase;
+            if (message.isRebuilding != null && message.hasOwnProperty("isRebuilding"))
+                object.isRebuilding = message.isRebuilding;
+            if (message.rebuildTimeRemaining != null && message.hasOwnProperty("rebuildTimeRemaining"))
+                if (typeof message.rebuildTimeRemaining === "number")
+                    object.rebuildTimeRemaining = options.longs === String ? String(message.rebuildTimeRemaining) : message.rebuildTimeRemaining;
+                else
+                    object.rebuildTimeRemaining = options.longs === String ? $util.Long.prototype.toString.call(message.rebuildTimeRemaining) : options.longs === Number ? new $util.LongBits(message.rebuildTimeRemaining.low >>> 0, message.rebuildTimeRemaining.high >>> 0).toNumber() : message.rebuildTimeRemaining;
+            let keys2;
+            if (message.playerMapping && (keys2 = Object.keys(message.playerMapping)).length) {
+                object.playerMapping = {};
+                for (let j = 0; j < keys2.length; ++j)
+                    object.playerMapping[keys2[j]] = message.playerMapping[keys2[j]];
+            }
+            if (message.isGameOver != null && message.hasOwnProperty("isGameOver"))
+                object.isGameOver = message.isGameOver;
+            if (message.winner != null && message.hasOwnProperty("winner"))
+                object.winner = message.winner;
+            return object;
+        };
+
+        /**
+         * Converts this GameStateInfo to JSON.
+         * @function toJSON
+         * @memberof shared.GameStateInfo
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GameStateInfo.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GameStateInfo
+         * @function getTypeUrl
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GameStateInfo.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.GameStateInfo";
+        };
+
+        return GameStateInfo;
+    })();
+
     shared.MatchState = (function() {
 
         /**
@@ -1082,6 +1951,8 @@ export const shared = $root.shared = (() => {
          * @property {Array.<number>|null} [score] MatchState score
          * @property {Array.<number>|null} [ranks] MatchState ranks
          * @property {number|null} [stage] MatchState stage
+         * @property {Array.<shared.IGameEvent>|null} [events] MatchState events
+         * @property {shared.IGameStateInfo|null} [gameState] MatchState gameState
          */
 
         /**
@@ -1097,6 +1968,7 @@ export const shared = $root.shared = (() => {
             this.paddles = [];
             this.score = [];
             this.ranks = [];
+            this.events = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -1160,6 +2032,22 @@ export const shared = $root.shared = (() => {
         MatchState.prototype.stage = 0;
 
         /**
+         * MatchState events.
+         * @member {Array.<shared.IGameEvent>} events
+         * @memberof shared.MatchState
+         * @instance
+         */
+        MatchState.prototype.events = $util.emptyArray;
+
+        /**
+         * MatchState gameState.
+         * @member {shared.IGameStateInfo|null|undefined} gameState
+         * @memberof shared.MatchState
+         * @instance
+         */
+        MatchState.prototype.gameState = null;
+
+        /**
          * Creates a new MatchState instance using the specified properties.
          * @function create
          * @memberof shared.MatchState
@@ -1207,6 +2095,11 @@ export const shared = $root.shared = (() => {
             }
             if (message.stage != null && Object.hasOwnProperty.call(message, "stage"))
                 writer.uint32(/* id 7, wireType 0 =*/56).int32(message.stage);
+            if (message.events != null && message.events.length)
+                for (let i = 0; i < message.events.length; ++i)
+                    $root.shared.GameEvent.encode(message.events[i], writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+            if (message.gameState != null && Object.hasOwnProperty.call(message, "gameState"))
+                $root.shared.GameStateInfo.encode(message.gameState, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
             return writer;
         };
 
@@ -1289,6 +2182,16 @@ export const shared = $root.shared = (() => {
                         message.stage = reader.int32();
                         break;
                     }
+                case 8: {
+                        if (!(message.events && message.events.length))
+                            message.events = [];
+                        message.events.push($root.shared.GameEvent.decode(reader, reader.uint32()));
+                        break;
+                    }
+                case 9: {
+                        message.gameState = $root.shared.GameStateInfo.decode(reader, reader.uint32());
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -1365,6 +2268,20 @@ export const shared = $root.shared = (() => {
             if (message.stage != null && message.hasOwnProperty("stage"))
                 if (!$util.isInteger(message.stage))
                     return "stage: integer expected";
+            if (message.events != null && message.hasOwnProperty("events")) {
+                if (!Array.isArray(message.events))
+                    return "events: array expected";
+                for (let i = 0; i < message.events.length; ++i) {
+                    let error = $root.shared.GameEvent.verify(message.events[i]);
+                    if (error)
+                        return "events." + error;
+                }
+            }
+            if (message.gameState != null && message.hasOwnProperty("gameState")) {
+                let error = $root.shared.GameStateInfo.verify(message.gameState);
+                if (error)
+                    return "gameState." + error;
+            }
             return null;
         };
 
@@ -1427,6 +2344,21 @@ export const shared = $root.shared = (() => {
             }
             if (object.stage != null)
                 message.stage = object.stage | 0;
+            if (object.events) {
+                if (!Array.isArray(object.events))
+                    throw TypeError(".shared.MatchState.events: array expected");
+                message.events = [];
+                for (let i = 0; i < object.events.length; ++i) {
+                    if (typeof object.events[i] !== "object")
+                        throw TypeError(".shared.MatchState.events: object expected");
+                    message.events[i] = $root.shared.GameEvent.fromObject(object.events[i]);
+                }
+            }
+            if (object.gameState != null) {
+                if (typeof object.gameState !== "object")
+                    throw TypeError(".shared.MatchState.gameState: object expected");
+                message.gameState = $root.shared.GameStateInfo.fromObject(object.gameState);
+            }
             return message;
         };
 
@@ -1448,6 +2380,7 @@ export const shared = $root.shared = (() => {
                 object.paddles = [];
                 object.score = [];
                 object.ranks = [];
+                object.events = [];
             }
             if (options.defaults) {
                 object.gameId = "";
@@ -1457,6 +2390,7 @@ export const shared = $root.shared = (() => {
                 } else
                     object.tick = options.longs === String ? "0" : 0;
                 object.stage = 0;
+                object.gameState = null;
             }
             if (message.gameId != null && message.hasOwnProperty("gameId"))
                 object.gameId = message.gameId;
@@ -1487,6 +2421,13 @@ export const shared = $root.shared = (() => {
             }
             if (message.stage != null && message.hasOwnProperty("stage"))
                 object.stage = message.stage;
+            if (message.events && message.events.length) {
+                object.events = [];
+                for (let j = 0; j < message.events.length; ++j)
+                    object.events[j] = $root.shared.GameEvent.toObject(message.events[j], options);
+            }
+            if (message.gameState != null && message.hasOwnProperty("gameState"))
+                object.gameState = $root.shared.GameStateInfo.toObject(message.gameState, options);
             return object;
         };
 
@@ -3831,6 +4772,8 @@ export const physics = $root.physics = (() => {
          * @property {Array.<number>|null} [ranks] PhysicsResponse ranks
          * @property {number|null} [stage] PhysicsResponse stage
          * @property {boolean|null} [end] PhysicsResponse end
+         * @property {Array.<shared.IGameEvent>|null} [events] PhysicsResponse events
+         * @property {shared.IGameStateInfo|null} [gameState] PhysicsResponse gameState
          */
 
         /**
@@ -3845,6 +4788,7 @@ export const physics = $root.physics = (() => {
             this.balls = [];
             this.paddles = [];
             this.ranks = [];
+            this.events = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -3916,6 +4860,22 @@ export const physics = $root.physics = (() => {
         PhysicsResponse.prototype.end = false;
 
         /**
+         * PhysicsResponse events.
+         * @member {Array.<shared.IGameEvent>} events
+         * @memberof physics.PhysicsResponse
+         * @instance
+         */
+        PhysicsResponse.prototype.events = $util.emptyArray;
+
+        /**
+         * PhysicsResponse gameState.
+         * @member {shared.IGameStateInfo|null|undefined} gameState
+         * @memberof physics.PhysicsResponse
+         * @instance
+         */
+        PhysicsResponse.prototype.gameState = null;
+
+        /**
          * Creates a new PhysicsResponse instance using the specified properties.
          * @function create
          * @memberof physics.PhysicsResponse
@@ -3961,6 +4921,11 @@ export const physics = $root.physics = (() => {
                 writer.uint32(/* id 7, wireType 0 =*/56).int32(message.stage);
             if (message.end != null && Object.hasOwnProperty.call(message, "end"))
                 writer.uint32(/* id 8, wireType 0 =*/64).bool(message.end);
+            if (message.events != null && message.events.length)
+                for (let i = 0; i < message.events.length; ++i)
+                    $root.shared.GameEvent.encode(message.events[i], writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+            if (message.gameState != null && Object.hasOwnProperty.call(message, "gameState"))
+                $root.shared.GameStateInfo.encode(message.gameState, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
             return writer;
         };
 
@@ -4040,6 +5005,16 @@ export const physics = $root.physics = (() => {
                         message.end = reader.bool();
                         break;
                     }
+                case 9: {
+                        if (!(message.events && message.events.length))
+                            message.events = [];
+                        message.events.push($root.shared.GameEvent.decode(reader, reader.uint32()));
+                        break;
+                    }
+                case 10: {
+                        message.gameState = $root.shared.GameStateInfo.decode(reader, reader.uint32());
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -4117,6 +5092,20 @@ export const physics = $root.physics = (() => {
             if (message.end != null && message.hasOwnProperty("end"))
                 if (typeof message.end !== "boolean")
                     return "end: boolean expected";
+            if (message.events != null && message.hasOwnProperty("events")) {
+                if (!Array.isArray(message.events))
+                    return "events: array expected";
+                for (let i = 0; i < message.events.length; ++i) {
+                    let error = $root.shared.GameEvent.verify(message.events[i]);
+                    if (error)
+                        return "events." + error;
+                }
+            }
+            if (message.gameState != null && message.hasOwnProperty("gameState")) {
+                let error = $root.shared.GameStateInfo.verify(message.gameState);
+                if (error)
+                    return "gameState." + error;
+            }
             return null;
         };
 
@@ -4179,6 +5168,21 @@ export const physics = $root.physics = (() => {
                 message.stage = object.stage | 0;
             if (object.end != null)
                 message.end = Boolean(object.end);
+            if (object.events) {
+                if (!Array.isArray(object.events))
+                    throw TypeError(".physics.PhysicsResponse.events: array expected");
+                message.events = [];
+                for (let i = 0; i < object.events.length; ++i) {
+                    if (typeof object.events[i] !== "object")
+                        throw TypeError(".physics.PhysicsResponse.events: object expected");
+                    message.events[i] = $root.shared.GameEvent.fromObject(object.events[i]);
+                }
+            }
+            if (object.gameState != null) {
+                if (typeof object.gameState !== "object")
+                    throw TypeError(".physics.PhysicsResponse.gameState: object expected");
+                message.gameState = $root.shared.GameStateInfo.fromObject(object.gameState);
+            }
             return message;
         };
 
@@ -4199,6 +5203,7 @@ export const physics = $root.physics = (() => {
                 object.balls = [];
                 object.paddles = [];
                 object.ranks = [];
+                object.events = [];
             }
             if (options.defaults) {
                 object.gameId = "";
@@ -4210,6 +5215,7 @@ export const physics = $root.physics = (() => {
                 object.goal = null;
                 object.stage = 0;
                 object.end = false;
+                object.gameState = null;
             }
             if (message.gameId != null && message.hasOwnProperty("gameId"))
                 object.gameId = message.gameId;
@@ -4239,6 +5245,13 @@ export const physics = $root.physics = (() => {
                 object.stage = message.stage;
             if (message.end != null && message.hasOwnProperty("end"))
                 object.end = message.end;
+            if (message.events && message.events.length) {
+                object.events = [];
+                for (let j = 0; j < message.events.length; ++j)
+                    object.events[j] = $root.shared.GameEvent.toObject(message.events[j], options);
+            }
+            if (message.gameState != null && message.hasOwnProperty("gameState"))
+                object.gameState = $root.shared.GameStateInfo.toObject(message.gameState, options);
             return object;
         };
 

@@ -3,7 +3,8 @@ import { Component } from "../ecs/Component.js";
 
 export class PaddleComponent implements Component {
 	public position: Vector3;
-	public id: number;
+	public id: number;          // Original player ID (stays constant)
+	public paddleIndex: number; // Current paddle index from physics (changes after rebuild)
 	public offset: number;
 	public maxoffset: number;
 	public baseRotation: number   // <— new
@@ -13,6 +14,7 @@ export class PaddleComponent implements Component {
 
 	constructor(id: number, position: Vector3, offset: number = 0, maxoffset: number, baseRotation: number, speed: number) {
 		this.id = id;
+		this.paddleIndex = id; // Initially same as ID, will change after rebuilds
 		this.offset = offset;
 		this.maxoffset = maxoffset;
 		this.position = position;
