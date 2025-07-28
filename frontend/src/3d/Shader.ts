@@ -534,7 +534,7 @@ Effect.ShadersStore['combineFragmentShader'] = `
 
 		f = (noise == 1. ? hash(time * 0.00001 + vUV.y) : 1.);
 		n = ivec2(mod(floor(vUV * resolution * f), 4.));
-		weight = M4[n.x][n.y]- 0.7;
+		weight = M4[n.x][n.y]- 0.65;
 		grass.rgb = grass.rgb + 0.5 * weight;
 		grass.rgb = (grass.rgb - 0.5) * 3.9 + 0.5;
 
