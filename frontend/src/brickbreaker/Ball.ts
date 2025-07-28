@@ -1,4 +1,4 @@
-import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2 } from "@babylonImport";
+import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2, TransformNode } from "@babylonImport";
 import { Player } from "./Player";
 
 
@@ -14,8 +14,9 @@ export class Ball {
 	private delta: number;
 	private newposition: Vector3 = new Vector3(0, 0.25, 0);
 
-	constructor(scene: Scene, material: StandardMaterial) {
+	constructor(scene: Scene, material: StandardMaterial, root: TransformNode) {
 		this.ball = MeshBuilder.CreateSphere("ball", { diameter: 0.5 }, scene);
+		this.ball.parent = root;
 		this.ball.position = new Vector3(0, 0.25, 0);
 		this.ball.material = material;
 		this.scene = scene;

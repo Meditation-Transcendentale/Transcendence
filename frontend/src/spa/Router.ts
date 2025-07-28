@@ -81,7 +81,7 @@ class RouterC {
 		} as routePage);
 		this.routes.set("/brick", {
 			html: "/game",
-			ts: "./brick.ts",
+			ts: "./brick",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/test", { //TO USE FOR TEMPORARY ROUTE EX: BR / IO
