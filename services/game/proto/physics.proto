@@ -25,6 +25,8 @@ message PhysicsResponse {
   repeated int32 ranks = 6; // BR: ranking per player
   int32 stage = 7;          // BR mode stage; others: ignored
   bool end = 8;
+  repeated shared.GameEvent events = 9; // Phase transition events
+  shared.GameStateInfo gameState = 10;  // Current game state
 }
 
 message MatchStateResponse { shared.MatchState state = 1; }

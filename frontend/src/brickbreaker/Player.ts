@@ -31,13 +31,15 @@ export class Player {
 		this.game = game;
 
 		this.goal = MeshBuilder.CreateCylinder("goal", { height: 0.5, diameter: 1, subdivisions: 16 }, this.scene);
+		this.goal.parent = game.root;
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
 		this.materialGoal.diffuseColor = new Color3(1, 0, 0);
 		this.goal.material = this.materialGoal;
-		this.goal.setAbsolutePosition(position);
+		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
 
 		this.shield = MeshBuilder.CreateCylinder("shield", { height: 0.25, diameter: 1.65, tessellation: 64, arc: 0.5, enclose: true, updatable: true }, this.scene);
+		this.shield.parent = game.root;
 		this.shield.rotation.y = Math.PI;
 		this.materialShield = new StandardMaterial("shieldMat", this.scene);
 		this.materialShield.diffuseColor = new Color3(0, 1, 0);
@@ -61,6 +63,8 @@ export class Player {
 		});
 
 		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
+		this.pointerSurface.parent = game.root;
+		console.log(`pointer pos= ${this.pointerSurface.position}`)
 		const invMat = new StandardMaterial("surfaceMat", this.scene);
 		invMat.diffuseColor.set(0, 0, 0);
 		invMat.alpha = 0;
@@ -208,7 +212,9 @@ export class Player {
 		const hit = this.scene.pickWithRay(ray);
 		if (hit?.pickedMesh) {
 			let targetPosition = hit.pickedPoint!;
+			targetPosition.x -= this.game.root.position.x;
 			targetPosition.y = this.goal.position.y;
+			targetPosition.z -= this.game.root.position.z;
 
 			let direction = targetPosition.subtract(this.goal.position);
 			const distance = direction.length();

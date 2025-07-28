@@ -251,6 +251,7 @@ export class PhysicsEngine {
 		this.rebuildDuration = 3000;
 		this.playerMapping = {};
 		this.originalPlayerCount = 0;
+		this.fixedPlayerIds = [];
 
 		this.gameEvents = [];
 	}
@@ -276,6 +277,7 @@ export class PhysicsEngine {
 		this.reset();
 		this.originalPlayerCount = numPlayers;
 
+		this.fixedPlayerIds = Array.from({ length: numPlayers }, (_, i) => i);
 		this.paddleData.offsets = new Float32Array(numPlayers);
 		this.paddleData.maxOffsets = new Float32Array(numPlayers);
 		this.paddleData.centerAngles = new Float32Array(numPlayers);
@@ -292,6 +294,7 @@ export class PhysicsEngine {
 			this.playerStates.activePlayers.add(pid);
 			this.paddleData.dead[pid] = 0;
 		}
+		this.playerMapping = {};
 	}
 
 	createPaddles(numPlayers) {
@@ -572,8 +575,12 @@ export class PhysicsEngine {
 			maxOffsets: new Float32Array(numActivePlayers),
 			centerAngles: new Float32Array(numActivePlayers),
 			inputStates: new Int8Array(numActivePlayers),
-			dead: new Uint8Array(numActivePlayers)
+			dead: new Uint8Array(this.originalPlayerCount)
 		};
+
+		for (let i = 0; i < this.originalPlayerCount; i++) {
+			newPaddleData.dead[i] = this.paddleData.dead[i];
+		}
 
 		activePlayers.forEach((originalPlayerId, newIndex) => {
 			const midAngle = newIndex * newAngleStep + newAngleStep / 2;
@@ -637,13 +644,14 @@ export class PhysicsEngine {
 		console.log(`Reset balls: created ${newBallCount} new balls`);
 	}
 
-	updatePaddleInputState(originalPlayerId, moveInput) {
+	updatePaddleInputState(fixedPlayerId, moveInput) {
 		if (this.isRebuilding) return;
 
-		const newIndex = this.playerMapping ? this.playerMapping[originalPlayerId] : originalPlayerId;
-		if (newIndex !== undefined && newIndex >= 0 && newIndex < this.paddleData.inputStates.length) {
-			if (!this.playerStates.eliminated.has(originalPlayerId)) {
-				this.paddleData.inputStates[newIndex] = Math.max(-1, Math.min(1, moveInput));
+		const paddleIndex = this.playerMapping[fixedPlayerId] ?? fixedPlayerId;
+
+		if (paddleIndex >= 0 && paddleIndex < this.paddleData.inputStates.length) {
+			if (!this.playerStates.eliminated.has(fixedPlayerId)) {
+				this.paddleData.inputStates[paddleIndex] = Math.max(-1, Math.min(1, moveInput));
 			}
 		}
 	}
@@ -814,12 +822,25 @@ export class PhysicsEngine {
 
 		const paddles = this.entities.paddles
 			.filter(ent => ent !== undefined && pd.isActive(ent))
-			.map((ent, i) => ({
-				id: i,
-				move: this.paddleData.inputStates[i] || 0,
-				offset: this.paddleData.offsets[i] || 0,
-				dead: this.paddleData.dead[i] === 1
-			}));
+			.map((ent, currentPaddleIndex) => {
+				let fixedPlayerId = currentPaddleIndex; // Default fallback
+
+				if (this.playerMapping && Object.keys(this.playerMapping).length > 0) {
+					const reverseMapping = Object.entries(this.playerMapping)
+						.find(([playerId, paddleIdx]) => paddleIdx === currentPaddleIndex);
+					if (reverseMapping) {
+						fixedPlayerId = parseInt(reverseMapping[0]);
+					}
+				}
+
+				return {
+					id: currentPaddleIndex,
+					playerId: fixedPlayerId,
+					move: this.paddleData.inputStates[currentPaddleIndex] || 0,
+					offset: this.paddleData.offsets[currentPaddleIndex] || 0,
+					dead: this.paddleData.dead[fixedPlayerId] === 1
+				};
+			});
 
 		const events = [...this.gameEvents];
 		this.gameEvents = [];

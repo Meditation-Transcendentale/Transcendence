@@ -15,6 +15,7 @@ import { createGameTemplate } from "./templates/builder.js";
 import { AnimationSystem } from "./systems/AnimationSystem.js";
 import { ArcRotateCamera, Color3, Color4, PointLight, Scene, TransformNode, Vector3, Engine, Mesh, UniversalCamera } from "@babylonImport";
 import { BallComponent } from "./components/BallComponent.js";
+import { PaddleComponent } from "./components/PaddleComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
 import { WallComponent } from "./components/WallComponent.js";
 import { Entity } from "./ecs/Entity.js";
@@ -26,7 +27,7 @@ export class PongBR {
 	public stateManager!: StateManager;
 	private wsManager!: WebSocketManager;
 	private inputManager!: InputManager;
-	private camera!: UniversalCamera;
+	private camera!: ArcRotateCamera;
 	private canvas;
 	private scoreUI: any;
 	private baseMeshes: any;
@@ -34,6 +35,7 @@ export class PongBR {
 	private uuid!: string;
 	private paddleBundles!: PaddleBundle[];
 	private pongRoot!: TransformNode;
+	private rotatingContainer!: TransformNode;
 	private inited: boolean;
 	private networkingSystem!: NetworkingSystem;
 	private inputSystem!: InputSystem;
@@ -51,9 +53,18 @@ export class PongBR {
 		this.pongRoot.position.set(-2200, -3500, -3500);
 		this.pongRoot.rotation.z -= 30.9000;
 		this.pongRoot.scaling.set(1, 1, 1);
-		this.camera = this.scene.getCameraByName('br') as UniversalCamera;
+
+		this.rotatingContainer = new TransformNode("rotatingContainer", this.scene);
+		this.rotatingContainer.parent = this.pongRoot;
+
+		this.camera = this.scene.getCameraByName('br') as ArcRotateCamera;
 		this.camera.parent = this.pongRoot;
 		this.camera.minZ = 0.2;
+
+		this.camera.alpha = 0;
+		this.camera.beta = Math.PI / 2.1;
+		this.camera.radius = 300;
+
 		this.baseMeshes = createBaseMeshes(this.scene, this.pongRoot);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
@@ -63,11 +74,8 @@ export class PongBR {
 		statue.rotation.set(0, Math.PI, 0);
 		statue.scaling.setAll(70);
 
-
-
 		this.inputManager = new InputManager();
-
-		localPaddleId = 0;
+		localPaddleId = 5;
 		this.initECS(this.instanceManagers, this.pongRoot);
 
 		this.stateManager = new StateManager(this.ecs);
@@ -92,10 +100,6 @@ export class PongBR {
 		this.wsManager = new WebSocketManager(wsUrl);
 
 		localPaddleId = await this.waitForRegistration();
-		const angle = (2 * Math.PI) / 100 * localPaddleId;
-		this.camera.position.set(Math.cos(-angle) * 210, 15, Math.sin(-angle) * 210);
-		this.camera.setTarget(new Vector3(0, 0, 0));
-		//this.camera.rotation.set(0, , 0);
 
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
 		this.ecs.addSystem(this.inputSystem);
@@ -106,11 +110,39 @@ export class PongBR {
 			this
 		);
 		this.ecs.addSystem(this.networkingSystem);
+
+		this.networkingSystem.resetPhaseState();
+
+		this.paddleBundles.forEach(b => {
+			this.ecs.removeEntity(b.paddle);
+			this.ecs.removeEntity(b.goal);
+			this.ecs.removeEntity(b.deathWall);
+			this.ecs.removeEntity(b.pillar);
+		});
+		const allEntities = this.ecs.getAllEntities();
+		allEntities.forEach(entity => {
+			if (entity.hasComponent(BallComponent)) {
+				this.ecs.removeEntity(entity);
+				//const ballComponent = entity.getComponent(BallComponent)!;
+				//const transform = entity.getComponent(TransformComponent);
+				//
+				//ballComponent.position.set(0, 0.5, 0);
+				//ballComponent.velocity.set(0, 0, 0);
+				//
+				//if (transform) {
+				//	transform.baseScale = new Vector3(1, 1, 1);
+				//	transform.enable();
+				//}
+			}
+		});
+
+		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot);
+		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
+
 		console.log("start");
 		this.pongRoot.setEnabled(true);
 		this.stateManager.setter(true);
 		this.stateManager.update();
-		//this.camera.attachControl(this.canvas);
 
 		this.scene.onBeforeRenderObservable.add(() => {
 			this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
@@ -119,7 +151,6 @@ export class PongBR {
 	}
 	public stop(): void {
 
-		//this.camera.detachControl();
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
 
@@ -151,19 +182,29 @@ export class PongBR {
 			this.camera
 		);
 		this.ecs.addSystem(this.thinInstanceSystem);
-		// this.ecs.addSystem(new VisualEffectSystem(this.scene));
-		//this.ecs.addSystem(new UISystem());
 		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot);
 	}
 
-	public transitionToRound(nextCount: number, entities: Entity[]) {
+	public transitionToRound(nextCount: number, entities: Entity[], physicsState?: any, playerMapping?: Record<number, number>) {
+		console.log(`🎮 Starting visual transition to ${nextCount} players (full arena rebuild)`);
+
+		const eliminatedPlayerIds = new Set<number>();
+		const activePlayers = new Set<number>();
+
+		if (physicsState && physicsState.paddles) {
+			physicsState.paddles.forEach((p: any) => {
+				if (p.dead) {
+					eliminatedPlayerIds.add(p.playerId);
+				} else {
+					activePlayers.add(p.playerId);
+				}
+			});
+			console.log(`🪦 Found eliminated players:`, Array.from(eliminatedPlayerIds));
+			console.log(`✅ Found active players:`, Array.from(activePlayers));
+		}
+
 		const cfg = { arenaRadius: 100, wallWidth: 1, paddleHeight: 1, paddleDepth: 1, goalDepth: 1 };
 		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
-		const targets: PaddleBundle[] = buildPaddles(this.ecs, nextCount, this.pongRoot);
-
-		const survivors = this.paddleBundles.filter(b => b.sliceIndex < nextCount);
-		const eliminated = this.paddleBundles.filter(b => b.sliceIndex >= nextCount);
-
 		for (const entity of entities) {
 			if (
 				!entity.hasComponent(BallComponent) ||
@@ -173,23 +214,15 @@ export class PongBR {
 			}
 			const transform = entity.getComponent(TransformComponent)!;
 			transform.baseScale = new Vector3(25 / nextCount, 25 / nextCount, 25 / nextCount);
-
 		}
 
-
-		eliminated.forEach(b => {
+		console.log(`🗑️  Removing all ${this.paddleBundles.length} existing paddle bundles`);
+		this.paddleBundles.forEach(b => {
 			this.ecs.removeEntity(b.paddle);
 			this.ecs.removeEntity(b.goal);
 			this.ecs.removeEntity(b.deathWall);
 			this.ecs.removeEntity(b.pillar);
 		});
-		survivors.forEach(b => {
-			this.ecs.removeEntity(b.paddle);
-			this.ecs.removeEntity(b.goal);
-			this.ecs.removeEntity(b.deathWall);
-			this.ecs.removeEntity(b.pillar);
-		});
-
 		for (const entity of entities) {
 			if (
 				!entity.hasComponent(WallComponent) ||
@@ -200,8 +233,16 @@ export class PongBR {
 			const transform = entity.getComponent(TransformComponent);
 			transform?.disable();
 		}
-		this.paddleBundles = targets;
+
+		console.log(`🏗️  Building new arena for ${nextCount} players`);
+		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.pongRoot);
+
+		console.log(`✅ New arena contains ${nextCount} active player positions - no eliminated player states to apply`);
+
+		console.log(`✅ Arena rebuild complete: ${this.paddleBundles.length} paddle bundles created`);
+
 	}
+
 
 	private waitForRegistration(): Promise<number> {
 		return new Promise((resolve, reject) => {
@@ -222,12 +263,10 @@ export class PongBR {
 					return;
 				}
 
-				// Check for the welcome case
 				if (serverMsg.welcome?.paddleId != null) {
 					const paddleId = serverMsg.welcome.paddleId;
 					console.log('Received WelcomeMessage:', paddleId);
 
-					// Create and send a “ready” ClientMessage via helper
 					const readyPayload: userinterface.IClientMessage = { ready: {} };
 					const readyBuf = encodeClientMessage(readyPayload);
 					socket.send(readyBuf);
@@ -239,7 +278,6 @@ export class PongBR {
 
 			socket.addEventListener('message', listener);
 
-			// Timeout guard
 			setTimeout(() => {
 				socket.removeEventListener('message', listener);
 				reject(new Error('Timed out waiting for WelcomeMessage'));

@@ -18,9 +18,10 @@ message Ball {
 
 message Paddle {
   int32 id = 1;
-  int32 move = 2; // -1: left, 0: none, 1: right
-  float offset = 3;
-  bool dead = 4; // Used in battle‐royale mode, false otherwise
+  int32 playerId = 2;
+  int32 move = 3; // -1: left, 0: none, 1: right
+  float offset = 4;
+  bool dead = 5; // Used in battle‐royale mode, false otherwise
 }
 
 message PaddleInput {
@@ -30,6 +31,28 @@ message PaddleInput {
 
 message Goal { int32 scorerId = 1; }
 
+// Game events for phase transitions
+message GameEvent {
+  string type = 1;           // PHASE_TRANSITION, REBUILD_COMPLETE, etc.
+  string phase = 2;          // Phase name
+  int32 remainingPlayers = 3;
+  int64 timestamp = 4;
+  repeated int32 activePlayers = 5;
+  map<int32, int32> playerMapping = 6; // originalPlayerId -> newPaddleIndex
+}
+
+// Game state information
+message GameStateInfo {
+  repeated int32 activePlayers = 1;
+  repeated int32 eliminatedPlayers = 2;
+  string currentPhase = 3;
+  bool isRebuilding = 4;
+  int64 rebuildTimeRemaining = 5;
+  map<int32, int32> playerMapping = 6;
+  bool isGameOver = 7;
+  int32 winner = 8;
+}
+
 message MatchState {
   string gameId = 1;
   int64 tick = 2;
@@ -38,6 +61,8 @@ message MatchState {
   repeated int32 score = 5; // Classic: scores per player
   repeated int32 ranks = 6; // BR: ranking per player
   int32 stage = 7;          // BR: current stage; others: ignored
+  repeated GameEvent events = 8; // Phase transition events
+  GameStateInfo gameState = 9;   // Current game state
 }
 
 message MatchCreateRequest {

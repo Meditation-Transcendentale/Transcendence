@@ -136,6 +136,9 @@ export namespace shared {
         /** Paddle id */
         id?: (number|null);
 
+        /** Paddle playerId */
+        playerId?: (number|null);
+
         /** Paddle move */
         move?: (number|null);
 
@@ -157,6 +160,9 @@ export namespace shared {
 
         /** Paddle id. */
         public id: number;
+
+        /** Paddle playerId. */
+        public playerId: number;
 
         /** Paddle move. */
         public move: number;
@@ -445,6 +451,272 @@ export namespace shared {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    /** Properties of a GameEvent. */
+    interface IGameEvent {
+
+        /** GameEvent type */
+        type?: (string|null);
+
+        /** GameEvent phase */
+        phase?: (string|null);
+
+        /** GameEvent remainingPlayers */
+        remainingPlayers?: (number|null);
+
+        /** GameEvent timestamp */
+        timestamp?: (number|Long|null);
+
+        /** GameEvent activePlayers */
+        activePlayers?: (number[]|null);
+
+        /** GameEvent playerMapping */
+        playerMapping?: ({ [k: string]: number }|null);
+    }
+
+    /** Represents a GameEvent. */
+    class GameEvent implements IGameEvent {
+
+        /**
+         * Constructs a new GameEvent.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: shared.IGameEvent);
+
+        /** GameEvent type. */
+        public type: string;
+
+        /** GameEvent phase. */
+        public phase: string;
+
+        /** GameEvent remainingPlayers. */
+        public remainingPlayers: number;
+
+        /** GameEvent timestamp. */
+        public timestamp: (number|Long);
+
+        /** GameEvent activePlayers. */
+        public activePlayers: number[];
+
+        /** GameEvent playerMapping. */
+        public playerMapping: { [k: string]: number };
+
+        /**
+         * Creates a new GameEvent instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GameEvent instance
+         */
+        public static create(properties?: shared.IGameEvent): shared.GameEvent;
+
+        /**
+         * Encodes the specified GameEvent message. Does not implicitly {@link shared.GameEvent.verify|verify} messages.
+         * @param message GameEvent message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: shared.IGameEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GameEvent message, length delimited. Does not implicitly {@link shared.GameEvent.verify|verify} messages.
+         * @param message GameEvent message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: shared.IGameEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GameEvent message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns GameEvent
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.GameEvent;
+
+        /**
+         * Decodes a GameEvent message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns GameEvent
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.GameEvent;
+
+        /**
+         * Verifies a GameEvent message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GameEvent message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GameEvent
+         */
+        public static fromObject(object: { [k: string]: any }): shared.GameEvent;
+
+        /**
+         * Creates a plain object from a GameEvent message. Also converts values to other types if specified.
+         * @param message GameEvent
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: shared.GameEvent, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GameEvent to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for GameEvent
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a GameStateInfo. */
+    interface IGameStateInfo {
+
+        /** GameStateInfo activePlayers */
+        activePlayers?: (number[]|null);
+
+        /** GameStateInfo eliminatedPlayers */
+        eliminatedPlayers?: (number[]|null);
+
+        /** GameStateInfo currentPhase */
+        currentPhase?: (string|null);
+
+        /** GameStateInfo isRebuilding */
+        isRebuilding?: (boolean|null);
+
+        /** GameStateInfo rebuildTimeRemaining */
+        rebuildTimeRemaining?: (number|Long|null);
+
+        /** GameStateInfo playerMapping */
+        playerMapping?: ({ [k: string]: number }|null);
+
+        /** GameStateInfo isGameOver */
+        isGameOver?: (boolean|null);
+
+        /** GameStateInfo winner */
+        winner?: (number|null);
+    }
+
+    /** Represents a GameStateInfo. */
+    class GameStateInfo implements IGameStateInfo {
+
+        /**
+         * Constructs a new GameStateInfo.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: shared.IGameStateInfo);
+
+        /** GameStateInfo activePlayers. */
+        public activePlayers: number[];
+
+        /** GameStateInfo eliminatedPlayers. */
+        public eliminatedPlayers: number[];
+
+        /** GameStateInfo currentPhase. */
+        public currentPhase: string;
+
+        /** GameStateInfo isRebuilding. */
+        public isRebuilding: boolean;
+
+        /** GameStateInfo rebuildTimeRemaining. */
+        public rebuildTimeRemaining: (number|Long);
+
+        /** GameStateInfo playerMapping. */
+        public playerMapping: { [k: string]: number };
+
+        /** GameStateInfo isGameOver. */
+        public isGameOver: boolean;
+
+        /** GameStateInfo winner. */
+        public winner: number;
+
+        /**
+         * Creates a new GameStateInfo instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GameStateInfo instance
+         */
+        public static create(properties?: shared.IGameStateInfo): shared.GameStateInfo;
+
+        /**
+         * Encodes the specified GameStateInfo message. Does not implicitly {@link shared.GameStateInfo.verify|verify} messages.
+         * @param message GameStateInfo message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: shared.IGameStateInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GameStateInfo message, length delimited. Does not implicitly {@link shared.GameStateInfo.verify|verify} messages.
+         * @param message GameStateInfo message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: shared.IGameStateInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GameStateInfo message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns GameStateInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.GameStateInfo;
+
+        /**
+         * Decodes a GameStateInfo message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns GameStateInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.GameStateInfo;
+
+        /**
+         * Verifies a GameStateInfo message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GameStateInfo message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GameStateInfo
+         */
+        public static fromObject(object: { [k: string]: any }): shared.GameStateInfo;
+
+        /**
+         * Creates a plain object from a GameStateInfo message. Also converts values to other types if specified.
+         * @param message GameStateInfo
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: shared.GameStateInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GameStateInfo to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for GameStateInfo
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     /** Properties of a MatchState. */
     interface IMatchState {
 
@@ -468,6 +740,12 @@ export namespace shared {
 
         /** MatchState stage */
         stage?: (number|null);
+
+        /** MatchState events */
+        events?: (shared.IGameEvent[]|null);
+
+        /** MatchState gameState */
+        gameState?: (shared.IGameStateInfo|null);
     }
 
     /** Represents a MatchState. */
@@ -499,6 +777,12 @@ export namespace shared {
 
         /** MatchState stage. */
         public stage: number;
+
+        /** MatchState events. */
+        public events: shared.IGameEvent[];
+
+        /** MatchState gameState. */
+        public gameState?: (shared.IGameStateInfo|null);
 
         /**
          * Creates a new MatchState instance using the specified properties.

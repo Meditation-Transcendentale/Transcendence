@@ -1,4 +1,4 @@
-import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4, Observer } from "@babylonImport";
+import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4, Observer, TransformNode } from "@babylonImport";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
 import earcut from "earcut";
@@ -20,17 +20,26 @@ export class BrickBreaker {
 	private lastTime: number = 0;
 	private cols: number;
 	private layers: number;
+	public root: TransformNode;
 
 	constructor(canvas: HTMLCanvasElement, scene: Scene) {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.engine = scene.getEngine() as Engine;
+		this.root = new TransformNode("pongbrRoot", this.scene);
+		this.root.position.set(2200, -3500, 3500);
+		//this.root.rotation.z -= 30.9000;
+		this.root.scaling.set(1, 1, 1);
 
 
-		this.setupCamera();
+
+		//this.setupCamera();
 		this.setupLight();
 		this.createArena();
 
+		this.camera = this.scene.getCameraByName("brick") as ArcRotateCamera;
+		this.camera.attachControl(this.canvas, true);
+		this.camera.parent = this.root
 		// const layers = Math.ceil((Math.random() * 5) + 1);
 		this.layers = 2;
 		this.cols = Math.ceil((Math.random() * 5) + 1);
@@ -38,7 +47,7 @@ export class BrickBreaker {
 
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
-		this.ball = new Ball(this.scene, ballMaterial);
+		this.ball = new Ball(this.scene, ballMaterial, this.root);
 		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
 
 		this.ball.updatePosition(0, 1);
@@ -97,14 +106,17 @@ export class BrickBreaker {
 		//this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 30, Vector3.Zero(), this.scene);
 		this.camera = this.scene.getCameraByName("brick") as ArcRotateCamera;
 		this.camera.attachControl(this.canvas, true);
+		this.camera.parent = this.root;
 	}
 
 	private setupLight() {
 		this.light = new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
+		this.light.parent = this.root;
 	}
 
 	private createArena() {
 		this.arena = MeshBuilder.CreateDisc("arena", { radius: 5, tessellation: 128 }, this.scene);
+		this.arena.parent = this.root;
 		const mat = new StandardMaterial("arenaMat", this.scene);
 		mat.diffuseColor.set(0.75, 0.75, 0.75);
 		mat.emissiveColor.set(0.75, 0.75, 0.75);
@@ -124,6 +136,7 @@ export class BrickBreaker {
 		}
 		const builder = new PolygonMeshBuilder("brick", points, this.scene, earcut);
 		const mesh = builder.build(true, 0.5);
+		mesh.parent = this.root;
 		mesh.position.y += 0.45;
 	}
 
@@ -154,6 +167,7 @@ export class BrickBreaker {
 
 				const builder = new PolygonMeshBuilder("brick", points, this.scene, earcut);
 				const mesh = builder.build(true, width);
+				mesh.parent = this.root;
 				mesh.position.y += 0.4;
 				bricksCols.push(mesh);
 			}
