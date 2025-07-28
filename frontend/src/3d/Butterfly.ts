@@ -79,7 +79,7 @@ export class Butterfly {
 		this.mesh.parent = this.root;
 
 		this.mesh.position.set(0, 0, 0);
-		this.mesh.scaling.setAll(0.13);
+		this.mesh.scaling.setAll(0.17);
 		this.mesh.material = this.material;
 		this.mesh.alwaysSelectAsActiveMesh = true;
 

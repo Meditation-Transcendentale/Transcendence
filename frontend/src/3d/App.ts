@@ -1,5 +1,5 @@
 
-import { Engine } from "@babylonImport";
+import { Engine, Matrix } from "@babylonImport";
 
 import { Environment } from "./Environment";
 import { Vue } from "../Vue";
@@ -38,8 +38,6 @@ class app3d {
 		window.addEventListener('resize', () => {
 			this.engine.resize(true);
 		})
-
-
 
 		this.environment = new Environment(this.engine, this.canvas);
 		//

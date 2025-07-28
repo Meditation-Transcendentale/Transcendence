@@ -19,7 +19,7 @@ export class Pipeline {
 		this.grassTexture = grassTexture;
 		this.ray = new Vector2(0, 0);
 
-		this.combine = new PostProcess("cloud", "combine", ["resolution"], ["cloudSampler", "grassSampler"], 1., this.camera);
+		this.combine = new PostProcess("cloud", "combine", ["resolution", "worldPos"], ["cloudSampler", "grassSampler"], 1., this.camera);
 		// this.combine.autoClear = false;
 		this.cloudTexture = new ProceduralTexture("cloud", 256, "cloud", this.scene);
 		this.combine.onApply = (effect) => {
@@ -57,5 +57,6 @@ export class Pipeline {
 		this.cloudTexture.setFloat('time', time);
 		this.cloudTexture.setFloat('ratio', window.innerWidth / window.innerHeight);
 		this.cloudTexture.setVector2("coord", this.ray);
+		this.cloudTexture.setVector3("worldPos", this.camera.position);
 	}
 }

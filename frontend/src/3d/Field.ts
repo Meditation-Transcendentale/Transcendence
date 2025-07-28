@@ -134,6 +134,8 @@ export class Field {
 		for (let i = 0; i < this.grass._tiles.length; i++) {
 			this.rt.renderList.push(this.grass._tiles[i]._mesh);
 		}
+
+		this.glowLayer.dispose();
 	}
 
 	public update(time: number, deltaTime: number) {
