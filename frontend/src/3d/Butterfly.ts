@@ -22,7 +22,7 @@ export class Butterfly {
 
 
 	private deltas!: Float32Array;
-	private n: number = 300;
+	private n: number = 100;
 
 	private speed = 0.8;
 
@@ -79,12 +79,12 @@ export class Butterfly {
 		this.mesh.parent = this.root;
 
 		this.mesh.position.set(0, 0, 0);
-		this.mesh.scaling.setAll(0.17);
+		this.mesh.scaling.setAll(0.4);
 		this.mesh.material = this.material;
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
 		this.mesh.setEnabled(false);
-		this.thinInstance(this.n, 16);
+		this.thinInstance(this.n, 30);
 		//this.octree.print();
 
 		// this.glowLayer.isEnabled = false;

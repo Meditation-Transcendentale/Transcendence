@@ -1,5 +1,10 @@
 @import url("font.css");
 
+::selection {
+	color: black !important;
+	background: White !important;
+}
+
 html,
 body {
 	width: 100%;
@@ -43,7 +48,9 @@ body {
 	--font-window-bar: bold small-caps 2vh de-valancia;
 	--font-window-content: de-valancia 2vh 100;
 	--font-readable: normal normal 2vh dotrice;
-	--font-speak: normal normal 3vh ydmyungjo;
+	/*--font-speak: normal normal 3vh ydmyungjo;*/
+	--font-speak: normal normal 3vh ptolemy;
+	--font-submit: normal normal 3vh ptolemy;
 
 	--input-on-color: white;
 	--input-on-background: blue;
@@ -281,7 +288,18 @@ input[on] {
 }
 
 .speak {
+	position: absolute;
+	width: fit-content;
+	height: fit-content;
 	font: var(--font-speak);
+
+	background-color: transparent;
+	color: white;
+	-webkit-text-stroke: 3px;
+	-webkit-text-stroke-color: black;
+	font-size: 10vh;
+	font-weight: bold;
+
 }
 
 .speak::before {
@@ -290,4 +308,26 @@ input[on] {
 
 .speak::after {
 	content: ">>";
+}
+
+.submit {
+	position: absolute;
+	width: fit-content;
+	height: fit-content;
+	font: var(--font-submit);
+
+	background-color: transparent;
+	color: white;
+	-webkit-text-stroke: 3px;
+	-webkit-text-stroke-color: black;
+	font-size: 10vh;
+	font-weight: bold;
+}
+
+.submit::before {
+	content: "[";
+}
+
+.submit::after {
+	content: "]";
 }

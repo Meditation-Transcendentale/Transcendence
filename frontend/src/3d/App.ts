@@ -3,6 +3,7 @@ import { Engine, Matrix } from "@babylonImport";
 
 import { Environment } from "./Environment";
 import { Vue } from "../Vue";
+import { css3dObject, CSSRenderer } from "./CSSRenderer";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -19,6 +20,8 @@ class app3d {
 
 	private vues: Map<string, Vue>;
 	private frame: number = 0;
+
+	private cssRenderer!: CSSRenderer;
 
 	constructor() {
 		console.log("eeeeee");
@@ -45,6 +48,7 @@ class app3d {
 
 		this.vues = new Map<string, Vue>;
 
+		this.cssRenderer = new CSSRenderer(this.environment.fieldCamera, this.engine.getRenderWidth(), this.engine.getRenderHeight());
 	}
 
 
@@ -56,6 +60,7 @@ class app3d {
 	public run() {
 		this.engine.runRenderLoop(() => {
 			this.environment.render();
+			this.cssRenderer.update();
 			this.updateVues();
 
 			this.fps.innerHTML = this.engine.getFps().toFixed();
@@ -93,9 +98,11 @@ class app3d {
 	}
 
 	public setVue(vue: string) {
-		if (!this.vues.has(vue)) {
-			this.vues.set(vue, this.environment.setVue(vue));
-		}
+		this.cssRenderer.dirty = true;
+		this.environment.setVue(vue);
+		//if (!this.vues.has(vue)) {
+		//	this.vues.set(vue, this.environment.setVue(vue));
+		//}
 	}
 
 	public getVue(vue: string): Vue | undefined {
@@ -104,6 +111,18 @@ class app3d {
 
 	public get scene() {
 		return this.environment.scene;
+	}
+
+	public addCSS3dObject(obj: css3dObject): number {
+		return this.cssRenderer.addObject(obj);
+	}
+
+	public setCSS3dObjectEnable(index: number, status: boolean) {
+		this.cssRenderer.setObjectEnable(index, status);
+	}
+
+	public onHoverEffect(status: number) {
+		this.environment.onHover(status);
 	}
 }
 

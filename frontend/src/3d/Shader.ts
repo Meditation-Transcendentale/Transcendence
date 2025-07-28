@@ -485,6 +485,8 @@ Effect.ShadersStore['combineFragmentShader'] = `
 	uniform sampler2D	cloudSampler;
 	uniform sampler2D	grassSampler;
 	uniform vec2		resolution;
+	uniform float		time;
+	uniform	float		noise;
 
 	varying vec2		vUV;
 
@@ -492,6 +494,11 @@ Effect.ShadersStore['combineFragmentShader'] = `
 	    0.0 / 4.0, 3.0 / 4.0,
 	    2.0 / 4.0, 1.0 / 4.0
 	);
+
+	float hash( float n )
+	{
+		return fract(sin(n)*43758.5453);
+	}
 
 	const mat4 M4 = (1.0 / 16.0) * mat4(
 	     0.0, 12.0,  3.0, 15.0,  // Column 0
@@ -513,7 +520,9 @@ Effect.ShadersStore['combineFragmentShader'] = `
 	
 	void main() {
 		vec4 cloud = texture2D(cloudSampler, vUV);
-		ivec2 n = ivec2(mod(floor(vUV * resolution * 0.5), 4.));
+		float f = (noise == 2. ? hash(time * 0.00001 + vUV.y) : 1.);
+
+		ivec2 n = ivec2(mod(floor(vUV * resolution * 0.5 * f), 4.));
 		float weight = M4[n.x][n.y]- 0.5;
 		cloud.rgb -= 0.3;
 		cloud.rgb = cloud.rgb + 0.9 * weight;
@@ -523,7 +532,8 @@ Effect.ShadersStore['combineFragmentShader'] = `
 		vec4 color = texture2D(textureSampler, vUV);
 		vec4 grass = texture2D(grassSampler, vUV);
 
-		n = ivec2(mod(floor(vUV * resolution), 4.));
+		f = (noise == 1. ? hash(time * 0.00001 + vUV.y) : 1.);
+		n = ivec2(mod(floor(vUV * resolution * f), 4.));
 		weight = M4[n.x][n.y]- 0.7;
 		grass.rgb = grass.rgb + 0.5 * weight;
 		grass.rgb = (grass.rgb - 0.5) * 3.9 + 0.5;
@@ -726,15 +736,15 @@ void main() {
 	// result = cloudcolour;
 	
 
-	red *= 0.3;
-	vec3 result = mix(skycolour, cloudcolour, clamp(f + c + red, 0.0, 1.0));
-	gl_FragColor = vec4( result, 1.0 );
+	//red *= 0.3;
+	//vec3 result = mix(skycolour, cloudcolour, clamp(f + c + red, 0.0, 1.0));
+	//gl_FragColor = vec4( result, 1.0 );
 
-	// red = max(0.,1. - red * 0.03);
-	// red = red * red * red;
-	//
-	// vec3 result = mix(skycolour, cloudcolour, clamp(f + c, 0.0, 1.0));
-	// gl_FragColor = vec4( result * red, 1.0 );
+	 red = max(0.,1. - red * 0.03);
+	 red = red * red * red;
+
+	 vec3 result = mix(skycolour, cloudcolour, clamp(f + c, 0.0, 1.0));
+	 gl_FragColor = vec4( result * red, 1.0 );
 }
 `
 
@@ -1273,7 +1283,9 @@ export class ButterflyMaterial extends CustomMaterial {
 		this.specularPower = 2;
 		// this.ambientColor = Color3.FromHexString("#c1121f")
 		this.diffuseColor = Color3.FromHexString("#03045e");
+		this.diffuseColor = Color3.FromHexString("#ffffff");
 		this.specularColor = Color3.FromHexString("#c1121f");
+		this.specularColor = Color3.FromHexString("#03045e");
 		this.backFaceCulling = false;
 	}
 

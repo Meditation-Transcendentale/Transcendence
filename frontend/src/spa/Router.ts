@@ -149,7 +149,7 @@ class RouterC {
 
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
 
-		// url.pathname = "/login";
+		//url.pathname = "/home";
 
 		this.routes.get(url.pathname)?.callback(url);
 		if (history) {

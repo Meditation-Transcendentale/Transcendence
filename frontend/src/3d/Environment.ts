@@ -36,7 +36,7 @@ export class Environment {
 
 	private updateHome: boolean = true;
 
-	private cameraDiv: HTMLDivElement;
+	//private cameraDiv: HTMLDivElement;
 	private perspective!: number;
 
 	private width: number;
@@ -85,10 +85,10 @@ export class Environment {
 		this.width = engine.getRenderWidth();
 		this.height = engine.getRenderHeight();
 
-		// const perspec = this.scene.getEngine().getRenderHeight() * 0.5 * cam!.getProjectionMatrix().m[5];
-		this.cameraDiv = document.querySelector("#camera") as HTMLDivElement;
-		this.cameraDiv.style.width = `${this.width}px`;
-		this.cameraDiv.style.height = `${this.height}px`;
+		//const perspec = this.scene.getEngine().getRenderHeight() * 0.5 * cam!.getProjectionMatrix().m[5];
+		//this.cameraDiv = document.querySelector("#camera") as HTMLDivElement;
+		//this.cameraDiv.style.width = `${this.width}px`;
+		//this.cameraDiv.style.height = `${this.height}px`;
 	}
 
 	private createMesh() {
@@ -144,8 +144,8 @@ export class Environment {
 		// pp.bloomScale = 0.25;
 
 		// Inspector.Show(this.scene, {});
-		this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
-		document.body.style.perspective = `${this.perspective}px`;
+		//this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
+		//document.body.style.perspective = `${this.perspective}px`;
 	}
 
 	public render() {
@@ -158,7 +158,7 @@ export class Environment {
 		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
-		this.updateCameraDiv();
+		//this.updateCameraDiv();
 	}
 
 	private updateCameraDiv() {
@@ -179,9 +179,16 @@ export class Environment {
 		this.scene.fogMode = Scene.FOGMODE_NONE;
 	}
 
-	public setVue(vue: string): Vue {
-		// return this.gears.setVue(vue);
-		return this.field.setVue(vue);
+	public setVue(vue: string) {
+		this.field.setVue(vue);
+	}
+
+	public get fieldCamera(): Camera {
+		return this.field.camera;
+	}
+
+	public onHover(status: number) {
+		this.field.onHover(status);
 	}
 
 	public dispose() {

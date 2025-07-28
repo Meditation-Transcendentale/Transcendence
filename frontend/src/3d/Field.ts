@@ -34,7 +34,7 @@ export class Field {
 	private butterfly: Butterfly;
 	private ground: Mesh;
 
-	private camera: FreeCamera;
+	public camera: FreeCamera;
 	private glowLayer: GlowLayer;
 
 	private cursor: Vector3;
@@ -57,10 +57,13 @@ export class Field {
 		this.grass = new Grass(this.scene, 20, this.cursor);
 		this.butterfly = new Butterfly(this.scene, this.cursorButterfly);
 
-		this.camera = new FreeCamera("fieldCamera", new Vector3(-2, 4, 3), this.scene, true);
+		this.camera = new FreeCamera("fieldCamera", new Vector3(0, 4, 40), this.scene, true);
+		this.camera.setTarget(new Vector3(0., 6, 30))
 		this.camera.rotation.y = Math.PI;
+		this.camera.attachControl();
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.intensity = 0.5;
+
 
 
 		//////
@@ -99,7 +102,7 @@ export class Field {
 
 		this.rt = new RenderTargetTexture("grass", { ratio: 0.5 }, this.scene);
 		this.rt.activeCamera = this.camera;
-		// this.rt.skipInitialClear = true;
+		//this.rt.skipInitialClear = true;
 		this.camera.layerMask = 0x0000FFFF;
 		this.scene.customRenderTargets = [];
 		this.scene.customRenderTargets.push(this.rt);
@@ -146,8 +149,13 @@ export class Field {
 		this.pipeline.update(time);
 	}
 
-	public setVue(vue: string): Vue {
-		const final = new Vue();
+	public onHover(status: number) {
+		//this.rt.skipInitialClear = status;
+		this.pipeline.hover = status;
+	}
+
+	public setVue(vue: string) {
+		//const final = new Vue();
 		switch (vue) {
 			// case 'play': {
 			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
@@ -156,14 +164,15 @@ export class Field {
 			// 	break;
 			// }
 			case 'home': {
-				final.init(this.camera);
-				// final.addWindow('play', {
-				// 	face: face,
-				// 	div: playdiv,
-				// 	matrix: this.test.getWorldMatrix(),
-				// 	onHoverCallback: (status: boolean) => { console.log("Hover:", status) }
+				this.camera.setTarget(new Vector3(0, 1, -10));
+				//final.init(this.camera);
+				//final.addWindow('play', {
+				//	face: face,
+				//	div: playdiv,
+				//	matrix: this.test.getWorldMatrix(),
+				//	onHoverCallback: (status: boolean) => { console.log("Hover:", status) }
 				//
-				// });
+				//});
 				// final.addWindow('info', this.cube1, this.vueBounding, Matrix.Identity());
 				// final.addWindow('stats', this.cube2, this.vueBounding, Matrix.Identity());
 				break;
@@ -174,17 +183,20 @@ export class Field {
 			// 	final.addWindow('br', this.cube1, this.vueBounding, Matrix.Identity());
 			// 	break;
 			// }
-			// case 'login': {
-			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
-			// 	final.addWindow('register', this.cube1, this.vueBounding, Matrix.Identity());
-			// 	break;
-			// }
-			// case 'register': {
-			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
-			// 	final.addWindow('login', this.cube0, this.vueBounding, Matrix.Identity());
-			//
-			// 	break;
-			// }
+			case 'login': {
+				this.camera.setTarget(new Vector3(0, 6, 30));
+				//final.init(this.camera);
+				// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
+				// 	final.addWindow('register', this.cube1, this.vueBounding, Matrix.Identity());
+				break;
+			}
+			case 'register': {
+				this.camera.setTarget(new Vector3(0, 4, 30))
+				//final.init(this.scene.getCameraByName('fieldCam') as Camera);
+				//final.addWindow('login', this.cube0, this.vueBounding, Matrix.Identity());
+
+				break;
+			}
 			// case 'test': {
 			// 	final.init(this.scene.getCameraByName('br') as Camera);
 			//
@@ -209,7 +221,7 @@ export class Field {
 			// }
 
 		}
-		return final;
+		//return final;
 	}
 
 }

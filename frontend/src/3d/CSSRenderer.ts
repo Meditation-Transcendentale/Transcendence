@@ -12,10 +12,12 @@ export class CSSRenderer {
 	public camera: Camera;
 	public width: number;
 	public height: number;
+	public dirty: boolean;
 
 	private cameraDiv: HTMLDivElement;
 	private perspective: number;
 	private objects: Array<css3dObject>;
+
 
 	constructor(camera: Camera, width: number, height: number) {
 		this.camera = camera;
@@ -30,6 +32,7 @@ export class CSSRenderer {
 
 		this.perspective = this.height * 0.5 * this.camera.getProjectionMatrix().m[5];
 		document.body.style.perspective = `${this.perspective}px`;
+		this.dirty = true;
 	}
 
 	public addObject(obj: css3dObject): number {
@@ -44,12 +47,15 @@ export class CSSRenderer {
 	}
 
 	public update() {
+		if (!this.camera.hasMoved && !this.dirty) { return; }
 		this.updateCameraDiv();
 		for (let i = 0; i < this.objects.length; i++) {
 			if (this.objects[i].enable) {
 				this.updateObject(this.objects[i]);
 			}
 		}
+		this.dirty = false;
+		//console.log("cssRender");
 	}
 
 	private updateCameraDiv() {
@@ -62,14 +68,20 @@ export class CSSRenderer {
 	private updateObject(obj: css3dObject) {
 		const world = this.camera.getWorldMatrix().m;
 		const m = obj.world.m;
-		const scaleX = 0.01 / obj.width;
-		const scaleY = 0.01 / obj.height;
+		const scaleX = 0.01 / obj.height;
+		const scaleY = 0.01 / obj.width;
 
 		obj.html.style.transform = `translate(-50%, -50%) matrix3d(${m[0] * scaleX}, ${m[1]}, ${m[2] * scaleX}, ${m[3]}, ${-m[4]}, ${-m[5] * scaleY}, ${-m[6]}, ${-m[7]}, ${m[8]}, ${m[9]}, ${m[10]}, ${m[11]}, ${-world[12] + m[12]}, ${-world[13] + m[13]}, ${world[14] - m[14]}, ${world[15] * 0.00001})`;
 	}
 
 	public setObjectEnable(index: number, status: boolean) {
 		if (index < 0 || index > this.objects.length) { return; }
+		if (!this.objects[index].enable && status) {
+			this.cameraDiv.appendChild(this.objects[index].html);
+			this.dirty = true;
+		} else if (this.objects[index].enable && !status) {
+			this.objects[index].html.remove();
+		}
 		this.objects[index].enable = status;
 	}
 }
