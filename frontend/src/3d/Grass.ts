@@ -174,10 +174,10 @@ export class Grass {
 		this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(-size * 6, 0, -size * 5)), this._size * 2, this._size * 2));
 
 
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
+		// this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
+		// this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
+		// this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
+		// this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
 		//
 		//
 		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, 0, 20)), this._size, this._size));

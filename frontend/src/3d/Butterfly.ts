@@ -83,6 +83,7 @@ export class Butterfly {
 		this.mesh.material = this.material;
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
+		this.mesh.setEnabled(false);
 		this.thinInstance(this.n, 16);
 		//this.octree.print();
 

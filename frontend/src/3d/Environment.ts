@@ -130,7 +130,7 @@ export class Environment {
 			mesh.receiveShadows = true;
 		})
 
-		this.scene.fogMode = Scene.FOGMODE_LINEAR;
+		this.scene.fogMode = Scene.FOGMODE_NONE;
 		this.scene.fogDensity = 0.2;
 		this.scene.fogStart = 100;
 		this.scene.fogEnd = 120;

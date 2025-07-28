@@ -558,6 +558,7 @@ Effect.ShadersStore["sharpenFragmentShader"] = `
 		sum += -1. * texture2D(textureSampler, vUV + vec2( LENGTH * dx , 0.0 ));
 		
 		gl_FragColor = sum;
+		gl_FragColor.a = 1.;
 	}
 `
 
@@ -646,6 +647,7 @@ float fbm(vec2 n) {
 
 void main() {
 	vec2 v = vUV * 2. - 1.;
+	v.y = v.y + 0.1;
 	vec2 p2 = coord + v.yx * vec2(-0.4, -ratio * 0.4);
 	vec2 p = vec2(cos(p2.y), sin(p2.y)) * sin(p2.x);
 	float red = 0.1 / max(cos(p2.x), 0.001);
@@ -716,19 +718,23 @@ void main() {
     c += c1;
     
     vec3 skycolour = mix(skycolour2, skycolour1, 1.);
-    vec3 cloudcolour = vec3(1.1, 1.1, 0.9) * clamp((clouddark + cloudlight*c), 0.0, 1.0);
+    vec3 cloudcolour = vec3(1.1, 0.9, 0.9) * clamp((clouddark + cloudlight*c), 0.0, 1.0);
    
     f = cloudcover + cloudalpha*f*r;
     
-    vec3 result = mix(skycolour, clamp(skytint * skycolour + cloudcolour, 0.0, 1.0), clamp(f + c, 0.0, 1.0));
+    // vec3 result = mix(skycolour, clamp(skytint * skycolour + cloudcolour, 0.0, 1.0), clamp(f + c, 0.0, 1.0));
+	// result = cloudcolour;
 	
-	red = max(0.,1. - red * 0.03);
-	red = red * red * red;
-	gl_FragColor = vec4( result * red, 1.0 );
-	// gl_FragColor.rgb = 1. - gl_FragColor.rgb;
-	// gl_FragColor.r = j.x;
-	// gl_FragColor.g = j.y;
-	// gl_FragColor.b = 0.;
+
+	red *= 0.3;
+	vec3 result = mix(skycolour, cloudcolour, clamp(f + c + red, 0.0, 1.0));
+	gl_FragColor = vec4( result, 1.0 );
+
+	// red = max(0.,1. - red * 0.03);
+	// red = red * red * red;
+	//
+	// vec3 result = mix(skycolour, cloudcolour, clamp(f + c, 0.0, 1.0));
+	// gl_FragColor = vec4( result * red, 1.0 );
 }
 `
 
