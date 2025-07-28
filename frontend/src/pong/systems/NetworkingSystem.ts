@@ -1,5 +1,5 @@
 
-import { Vector3, Matrix } from "@babylonImport";
+import { Vector3, Matrix, Lerp } from "@babylonImport";
 // src/systems/NetworkingSystem.ts
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
@@ -42,7 +42,7 @@ export class NetworkingSystem extends System {
 
 		const now = performance.now();
 
-		console.log("called");
+		// console.log("called");
 		messages.forEach((raw: ArrayBuffer) => {
 			let serverMsg: userinterface.ServerMessage;
 			try {
@@ -60,7 +60,7 @@ export class NetworkingSystem extends System {
 				const paddles = state.paddles ?? [];
 				const score = state.score ?? [];
 				// 1. Ball updates
-				console.log(balls);
+				// console.log(balls);
 				balls.forEach(b => {
 					const e = entities.find(e =>
 						e.hasComponent(BallComponent) &&
@@ -118,6 +118,12 @@ export class NetworkingSystem extends System {
 						if (inputComp.gameMode === "online" && !inputComp.isLocal) {
 							paddleComp.offset = p.offset;
 						}
+
+						paddleComp.serverOffset = p.offset;
+						if (paddleComp.id == 2 || paddleComp.id == 3)
+							paddleComp.offset = p.offset;
+
+						
 
 						const tf = e.getComponent(TransformComponent)!;
 						const rot = tf.rotation;
