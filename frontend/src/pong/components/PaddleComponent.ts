@@ -5,6 +5,7 @@ export class PaddleComponent implements Component {
 	public position: Vector3;
 	public id: number;
 	public offset: number;
+	public serverOffset: number;
 	public move: number;
 	public lastMove: number;
 	// public displayAsWall: boolean;
@@ -15,6 +16,7 @@ export class PaddleComponent implements Component {
 		this.move = 0;
 		this.lastMove = 0;
 		this.position = position;
+		this.serverOffset = 0;
 		// this.displayAsWall = displayAsWall;
 	}
 }

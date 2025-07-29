@@ -23,6 +23,8 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 	ecs.addEntity(scoreUI);
 
 	for (let i = 0; i < 4; i++) {
+		if (i == 2 || i == 3)
+			continue;
 		const paddleEntity = new Entity();
 		const posX = config.arenaSizeX / 2 / 10 * 9;
 		const x = i % 2 ? -posX : posX;
