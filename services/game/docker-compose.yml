@@ -16,6 +16,8 @@ services:
     depends_on:
       - nats
     command: npm run dev
+    networks:
+      - transcendence-network
     environment:
       - NATS_URL=nats://nats:4222
       - PORT=5001
@@ -120,3 +122,6 @@ services:
       - NATS_URL=nats://nats:4222
     depends_on:
       - nats
+
+
+

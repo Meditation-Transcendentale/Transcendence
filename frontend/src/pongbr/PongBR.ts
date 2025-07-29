@@ -45,14 +45,13 @@ export class PongBR {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.inited = false;
+		this.pongRoot = this.scene.getTransformNodeByName('pongbrRoot') as TransformNode;
 	}
 
 	public async init() {
 		console.log("INIT");
-		this.pongRoot = new TransformNode("pongbrRoot", this.scene);
-		this.pongRoot.position.set(-2200, -3500, -3500);
-		this.pongRoot.rotation.z -= 30.9000;
-		this.pongRoot.scaling.set(1, 1, 1);
+		const arena = this.scene.getMeshByName('arenaBox') as Mesh;
+		arena.parent = this.pongRoot;
 
 		this.rotatingContainer = new TransformNode("rotatingContainer", this.scene);
 		this.rotatingContainer.parent = this.pongRoot;
@@ -65,7 +64,7 @@ export class PongBR {
 		this.camera.beta = Math.PI / 2.1;
 		this.camera.radius = 300;
 
-		this.baseMeshes = createBaseMeshes(this.scene, this.pongRoot);
+		this.baseMeshes = createBaseMeshes(this.scene, this.rotatingContainer);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
 		const statue = this.scene.getMeshByName('Version NoSmile.006') as Mesh;
@@ -75,8 +74,8 @@ export class PongBR {
 		statue.scaling.setAll(70);
 
 		this.inputManager = new InputManager();
-		localPaddleId = 5;
-		this.initECS(this.instanceManagers, this.pongRoot);
+		localPaddleId = 0;
+		this.initECS(this.instanceManagers, this.rotatingContainer);
 
 		this.stateManager = new StateManager(this.ecs);
 		this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
@@ -163,8 +162,8 @@ export class PongBR {
 			paddle: new ThinInstanceManager(baseMeshes.paddle, 100, 50, 100),
 			wall: new ThinInstanceManager(baseMeshes.wall, 100, 50, 100),
 			portal: new ThinInstanceManager(baseMeshes.portal, 4, 50, 100),
-			pillar: new ThinInstanceManager(baseMeshes.pillar, /* capacity */ 200, 50, 100),
-			goal: new ThinInstanceManager(baseMeshes.goal,   /* capacity */ 100, 50, 100),
+			pillar: new ThinInstanceManager(baseMeshes.pillar, 200, 50, 100),
+			goal: new ThinInstanceManager(baseMeshes.goal, 100, 50, 100),
 		}
 	}
 
@@ -186,8 +185,6 @@ export class PongBR {
 	}
 
 	public transitionToRound(nextCount: number, entities: Entity[], physicsState?: any, playerMapping?: Record<number, number>) {
-		console.log(`🎮 Starting visual transition to ${nextCount} players (full arena rebuild)`);
-
 		const eliminatedPlayerIds = new Set<number>();
 		const activePlayers = new Set<number>();
 
@@ -199,8 +196,6 @@ export class PongBR {
 					activePlayers.add(p.playerId);
 				}
 			});
-			console.log(`🪦 Found eliminated players:`, Array.from(eliminatedPlayerIds));
-			console.log(`✅ Found active players:`, Array.from(activePlayers));
 		}
 
 		const cfg = { arenaRadius: 100, wallWidth: 1, paddleHeight: 1, paddleDepth: 1, goalDepth: 1 };
@@ -216,7 +211,6 @@ export class PongBR {
 			transform.baseScale = new Vector3(25 / nextCount, 25 / nextCount, 25 / nextCount);
 		}
 
-		console.log(`🗑️  Removing all ${this.paddleBundles.length} existing paddle bundles`);
 		this.paddleBundles.forEach(b => {
 			this.ecs.removeEntity(b.paddle);
 			this.ecs.removeEntity(b.goal);
@@ -234,13 +228,7 @@ export class PongBR {
 			transform?.disable();
 		}
 
-		console.log(`🏗️  Building new arena for ${nextCount} players`);
-		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.pongRoot);
-
-		console.log(`✅ New arena contains ${nextCount} active player positions - no eliminated player states to apply`);
-
-		console.log(`✅ Arena rebuild complete: ${this.paddleBundles.length} paddle bundles created`);
-
+		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer);
 	}
 
 

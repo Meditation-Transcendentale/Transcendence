@@ -83,8 +83,10 @@ export function buildPaddles(
 		paddle.addComponent(
 			new PaddleComponent(i, Vector3.Zero(), 0, maxOffset, paddleRotY, playerCount / 4)
 		);
-		if (i == 0)
+		if (i == 0) {
 			paddle.addComponent(new InputComponent(true));
+			pongRoot.rotation.y = -paddleRotY;
+		}
 		else
 			paddle.addComponent(new InputComponent(false));
 		paddle.addComponent(
