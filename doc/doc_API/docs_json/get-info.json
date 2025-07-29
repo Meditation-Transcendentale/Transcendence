@@ -92,7 +92,7 @@
                 }
             }
         },
-		"/info/:username": {
+		"/info/username/:username": {
 			"get": {
 				"summary": "Retrieve User Information by Username",
 				"tags": ["Get Info"],
@@ -199,6 +199,70 @@
 									"type": "object",
 									"properties": {
 										"message": { "type": "string", "example": "Player is not in a game or a lobby" }
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "Server error." }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/info/uuid/:uuid": {
+			"get": {
+				"summary": "Retrieve Username by UUID",
+				"tags": ["Get Info"],
+				"description": "Retrieve Username by UUID",
+				"parameters": [
+					{
+						"name": "uuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved username",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"userInfo": {
+											"type": "object",
+											"properties": {
+												"username": { "type": "string", "example": "User1234"}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "User not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": { "type": "string", "example": "User not found." }
 									}
 								}
 							}

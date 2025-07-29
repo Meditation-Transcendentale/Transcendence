@@ -92,7 +92,7 @@ app.get('/me', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send( {userInfo: userInfo});
 }));
 
-app.get('/:username', handleErrors(async (req, res) => {
+app.get('/username/:username', handleErrors(async (req, res) => {
 
 	const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
 
@@ -113,6 +113,19 @@ app.get('/status', handleErrors(async (req, res) => {
 
 	res.code(statusCode.SUCCESS).send({ status: status.status });
 
+}));
+
+app.get('/uuid/:uuid', handleErrors(async (req, res) => {
+
+	if (!req.params.uuid) {
+		return res.code(statusCode.BAD_REQUEST).send({ message: returnMessages.UUID_REQUIRED });
+	}
+	const user = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: req.params.uuid });
+	if (!user) {
+		return res.code(statusCode.NOT_FOUND).send({ message: returnMessages.USER_NOT_FOUND });
+	}
+
+	res.code(statusCode.SUCCESS).send({ username: user.username });
 }));
 
 app.get('/health', (req, res) => {
