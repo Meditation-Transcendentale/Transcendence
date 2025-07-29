@@ -24,6 +24,7 @@ services:
       # - ./lobby-manager/test:/app/test
       - ./services/game/lobby-manager/package.json:/app/package.json
       - ./services/game/lobby-manager/.env.example:/app/.env
+      - ./services/user/shared:/usr/src/app/shared
       - ./shared/certs:/app/certs:ro
 
     depends_on:
