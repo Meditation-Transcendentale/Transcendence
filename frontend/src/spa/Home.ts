@@ -59,6 +59,10 @@ class Home {
 			enable: false
 		})
 
+		this.ref.play.html.addEventListener("click", () => {
+			Router.nav("/play");
+		})
+
 
 
 

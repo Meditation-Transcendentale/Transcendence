@@ -1,3 +1,4 @@
+import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
 //import { playVue } from "../Vue";
 import { getRequest, postRequest } from "./requests";
@@ -109,8 +110,11 @@ const lr: listResp = {
 
 
 interface playHtmlReference {
-	create: HTMLDivElement;
-	join: HTMLDivElement;
+	switch: { html: HTMLDivElement, id: number },
+	swCreate: HTMLInputElement,
+	swJoin: HTMLInputElement
+	join: { html: HTMLDivElement, id: number },
+	create: { html: HTMLDivElement, id: number },
 	brMod: HTMLInputElement;
 	tournamentMod: HTMLInputElement;
 	defaultMap: HTMLInputElement;
@@ -147,6 +151,7 @@ interface listResp {
 
 export default class Play {
 	private div: HTMLDivElement;
+	private css: HTMLLinkElement;
 	private ref: playHtmlReference;
 	private state: playState;
 
@@ -160,9 +165,13 @@ export default class Play {
 		this.div = div;
 		console.log(div.id);
 
+		this.css = div.querySelector("link") as HTMLLinkElement;
 		this.ref = {
-			create: div.querySelector('#play-create') as HTMLDivElement,
-			join: div.querySelector("#play-join") as HTMLDivElement,
+			switch: { html: div.querySelector("#play-switch") as HTMLDivElement, id: -1 },
+			swCreate: div.querySelector("#create-switch") as HTMLInputElement,
+			swJoin: div.querySelector("#join-switch") as HTMLInputElement,
+			create: { html: div.querySelector("#play-create") as HTMLDivElement, id: -1 },
+			join: { html: div.querySelector("#play-join") as HTMLDivElement, id: -1 },
 			brMod: div.querySelector("#br-mod") as HTMLInputElement,
 			tournamentMod: div.querySelector("#tournament-mod") as HTMLInputElement,
 			defaultMap: div.querySelector("#default-map") as HTMLInputElement,
@@ -175,17 +184,58 @@ export default class Play {
 			joinId: div.querySelector("#join-id") as HTMLInputElement,
 		}
 
-		console.log("brmod: ", this.ref.brMod);
 
+		//console.log("brmod: ", this.ref.brMod);
+		//
 		this.createState = {
 			mod: null,
 			map: null,
 		}
-
+		//
 		this.state = playState.create;
-		this.ref.create.remove();
-		this.ref.join.remove();
 
+		this.ref.switch.id = App3D.addCSS3dObject({
+			html: this.ref.switch.html,
+			width: 1.2,
+			height: 1.2,
+			world: Matrix.RotationY(Math.PI * 1.2).multiply(Matrix.Translation(-17, 3, 25)),
+			enable: false
+		})
+		this.ref.create.id = App3D.addCSS3dObject({
+			html: this.ref.create.html,
+			width: 1.,
+			height: 1.,
+			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-22, 2, 23)),
+			enable: false
+		})
+		this.ref.join.id = App3D.addCSS3dObject({
+			html: this.ref.join.html,
+			width: 1.,
+			height: 1.,
+			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-23, 3, 23)),
+			enable: false
+		})
+
+
+		this.ref.swJoin.toggleAttribute("down");
+		this.ref.swCreate.addEventListener("click", () => {
+			App3D.setCSS3dObjectEnable(this.ref.create.id, true);
+			App3D.setCSS3dObjectEnable(this.ref.join.id, false);
+			this.ref.swJoin.toggleAttribute("down", true);
+			this.ref.swCreate.toggleAttribute("down", false);
+			this.state = playState.create;
+		})
+		this.ref.swJoin.addEventListener("click", () => {
+			App3D.setCSS3dObjectEnable(this.ref.create.id, false);
+			App3D.setCSS3dObjectEnable(this.ref.join.id, true);
+			this.ref.swJoin.toggleAttribute("down", false);
+			this.ref.swCreate.toggleAttribute("down", true);
+			this.state = playState.join;
+		})
+
+		//this.ref.create.remove();
+		//this.ref.join.remove();
+		//
 		this.ref.createWin.toggleAttribute("off");
 
 
@@ -267,7 +317,7 @@ export default class Play {
 
 		//this.ref.smod.toggleAttribute('off');
 		//this.ref.createBtn.toggleAttribute('off');
-
+		//
 		//
 		//this.ref.modPong.addEventListener('click', () => {
 		//	this.ref.modPong.toggleAttribute('ok');
@@ -346,10 +396,10 @@ export default class Play {
 		//	}
 		//
 		//})
-
-
-
-
+		//
+		//
+		//
+		//
 		//this.ref = {
 		//	mod: div.querySelector("#play-mod") as HTMLSelectElement,
 		//	map: div.querySelector("#play-map") as HTMLSelectElement,
@@ -361,19 +411,19 @@ export default class Play {
 		//	list: div.querySelector("#play-list") as HTMLDivElement
 		//}
 
-		App3D.setVue('play');
-		const playVue = App3D.getVue('play');
-		playVue.windowAddEvent('create', 'click', () => {
-			this.ref.join.remove();
-			this.div.appendChild(this.ref.create);
-			this.state = playState.create;
-		})
-
-		playVue.windowAddEvent('join', 'click', () => {
-			this.ref.create.remove();
-			this.div.appendChild(this.ref.join);
-			this.state = playState.join;
-		})
+		//App3D.setVue('play');
+		//const playVue = App3D.getVue('play');
+		//playVue.windowAddEvent('create', 'click', () => {
+		//	this.ref.join.remove();
+		//	this.div.appendChild(this.ref.create);
+		//	this.state = playState.create;
+		//})
+		//
+		//playVue.windowAddEvent('join', 'click', () => {
+		//	this.ref.create.remove();
+		//	this.div.appendChild(this.ref.join);
+		//	this.state = playState.join;
+		//})
 
 
 		//this.ref.mod.addEventListener("change", () => {
@@ -414,29 +464,35 @@ export default class Play {
 	}
 
 	public load(params: URLSearchParams) {
-		App3D.loadVue('play');
+		App3D.setVue("play");
+		App3D.setCSS3dObjectEnable(this.ref.switch.id, true);
+		//App3D.loadVue('play');
 		switch (this.state) {
 			case playState.create: {
-				this.div.appendChild(this.ref.create);
+				App3D.setCSS3dObjectEnable(this.ref.create.id, true);
 				break;
 			}
 			case playState.join: {
-				this.div.appendChild(this.ref.join);
+				App3D.setCSS3dObjectEnable(this.ref.join.id, true);
 				break;
 			}
-
 		}
-		this.parseListResp(lr);
-		if (User.status?.lobby) {
-			Router.nav(`/lobby?id=${User.status.lobby}`, false, false);
-		}
-		//this.ref.join.disabled = true;
-		document.querySelector("#main-container")?.appendChild(this.div);
+		document.body.appendChild(this.css);
+		//this.parseListResp(lr);
+		//if (User.status?.lobby) {
+		//	Router.nav(`/lobby?id=${User.status.lobby}`, false, false);
+		//}
+		////this.ref.join.disabled = true;
+		//document.querySelector("#main-container")?.appendChild(this.div);
 	}
 
 	public async unload() {
-		App3D.unloadVue('play');
-		this.div.remove();
+		App3D.setCSS3dObjectEnable(this.ref.switch.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.create.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.join.id, false);
+		this.css.remove();
+		//App3D.unloadVue('play');
+		//this.div.remove();
 	}
 
 	async postRequest(path: string, body: {}): Promise<JSON> {

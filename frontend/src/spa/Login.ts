@@ -114,16 +114,16 @@ class Login {
 			world: Matrix.RotationY(Math.PI * 0.9).multiply(Matrix.Translation(-5, 6, 30)),
 			enable: false
 		})
-		this.ref.swRegister.toggleAttribute("of", true)
+		this.ref.swRegister.toggleAttribute("down", true)
 		this.ref.swLogin.addEventListener("click", () => {
 			App3D.setVue("login");
-			this.ref.swLogin.toggleAttribute("of", false);
-			this.ref.swRegister.toggleAttribute("of", true);
+			this.ref.swLogin.toggleAttribute("down", false);
+			this.ref.swRegister.toggleAttribute("down", true);
 		})
 		this.ref.swRegister.addEventListener("click", () => {
 			App3D.setVue("register");
-			this.ref.swLogin.toggleAttribute("of", true);
-			this.ref.swRegister.toggleAttribute("of", false);
+			this.ref.swLogin.toggleAttribute("down", true);
+			this.ref.swRegister.toggleAttribute("down", false);
 		})
 
 
