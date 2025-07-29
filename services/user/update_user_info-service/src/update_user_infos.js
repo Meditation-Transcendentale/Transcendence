@@ -18,7 +18,7 @@ import { natsRequest } from "../../shared/natsRequest.mjs";
 dotenv.config({ path: "../../../../.env" });
 
 const app = Fastify({
-	// logger: true,
+	logger: true,
 	https: {
 		key: fs.readFileSync(process.env.SSL_KEY),
 		cert: fs.readFileSync(process.env.SSL_CERT)
@@ -183,7 +183,7 @@ app.patch('/avatar', handleErrors(async (req, res) => {
 
 	const cdnPath = await getAvatarCdnUrl(avatar, user.uuid);
 
-	await natsRequest(nats, jc, 'user.updateAvatar', { cdnPath, userId: user.id });
+	await natsRequest(nats, jc, 'user.updateAvatar', { avatar: cdnPath, userId: user.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.AVATAR_UPDATED, data: { cdnPath }});
 

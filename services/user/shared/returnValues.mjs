@@ -67,6 +67,7 @@ const returnMessages = {
 	AVATAR_REQUIRED: 'No avatar file provided',
 	AVATAR_UPDATED: 'Avatar updated successfully',
 	INVALID_TYPE: 'Invalid image type',
+	UUID_REQUIRED: 'UUID is required',
 
 }
 
