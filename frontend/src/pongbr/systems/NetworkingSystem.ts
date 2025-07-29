@@ -8,7 +8,7 @@ import { WebSocketManager } from "../network/WebSocketManager.js";
 import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { WallComponent } from "../components/WallComponent.js";
-import { PongBR } from "../PongBR.js";
+import { localPaddleId, PongBR } from "../PongBR.js";
 import { PhaseState, PhaseTransitionEvent, RebuildCompleteEvent, GameStateInfo } from "../state/PhaseState.js";
 
 export class NetworkingSystem extends System {
@@ -154,10 +154,13 @@ export class NetworkingSystem extends System {
 					else {
 
 						const paddleComp = e.getComponent(PaddleComponent)!;
-						paddleComp.offset = p.offset as number;
+						if (p.id != localPaddleId)
+							paddleComp.offset = p.offset as number;
+						else {
+							paddleComp.serverOffset = p.offset as number;
 
-						const transform = e.getComponent(TransformComponent)!;
-						transform.rotation.y = paddleComp.baseRotation + p.offset;
+						}
+
 						paddle?.enable();
 						wall?.disable();
 					}
