@@ -24,13 +24,20 @@ services:
       # - ./lobby-manager/test:/app/test
       - ./services/game/lobby-manager/package.json:/app/package.json
       - ./services/game/lobby-manager/.env.example:/app/.env
-      - ./shared/certs:/usr/src/app/certs:ro
+      - ./shared/certs:/app/certs:ro
+
     depends_on:
-      - nats_game
+      nats_game:
+        condition: service_started
+      database_certs-init:
+        condition: service_completed_successfully
     command: npm run dev
     environment:
       - NATS_URL=${NATS_GAME_URL}
       - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - PORT=5001
     ports:
       - "5001:5001"

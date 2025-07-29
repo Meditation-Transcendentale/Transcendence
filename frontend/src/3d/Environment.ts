@@ -15,6 +15,7 @@ import {
 	Vector3,
 	Inspector,
 	UniversalCamera,
+	TransformNode,
 	LoadAssetContainerAsync
 } from "@babylonImport";
 import { Field } from "./Field";
@@ -32,6 +33,7 @@ export class Environment {
 	private lastTime: number;
 	private deltaTime: number;
 	private frame: number;
+	private pongRoot: TransformNode;
 
 	private gears!: Gears;
 
@@ -82,10 +84,15 @@ export class Environment {
 	}
 
 	private createMesh() {
+		this.pongRoot = new TransformNode("pongbrRoot", this.scene);
+		this.pongRoot.position.set(-2200, -3500, -3500);
+		this.pongRoot.rotation.z -= 30.9000;
+		this.pongRoot.scaling.set(1, 1, 1);
 		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 1, tessellation: 128 }, this.scene);
-		arenaMesh.position = new Vector3(-2200, -3500, -3500);
-		//arenaMesh.rotation.x += Math.PI / 2;
-		arenaMesh.rotation.z -= 30.9000;
+		arenaMesh.parent = this.pongRoot;
+		//arenaMesh.position = new Vector3(-2200, -3500, -3500);
+		////arenaMesh.rotation.x += Math.PI / 2;
+		//arenaMesh.rotation.z -= 30.9000;
 		const material = new StandardMaterial("arenaMaterial", this.scene);
 		material.diffuseColor.set(0, 0, 0);
 		material.specularColor.set(0, 0, 0);
@@ -98,6 +105,7 @@ export class Environment {
 		fresnel.power = 15;
 		material.emissiveFresnelParameters = fresnel;
 		arenaMesh.material = material;
+
 	}
 	public async init() {
 
@@ -109,7 +117,7 @@ export class Environment {
 		this.camera_pong = new ArcRotateCamera('pong', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
 		loaded.addAllToScene();
-		//loaded.meshes[1].setEnabled(false);
+		loaded.meshes[1].parent = this.pongRoot;
 
 
 		//this.scene.debugLayer.show();

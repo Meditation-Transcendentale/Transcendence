@@ -60,7 +60,7 @@ export class NetworkingSystem extends System {
 				const stage = state.stage;
 				const events = state.events ?? [];
 				const gameState = state.gameState as GameStateInfo;
-				
+
 				this.currentPhysicsState = { balls, paddles, stage, events, gameState };
 
 				if (gameState) {
@@ -127,7 +127,7 @@ export class NetworkingSystem extends System {
 						e.hasComponent(PaddleComponent) &&
 						e.getComponent(PaddleComponent)!.paddleIndex === p.id
 					);
-					
+
 					if (!e) {
 						e = entities.find(e =>
 							e.hasComponent(PaddleComponent) &&
@@ -154,7 +154,7 @@ export class NetworkingSystem extends System {
 					else {
 
 						const paddleComp = e.getComponent(PaddleComponent)!;
-						paddleComp.offset = p.offset as number; // update direction
+						paddleComp.offset = p.offset as number;
 
 						const transform = e.getComponent(TransformComponent)!;
 						transform.rotation.y = paddleComp.baseRotation + p.offset;
@@ -174,4 +174,5 @@ export class NetworkingSystem extends System {
 			}
 		});
 	}
+
 }

@@ -44,7 +44,6 @@ export class InputSystem extends System {
 			const paddle = entity.getComponent(PaddleComponent)!;
 			const transform = entity.getComponent(TransformComponent)!;
 
-			let offsetChange = 0;
 			const leftPressed = this.inputManager.isKeyPressed("KeyA");
 			const rightPressed = this.inputManager.isKeyPressed("KeyD");
 
