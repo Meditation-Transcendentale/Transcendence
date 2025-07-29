@@ -2,6 +2,7 @@ import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
 import { Vector3 } from "@babylonImport";
+import { PaddleComponent } from "../components/PaddleComponent.js";
 
 export class MovementSystem extends System {
 
@@ -31,6 +32,22 @@ export class MovementSystem extends System {
 						ball.position.copyFrom(corrected);
 					} else if (dist > 1) {
 						ball.position.copyFrom(ball.serverPosition);
+					}
+				}
+			}
+
+			if (entity.hasComponent(PaddleComponent)){
+				const paddle = entity.getComponent(PaddleComponent)!;
+				if (paddle.id == 0){
+					const dist = Math.abs(paddle.offset - paddle.serverOffset);
+					if (dist > 0) {
+						console.log("dist", dist);
+						if (dist >= 0.3){
+							paddle.offset = paddle.serverOffset;
+						} else {
+							const corrected = (1 - 0.3) * paddle.offset + 0.3 * paddle.serverOffset;
+							paddle.offset = corrected;
+						}
 					}
 				}
 			}

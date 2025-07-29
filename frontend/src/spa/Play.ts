@@ -298,7 +298,7 @@ export default class Play {
 
 		this.ref.createBtn.addEventListener("click", () => {
 			console.log(`create game-> mod:${this.createState.mod}, map:${this.createState.map}`)
-			this.postRequest("lobby/create", {
+			postRequest("lobby/create", {
 				mode: this.createState.mod,
 				map: this.createState.map
 			})
@@ -495,37 +495,37 @@ export default class Play {
 		//this.div.remove();
 	}
 
-	async postRequest(path: string, body: {}): Promise<JSON> {
-		const response = await fetch(`http://${this.gameIP}:5001/${path}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(body)
+	//async postRequest(path: string, body: {}): Promise<JSON> {
+	//	const response = await fetch(`https://${this.gameIP}:5001/${path}`, {
+	//		method: 'POST',
+	//		headers: {
+	//			'Content-Type': 'application/json'
+	//		},
+	//		body: JSON.stringify(body)
+	//
+	//	});
+	//
+	//	if (!response.ok) {
+	//		return Promise.reject(response);
+	//	}
+	//
+	//	return response.json();
+	//}
 
-		});
-
-		if (!response.ok) {
-			return Promise.reject(response);
-		}
-
-		return response.json();
-	}
-
-	async getRequest(path: string): Promise<JSON> {
-		const response = await fetch(`http://${this.gameIP}:5001/${path}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-		});
-
-		if (!response.ok) {
-			return Promise.reject(response);
-		}
-
-		return response.json();
-	}
+	//async getRequest(path: string): Promise<JSON> {
+	//	const response = await fetch(`https://${this.gameIP}:5001/${path}`, {
+	//		method: 'GET',
+	//		headers: {
+	//			'Content-Type': 'application/json'
+	//		},
+	//	});
+	//
+	//	if (!response.ok) {
+	//		return Promise.reject(response);
+	//	}
+	//
+	//	return response.json();
+	//}
 
 	private createResolve(json: any) {
 		Router.nav(`/lobby?id=${json.lobbyId}`, false, false)

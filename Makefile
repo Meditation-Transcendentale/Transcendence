@@ -7,6 +7,7 @@ DOCKER_COMPOSE_GAME = -f ./services/game/docker-compose.dev.yml
 DOCKER_COMPOSE_METRICS = -f ./metrics/docker-compose-metrics.yml
 
 TARGET ?= all
+METRICS ?= false
 
 ifeq ($(TARGET),user)
 	DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER)
@@ -21,9 +22,12 @@ else ifeq ($(TARGET),all)
 						  $(DOCKER_COMPOSE_STATS) \
 						  $(DOCKER_COMPOSE_FRONTEND) \
 						  $(DOCKER_COMPOSE_GAME)
-						  # $(DOCKER_COMPOSE_METRICS)
 else
 	$(error Unknown TARGET value '$(TARGET)')
+endif
+
+ifeq ($(METRICS),true)
+	DOCKER_COMPOSE_FILE += $(DOCKER_COMPOSE_METRICS)
 endif
 
 .PHONY: all build down stop up re cleanVolumes clean cleanShared reCleanData update-hostname-env

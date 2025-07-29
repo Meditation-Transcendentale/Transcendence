@@ -53,6 +53,8 @@ services:
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
+      nats:
+        condition: service_started
 
 volumes:
   stats_shared:

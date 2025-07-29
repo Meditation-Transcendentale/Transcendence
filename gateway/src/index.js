@@ -17,7 +17,7 @@ const FRONTEND_PORT = 8080;
 const hostIP = process.env.HOSTNAME;
 const hostOrigin = `https://${hostIP}:${FRONTEND_PORT}`;
 const app = fastify({
-	logger: true,
+	// logger: true,
 	https: {
 		key: fs.readFileSync(process.env.SSL_KEY),
 		cert: fs.readFileSync(process.env.SSL_CERT)
@@ -61,10 +61,9 @@ app.setErrorHandler((error, req, res) => {
 const verifyJWT = async (req, res) => {
 	if (req.raw.url && req.raw.url.endsWith('/metrics') || req.raw.url.endsWith('/health')) {
 		if (req.raw.url.endsWith('/health')) {
-			return ;
+			return;
 		}
 		const metricsAuth = req.headers['authorization'];
-		console.log(`Metrics Auth: ${metricsAuth}`);
 		if (metricsAuth && metricsAuth.startsWith('Basic ')) {
 			const base64Credentials = metricsAuth.split(' ')[1];
 			const [username, password] = Buffer.from(base64Credentials, 'base64').toString('utf-8').split(':');
@@ -135,6 +134,27 @@ app.register(fastifyHttpProxy, {
 app.register(fastifyHttpProxy, {
 	upstream: 'https://friends-service:4004',
 	prefix: '/friends',
+	http2: false,
+	preHandler: verifyJWT,
+	replyOptions: {
+		rewriteRequestHeaders: (req, headers) => {
+			if (req.user) {
+				headers['user'] = JSON.stringify(req.user);
+			}
+			headers['x-api-key'] = process.env.API_GATEWAY_KEY;
+			return headers;
+		}
+	}
+});
+
+//app.register(fastifyHttpProxy, {
+//	upstream: 'https://lobby_manager:5011',
+//	prefix: '/lobbies',
+//});
+
+app.register(fastifyHttpProxy, {
+	upstream: 'https://lobby_manager:5001',
+	prefix: '/lobby',
 	http2: false,
 	preHandler: verifyJWT,
 	replyOptions: {

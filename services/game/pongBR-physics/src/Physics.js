@@ -1,4 +1,4 @@
-import { PhysicsEngine } from './physicsEngine.js';
+import { PhysicsEngine } from './physics-engine.js';
 
 export const Physics = {
 	games: new Map(),
@@ -27,14 +27,15 @@ export const Physics = {
 		//const startTime = performance.now();
 
 		try {
-			const { balls, paddles, events } = eng.step();
+			const { balls, paddles, stage, ranks, end, events } = eng.step();
 			// End measuring performance
 			//const endTime = performance.now();
 			//const duration = endTime - startTime;
 			//
 			//console.log(`Step execution time for game ${gameId} at tick ${tick}: ${duration} milliseconds`);
 
-			return { gameId, tick, balls, paddles, events };
+			const gameState = eng.gameState.getGameState(); // Get current game state
+			return { gameId, tick, balls, paddles, stage, ranks, end, events, gameState };
 		} catch (err) {
 			console.error('Physics.step() failed at tick', tick, err);
 			throw err;

@@ -251,6 +251,7 @@ export class PhysicsEngine {
 		this.rebuildDuration = 3000;
 		this.playerMapping = {};
 		this.originalPlayerCount = 0;
+		this.fixedPlayerIds = [];
 
 		this.gameEvents = [];
 	}
@@ -276,6 +277,7 @@ export class PhysicsEngine {
 		this.reset();
 		this.originalPlayerCount = numPlayers;
 
+		this.fixedPlayerIds = Array.from({ length: numPlayers }, (_, i) => i);
 		this.paddleData.offsets = new Float32Array(numPlayers);
 		this.paddleData.maxOffsets = new Float32Array(numPlayers);
 		this.paddleData.centerAngles = new Float32Array(numPlayers);
@@ -292,6 +294,7 @@ export class PhysicsEngine {
 			this.playerStates.activePlayers.add(pid);
 			this.paddleData.dead[pid] = 0;
 		}
+		this.playerMapping = {};
 	}
 
 	createPaddles(numPlayers) {
@@ -367,6 +370,7 @@ export class PhysicsEngine {
 
 		for (let ballIndex = this.entities.balls.length - 1; ballIndex >= 0; ballIndex--) {
 			const ballEnt = this.entities.balls[ballIndex];
+			// Skip disabled balls
 			if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
 
 			const ballX = pd.posX[ballEnt];
@@ -384,7 +388,6 @@ export class PhysicsEngine {
 			}
 		}
 	}
-
 	findPlayerByAngle(ballAngle) {
 		while (ballAngle < 0) ballAngle += 2 * Math.PI;
 		while (ballAngle >= 2 * Math.PI) ballAngle -= 2 * Math.PI;
@@ -457,6 +460,7 @@ export class PhysicsEngine {
 		let targetPhase = this.currentPhase;
 		if (remainingPlayers <= 1) {
 			this.endGame();
+			return;
 		}
 
 		if (remainingPlayers <= 3 && remainingPlayers > 1) targetPhase = 'Final Phase';
@@ -489,7 +493,6 @@ export class PhysicsEngine {
 		this.isRebuilding = true;
 		this.rebuildStartTime = Date.now();
 
-		// Move balls away immediately when rebuild starts
 		this.moveAllBallsAway();
 
 		console.log(`Starting arena rebuild for ${this.currentPhase}...`);
@@ -572,8 +575,12 @@ export class PhysicsEngine {
 			maxOffsets: new Float32Array(numActivePlayers),
 			centerAngles: new Float32Array(numActivePlayers),
 			inputStates: new Int8Array(numActivePlayers),
-			dead: new Uint8Array(numActivePlayers)
+			dead: new Uint8Array(this.originalPlayerCount)
 		};
+
+		for (let i = 0; i < this.originalPlayerCount; i++) {
+			newPaddleData.dead[i] = this.paddleData.dead[i];
+		}
 
 		activePlayers.forEach((originalPlayerId, newIndex) => {
 			const midAngle = newIndex * newAngleStep + newAngleStep / 2;
@@ -637,13 +644,14 @@ export class PhysicsEngine {
 		console.log(`Reset balls: created ${newBallCount} new balls`);
 	}
 
-	updatePaddleInputState(originalPlayerId, moveInput) {
+	updatePaddleInputState(fixedPlayerId, moveInput) {
 		if (this.isRebuilding) return;
 
-		const newIndex = this.playerMapping ? this.playerMapping[originalPlayerId] : originalPlayerId;
-		if (newIndex !== undefined && newIndex >= 0 && newIndex < this.paddleData.inputStates.length) {
-			if (!this.playerStates.eliminated.has(originalPlayerId)) {
-				this.paddleData.inputStates[newIndex] = Math.max(-1, Math.min(1, moveInput));
+		const paddleIndex = this.playerMapping[fixedPlayerId] ?? fixedPlayerId;
+
+		if (paddleIndex >= 0 && paddleIndex < this.paddleData.inputStates.length) {
+			if (!this.playerStates.eliminated.has(fixedPlayerId)) {
+				this.paddleData.inputStates[paddleIndex] = Math.max(-1, Math.min(1, moveInput));
 			}
 		}
 	}
@@ -801,31 +809,49 @@ export class PhysicsEngine {
 		const pd = this.pd;
 
 		const balls = this.entities.balls
-			.filter(ent => pd.isActive(ent) && pd.isEliminated[ent] !== 1)
+			.filter(ent => pd.isActive(ent))
 			.map((ent, i) => ({
 				id: i,
-				x: pd.posX[ent], y: pd.posY[ent],
-				vx: pd.velX[ent], vy: pd.velY[ent],
-				radius: pd.radius[ent]
+				x: pd.posX[ent],
+				y: pd.posY[ent],
+				vx: pd.velX[ent],
+				vy: pd.velY[ent],
+				radius: pd.radius[ent],
+				disabled: pd.isEliminated[ent] === 1
 			}));
 
 		const paddles = this.entities.paddles
 			.filter(ent => ent !== undefined && pd.isActive(ent))
-			.map((ent, i) => ({
-				id: i,
-				move: this.paddleData.inputStates[i] || 0,
-				offset: this.paddleData.offsets[i] || 0,
-				dead: this.paddleData.dead[i] === 1
-			}));
+			.map((ent, currentPaddleIndex) => {
+				let fixedPlayerId = currentPaddleIndex; // Default fallback
+
+				if (this.playerMapping && Object.keys(this.playerMapping).length > 0) {
+					const reverseMapping = Object.entries(this.playerMapping)
+						.find(([playerId, paddleIdx]) => paddleIdx === currentPaddleIndex);
+					if (reverseMapping) {
+						fixedPlayerId = parseInt(reverseMapping[0]);
+					}
+				}
+
+				return {
+					id: currentPaddleIndex,
+					playerId: fixedPlayerId,
+					move: this.paddleData.inputStates[currentPaddleIndex] || 0,
+					offset: this.paddleData.offsets[currentPaddleIndex] || 0,
+					dead: this.paddleData.dead[fixedPlayerId] === 1
+				};
+			});
 
 		const events = [...this.gameEvents];
 		this.gameEvents = [];
 
 		return {
-			balls, paddles,
+			balls,
+			paddles,
 			score: [],
 			ranks: this.calculatePlayerRanks(),
 			stage: this.getStageFromPhase(),
+			end: this.gameOver || this.playerStates.activePlayers.size <= 1,
 			events,
 			gameState: {
 				activePlayers: Array.from(this.playerStates.activePlayers),
@@ -841,7 +867,7 @@ export class PhysicsEngine {
 			},
 			config: this.cfg,
 			frameStats: {
-				activeBalls: balls.length,
+				activeBalls: balls.filter(ball => !ball.disabled).length,
 				activePaddles: paddles.length,
 				totalPlayers: this.entities.paddles.length
 			}
@@ -894,9 +920,9 @@ export class PhysicsEngine {
 		if (!this.pd.isActive(ballEnt)) return false;
 
 		const pd = this.pd;
+		pd.isEliminated[ballEnt] = 1;
 		pd.posX[ballEnt] = pd.posY[ballEnt] = this.cfg.ARENA_RADIUS * 10;
 		pd.velX[ballEnt] = pd.velY[ballEnt] = 0;
-		pd.isEliminated[ballEnt] = 1;
 		return true;
 	}
 

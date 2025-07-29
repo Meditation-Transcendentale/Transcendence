@@ -204,29 +204,32 @@ export class Field {
 
 				break;
 			}
-			// case 'test': {
-			// 	final.init(this.scene.getCameraByName('br') as Camera);
+			//case 'test': {
+			//	final.init(this.scene.getCameraByName('br') as Camera);
 			//
-			// 	break;
-			// }
-			// case 'lobby': {
-			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
-			// 	final.addWindow('back', this.cube1, this.vueBounding, Matrix.Identity());
+			//	break;
+			//}
+			//case 'lobby': {
+			//	final.init(this.scene.getCameraByName('fieldCam') as Camera);
+			//	final.addWindow('back', this.cube1, this.vueBounding, Matrix.Identity());
 			//
-			// 	break;
-			// }
-			// case 'info': {
-			// 	final.init(this.scene.getCameraByName("fieldCam") as Camera);
-			// 	final.addWindow('user', this.cube0, this.vueBounding, Matrix.Identity());
-			// 	final.addWindow('security', this.cube1, this.vueBounding, Matrix.Identity());
+			//	break;
+			//}
+			//case 'info': {
+			//	final.init(this.scene.getCameraByName("fieldCam") as Camera);
+			//	final.addWindow('user', this.cube0, this.vueBounding, Matrix.Identity());
+			//	final.addWindow('security', this.cube1, this.vueBounding, Matrix.Identity());
 			//
-			// 	break;
-			// }
-			// case 'game': {
-			// 	final.init(this.scene.getCameraByName('pong') as Camera);
-			// 	break;
-			// }
-
+			//	break;
+			//}
+			//case 'game': {
+			//	final.init(this.scene.getCameraByName('pong') as Camera);
+			//	break;
+			//}
+			//case 'brick': {
+			//	final.init(this.scene.getCameraByName('brick') as Camera);
+			//	break;
+			//}
 		}
 		//return final;
 	}

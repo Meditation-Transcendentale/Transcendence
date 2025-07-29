@@ -24,13 +24,21 @@ services:
       # - ./lobby-manager/test:/app/test
       - ./services/game/lobby-manager/package.json:/app/package.json
       - ./services/game/lobby-manager/.env.example:/app/.env
-      - ./shared/certs:/usr/src/app/certs:ro
+      - ./services/user/shared:/usr/src/app/shared
+      - ./shared/certs:/app/certs:ro
+
     depends_on:
-      - nats_game
+      nats_game:
+        condition: service_started
+      database_certs-init:
+        condition: service_completed_successfully
     command: npm run dev
     environment:
       - NATS_URL=${NATS_GAME_URL}
       - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - PORT=5001
     ports:
       - "5001:5001"
@@ -155,21 +163,6 @@ services:
     networks:
       - game-network
       - metrics-network
-
-  # pongio-physics:
-  #   build: ./services/game/pongIO-physics
-  #   volumes:
-  #     - ./services/game/pongIO-physics/src:/app/src
-  #     - ./services/game/pongIO-physics/test:/app/test
-  #     - ./services/game/pongIO-physics/package.json:/app/package.json
-  #     - ./services/game/pongIO-physics/.env.example:/app/.env
-  #   command: npm run dev
-  #   restart: unless-stopped
-  #   environment:
-  #     - SERVICE_NAME=pongIO-physics
-  #     - NATS_URL=nats://nats:4222
-  #   depends_on:
-  #     - nats
 
   # ai:
   #   container_name: ai_service

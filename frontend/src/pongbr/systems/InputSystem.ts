@@ -44,7 +44,6 @@ export class InputSystem extends System {
 			const paddle = entity.getComponent(PaddleComponent)!;
 			const transform = entity.getComponent(TransformComponent)!;
 
-			let offsetChange = 0;
 			const leftPressed = this.inputManager.isKeyPressed("KeyA");
 			const rightPressed = this.inputManager.isKeyPressed("KeyD");
 
@@ -52,7 +51,7 @@ export class InputSystem extends System {
 			if (leftPressed && !rightPressed) this.move = 1;
 			else if (rightPressed && !leftPressed) this.move = -1;
 
-			//offsetChange = this.move * 1.2 / paddle.speed * dt;
+			//let offsetChange = this.move * 10 / paddle.speed * dt;
 			//paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -paddle.maxoffset, paddle.maxoffset);
 			//transform.rotation.y = paddle.baseRotation + paddle.offset;
 			if (this.move != this.lastSentMove) {

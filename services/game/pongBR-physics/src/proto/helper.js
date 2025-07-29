@@ -16,15 +16,15 @@ export function decodePhysicsRequest(buffer) {
 }
 
 export function encodePhysicsResponse(payload) {
-	const err = Proto.shared.PhysicsResponse.verify(payload);
+	const err = Proto.physics.PhysicsResponse.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.shared.PhysicsResponse
-		.encode(Proto.shared.PhysicsResponse.create(payload))
+	return Proto.physics.PhysicsResponse
+		.encode(Proto.physics.PhysicsResponse.create(payload))
 		.finish();
 }
 
 export function decodePhysicsResponse(buffer) {
-	return Proto.shared.PhysicsResponse.decode(buffer);
+	return Proto.physics.PhysicsResponse.decode(buffer);
 }
 
 /**
