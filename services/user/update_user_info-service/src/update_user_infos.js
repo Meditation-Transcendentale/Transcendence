@@ -18,7 +18,7 @@ import { natsRequest } from "../../shared/natsRequest.mjs";
 dotenv.config({ path: "../../../../.env" });
 
 const app = Fastify({
-	logger: true,
+	// logger: true,
 	https: {
 		key: fs.readFileSync(process.env.SSL_KEY),
 		cert: fs.readFileSync(process.env.SSL_CERT)

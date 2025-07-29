@@ -17,7 +17,7 @@ const FRONTEND_PORT = 8080;
 const hostIP = process.env.HOSTNAME;
 const hostOrigin = `https://${hostIP}:${FRONTEND_PORT}`;
 const app = fastify({
-	logger: true,
+	// logger: true,
 	https: {
 		key: fs.readFileSync(process.env.SSL_KEY),
 		cert: fs.readFileSync(process.env.SSL_CERT)
@@ -64,7 +64,6 @@ const verifyJWT = async (req, res) => {
 			return ;
 		}
 		const metricsAuth = req.headers['authorization'];
-		console.log(`Metrics Auth: ${metricsAuth}`);
 		if (metricsAuth && metricsAuth.startsWith('Basic ')) {
 			const base64Credentials = metricsAuth.split(' ')[1];
 			const [username, password] = Buffer.from(base64Credentials, 'base64').toString('utf-8').split(':');

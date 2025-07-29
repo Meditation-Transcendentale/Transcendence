@@ -25,6 +25,7 @@ services:
       - ./services/game/lobby-manager/package.json:/app/package.json
       - ./services/game/lobby-manager/.env.example:/app/.env
       - ./shared/certs:/usr/src/app/certs:ro
+      - ./services/user/shared:/usr/src/app/shared
     depends_on:
       - nats_game
     command: npm run dev
