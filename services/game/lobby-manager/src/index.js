@@ -28,6 +28,7 @@ async function start() {
 			cert: fs.readFileSync(process.env.SSL_CERT)
 		}
 	});
+	app.addHook('onRequest', verifyApiKey);
 	await app.register(fastifyCors, { origin: '*' });
 	app.decorate('lobbyService', lobbyService);
 	app.decorate('natsClient', natsClient);
@@ -44,7 +45,6 @@ async function start() {
 		if (!token) console.error('uWS failed to start');
 		else console.log(`uWS WebSocket listening on ${config.WS_PORT}`);
 	});
-	app.addHook('onRequest', verifyApiKey);
 
 }
 
