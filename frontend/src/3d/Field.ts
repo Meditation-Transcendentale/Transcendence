@@ -163,7 +163,7 @@ export class Field {
 		switch (vue) {
 			case 'play': {
 				this.camera.position.set(-20, 1, 30);
-				this.camera.setTarget(new Vector3(-20, 3, 20));
+				this.camera.setTarget(new Vector3(-20, 4, 20));
 				//console.log("TARGET", this.camera.target);
 
 				//final.init(this.scene.getCameraByName('fieldCam') as Camera);

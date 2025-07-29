@@ -26,6 +26,8 @@ interface player {
 export default class Lobby {
 	private div: HTMLDivElement;
 	private ref: lobbyHtmlReference;
+	private css: HTMLLinkElement;
+
 	private ws: WebSocket | null;
 	private id: string | null;
 	private mode: string | null;
@@ -43,6 +45,8 @@ export default class Lobby {
 		this.state = lobbyState.none;
 
 		this.players = new Map<string, player>;
+
+		this.css = div.querySelector("link") as HTMLLinkElement;
 
 		this.ref = {
 			playersWindow: { html: div.querySelector("#players-window") as HTMLDivElement, id: -1 },
@@ -74,12 +78,14 @@ export default class Lobby {
 
 		this.players.set(User.uuid as string, this.createPlayerDiv(User.uuid as string, false, true));
 
+		document.body.appendChild(this.css);
 		App3D.setVue("lobby");
 		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, true);
 	}
 
 	public async unload() {
 		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, false);
+		this.css.remove();
 		this.players.clear();
 	}
 

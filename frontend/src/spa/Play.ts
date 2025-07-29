@@ -203,15 +203,15 @@ export default class Play {
 		})
 		this.ref.create.id = App3D.addCSS3dObject({
 			html: this.ref.create.html,
-			width: 1.,
-			height: 1.,
+			width: 1.5,
+			height: 1.5,
 			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-22, 2, 23)),
 			enable: false
 		})
 		this.ref.join.id = App3D.addCSS3dObject({
 			html: this.ref.join.html,
-			width: 1.,
-			height: 1.,
+			width: 1.5,
+			height: 1.5,
 			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-23, 3, 23)),
 			enable: false
 		})
@@ -308,11 +308,11 @@ export default class Play {
 		})
 
 		this.ref.joinId.addEventListener("focusin", () => {
-			this.div.querySelector("#join-indic")?.setAttribute("on", "");
+			//this.div.querySelector("#join-indic")?.setAttribute("on", "");
 		})
 
 		this.ref.joinId.addEventListener("focusout", () => {
-			this.div.querySelector("#join-indic")?.removeAttribute("on");
+			//this.div.querySelector("#join-indic")?.removeAttribute("on");
 		})
 
 		//this.ref.smod.toggleAttribute('off');
@@ -478,7 +478,7 @@ export default class Play {
 			}
 		}
 		document.body.appendChild(this.css);
-		//this.parseListResp(lr);
+		this.parseListResp(lr);
 		//if (User.status?.lobby) {
 		//	Router.nav(`/lobby?id=${User.status.lobby}`, false, false);
 		//}
