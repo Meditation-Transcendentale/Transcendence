@@ -15,6 +15,8 @@ export class Pipeline {
 
 	public hover: number;
 
+	private enable: boolean;
+
 	constructor(scene: Scene, camera: Camera, grassTexture: RenderTargetTexture) {
 		this.scene = scene;
 		this.camera = camera;
@@ -62,6 +64,7 @@ export class Pipeline {
 		}
 
 		console.log("FOV", this.camera.fov);
+		this.enable = true;
 	}
 
 	public update(time: number) {
@@ -74,5 +77,23 @@ export class Pipeline {
 		this.cloudTexture.setFloat('ratio', window.innerWidth / window.innerHeight);
 		this.cloudTexture.setVector2("coord", this.ray);
 		this.cloudTexture.setVector3("worldPos", this.camera.position);
+	}
+
+	public setEnable(status: boolean) {
+		if (status && !this.enable) {
+			this.cloudTexture.refreshRate = 1;
+			this.grassTexture.refreshRate = 1;
+			this.camera.attachPostProcess(this.combine);
+			this.camera.attachPostProcess(this.sharpen);
+			this.camera.attachPostProcess(this.glitch);
+			this.enable = true;
+		} else if (!status && this.enable) {
+			this.cloudTexture.refreshRate = 0;
+			this.grassTexture.refreshRate = 0;
+			this.camera.detachPostProcess(this.glitch);
+			this.camera.detachPostProcess(this.sharpen);
+			this.camera.detachPostProcess(this.combine);
+			this.enable = false;
+		}
 	}
 }

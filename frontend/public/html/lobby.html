@@ -1,7 +1,11 @@
 <div id="lobby" class="sub-container">
 	<link rel="stylesheet" type="text/css" href="/css/lobby.css">
-	<div id="ready-btn-window" class="window">
-			<div class="window-bar">READY</div>
-			<input id="ready-btn" class="window-content" type="button" value="READY"/>
+	<div id="players-window" class="window">
+			<div class="window-bar">PLAYERS LIST</div>
+			<table class="window-content">
+				<thead>	<tr><th>Username</th><th>Status</th></tr></thead>
+				<tbody id="players-list" class="list-body"></tbody>
+			</table>
+			</div>
 	</div>
 </div>

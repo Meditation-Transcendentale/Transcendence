@@ -15,7 +15,8 @@ import {
 	Vector3,
 	UniversalCamera,
 	TransformNode,
-	LoadAssetContainerAsync
+	LoadAssetContainerAsync,
+	Mesh
 } from "@babylonImport";
 import { Field } from "./Field";
 
@@ -45,6 +46,8 @@ export class Environment {
 
 	private width: number;
 	private height: number;
+
+	private gameMeshes: Array<Mesh>;
 
 
 
@@ -93,6 +96,8 @@ export class Environment {
 		//this.cameraDiv = document.querySelector("#camera") as HTMLDivElement;
 		//this.cameraDiv.style.width = `${this.width}px`;
 		//this.cameraDiv.style.height = `${this.height}px`;
+		//
+		this.gameMeshes = new Array<Mesh>;
 	}
 
 	private createMesh() {
@@ -118,10 +123,12 @@ export class Environment {
 		material.emissiveFresnelParameters = fresnel;
 		arenaMesh.material = material;
 
+		this.gameMeshes.push(arenaMesh);
+
 	}
 	public async init() {
 
-		// this.createMesh();
+		this.createMesh();
 		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		//this.camera_br = new UniversalCamera('br', Vector3.Zero(), this.scene);
 		this.camera_brick = new ArcRotateCamera("brick", Math.PI / 2, 0, 30, Vector3.Zero(), this.scene);
@@ -129,9 +136,9 @@ export class Environment {
 		this.camera_pong = new ArcRotateCamera('pong', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
 
-		loaded.meshes[1].setEnabled(false);
 		loaded.addAllToScene();
 		loaded.meshes[1].parent = this.pongRoot;
+		this.gameMeshes.push(loaded.meshes[1] as Mesh);
 
 
 		//this.scene.debugLayer.show();
@@ -160,6 +167,11 @@ export class Environment {
 		// Inspector.Show(this.scene, {});
 		//this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
 		//document.body.style.perspective = `${this.perspective}px`;
+		//
+
+		for (let i = 0; i < this.gameMeshes.length; i++) {
+			this.gameMeshes[i].setEnabled(false);
+		}
 	}
 
 	public render() {
@@ -185,12 +197,22 @@ export class Environment {
 	public enableHome() {
 		this.updateHome = true;
 		this.scene.fogMode = Scene.FOGMODE_LINEAR;
+		this.scene.activeCamera = this.fieldCamera;
+		for (let i = 0; i < this.gameMeshes.length; i++) {
+			this.gameMeshes[i].setEnabled(false);
+		}
+		this.fieldCamera.setEnabled(true);
 
 	}
 
 	public disableHome() {
 		this.updateHome = false;
 		this.scene.fogMode = Scene.FOGMODE_NONE;
+		for (let i = 0; i < this.gameMeshes.length; i++) {
+			this.gameMeshes[i].setEnabled(true);
+		}
+		this.fieldCamera.setEnabled(false);
+
 	}
 
 	public setVue(vue: string) {

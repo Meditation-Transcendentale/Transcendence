@@ -154,6 +154,10 @@ export class Field {
 		this.pipeline.hover = status;
 	}
 
+	public setEnable(status: boolean) {
+		this.pipeline.setEnable(status);
+	}
+
 	public setVue(vue: string) {
 		//const final = new Vue();
 		switch (vue) {
@@ -204,17 +208,19 @@ export class Field {
 
 				break;
 			}
-			//case 'test': {
-			//	final.init(this.scene.getCameraByName('br') as Camera);
-			//
-			//	break;
-			//}
-			//case 'lobby': {
-			//	final.init(this.scene.getCameraByName('fieldCam') as Camera);
-			//	final.addWindow('back', this.cube1, this.vueBounding, Matrix.Identity());
-			//
-			//	break;
-			//}
+			case 'pongBR': {
+				//final.init(this.scene.getCameraByName('br') as Camera);
+				this.scene.activeCamera = this.scene.getCameraById('br');
+				this.scene.activeCamera?.attachControl();
+
+				break;
+			}
+			case 'lobby': {
+				this.camera.position.set(0, 4, -30);
+				this.camera.setTarget(new Vector3(0, 9, -40));
+
+				break;
+			}
 			//case 'info': {
 			//	final.init(this.scene.getCameraByName("fieldCam") as Camera);
 			//	final.addWindow('user', this.cube0, this.vueBounding, Matrix.Identity());
