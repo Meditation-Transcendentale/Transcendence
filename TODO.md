@@ -57,8 +57,6 @@
 - fix paddle issue with phase system
 - ball spawn sytem server and client side
 - tweak scaling mesh base on player number
-- implement interpolation ball 
-- 
 
 ### Pong
 
