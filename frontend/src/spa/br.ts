@@ -34,7 +34,7 @@ export default class br {
 	public load(params: URLSearchParams) {
 		App3D.setVue('pongBR');
 		App3D.disableHome();
-		//document.querySelector("canvas")?.focus();
+		document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
 		//(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";
 		if (!this.pongbr)

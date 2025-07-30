@@ -101,7 +101,6 @@ export class Pong {
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 
-		// localPaddleId = 0;
 		localPaddleId = await this.waitForRegistration();
 
 		// 4) Plug networking into ECS

@@ -2,7 +2,8 @@ import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
 import { InputSystem } from "./systems/InputSystem.js";
-import { NetworkingSystem } from "./systems/NetworkingSystem.js";
+//import { NetworkingSystem } from "./systems/NetworkingSystem.js";
+import { HybridNetworkingSystem as NetworkingSystem } from "./systems/HybridNetworkingSystem.js";
 import { ThinInstanceSystem } from "./systems/ThinInstanceSystem.js";
 import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
@@ -40,6 +41,7 @@ export class PongBR {
 	private networkingSystem!: NetworkingSystem;
 	private inputSystem!: InputSystem;
 	private thinInstanceSystem!: ThinInstanceSystem;
+	public currentBallScale: Vector3 = new Vector3(1, 1, 1);
 
 	constructor(canvas: any, scene: Scene) {
 		this.canvas = canvas;
@@ -138,6 +140,10 @@ export class PongBR {
 		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot);
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
 
+		this.currentBallScale = new Vector3(1, 1, 1);
+
+		this.networkingSystem.forceIndexRebuild();
+
 		console.log("start");
 		this.pongRoot.setEnabled(true);
 		this.stateManager.setter(true);
@@ -200,16 +206,24 @@ export class PongBR {
 
 		const cfg = { arenaRadius: 100, wallWidth: 1, paddleHeight: 1, paddleDepth: 1, goalDepth: 1 };
 		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
-		for (const entity of entities) {
-			if (
-				!entity.hasComponent(BallComponent) ||
-				!entity.hasComponent(TransformComponent)
-			) {
-				continue;
-			}
-			const transform = entity.getComponent(TransformComponent)!;
-			transform.baseScale = new Vector3(25 / nextCount, 25 / nextCount, 25 / nextCount);
+
+		let scaleFactor: number;
+		switch (nextCount) {
+			case 100: scaleFactor = 1; break;
+			case 50: scaleFactor = 1.5; break;
+			case 25: scaleFactor = 2; break;
+			case 12: scaleFactor = 2.5; break;
+			case 3: scaleFactor = 3.0; break;
+			default: scaleFactor = 25 / nextCount;
 		}
+		this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+		const allEntities = this.ecs.getAllEntities();
+		allEntities.forEach(entity => {
+			if (entity.hasComponent(BallComponent)) {
+				this.ecs.removeEntity(entity);
+			}
+		});
 
 		this.paddleBundles.forEach(b => {
 			this.ecs.removeEntity(b.paddle);
@@ -229,6 +243,8 @@ export class PongBR {
 		}
 
 		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer);
+
+		this.networkingSystem.forceIndexRebuild();
 	}
 
 

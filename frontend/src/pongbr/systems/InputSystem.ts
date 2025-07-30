@@ -48,11 +48,11 @@ export class InputSystem extends System {
 			const rightPressed = this.inputManager.isKeyPressed("KeyD");
 
 			this.move = 0;
-			if (leftPressed && !rightPressed) this.move = 1;
-			else if (rightPressed && !leftPressed) this.move = -1;
+			if (leftPressed && !rightPressed) this.move = -1;
+			else if (rightPressed && !leftPressed) this.move = 1;
 
-			//let offsetChange = this.move * 10 / paddle.speed * dt;
-			//paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -paddle.maxoffset, paddle.maxoffset);
+			let offsetChange = this.move * 1.2 / paddle.speed * dt;
+			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -paddle.maxoffset, paddle.maxoffset);
 			//transform.rotation.y = paddle.baseRotation + paddle.offset;
 			if (this.move != this.lastSentMove) {
 				const payload: userinterface.IClientMessage = {

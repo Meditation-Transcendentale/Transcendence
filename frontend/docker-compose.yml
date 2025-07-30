@@ -52,6 +52,9 @@ services:
       - front
       - transcendence-network
     restart: always
+    depends_on:
+      api-gateway:
+        condition: service_started
   
 volumes:
   bomba:

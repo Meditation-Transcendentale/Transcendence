@@ -6,9 +6,11 @@ export class PaddleComponent implements Component {
 	public id: number;          // Original player ID (stays constant)
 	public paddleIndex: number; // Current paddle index from physics (changes after rebuild)
 	public offset: number;
+	public serverOffset: number;
 	public maxoffset: number;
 	public baseRotation: number   // <— new
 	public speed: number   // <— new
+	public lastServerOffset!: number;
 	public static key = "PaddleComponent";
 	// public displayAsWall: boolean;
 
@@ -16,6 +18,7 @@ export class PaddleComponent implements Component {
 		this.id = id;
 		this.paddleIndex = id; // Initially same as ID, will change after rebuilds
 		this.offset = offset;
+		this.serverOffset = offset;
 		this.maxoffset = maxoffset;
 		this.position = position;
 		this.baseRotation = baseRotation;

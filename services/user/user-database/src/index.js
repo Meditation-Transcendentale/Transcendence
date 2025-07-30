@@ -140,6 +140,7 @@ handleErrorsNats(async () => {
 		}),
 		handleNatsSubscription("user.updateAvatar", async (msg) => {
 			const { avatar, userId } = jc.decode(msg.data);
+			console.log("Updating avatar for user:", userId, "with avatar:", avatar);
 			userService.updateAvatar(avatar, userId);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
