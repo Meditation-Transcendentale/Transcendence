@@ -411,14 +411,14 @@ export class PhysicsEngine {
 		const cfg = this.cfg;
 		const pd = this.pd;
 		const dt = 1 / this.cfg.TARGET_FPS;
-		const moveSpeed = 10;
+		const moveSpeed = 1.2;
 		const numPlayers = this.entities.paddles.length;
 
 		for (let pid = 0; pid < numPlayers; pid++) {
 			const paddleEnt = this.entities.paddles[pid];
 			if (!pd.isActive(paddleEnt) || this.paddleData.inputStates[pid] === 0) continue;
 
-			const deltaOffset = this.paddleData.inputStates[pid] * moveSpeed / numPlayers / 4 * dt;
+			const deltaOffset = this.paddleData.inputStates[pid] * moveSpeed / (numPlayers / 4) * dt;
 			const newOffset = this.paddleData.offsets[pid] + deltaOffset;
 			const maxOffset = this.paddleData.maxOffsets[pid];
 
