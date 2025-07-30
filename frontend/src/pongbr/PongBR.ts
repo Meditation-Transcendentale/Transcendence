@@ -14,12 +14,14 @@ import type { userinterface } from './utils/proto/message.js';
 import { buildPaddles, PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
 import { AnimationSystem } from "./systems/AnimationSystem.js";
-import { ArcRotateCamera, Color3, Color4, PointLight, Scene, TransformNode, Vector3, Engine, Mesh, UniversalCamera } from "@babylonImport";
+import { ArcRotateCamera, Color3, Color4, PointLight, Scene, TransformNode, Vector3, Vector2, Engine, Mesh, UniversalCamera, DefaultRenderingPipeline, PolygonMeshBuilder } from "@babylonImport";
 import { BallComponent } from "./components/BallComponent.js";
 import { PaddleComponent } from "./components/PaddleComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
 import { WallComponent } from "./components/WallComponent.js";
 import { Entity } from "./ecs/Entity.js";
+import earcut from "earcut";
+
 
 export let localPaddleId: any = null;
 export class PongBR {
@@ -66,9 +68,33 @@ export class PongBR {
 		this.camera.beta = Math.PI / 2.1;
 		this.camera.radius = 300;
 
+		//var pipeline = new DefaultRenderingPipeline(
+		//	"brPipeline",
+		//	true,
+		//	this.scene,
+		//	[this.camera]
+		//);
+		//pipeline.samples = 4;
+		//pipeline.sharpenEnabled = true;
 		this.baseMeshes = createBaseMeshes(this.scene, this.rotatingContainer);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
+
+		const radian = 2 * Math.PI;
+
+		let points: Vector2[] = [];
+		for (let k = 128; k >= 0; --k) {
+			let point = new Vector2(Math.cos(radian * k / 128) * 202, Math.sin(radian * k / 128) * 202);
+			points.push(point);
+		}
+		for (let k = 0; k <= 128; ++k) {
+			let point = new Vector2(Math.cos(radian * k / 128) * 203, Math.sin(radian * k / 128) * 203);
+			points.push(point);
+		}
+		const builder = new PolygonMeshBuilder("brick", points, this.scene, earcut);
+		const mesh = builder.build(true, 1.);
+		mesh.parent = this.rotatingContainer;
+		mesh.position.y += 0.45;
 		const statue = this.scene.getMeshByName('Version NoSmile.006') as Mesh;
 		statue.parent = this.pongRoot;
 		statue.position.set(-750, -350, 0);
@@ -95,7 +121,7 @@ export class PongBR {
 			this.ecs.removeSystem(this.networkingSystem);
 			this.thinInstanceSystem.reset(this.ecs.getAllEntities());
 		}
-		const wsUrl = `ws://${window.location.hostname}:5004?` +
+		const wsUrl = `wss://${window.location.hostname}:7000/game?` +
 			`uuid=${uuid}&` +
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
@@ -213,7 +239,7 @@ export class PongBR {
 			case 50: scaleFactor = 1.5; break;
 			case 25: scaleFactor = 2; break;
 			case 12: scaleFactor = 2.5; break;
-			case 3: scaleFactor = 3.0; break;
+			case 3: scaleFactor = 6.0; break;
 			default: scaleFactor = 25 / nextCount;
 		}
 		this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);

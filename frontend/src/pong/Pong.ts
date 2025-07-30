@@ -96,7 +96,7 @@ export class Pong {
 			this.ecs.removeSystem(this.networkingSystem);
 		}
 		console.log("UU", uuid)
-		const wsUrl = `ws://${window.location.hostname}:5004?` +
+		const wsUrl = `wss://${window.location.hostname}:7000/game?` +
 			`uuid=${encodeURIComponent(uuid)}&` +
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);

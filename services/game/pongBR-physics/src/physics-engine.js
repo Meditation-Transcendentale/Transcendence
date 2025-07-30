@@ -386,7 +386,7 @@ export class PhysicsEngine {
 		this.entities.balls.length = 0;
 
 		const ballsPerPlayer = Math.floor(cfg.INITIAL_BALLS / cfg.MAX_PLAYERS);
-		const newBallCount = Math.max(ballsPerPlayer * numActivePlayers, 20);
+		const newBallCount = Math.max(ballsPerPlayer * numActivePlayers / 2, 3);
 
 		console.log(`Creating ${newBallCount} new balls. Entity stats before:`, pd.getStats());
 
