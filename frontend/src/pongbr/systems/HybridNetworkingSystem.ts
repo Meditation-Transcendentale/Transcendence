@@ -1,4 +1,3 @@
-// src/systems/NetworkingSystem.ts
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
@@ -10,25 +9,27 @@ import { userinterface } from "../utils/proto/message.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { localPaddleId, PongBR } from "../PongBR.js";
 import { PhaseState, PhaseTransitionEvent, RebuildCompleteEvent, GameStateInfo } from "../state/PhaseState.js";
+import { Vector3 } from "@babylonImport";
 
-export class NetworkingSystem extends System {
+export class HybridNetworkingSystem extends System {
 	private wsManager: WebSocketManager;
 	private uuid: string;
 	private scoreUI: any;
-	private myScore: number;
-	private opponentScore: number;
 	private game: PongBR;
 	private phaseState: PhaseState;
 	private currentPhysicsState: any = null;
-	// private endUI = globalEndUI;
+
+	private ballIdToEntity = new Map<number, Entity>();
+	private paddleIdToEntity = new Map<number, Entity>();
+	private paddlePlayerIdToEntity = new Map<number, Entity>();
+	private wallPlayerIdToEntity = new Map<number, Entity>();
+	private indexesDirty = true;
 
 	constructor(wsManager: WebSocketManager, uuid: string, scoreUI: any, game: PongBR) {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
 		this.scoreUI = scoreUI;
-		this.myScore = 0;
-		this.opponentScore = 0;
 		this.game = game;
 		this.phaseState = new PhaseState();
 	}
@@ -36,10 +37,56 @@ export class NetworkingSystem extends System {
 	resetPhaseState(): void {
 		this.phaseState.reset();
 		this.currentPhysicsState = null;
-		console.log('🔄 NetworkingSystem: Phase state reset for new game');
+		this.indexesDirty = true;
+		this.ballIdToEntity.clear();
+		this.paddleIdToEntity.clear();
+		this.paddlePlayerIdToEntity.clear();
+		this.wallPlayerIdToEntity.clear();
+	}
+
+	public forceIndexRebuild(): void {
+		this.indexesDirty = true;
+	}
+
+	private rebuildIndices(entities: Entity[]): void {
+		if (!this.indexesDirty) return;
+
+		this.ballIdToEntity.clear();
+		this.paddleIdToEntity.clear();
+		this.paddlePlayerIdToEntity.clear();
+		this.wallPlayerIdToEntity.clear();
+
+		let ballCount = 0, paddleCount = 0, wallCount = 0;
+
+		for (const entity of entities) {
+			if (entity.hasComponent(BallComponent)) {
+				const ball = entity.getComponent(BallComponent)!;
+				this.ballIdToEntity.set(ball.id, entity);
+				ballCount++;
+			}
+
+			if (entity.hasComponent(PaddleComponent)) {
+				const paddle = entity.getComponent(PaddleComponent)!;
+				this.paddleIdToEntity.set(paddle.paddleIndex, entity);
+				this.paddlePlayerIdToEntity.set(paddle.id, entity);
+				paddleCount++;
+			}
+
+			if (entity.hasComponent(WallComponent)) {
+				const wall = entity.getComponent(WallComponent)!;
+				this.wallPlayerIdToEntity.set(wall.id, entity);
+				wallCount++;
+			}
+		}
+
+		this.indexesDirty = false;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		if (this.indexesDirty) {
+			this.rebuildIndices(entities);
+		}
+
 		const messages = this.wsManager.getMessages();
 
 		messages.forEach((raw: ArrayBuffer) => {
@@ -51,10 +98,8 @@ export class NetworkingSystem extends System {
 				return;
 			}
 
-			// === State update ===
 			if (serverMsg.state != null) {
-				const state = serverMsg.state;  // MatchState
-
+				const state = serverMsg.state;
 				const balls = state.balls ?? [];
 				const paddles = state.paddles ?? [];
 				const stage = state.stage;
@@ -74,30 +119,26 @@ export class NetworkingSystem extends System {
 						const rebuildEvent = event as RebuildCompleteEvent;
 						const result = this.phaseState.handleRebuildComplete(rebuildEvent);
 
+						this.indexesDirty = true;
+
 						if (result.shouldTransition) {
-							console.log(`🎮 Transition to round called - full arena rebuild`);
 							this.game.transitionToRound(result.playerCount, entities, this.currentPhysicsState);
 						} else if (result.shouldRemap && rebuildEvent.playerMapping) {
-							console.log('🔧 Remapping paddle entities (no visual transition)');
 							this.phaseState.remapPaddleEntities(entities, rebuildEvent.playerMapping);
 						}
 					}
 				});
 
 				if (stage && stage !== this.phaseState.currentStage && this.phaseState.isReadyForTransition()) {
-					console.log(`🔄 Stage fallback sync: ${this.phaseState.currentStage} → ${stage}`);
 					const result = this.phaseState.shouldSyncToStage(stage as number);
 					if (result.shouldTransition) {
 						this.game.transitionToRound(result.playerCount, entities);
+						this.indexesDirty = true;
 					}
 				}
-				// 1. Ball updates - WITH PERFORMANCE TRACKING
-				const ballStartTime = performance.now();
+
 				balls.forEach(b => {
-					const e = entities.find(e =>
-						e.hasComponent(BallComponent) &&
-						e.getComponent(BallComponent)!.id === b.id
-					);
+					const e = this.ballIdToEntity.get(b.id);
 					if (!e) return;
 					const transform = e.getComponent(TransformComponent);
 					if (b.disabled == true)
@@ -105,91 +146,55 @@ export class NetworkingSystem extends System {
 					else {
 						const ball = e.getComponent(BallComponent)!;
 						transform?.enable();
-						ball.position.set(b.x, 0.5, b.y);
+
+						const scaleFactor = this.game.currentBallScale ? this.game.currentBallScale.x : 1.0;
+						const adjustedY = 0.5 + (scaleFactor - 1.0) * 0.1;
+
+						ball.position.set(b.x, adjustedY, b.y);
 						ball.velocity.set(b.vx, 0, b.vy);
+
+						if (transform && this.game.currentBallScale) {
+							transform.baseScale = this.game.currentBallScale.clone();
+							transform.scale = this.game.currentBallScale.clone();
+						}
 					}
 				});
-				const ballTime = performance.now() - ballStartTime;
 
-				// 2. Paddle updates - WITH PERFORMANCE TRACKING
-				const paddleStartTime = performance.now();
-				let paddleFinds = 0; // Count number of entity.find() calls
 				paddles.forEach(p => {
-					// Debug: Log physics paddle data to understand the structure
-					//if (Math.random() < 0.01) { // Log occasionally to avoid spam
-					//	console.log(`🎮 Physics paddle data:`, { 
-					//		id: p.id, 
-					//		playerId: p.playerId, 
-					//		offset: p.offset, 
-					//		dead: p.dead 
-					//	});
-					//}
-
-					//if (p.id === localPaddleId) return;
-
-					let e = entities.find(e =>
-						e.hasComponent(PaddleComponent) &&
-						e.getComponent(PaddleComponent)!.paddleIndex === p.id
-					);
-					paddleFinds++; // Count find operations
-
+					let e = this.paddleIdToEntity.get(p.id);
 					if (!e) {
-						e = entities.find(e =>
-							e.hasComponent(PaddleComponent) &&
-							e.getComponent(PaddleComponent)!.id === p.playerId
-						);
-						paddleFinds++; // Count find operations
+						e = this.paddlePlayerIdToEntity.get(p.playerId);
 					}
 
 					if (!e) return;
 
 					const playerId = e.getComponent(PaddleComponent)!.id;
-					let w = entities.find(entity =>
-						entity.hasComponent(WallComponent) &&
-						entity.getComponent(WallComponent)!.id === playerId
-					);
-					paddleFinds++; // Count find operations
-					
+					const w = this.wallPlayerIdToEntity.get(playerId);
+
 					const paddle = e.getComponent(TransformComponent);
 					const wall = w?.getComponent(TransformComponent);
+
 					if (p.dead) {
-						if (!w)
-							return;
+						if (!w) return;
 						paddle?.disable();
 						wall?.enable();
-
-					}
-					else {
-
+					} else {
 						const paddleComp = e.getComponent(PaddleComponent)!;
 						if (p.id != localPaddleId)
 							paddleComp.offset = p.offset as number;
 						else {
 							paddleComp.serverOffset = p.offset as number;
-
 						}
 
 						paddle?.enable();
 						wall?.disable();
 					}
 				});
-				const paddleTime = performance.now() - paddleStartTime;
-
-				// Performance logging for comparison
-				if (balls.length > 0 || paddles.length > 0) {
-					console.log(`🐌 ORIGINAL: Balls: ${ballTime.toFixed(3)}ms, Paddles: ${paddleTime.toFixed(3)}ms (${paddleFinds} finds)`);
-				}
 			}
 
-			// === Game End ===
 			if (serverMsg.end) {
 				console.log("Received GameEndMessage");
-				// const scores = serverMsg.end.score as number[];
-				// const myScore = scores[localPaddleId] ?? 0;
-				// const other = scores.find((_, i) => i !== localPaddleId) ?? 0;
-				// global.endUI = gameEndUI(myScore < other);
 			}
 		});
 	}
-
 }
