@@ -614,7 +614,7 @@ uniform float	ratio;
 varying vec2	vUV;
 
 const float cloudscale = 1.1;
-const float speed = 0.03;
+const float speed = 0.005;
 const float clouddark = 0.5;
 const float cloudlight = 0.3;
 const float cloudcover = 0.2;

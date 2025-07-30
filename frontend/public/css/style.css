@@ -326,6 +326,7 @@ input[on] {
 	-webkit-text-stroke-color: black;
 	font-size: 10vh;
 	font-weight: bold;
+	pointer-events: auto;
 }
 
 .submit::before {

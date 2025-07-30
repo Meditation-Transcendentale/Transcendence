@@ -157,9 +157,9 @@ class Login {
 			enable: false
 		})
 		this.ref.enter.addEventListener("click", () => {
-			if (this.ref.swLogin.hasAttribute("of")) {
+			if (this.ref.swLogin.hasAttribute("down")) {
 				this.register();
-			} else if (this.ref.swRegister.hasAttribute("of")) {
+			} else if (this.ref.swRegister.hasAttribute("down")) {
 				this.login();
 			}
 		})

@@ -10,7 +10,7 @@ import { createButton } from "./utils";
 const lr: listResp = {
 	lobbies: [
 		{
-			id: "egeggege-wefwefbwejhf-wefhbwf-wefwfe",
+			id: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			mod: "local",
 			maxPlayers: 1,
 			players: ["ehehe"]
@@ -95,7 +95,7 @@ const lr: listResp = {
 			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
 		},
 		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
+			id: "ffffffffffffffffffffffffffffffffffff",
 			mod: 'pongbr',
 			maxPlayers: 100,
 			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
@@ -139,9 +139,9 @@ interface createState {
 }
 
 type lobby = {
-	id: string,
-	mod: string,
-	maxPlayers: number,
+	lobbyId: string,
+	map: string,
+	mode: string,
 	players: string[]
 }
 
@@ -226,6 +226,9 @@ export default class Play {
 			this.state = playState.create;
 		})
 		this.ref.swJoin.addEventListener("click", () => {
+			getRequest("lobby/list")
+				.then((json: any) => { console.log(json); this.parseListResp(json) })
+				.catch((err) => { console.log(err) });
 			App3D.setCSS3dObjectEnable(this.ref.create.id, false);
 			App3D.setCSS3dObjectEnable(this.ref.join.id, true);
 			this.ref.swJoin.toggleAttribute("down", false);
@@ -473,12 +476,16 @@ export default class Play {
 				break;
 			}
 			case playState.join: {
+				getRequest("lobby/list")
+					.then((json: any) => { this.parseListResp(json) })
+					.catch((err) => { console.log(err) });
 				App3D.setCSS3dObjectEnable(this.ref.join.id, true);
 				break;
 			}
 		}
 		document.body.appendChild(this.css);
-		this.parseListResp(lr);
+		// this.parseListResp(lr);
+		// 	.then((resp) => { })
 		//if (User.status?.lobby) {
 		//	Router.nav(`/lobby?id=${User.status.lobby}`, false, false);
 		//}
@@ -597,9 +604,9 @@ export default class Play {
 		const id = document.createElement('td');
 		const mod = document.createElement('td');
 		const player = document.createElement('td');
-		id.innerText = l.id;
-		mod.innerText = l.mod;
-		player.innerText = `${l.players.length}/${l.maxPlayers}`;
+		id.innerText = l.lobbyId;
+		mod.innerText = l.mode;
+		player.innerText = `${l.players.length}/?`;
 		div.appendChild(id);
 		div.appendChild(mod);
 		div.appendChild(player);

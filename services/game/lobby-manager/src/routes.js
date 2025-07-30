@@ -4,7 +4,8 @@ import { handleErrors } from "../shared/handleErrors.mjs";
 export default async function routes(fastify) {
 	const { lobbyService, natsClient } = fastify;
 
-	fastify.get('/list', handleErrors(async () => {
+	fastify.get('/list', handleErrors(async (req, res) => {
+		res.send({ lobbies: lobbyService.list() });
 		return lobbyService.list();
 	}));
 

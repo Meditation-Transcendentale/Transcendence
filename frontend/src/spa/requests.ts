@@ -13,7 +13,6 @@ export async function getRequest(path: string): Promise<JSON> {
 	if (!response.ok) {
 		return Promise.reject(response);
 	}
-
 	return response.json();
 }
 
