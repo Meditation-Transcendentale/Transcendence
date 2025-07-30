@@ -70,7 +70,6 @@ export class NetworkingSystem extends System {
 					const ball = e.getComponent(BallComponent)!;
 					ball.serverPosition.set(b.x, 0.5, b.y);
 					ball.lastServerUpdate = performance.now();
-					// console.log();
 					if (b.vx != this.oldVelX || b.vy != this.oldVelY) {
 						ball.velocity.set(b.vx, 0, b.vy);
 						this.oldVelX = b.vx!;
@@ -78,30 +77,6 @@ export class NetworkingSystem extends System {
 					}
 				});
 
-				// 2. Paddle updates
-				// paddles.forEach(p => {
-				// 	// if (p.id === localPaddleId) return;
-
-				// 	const e = entities.find(e =>
-				// 		e.hasComponent(PaddleComponent) &&
-				// 		(e.getComponent(PaddleComponent)!.id === p.id || e.getComponent(PaddleComponent)!.id - 2 === p.id)
-				// 	);
-				// 	if (!e) return;
-
-				// 	const paddleComp = e.getComponent(PaddleComponent)!;
-				// 	const inputComp = e.getComponent(InputComponent)!;
-				// 	console.log(paddleComp.id);
-				// 	if (inputComp.gameMode === "online" && !inputComp.isLocal)
-				// 		paddleComp.offset = p.offset; // update direction
-
-				// 	const tf = e.getComponent(TransformComponent)!;
-				// 	const rot = tf.rotation;
-				// 	const right = Vector3.TransformCoordinates(
-				// 		new Vector3(1, 0, 0),
-				// 		Matrix.RotationYawPitchRoll(rot.y, rot.x, rot.z)
-				// 	);
-				// 	tf.position.copyFrom(tf.basePosition.add(right.scale(paddleComp.offset)));
-				// });
 				paddles.forEach(p => {
 					// if (p.id === localPaddleId) return;
 
@@ -123,7 +98,7 @@ export class NetworkingSystem extends System {
 						if (paddleComp.id == 2 || paddleComp.id == 3)
 							paddleComp.offset = p.offset;
 
-						
+
 
 						const tf = e.getComponent(TransformComponent)!;
 						const rot = tf.rotation;

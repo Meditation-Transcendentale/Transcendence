@@ -150,7 +150,8 @@ export class HybridNetworkingSystem extends System {
 						const scaleFactor = this.game.currentBallScale ? this.game.currentBallScale.x : 1.0;
 						const adjustedY = 0.5 + (scaleFactor - 1.0) * 0.1;
 
-						ball.position.set(b.x, adjustedY, b.y);
+						ball.serverPosition.set(b.x, adjustedY, b.y);
+						ball.lastServerUpdate = performance.now();
 						ball.velocity.set(b.vx, 0, b.vy);
 
 						if (transform && this.game.currentBallScale) {

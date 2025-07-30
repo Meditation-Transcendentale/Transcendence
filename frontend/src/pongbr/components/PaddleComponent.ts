@@ -10,6 +10,7 @@ export class PaddleComponent implements Component {
 	public maxoffset: number;
 	public baseRotation: number   // <— new
 	public speed: number   // <— new
+	public lastServerOffset!: number;
 	public static key = "PaddleComponent";
 	// public displayAsWall: boolean;
 
