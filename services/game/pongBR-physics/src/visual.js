@@ -292,7 +292,7 @@ function handleInput() {
 	// Zoom
 	if (raylib.IsKeyDown(raylib.KEY_I)) ZOOM *= 1.02;
 	if (raylib.IsKeyDown(raylib.KEY_O)) ZOOM *= 0.98;
-	ZOOM = Math.max(0.8, Math.min(ZOOM, 6));
+	ZOOM = Math.max(0.8, Math.min(ZOOM, 10));
 }
 
 function forcePhase(phaseName) {

@@ -84,6 +84,8 @@ export class PhysicsEngine {
 
 			const sliceStart = pid * angleStep;
 			const midAngle = sliceStart + pillarArc + halfUsableArc;
+			// const midAngle = sliceStart + halfUsableArc;
+			// const midAngle = sliceStart  halfUsableArc;
 
 			this.paddleData.centerAngles[pid] = midAngle;
 			this.paddleData.maxOffsets[pid] = maxOffsets;
@@ -93,6 +95,7 @@ export class PhysicsEngine {
 			pd.posY[paddleEnt] = Math.sin(midAngle) * cfg.ARENA_RADIUS;
 			pd.rot[paddleEnt] = midAngle - Math.PI / 2;
 
+			// console.log(`Physics paddle ${pid}: midAngle = ${midAngle}, centerAngle = ${this.paddleData.centerAngles[pid]}`);
 			const perim = 2 * Math.PI * cfg.ARENA_RADIUS;
 			const cellW = (perim / numPlayers) * cfg.PADDLE_FILL;
 			pd.halfW[paddleEnt] = cellW / 2;
@@ -103,6 +106,7 @@ export class PhysicsEngine {
 			this.entities.pillars[pid] = pillarEnt;
 
 			const pillarAngle = midAngle - maxOffsets - halfArc;
+			// const pillarAngle = sliceStart;
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * cfg.ARENA_RADIUS;
@@ -186,7 +190,7 @@ export class PhysicsEngine {
 				let normalizedBallAngle = ballAngle;
 				while (normalizedBallAngle < 0) normalizedBallAngle += 2 * Math.PI;
 				while (normalizedBallAngle >= 2 * Math.PI) normalizedBallAngle -= 2 * Math.PI;
-
+				
 				for (let paddleIndex = 0; paddleIndex < numPlayers; paddleIndex++) {
 					let fixedPlayerId = paddleIndex;
 					if (this.gameState.playerMapping && Object.keys(this.gameState.playerMapping).length > 0) {
@@ -206,23 +210,14 @@ export class PhysicsEngine {
 						currentPaddleAngle = this.paddleData.centerAngles[paddleIndex] + this.paddleData.offsets[paddleIndex];
 						arcWidth = angleStep * cfg.PADDLE_FILL;
 					}
-
 					const startAngle = currentPaddleAngle - arcWidth / 2;
-					const endAngle = currentPaddleAngle + arcWidth / 2;
 
-					let normalizedStart = startAngle;
-					let normalizedEnd = endAngle;
-					while (normalizedStart < 0) normalizedStart += 2 * Math.PI;
-					while (normalizedStart >= 2 * Math.PI) normalizedStart -= 2 * Math.PI;
-					while (normalizedEnd < 0) normalizedEnd += 2 * Math.PI;
-					while (normalizedEnd >= 2 * Math.PI) normalizedEnd -= 2 * Math.PI;
+					// Normalize difference between ball and paddle start
+					let angleDiff = normalizedBallAngle - startAngle;
+					while (angleDiff < 0) angleDiff += 2 * Math.PI;
+					while (angleDiff >= 2 * Math.PI) angleDiff -= 2 * Math.PI;
 
-					let withinSlice;
-					if (normalizedStart <= normalizedEnd) {
-						withinSlice = normalizedBallAngle >= normalizedStart && normalizedBallAngle <= normalizedEnd;
-					} else {
-						withinSlice = normalizedBallAngle >= normalizedStart || normalizedBallAngle <= normalizedEnd;
-					}
+					const withinSlice = angleDiff <= arcWidth;
 
 					if (withinSlice) {
 						pd.posX[ballEnt] = nx * collisionDistance;
@@ -280,7 +275,7 @@ export class PhysicsEngine {
 
 		if (numActivePlayers === 0) return;
 
-		console.log(`Redistributing ${numActivePlayers} players. Entity stats before cleanup:`, pd.getStats());
+		// console.log(`Redistributing ${numActivePlayers} players. Entity stats before cleanup:`, pd.getStats());
 
 		let destroyedPaddles = 0;
 		let destroyedPillars = 0;
@@ -299,7 +294,7 @@ export class PhysicsEngine {
 			}
 		});
 
-		console.log(`Destroyed ${destroyedPaddles} paddles and ${destroyedPillars} pillars. Entity stats after cleanup:`, pd.getStats());
+		// console.log(`Destroyed ${destroyedPaddles} paddles and ${destroyedPillars} pillars. Entity stats after cleanup:`, pd.getStats());
 
 		const newAngleStep = (2 * Math.PI) / numActivePlayers;
 		const phaseConfig = getPhaseConfig(this.gameState.currentPhase);
@@ -329,7 +324,7 @@ export class PhysicsEngine {
 			newPaddleData.dead[i] = this.paddleData.dead[i];
 		}
 
-		console.log(`Creating ${numActivePlayers} new paddles and pillars...`);
+		// console.log(`Creating ${numActivePlayers} new paddles and pillars...`);
 
 		activePlayers.forEach((fixedPlayerId, newPaddleIndex) => {
 			const midAngle = newPaddleIndex * newAngleStep + newAngleStep / 2;
@@ -367,7 +362,7 @@ export class PhysicsEngine {
 
 		this.gameState.updatePlayerMapping(activePlayers);
 
-		console.log(`Redistributed ${numActivePlayers} players. Final entity stats:`, pd.getStats());
+		// console.log(`Redistributed ${numActivePlayers} players. Final entity stats:`, pd.getStats());
 	}
 
 	resetBallsForNewPhase() {
@@ -375,7 +370,7 @@ export class PhysicsEngine {
 		const cfg = this.cfg;
 		const numActivePlayers = this.gameState.playerStates.activePlayers.size;
 
-		console.log(`Resetting balls for new phase. Current balls: ${this.entities.balls.length}`);
+		// console.log(`Resetting balls for new phase. Current balls: ${this.entities.balls.length}`);
 
 		this.entities.balls.forEach(ballEnt => {
 			if (ballEnt !== undefined && pd.isActive(ballEnt)) {
@@ -388,11 +383,11 @@ export class PhysicsEngine {
 		const ballsPerPlayer = Math.floor(cfg.INITIAL_BALLS / cfg.MAX_PLAYERS);
 		const newBallCount = Math.max(ballsPerPlayer * numActivePlayers / 2, 3);
 
-		console.log(`Creating ${newBallCount} new balls. Entity stats before:`, pd.getStats());
+		// console.log(`Creating ${newBallCount} new balls. Entity stats before:`, pd.getStats());
 
 		this.createBalls(newBallCount);
 
-		console.log(`Ball reset complete. Entity stats after:`, pd.getStats());
+		// console.log(`Ball reset complete. Entity stats after:`, pd.getStats());
 	}
 
 	updatePaddleInputState(fixedPlayerId, moveInput) {
@@ -564,12 +559,12 @@ export class PhysicsEngine {
 		const expectedPaddles = this.entities.paddles.filter(p => p !== undefined && pd.isActive(p)).length;
 		const expectedPillars = this.entities.pillars.filter(p => p !== undefined && pd.isActive(p)).length;
 
-		console.log(`Entity integrity check:`);
-		console.log(`  Active entities: ${activeCount}/${pd.count} (max: ${pd.maxEntities})`);
-		console.log(`  Balls: ${ballCount} (expected: ${expectedBalls})`);
-		console.log(`  Paddles: ${paddleCount} (expected: ${expectedPaddles})`);
-		console.log(`  Pillars: ${pillarCount} (expected: ${expectedPillars})`);
-		console.log(`  Free list size: ${pd.freeList.length}`);
+		// console.log(`Entity integrity check:`);
+		// console.log(`  Active entities: ${activeCount}/${pd.count} (max: ${pd.maxEntities})`);
+		// console.log(`  Balls: ${ballCount} (expected: ${expectedBalls})`);
+		// console.log(`  Paddles: ${paddleCount} (expected: ${expectedPaddles})`);
+		// console.log(`  Pillars: ${pillarCount} (expected: ${expectedPillars})`);
+		// console.log(`  Free list size: ${pd.freeList.length}`);
 
 		return {
 			activeCount,
@@ -584,17 +579,17 @@ export class PhysicsEngine {
 	}
 
 	completeArenaRebuild() {
-		console.log(`Starting arena rebuild cleanup for ${this.gameState.currentPhase}`);
-		console.log(`Pre-rebuild entity integrity:`);
+		// console.log(`Starting arena rebuild cleanup for ${this.gameState.currentPhase}`);
+		// console.log(`Pre-rebuild entity integrity:`);
 		this.verifyEntityIntegrity();
 
 		this.redistributeSurvivingPlayers();
 		this.resetBallsForNewPhase();
 		this.gameState.completeArenaRebuild();
 
-		console.log(`Post-rebuild entity integrity:`);
+		// console.log(`Post-rebuild entity integrity:`);
 		this.verifyEntityIntegrity();
-		console.log(`Arena rebuild complete!`);
+		// console.log(`Arena rebuild complete!`);
 	}
 
 	disableBall(ballIndex) {

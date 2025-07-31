@@ -71,11 +71,12 @@ export function buildPaddles(
 	for (let i = 0; i < playerCount; i++) {
 		const sliceStart = i * angleStep;
 		const midAngle = sliceStart + pillarArc + halfUsableArc;
+		// const midAngle = sliceStart + pillarArc/ 2 + halfUsableArc;
 
-		const paddleAngle = midAngle;  // Same as physics
+		const paddleRotY = - midAngle;  // Same as physics
 
 
-		const paddleRotY = -paddleAngle;  // Face inward
+		// const paddleRotY = -paddleAngle;  // Face inward
 
 
 		// ---- Paddle ----
@@ -83,9 +84,12 @@ export function buildPaddles(
 		paddle.addComponent(
 			new PaddleComponent(i, Vector3.Zero(), 0, maxOffset, paddleRotY, playerCount / 4)
 		);
+		if (i == 1)
+			console.log(`Frontend paddle 1: midAngle=${midAngle.toFixed(3)}, rotY=${paddleRotY.toFixed(3)}`);
 		if (i == 0) {
 			paddle.addComponent(new InputComponent(true));
-			pongRoot.rotation.y = -paddleRotY;
+			// pongRoot.rotation.y = -paddleRotY;
+			console.log(`Frontend paddle 0: midAngle=${midAngle.toFixed(3)}, rotY=${paddleRotY.toFixed(3)}`);
 		}
 		else
 			paddle.addComponent(new InputComponent(false));

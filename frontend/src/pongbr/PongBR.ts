@@ -80,21 +80,21 @@ export class PongBR {
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 
 
-		const radian = 2 * Math.PI;
-
-		let points: Vector2[] = [];
-		for (let k = 128; k >= 0; --k) {
-			let point = new Vector2(Math.cos(radian * k / 128) * 202, Math.sin(radian * k / 128) * 202);
-			points.push(point);
-		}
-		for (let k = 0; k <= 128; ++k) {
-			let point = new Vector2(Math.cos(radian * k / 128) * 203, Math.sin(radian * k / 128) * 203);
-			points.push(point);
-		}
-		const builder = new PolygonMeshBuilder("brick", points, this.scene, earcut);
-		const mesh = builder.build(true, 1.);
-		mesh.parent = this.rotatingContainer;
-		mesh.position.y += 0.45;
+		// const radian = 2 * Math.PI;
+		//
+		// let points: Vector2[] = [];
+		// for (let k = 128; k >= 0; --k) {
+		// 	let point = new Vector2(Math.cos(radian * k / 128) * 202, Math.sin(radian * k / 128) * 202);
+		// 	points.push(point);
+		// }
+		// for (let k = 0; k <= 128; ++k) {
+		// 	let point = new Vector2(Math.cos(radian * k / 128) * 203, Math.sin(radian * k / 128) * 203);
+		// 	points.push(point);
+		// }
+		// const builder = new PolygonMeshBuilder("brick", points, this.scene, earcut);
+		// const mesh = builder.build(true, 1.);
+		// mesh.parent = this.rotatingContainer;
+		// mesh.position.y += 0.45;
 		const statue = this.scene.getMeshByName('Version NoSmile.006') as Mesh;
 		statue.parent = this.pongRoot;
 		statue.position.set(-750, -350, 0);

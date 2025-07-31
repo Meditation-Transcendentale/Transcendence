@@ -130,13 +130,12 @@ export class Pong {
 
 	}
 	public stop(): void {
-		//if (this.engine) {
-		//	this.engine.stopRenderLoop();
-		//}
+		if (this.scoreUI?.dispose) {
+			this.scoreUI.dispose();
+		} else if (this.scoreUI?.parentNode) {
+			this.scoreUI.parentNode.removeChild(this.scoreUI);
+		}
 
-		//if (this.scene) {
-		//  this.scene.detachControl();
-		//}
 
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
@@ -148,7 +147,6 @@ export class Pong {
 
 	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
 		this.ecs = new ECSManager();
-		// this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
 		this.ecs.addSystem(new ThinInstanceSystem(
 			instanceManagers.ball,
 			instanceManagers.paddle,
@@ -161,7 +159,6 @@ export class Pong {
 		this.uiSystem = new UISystem(this);
 		this.scoreUI = this.uiSystem.scoreUI;
 		this.ecs.addSystem(this.uiSystem);
-		// this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid));
 
 		createGameTemplate(this.ecs, config, localPaddleId, this.gameMode);
 	}
@@ -186,11 +183,9 @@ export class Pong {
 					return;
 				}
 
-				// Check for the welcome case
 				if (serverMsg.welcome?.paddleId != null) {
 					const paddleId = serverMsg.welcome.paddleId;
 
-					// Create and send a “ready” ClientMessage via helper
 					const readyPayload: userinterface.IClientMessage = { ready: {} };
 					const readyBuf = encodeClientMessage(readyPayload);
 					socket.send(readyBuf);
@@ -202,40 +197,11 @@ export class Pong {
 
 			socket.addEventListener('message', listener);
 
-			// Timeout guard
 			setTimeout(() => {
 				socket.removeEventListener('message', listener);
 				reject(new Error('Timed out waiting for WelcomeMessage'));
 			}, 5000);
 		});
-	}
-
-	dispose() {
-		const { arena, ball, paddle, wall } = this.baseMeshes;
-		this.stateManager.setter(false);
-
-		[arena, ball, wall, paddle].forEach(mesh => {
-			mesh.material?.dispose?.();
-			mesh.dispose?.();
-		});
-		this.cam.dispose();
-		this.engine.clear(new Color4(1, 1, 1, 1), true, true);
-		this.engine.stopRenderLoop();
-
-		this.wsManager?.socket?.close();
-		this.scene?.dispose();
-		this.engine?.dispose();
-
-		this.visualEffectSystem?.dispose();
-
-		if (this.scoreUI?.dispose) {
-			this.scoreUI.dispose();
-		} else if (this.scoreUI?.parentNode) {
-			this.scoreUI.parentNode.removeChild(this.scoreUI);
-		}
-		clearTimeout(resizeTimeout);
-		this.engine.dispose();
-		Router.nav(`/play`, false, false);
 	}
 
 	public static INIT() {
