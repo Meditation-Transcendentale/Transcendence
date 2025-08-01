@@ -84,6 +84,7 @@ export class PhysicsEngine {
 
 			const sliceStart = pid * angleStep;
 			const midAngle = sliceStart + pillarArc + halfUsableArc;
+			console.log(`paddle  id = ${pid} sliceStart = ${sliceStart}, paddleRotY = ${midAngle}`)
 			// const midAngle = sliceStart + halfUsableArc;
 			// const midAngle = sliceStart  halfUsableArc;
 
@@ -105,8 +106,8 @@ export class PhysicsEngine {
 			const pillarEnt = pd.create(ENTITY_MASKS.PILLAR | ENTITY_MASKS.STATIC);
 			this.entities.pillars[pid] = pillarEnt;
 
-			const pillarAngle = midAngle - maxOffsets - halfArc;
-			// const pillarAngle = sliceStart;
+			// const pillarAngle = midAngle - maxOffsets - halfArc;
+			const pillarAngle = sliceStart + angleStep - pillarArc / 2;
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * cfg.ARENA_RADIUS;
@@ -187,11 +188,14 @@ export class PhysicsEngine {
 				if (velocityDotNormal <= 0) continue;
 
 				const ballAngle = Math.atan2(ballY, ballX);
-				let normalizedBallAngle = ballAngle;
-				while (normalizedBallAngle < 0) normalizedBallAngle += 2 * Math.PI;
-				while (normalizedBallAngle >= 2 * Math.PI) normalizedBallAngle -= 2 * Math.PI;
-				
-				for (let paddleIndex = 0; paddleIndex < numPlayers; paddleIndex++) {
+				const normalizedBallAngle = ballAngle < 0 ? ballAngle + 2 * Math.PI : ballAngle;
+
+				const approximateSector = Math.floor(normalizedBallAngle / angleStep) % numPlayers;
+
+				const checkRange = 2;
+				for (let offset = -checkRange; offset <= checkRange; offset++) {
+					const paddleIndex = (approximateSector + offset + numPlayers) % numPlayers;
+
 					let fixedPlayerId = paddleIndex;
 					if (this.gameState.playerMapping && Object.keys(this.gameState.playerMapping).length > 0) {
 						const reverseMapping = Object.entries(this.gameState.playerMapping)
@@ -202,7 +206,6 @@ export class PhysicsEngine {
 					}
 
 					let currentPaddleAngle, arcWidth;
-
 					if (this.gameState.playerStates.eliminated.has(fixedPlayerId)) {
 						currentPaddleAngle = this.paddleData.centerAngles[paddleIndex];
 						arcWidth = angleStep;
@@ -210,12 +213,12 @@ export class PhysicsEngine {
 						currentPaddleAngle = this.paddleData.centerAngles[paddleIndex] + this.paddleData.offsets[paddleIndex];
 						arcWidth = angleStep * cfg.PADDLE_FILL;
 					}
-					const startAngle = currentPaddleAngle - arcWidth / 2;
 
-					// Normalize difference between ball and paddle start
+					const startAngle = currentPaddleAngle - arcWidth / 2;
 					let angleDiff = normalizedBallAngle - startAngle;
-					while (angleDiff < 0) angleDiff += 2 * Math.PI;
-					while (angleDiff >= 2 * Math.PI) angleDiff -= 2 * Math.PI;
+
+					if (angleDiff < 0) angleDiff += 2 * Math.PI;
+					else if (angleDiff >= 2 * Math.PI) angleDiff -= 2 * Math.PI;
 
 					const withinSlice = angleDiff <= arcWidth;
 
@@ -234,6 +237,7 @@ export class PhysicsEngine {
 			}
 		}
 	}
+
 
 	convertPaddleToWall(playerId) {
 		const pd = this.pd;
@@ -297,12 +301,10 @@ export class PhysicsEngine {
 		// console.log(`Destroyed ${destroyedPaddles} paddles and ${destroyedPillars} pillars. Entity stats after cleanup:`, pd.getStats());
 
 		const newAngleStep = (2 * Math.PI) / numActivePlayers;
-		const phaseConfig = getPhaseConfig(this.gameState.currentPhase);
-		const phaseAngleStep = (2 * Math.PI) / phaseConfig.playerCount;
-		const paddleArc = phaseAngleStep * cfg.PADDLE_FILL;
+		const paddleArc = newAngleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
-		const pillarArc = phaseAngleStep * 0.1;
-		const usableArc = phaseAngleStep - pillarArc;
+		const pillarArc = newAngleStep * 0.1;
+		const usableArc = newAngleStep - pillarArc;
 		const halfUsableArc = usableArc / 2;
 		const maxOffsets = halfUsableArc - halfArc;
 
@@ -327,7 +329,8 @@ export class PhysicsEngine {
 		// console.log(`Creating ${numActivePlayers} new paddles and pillars...`);
 
 		activePlayers.forEach((fixedPlayerId, newPaddleIndex) => {
-			const midAngle = newPaddleIndex * newAngleStep + newAngleStep / 2;
+			const sliceStart = newPaddleIndex * newAngleStep;
+			const midAngle = sliceStart + pillarArc + halfUsableArc;
 
 			const paddleEnt = pd.create(ENTITY_MASKS.PADDLE);
 			newPaddles[newPaddleIndex] = paddleEnt;
@@ -347,7 +350,7 @@ export class PhysicsEngine {
 			const pillarEnt = pd.create(ENTITY_MASKS.PILLAR | ENTITY_MASKS.STATIC);
 			newPillars[newPaddleIndex] = pillarEnt;
 
-			const pillarAngle = midAngle - maxOffsets - halfArc;
+			const pillarAngle = sliceStart + newAngleStep - pillarArc / 2;
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * cfg.ARENA_RADIUS;

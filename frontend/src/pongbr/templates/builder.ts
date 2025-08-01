@@ -74,6 +74,7 @@ export function buildPaddles(
 		// const midAngle = sliceStart + pillarArc/ 2 + halfUsableArc;
 
 		const paddleRotY = - midAngle;  // Same as physics
+		console.log(`paddle  id = ${i} sliceStart = ${sliceStart}, paddleRotY = ${paddleRotY}`)
 
 
 		// const paddleRotY = -paddleAngle;  // Face inward
