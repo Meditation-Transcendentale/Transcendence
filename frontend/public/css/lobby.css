@@ -61,20 +61,31 @@
 	overflow: hidden;
 	white-space: nowrap;
 	max-width: 100%;
-	min-width: 30%;
 	padding-right: 2vh;
 	padding-left: 0.5vh;
 	text-overflow: "...";
 	border-top: 0.1vh solid #ccc;
 }
 
-.list-body>tr:nth-child(1) {
-	text-align: center;
+.list-body .username {
+	text-align: left;
+	min-width: 160%;
 }
 
-.list-body>tr:nth-child(2) {
+.list-body .status {
 	text-align: center;
+	min-width: 20%;
 }
+
+/**/
+/* .list-body>tr:nth-child(1) { */
+/* 	text-align: left; */
+/* 	min-width: 80%; */
+/* } */
+/**/
+/* .list-body>tr:nth-child(2) { */
+/* 	text-align: center; */
+/* } */
 
 /*.list-body>tr:hover>td {*/
 /*	color: black;*/

@@ -5,108 +5,7 @@ import { getRequest, postRequest } from "./requests";
 import Router from "./Router";
 import { User } from "./User";
 import { createButton } from "./utils";
-
-
-const lr: listResp = {
-	lobbies: [
-		{
-			id: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-			mod: "local",
-			maxPlayers: 1,
-			players: ["ehehe"]
-		},
-		{
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		}, {
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		}, {
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		}, {
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		},
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		},
-		{
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		}, {
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		},
-		{
-			id: "ffffffffffffffffffffffffffffffffffff",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		},
-
-
-
-
-	]
-};
-
+import { Popup } from "./Popup";
 
 
 interface playHtmlReference {
@@ -125,6 +24,8 @@ interface playHtmlReference {
 	createWin: HTMLDivElement;
 	list: HTMLTableElement;
 	joinId: HTMLInputElement;
+	lobbyInfoWindow: { html: HTMLDivElement, id: number };
+	lobbyInfo: HTMLDivElement;
 };
 
 enum playState {
@@ -182,6 +83,8 @@ export default class Play {
 			createWin: div.querySelector("#create-btn-window") as HTMLDivElement,
 			list: div.querySelector("#join-list") as HTMLTableElement,
 			joinId: div.querySelector("#join-id") as HTMLInputElement,
+			lobbyInfoWindow: { html: div.querySelector("#play-lobby-info") as HTMLDivElement, id: -1 },
+			lobbyInfo: div.querySelector("#lobby-info") as HTMLDivElement
 		}
 
 
@@ -316,6 +219,14 @@ export default class Play {
 
 		this.ref.joinId.addEventListener("focusout", () => {
 			//this.div.querySelector("#join-indic")?.removeAttribute("on");
+		})
+
+		this.ref.lobbyInfoWindow.id = App3D.addCSS3dObject({
+			html: this.ref.lobbyInfoWindow.html,
+			width: 2.,
+			height: 2.,
+			world: Matrix.RotationY(Math.PI * 1).multiply(Matrix.Translation(-20, 4, 24)),
+			enable: false
 		})
 
 		//this.ref.smod.toggleAttribute('off');
@@ -497,6 +408,7 @@ export default class Play {
 		App3D.setCSS3dObjectEnable(this.ref.switch.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.create.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.join.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.lobbyInfoWindow.id, false);
 		this.css.remove();
 		//App3D.unloadVue('play');
 		//this.div.remove();
@@ -580,20 +492,6 @@ export default class Play {
 	private parseListResp(resp: listResp) {
 		const body = this.ref.list.querySelector("tbody") as HTMLElement;
 		body.innerHTML = '';
-		//this.ref.list.innerHTML = '';
-		//const div = document.createElement('tr');
-		//const id = document.createElement('th');
-		//const mod = document.createElement('th');
-		//const player = document.createElement('th');
-		//id.innerText = "lobby id";
-		//mod.innerText = "mod";
-		//player.innerText = "players";
-		//div.appendChild(id);
-		//div.appendChild(mod);
-		//div.appendChild(player);
-		//
-		//this.ref.list.appendChild(div);
-
 		for (let i = 0; i < resp.lobbies.length; i++) {
 			body.appendChild(this.createLobbyList(resp.lobbies[i]));
 		}
@@ -610,10 +508,44 @@ export default class Play {
 		div.appendChild(id);
 		div.appendChild(mod);
 		div.appendChild(player);
+		div.addEventListener("click", () => {
+			this.setLobbyInfo(l.lobbyId);
+		})
 
 		return div;
 	}
 
+	private async setLobbyInfo(lobbyId: string) {
+		// App3D.setCSS3dObjectEnable(this.ref.lobbyInfoWindow.id, false);
+		let state = await getRequest(`lobby/${lobbyId}`).catch((err) => { console.log(err) }) as any;
+		state = state.state;
+
+		const status = this.ref.lobbyInfo.querySelector("#lobby-status") as HTMLDivElement;
+		status.innerText = `id: ${lobbyId}
+mode: ${state.mode}
+map: ${state.map}`;
+
+		const players = this.ref.lobbyInfo.querySelector("ul") as HTMLElement;
+		players.innerHTML = "";
+		let html = "";
+		for (let i = 0; i < state.players.length; i++) {
+			const name = await getRequest(`info/uuid/${state.players[i].uuid}`).catch((err) => { console.log(err) }) as any;
+			html += `<li>${name.username}</li>`;
+		}
+		players.innerHTML = html;
+		const join = this.ref.lobbyInfo.querySelector("#lobby-join") as HTMLDivElement;
+		join.innerHTML = "";
+		const btn = document.createElement("input") as HTMLInputElement;
+		btn.className = "window-content";
+		btn.type = "button";
+		btn.value = "JOIN";
+		btn.addEventListener(("click"), () => {
+			Router.nav(`/lobby?id=${lobbyId}`, false, false);
+		})
+		join.appendChild(btn);
+		Popup.addPopup(this.ref.lobbyInfoWindow.html);
+		// App3D.setCSS3dObjectEnable(this.ref.lobbyInfoWindow.id, true);
+	}
 
 }
 

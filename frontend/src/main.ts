@@ -1,4 +1,5 @@
 import { App3D } from "./3d/App";
+import { Popup } from "./spa/Popup";
 import Router from "./spa/Router";
 
 //async function init() {
@@ -34,6 +35,7 @@ async function init() {
 	window.addEventListener('keydown', (e) => {
 		if (e.key == 'Escape') {
 			Router.nav('/home', false, true)
+			Popup.removePopup();
 		}
 	})
 }

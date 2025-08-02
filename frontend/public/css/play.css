@@ -327,3 +327,61 @@
 		opacity: 1;
 	}
 }
+
+
+#play-lobby-info {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: fit-content;
+	width: fit-content;
+	transform: translate(-50%, -50%);
+}
+
+#play-lobby-info * {
+	font-size: 5vh;
+}
+
+#lobby-info li {
+	display: block;
+}
+
+#lobby-info {
+	display: grid;
+	height: 50vh;
+}
+
+#lobby-status {
+	grid-column: 1/1;
+	width: 40vh;
+	overflow: hidden;
+}
+
+#lobby-info>ul {
+	grid-column: 2/2;
+	width: 40vh;
+	height: 30vh;
+	overflow: scroll;
+}
+
+#lobby-join {
+	grid-column: 1/3;
+	bottom: 0%;
+	height: fit-content;
+}
+
+#lobby-join>input {
+	height: fit-content;
+	width: 90%;
+	margin-left: 5%;
+	font-size: 6vh;
+	text-align: center;
+	border: 0.4vh white solid;
+	animation: blink 1.5s linear infinite;
+}
+
+#lobby-join>input:hover {
+	color: black;
+	background-color: white;
+	animation: none;
+}

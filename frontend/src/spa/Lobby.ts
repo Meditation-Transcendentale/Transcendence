@@ -4,6 +4,7 @@ import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
 // import { lobbyVue } from "../Vue";
 import Router from "./Router";
 import { User } from "./User";
+import { getRequest } from "./requests";
 
 
 interface lobbyHtmlReference {
@@ -76,7 +77,7 @@ export default class Lobby {
 		this.setupWs(this.id);
 		this.ref.playersList.innerHTML = "";
 
-		this.players.set(User.uuid as string, this.createPlayerDiv(User.uuid as string, false, true));
+		this.createPlayerDiv(User.uuid as string, false, true);
 
 		document.body.appendChild(this.css);
 		App3D.setVue("lobby");
@@ -85,6 +86,8 @@ export default class Lobby {
 
 	public async unload() {
 		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, false);
+		this.ws?.send(encodeClientMessage({ quit: { lobbyId: this.id as string, uuid: User.uuid } }));
+		this.ws?.close();
 		this.css.remove();
 		this.players.clear();
 	}
@@ -153,26 +156,32 @@ export default class Lobby {
 				this.players.get(r[i].uuid)!.status.innerText = (r[i].ready ? "yes" : "no");
 
 			} else {
-				this.players.set(r[i].uuid, this.createPlayerDiv(r[i].uuid, r[i].ready, false));
+				this.createPlayerDiv(r[i].uuid, r[i].ready, false);
 			}
 		}
-		for (let i in this.players.keys()) {
+		for (let i of this.players.keys()) {
 			let checked = false;
 			for (let y = 0; y < r.length; y++) {
-				checked = i === r[y].uuid;
+				checked = checked || (i == r[y].uuid);
 			}
 			if (!checked) {
+				console.log("destroy");
 				this.players.get(i)!.td.remove();
 				this.players.delete(i);
 			}
 		}
 	}
 
-	private createPlayerDiv(uuid: string, ready: boolean, self: boolean): player {
+	private async createPlayerDiv(uuid: string, ready: boolean, self: boolean) {
 		const div = document.createElement('tr');
 		const name = document.createElement('td');
 		const status = document.createElement('td');
-		name.innerText = uuid; //NEED TO IMPLEMENT A ROUTE GET /userinfo/:uuid to get Username from uuid
+
+		name.className = "username";
+		status.className = "status";
+
+		const rep = await getRequest(`info/uuid/${uuid}`).catch((err) => console.log(err)) as any;
+		name.innerText = rep.username; //NEED TO IMPLEMENT A ROUTE GET /userinfo/:uuid to get Username from uuid
 		status.innerText = (ready ? "yes" : "no");
 		if (self) {
 			status.addEventListener("click", () => {
@@ -184,11 +193,7 @@ export default class Lobby {
 		div.appendChild(status);
 		this.ref.playersList.appendChild(div);
 
-		return {
-			td: div,
-			name: name,
-			status: status
-		}
+		this.players.set(uuid, { td: div, name: name, status: status });
 	}
 
 	private async wsSend(type: string) {

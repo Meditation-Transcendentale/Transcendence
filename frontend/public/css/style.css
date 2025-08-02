@@ -263,6 +263,14 @@ input {
 	all: unset;
 }
 
+input[type=text] {
+	cursor: text;
+}
+
+input[type="button"] {
+	cursor: cell;
+}
+
 input[on] {
 	color: var(--input-on-color) !important;
 	background-color: var(--input-on-background) !important;
@@ -382,4 +390,17 @@ input[on] {
 
 .switch-input[down]:hover {
 	letter-spacing: 0vh;
+}
+
+.blur-popup {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	backdrop-filter: blur(5px);
+	pointer-events: all;
+	z-index: 10;
+}
+
+.blur-popup>* {
+	z-index: 11;
 }
