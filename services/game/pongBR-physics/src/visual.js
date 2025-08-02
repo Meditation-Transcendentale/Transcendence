@@ -1,7 +1,7 @@
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const raylib = require('raylib');
-import { PhysicsEngine } from './physicsEngine.js';
+import { PhysicsEngine } from './physics-engine.js';
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
@@ -63,17 +63,19 @@ function drawArena() {
 function drawBalls(balls) {
 	for (let i = 0; i < balls.length; i++) {
 		const ball = balls[i];
+		if (ball.disabled) continue; // Skip disabled balls
+
 		const pos = toScreen(ball.x, ball.y);
 		const ballRadius = Math.max(2, ball.radius * ZOOM);
-		
+
 		// Color code balls: Red=normal, Orange=near collision
 		const distFromCenter = Math.sqrt(ball.x * ball.x + ball.y * ball.y);
 		const collisionDistance = engine.cfg.ARENA_RADIUS - ball.radius;
 		const isNearCollision = distFromCenter >= collisionDistance - 20;
 		const ballColor = isNearCollision ? raylib.ORANGE : raylib.RED;
-		
+
 		raylib.DrawCircle(pos.x, pos.y, ballRadius, ballColor);
-		
+
 		// Show ball angle for first few balls
 		if (debugMode && i < 3 && isNearCollision) {
 			const ballAngle = Math.atan2(ball.y, ball.x);
@@ -136,7 +138,7 @@ function drawPillars() {
 function drawPaddles(paddles) {
 	const numPlayers = engine.entities.paddles.length;
 	const angleStep = (2 * Math.PI) / numPlayers;
-	
+
 	for (let paddleIndex = 0; paddleIndex < paddles.length; paddleIndex++) {
 		const paddle = paddles[paddleIndex];
 		const paddleEnt = engine.entities.paddles[paddleIndex];
@@ -150,19 +152,12 @@ function drawPaddles(paddles) {
 		const halfW = engine.pd.halfW[paddleEnt];
 		const halfH = engine.pd.halfH[paddleEnt];
 
-		// Get player ID mapping (same logic as collision detection)
-		let fixedPlayerId = paddleIndex;
-		if (engine.gameState && engine.gameState.playerMapping && Object.keys(engine.gameState.playerMapping).length > 0) {
-			const reverseMapping = Object.entries(engine.gameState.playerMapping)
-				.find(([playerId, pIdx]) => pIdx === paddleIndex);
-			if (reverseMapping) {
-				fixedPlayerId = parseInt(reverseMapping[0]);
-			}
-		}
+		// Get player ID from paddle data
+		const fixedPlayerId = paddle.playerId;
 
 		// Calculate collision area (same as physics)
 		let currentPaddleAngle, arcWidth;
-		const isEliminated = engine.gameState && engine.gameState.playerStates && engine.gameState.playerStates.eliminated.has(fixedPlayerId);
+		const isEliminated = engine.gameState.playerStates.eliminated.has(fixedPlayerId);
 		if (isEliminated) {
 			currentPaddleAngle = engine.paddleData.centerAngles[paddleIndex];
 			arcWidth = angleStep;
@@ -178,7 +173,7 @@ function drawPaddles(paddles) {
 
 		// Color: Blue=alive, Gray=eliminated, Lime=first 3 paddles for debugging
 		let paddleColor;
-		if (isEliminated) {
+		if (isEliminated || paddle.dead) {
 			paddleColor = raylib.GRAY;
 		} else if (debugMode && paddleIndex < 3) {
 			paddleColor = raylib.LIME; // Highlight first 3 for debugging
@@ -198,30 +193,30 @@ function drawPaddles(paddles) {
 		if (debugMode && paddleIndex < 5) {
 			const arenaCenter = toScreen(0, 0);
 			const rayLength = engine.cfg.ARENA_RADIUS * ZOOM;
-			
+
 			// Paddle start and end angles (physical paddle bounds)
 			const paddleStartAngle = engine.paddleData.centerAngles[paddleIndex] - (angleStep / 2);
 			const paddleEndAngle = engine.paddleData.centerAngles[paddleIndex] + (angleStep / 2);
-			
+
 			// Collision slice start and end angles  
 			const sliceStartAngle = currentPaddleAngle - arcWidth / 2;
 			const sliceEndAngle = currentPaddleAngle + arcWidth / 2;
-			
+
 			// Draw paddle bounds (green rays)
 			const paddleStartX = arenaCenter.x + Math.cos(paddleStartAngle) * rayLength;
 			const paddleStartY = arenaCenter.y + Math.sin(paddleStartAngle) * rayLength;
 			const paddleEndX = arenaCenter.x + Math.cos(paddleEndAngle) * rayLength;
 			const paddleEndY = arenaCenter.y + Math.sin(paddleEndAngle) * rayLength;
-			
+
 			raylib.DrawLine(arenaCenter.x, arenaCenter.y, paddleStartX, paddleStartY, raylib.GREEN);
 			raylib.DrawLine(arenaCenter.x, arenaCenter.y, paddleEndX, paddleEndY, raylib.GREEN);
-			
+
 			// Draw collision slice bounds (red rays)
 			const sliceStartX = arenaCenter.x + Math.cos(sliceStartAngle) * rayLength * 0.9;
 			const sliceStartY = arenaCenter.y + Math.sin(sliceStartAngle) * rayLength * 0.9;
 			const sliceEndX = arenaCenter.x + Math.cos(sliceEndAngle) * rayLength * 0.9;
 			const sliceEndY = arenaCenter.y + Math.sin(sliceEndAngle) * rayLength * 0.9;
-			
+
 			raylib.DrawLine(arenaCenter.x, arenaCenter.y, sliceStartX, sliceStartY, raylib.RED);
 			raylib.DrawLine(arenaCenter.x, arenaCenter.y, sliceEndX, sliceEndY, raylib.RED);
 		}
@@ -231,6 +226,7 @@ function drawPaddles(paddles) {
 			drawText(`P${fixedPlayerId}`, pos.x + 15, pos.y - 25, 12, raylib.WHITE);
 			drawText(`${(currentPaddleAngle * 180 / Math.PI).toFixed(1)}°`, pos.x + 15, pos.y - 10, 10, raylib.CYAN);
 			drawText(`${(arcWidth * 180 / Math.PI).toFixed(1)}°`, pos.x + 15, pos.y + 5, 10, raylib.MAGENTA);
+			drawText(`Off:${paddle.offset.toFixed(2)}`, pos.x + 15, pos.y + 20, 8, raylib.YELLOW);
 		} else {
 			drawText(`P${fixedPlayerId}`, pos.x + 15, pos.y - 15, 12, raylib.WHITE);
 		}
@@ -257,23 +253,23 @@ function drawPhaseInfo() {
 	drawText(`${gameState.currentPhase}`, boxX + 15, yOffset, 18, raylib.YELLOW);
 	yOffset += lineHeight * 1.2;
 
-	const activeCount = gameState.activePlayers.length;
-	const totalCount = engine.originalPlayerCount || NUM_PLAYERS;
+	const activeCount = gameState.activePlayers ? gameState.activePlayers.length : 0;
+	const totalCount = NUM_PLAYERS;
 	drawText(`Players: ${activeCount}/${totalCount}`, boxX + 15, yOffset, 14, raylib.WHITE);
 	yOffset += lineHeight;
 
-	// Phase paddle size
-	const phasePaddleSize = engine.getPhasePaddleSize();
-	drawText(`Paddle Size: ${phasePaddleSize.toFixed(1)}`, boxX + 15, yOffset, 12, raylib.CYAN);
+	// Phase paddle size - using stage info from state
+	drawText(`Stage: ${state.stage}`, boxX + 15, yOffset, 12, raylib.CYAN);
 	yOffset += lineHeight;
 
 	// Status
 	if (gameState.isRebuilding) {
 		const timeLeft = Math.ceil(gameState.rebuildTimeRemaining / 1000);
 		drawText(`REBUILDING... ${timeLeft}s`, boxX + 15, yOffset, 12, raylib.ORANGE);
-	} else if (gameState.isGameOver) {
-		const winner = gameState.winner;
-		const winText = winner !== null ? `Winner: P${winner}` : "No Winner";
+	} else if (state.end || gameState.gameOver) {
+		const ranks = state.ranks || [];
+		const winner = ranks.length > 0 ? ranks[0] : null;
+		const winText = winner !== null ? `Winner: P${winner.playerId}` : "No Winner";
 		drawText(`GAME OVER`, boxX + 15, yOffset, 14, raylib.GOLD);
 		yOffset += lineHeight * 0.8;
 		drawText(winText, boxX + 15, yOffset, 12, raylib.GOLD);
@@ -294,23 +290,24 @@ function drawUI() {
 	yOffset += lineHeight * 1.5;
 
 	// Basic info
-	drawText(`Active: ${engine.playerStates.activePlayers.size}`, 20, yOffset, 14);
+	const activePlayers = engine.gameState.playerStates.activePlayers.size;
+	drawText(`Active: ${activePlayers}`, 20, yOffset, 14);
 	yOffset += lineHeight;
 	drawText(`Balls: ${state.balls.length}`, 20, yOffset, 14);
 	yOffset += lineHeight;
-	
+
+	// Frame stats
+	if (state.frameStats) {
+		drawText(`Active Balls: ${state.frameStats.activeBalls}`, 20, yOffset, 14);
+		yOffset += lineHeight;
+	}
+
 	// Debug mode indicator
 	const debugText = debugMode ? "Debug: ON" : "Debug: OFF";
 	const debugColor = debugMode ? raylib.GREEN : raylib.GRAY;
 	drawText(debugText, 20, yOffset, 14, debugColor);
 	yOffset += lineHeight;
-	
-	// Collision system indicator
-	const collisionText = engine.useSimplifiedCollision === 2 ? "Collision: OPTIMIZED" : "Collision: ORIGINAL";
-	const collisionColor = engine.useSimplifiedCollision === 2 ? raylib.MAGENTA : raylib.CYAN;
-	drawText(collisionText, 20, yOffset, 14, collisionColor);
-	yOffset += lineHeight;
-	
+
 	// Collision debug info
 	if (debugMode) {
 		const nearCollisionBalls = state.balls.filter(ball => {
@@ -336,8 +333,8 @@ function drawUI() {
 		"T: Eliminate Random Player",
 		"R: Reset Game",
 		"D: Toggle Debug Mode",
-		"S: Toggle Original/Optimized", 
 		"P: Log Pillar Positions",
+		"1-4: Test Paddle Movement",
 		"Arrows: Move Camera",
 		"I/O: Zoom"
 	];
@@ -371,11 +368,11 @@ function handleInput() {
 
 	// Test elimination - this is the main feature
 	if (raylib.IsKeyPressed(raylib.KEY_T)) {
-		const activePlayers = Array.from(engine.playerStates.activePlayers);
+		const activePlayers = Array.from(engine.gameState.playerStates.activePlayers);
 		if (activePlayers.length > 1) {
 			const randomPlayer = activePlayers[Math.floor(Math.random() * activePlayers.length)];
-			const randomBall = Math.floor(Math.random() * engine.entities.balls.length);
-			engine.eliminatePlayer(randomPlayer, randomBall);
+			// Simulate elimination by calling the game state method
+			engine.gameState.eliminatePlayer(randomPlayer, 0);
 			logEvent(`Eliminated Player ${randomPlayer}`, raylib.ORANGE);
 		}
 	}
@@ -396,11 +393,22 @@ function handleInput() {
 		logEvent(`Debug mode: ${debugMode ? 'ON' : 'OFF'}`, raylib.CYAN);
 	}
 
-	// Collision system toggle
-	if (raylib.IsKeyPressed(raylib.KEY_S)) {
-		engine.useSimplifiedCollision = engine.useSimplifiedCollision === 0 ? 2 : 0;
-		const mode = engine.useSimplifiedCollision === 2 ? 'OPTIMIZED' : 'ORIGINAL';
-		logEvent(`Collision: ${mode}`, raylib.MAGENTA);
+	// Test paddle movement
+	if (raylib.IsKeyPressed(raylib.KEY_ONE)) {
+		engine.updatePaddleInputState(0, 1); // Move player 0 right
+		logEvent("Player 0 move right", raylib.CYAN);
+	}
+	if (raylib.IsKeyPressed(raylib.KEY_TWO)) {
+		engine.updatePaddleInputState(0, -1); // Move player 0 left
+		logEvent("Player 0 move left", raylib.CYAN);
+	}
+	if (raylib.IsKeyPressed(raylib.KEY_THREE)) {
+		engine.updatePaddleInputState(1, 1); // Move player 1 right
+		logEvent("Player 1 move right", raylib.CYAN);
+	}
+	if (raylib.IsKeyPressed(raylib.KEY_FOUR)) {
+		engine.updatePaddleInputState(1, -1); // Move player 1 left
+		logEvent("Player 1 move left", raylib.CYAN);
 	}
 
 	// Force pillar position update
@@ -432,12 +440,6 @@ function handleInput() {
 	ZOOM = Math.max(0.8, Math.min(ZOOM, 10));
 }
 
-function forcePhase(phaseName) {
-	engine.currentPhase = phaseName;
-	engine.startArenaRebuild();
-	logEvent(`Forced ${phaseName}`, raylib.CYAN);
-}
-
 // === MAIN LOOP ===
 
 while (!raylib.WindowShouldClose()) {
@@ -464,7 +466,7 @@ while (!raylib.WindowShouldClose()) {
 						break;
 					case 'ARENA_REBUILD_COMPLETE':
 						color = raylib.GREEN;
-						message = `Arena rebuilt - ${event.activePlayers.length} survivors`;
+						message = `Arena rebuilt - ${event.activePlayers ? event.activePlayers.length : 0} survivors`;
 						break;
 					case 'GAME_END':
 						color = raylib.GOLD;

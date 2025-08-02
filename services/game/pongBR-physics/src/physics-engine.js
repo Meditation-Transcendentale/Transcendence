@@ -107,11 +107,12 @@ export class PhysicsEngine {
 			this.entities.pillars[pid] = pillarEnt;
 
 			// const pillarAngle = midAngle - maxOffsets - halfArc;
-			const pillarAngle = sliceStart + angleStep - pillarArc / 2;
+			// const pillarAngle = sliceStart + angleStep - pillarArc / 2;
+			const pillarAngle = sliceStart + pillarArc / 2;
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
-			pd.posX[pillarEnt] = Math.cos(pillarAngle) * cfg.ARENA_RADIUS;
-			pd.posY[pillarEnt] = Math.sin(pillarAngle) * cfg.ARENA_RADIUS;
+			pd.posX[pillarEnt] = Math.cos(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
+			pd.posY[pillarEnt] = Math.sin(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
 			pd.rot[pillarEnt] = pillarAngle;
 			pd.halfW[pillarEnt] = pd.halfH[pillarEnt] = pd.radius[pillarEnt] = pillarSize / 2;
 		}
@@ -350,11 +351,12 @@ export class PhysicsEngine {
 			const pillarEnt = pd.create(ENTITY_MASKS.PILLAR | ENTITY_MASKS.STATIC);
 			newPillars[newPaddleIndex] = pillarEnt;
 
-			const pillarAngle = sliceStart + newAngleStep - pillarArc / 2;
+			// const pillarAngle = sliceStart + newAngleStep - pillarArc / 2;
+			const pillarAngle = sliceStart + pillarArc / 2;
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
-			pd.posX[pillarEnt] = Math.cos(pillarAngle) * cfg.ARENA_RADIUS;
-			pd.posY[pillarEnt] = Math.sin(pillarAngle) * cfg.ARENA_RADIUS;
+			pd.posX[pillarEnt] = Math.cos(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
+			pd.posY[pillarEnt] = Math.sin(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
 			pd.rot[pillarEnt] = pillarAngle;
 			pd.halfW[pillarEnt] = pd.halfH[pillarEnt] = pd.radius[pillarEnt] = pillarSize / 2;
 		});
