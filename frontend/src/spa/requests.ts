@@ -99,3 +99,19 @@ export async function meReject() {
 		new CustomEvent("status", { detail: { ok: false, json: "Not Logged In" } }))
 	setTimeout(() => { window.location.reload() }, 500);
 }
+
+export async function cdnRequest(path: string): Promise<JSON> {
+	const response = await fetch(`https://${window.location.hostname}:7000/cdn${encodeURI(path)}`, {
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		credentials: 'include',
+	});
+
+	if (!response.ok) {
+		return Promise.reject(response);
+	}
+	return response.json();
+}

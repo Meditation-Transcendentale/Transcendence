@@ -70,3 +70,120 @@
 	color: black;
 	background-color: white;
 }
+
+#setting-window {
+	position: absolute;
+	top: 30%;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 31vh;
+	height: 30vh;
+}
+
+#setting-window>.window-bar {
+	font-size: 2.5vh;
+}
+
+#setting-window>.window-content {
+	font-size: 3vh;
+}
+
+#avatar-img {
+	width: 10vh;
+	height: 10vh;
+	background-color: grey;
+	cursor: pointer;
+	border-radius: 10%;
+	border-color: white;
+	border-style: solid;
+	border-width: 0.2vh;
+	object-fit: cover;
+
+	transition: opacity 0.2s ease;
+}
+
+#avatar-change {
+	display: none;
+}
+
+#avatar-img:hover {
+	opacity: 0.8;
+}
+
+
+#username-change {
+	font-size: 3vh;
+	text-align: left;
+	color: white;
+	border-bottom: 0.1em white solid;
+	overflow: hidden;
+}
+
+#password-change,
+#setting-edit,
+#twofa-change {
+	height: fit-content;
+	text-align: center;
+	border: 0.1em white solid;
+}
+
+#password-change:hover,
+#setting-edit:hover,
+#twofa-change:hover {
+	color: black;
+	background-color: white;
+	animation: none;
+}
+
+#avatar-img {
+	position: absolute;
+	top: 1.2em;
+	left: 0.3em;
+}
+
+#username-change {
+	position: absolute;
+	width: 15vh;
+	top: 1.2em;
+	left: 12vh;
+}
+
+#avatar-edit {
+	position: absolute;
+	font-size: 2.2vh;
+	padding-right: 0.1em;
+	top: 4em;
+	left: 12vh;
+}
+
+#avatar-edit[off] {
+	pointer-events: none;
+}
+
+#username-edit {
+	position: absolute;
+	font-size: 2.2vh;
+	padding-right: 0.1em;
+	top: 4em;
+	left: 12vh;
+}
+
+#username-edit[off] {
+	pointer-events: none;
+}
+
+#password-change {
+	position: absolute;
+	bottom: 1%;
+	left: 1%;
+	width: 48%;
+
+}
+
+#twofa-change {
+	position: absolute;
+	bottom: 1%;
+	right: 1%;
+	width: 48%;
+
+}

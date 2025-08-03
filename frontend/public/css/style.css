@@ -215,7 +215,6 @@ input[off] {
 	color: grey;
 	background-color: #222;
 	border-color: grey !important;
-	pointer-events: none;
 }
 
 
@@ -276,11 +275,11 @@ input[on] {
 	background-color: var(--input-on-background) !important;
 }
 
-/*.readable {*/
-/*	font: var(--font-readable);*/
-/*	text-transform: none;*/
-/*	letter-spacing: normal;*/
-/*}*/
+.readable {
+	font: var(--font-readable);
+	text-transform: none;
+	letter-spacing: normal;
+}
 
 .frame-butterfly {
 	position: absolute;
