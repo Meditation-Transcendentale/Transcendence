@@ -125,16 +125,22 @@ class AthQuit {
 interface settingHtmlReference {
 	username: HTMLInputElement,
 	twofa: HTMLInputElement,
+	password: HTMLInputElement,
 	editUsername: HTMLInputElement,
 	editAvatar: HTMLInputElement,
 	avatarImg: HTMLImageElement,
 	avatarChange: HTMLInputElement,
-	verifyWindow: HTMLDivElement,
-	verifyContent: HTMLDivElement,
-	verifySumbit: HTMLInputElement,
-	verifyA: HTMLInputElement,
-	verifyB: HTMLInputElement,
-	verifyC: HTMLInputElement,
+	passwordWindow: HTMLDivElement,
+	passwordInput: HTMLInputElement,
+	passwordSubmit: HTMLInputElement,
+	passwordChangeWindow: HTMLDivElement,
+	passwordOls: HTMLInputElement,
+	passwordNew: HTMLInputElement,
+	passwordChangeSubmit: HTMLInputElement,
+	twofaWindow: HTMLDivElement,
+	twofaInput: HTMLInputElement,
+	twofaSubmit: HTMLInputElement
+
 }
 
 enum verifyState {
@@ -155,21 +161,22 @@ class AthSetting {
 		this.ref = {
 			username: div.querySelector("#username-change") as HTMLInputElement,
 			twofa: div.querySelector("#twofa-change") as HTMLInputElement,
+			password: div.querySelector('#password-change') as HTMLInputElement,
 			editUsername: div.querySelector("#username-edit") as HTMLInputElement,
 			editAvatar: div.querySelector("#avatar-edit") as HTMLInputElement,
 			avatarImg: div.querySelector("#avatar-img") as HTMLImageElement,
 			avatarChange: div.querySelector("#avatar-change") as HTMLInputElement,
-			verifyWindow: div.querySelector("#verify-window") as HTMLDivElement,
-			verifyContent: div.querySelector("#verify-content") as HTMLDivElement,
-			verifySumbit: div.querySelector("#verify-submit") as HTMLInputElement,
-			verifyA: div.querySelector("#verify-a") as HTMLInputElement,
-			verifyB: div.querySelector("#verify-b") as HTMLInputElement,
-			verifyC: div.querySelector("#verify-c") as HTMLInputElement
+			passwordWindow: div.querySelector("#password-window") as HTMLDivElement,
+			passwordInput: div.querySelector("#password-input") as HTMLInputElement,
+			passwordSubmit: div.querySelector("#password-submit") as HTMLInputElement,
+			passwordChangeWindow: div.querySelector("#password-change-window") as HTMLDivElement,
+			passwordOls: div.querySelector("#password-old-input") as HTMLInputElement,
+			passwordNew: div.querySelector("#password-new-input") as HTMLInputElement,
+			passwordChangeSubmit: div.querySelector("#password-change-submit") as HTMLInputElement,
+			twofaWindow: div.querySelector("#twofa-window") as HTMLDivElement,
+			twofaInput: div.querySelector("#twofa-input") as HTMLInputElement,
+			twofaSubmit: div.querySelector("#twofa-submit") as HTMLInputElement
 		}
-
-		this.ref.verifyA.remove();
-		this.ref.verifyB.remove();
-		this.ref.verifyC.remove();
 
 		this.ref.avatarChange.addEventListener('change', () => {
 			this.ref.avatarImg.src = URL.createObjectURL(this.ref.avatarChange.files[0]);
@@ -186,8 +193,9 @@ class AthSetting {
 
 		this.ref.editUsername.addEventListener("click", () => {
 			this.state = verifyState.username;
-			this.setPopup();
+			//this.setVerifyPopup();
 		})
+
 
 	}
 
@@ -203,42 +211,20 @@ class AthSetting {
 		Popup.removePopup();
 	}
 
-	private setPopup() {
-		this.ref.verifyA.remove();
-		this.ref.verifyB.remove();
-		this.ref.verifyC.remove();
-		this.ref.verifyA.value = "";
-		this.ref.verifyB.value = "";
-		this.ref.verifyC.value = "";
-		switch (this.state) {
-			case verifyState.username: {
-				this.ref.verifyA.placeholder = "password";
-				this.ref.verifyB.placeholder = "2fa token";
-				this.ref.verifyA.type = "password";
-				this.ref.verifyB.type = "text";
-				this.ref.verifyContent.appendChild(this.ref.verifyA);
-				if (User.twofa as number > 0) {
-					this.ref.verifyContent.appendChild(this.ref.verifyB);
-				}
-				Popup.addPopup(this.ref.verifyWindow);
-				break;
-			}
-			case verifyState.password: {
-				this.ref.verifyA.placeholder = "old password";
-				this.ref.verifyB.placeholder = "new password";
-				this.ref.verifyC.placeholder = "two token";
-				this.ref.verifyA.type = "password";
-				this.ref.verifyB.type = "password";
-				this.ref.verifyC.type = "text";
-				this.ref.verifyContent.appendChild(this.ref.verifyA);
-				this.ref.verifyContent.appendChild(this.ref.verifyB);
-				if (User.twofa as number > 0) {
-					this.ref.verifyContent.appendChild(this.ref.verifyC);
-				}
-				Popup.addPopup(this.ref.verifyWindow);
-			}
-		}
-	}
+	//private setVerifyPopup() {
+	//	switch (this.state) {
+	//		case verifyState.username: {
+	//			this.ref.passwordInput.value = "";
+	//			Popup.addPopup(this.ref.passwordWindow);
+	//			break;
+	//		}
+	//		case verifyState.password: {
+	//			break;
+	//		}
+	//	}
+	//}
+
+
 }
 
 export default Ath;

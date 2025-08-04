@@ -536,7 +536,7 @@ Effect.ShadersStore['combineFragmentShader'] = `
 		n = ivec2(mod(floor(vUV * resolution * f), 4.));
 		weight = M4[n.x][n.y]- 0.65;
 		grass.rgb = grass.rgb + 0.5 * weight;
-		grass.rgb = (grass.rgb - 0.5) * 3.9 + 0.5;
+		grass.rgb = (grass.rgb - 0.5) * 4.9 + 0.5;
 
 		
 		float a = clamp(2. * (grass.a - color.a), 0., 1.);
@@ -561,11 +561,14 @@ Effect.ShadersStore["sharpenFragmentShader"] = `
 		float dx = 1.0 / resolution.x;
 		float dy = 1.0 / resolution.y;
 		vec4 sum = vec4(0.0);
-		sum += -1. * texture2D(textureSampler, vUV + vec2( -LENGTH * dx , 0.0 ));
-		sum += -1. * texture2D(textureSampler, vUV + vec2( 0.0 , -LENGTH * dy));
-		sum += 5. * texture2D(textureSampler, vUV );
-		sum += -1. * texture2D(textureSampler, vUV + vec2( 0.0 , LENGTH * dy));
-		sum += -1. * texture2D(textureSampler, vUV + vec2( LENGTH * dx , 0.0 ));
+		float amount = 1.;
+		float neighbor = amount * -1.;
+		float center = amount * 4. + 1.;
+		sum += neighbor * texture2D(textureSampler, vUV + vec2( -LENGTH * dx , 0.0 ));
+		sum += neighbor * texture2D(textureSampler, vUV + vec2( 0.0 , -LENGTH * dy));
+		sum += center * texture2D(textureSampler, vUV );
+		sum += neighbor * texture2D(textureSampler, vUV + vec2( 0.0 , LENGTH * dy));
+		sum += neighbor * texture2D(textureSampler, vUV + vec2( LENGTH * dx , 0.0 ));
 		
 		gl_FragColor = sum;
 		gl_FragColor.a = 1.;
