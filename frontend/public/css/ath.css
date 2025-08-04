@@ -120,7 +120,8 @@
 }
 
 #password-change,
-#setting-edit,
+#username-edit,
+#avatar-edit,
 #twofa-change {
 	height: fit-content;
 	text-align: center;
@@ -128,7 +129,8 @@
 }
 
 #password-change:hover,
-#setting-edit:hover,
+#username-edit:hover,
+#avatar-edit:hover,
 #twofa-change:hover {
 	color: black;
 	background-color: white;
@@ -151,8 +153,8 @@
 #avatar-edit {
 	position: absolute;
 	font-size: 2.2vh;
-	padding-right: 0.1em;
-	top: 4em;
+	padding-right: 0.2em;
+	top: 3.5em;
 	left: 12vh;
 }
 
@@ -163,8 +165,8 @@
 #username-edit {
 	position: absolute;
 	font-size: 2.2vh;
-	padding-right: 0.1em;
-	top: 4em;
+	padding-right: 0.2em;
+	top: 5em;
 	left: 12vh;
 }
 

@@ -8,11 +8,7 @@ interface athHtmlReference {
 	quit: HTMLInputElement,
 }
 
-enum verifyState {
-	username,
-	password,
-	twofa
-}
+
 
 class Ath {
 	private div: HTMLDivElement;
@@ -46,13 +42,9 @@ class Ath {
 		})
 
 
-		this.ref.avatarChange.addEventListener('change', () => {
-			this.ref.avatarImg.src = URL.createObjectURL(this.ref.avatarChange.files[0]);
-			this.ref.settingEdit.removeAttribute('off');
-		})
 
-		this.ref.settingEdit.addEventListener("click", () => { //FOR Username
-		})
+		// this.ref.settingEdit.addEventListener("click", () => { //FOR Username
+		// })
 
 
 		console.log("USER", User);
@@ -137,11 +129,25 @@ interface settingHtmlReference {
 	editAvatar: HTMLInputElement,
 	avatarImg: HTMLImageElement,
 	avatarChange: HTMLInputElement,
+	verifyWindow: HTMLDivElement,
+	verifyContent: HTMLDivElement,
+	verifySumbit: HTMLInputElement,
+	verifyA: HTMLInputElement,
+	verifyB: HTMLInputElement,
+	verifyC: HTMLInputElement,
+}
+
+enum verifyState {
+	username,
+	password,
+	twofa
 }
 
 class AthSetting {
 	private div: HTMLDivElement;
 	private ref: settingHtmlReference;
+
+	private state!: verifyState;
 
 	constructor(div: HTMLDivElement) {
 		this.div = div.querySelector("#setting-window") as HTMLDivElement;
@@ -152,21 +158,87 @@ class AthSetting {
 			editUsername: div.querySelector("#username-edit") as HTMLInputElement,
 			editAvatar: div.querySelector("#avatar-edit") as HTMLInputElement,
 			avatarImg: div.querySelector("#avatar-img") as HTMLImageElement,
-			avatarChange: div.querySelector("#avatar-change") as HTMLInputElement
+			avatarChange: div.querySelector("#avatar-change") as HTMLInputElement,
+			verifyWindow: div.querySelector("#verify-window") as HTMLDivElement,
+			verifyContent: div.querySelector("#verify-content") as HTMLDivElement,
+			verifySumbit: div.querySelector("#verify-submit") as HTMLInputElement,
+			verifyA: div.querySelector("#verify-a") as HTMLInputElement,
+			verifyB: div.querySelector("#verify-b") as HTMLInputElement,
+			verifyC: div.querySelector("#verify-c") as HTMLInputElement
 		}
+
+		this.ref.verifyA.remove();
+		this.ref.verifyB.remove();
+		this.ref.verifyC.remove();
+
+		this.ref.avatarChange.addEventListener('change', () => {
+			this.ref.avatarImg.src = URL.createObjectURL(this.ref.avatarChange.files[0]);
+			this.ref.editAvatar.removeAttribute('off');
+		})
+
+		this.ref.editAvatar.addEventListener("click", () => {
+			alert("fix cdn");
+		})
+
+		this.ref.username.addEventListener("keydown", () => {
+			this.ref.editUsername.removeAttribute("off");
+		})
+
+		this.ref.editUsername.addEventListener("click", () => {
+			this.state = verifyState.username;
+			this.setPopup();
+		})
+
 	}
 
 	public load() {
 		this.ref.username.value = User.username as string;
 		this.ref.twofa.value = (User.twofa as number > 0 ? "2FA Enabled" : "2FA Disabled");
 		this.ref.editUsername.toggleAttribute("off", true);
+		this.ref.editAvatar.toggleAttribute("off", true);
 		Popup.addPopup(this.div);
 	}
 
-	private unload() {
+	public unload() {
 		Popup.removePopup();
 	}
 
+	private setPopup() {
+		this.ref.verifyA.remove();
+		this.ref.verifyB.remove();
+		this.ref.verifyC.remove();
+		this.ref.verifyA.value = "";
+		this.ref.verifyB.value = "";
+		this.ref.verifyC.value = "";
+		switch (this.state) {
+			case verifyState.username: {
+				this.ref.verifyA.placeholder = "password";
+				this.ref.verifyB.placeholder = "2fa token";
+				this.ref.verifyA.type = "password";
+				this.ref.verifyB.type = "text";
+				this.ref.verifyContent.appendChild(this.ref.verifyA);
+				if (User.twofa as number > 0) {
+					this.ref.verifyContent.appendChild(this.ref.verifyB);
+				}
+				Popup.addPopup(this.ref.verifyWindow);
+				break;
+			}
+			case verifyState.password: {
+				this.ref.verifyA.placeholder = "old password";
+				this.ref.verifyB.placeholder = "new password";
+				this.ref.verifyC.placeholder = "two token";
+				this.ref.verifyA.type = "password";
+				this.ref.verifyB.type = "password";
+				this.ref.verifyC.type = "text";
+				this.ref.verifyContent.appendChild(this.ref.verifyA);
+				this.ref.verifyContent.appendChild(this.ref.verifyB);
+				if (User.twofa as number > 0) {
+					this.ref.verifyContent.appendChild(this.ref.verifyC);
+				}
+				Popup.addPopup(this.ref.verifyWindow);
+			}
+		}
+	}
 }
 
 export default Ath;
