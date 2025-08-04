@@ -1,10 +1,8 @@
 import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
-//import { loginVue } from "../Vue";
 import Router from "./Router";
 
 import { postRequest } from "./requests";
-import { raiseStatus } from "./utils";
 
 
 type authHtmlReference = {
@@ -50,38 +48,6 @@ class Login {
 			//twofaToken: this.div.querySelector("#login-2fa-token") as HTMLInputElement,
 			//twofa: this.div.querySelector("#login-2fa-submit") as HTMLInputElement,
 		};
-		//
-		//this.ref.login.addEventListener("submit", (ev) => {
-		//	ev.preventDefault();
-		//	postRequest("auth/login", {
-		//		username: this.ref.username.value,
-		//		password: this.ref.password.value
-		//	})
-		//		.then((json) => { this.loginResolve(json) })
-		//		.catch((resp) => { this.loginReject(resp) })
-		//})
-
-		//
-		//this.htmlReference.twofa.addEventListener("click", () => {
-		//	postRequest("/auth/login", {
-		//		username: this.htmlReference.username.value,
-		//		password: this.htmlReference.password.value,
-		//		token: this.htmlReference.twofaToken.value
-		//	})
-		//		.then((json) => { this.loginResolve(json) })
-		//		.catch((resp) => { this.loginReject(resp) })
-		//})
-
-		//this.htmlReference.register.addEventListener("click", () => {
-		//	Router.nav("/register");
-		//})
-
-		//App3D.setVue('login');
-		//const loginVue = App3D.getVue('login');
-		//loginVue.windowAddEvent('register', 'click', () => {
-		//	Router.nav("/register")
-		//})
-		//
 
 		this.ref.login.id = App3D.addCSS3dObject({
 			html: this.ref.login.html,
