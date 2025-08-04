@@ -39,7 +39,7 @@ export class Player {
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
 
-		this.shield = MeshBuilder.CreateCylinder("shield", { height: 0.25, diameter: 1.65, tessellation: 64, arc: 0.5, enclose: true, updatable: true }, this.scene);
+		this.shield = MeshBuilder.CreateCylinder("shield", { height: 0.25, diameter: 1.8, tessellation: 64, arc: 0.5, enclose: true, updatable: true }, this.scene);
 		this.shield.parent = game.root;
 		this.shield.rotation.y = Math.PI;
 		this.materialShield = new StandardMaterial("shieldMat", this.scene);

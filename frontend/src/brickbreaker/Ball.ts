@@ -1,5 +1,6 @@
 import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2, TransformNode } from "@babylonImport";
 import { Player } from "./Player";
+import { BrickBreaker } from "./brickbreaker";
 
 
 export class Ball {
@@ -11,20 +12,25 @@ export class Ball {
 	private scene: Scene;
 	private matUntouched: StandardMaterial;
 	private matTouched: StandardMaterial;
+	private game: BrickBreaker;
 	private delta: number;
 	private newposition: Vector3 = new Vector3(0, 0.25, 0);
+	private bricksLeft: number;
+	private isDirty: boolean = false;
 
-	constructor(scene: Scene, material: StandardMaterial, root: TransformNode) {
+	constructor(scene: Scene, material: StandardMaterial, root: TransformNode, bricksNumber: number, game: BrickBreaker) {
 		this.ball = MeshBuilder.CreateSphere("ball", { diameter: 0.5 }, scene);
 		this.ball.parent = root;
 		this.ball.position = new Vector3(0, 0.25, 0);
 		this.ball.material = material;
 		this.scene = scene;
+		this.game = game;
 
 		this.matTouched = new StandardMaterial("touchedMat", this.scene);
 		this.matTouched.diffuseColor.set(0, 0, 1);
 		this.matUntouched = new StandardMaterial("untouchedMat", this.scene);
 		this.matUntouched.diffuseColor.set(1, 0, 0);
+		this.bricksLeft = bricksNumber;
 	}
 
 	public updatePosition(x: number, z: number): void {
@@ -49,7 +55,7 @@ export class Ball {
 					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x, 0, this.newposition.z - playerGoalPos.z).normalize();
 					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
 					this.speedScale = Math.min(this.speedScale * 1.1, 5);
-				} else if (collideGoal) {
+				} else if (collideGoal && this.isDirty) {
 					this.touched = false;
 					this.ball.material = this.matUntouched;
 					player.die();
@@ -87,9 +93,13 @@ export class Ball {
 			if (target && target.isEnabled()) {
 				if (this.touched) {
 					target.setEnabled(false);
+					this.bricksLeft--;
 					this.ball.material = this.matUntouched;
 					this.touched = false;
+					this.isDirty = true;
 				}
+				if (this.bricksLeft == 0)
+					this.endGame();
 				const normal = new Vector3(this.newposition.x, 0, this.newposition.z).normalize();
 				const dot = this.velocity.dot(normal);
 				const reflect = this.velocity.subtract(normal.scale(2 * dot));
@@ -122,6 +132,7 @@ export class Ball {
 			const insidePos = normal.scale(arenaRadius - ballRadius - 0.001);
 			pos.x = insidePos.x;
 			pos.z = insidePos.z;
+			this.isDirty = true;
 		}
 	}
 
@@ -133,7 +144,7 @@ export class Ball {
 		if (player.getShieldActive() == 0)
 			return false;
 
-		const shieldRadius = 0.825;
+		const shieldRadius = 0.9;
 		const ballRadius = 0.25;
 
 		const v1 = new Vector3(ballPosition.x - shieldPosition.x, 0, ballPosition.z - shieldPosition.z);
@@ -146,10 +157,13 @@ export class Ball {
 		const clamp = Math.min(Math.max((bx * c.x) + (v2.z * c.y), 0), shieldRadius);
 		const m = Math.sqrt((bx - (c.x * clamp)) * (bx - (c.x * clamp)) + (v2.z - (c.y * clamp)) * (v2.z - (c.y * clamp)));
 		const distance = Math.max(l, m * Math.sign((c.y * bx) - (c.x * v2.z)));
-		console.log("distance", distance);
-		console.log("shieldAngle", shieldAngle);
 
 		return distance <= ballRadius;
+	}
+
+	private endGame(){
+		// end screen UI
+		this.game.dispose();
 	}
 
 	public getMesh(): Mesh {
