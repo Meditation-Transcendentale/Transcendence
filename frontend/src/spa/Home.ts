@@ -8,7 +8,6 @@ import { raiseStatus } from "./utils";
 
 
 interface homeHtmlReference {
-	info: { html: HTMLElement, id: number },
 	stats: { html: HTMLElement, id: number },
 	play: { html: HTMLElement, id: number },
 	bricks: { html: HTMLElement, id: number },
@@ -23,20 +22,12 @@ class Home {
 		this.div = div;
 
 		this.ref = {
-			info: { html: div.querySelector("#home-info") as HTMLElement, id: -1 },
 			stats: { html: div.querySelector("#home-stats") as HTMLElement, id: -1 },
 			play: { html: div.querySelector("#home-play") as HTMLElement, id: -1 },
 			bricks: { html: div.querySelector("#home-bricks") as HTMLElement, id: -1 }
 		};
 
 
-		this.ref.info.id = App3D.addCSS3dObject({
-			html: this.ref.info.html,
-			width: 1,
-			height: 1,
-			world: Matrix.RotationY(Math.PI * 0.9).multiply(Matrix.Translation(-10, 3, -10)),
-			enable: false
-		})
 		this.ref.stats.id = App3D.addCSS3dObject({
 			html: this.ref.stats.html,
 			width: 1,
@@ -59,8 +50,16 @@ class Home {
 			enable: false
 		})
 
+		this.ref.stats.html.addEventListener("click", () => {
+			Router.nav(`/stats?u=${User.username}`);
+		})
+
 		this.ref.play.html.addEventListener("click", () => {
 			Router.nav("/play");
+		})
+
+		this.ref.bricks.html.addEventListener("click", () => {
+			Router.nav("/brick")
 		})
 
 
@@ -143,11 +142,10 @@ class Home {
 		//meRequest()
 		//.catch(() => window.location.reload());
 		App3D.setVue("home");
-		App3D.setCSS3dObjectEnable(this.ref.info.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.stats.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.play.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.bricks.id, true);
-		(document.querySelector("#main-container") as HTMLDivElement)?.remove();
+		//(document.querySelector("#main-container") as HTMLDivElement)?.remove();
 
 		// document.querySelector("#main-container")?.appendChild(this.div);
 
@@ -179,7 +177,6 @@ class Home {
 	}
 
 	public async unload() {
-		App3D.setCSS3dObjectEnable(this.ref.info.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.stats.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.play.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.bricks.id, false);

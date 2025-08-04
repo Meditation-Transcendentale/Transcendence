@@ -210,7 +210,7 @@ export class Field {
 			}
 			case 'pongBR': {
 				//final.init(this.scene.getCameraByName('br') as Camera);
-				this.scene.activeCamera = this.scene.getCameraById('br');
+				this.scene.activeCamera = this.scene.getCameraByName('br');
 				this.scene.activeCamera?.attachControl();
 
 				break;
@@ -228,14 +228,16 @@ export class Field {
 			//
 			//	break;
 			//}
-			//case 'game': {
-			//	final.init(this.scene.getCameraByName('pong') as Camera);
-			//	break;
-			//}
-			//case 'brick': {
-			//	final.init(this.scene.getCameraByName('brick') as Camera);
-			//	break;
-			//}
+			case 'game': {
+				this.scene.activeCamera = this.scene.getCameraByName("pong");
+				//final.init(this.scene.getCameraByName('pong') as Camera);
+				break;
+			}
+			case 'brick': {
+				this.scene.activeCamera = this.scene.getCameraByName("brick");
+				//final.init(this.scene.getCameraByName('brick') as Camera);
+				break;
+			}
 		}
 		//return final;
 	}

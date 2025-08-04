@@ -1,8 +1,13 @@
+import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
 import { getRequest } from "./requests";
 import { createDivception, raiseStatus } from "./utils";
 
 type statsHtmlReference = {
+	switch: { html: HTMLDivElement, id: number },
+	swBR: HTMLInputElement,
+	swPong: HTMLInputElement,
+	container: { html: HTMLDivElement, id: number }
 	username: HTMLDivElement,
 	stats: HTMLDivElement,
 	history: HTMLDivElement,
@@ -59,6 +64,7 @@ type brPlayerStats = {
 class Stats {
 	private div: HTMLDivElement;
 	private ref: statsHtmlReference;
+	private css: HTMLLinkElement;
 
 	private classicPlayerStats: classicPlayerStats | null;
 	private brPlayerStats: brPlayerStats | null;
@@ -69,6 +75,7 @@ class Stats {
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
+		this.css = div.querySelector("link") as HTMLLinkElement;
 		this.classicPlayerStats = null;
 		this.brPlayerStats = null;
 		this.currentHistory = null;
@@ -79,6 +86,10 @@ class Stats {
 
 
 		this.ref = {
+			switch: { html: div.querySelector("#stats-switch") as HTMLDivElement, id: -1 },
+			swBR: div.querySelector("#br-switch") as HTMLInputElement,
+			swPong: div.querySelector("#pong-switch") as HTMLInputElement,
+			container: { html: div.querySelector("#stats-container") as HTMLDivElement, id: -1 },
 			username: this.div.querySelector("#stats-username") as HTMLDivElement,
 			stats: this.div.querySelector("#stats-table-window") as HTMLDivElement,
 			history: this.div.querySelector("#stats-history-window") as HTMLDivElement,
@@ -92,9 +103,24 @@ class Stats {
 
 		this.initPlayerStats();
 
-		App3D.setVue('stats');
-		const statsVue = App3D.getVue('stats');
-		statsVue.windowAddEvent('pong', 'click', () => {
+		this.ref.switch.id = App3D.addCSS3dObject({
+			html: this.ref.switch.html,
+			width: 1,
+			height: 1,
+			world: Matrix.RotationY(Math.PI * 1.2).multiply(Matrix.Translation(-17, 3, 25)),
+			enable: false
+		})
+
+		this.ref.container.id = App3D.addCSS3dObject({
+			html: this.ref.container.html,
+			width: 2.,
+			height: 2.,
+			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-21, 2, 23)),
+			enable: false
+
+		})
+
+		this.ref.swPong.addEventListener("click", () => {
 			if (this.mode != 1) {
 				this.ref.brHistory.remove();
 				this.brPlayerStats!.div.remove();
@@ -102,15 +128,17 @@ class Stats {
 				this.ref.stats.appendChild(this.classicPlayerStats!.div);
 				this.mode = 1;
 			}
+			this.ref.swPong.toggleAttribute("down", false);
+			this.ref.swBR.toggleAttribute("down", true);
+
 			getRequest(`stats/player/${this.ref.username.innerText}/classic`)
 				.then((json: any) => {
 					//console.log(json.playerStats);
 					this.classicResolve(json.playerStats);
 				})
-				.catch((resp) => { this.statsReject(resp) });
 		})
 
-		statsVue.windowAddEvent('br', 'click', () => {
+		this.ref.swBR.addEventListener("click", () => {
 			if (this.mode != 2) {
 				this.ref.classicHistory.remove();
 				this.classicPlayerStats!.div.remove();
@@ -118,15 +146,16 @@ class Stats {
 				this.ref.stats.appendChild(this.brPlayerStats!.div);
 				this.mode = 2;
 			}
+			this.ref.swPong.toggleAttribute("down", true);
+			this.ref.swBR.toggleAttribute("down", false);
+
 			getRequest(`stats/player/${this.ref.username.innerText}/br`)
 				.then((json: any) => {
 					//console.log(json.playerStats);
 					this.brResolve(json.playerStats);
 				})
 				.catch((resp) => { this.statsReject(resp) });
-
 		})
-
 	}
 
 	private initPlayerStats() {
@@ -191,14 +220,17 @@ class Stats {
 
 	public load(params: URLSearchParams) {
 		if (!this.checkParams(params)) { return; }
-		App3D.loadVue('stats');
+		document.head.appendChild(this.css);
+		App3D.setVue('play');
+		App3D.setCSS3dObjectEnable(this.ref.switch.id, true);
+		App3D.setCSS3dObjectEnable(this.ref.container.id, true);
 
 		this.ref.username.innerText = params.get("u") as string;
 
-		document.querySelector("#main-container")?.appendChild(this.div);
 		this.ref.history.appendChild(this.ref.classicHistory);
 		this.ref.stats.appendChild(this.classicPlayerStats!.div);
 		this.mode = 1;
+		this.ref.swBR.toggleAttribute("down", true);
 		getRequest(`stats/player/${this.ref.username.innerText}/classic`)
 			.then((json: any) => {
 				//console.log(json)
@@ -209,14 +241,15 @@ class Stats {
 	}
 
 	public async unload() {
-		App3D.unloadVue('stats');
-		this.div.remove();
+		this.css.remove();
+		App3D.setCSS3dObjectEnable(this.ref.switch.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.container.id, false);
 	}
 
 	private checkParams(params: URLSearchParams) {
 		const u = params.get("u");
 		if (!u) {
-			raiseStatus(false, "error in stats url");
+			//raiseStatus(false, "error in stats url");
 			return false;
 		}
 		return true;
