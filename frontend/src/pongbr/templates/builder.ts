@@ -126,8 +126,8 @@ export function buildPaddles(
 
 		// ---- Pillars ----
 		const angle = midAngle - maxOffset - halfArc;
-		const baseX = Math.cos(angle) * arenaRadius;
-		const baseZ = Math.sin(angle) * arenaRadius;
+		const baseX = Math.cos(angle) * (arenaRadius + pillarSize / 2);
+		const baseZ = Math.sin(angle) * (arenaRadius + pillarSize / 2);
 
 		const tx = -Math.sin(angle);
 		const tz = Math.cos(angle);
