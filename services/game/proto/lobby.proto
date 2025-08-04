@@ -1,0 +1,83 @@
+// ----------------------------------------------------------------------
+// proto/lobby.proto
+// ----------------------------------------------------------------------
+syntax = "proto3";
+
+package lobby;
+
+import "google/protobuf/empty.proto";
+import "shared.proto"; // Import core shared types
+
+// -----------------------------------------------------------------------------
+// Lobby‐specific messages
+// -----------------------------------------------------------------------------
+message UserStatus {
+  string uuid     = 1; // the user's UUID
+  string lobbyId  = 2; // which lobby they’re in
+  string status   = 3; // e.g. "joined", "left", etc.
+}
+
+message QuitMessage {
+  string uuid    = 1; // player’s UUID
+  string lobbyId = 2; // lobby to quit
+}
+
+message ReadyMessage {
+  string lobbyId = 1; // player toggles ready in this lobby
+}
+
+message ErrorMessage {
+  string message = 1; // human‐readable error
+}
+
+message StartMessage {
+  string lobbyId = 1;
+  string gameId  = 2;
+  string map     = 3; // which map to use
+}
+
+message Player {
+  string uuid  = 1;
+  bool   ready = 2;
+}
+
+message UpdateMessage {
+  string           lobbyId = 1;
+  repeated Player  players = 2;
+  string           status  = 3; // e.g. "waiting", "starting"
+  string           mode    = 4; // e.g. "waiting", "starting"
+}
+
+// Envelope for *all* client→server messages
+message ClientMessage {
+  oneof payload {
+    QuitMessage  quit  = 1;
+    ReadyMessage ready = 2;
+  }
+}
+
+// Envelope for *all* server→client messages
+message ServerMessage {
+  oneof payload {
+    StartMessage  start  = 1;
+    UpdateMessage update = 2;
+    ErrorMessage  error  = 3;
+  }
+}
+
+// NATS publish: user.${uuid}.status
+// (the server could publish this when status changes)
+message UserStatusPublish {
+  string uuid    = 1;
+  string lobbyId = 2;
+  string status  = 3;
+}
+
+// NATS request → game.${mode}.match.create
+message MatchCreateRequest {
+  repeated string players = 1; // array of player UUIDs
+}
+
+message MatchCreateResponse {
+  string gameId = 1; // newly created game’s ID
+}

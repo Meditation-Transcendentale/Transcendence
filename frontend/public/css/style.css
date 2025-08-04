@@ -1,0 +1,245 @@
+@import url("font.css");
+
+html,
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+}
+
+body {
+	background-color: black;
+}
+
+:root {
+	touch-action: pan-x pan-y;
+	height: 100%;
+	width: 100%;
+
+	--frame-color: #8E1616;
+	--frame-text-color: #000;
+
+	--text-color: #000;
+	--text-background: #fff;
+
+	--window-color: #fff;
+	--window-background: #111;
+
+	--font-window-bar: bold small-caps 2vh de-valancia;
+	--font-window-content: de-valancia 2vh 100;
+	--font-readable: normal normal 2vh dotrice;
+
+	--input-on-color: white;
+	--input-on-background: blue;
+}
+
+canvas {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: block;
+	z-index: 0;
+}
+
+
+
+#fps {
+	position: absolute;
+	background-color: black;
+	border: 2px solid red;
+	text-align: center;
+	font-size: 16px;
+	color: white;
+	bottom: 15px;
+	left: 10px;
+	width: 60px;
+	height: 20px;
+}
+
+
+.gl0 {
+	font-family: sensible-senseless;
+}
+
+.gl1 {
+	font-family: owlcave;
+	font-weight: bold;
+}
+
+.gl2 {
+	font-family: radio;
+	z-index: 3;
+}
+
+.gl3 {
+	font-family: susle;
+}
+
+
+
+
+/*#status[ok="false"] {*/
+/*	background-color: #bf382e;*/
+/*}*/
+/**/
+/*#status[ok="true"] {*/
+/*	background-color: #67b320;*/
+/*}*/
+/**/
+/*#status {*/
+/*	opacity: 0;*/
+/*	position: absolute;*/
+/*	pointer-events: none;*/
+/*	width: 100%;*/
+/*	z-index: 2;*/
+/*	top: 50%;*/
+/*	transform: translateY(-50%);*/
+/*	text-align: center;*/
+/*	padding-top: 20px;*/
+/*	padding-bottom: 20px;*/
+/*	font-size: 30px;*/
+/*}*/
+
+/*##################################################################################################*/
+
+.frame {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 5px solid var(--frame-color);
+	min-height: 100px;
+	min-width: 100px;
+	overflow: hidden;
+	transition:
+		top 2s,
+		left 2s,
+		width 5s, 0.3s height 5s, 0.3s;
+	z-index: 2;
+}
+
+.frame-butterfly {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 2px solid var(--frame-color);
+	overflow: hidden;
+	z-index: 2;
+}
+
+.frame-text {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	color: var(--frame-text-color);
+	background-color: var(--frame-color);
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: 2vh;
+	pointer-events: none;
+}
+
+.frame-hover {
+	width: auto;
+	font-size: 1.5vh;
+	background-color: blue;
+	color: white;
+	pointer-events: none;
+	opacity: 0.7;
+	pointer-events: none;
+	animation: glitch 0.1s linear infinite;
+	animation-timing-function: step-start;
+}
+
+.sub-container>span,
+.text {
+	vertical-align: top;
+	display: inline;
+	color: var(--text-color);
+	background-color: var(--text-background);
+	font-size: 2vh;
+	font-family: monospace;
+}
+
+.window {
+	display: block;
+	position: absolute;
+	min-height: 5vh;
+	min-width: 10vh;
+	z-index: 2;
+	background-color: var(--window-background);
+	color: var(--window-color);
+	border: 0.3vh white solid;
+}
+
+
+.window[off] input,
+input[off] {
+	color: grey;
+	background-color: #222;
+	border-color: grey !important;
+	pointer-events: none;
+}
+
+
+
+.window-bar {
+	position: sticky;
+	top: 0;
+	font: var(--font-window-bar);
+	letter-spacing: -0.6vh;
+	text-align: right;
+	background-color: inherit;
+	color: inherit;
+	border-bottom: 0.2vh #aaa solid;
+	padding-right: 1vh;
+}
+
+
+
+.window-content {
+	font: var(--font-window-bar);
+	letter-spacing: -0.4vh;
+	text-transform: uppercase;
+	text-overflow: "...";
+	background-color: inherit;
+	color: inherit;
+}
+
+#main-container {
+	position: absolute;
+	width: 50%;
+	height: 100%;
+	right: 0;
+	z-index: 0;
+	/*background-color: rgba(60, 0, 0, 0.2);*/
+}
+
+
+.sub-container {
+	width: 100%;
+	height: 100%;
+}
+
+input {
+	all: unset;
+}
+
+input[on] {
+	color: var(--input-on-color) !important;
+	background-color: var(--input-on-background) !important;
+}
+
+.readable {
+	font: var(--font-readable);
+	text-transform: none;
+	letter-spacing: normal;
+}
+
+.line {
+	position: absolute;
+	height: 0.1vh;
+	background-color: blue;
+	z-index: 0;
+}

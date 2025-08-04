@@ -5,36 +5,78 @@ on:
     branches: [main, dev]
   pull_request:
 
+env:
+  DOCKER_COMPOSE_FILES: -f docker-compose.yml -f ./services/stats/docker-compose-stats.yml -f ./frontend/docker-compose.yml -f ./services/game/docker-compose.dev.yml
+
 jobs:
-  test-services:
+  Docker-Services-Tests:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        service:
-          - services/game/game-manager
-          - services/game/user-interface
-          - services/game/pong-physics
-          - services/game/pongBR-physics
-          - services/game/pongIO-physics
-          - services/game/ai
+    # strategy:
+    #   matrix:
+    #     service:
+    #       - services/game/game-manager
+    #       - services/game/user-interface
+    #       - services/game/pong-physics
+    #       - services/game/pongBR-physics
+    #       - services/game/pongIO-physics
+    #       - services/game/ai
 
-    defaults:
-      run:
-        working-directory: ${{ matrix.service }}
+    # defaults:
+    #   run:
+    #     working-directory: ${{ matrix.service }}
 
     steps:
       - name: 📥 Checkout repo
         uses: actions/checkout@v3
 
-      - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+      - name: 🔧 Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Create .env file
+        run: |
+          echo "JWT_SECRETKEY=jwt_secret" > .env
+          echo "DATABASE_URL=/app/data/database.sqlite" >> .env
+          echo "SSL_KEY=/app/certs/server.key" >> .env
+          echo "SSL_CERT=/app/certs/server.crt" >> .env
+          echo "GOOGLE_CLIENT_ID=google_client_id" >> .env
+          echo "API_GATEWAY_KEY=api_key" >> .env
+          echo "ENCRYPTION_KEY=encryption_key" >> .env
+          echo "NATS_URL=nats://nats:6002" >> .env
+          echo "FT_API_UID=ft_uid" >> .env
+          echo "FT_API_SECRET=ft_secret" >> .env
+          echo "CDN_URL=https://localhost:3002/cdn" >> .env
+          echo "HOSTNAME=localhost" >> .env
+          echo "NATS_GAME_URL=nats://nats_game:4222" >> .env
+          echo "NATS_GAME_TOKEN=your_nats_game_token" >> .env
+          echo "NATS_TOKEN=your_nats_token" >> .env
+          echo "METRICS_PASSWORD=your_metrics_password" >> .env
 
-      - name: 📦 Install dependencies
-        run: npm ci
+      - name: 🐳 Build up
+        run: docker compose $DOCKER_COMPOSE_FILES up --build -d
 
-      - name: 🧪 Run tests
-        run: npm test
+      - name: 🐳 Check container status
+        run: |
+          docker compose ps
+          if docker compose ps | tail -n +2 | grep -v "Up"; then
+            echo "Some containers are not running!"
+            exit 1
+          fi
+
+      - name: ⏳ Wait for services
+        run: sleep 15
+
+      - name: Health check API
+        run: |
+          curl --fail --insecure https://localhost:3000/health || exit 1
+          curl --fail --insecure https://localhost:3000/stats/health || exit 1
+          curl --fail --insecure https://localhost:3000/auth/health || exit 1
+          curl --fail --insecure https://localhost:3000/friends/health || exit 1
+          curl --fail --insecure https://localhost:3000/info/health || exit 1
+          curl --fail --insecure https://localhost:3000/register/health || exit 1
+          curl --fail --insecure https://localhost:3000/update-info/health || exit 1
+
+      - name: Down services
+        run: docker compose $DOCKER_COMPOSE_FILES down
+
 

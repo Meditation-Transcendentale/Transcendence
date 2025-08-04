@@ -9,4 +9,6 @@ RUN npm install
 COPY src ./src
 COPY test ./test
 
-CMD ["npm", "start"]
+EXPOSE 5053
+
+CMD ["npm", "run", "dev"]

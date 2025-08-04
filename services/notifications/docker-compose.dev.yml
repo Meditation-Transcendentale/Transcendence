@@ -1,0 +1,17 @@
+services:
+  notifications-manager:
+    build:
+      context: ./notifications-manager
+    volumes:
+      - ./notifications-manager/src:/app/src
+      - ./notifications-manager/package.json:/app/package.json
+      - ./notifications-manager/.env.example:/app/.env
+    command: npm run dev
+    ports:
+      - "7001:7001"
+      - "7011:7011"
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully

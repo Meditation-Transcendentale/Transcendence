@@ -1,22 +1,20 @@
 // src/routes.js
+import { handleErrors } from "../shared/handleErrors.mjs";
+
 export default async function routes(fastify) {
 	const { lobbyService, natsClient } = fastify;
 
-	fastify.get('/lobby/list', async () => {
+	fastify.get('/list', handleErrors(async () => {
 		return lobbyService.list();
-	});
+	}));
 
-	fastify.post('/lobby/create', async (req, reply) => {
+	fastify.post('/create', handleErrors(async (req, reply) => {
 		const state = lobbyService.create(req.body);
 		reply.code(201).send(state);
-	});
+	}));
 
-	fastify.get('/lobby/:id', async (req, reply) => {
-		try {
-			const state = lobbyService.getLobby(req.params.id);
-			return state;
-		} catch (err) {
-			reply.code(404).send({ error: err.message });
-		}
-	});
+	fastify.get('/:id', handleErrors(async (req, reply) => {
+		const state = lobbyService.getLobby(req.params.id);
+		return state;
+	}));
 };

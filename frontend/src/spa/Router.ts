@@ -21,17 +21,22 @@ class RouterC {
 
 	private routes: Map<string, routePage>;
 
+	private parser: DOMParser;
+
+	public AUTHENTIFICATION: boolean = true;
+
 	constructor() {
 		this.initRoute = null;
-		this.location = `http://${window.location.hostname}:8080`;
+		this.location = `http://${window.location.hostname}:7000`;
 		this.oldURL = "";
 		this.currentPage = null;
+		this.parser = new DOMParser();
 
 		this.routes = new Map<string, routePage>;
 
-		this.routes.set("/auth", {
-			html: "/auth",
-			ts: "./Auth",
+		this.routes.set("/login", {
+			html: "/login",
+			ts: "./Login",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/register", {
@@ -44,41 +49,47 @@ class RouterC {
 			ts: "./Home",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
-		this.routes.set("/game", {
-			html: "/game",
-			ts: "./Game",
-			callback: (url: URL) => { this.loadInMain(url) }
-		} as routePage);
 		this.routes.set("/info", {
 			html: "/info",
 			ts: "./Info",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/stats", {
 			html: "/stats",
 			ts: "./Stats",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/lobby", {
 			html: "/lobby",
 			ts: "./Lobby",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/play", {
 			html: "/play",
 			ts: "./Play",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/friendlist", {
 			html: "/friendlist",
 			ts: "./Friendlist",
-			callback: (url: URL) => { this.loadInHome(url) }
+			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/game", {
 			html: "/game",
 			ts: "./Game",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
+		this.routes.set("/brick", {
+			html: "/game",
+			ts: "./brick",
+			callback: (url: URL) => { this.loadInMain(url) }
+		} as routePage);
+		this.routes.set("/test", { //TO USE FOR TEMPORARY ROUTE EX: BR / IO
+			html: "/game",
+			ts: "./br",
+			callback: (url: URL) => { this.loadInMain(url) }
+		} as routePage);
+
 
 
 		window.addEventListener("popstate", () => {
@@ -109,31 +120,40 @@ class RouterC {
 			url.search = "";
 		}
 
-		await meRequest("no-cache")
-			.then(() => {
-				if (url.pathname == "/auth" || url.pathname == "/register") {
-					url.pathname = "/home";
-					url.search = "";
-				}
-				this.oldURL = url.href;
-			})
-			.catch(() => {
-				this.oldURL = url.href;
-				if (url.pathname != "/auth" && url.pathname != "/register") {
-					url.pathname = "/auth";
-					url.search = "";
-					if (!this.first) {
-						meReject();
-						throw ("aaa");
-					};
-					console.log("%c Not logged in redirected to /auth", "color: white; background-color: red")
-				}
-			})
+		if (this.AUTHENTIFICATION) {
+			//this.oldURL = url.href;
+			await meRequest("no-cache")
+				.then(() => {
+					if (url.pathname == "/login" || url.pathname == "/register") {
+						url.pathname = "/home";
+						url.search = "";
+					}
+					this.oldURL = url.href;
+					this.first = false;
+				})
+				.catch(() => {
+					this.oldURL = url.href;
+					if (url.pathname != "/login" && url.pathname != "/register") {
+						url.pathname = "/login";
+						url.search = "";
+						if (!this.first) {
+							meReject();
+							throw ("aaa");
+						};
+						console.log("%c Not logged in redirected to /login", "color: white; background-color: red")
+					}
+				})
+		} else {
+			if (url.pathname == "/login" || url.pathname == "/register") {
+				url.pathname = "/home";
+				url.search = "";
+			}
+			this.oldURL = url.href;
+		}
 
 
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
 
-		this.first = false;
 		this.routes.get(url.pathname)?.callback(url);
 		if (history) {
 			window.history.pushState("", "", url.pathname + url.search)
@@ -179,7 +199,7 @@ class RouterC {
 
 	private async getHTML(path: string): Promise<HTMLDivElement> {
 		console.log("%c Fetching %s", "color: black; background-color: plum", path);
-		const url = `http://${window.location.hostname}:8080/html` + path + ".html";
+		const url = `https://${window.location.hostname}:7000/html` + path + ".html";
 		const response = await fetch(url, { redirect: "error" })
 
 		if (!response.ok) {
@@ -189,13 +209,12 @@ class RouterC {
 		const text = await response.text();
 		const div = document.createElement("div");
 		div.innerHTML = text;
-
-		return div;
+		return div.firstChild as HTMLDivElement;
 	}
 
 	private async getTS(path: string): Promise<{ default: any }> {
 		console.log("%c Importing %s", "color: black; background-color: orange", path);
-		const ts = await import(/* @vite-ignore */ path);
+		const ts = await import(/* @vite-ignore */ `${path}`);
 		return ts;
 	}
 }

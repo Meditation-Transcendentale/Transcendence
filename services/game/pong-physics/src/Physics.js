@@ -10,6 +10,8 @@ import {
  * Core physics service: manages multiple Game instances and steps them.
  */
 
+const MAX_OFFSET = 8.4;
+const SPEED = 10;
 export const Physics = {
 	games: new Map(),
 
@@ -23,16 +25,56 @@ export const Physics = {
 	   * @returns {{ gameId: string, tick: number, balls: Array, paddles: Array }}
 	   */
 
-	processTick({ gameId, lastState }) {
+	// message PhysicsRequest {
+	//   string gameId = 1;
+	//   int64 tick = 2;
+	//   repeated PaddleInput input = 3;
+	//   int32 stage = 4; // BR mode stage; others: ignored
+	// }
+	processTick({ gameId, tick, input }) {
 		if (!this.games.has(gameId)) {
 			console.log(`[physics] Initializing new game ${gameId}`);
 			this.games.set(gameId, new Game(gameId));
 		}
+		// console.log(performance.now());
 		let events = [];
 		const game = this.games.get(gameId);
 		const em = game.entityManager;
 		const subSteps = 20;
 		const dt = 1 / 60 / subSteps;
+
+		if (input && Array.isArray(input)) {
+			for (let i = 0; i < input.length; i++) {
+				const { id, move } = input[i];
+				game.updatePaddleInput(id, move);
+
+			}
+		}
+
+		const paddles = em.getEntitiesWithComponents(['paddle', 'position']);
+
+		for (let i = 0; i < paddles.length; i++) {
+			const entity = paddles[i];
+			const paddle = entity.getComponent('paddle');
+			const position = entity.getComponent('position');
+
+			const move = paddle.move ?? 0;
+			if (move === 0)
+				continue;
+			let offset = paddle.offset ?? 0;
+
+			const velocity = move * SPEED * 1 / 60;
+			offset += velocity;
+
+			offset = Math.max(-MAX_OFFSET, Math.min(offset, MAX_OFFSET));
+			paddle.offset = offset;
+
+			if (i === 0)
+				position.y = -offset;
+			else
+				position.y = offset;
+			paddle.dirty = true;
+		}
 
 		const collidableEntities = em.getEntitiesWithComponents(['position', 'collider']);
 		const tree = new AABBTree();
@@ -59,11 +101,6 @@ export const Physics = {
 
 			for (let i = 0, len = ballEntities.length; i < len; i++) {
 				const ball = ballEntities[i];
-				const ballVel = ball.getComponent('velocity');
-			}
-
-			for (let i = 0, len = ballEntities.length; i < len; i++) {
-				const ball = ballEntities[i];
 				const ballCollider = ball.getComponent('collider');
 				if (ballCollider.type !== 'circle') continue;
 				const ballPos = ball.getComponent('position');
@@ -81,11 +118,13 @@ export const Physics = {
 
 						const { mtv, penetration } = computeCircleBoxMTV(ballPos, ballCollider, wallPos, otherCollider);
 						if (wall.isGoal === true && penetration > 0) {
-							let scorer = wall.id === 0
-								? 1  // right paddle component id
-								: 0; // left paddle component id
-							scorer = ballPos.x > 0 ? 0 : 1;
+							// let scorer = wall.id === 0
+							// 	? 0  // right paddle component id
+							// 	: 1; // left paddle component id
+							let scorer = ballPos.x > 0 ? 1 : 0;
 							events.push({ type: 'goal', gameId, playerId: scorer });
+							console.log(`Scorer id = ${scorer}`);
+							game.resetBall();
 							break;
 						}
 						if (penetration > 0) {
@@ -119,7 +158,7 @@ export const Physics = {
 				if (ballCollider.type !== 'circle') continue;
 				const ballPos = ball.getComponent('position');
 				const ballVel = ball.getComponent('velocity');
-
+				let collidedPaddle = null;
 				let weightedMTVx = 0, weightedMTVy = 0, totalPenetration = 0;
 				for (let j = 0, jLen = paddleEntities.length; j < jLen; j++) {
 					const paddle = paddleEntities[j];
@@ -131,21 +170,54 @@ export const Physics = {
 						weightedMTVx += mtv.x * penetration;
 						weightedMTVy += mtv.y * penetration;
 						totalPenetration += penetration;
+						if (!collidedPaddle) {
+							collidedPaddle = paddle;
+						}
 					}
 				}
 				if (totalPenetration > 0) {
 					const avgMTVx = weightedMTVx / totalPenetration;
 					const avgMTVy = weightedMTVy / totalPenetration;
+
 					ballPos.x += avgMTVx;
 					ballPos.y += avgMTVy;
-					const mag = Math.hypot(avgMTVx, avgMTVy);
-					if (mag > 0) {
-						const normalX = avgMTVx / mag;
-						const normalY = avgMTVy / mag;
-						const dot = ballVel.x * normalX + ballVel.y * normalY;
-						const restitution = 1;
-						ballVel.x -= 2 * dot * normalX * restitution;
-						ballVel.y -= 2 * dot * normalY * restitution;
+
+					if (collidedPaddle) {
+						const paddlePos = collidedPaddle.getComponent('position');
+						const paddleCollider = collidedPaddle.getComponent('collider');
+						const paddleHalfHeight = paddleCollider.width / 2;
+						const relativeIntersectY = ballPos.y - paddlePos.y;
+
+						let rawNormY = relativeIntersectY / paddleHalfHeight;
+						rawNormY = Math.max(-1, Math.min(1, rawNormY));
+
+						const deadZone = 0.;
+						let mappedY;
+						if (Math.abs(rawNormY) < deadZone) {
+							mappedY = 0;
+						} else {
+							mappedY = rawNormY > 0
+								? (rawNormY - deadZone) / (1 - deadZone)
+								: (rawNormY + deadZone) / (1 - deadZone);
+						}
+
+						const maxBounceAngle = (75 * Math.PI) / 180;
+						const bounceAngle = mappedY * maxBounceAngle;
+
+						const isLeftPaddle = paddlePos.x < 0;
+						const directionX = isLeftPaddle ? +1.2 : -1.2;
+						const speed = Math.hypot(ballVel.x, ballVel.y);
+
+						ballVel.x = speed * Math.cos(-bounceAngle) * directionX;
+						ballVel.y = speed * -Math.sin(-bounceAngle);
+
+						const maxSpeed = 150;
+						const newSpeed = Math.hypot(ballVel.x, ballVel.y);
+						if (newSpeed > maxSpeed) {
+							const scale = maxSpeed / newSpeed;
+							ballVel.x *= scale;
+							ballVel.y *= scale;
+						}
 					}
 				}
 			}
@@ -154,7 +226,7 @@ export const Physics = {
 		const tempstate = game.getState();
 		return {
 			gameId,
-			tick,
+			tick: tick,
 			balls: tempstate.balls,
 			paddles: tempstate.paddles,
 			events

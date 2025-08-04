@@ -21,11 +21,11 @@
 		}
 	],
 	"paths": {
-        "/update-info": {
+        "/update-info/username": {
             "patch": {
-                "summary": "Update user information",
+                "summary": "Update user Username",
                 "tags": ["Update Infos"],
-                "description": "Update user information in DB.",
+                "description": "Update user Username in DB.",
                 "parameters": [
                     {
                         "name": "user",
@@ -52,9 +52,100 @@
                                 "minProperties": 1,
                                 "properties": {
                                     "username": { "type": "string", "example": "user123" },
-                                    "avatar": { "type": "string", "format": "uri", "example": "https://example.com/avatar.png" },
 									"password": { "type": "string", "format": "password", "example": "Password123" },
 									"token": { "type": "string", "example": "448448" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful update",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User information updated successfully." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Nothing to update." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "User not found." }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Server error." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update-info/avatar": {
+            "patch": {
+                "summary": "Update user Avatar",
+                "tags": ["Update Infos"],
+                "description": "Update user Avatar in DB.",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "uuid": { "type": "string", "example": "c1b1a8e2-1e7a-4e3c-8c7e-1b2a3c4d5e6f" },
+                                "role": { "type": "string", "example": "user" },
+                                "iat": { "type": "integer", "example": "1700000000" },
+                                "exp": { "type": "integer", "example": "1700036000" }
+                            }
+                        },
+                        "description": "Encoded user information including UUID, role, issued-at (`iat`), and expiration (`exp`)."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "minProperties": 1,
+                                "properties": {
+                                    "avatar": {"type": "string", "format": "binary", "description": "The user's avatar image file."}
                                 }
                             }
                         }

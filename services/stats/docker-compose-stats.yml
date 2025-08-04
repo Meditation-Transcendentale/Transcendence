@@ -2,13 +2,17 @@ services:
   nats:
     image: nats:latest
     container_name: nats
-    ports:
-      - "6002:6002"
+    environment:
+      - NATS_TOKEN=${NATS_TOKEN}
     volumes:
       - ./services/stats/nats-server.conf:/nats-server.conf:ro
+      - ./shared/certs:/etc/certs:ro
     command: ["-c", "/nats-server.conf"]
     networks:
       - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
   
   stats_manager:
     build: 
@@ -24,6 +28,7 @@ services:
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
     depends_on:
@@ -42,11 +47,14 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=${DATABASE_URL}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
+      nats:
+        condition: service_started
 
 volumes:
   stats_shared:

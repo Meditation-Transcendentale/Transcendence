@@ -1,4 +1,5 @@
-import { Engine, Scene, Color4, ArcRotateCamera, GlowLayer } from "@babylonjs/core";
+
+import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, Inspector } from "@babylonImport";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -7,225 +8,200 @@ import { NetworkingSystem } from "./systems/NetworkingSystem.js";
 import { ThinInstanceSystem } from "./systems/ThinInstanceSystem.js";
 import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
-import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
 import { getOrCreateUUID } from "./utils/getUUID.js";
 import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
-import { DebugVisualizer } from "./debug/DebugVisualizer.js";
 import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
-import { gameScoreInterface } from "./utils/displayGameInfo.js";
-import { createCamera, createArenaMesh, createBallMesh, createPaddleMesh, createWallMesh } from "./utils/initializeGame.js";
-import { Inspector } from '@babylonjs/inspector';
+import { createCamera, createBaseMeshes, createInstanceManagers } from "./utils/initGame.js";
+import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
+import Router from "../spa/Router";
+import type { userinterface } from './utils/proto/message.js';
 
-
-const API_BASE = "http://10.19.225.59:4000";
-//const API_BASE = `http://${window.location.hostname}:4000`;
-export const global = {
-	endUI: null as any
-}
+const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
 let engine: any;
-let resizeTimeout: number;
+let resizeTimeout: NodeJS.Timeout;
+
 export class Pong {
 	private engine!: Engine;
-	private scene!: Scene;
+	private scene: Scene;
+	private cam!: ArcRotateCamera;
+
 	private ecs!: ECSManager;
 	public stateManager!: StateManager;
 	private wsManager!: WebSocketManager;
 	private inputManager!: InputManager;
-	private camera!: ArcRotateCamera;
-	private debugVisualizer!: DebugVisualizer;
-	private gameId;
-	private canvas;
-	private paddleId: any;
-	private scoreUI: any;
+
+	private visualEffectSystem!: VisualEffectSystem;
+	private uiSystem!: UISystem;
+
+	private uuid!: string;
 	private baseMeshes: any;
 	private instanceManagers: any;
-	private glowLayer: any;
-	private uuid!: string;
+	private scoreUI: any;
 
-	constructor(canvas: any, gameId: any) {
+	private canvas;
+	private gameId;
+	private gameMode: string;
+	private pongRoot!: TransformNode;
+	private inited: boolean;
+	private networkingSystem!: NetworkingSystem;
+	private inputSystem!: InputSystem;
+
+	constructor(canvas: any, gameId: any, gameMode: any, scene: Scene) {
 		this.canvas = canvas;
+		this.scene = scene;
 		this.gameId = gameId;
+		this.gameMode = gameMode;
+		this.engine = this.scene.getEngine() as Engine;
+		this.inited = false;
 	}
 
-	async start() {
-		console.log("start");
-		this.engine = new Engine(this.canvas, true);
-		engine = this.engine;
-
-		this.scene = new Scene(this.engine);
+	public async init() {
 		const config = {
 			numberOfBalls: 1,
 			arenaSizeX: 30,
 			arenaSizeZ: 20,
 			wallWidth: 1
 		};
-		// Inspector.Show(this.scene, {});
 
-		this.glowLayer = new GlowLayer("glow", this.scene);
-		this.glowLayer.intensity = 0.3;
-		this.camera = createCamera(this.scene, this.canvas);
+		this.pongRoot = new TransformNode("pongRoot", this.scene);
+		this.pongRoot.position.set(2000, -3500, -3500);
+		this.cam = this.scene.getCameraByName('pong') as ArcRotateCamera;
+		this.cam.parent = this.pongRoot;
+		this.cam.minZ = 0.2;
+		this.baseMeshes = createBaseMeshes(this.scene, config, this.pongRoot);
+		this.instanceManagers = createInstanceManagers(this.baseMeshes);
+		this.uuid = getOrCreateUUID();
 
-		this.baseMeshes = this.createBaseMeshes(config);
-		this.glowLayer.addIncludedOnlyMesh(this.baseMeshes.wall);
-		this.glowLayer.excludeMeshes = true;
-		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
-
-		this.uuid = await getOrCreateUUID();
-		const wsUrl = `ws://10.19.225.59:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		//const wsUrl = `ws://localhost:3000?uuid=${encodeURIComponent(uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		this.wsManager = new WebSocketManager(wsUrl);
+		// const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
+		// this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
-		// localPaddleId = await this.waitForWelcome();
-		localPaddleId = await this.waitForRegistration();
+		// localPaddleId = await this.waitForRegistration();
+		//this.camera = createCamera(this.scene, this.canvas, localPaddleId, this.gameMode);
 		this.initECS(config, this.instanceManagers, this.uuid);
-
 		this.stateManager = new StateManager(this.ecs);
+		this.inited = true;
+
+
+	}
+	public async start(gameId: string, uuid: string) {
+		if (!this.inited) {
+			await this.init();
+		}
+		if (this.wsManager) {
+			this.wsManager.socket.close();
+			this.ecs.removeSystem(this.inputSystem);
+			this.ecs.removeSystem(this.networkingSystem);
+		}
+		console.log("UU", uuid)
+		const wsUrl = `wss://${window.location.hostname}:7000/game?` +
+			`uuid=${encodeURIComponent(uuid)}&` +
+			`gameId=${encodeURIComponent(gameId)}`;
+		this.wsManager = new WebSocketManager(wsUrl);
+
+		localPaddleId = await this.waitForRegistration();
+
+		// 4) Plug networking into ECS
+		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
+		this.ecs.addSystem(this.inputSystem);
+		this.networkingSystem = new NetworkingSystem(
+			this.wsManager,
+			this.uuid
+		);
+		this.ecs.addSystem(this.networkingSystem);
+		console.log("start");
+		//this.engine = new Engine(this.canvas, true);
+		//engine = this.engine;
+		this.pongRoot.setEnabled(true);
+		// this.stateManager.set_ecs(this.ecs);
+		this.stateManager.setter(true);
 		this.stateManager.update();
 
-		this.engine.runRenderLoop(() => {
-			this.scene.render();
-		});
+		//this.engine.runRenderLoop(() => {
+		//	this.scene.render();
+		//this.scene.onBeforeRenderObservable.add(() => {
+		//	// called _before_ every frame is drawn
+		//	this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
+		//});
+		//	//this.baseMeshes.portal.material.enableResolutionUniform();
+		//});
 
 	}
-
-	private createInstanceManagers(baseMeshes: any) {
-		return {
-			ball: new ThinInstanceManager(baseMeshes.ball, 1, 50, 100),
-			paddle: new ThinInstanceManager(baseMeshes.paddle, 2, 50, 100),
-			wall: new ThinInstanceManager(baseMeshes.wall, 4, 50, 100)
-		}
-	}
-
-	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
-		this.ecs = new ECSManager();
-		this.ecs.addSystem(new MovementSystem());
-		this.ecs.addSystem(new InputSystem(this.inputManager, this.wsManager));
-		this.ecs.addSystem(new NetworkingSystem(this.wsManager, uuid, this.scoreUI));
-		this.ecs.addSystem(new ThinInstanceSystem(
-			instanceManagers.ball,
-			instanceManagers.paddle,
-			instanceManagers.wall,
-			this.camera
-		));
-		this.ecs.addSystem(new VisualEffectSystem(this.scene));
-		this.ecs.addSystem(new UISystem(this.scene));
-
-		createGameTemplate(this.ecs, config, localPaddleId);
-	}
-
-	private createBaseMeshes(config: GameTemplateConfig) {
-		return {
-			arena: createArenaMesh(this.scene, config),
-			ball: createBallMesh(this.scene, config),
-			paddle: createPaddleMesh(this.scene, config),
-			wall: createWallMesh(this.scene, config)
-		}
-	}
-	private waitForRegistration(): Promise<number> {
-		return new Promise((resolve, reject) => {
-			const socket = this.wsManager.socket;
-			const listener = (event: MessageEvent) => {
-				let data: any;
-				if (typeof event.data === "string") {
-					try {
-						data = JSON.parse(event.data);
-					} catch {
-						return;
-					}
-				} else {
-					return;
-				}
-
-				if (data.type === "welcome") {
-					console.log("Got welcome (session):", data);
-					socket.send(JSON.stringify({
-						type: "registerGame",
-						data: { gameId: this.gameId, uuid: this.uuid }
-					}));
-				}
-
-				else if (data.type === "registered") {
-					console.log("Registered into game:", data);
-					this.paddleId = data.paddleId;
-					socket.removeEventListener("message", listener);
-					clearTimeout(timeout);
-					resolve(data.paddleId);
-				}
-			}
-
-			socket.addEventListener("message", listener);
-
-			// const timeout = setTimeout(() => {
-			// 	this.wsManager.socket.removeEventListener("message", listener);
-			// 	reject(new Error("Timed out waiting for welcome"));
-			// }, 5000)
-
-			// setTimeout(() => reject(new Error("Timed out waiting for registration")), 5000);
-		});
-	}
-
-
-	waitForWelcome() {
-		return new Promise((resolve) => {
-			this.wsManager.socket.addEventListener("message", (event) => {
-				let data;
-				if (typeof event.data === "string") {
-					try {
-						data = JSON.parse(event.data);
-					} catch (e) {
-						console.error("Error parsing JSON in waitForWelcome:", e);
-						return;
-					}
-				} else {
-					console.warn("Received non-string message in waitForWelcome; ignoring.");
-					return;
-				}
-
-				if (data.type === "welcome") {
-					console.log("Received welcome:", data);
-					this.paddleId = data.paddleId;
-
-					this.wsManager.socket.send(JSON.stringify({
-						type: "registerGame",
-						data: { gameId: this.gameId }
-					}));
-
-					resolve(data.paddleId);
-				}
-			}, { once: true });
-		});
-	}
-
-	dispose() {
-		this.baseMeshes.arena.material.dispose();
-		this.baseMeshes.arena.dispose();
-		this.baseMeshes.ball.material.dispose();
-		this.baseMeshes.ball.dispose();
-		this.baseMeshes.paddle.dispose();
-		this.baseMeshes.wall.material.dispose();
-		this.baseMeshes.wall.dispose();
-		this.camera.dispose();
-		this.engine.clear(new Color4(1, 1, 1, 1), true, true);
-		this.engine.stopRenderLoop();
-		if (this.wsManager?.socket) {
-			// this.wsManager.socket.removeEventListener('message', this.wsManager.socketListener);
-			this.wsManager.socket.close();
-		}
-		// this.scene.onBeforeRenderObservable.clear();
-		// this.scene.onBPointerObservable.clear();
-		this.scene?.dispose();
-		this.engine?.dispose();
-		global.endUI?.dispose();
+	public stop(): void {
 		if (this.scoreUI?.dispose) {
 			this.scoreUI.dispose();
 		} else if (this.scoreUI?.parentNode) {
 			this.scoreUI.parentNode.removeChild(this.scoreUI);
 		}
-		clearTimeout(resizeTimeout);
-		this.engine.dispose();
+
+
+		this.pongRoot.setEnabled(false);
+		this.stateManager.setter(false);
+
+		console.log("render loop stopped and game paused");
+	}
+
+
+
+	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
+		this.ecs = new ECSManager();
+		this.ecs.addSystem(new ThinInstanceSystem(
+			instanceManagers.ball,
+			instanceManagers.paddle,
+			instanceManagers.wall,
+			this.cam
+		));
+		this.ecs.addSystem(new MovementSystem());
+		this.visualEffectSystem = new VisualEffectSystem(this.scene);
+		this.ecs.addSystem(this.visualEffectSystem);
+		this.uiSystem = new UISystem(this);
+		this.scoreUI = this.uiSystem.scoreUI;
+		this.ecs.addSystem(this.uiSystem);
+
+		createGameTemplate(this.ecs, config, localPaddleId, this.gameMode);
+	}
+
+
+	private waitForRegistration(): Promise<number> {
+		return new Promise((resolve, reject) => {
+			const socket = this.wsManager.socket;
+
+			const listener = (event: MessageEvent) => {
+				if (!(event.data instanceof ArrayBuffer)) {
+					console.warn('Non-binary message received, ignoring');
+					return;
+				}
+
+				let serverMsg: userinterface.ServerMessage;
+				try {
+					const buf = new Uint8Array(event.data);
+					serverMsg = decodeServerMessage(buf);
+				} catch (err) {
+					console.error('Failed to decode protobuf message:', err);
+					return;
+				}
+
+				if (serverMsg.welcome?.paddleId != null) {
+					const paddleId = serverMsg.welcome.paddleId;
+
+					const readyPayload: userinterface.IClientMessage = { ready: {} };
+					const readyBuf = encodeClientMessage(readyPayload);
+					socket.send(readyBuf);
+
+					socket.removeEventListener('message', listener);
+					resolve(paddleId);
+				}
+			};
+
+			socket.addEventListener('message', listener);
+
+			setTimeout(() => {
+				socket.removeEventListener('message', listener);
+				reject(new Error('Timed out waiting for WelcomeMessage'));
+			}, 5000);
+		});
 	}
 
 	public static INIT() {
@@ -236,6 +212,5 @@ export class Pong {
 					engine.resize();
 			}, 100); // délai pour limiter les appels trop fréquents
 		});
-
 	}
 }

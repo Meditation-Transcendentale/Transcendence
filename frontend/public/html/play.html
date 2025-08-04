@@ -1,30 +1,61 @@
-<div id="play" class="instant">
-	<div id="play-create" class="instant">
-		<label>Create</label><br/>
-		<select id="play-mod">
-			<option id="pong-mod" value="pong">Pong</option>
-			<option id="br-mod" value="br">BR</option>
-			<option id="io-mod" value="io">IO</option>
-		</select>
-		<select id="play-map">
-			<option id="default-map" value="default">Default Map</option>
-		</select>
-		<select id="play-submod" >
-			<option id="local-mod" value="local">Local</option>
-			<option id="ia-mod" value="ia">IA</option>
-			<option id="online-mod" value="online">Online</option>
-		</select><br/>
-		<input type="button" id="create-btn" value="Create Lobby"></input>
-	</div><br/>
-
-	<div id="play-join" class="instant">
-		<label>Join</label><br/>
-		<input type="text" id="join-id" placeholder="lobby id"/>
-		<input type="button" id="join-btn" value="Join"/>
+<div id="play" class="sub-container">
+	<link rel="stylesheet" type="text/css" href="/css/play.css">
+	<div id="play-create" class="sub-container">
+		<div id="create-map-window" class="window">
+			<div class="window-bar">CHOOSE MAP</div>
+			<div class="window-content">
+				<div id="create-map" class="window-content">
+					<input id="default-map" type="button" value="DEFAULT"/>
+					<input id="term-map" type="button" value="TERMINATOR" off/>
+					<input id="term-map" type="button" value="TERMINATOR" off/>
+				</div>
+				<div id="map-description" class="window-content">Incradible map woth a lot a functionnality</div>
+			</div>
+		</div>
+		<div id="create-mod-window" class="window">
+			<div class="window-bar">CHOOSE VARIANT</div>
+			<div class="window-content">
+				<div id="create-mod" class="window-content">
+					<input id="br-mod" type="button" value="BR"/>
+					<input id="tournament-mod" type="button" value="TOURNAMENT"/>
+					<input id="local-mod"  type="button" value="LOCAL"/>
+					<input id="online-mod"  type="button" value="ONLINE"/>
+					<input id="ai-mod" type="button" value="AI"/>
+				</div>
+				<div id="mod-description" class="window-content">Incradible mod woth a lot a fun</div>
+			</div>
+		</div>
+		<div id="create-btn-window" class="window">
+			<div class="window-bar">CREATE</div>
+			<input id="create-btn" class="window-content" type="button" value="CREATE"/>
+		</div>
+		<span>wfef web?</span><br/>
+		<span>qewefwef  ewef MOD</span>
+		<span>aidbqd qwd</span><br/><br/><br/>
+		<span>webwefb fwebfwe</span><br/>
+		<span>fwefjhbwefjhwef MAP</span>
+		<span>wehfjbwef wefkjbwef wefjhwefhwefjwvef CREATE</span>
+		<span>ewef.</span>
 	</div>
-
-	<input id="play-refresh" type="button" value="Refresh">
-	<div id="play-list">
+	<div id="play-join" class="sub-container">
+		<div class="a"><span class="d">fwef wef akjbw,</span></div>
+		<span >kdbas kja awjdkwad ww</span><br/>
+		<span >qd dqjwhd qjwhdd djqhd qjwhdqhjwd qwjdhdq djqhdwdjhqb djwhqbd qwdhbd qdwjhbq  hwwhhwhwhq whdqd</span><br/>
+		<span >asd skksksksksad LIST</span>
+		<span> wke fjweh  wejfhwef weeehwf</span><br/>
+		<span> ewfbwefwejhfwef wjehfwefbw fwejh JOIN</span>
+		<div id="join-list-container" class="window">
+			<div class="window-bar">LIST LOBBY</div>
+			<table id="join-list" class="window-content">
+				<thead>	<tr><th>Lobby id</th><th>Mod</th><th>Players</th></tr></thead>
+				<tbody class="list-body"></tbody>
+			</table>
+		</div>
+		<div id="join-input-container" class="window">
+			<div class="window-bar">JOIN LOBBY</div>
+			<div id="join-indic" class="window-content">PRESS ENTER</div>
+			<input type="text" id="join-id" class="window-content readable" placeholder="......................."/>
+		</div>
 	</div>
-
+	
 </div>

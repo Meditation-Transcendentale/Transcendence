@@ -6,19 +6,23 @@ import dotenv from "dotenv";
 dotenv.config({ path: "../../../.env" });
 
 const jc = JSONCodec();
-const nats = await connect({ servers: process.env.NATS_URL });
+const nats = await connect({ 
+	servers: process.env.NATS_URL,
+	token: process.env.NATS_TOKEN,
+	tls: { rejectUnauthorized: false }
+});
 
 async function handleNatsSubscription(subject, handler) {
-    const sub = nats.subscribe(subject);
-    for await (const msg of sub) {
-        try {
-            await handler(msg);
-        } catch (error) {
-            const status = error.status || 500;
-            const message = error.message || "Internal Server Error";
-            nats.publish(msg.reply, jc.encode({ success: false, status, message }));
-        }
-    }
+	const sub = nats.subscribe(subject);
+	for await (const msg of sub) {
+		try {
+			await handler(msg);
+		} catch (error) {
+			const status = error.status || 500;
+			const message = error.message || "Internal Server Error";
+			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
+		}
+	}
 }
 
 handleErrorsNats(async () => {
@@ -136,6 +140,7 @@ handleErrorsNats(async () => {
 		}),
 		handleNatsSubscription("user.updateAvatar", async (msg) => {
 			const { avatar, userId } = jc.decode(msg.data);
+			console.log("Updating avatar for user:", userId, "with avatar:", avatar);
 			userService.updateAvatar(avatar, userId);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),

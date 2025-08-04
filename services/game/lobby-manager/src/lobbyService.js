@@ -4,7 +4,7 @@ import natsClient from './natsClient.js'
 import {
 	encodeMatchCreateRequest,
 	decodeMatchCreateResponse
-} from './proto/message.js'
+} from './proto/helper.js'
 
 // Simple Lobby model
 class Lobby {
@@ -12,6 +12,7 @@ class Lobby {
 		this.id = id
 		this.mode = mode
 		this.map = map
+		console.log(mode);
 		this.maxPlayers = config.MAX_PLAYERS[mode] ?? 2
 		// userId -> { isReady, lastSeen }
 		this.players = new Map()
@@ -26,7 +27,7 @@ class Lobby {
 		if (this.players.has(userId)) {
 			throw new Error(`Player already in lobby`)
 		}
-		this.players.set(userId, { isReady: false, lastSeen: Date.now() })
+		this.players.set(userId, { isReady: false })
 	}
 
 	removePlayer(userId) {
@@ -41,20 +42,22 @@ class Lobby {
 
 	allReady() {
 		return (
-			this.players.size > 0 &&
+			this.players.size == this.maxPlayers &&
 			[...this.players.values()].every(p => p.isReady)
 		)
 	}
 
 	getState() {
-		const players = [...this.players.keys()]
 		const status = this.allReady() ? 'starting' : 'waiting'
 		return {
 			lobbyId: this.id,
-			mode: this.mode,
 			map: this.map,
-			players,
+			players: [...this.players.entries()].map(([uuid, { isReady }]) => ({
+				uuid,
+				ready: isReady,
+			})),
 			status,
+			mode: this.mode,
 			gameId: this.gameId
 		}
 	}
@@ -73,6 +76,7 @@ export default class LobbyService {
 		const id = Date.now().toString()
 		const lobby = new Lobby({ id, mode, map })
 		this.lobbies.set(id, lobby)
+		console.log(`Lobby ID = ${id}`)
 		return lobby.getState()
 	}
 
@@ -96,6 +100,7 @@ export default class LobbyService {
 	 */
 
 	async ready(lobbyId, userId) {
+		console.log("HERE");
 		const lobby = this.lobbies.get(lobbyId)
 		if (!lobby) throw new Error('Lobby not found')
 
@@ -104,7 +109,7 @@ export default class LobbyService {
 
 		if (lobby.allReady()) {
 			const reqBuf = encodeMatchCreateRequest({
-				players: state.players,
+				players: [...lobby.players.keys()],
 			})
 
 			try {

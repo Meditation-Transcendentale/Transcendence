@@ -16,22 +16,18 @@ export class StateManager {
 		const now = performance.now();
 		const deltaTime = now - this.lastUpdate;
 		this.lastUpdate = now;
-		this.accumulatedTime += deltaTime;
-		// console.log("render");
-		// while (this.accumulatedTime >= this.timestep) {
-		// 	console.log("here");
-		this.ecs.update(this.timestep);
-		this.accumulatedTime -= this.timestep;
-		// }
+		this.ecs.update(deltaTime);
 		this.id = requestAnimationFrame(() => this.update());
-		if (!this.start){
-			console.log(this.id);
+		if (!this.start) {
 			cancelAnimationFrame(this.id);
 		}
 	}
 
 	setter(value: boolean): void {
-		console.log("change start");
 		this.start = value;
 	}
+	set_ecs(ecs: ECSManager) {
+		this.ecs = ecs;
+	}
+
 }

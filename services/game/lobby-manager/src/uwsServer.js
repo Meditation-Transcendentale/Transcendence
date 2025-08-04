@@ -1,14 +1,21 @@
 // src/uwsServer.js
+import { readFileSync } from 'fs';
 import uWS from 'uWebSockets.js';
 import {
 	decodeClientMessage,
 	encodeServerMessage
-} from './proto/message.js';
+} from './proto/helper.js';
 
 const sockets = new Map(); // lobbyId → Set<ws>
 
 export function createUwsApp(path, lobbyService) {
-	const app = uWS.App();
+	const key = readFileSync(process.env.SSL_KEY || './ssl/key.pem', 'utf8');
+	const cert = readFileSync(process.env.SSL_CERT || './ssl/cert.pem', 'utf8');
+	const app = uWS.SSLApp({
+		key_file_name: process.env.SSL_KEY,
+		cert_file_name: process.env.SSL_CERT
+	});
+	console.log("LES CLEES LA CON DE TOI", process.env.SSL_KEY, process.env.SSL_KEY)
 
 	app.ws(path, {
 		idleTimeout: 60,
@@ -37,7 +44,7 @@ export function createUwsApp(path, lobbyService) {
 
 			try {
 				const state = lobbyService.join(lobbyId, ws.userId);
-				const buf = encodeServerMessage({ update: state });
+				const buf = encodeServerMessage({ update: { lobbyId: state.lobbyId, players: state.players, status: state.status, mode: state.mode } });
 				ws.subscribe(lobbyId);
 				app.publish(lobbyId, buf, true);
 			} catch (err) {
@@ -59,7 +66,6 @@ export function createUwsApp(path, lobbyService) {
 				console.log(newState);
 
 				if (newState.gameId) {
-					// send “start” to everyone...
 					const startBuf = encodeServerMessage({
 						start: {
 							lobbyId: newState.lobbyId,
@@ -69,11 +75,10 @@ export function createUwsApp(path, lobbyService) {
 					});
 					app.publish(ws.lobbyId, startBuf, true);
 
-					// …then close them out
-					for (const peer of sockets.get(ws.lobbyId) || []) {
-						peer.close(1000, 'Game starting');
-					}
-					sockets.delete(ws.lobbyId);
+					// for (const peer of sockets.get(ws.lobbyId) || []) {
+					// 	peer.close(1000, 'Game starting');
+					// }
+					// sockets.delete(ws.lobbyId);
 					return;
 				}
 			}

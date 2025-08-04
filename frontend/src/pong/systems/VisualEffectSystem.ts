@@ -1,4 +1,4 @@
-import { ParticleSystem, Vector3, Texture, Scene, Color4 } from "@babylonjs/core";
+import { Vector3, ParticleSystem, Texture, Scene, Color4 } from "@babylonImport";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
@@ -7,12 +7,14 @@ import { TransformComponent } from "../components/TransformComponent.js";
 export class VisualEffectSystem extends System {
 	private scene!: Scene;
 	private particlePool: ParticleSystem[] = [];
-	private maxParticle: number = 250;
+	private maxParticle: number = 5;
+	private texture: Texture;
 
 	constructor(scene: Scene) {
 		super();
 		this.scene = scene;
-		for(let i = 0; i < this.maxParticle; i++) {
+		this.texture = new Texture("textures/Shard_Alpha.png", this.scene);
+		for (let i = 0; i < this.maxParticle; i++) {
 			this.particlePool.push(this.createParticleSystem());
 		}
 	}
@@ -42,7 +44,7 @@ export class VisualEffectSystem extends System {
 
 	private createParticleSystem(): ParticleSystem {
 		const ps = new ParticleSystem("particles", 10, this.scene);
-		ps.particleTexture = new Texture("textures/Shard_Alpha.png", this.scene);
+		ps.particleTexture = this.texture;
 
 		ps.color1 = new Color4(1.0, 1.0, 1.0, 1.0);
 		ps.color2 = new Color4(1.0, 1.0, 1.0, 1.0);
@@ -82,12 +84,20 @@ export class VisualEffectSystem extends System {
 
 		ps.emitter = position;
 		ps.createDirectedSphereEmitter(1, direction.add(randomVec()), direction.add(randomVec().negate()));
+		ps.manualEmitCount = 50;
 		ps.start();
 
 		setTimeout(() => {
 			ps.stop();
-			ps.dispose();
-			console.log("dispose fx");
+			ps.reset();
 		}, (0.25 / 0.005 * (1000 / 60)) + 50);
+	}
+
+	dispose(): void {
+		for (const ps of this.particlePool) {
+			ps.stop();
+			ps.dispose();
+		}
+		this.particlePool = [];
 	}
 }

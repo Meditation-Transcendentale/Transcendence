@@ -1,4 +1,4 @@
-import { Matrix, Scalar, Vector3 } from "@babylonjs/core";
+import { Vector3, Scalar, Matrix } from "@babylonImport";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { InputComponent } from "../components/InputComponent.js";
@@ -7,23 +7,29 @@ import { TransformComponent } from "../components/TransformComponent.js";
 import { InputManager } from "../input/InputManager.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
 import { localPaddleId } from "../Pong.js";
+import { userinterface } from "../utils/proto/message.js";
+import { encodeClientMessage } from "../utils/proto/helper.js";
 
 export class InputSystem extends System {
 	private inputManager: InputManager;
 	private wsManager: WebSocketManager;
 	private localPaddleId: number | null = null;
 	private readonly MAX_OFFSET: number = 8.4;
-	private move: boolean;
+	private move: number;
 
 	constructor(inputManager: InputManager, wsManager: WebSocketManager) {
 		super();
 		this.inputManager = inputManager;
 		this.wsManager = wsManager;
 		this.localPaddleId = localPaddleId;
-		this.move = false;
+		this.move = 0;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		// console.log("update input");
+		const now = performance.now();
+		// console.log("input: ", now);
+		const dt = deltaTime / 1000;
 		for (const entity of entities) {
 			if (
 				!entity.hasComponent(InputComponent) ||
@@ -34,42 +40,71 @@ export class InputSystem extends System {
 			}
 
 			const input = entity.getComponent(InputComponent)!;
-			if (input.isLocal != true) continue;
+			if (!input.isLocal) continue;
 
 			const paddle = entity.getComponent(PaddleComponent)!;
 			const transform = entity.getComponent(TransformComponent)!;
 
 			let offsetChange = 0;
-			const leftPressed = this.inputManager.isKeyPressed("KeyA");
-			const rightPressed = this.inputManager.isKeyPressed("KeyD");
-
-			this.move = leftPressed || rightPressed;
-
-			if (this.move) {
-				offsetChange = leftPressed ? 0.4 : -0.4;
+			let upKeys = [];
+			let downKeys = [];
+			if (input.gameMode === "online" || input.gameMode === "ia") {
+				if (paddle.id == 0) {
+					upKeys = ["KeyW", "ArrowUp"];
+					downKeys = ["KeyS", "ArrowDown"];
+				} else {
+					downKeys = ["KeyW", "ArrowUp"];
+					upKeys = ["KeyS", "ArrowDown"];
+				}
+			} else {
+				if (paddle.id == 0) {
+					upKeys = ["KeyW"];
+					downKeys = ["KeyS"];
+				} else if (paddle.id == 1) {
+					upKeys = ["ArrowDown"];
+					downKeys = ["ArrowUp"];
+				}
 			}
-			paddle.offset = Scalar.Clamp(paddle.offset, -this.MAX_OFFSET, this.MAX_OFFSET);
 
-			if (this.move) {
-				paddle.offset += offsetChange;
+			let UpPressed = upKeys.some(key => this.inputManager.isKeyPressed(key));
+			let DownPressed = downKeys.some(key => this.inputManager.isKeyPressed(key));
 
-				const rotationMatrix = Matrix.RotationYawPitchRoll(
-					transform.rotation.y,
-					transform.rotation.x,
-					transform.rotation.z
-				);
-				const localRight = Vector3.TransformCoordinates(new Vector3(1, 0, 0), rotationMatrix);
-				transform.position.copyFrom(transform.basePosition.add(localRight.scale(paddle.offset)));
+			paddle.move = 0;
+			if (UpPressed && !DownPressed) {
+				paddle.move = 1;
+			}
+			else if (DownPressed && !UpPressed) {
+				paddle.move = -1;
+			}
 
-				this.wsManager.send({
-					type: "paddleUpdate",
-					data: {
-						paddleId: localPaddleId,
-						move: this.move,
-						offset: paddle.offset,
+			offsetChange = paddle.move * 10 * dt;
+			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -this.MAX_OFFSET, this.MAX_OFFSET);
+
+			const rotationMatrix = Matrix.RotationYawPitchRoll(
+				transform.rotation.y,
+				transform.rotation.x,
+				transform.rotation.z
+			);
+			const localRight = Vector3.TransformCoordinates(
+				Vector3.Right(),
+				rotationMatrix
+			);
+			const displacement = localRight.clone().scale(paddle.offset);
+			transform.position.copyFrom(
+				transform.basePosition.add(displacement)
+			);
+			if (paddle.move != paddle.lastMove) {
+				const payload: userinterface.IClientMessage = {
+					paddleUpdate: {
+						paddleId: paddle.id,
+						move: paddle.move, //remplacer par paddle.offset
 					}
-				});
-				console.log("playerId =" + localPaddleId);
+				};
+
+				const buffer = encodeClientMessage(payload);
+				this.wsManager.socket.send(buffer);
+				paddle.lastMove = paddle.move;
+
 			}
 		}
 	}

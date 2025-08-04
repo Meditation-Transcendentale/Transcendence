@@ -1,0 +1,35 @@
+// nats.publish.status.json
+// notification.${uuid}.status
+{
+    "status":{
+            "type": "object",
+            "oneOf": [
+                {
+                    "properties": {
+                        "type": "online"
+                    },
+                    "required": ["type"]
+                },
+                {
+                    "properties": {
+                        "type": "offline"
+                    },
+                    "required": ["type"]
+                },
+                {
+                    "properties": {
+                        "type": "in-lobby",
+                        "lobbyId": "string"
+                    },
+                    "required": ["type", "lobbyId"]
+                },
+                {
+                    "properties": {
+                        "type": "in-game",
+                        "gameId": "string"
+                    },
+                    "required": ["type", "gameId"]
+                }
+            ]
+    }
+}

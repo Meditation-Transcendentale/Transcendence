@@ -11,7 +11,11 @@ import { natsRequest } from '../../shared/natsRequest.mjs';
 
 dotenv.config({ path: "../../../.env" });
 
-const nats = await connect({ servers: process.env.NATS_URL });
+const nats = await connect({ 
+	servers: process.env.NATS_URL,
+	token: process.env.NATS_TOKEN,
+	tls: { rejectUnauthorized: false }
+});
 const jc = JSONCodec();
 
 function generateSecret() {
