@@ -2,8 +2,12 @@ import { GameStateNode } from './GameStateNode.js';
 import { predictBallState } from './physics.js';
 import { BALL_ACCELERATION, STEP_SIZE, PADDLE_HEIGHT, MAP_HEIGHT, WALL_SIZE, PADDLE_AI_X, PADDLE_WIDTH, BALL_DIAM } from './constants.js';
 import { evaluateNode } from './evaluate.js';
-import { i } from './main.js';
 
+
+/**
+ * Generate a range of Y positions around the position where the ball should cross the goal
+ * @returns the range of Y positions
+ */
 function generateFullRange() {
   const lower = -(MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) * 0.5;
   const upper = (MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) * 0.5;
@@ -14,44 +18,29 @@ function generateFullRange() {
   return range;
 }
 
-export function expand(root, node) {
-  const children = [];
-  const newVelX = -node.futureBallState.ballVel[0] * BALL_ACCELERATION;
-      
+/**
+ * Expands the current node by simulating ball travel until it reaches AI or Opponent.
+ * Each child represents a possible final position where the ball is received.
+ * @param {*} node to expand
+ */
+export function expand(node) {    
   const isAIMove = node.futureBallState.ballVel[0] >= 0;
-  const targetY = node.futureBallState.ballPos[1];
   const paddlePositions = generateFullRange();
   
-  const angleFactor = 0.5;
-
   for (const paddlePos of paddlePositions) {
-    const offset = targetY - paddlePos;
-    const newVelY = offset * angleFactor;
-
+    const distanceToBall = Math.abs(paddlePos - node.futureBallState.ballPos[1]);
+    const newVelY = node.ballState.ballVel[1] * ((paddlePos - node.futureBallState.ballPos[1] >= 0) == (node.ballState.ballVel[1] >= 0) ? -BALL_ACCELERATION : BALL_ACCELERATION) * distanceToBall;
+    const newVelX = node.ballstate.ballVel[0] * -BALL_ACCELERATION;
     const newBallVel = [newVelX, newVelY];
     const futureBallState = predictBallState(node.futureBallState.ballPos, newBallVel);
-    const aiPaddle = isAIMove ? paddlePos : node.aiPaddlePos;
-    const playerPaddle = isAIMove ? node.playerPaddlePos : paddlePos;
-
-    const newBallState = {
-      ballPos: [...node.futureBallState.ballPos],
-      ballVel: [...node.futureBallState.ballVel]
-    };
-
-    const child = new GameStateNode(
-      newBallState,
-      aiPaddle,
-      playerPaddle,
-      futureBallState
-    );
-
-    root.i += 1;
-//     console.log(`Init pos: ${newBallState.ballPos[0]}|${newBallState.ballPos[1]}
-//       ${newBallState.ballVel[0]}|${newBallState.ballVel[1]}
-// Future: ${futureBallState.ballPos[0]}|${futureBallState.ballPos[1]}
-//       ${futureBallState.ballVel[0]}|${futureBallState.ballVel[1]}\n`);
-    children.push(child);
+    
+    let newNode;
+    if (isAIMove)
+      newNode = GameStateNode(node.futureBallState, paddlePos, node.playerPaddle, futureBallState);
+    else
+      newNode = GameStateNode(node.futureBallState, node.aiPaddle, paddlePos, futureBallState);
+    newNode.evaluation = evaluateNode(newNode);
   }
-
-  return children;
+  node.children.push(newNode);
+  newNode.parent = node;
 }

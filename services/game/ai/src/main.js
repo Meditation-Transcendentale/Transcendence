@@ -1,7 +1,7 @@
 import { weightsProfiles } from './weightsProfiles.js';
 import { GameStateNode } from './GameStateNode.js';
 import { predictBallState } from './physics.js';
-import { runMinmax } from './minmax.js';
+import { runMinmax } from '../src/minmax.js';
 
 export let i = 0;
 

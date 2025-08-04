@@ -10,5 +10,11 @@ export class GameStateNode {
       ballPos: [...futureBallState.ballPos],
       ballVel: [...futureBallState.ballVel]
     };
+    this.children = [];
+    this.parent = null;
+    this.evaluation = {
+      alpha: 0,
+      beta: 0
+    }
   }
 }

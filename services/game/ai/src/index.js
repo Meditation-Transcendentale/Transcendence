@@ -1,5 +1,6 @@
-const { connect } = require('nats');
-require('dotenv').config();
+import dotenv from 'dotenv';
+import natsClient from './natsClient.js'
+dotenv.config();
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'service';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
