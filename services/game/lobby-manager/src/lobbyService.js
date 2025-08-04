@@ -76,6 +76,7 @@ export default class LobbyService {
 		const id = Date.now().toString()
 		const lobby = new Lobby({ id, mode, map })
 		this.lobbies.set(id, lobby)
+		console.log(`Lobby ID = ${id}`)
 		return lobby.getState()
 	}
 

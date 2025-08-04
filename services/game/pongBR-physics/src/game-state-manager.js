@@ -86,7 +86,7 @@ export class GameStateManager {
 			remainingPlayers: this.playerStates.activePlayers.size
 		});
 
-		console.log(`Player ${playerId} eliminated! ${this.playerStates.activePlayers.size} players remaining.`);
+		// console.log(`Player ${playerId} eliminated! ${this.playerStates.activePlayers.size} players remaining.`);
 
 		this.checkPhaseTransition();
 	}
@@ -120,14 +120,14 @@ export class GameStateManager {
 			timestamp: Date.now()
 		});
 
-		console.log(`Phase Transition: ${newPhase} - ${this.playerStates.activePlayers.size} players remaining`);
+		// console.log(`Phase Transition: ${newPhase} - ${this.playerStates.activePlayers.size} players remaining`);
 		this.startArenaRebuild();
 	}
 
 	startArenaRebuild() {
 		this.isRebuilding = true;
 		this.rebuildStartTime = Date.now();
-		console.log(`Starting arena rebuild for ${this.currentPhase}...`);
+		// console.log(`Starting arena rebuild for ${this.currentPhase}...`);
 
 		if (this.onRebuildStart) {
 			this.onRebuildStart();
@@ -146,7 +146,7 @@ export class GameStateManager {
 	}
 
 	completeArenaRebuild() {
-		console.log(`Completing arena rebuild for ${this.currentPhase}`);
+		// console.log(`Completing arena rebuild for ${this.currentPhase}`);
 		this.isRebuilding = false;
 		this.playerStates.eliminated.clear();
 
@@ -158,7 +158,7 @@ export class GameStateManager {
 			timestamp: Date.now()
 		});
 
-		console.log(`Arena rebuild complete! ${this.playerStates.activePlayers.size} players remaining.`);
+		// console.log(`Arena rebuild complete! ${this.playerStates.activePlayers.size} players remaining.`);
 	}
 
 	updatePlayerMapping(activePlayers) {
@@ -166,7 +166,7 @@ export class GameStateManager {
 		activePlayers.forEach((fixedPlayerId, newPaddleIndex) => {
 			this.playerMapping[fixedPlayerId] = newPaddleIndex;
 		});
-		console.log('Player mapping updated:', this.playerMapping);
+		// console.log('Player mapping updated:', this.playerMapping);
 	}
 
 	endGame() {

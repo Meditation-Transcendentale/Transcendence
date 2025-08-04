@@ -12,6 +12,7 @@ let ZOOM = 2.0;
 let camX = 0;
 let camY = 0;
 let paused = false;
+let debugMode = true; // Show collision debugging by default
 
 // Event log for key events only
 let eventLog = [];
@@ -60,10 +61,27 @@ function drawArena() {
 }
 
 function drawBalls(balls) {
-	for (const ball of balls) {
+	for (let i = 0; i < balls.length; i++) {
+		const ball = balls[i];
 		const pos = toScreen(ball.x, ball.y);
 		const ballRadius = Math.max(2, ball.radius * ZOOM);
-		raylib.DrawCircle(pos.x, pos.y, ballRadius, raylib.RED);
+		
+		// Color code balls: Red=normal, Orange=near collision
+		const distFromCenter = Math.sqrt(ball.x * ball.x + ball.y * ball.y);
+		const collisionDistance = engine.cfg.ARENA_RADIUS - ball.radius;
+		const isNearCollision = distFromCenter >= collisionDistance - 20;
+		const ballColor = isNearCollision ? raylib.ORANGE : raylib.RED;
+		
+		raylib.DrawCircle(pos.x, pos.y, ballRadius, ballColor);
+		
+		// Show ball angle for first few balls
+		if (debugMode && i < 3 && isNearCollision) {
+			const ballAngle = Math.atan2(ball.y, ball.x);
+			let normalizedAngle = ballAngle;
+			while (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
+			const angleDegrees = (normalizedAngle * 180 / Math.PI).toFixed(1);
+			drawText(`${angleDegrees}°`, pos.x + 15, pos.y - 5, 10, raylib.WHITE);
+		}
 	}
 }
 
@@ -103,30 +121,70 @@ function drawPillars() {
 			1,
 			outlineColor
 		);
+
+		// Debug info for first few pillars
+		if (debugMode && i < 5) {
+			const pillarAngle = Math.atan2(y, x);
+			const angleDegrees = (pillarAngle * 180 / Math.PI).toFixed(1);
+			drawText(`PIL${i}`, pos.x + 20, pos.y - 20, 10, raylib.WHITE);
+			drawText(`${angleDegrees}°`, pos.x + 20, pos.y - 5, 8, raylib.YELLOW);
+			drawText(`${x.toFixed(0)},${y.toFixed(0)}`, pos.x + 20, pos.y + 8, 8, raylib.CYAN);
+		}
 	}
 }
 
 function drawPaddles(paddles) {
-	for (let i = 0; i < paddles.length; i++) {
-		const paddle = paddles[i];
-		const paddleEnt = engine.entities.paddles[i];
+	const numPlayers = engine.entities.paddles.length;
+	const angleStep = (2 * Math.PI) / numPlayers;
+	
+	for (let paddleIndex = 0; paddleIndex < paddles.length; paddleIndex++) {
+		const paddle = paddles[paddleIndex];
+		const paddleEnt = engine.entities.paddles[paddleIndex];
 
 		if (!paddleEnt || !engine.pd.isActive(paddleEnt)) continue;
 
-		// Get actual paddle data from physics
+		// Get paddle physics data
 		const x = engine.pd.posX[paddleEnt];
 		const y = engine.pd.posY[paddleEnt];
 		const rot = engine.pd.rot[paddleEnt];
 		const halfW = engine.pd.halfW[paddleEnt];
 		const halfH = engine.pd.halfH[paddleEnt];
 
+		// Get player ID mapping (same logic as collision detection)
+		let fixedPlayerId = paddleIndex;
+		if (engine.gameState && engine.gameState.playerMapping && Object.keys(engine.gameState.playerMapping).length > 0) {
+			const reverseMapping = Object.entries(engine.gameState.playerMapping)
+				.find(([playerId, pIdx]) => pIdx === paddleIndex);
+			if (reverseMapping) {
+				fixedPlayerId = parseInt(reverseMapping[0]);
+			}
+		}
+
+		// Calculate collision area (same as physics)
+		let currentPaddleAngle, arcWidth;
+		const isEliminated = engine.gameState && engine.gameState.playerStates && engine.gameState.playerStates.eliminated.has(fixedPlayerId);
+		if (isEliminated) {
+			currentPaddleAngle = engine.paddleData.centerAngles[paddleIndex];
+			arcWidth = angleStep;
+		} else {
+			currentPaddleAngle = engine.paddleData.centerAngles[paddleIndex] + engine.paddleData.offsets[paddleIndex];
+			arcWidth = angleStep * engine.cfg.PADDLE_FILL;
+		}
+
 		const pos = toScreen(x, y);
 		const paddleWidth = halfW * 2 * ZOOM;
 		const paddleHeight = halfH * 2 * ZOOM;
 		const rotationDegrees = rot * (180 / Math.PI);
 
-		// Color based on status: Blue=alive, Gray=dead
-		const paddleColor = paddle.dead ? raylib.GRAY : raylib.BLUE;
+		// Color: Blue=alive, Gray=eliminated, Lime=first 3 paddles for debugging
+		let paddleColor;
+		if (isEliminated) {
+			paddleColor = raylib.GRAY;
+		} else if (debugMode && paddleIndex < 3) {
+			paddleColor = raylib.LIME; // Highlight first 3 for debugging
+		} else {
+			paddleColor = raylib.BLUE;
+		}
 
 		// Draw paddle
 		raylib.DrawRectanglePro(
@@ -136,13 +194,46 @@ function drawPaddles(paddles) {
 			paddleColor
 		);
 
-		// Simple status indicator
-		const statusColor = paddle.dead ? raylib.RED : raylib.GREEN;
-		raylib.DrawCircle(pos.x - 20, pos.y, 5, statusColor);
+		// Draw debug rays in debug mode
+		if (debugMode && paddleIndex < 5) {
+			const arenaCenter = toScreen(0, 0);
+			const rayLength = engine.cfg.ARENA_RADIUS * ZOOM;
+			
+			// Paddle start and end angles (physical paddle bounds)
+			const paddleStartAngle = engine.paddleData.centerAngles[paddleIndex] - (angleStep / 2);
+			const paddleEndAngle = engine.paddleData.centerAngles[paddleIndex] + (angleStep / 2);
+			
+			// Collision slice start and end angles  
+			const sliceStartAngle = currentPaddleAngle - arcWidth / 2;
+			const sliceEndAngle = currentPaddleAngle + arcWidth / 2;
+			
+			// Draw paddle bounds (green rays)
+			const paddleStartX = arenaCenter.x + Math.cos(paddleStartAngle) * rayLength;
+			const paddleStartY = arenaCenter.y + Math.sin(paddleStartAngle) * rayLength;
+			const paddleEndX = arenaCenter.x + Math.cos(paddleEndAngle) * rayLength;
+			const paddleEndY = arenaCenter.y + Math.sin(paddleEndAngle) * rayLength;
+			
+			raylib.DrawLine(arenaCenter.x, arenaCenter.y, paddleStartX, paddleStartY, raylib.GREEN);
+			raylib.DrawLine(arenaCenter.x, arenaCenter.y, paddleEndX, paddleEndY, raylib.GREEN);
+			
+			// Draw collision slice bounds (red rays)
+			const sliceStartX = arenaCenter.x + Math.cos(sliceStartAngle) * rayLength * 0.9;
+			const sliceStartY = arenaCenter.y + Math.sin(sliceStartAngle) * rayLength * 0.9;
+			const sliceEndX = arenaCenter.x + Math.cos(sliceEndAngle) * rayLength * 0.9;
+			const sliceEndY = arenaCenter.y + Math.sin(sliceEndAngle) * rayLength * 0.9;
+			
+			raylib.DrawLine(arenaCenter.x, arenaCenter.y, sliceStartX, sliceStartY, raylib.RED);
+			raylib.DrawLine(arenaCenter.x, arenaCenter.y, sliceEndX, sliceEndY, raylib.RED);
+		}
 
-		// Show player ID and paddle size
-		drawText(`P${i}`, pos.x + 15, pos.y - 15, 12, raylib.WHITE);
-		drawText(`${(halfW * 2).toFixed(0)}`, pos.x + 15, pos.y, 10, raylib.CYAN);
+		// Show debug info for first 3 paddles or basic info
+		if (debugMode && paddleIndex < 3) {
+			drawText(`P${fixedPlayerId}`, pos.x + 15, pos.y - 25, 12, raylib.WHITE);
+			drawText(`${(currentPaddleAngle * 180 / Math.PI).toFixed(1)}°`, pos.x + 15, pos.y - 10, 10, raylib.CYAN);
+			drawText(`${(arcWidth * 180 / Math.PI).toFixed(1)}°`, pos.x + 15, pos.y + 5, 10, raylib.MAGENTA);
+		} else {
+			drawText(`P${fixedPlayerId}`, pos.x + 15, pos.y - 15, 12, raylib.WHITE);
+		}
 	}
 }
 
@@ -207,6 +298,28 @@ function drawUI() {
 	yOffset += lineHeight;
 	drawText(`Balls: ${state.balls.length}`, 20, yOffset, 14);
 	yOffset += lineHeight;
+	
+	// Debug mode indicator
+	const debugText = debugMode ? "Debug: ON" : "Debug: OFF";
+	const debugColor = debugMode ? raylib.GREEN : raylib.GRAY;
+	drawText(debugText, 20, yOffset, 14, debugColor);
+	yOffset += lineHeight;
+	
+	// Collision system indicator
+	const collisionText = engine.useSimplifiedCollision === 2 ? "Collision: OPTIMIZED" : "Collision: ORIGINAL";
+	const collisionColor = engine.useSimplifiedCollision === 2 ? raylib.MAGENTA : raylib.CYAN;
+	drawText(collisionText, 20, yOffset, 14, collisionColor);
+	yOffset += lineHeight;
+	
+	// Collision debug info
+	if (debugMode) {
+		const nearCollisionBalls = state.balls.filter(ball => {
+			const dist = Math.sqrt(ball.x * ball.x + ball.y * ball.y);
+			return dist >= engine.cfg.ARENA_RADIUS - ball.radius - 20;
+		}).length;
+		drawText(`Near collision: ${nearCollisionBalls}`, 20, yOffset, 14, raylib.ORANGE);
+		yOffset += lineHeight;
+	}
 
 	// Status
 	const status = paused ? "PAUSED" : "RUNNING";
@@ -222,7 +335,9 @@ function drawUI() {
 		"SPACE: Pause/Resume",
 		"T: Eliminate Random Player",
 		"R: Reset Game",
-		"1-5: Force Phase",
+		"D: Toggle Debug Mode",
+		"S: Toggle Original/Optimized", 
+		"P: Log Pillar Positions",
 		"Arrows: Move Camera",
 		"I/O: Zoom"
 	];
@@ -275,12 +390,34 @@ function handleInput() {
 		logEvent("Game reset!", raylib.GREEN);
 	}
 
-	// Force phases for testing
-	if (raylib.IsKeyPressed(raylib.KEY_ONE)) forcePhase('Phase 1');
-	if (raylib.IsKeyPressed(raylib.KEY_TWO)) forcePhase('Phase 2');
-	if (raylib.IsKeyPressed(raylib.KEY_THREE)) forcePhase('Phase 3');
-	if (raylib.IsKeyPressed(raylib.KEY_FOUR)) forcePhase('Phase 4');
-	if (raylib.IsKeyPressed(raylib.KEY_FIVE)) forcePhase('Final Phase');
+	// Debug mode toggle
+	if (raylib.IsKeyPressed(raylib.KEY_D)) {
+		debugMode = !debugMode;
+		logEvent(`Debug mode: ${debugMode ? 'ON' : 'OFF'}`, raylib.CYAN);
+	}
+
+	// Collision system toggle
+	if (raylib.IsKeyPressed(raylib.KEY_S)) {
+		engine.useSimplifiedCollision = engine.useSimplifiedCollision === 0 ? 2 : 0;
+		const mode = engine.useSimplifiedCollision === 2 ? 'OPTIMIZED' : 'ORIGINAL';
+		logEvent(`Collision: ${mode}`, raylib.MAGENTA);
+	}
+
+	// Force pillar position update
+	if (raylib.IsKeyPressed(raylib.KEY_P)) {
+		// Trigger pillar position recalculation if needed
+		logEvent("Pillar positions logged to console", raylib.ORANGE);
+		console.log("=== PILLAR POSITIONS ===");
+		for (let i = 0; i < Math.min(5, engine.entities.pillars.length); i++) {
+			const pillarEnt = engine.entities.pillars[i];
+			if (pillarEnt && engine.pd.isActive(pillarEnt)) {
+				const x = engine.pd.posX[pillarEnt];
+				const y = engine.pd.posY[pillarEnt];
+				const angle = Math.atan2(y, x) * 180 / Math.PI;
+				console.log(`Pillar ${i}: pos(${x.toFixed(2)}, ${y.toFixed(2)}) angle=${angle.toFixed(2)}°`);
+			}
+		}
+	}
 
 	// Camera
 	const camSpeed = 8 / ZOOM;
@@ -292,7 +429,7 @@ function handleInput() {
 	// Zoom
 	if (raylib.IsKeyDown(raylib.KEY_I)) ZOOM *= 1.02;
 	if (raylib.IsKeyDown(raylib.KEY_O)) ZOOM *= 0.98;
-	ZOOM = Math.max(0.8, Math.min(ZOOM, 6));
+	ZOOM = Math.max(0.8, Math.min(ZOOM, 10));
 }
 
 function forcePhase(phaseName) {
