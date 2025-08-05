@@ -1,12 +1,11 @@
-import { GlowLayer, LoadAssetContainerAsync, Matrix, Mesh, Scene, TransformNode, Vector3, Vector4 } from "@babylonImport";
+import { GlowLayer, LoadAssetContainerAsync, Matrix, Mesh, Scene, TransformNode, Vector3 } from "@babylonImport";
 import { ButterflyMaterial } from "./Shader";
-import { Noise } from "./Noise";
 
 export class Butterfly {
 
 	public root: TransformNode;
 
-	private mesh!: Mesh;
+	public mesh!: Mesh;
 	private material: ButterflyMaterial;
 	private scene: Scene;
 
@@ -23,7 +22,7 @@ export class Butterfly {
 
 
 	private deltas!: Float32Array;
-	private n: number = 300;
+	private n: number = 100;
 
 	private speed = 0.8;
 
@@ -31,14 +30,14 @@ export class Butterfly {
 	private flock: number = 1;
 	private disperse: number = 0;
 
-	public glowLayer!: GlowLayer;
-	private glowMat!: ButterflyMaterial;
+	public glowMat!: ButterflyMaterial;
 
 	public origin: Vector3;
 
 	private grid!: Grid2D;
 
 	private fps: HTMLElement;
+
 
 
 	constructor(scene: Scene, origin: Vector3) {
@@ -57,7 +56,7 @@ export class Butterfly {
 			width: 42,
 			depth: 42,
 			height: 10,
-			minPerCell: 100,
+			minPerCell: this.n,
 			cellSize: 1
 		})
 
@@ -80,17 +79,15 @@ export class Butterfly {
 		this.mesh.parent = this.root;
 
 		this.mesh.position.set(0, 0, 0);
-		this.mesh.scaling.setAll(0.13);
-		this.mesh.material = this.material
+		this.mesh.scaling.setAll(0.4);
+		this.mesh.material = this.material;
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
-		this.thinInstance(this.n, 16);
+		this.mesh.setEnabled(false);
+		this.thinInstance(this.n, 30);
 		//this.octree.print();
-		this.glowLayer = new GlowLayer("glow", this.scene);
-		this.glowLayer.setMaterialForRendering(this.mesh, this.glowMat);
 
-		this.glowLayer.intensity = 0.5;
-		this.glowLayer.isEnabled = false;
+		// this.glowLayer.isEnabled = false;
 
 	}
 
@@ -156,8 +153,8 @@ export class Butterfly {
 
 				this.origin.subtractToRef(ip, cursor);
 				const cursorL = cursor.length();
-				cursor.scaleInPlace(cursorL < 4 ? 0.02 : 0.);
-				const cursorField = cursorL < 5.5 ? 0 : 1.;
+				cursor.scaleInPlace(cursorL < 2 ? 0.02 : 0.);
+				const cursorField = cursorL < 2.5 ? 0 : 1.;
 
 				flock.scaleInPlace(0.5 * speed * this.flock * cursorField);
 				// flock.subtractInPlace(onEdge == true ? ip.scale(speed)  : v0);
@@ -175,10 +172,10 @@ export class Butterfly {
 
 				this.bound(iv, ip, speed);
 
-				ip.addInPlace(iv.scale(Math.min(1., this.flying[ii])));
+				ip.addInPlace(iv.scale(Math.min(1., this.directions[ii * 3 + 2])));
 				ip.toArray(this.moves, ii * 3);
-				this.directions[ii * 2] = iv.x;
-				this.directions[ii * 2 + 1] = iv.z;
+				this.directions[ii * 3] = iv.x;
+				this.directions[ii * 3 + 1] = iv.z;
 				this.perching(ip, ii);
 			}
 			cell.indexes.fill(-1, 0, cell.count);
@@ -204,8 +201,8 @@ export class Butterfly {
 			}
 			ip.addInPlace(iv);
 			ip.toArray(this.moves, ii * 3);
-			this.directions[ii * 2] = iv.x;
-			this.directions[ii * 2 + 1] = iv.z;
+			this.directions[ii * 3] = iv.x;
+			this.directions[ii * 3 + 1] = iv.z;
 		}
 		cell.indexes.fill(-1, 0, cell.count);
 		cell.count = 0;
@@ -219,7 +216,7 @@ export class Butterfly {
 	private activeFlock() {
 		this.flock = 1;
 		this.disperse = 0;
-		setTimeout(() => { this.disbaleFlock() }, (Math.random() * 0.5 + 0.5) * 3000);
+		setTimeout(() => { this.disbaleFlock() }, (Math.random() * 0.5 + 0.5) * 1000);
 	}
 
 	private disbaleFlock() {
@@ -229,11 +226,11 @@ export class Butterfly {
 	}
 
 	private perching(bp: Vector3, index: number) {
-		if (bp.y < 0.1 && this.flying[index] > 100) {
-			this.flying[index] = 0;
-			setTimeout(() => { this.flying[index] = 0.1 }, (Math.random() * 0.5 + 0.5) * 1000);
+		if (bp.y < 0.15 && this.directions[index * 3 + 2] > 100) {
+			this.directions[index * 3 + 2] = 0;
+			setTimeout(() => { this.directions[index * 3 + 2] = 0.1 }, (Math.random() * 0.5 + 0.5) * 1000);
 		} else {
-			this.flying[index] = this.flying[index] * 1.01;
+			this.directions[index * 3 + 2] = this.directions[index * 3 + 2] * 1.01;
 		}
 
 	}
@@ -250,7 +247,7 @@ export class Butterfly {
 
 		const bufferMatrix = new Float32Array(16 * n);
 		this.moves = new Float32Array(3 * n);
-		this.directions = new Float32Array(2 * n);
+		this.directions = new Float32Array(3 * n);
 		this.flying = new Float32Array(n);
 
 		for (let i = 0; i < n; i++) {
@@ -279,14 +276,15 @@ export class Butterfly {
 			this.positions.push(position);
 			this.velocities.push(v);
 			this.octree.add(i, position);
-			this.directions[i * 2] = v.x;
-			this.directions[i * 2 + 1] = v.z;
+			this.directions[i * 3] = v.x;
+			this.directions[i * 3 + 1] = v.z;
+			this.directions[i * 3 + 2] = 1;
 			this.grid.add(i, position);
 		}
 
 		this.mesh.thinInstanceSetBuffer('matrix', bufferMatrix, 16, true);
 		this.mesh.thinInstanceSetBuffer('move', this.moves, 3, false);
-		this.mesh.thinInstanceSetBuffer('direction', this.directions, 2, false);
+		this.mesh.thinInstanceSetBuffer('direction', this.directions, 3, false);
 	}
 }
 

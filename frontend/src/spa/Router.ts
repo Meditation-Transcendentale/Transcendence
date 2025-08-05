@@ -8,7 +8,7 @@ type routePage = {
 };
 
 interface IPage {
-	load(params: URLSearchParams): void;
+	load(params?: URLSearchParams): void;
 	unload(): Promise<any>;
 }
 
@@ -20,6 +20,7 @@ class RouterC {
 	private currentPage: IPage | null;
 
 	private routes: Map<string, routePage>;
+	private ath: routePage;
 
 	private parser: DOMParser;
 
@@ -90,7 +91,11 @@ class RouterC {
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 
-
+		this.ath = {
+			html: "/ath",
+			ts: "./Ath",
+			callback: () => { this.loadAth() }
+		}
 
 		window.addEventListener("popstate", () => {
 			this.currentPage?.unload()
@@ -154,6 +159,10 @@ class RouterC {
 
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
 
+		//url.pathname = "/home";
+		if (url.pathname !== "/login" && url.pathname !== "/register") {
+			this.loadAth();
+		}
 		this.routes.get(url.pathname)?.callback(url);
 		if (history) {
 			window.history.pushState("", "", url.pathname + url.search)
@@ -175,25 +184,13 @@ class RouterC {
 		this.currentPage.load(url.searchParams);
 	}
 
-	private async loadInHome(url: URL) {
-		if (!document.querySelector("#home-container")) {
-			this.loadInMain(new URL(`${this.location}/home`))
-				.then(() => { this.loadInHome(url) })
-			return;
+	private async loadAth() {
+		if (!this.ath.instance) {
+			const html = await this.getHTML(this.ath!.html);
+			const ts = await this.getTS(this.ath!.ts);
+			this.ath!.instance = new ts.default(html);
 		}
-
-		const route = this.routes.get(url.pathname);
-		if (!route?.instance) {
-			const html = await this.getHTML(route!.html);
-			const ts = await this.getTS(route!.ts);
-			route!.instance = new ts.default(html);
-		}
-		if (this.currentPage !== this.routes.get("/home")?.instance) {
-			await this.currentPage?.unload();
-		}
-		this.currentPage = (route?.instance as IPage);
-		this.currentPage.load(url.searchParams);
-
+		this.ath.instance?.load();
 	}
 
 

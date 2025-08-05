@@ -1,116 +1,17 @@
+import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
-//import { playVue } from "../Vue";
 import { getRequest, postRequest } from "./requests";
 import Router from "./Router";
-import { User } from "./User";
 import { createButton } from "./utils";
-
-
-const lr: listResp = {
-	lobbies: [
-		{
-			id: "egeggege-wefwefbwejhf-wefhbwf-wefwfe",
-			mod: "local",
-			maxPlayers: 1,
-			players: ["ehehe"]
-		},
-		{
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		}, {
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		}, {
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		}, {
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		},
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		},
-		{
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		}, {
-			id: "wefbwefb-wefwefwef-wefwefwjhfebwe-we",
-			mod: "online",
-			maxPlayers: 2,
-			players: ["bob"]
-		},
-
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		},
-		{
-			id: "fwefwehfwef-wjehfwejhf-wefjhwv-fwefe",
-			mod: 'pongbr',
-			maxPlayers: 100,
-			players: ["wef", "wefwefwf", "csdcxc", "adsad", "ashdahv", "kklks", "wefef"]
-		},
-
-
-
-
-	]
-};
-
+import { Popup } from "./Popup";
 
 
 interface playHtmlReference {
-	create: HTMLDivElement;
-	join: HTMLDivElement;
+	switch: { html: HTMLDivElement, id: number },
+	swCreate: HTMLInputElement,
+	swJoin: HTMLInputElement
+	join: { html: HTMLDivElement, id: number },
+	create: { html: HTMLDivElement, id: number },
 	brMod: HTMLInputElement;
 	tournamentMod: HTMLInputElement;
 	defaultMap: HTMLInputElement;
@@ -121,6 +22,8 @@ interface playHtmlReference {
 	createWin: HTMLDivElement;
 	list: HTMLTableElement;
 	joinId: HTMLInputElement;
+	lobbyInfoWindow: { html: HTMLDivElement, id: number };
+	lobbyInfo: HTMLDivElement;
 };
 
 enum playState {
@@ -135,9 +38,9 @@ interface createState {
 }
 
 type lobby = {
-	id: string,
-	mod: string,
-	maxPlayers: number,
+	lobbyId: string,
+	map: string,
+	mode: string,
 	players: string[]
 }
 
@@ -147,6 +50,7 @@ interface listResp {
 
 export default class Play {
 	private div: HTMLDivElement;
+	private css: HTMLLinkElement;
 	private ref: playHtmlReference;
 	private state: playState;
 
@@ -155,14 +59,17 @@ export default class Play {
 
 
 	private gameIP = window.location.hostname;
-	// private gameIP = "localhost";
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 		console.log(div.id);
 
+		this.css = div.querySelector("link") as HTMLLinkElement;
 		this.ref = {
-			create: div.querySelector('#play-create') as HTMLDivElement,
-			join: div.querySelector("#play-join") as HTMLDivElement,
+			switch: { html: div.querySelector("#play-switch") as HTMLDivElement, id: -1 },
+			swCreate: div.querySelector("#create-switch") as HTMLInputElement,
+			swJoin: div.querySelector("#join-switch") as HTMLInputElement,
+			create: { html: div.querySelector("#play-create") as HTMLDivElement, id: -1 },
+			join: { html: div.querySelector("#play-join") as HTMLDivElement, id: -1 },
 			brMod: div.querySelector("#br-mod") as HTMLInputElement,
 			tournamentMod: div.querySelector("#tournament-mod") as HTMLInputElement,
 			defaultMap: div.querySelector("#default-map") as HTMLInputElement,
@@ -173,9 +80,10 @@ export default class Play {
 			createWin: div.querySelector("#create-btn-window") as HTMLDivElement,
 			list: div.querySelector("#join-list") as HTMLTableElement,
 			joinId: div.querySelector("#join-id") as HTMLInputElement,
+			lobbyInfoWindow: { html: div.querySelector("#play-lobby-info") as HTMLDivElement, id: -1 },
+			lobbyInfo: div.querySelector("#lobby-info") as HTMLDivElement
 		}
 
-		console.log("brmod: ", this.ref.brMod);
 
 		this.createState = {
 			mod: null,
@@ -183,8 +91,48 @@ export default class Play {
 		}
 
 		this.state = playState.create;
-		this.ref.create.remove();
-		this.ref.join.remove();
+
+		this.ref.switch.id = App3D.addCSS3dObject({
+			html: this.ref.switch.html,
+			width: 1.2,
+			height: 1.2,
+			world: Matrix.RotationY(Math.PI * 1.2).multiply(Matrix.Translation(-17, 3, 25)),
+			enable: false
+		})
+		this.ref.create.id = App3D.addCSS3dObject({
+			html: this.ref.create.html,
+			width: 1.5,
+			height: 1.5,
+			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-22, 2, 23)),
+			enable: false
+		})
+		this.ref.join.id = App3D.addCSS3dObject({
+			html: this.ref.join.html,
+			width: 1.5,
+			height: 1.5,
+			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-23, 3, 23)),
+			enable: false
+		})
+
+
+		this.ref.swJoin.toggleAttribute("down");
+		this.ref.swCreate.addEventListener("click", () => {
+			App3D.setCSS3dObjectEnable(this.ref.create.id, true);
+			App3D.setCSS3dObjectEnable(this.ref.join.id, false);
+			this.ref.swJoin.toggleAttribute("down", true);
+			this.ref.swCreate.toggleAttribute("down", false);
+			this.state = playState.create;
+		})
+		this.ref.swJoin.addEventListener("click", () => {
+			getRequest("lobby/list", "no-cache")
+				.then((json: any) => { console.log(json); this.parseListResp(json) })
+				.catch((err) => { console.log(err) });
+			App3D.setCSS3dObjectEnable(this.ref.create.id, false);
+			App3D.setCSS3dObjectEnable(this.ref.join.id, true);
+			this.ref.swJoin.toggleAttribute("down", false);
+			this.ref.swCreate.toggleAttribute("down", true);
+			this.state = playState.join;
+		})
 
 		this.ref.createWin.toggleAttribute("off");
 
@@ -258,218 +206,49 @@ export default class Play {
 		})
 
 		this.ref.joinId.addEventListener("focusin", () => {
-			this.div.querySelector("#join-indic")?.setAttribute("on", "");
+			//this.div.querySelector("#join-indic")?.setAttribute("on", "");
 		})
 
 		this.ref.joinId.addEventListener("focusout", () => {
-			this.div.querySelector("#join-indic")?.removeAttribute("on");
+			//this.div.querySelector("#join-indic")?.removeAttribute("on");
 		})
 
-		//this.ref.smod.toggleAttribute('off');
-		//this.ref.createBtn.toggleAttribute('off');
-
-		//
-		//this.ref.modPong.addEventListener('click', () => {
-		//	this.ref.modPong.toggleAttribute('ok');
-		//	this.ref.modBR.removeAttribute('ok');
-		//	this.ref.smod.toggleAttribute('off');
-		//	this.createState.mod = this.ref.modPong.hasAttribute('ok') ? 1 : 0;
-		//	if (this.createState.mod && this.createState.map && this.createState.submod) {
-		//		this.ref.createBtn.setAttribute('ok', '');
-		//	} else {
-		//		this.ref.createBtn.removeAttribute('ok');
-		//	}
-		//})
-		//
-		//this.ref.modBR.addEventListener('click', () => {
-		//	this.ref.modBR.toggleAttribute('ok');
-		//	this.ref.modPong.removeAttribute('ok');
-		//	this.ref.smod.setAttribute('off', '');
-		//	this.createState.mod = this.ref.modBR.hasAttribute('ok') ? 2 : 0;
-		//	if (this.createState.mod && this.createState.map) {
-		//		this.ref.createBtn.setAttribute('ok', '');
-		//	} else {
-		//		this.ref.createBtn.removeAttribute('ok');
-		//	}
-		//
-		//})
-		//
-		//this.ref.mapDefault.addEventListener('click', () => {
-		//	this.ref.mapDefault.toggleAttribute('ok');
-		//	this.createState.map = this.ref.mapDefault.hasAttribute('ok');
-		//
-		//	if ((this.createState.mod == 2 || this.createState.mod == 1 && this.createState.submod) && this.createState.map) {
-		//		this.ref.createBtn.setAttribute('ok', '');
-		//	} else {
-		//		this.ref.createBtn.removeAttribute('ok');
-		//	}
-		//
-		//})
-		//
-		//this.ref.smodOnline.addEventListener('click', () => {
-		//	this.ref.smodOnline.toggleAttribute('ok')
-		//	this.ref.smodLocal.removeAttribute('ok')
-		//	this.ref.smodAI.removeAttribute('ok')
-		//	this.createState.submod = this.ref.smodOnline.hasAttribute('ok');
-		//	if (this.createState.mod && this.createState.map && this.createState.submod) {
-		//		this.ref.createBtn.setAttribute('ok', '');
-		//	} else {
-		//		this.ref.createBtn.removeAttribute('ok');
-		//	}
-		//
-		//
-		//})
-		//
-		//this.ref.smodLocal.addEventListener('click', () => {
-		//	this.ref.smodLocal.toggleAttribute('ok')
-		//	this.ref.smodAI.removeAttribute('ok')
-		//	this.ref.smodOnline.removeAttribute('ok')
-		//	this.createState.submod = this.ref.smodLocal.hasAttribute('ok');
-		//	if (this.createState.mod && this.createState.map && this.createState.submod) {
-		//		this.ref.createBtn.setAttribute('ok', '');
-		//	} else {
-		//		this.ref.createBtn.removeAttribute('ok');
-		//	}
-		//
-		//
-		//})
-		//
-		//this.ref.smodAI.addEventListener('click', () => {
-		//	this.ref.smodAI.toggleAttribute('ok')
-		//	this.ref.smodLocal.removeAttribute('ok')
-		//	this.ref.smodOnline.removeAttribute('ok')
-		//	this.createState.submod = this.ref.smodAI.hasAttribute('ok');
-		//	if (this.createState.mod && this.createState.map && this.createState.submod) {
-		//		this.ref.createBtn.setAttribute('ok', '');
-		//	} else {
-		//		this.ref.createBtn.removeAttribute('ok');
-		//	}
-		//
-		//})
-
-
-
-
-		//this.ref = {
-		//	mod: div.querySelector("#play-mod") as HTMLSelectElement,
-		//	map: div.querySelector("#play-map") as HTMLSelectElement,
-		//	submod: div.querySelector("#play-submod") as HTMLSelectElement,
-		//	create: div.querySelector("#create-btn") as HTMLInputElement,
-		//	joinID: div.querySelector("#join-id") as HTMLInputElement,
-		//	join: div.querySelector("#join-btn") as HTMLInputElement,
-		//	refresh: div.querySelector("#play-refresh") as HTMLInputElement,
-		//	list: div.querySelector("#play-list") as HTMLDivElement
-		//}
-
-		App3D.setVue('play');
-		const playVue = App3D.getVue('play');
-		playVue.windowAddEvent('create', 'click', () => {
-			this.ref.join.remove();
-			this.div.appendChild(this.ref.create);
-			this.state = playState.create;
+		this.ref.lobbyInfoWindow.id = App3D.addCSS3dObject({
+			html: this.ref.lobbyInfoWindow.html,
+			width: 2.,
+			height: 2.,
+			world: Matrix.RotationY(Math.PI * 1).multiply(Matrix.Translation(-20, 4, 24)),
+			enable: false
 		})
 
-		playVue.windowAddEvent('join', 'click', () => {
-			this.ref.create.remove();
-			this.div.appendChild(this.ref.join);
-			this.state = playState.join;
-		})
-
-
-		//this.ref.mod.addEventListener("change", () => {
-		//	if (this.ref.mod.value == "pong") {
-		//		this.ref.submod.removeAttribute("disabled");
-		//	} else {
-		//		this.ref.submod.setAttribute("disabled", "");
-		//	}
-		//});
-		//
-		//this.ref.joinID.addEventListener('input', () => {
-		//	this.ref.join.disabled = false;
-		//})
-		//
-		//this.ref.create.addEventListener("click", () => {
-		//	console.log(`create lobby: mod=${this.ref.mod.value == "pong" ? this.ref.submod.value : this.ref.mod.value}, map=${this.ref.map.value}`);
-		//	this.postRequest("lobby/create", {
-		//		mode: this.ref.mod.value == "pong" ? this.ref.submod.value : this.ref.mod.value,
-		//		map: this.ref.map.value
-		//	})
-		//		.then((json) => { this.createResolve(json) })
-		//		.catch((resp) => { this.createReject(resp) });
-		//});
-		//
-		//this.ref.join.addEventListener("click", () => {
-		//	console.log(`join lobby: id=${this.ref.joinID.value}`);
-		//	this.getRequest(`lobby/${this.ref.joinID.value}`)
-		//		.then((json) => { this.joinResolve(json) })
-		//		.catch((resp) => { this.joinReject(resp) });
-		//})
-		//
-		//this.ref.refresh.addEventListener("click", () => {
-		//	console.log("refresh lobby list")
-		//	this.getRequest(`lobby/list`)
-		//		.then((json) => { this.listResolve(json) })
-		//		.catch((resp) => { this.listReject(resp) });
-		//})
 	}
 
 	public load(params: URLSearchParams) {
-		App3D.loadVue('play');
+		App3D.setVue("play");
+		App3D.setCSS3dObjectEnable(this.ref.switch.id, true);
 		switch (this.state) {
 			case playState.create: {
-				this.div.appendChild(this.ref.create);
+				App3D.setCSS3dObjectEnable(this.ref.create.id, true);
 				break;
 			}
 			case playState.join: {
-				this.div.appendChild(this.ref.join);
+				getRequest("lobby/list")
+					.then((json: any) => { this.parseListResp(json) })
+					.catch((err) => { console.log(err) });
+				App3D.setCSS3dObjectEnable(this.ref.join.id, true);
 				break;
 			}
-
 		}
-		this.parseListResp(lr);
-		if (User.status?.lobby) {
-			Router.nav(`/lobby?id=${User.status.lobby}`, false, false);
-		}
-		//this.ref.join.disabled = true;
-		document.querySelector("#main-container")?.appendChild(this.div);
+		document.body.appendChild(this.css);
 	}
 
 	public async unload() {
-		App3D.unloadVue('play');
-		this.div.remove();
+		App3D.setCSS3dObjectEnable(this.ref.switch.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.create.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.join.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.lobbyInfoWindow.id, false);
+		this.css.remove();
 	}
-
-	//async postRequest(path: string, body: {}): Promise<JSON> {
-	//	const response = await fetch(`https://${this.gameIP}:5001/${path}`, {
-	//		method: 'POST',
-	//		headers: {
-	//			'Content-Type': 'application/json'
-	//		},
-	//		body: JSON.stringify(body)
-	//
-	//	});
-	//
-	//	if (!response.ok) {
-	//		return Promise.reject(response);
-	//	}
-	//
-	//	return response.json();
-	//}
-
-	//async getRequest(path: string): Promise<JSON> {
-	//	const response = await fetch(`https://${this.gameIP}:5001/${path}`, {
-	//		method: 'GET',
-	//		headers: {
-	//			'Content-Type': 'application/json'
-	//		},
-	//	});
-	//
-	//	if (!response.ok) {
-	//		return Promise.reject(response);
-	//	}
-	//
-	//	return response.json();
-	//}
 
 	private createResolve(json: any) {
 		Router.nav(`/lobby?id=${json.lobbyId}`, false, false)
@@ -499,6 +278,7 @@ export default class Play {
 			let e = document.createElement("div");
 			e.innerText = elem.gameId ? elem.gameId : elem.lobbyId;
 			e.appendChild(createButton("Join", (btn: HTMLInputElement) => {
+				Popup.removePopup();
 				Router.nav(`/lobby?id=${elem.lobbyId}`, false, false);
 			}))
 			div.appendChild(e);
@@ -517,20 +297,6 @@ export default class Play {
 	private parseListResp(resp: listResp) {
 		const body = this.ref.list.querySelector("tbody") as HTMLElement;
 		body.innerHTML = '';
-		//this.ref.list.innerHTML = '';
-		//const div = document.createElement('tr');
-		//const id = document.createElement('th');
-		//const mod = document.createElement('th');
-		//const player = document.createElement('th');
-		//id.innerText = "lobby id";
-		//mod.innerText = "mod";
-		//player.innerText = "players";
-		//div.appendChild(id);
-		//div.appendChild(mod);
-		//div.appendChild(player);
-		//
-		//this.ref.list.appendChild(div);
-
 		for (let i = 0; i < resp.lobbies.length; i++) {
 			body.appendChild(this.createLobbyList(resp.lobbies[i]));
 		}
@@ -541,16 +307,49 @@ export default class Play {
 		const id = document.createElement('td');
 		const mod = document.createElement('td');
 		const player = document.createElement('td');
-		id.innerText = l.id;
-		mod.innerText = l.mod;
-		player.innerText = `${l.players.length}/${l.maxPlayers}`;
+		id.innerText = l.lobbyId;
+		mod.innerText = l.mode;
+		player.innerText = `${l.players.length}/?`;
 		div.appendChild(id);
 		div.appendChild(mod);
 		div.appendChild(player);
+		div.addEventListener("click", () => {
+			this.setLobbyInfo(l.lobbyId);
+		})
 
 		return div;
 	}
 
+	private async setLobbyInfo(lobbyId: string) {
+		let state = await getRequest(`lobby/${lobbyId}`).catch((err) => { console.log(err) }) as any;
+		state = state.state;
+
+		const status = this.ref.lobbyInfo.querySelector("#lobby-status") as HTMLDivElement;
+		status.innerText = `id: ${lobbyId}
+mode: ${state.mode}
+map: ${state.map}`;
+
+		const players = this.ref.lobbyInfo.querySelector("ul") as HTMLElement;
+		players.innerHTML = "";
+		let html = "";
+		for (let i = 0; i < state.players.length; i++) {
+			const name = await getRequest(`info/uuid/${state.players[i].uuid}`).catch((err) => { console.log(err) }) as any;
+			html += `<li>${name.username}</li>`;
+		}
+		players.innerHTML = html;
+		const join = this.ref.lobbyInfo.querySelector("#lobby-join") as HTMLDivElement;
+		join.innerHTML = "";
+		const btn = document.createElement("input") as HTMLInputElement;
+		btn.className = "window-content";
+		btn.type = "button";
+		btn.value = "JOIN";
+		btn.addEventListener(("click"), () => {
+			Router.nav(`/lobby?id=${lobbyId}`, false, false);
+			Popup.removePopup();
+		})
+		join.appendChild(btn);
+		Popup.addPopup(this.ref.lobbyInfoWindow.html);
+	}
 
 }
 

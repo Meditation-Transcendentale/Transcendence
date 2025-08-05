@@ -82,7 +82,7 @@ for (let file of Object(spa)) {
 		//minifyIdentifiers: true,
 		splitting: false,
 		resolveExtensions: ['.ts', '.js'],
-		plugins: [notifyPlugin]
+		plugins: [notifyPlugin, customAliasPlugin]
 	}).then((ctx) => { spactxs.push(ctx) });
 }
 

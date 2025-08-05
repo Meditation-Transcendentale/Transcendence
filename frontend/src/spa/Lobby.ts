@@ -1,12 +1,15 @@
+import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
 import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
 // import { lobbyVue } from "../Vue";
 import Router from "./Router";
 import { User } from "./User";
+import { getRequest } from "./requests";
 
 
 interface lobbyHtmlReference {
-	ready: HTMLInputElement;
+	playersWindow: { html: HTMLDivElement, id: number }
+	playersList: HTMLDivElement
 }
 
 enum lobbyState {
@@ -15,16 +18,23 @@ enum lobbyState {
 	ready = 3
 };
 
-
+interface player {
+	td: HTMLElement,
+	name: HTMLElement,
+	status: HTMLElement
+}
 
 export default class Lobby {
 	private div: HTMLDivElement;
 	private ref: lobbyHtmlReference;
+	private css: HTMLLinkElement;
+
 	private ws: WebSocket | null;
 	private id: string | null;
 	private mode: string | null;
 	private state: lobbyState;
 
+	private players: Map<string, player>;
 	private gameIP = window.location.hostname;
 	// private gameIP = "localhost";
 
@@ -35,20 +45,21 @@ export default class Lobby {
 		this.mode = null;
 		this.state = lobbyState.none;
 
+		this.players = new Map<string, player>;
+
+		this.css = div.querySelector("link") as HTMLLinkElement;
+
 		this.ref = {
-			ready: div.querySelector("#ready-btn") as HTMLInputElement,
+			playersWindow: { html: div.querySelector("#players-window") as HTMLDivElement, id: -1 },
+			playersList: div.querySelector("#players-list") as HTMLDivElement
 		};
 
-		this.ref.ready.addEventListener("click", () => {
-			this.ws?.send(encodeClientMessage({ ready: { lobbyId: this.id as string } }));
-			console.log("je suis la")
-		})
-
-		App3D.setVue("lobby");
-
-		const lobbyVue = App3D.getVue('lobby');
-		lobbyVue.windowAddEvent('BACK', 'click', () => {
-			Router.nav("/play", false, true);
+		this.ref.playersWindow.id = App3D.addCSS3dObject({
+			html: this.ref.playersWindow.html,
+			width: 1,
+			height: 1,
+			world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 9, -40)),
+			enable: false
 		})
 	}
 
@@ -62,15 +73,23 @@ export default class Lobby {
 			console.error("Not id passed to lobby");
 			//return;
 		}
-		App3D.loadVue("lobby");
 		this.id = params.get("id") as string;
 		this.setupWs(this.id);
-		document.querySelector('#main-container')?.appendChild(this.div);
+		this.ref.playersList.innerHTML = "";
+
+		this.createPlayerDiv(User.uuid as string, false, true);
+
+		document.body.appendChild(this.css);
+		App3D.setVue("lobby");
+		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, true);
 	}
 
 	public async unload() {
-		App3D.unloadVue("lobby");
-		this.div.remove();
+		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, false);
+		this.ws?.send(encodeClientMessage({ quit: { lobbyId: this.id as string, uuid: User.uuid } }));
+		this.ws?.close();
+		this.css.remove();
+		this.players.clear();
 	}
 
 	private setupWs(id: string) {
@@ -84,7 +103,6 @@ export default class Lobby {
 			console.log(e);
 			console.log("OPEN");
 			this.state = lobbyState.connect;
-			this.ref.ready.disabled = false;
 			User.status = { lobby: id };
 		}
 
@@ -103,7 +121,8 @@ export default class Lobby {
 			}
 
 			if (payload.update != null) {
-				this.mode = payload.update.mode as null;
+				this.mode = payload.update.mode as string;
+				this.updatePlayers(payload.update.players as Array<{ uuid: string, ready: boolean }>);
 				console.log(`Update :${payload}`);
 			}
 
@@ -129,6 +148,52 @@ export default class Lobby {
 		this.ws.onerror = (err) => {
 			console.warn(err);
 		}
+	}
+
+	private updatePlayers(r: Array<{ uuid: string, ready: boolean }>) {
+		for (let i = 0; i < r.length; i++) {
+			if (this.players.has(r[i].uuid)) {
+				this.players.get(r[i].uuid)!.status.innerText = (r[i].ready ? "yes" : "no");
+
+			} else {
+				this.createPlayerDiv(r[i].uuid, r[i].ready, false);
+			}
+		}
+		for (let i of this.players.keys()) {
+			let checked = false;
+			for (let y = 0; y < r.length; y++) {
+				checked = checked || (i == r[y].uuid);
+			}
+			if (!checked) {
+				console.log("destroy");
+				this.players.get(i)!.td.remove();
+				this.players.delete(i);
+			}
+		}
+	}
+
+	private async createPlayerDiv(uuid: string, ready: boolean, self: boolean) {
+		const div = document.createElement('tr');
+		const name = document.createElement('td');
+		const status = document.createElement('td');
+
+		name.className = "username";
+		status.className = "status";
+
+		const rep = await getRequest(`info/uuid/${uuid}`).catch((err) => console.log(err)) as any;
+		name.innerText = rep.username; //NEED TO IMPLEMENT A ROUTE GET /userinfo/:uuid to get Username from uuid
+		status.innerText = (ready ? "yes" : "no");
+		if (self) {
+			status.addEventListener("click", () => {
+				this.ws?.send(encodeClientMessage({ ready: { lobbyId: this.id as string } }));
+			}, { once: true });
+			status.toggleAttribute("click");
+		}
+		div.appendChild(name);
+		div.appendChild(status);
+		this.ref.playersList.appendChild(div);
+
+		this.players.set(uuid, { td: div, name: name, status: status });
 	}
 
 	private async wsSend(type: string) {

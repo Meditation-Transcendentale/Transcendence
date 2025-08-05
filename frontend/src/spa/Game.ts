@@ -15,26 +15,29 @@ export default class Game {
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 		this.pong = null;
-		App3D.setVue('game');
+		//App3D.setVue('game');
 		this.mod = null;
 		this.map = null;
 		this.id = null;
 	}
 
 	public unload() {
-		App3D.unloadVue('game');
+		App3D.enableHome();
+		//App3D.unloadVue('game');
 		//document.querySelector("canvas")?.blur();
 		this.pong?.stop();
 		//this.pongbr?.dispose();
 		//this.div.remove();
-		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "0";
+		//(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "0";
 	}
 
 	public load(params: URLSearchParams) {
-		App3D.loadVue('game');
+		App3D.disableHome();
+		App3D.setVue('game');
+		//App3D.loadVue('game');
 		//document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
-		(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";
+		//(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";
 		if (!this.pong)
 			this.pong = new Pong(document.querySelector("#canvas"), params.get("id"), params.get("mod"), App3D.scene);
 		let gameId = params.get("id");
