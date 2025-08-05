@@ -5,6 +5,10 @@ import {
 	Color4,
 	Color3,
 	RenderTargetTexture,
+	Matrix,
+	Quaternion,
+	ArcRotateCamera,
+	UniversalCamera,
 } from "@babylonImport";
 import { Vue } from "../Vue";
 import "./Shader.ts";
@@ -60,6 +64,8 @@ export class Field {
 		this.butterfly = new Butterfly(this.scene, this.cursorButterfly);
 
 		this.camera = new FreeCamera("fieldCamera", new Vector3(0, 4, 40), this.scene, true);
+		//this.camera = new ArcRotateCamera("fieldCamera", 0, 0, 10, Vector3.Zero(), this.scene);
+		//this.camera = new UniversalCamera("fieldCamera", Vector3.Zero(), this.scene);
 		this.camera.setTarget(new Vector3(0., 6, 30))
 		this.camera.rotation.y = Math.PI;
 		this.camera.attachControl();
@@ -178,11 +184,6 @@ export class Field {
 			case 'play': {
 				this.camera.position.set(-20, 1, 30);
 				this.camera.setTarget(new Vector3(-20, 4, 20));
-				//console.log("TARGET", this.camera.target);
-
-				//final.init(this.scene.getCameraByName('fieldCam') as Camera);
-				//final.addWindow('create', this.cube0, this.vueBounding, Matrix.Identity());
-				//final.addWindow('join', this.cube1, this.vueBounding, Matrix.Identity());
 				break;
 			}
 			case 'home': {
@@ -200,16 +201,6 @@ export class Field {
 				//	duration: 0.4,
 				//	callback: () => { this.camera.setTarget(this.camera.target) }
 				//})
-				//final.init(this.camera);
-				//final.addWindow('play', {
-				//	face: face,
-				//	div: playdiv,
-				//	matrix: this.test.getWorldMatrix(),
-				//	onHoverCallback: (status: boolean) => { console.log("Hover:", status) }
-				//
-				//});
-				// final.addWindow('info', this.cube1, this.vueBounding, Matrix.Identity());
-				// final.addWindow('stats', this.cube2, this.vueBounding, Matrix.Identity());
 				break;
 			}
 			// case 'stats': {
@@ -221,21 +212,14 @@ export class Field {
 			case 'login': {
 				this.camera.position.set(0, 4, 40);
 				this.camera.setTarget(new Vector3(0, 6, 30));
-				//final.init(this.camera);
-				// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
-				// 	final.addWindow('register', this.cube1, this.vueBounding, Matrix.Identity());
 				break;
 			}
 			case 'register': {
 				this.camera.position.set(0, 4, 40);
 				this.camera.setTarget(new Vector3(0, 4, 30))
-				//final.init(this.scene.getCameraByName('fieldCam') as Camera);
-				//final.addWindow('login', this.cube0, this.vueBounding, Matrix.Identity());
-
 				break;
 			}
 			case 'pongBR': {
-				//final.init(this.scene.getCameraByName('br') as Camera);
 				this.scene.activeCamera = this.scene.getCameraByName('br');
 				this.scene.activeCamera?.attachControl();
 
@@ -247,25 +231,25 @@ export class Field {
 
 				break;
 			}
-			//case 'info': {
-			//	final.init(this.scene.getCameraByName("fieldCam") as Camera);
-			//	final.addWindow('user', this.cube0, this.vueBounding, Matrix.Identity());
-			//	final.addWindow('security', this.cube1, this.vueBounding, Matrix.Identity());
-			//
-			//	break;
-			//}
 			case 'game': {
 				this.scene.activeCamera = this.scene.getCameraByName("pong");
-				//final.init(this.scene.getCameraByName('pong') as Camera);
 				break;
 			}
 			case 'brick': {
 				this.scene.activeCamera = this.scene.getCameraByName("brick");
-				//final.init(this.scene.getCameraByName('brick') as Camera);
+				break;
+			}
+			case 'exemple1': {
+				this.camera.position.set(20, 1, 7);
+				this.camera.setTarget(new Vector3(15, 2, 8).scale(2));
+				break;
+			}
+			case 'exemple2': {
+				this.camera.position.set(17, 0.5, 8);
+				this.camera.setTarget(new Vector3(15, 2, 8));
 				break;
 			}
 		}
-		//return final;
 	}
 
 }

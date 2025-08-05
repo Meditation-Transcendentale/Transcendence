@@ -414,6 +414,7 @@ input[on] {
 	min-height: 10vh;
 	height: fit-content;
 	pointer-events: auto;
+	/*z-index: 39;*/
 }
 
 #notification-container:hover * {
@@ -432,6 +433,11 @@ input[on] {
 	color: black;
 	opacity: 0;
 	animation: fade-out var(--duration) linear;
+	/*z-index: 40;*/
+}
+
+.notification:hover {
+	color: white;
 }
 
 @keyframes fade-out {

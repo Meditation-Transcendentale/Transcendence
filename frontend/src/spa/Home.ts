@@ -72,6 +72,10 @@ class Home {
 			Router.nav("/brick")
 		})
 
+		this.ref.exemple.html.addEventListener("click", () => {
+			Router.nav("/exemple")
+		})
+
 
 
 

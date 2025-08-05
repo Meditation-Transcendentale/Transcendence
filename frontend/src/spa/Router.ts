@@ -90,6 +90,13 @@ class RouterC {
 			ts: "./br",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
+		this.routes.set("/exemple", { //TO USE FOR TEMPORARY ROUTE EX: BR / IO
+			html: "/exemple",
+			ts: "./Exemple",
+			callback: (url: URL) => { this.loadInMain(url) }
+		} as routePage);
+
+
 
 		this.ath = {
 			html: "/ath",
