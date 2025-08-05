@@ -45,13 +45,12 @@ export class Ball {
 
 			if (player.getAlive()) {
 				const playerGoalPos = player.getPlayerGoal().position;
-				const collideGoal = Vector3.Distance(playerGoalPos, this.newposition) - 0.25 < 0.5;
+				const collideGoal = Math.sqrt((playerGoalPos.x - this.newposition.x)*(playerGoalPos.x - this.newposition.x)+(playerGoalPos.z - this.newposition.z)*(playerGoalPos.z - this.newposition.z)) - 0.25 < 0.35;
 				const collideShield = this.detectCollisionShield(player);
 
 				if (collideShield) {
 					this.touched = true;
 					this.ball.material = this.matTouched;
-					console.log("touch shield");
 					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x, 0, this.newposition.z - playerGoalPos.z).normalize();
 					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
 					this.speedScale = Math.min(this.speedScale * 1.1, 5);
