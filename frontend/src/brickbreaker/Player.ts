@@ -20,7 +20,7 @@ export class Player {
 	private inputPointer: any;
 
 	private keysPressed: Set<string> = new Set();
-	private pointer: Vector2 = new Vector2(0, 0);
+	private pointer: Vector2;
 
 	private scene: Scene;
 
@@ -38,6 +38,7 @@ export class Player {
 		this.goal.material = this.materialGoal;
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
+		this.pointer = new Vector2(game.root.position.x, game.root.position.z);
 
 		this.shield = MeshBuilder.CreateCylinder("shield", { height: 0.25, diameter: 1.8, tessellation: 64, arc: 0.5, enclose: true, updatable: true }, this.scene);
 		this.shield.parent = game.root;
@@ -63,7 +64,6 @@ export class Player {
 
 		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
 		this.pointerSurface.parent = game.root;
-		console.log(`pointer pos= ${this.pointerSurface.position}`)
 		const invMat = new StandardMaterial("surfaceMat", this.scene);
 		invMat.diffuseColor.set(0, 0, 0);
 		invMat.alpha = 0;
@@ -114,7 +114,7 @@ export class Player {
 				vec2 newXZ = vec2(cos(newAngle), sin(newAngle)) * radius;
 				vec3 newPosition = vec3(newXZ.x, position.y, newXZ.y);
 
-				newPosition -= paddlePosition;
+				newPosition += paddlePosition * vec3(-1., 1., -1.);
 				gl_Position = worldViewProjection * vec4(newPosition, 1.0);
 			}
 		`;
@@ -209,7 +209,7 @@ export class Player {
 	}
 
 	private movePlayer() {
-		let speed = 0.5;
+		let speed = 1;
 		if (this.isKeyPressed("Space")) {
 			this.inputDown = true;
 		} else if (this.inputDown == true) {
@@ -225,15 +225,15 @@ export class Player {
 			targetPosition.z -= this.game.root.position.z;
 
 			let direction = targetPosition.subtract(this.goal.position);
+			direction.y = 0;
 			const distance = direction.length();
-			direction.y = this.goal.position.y;
 
 			if (distance < 0.01) {
 				this.velocity = Vector3.Zero();
 			} else {
 				this.goal.rotation.y = Math.atan2(direction.x, direction.z);
 				direction.normalize();
-				speed *= Math.min(distance, 1);
+				speed *= Math.min(distance * 2, 1);
 				this.velocity = Vector3.Lerp(this.velocity, direction.scale(speed), 0.5);
 			}
 		}
