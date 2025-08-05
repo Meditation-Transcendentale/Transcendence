@@ -2,7 +2,7 @@ class NotificationManagerC {
 	private container: HTMLDivElement;
 	private defaultDiv: HTMLDivElement;
 
-	private defaultDuration = 1000; //in millisecond
+	private defaultDuration = 5000; //in millisecond
 
 	private canceled!: Array<HTMLElement>;
 	private state = false;
@@ -16,7 +16,11 @@ class NotificationManagerC {
 		this.defaultDiv = document.createElement("div");
 		this.defaultDiv.className = "notification";
 
+		this.canceled = new Array<HTMLElement>;
 		this.container.addEventListener("mouseenter", () => {
+			for (let i = 0; i < this.canceled.length; i++) {
+				this.canceled[i]?.remove();
+			}
 			this.canceled = new Array<HTMLElement>;
 			this.hover = true;
 		})
@@ -36,8 +40,17 @@ class NotificationManagerC {
 
 	}
 
-	public addDiv() {
-
+	public addDiv(div: HTMLDivElement) {
+		div.className = "notification";
+		div.style.setProperty("--duration", `${this.defaultDuration + 10}ms`)
+		this.container.insertBefore(div, this.container.firstChild);
+		setTimeout(() => {
+			if (this.hover) {
+				this.canceled.push(div);
+			} else {
+				div.remove();
+			}
+		}, this.defaultDuration)
 	}
 
 	public setEnable(state: boolean) {
