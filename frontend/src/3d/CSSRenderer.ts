@@ -84,4 +84,12 @@ export class CSSRenderer {
 		}
 		this.objects[index].enable = status;
 	}
+
+	public resize(width: number, height: number) {
+		this.width = width;
+		this.height = height;
+		this.perspective = this.height * 0.5 * this.camera.getProjectionMatrix().m[5];
+		document.body.style.perspective = `${this.perspective}px`;
+		this.dirty = true;
+	}
 }

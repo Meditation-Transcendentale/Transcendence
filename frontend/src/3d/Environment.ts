@@ -174,8 +174,7 @@ export class Environment {
 		}
 	}
 
-	public render() {
-		const time = performance.now() * 0.001;
+	public render(time: number) {
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
 		if (this.updateHome) {
@@ -196,7 +195,7 @@ export class Environment {
 
 	public enableHome() {
 		this.updateHome = true;
-		this.scene.fogMode = Scene.FOGMODE_LINEAR;
+		//this.scene.fogMode = Scene.FOGMODE_LINEAR;
 		this.scene.activeCamera = this.fieldCamera;
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
@@ -225,6 +224,10 @@ export class Environment {
 
 	public onHover(status: number) {
 		this.field.onHover(status);
+	}
+
+	public resize() {
+		this.field.resize();
 	}
 
 	public dispose() {

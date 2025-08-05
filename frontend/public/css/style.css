@@ -403,3 +403,46 @@ input[on] {
 .blur-popup>* {
 	z-index: 11;
 }
+
+#notification-container {
+	display: block;
+	position: absolute;
+	top: 0%;
+	right: 0%;
+	width: fit-content;
+	min-width: 10vh;
+	min-height: 10vh;
+	height: fit-content;
+	pointer-events: auto;
+}
+
+#notification-container:hover * {
+	opacity: 1;
+	animation: none;
+}
+
+.notification {
+	display: block;
+	position: relative;
+	right: 0%;
+	width: fit-content;
+	height: fit-content;
+	font: var(--font-speak);
+	font-size: 3vh;
+	color: black;
+	opacity: 0;
+	animation: fade-out var(--duration) linear;
+}
+
+@keyframes fade-out {
+
+	0%,
+	80% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+
+}

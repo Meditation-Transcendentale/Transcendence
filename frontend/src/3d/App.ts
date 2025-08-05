@@ -4,6 +4,7 @@ import { Engine, Matrix } from "@babylonImport";
 import { Environment } from "./Environment";
 import { Vue } from "../Vue";
 import { css3dObject, CSSRenderer } from "./CSSRenderer";
+import { Interpolator } from "./Interpolator";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -40,6 +41,8 @@ class app3d {
 		//
 		window.addEventListener('resize', () => {
 			this.engine.resize(true);
+			this.environment.resize();
+			this.cssRenderer.resize(this.engine.getRenderWidth(), this.engine.getRenderHeight())
 		})
 
 		this.environment = new Environment(this.engine, this.canvas);
@@ -59,8 +62,10 @@ class app3d {
 
 	public run() {
 		this.engine.runRenderLoop(() => {
-			this.environment.render();
+			const time = performance.now() * 0.001;
+			this.environment.render(time);
 			this.cssRenderer.update();
+			Interpolator.update(time);
 			this.updateVues();
 
 			this.fps.innerHTML = this.engine.getFps().toFixed();

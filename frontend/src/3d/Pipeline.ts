@@ -48,6 +48,7 @@ export class Pipeline {
 		}
 
 		this.sharpen = new PostProcess("sharpen", "sharpen", ["resolution"], null, 1., this.camera);
+		//console.log("SHARPEN SIZE:", this.sharpen.texelSize)
 		this.sharpen.autoClear = false;
 		this.sharpen.onApply = (effect) => {
 			effect.setFloat2("resolution", window.innerWidth, window.innerHeight);

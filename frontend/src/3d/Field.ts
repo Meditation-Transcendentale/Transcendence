@@ -13,6 +13,7 @@ import { Grass } from "./Grass";
 import { Butterfly } from "./Butterfly";
 import { Pipeline } from "./Pipeline";
 import { DitherMaterial } from "./Shader.ts";
+import { Interpolator } from "./Interpolator";
 
 
 const playdiv = document.createElement("div");
@@ -47,6 +48,7 @@ export class Field {
 	private test22: Mesh;
 
 	private rt: RenderTargetTexture;
+	private rtRatio = 1;
 
 	constructor(scene: Scene) {
 		this.scene = scene;
@@ -61,6 +63,7 @@ export class Field {
 		this.camera.setTarget(new Vector3(0., 6, 30))
 		this.camera.rotation.y = Math.PI;
 		this.camera.attachControl();
+		this.camera.minZ = 0.01;
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.intensity = 0.5;
 
@@ -100,7 +103,8 @@ export class Field {
 		this.ground.material = m;
 		this.ground.layerMask = 0x10000000;
 
-		this.rt = new RenderTargetTexture("grass", { ratio: 0.5 }, this.scene);
+		this.rt = new RenderTargetTexture("grass", { width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio }, this.scene);
+		console.log("GRASS RT SIZE", this.rt.getSize());
 		this.rt.activeCamera = this.camera;
 		//this.rt.skipInitialClear = true;
 		this.camera.layerMask = 0x0000FFFF;
@@ -122,7 +126,7 @@ export class Field {
 
 		window.addEventListener("mousemove", (ev) => {
 			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
-			let delta = Math.abs(this.camera.position.y - 0.5) / ray.y;
+			let delta = Math.abs(this.camera.position.y - 1) / ray.y;
 
 			this.cursorButterfly.x = this.camera.position.x - ray.x * delta;
 			this.cursorButterfly.y = 0;
@@ -158,6 +162,10 @@ export class Field {
 		this.pipeline.setEnable(status);
 	}
 
+	public resize() {
+		this.rt.resize({ width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio })
+	}
+
 	public setVue(vue: string) {
 		//const final = new Vue();
 		switch (vue) {
@@ -174,6 +182,18 @@ export class Field {
 			case 'home': {
 				this.camera.position.set(0, 2, 10);
 				this.camera.setTarget(new Vector3(0, 3, -10));
+				//Interpolator.addElem({
+				//	start: this.camera.position,
+				//	end: new Vector3(0, 2, 10),
+				//	duration: 0.5,
+				//	callback: () => { }
+				//})
+				//Interpolator.addElem({
+				//	start: this.camera.target,
+				//	end: new Vector3(0, 3, -10),
+				//	duration: 0.4,
+				//	callback: () => { this.camera.setTarget(this.camera.target) }
+				//})
 				//final.init(this.camera);
 				//final.addWindow('play', {
 				//	face: face,

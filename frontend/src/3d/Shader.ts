@@ -522,12 +522,12 @@ Effect.ShadersStore['combineFragmentShader'] = `
 		vec4 cloud = texture2D(cloudSampler, vUV);
 		float f = (noise == 2. ? hash(time * 0.00001 + vUV.y) : 1.);
 
-		ivec2 n = ivec2(mod(floor(vUV * resolution * 0.5 * f), 4.));
-		float weight = M4[n.x][n.y]- 0.5;
-		cloud.rgb -= 0.3;
-		cloud.rgb = cloud.rgb + 0.9 * weight;
-		cloud.rgb = floor(cloud.rgb * 4. + 0.5) * (1. / 4.);
-		cloud.rgb = (cloud.rgb - 0.5) * 2.5 + 0.5;
+		ivec2 n = ivec2(mod(floor(vUV * resolution * 0.5 * f), 2.));
+		float weight = M2[n.x][n.y]- 0.5;
+		//cloud.rgb -= 0.3;
+		cloud.rgb = cloud.rgb + 0.1 * cloud.a * weight;
+		cloud.rgb = floor(cloud.rgb * 16. + 0.5) * (1. / 16.);
+		cloud.rgb = (cloud.rgb - 0.5) * 1.3 + 0.5;
 
 		vec4 color = texture2D(textureSampler, vUV);
 		vec4 grass = texture2D(grassSampler, vUV);
@@ -535,8 +535,8 @@ Effect.ShadersStore['combineFragmentShader'] = `
 		f = (noise == 1. ? hash(time * 0.00001 + vUV.y) : 1.);
 		n = ivec2(mod(floor(vUV * resolution * f), 4.));
 		weight = M4[n.x][n.y]- 0.65;
-		grass.rgb = grass.rgb + 0.5 * weight;
-		grass.rgb = (grass.rgb - 0.5) * 4.9 + 0.5;
+		grass.rgb = grass.rgb + 0.4 * weight;
+		grass.rgb = (grass.rgb - 0.5) * 1.3 + 0.5;
 
 		
 		float a = clamp(2. * (grass.a - color.a), 0., 1.);
@@ -620,11 +620,11 @@ const float cloudscale = 1.1;
 const float speed = 0.005;
 const float clouddark = 0.5;
 const float cloudlight = 0.3;
-const float cloudcover = 0.2;
+const float cloudcover = 0.8;
 const float cloudalpha = 8.0;
 const float skytint = 0.5;
-const vec3 skycolour1 = vec3(0., 0., 0.);
-const vec3 skycolour2 = vec3(0., 0., .0);
+const vec3 skycolour2 = vec3(0.2, 0.4, 0.66) * 1.;
+const vec3 skycolour1 = vec3(0.5, 0.71, .86) * 1.;
 
 const mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
 
@@ -730,12 +730,12 @@ void main() {
 	
     c += c1;
     
-    vec3 skycolour = mix(skycolour2, skycolour1, 1.);
-    vec3 cloudcolour = vec3(1.1, 0.9, 0.9) * clamp((clouddark + cloudlight*c), 0.0, 1.0);
+    vec3 skycolour = mix(skycolour2, skycolour1, clamp(red * 0.8, 0., 1.));
+    vec3 cloudcolour = vec3(0.89, 0.91, 0.92) * 1.2 * clamp((clouddark + cloudlight*c), 0.0, 1.0);
    
     f = cloudcover + cloudalpha*f*r;
     
-    // vec3 result = mix(skycolour, clamp(skytint * skycolour + cloudcolour, 0.0, 1.0), clamp(f + c, 0.0, 1.0));
+     vec3 result = mix(skycolour, clamp(skytint * skycolour + cloudcolour, 0.0, 1.0), clamp(f + c, 0.0, 1.0));
 	// result = cloudcolour;
 	
 
@@ -746,8 +746,8 @@ void main() {
 	 red = max(0.,1. - red * 0.03);
 	 red = red * red * red;
 
-	 vec3 result = mix(skycolour, cloudcolour, clamp(f + c, 0.0, 1.0));
-	 gl_FragColor = vec4( result * red, 1.0 );
+	 //vec3 result = mix(skycolour, cloudcolour, clamp(f + c, 0.0, 1.0));
+	 gl_FragColor = vec4( result * red, f + c );
 }
 `
 
@@ -1069,6 +1069,8 @@ export class GrassShader extends CustomMaterial {
 		// this.specularPower = 1000;
 		this.backFaceCulling = false;
 		// this.twoSidedLighting = true;
+		this.diffuseColor = Color3.FromHexString("#4b8024");
+		this.diffuseColor = new Color3(0.6, 1., 0.28);
 
 		// this.emissiveColor = new Color3(0.3, 0.3, 0.3);
 
