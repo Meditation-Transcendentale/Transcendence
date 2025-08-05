@@ -37,6 +37,7 @@ SERVICES=(
   "lobby-manager"
   "frontend-pong"
   "frontend-pongbr"
+  "ai"
 )
 
 echo "🛠 Starting protobuf generation for all services..."
@@ -83,6 +84,12 @@ for svc in "${SERVICES[@]}"; do
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/physics.proto"
+      )
+      ;;
+    "ai")
+      # pongbr-physics needs shared types + physics messages for battle royale
+      PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/shared.proto"
       )
       ;;
     "user-interface")
