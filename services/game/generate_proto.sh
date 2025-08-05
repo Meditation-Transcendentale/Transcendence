@@ -128,19 +128,19 @@ for svc in "${SERVICES[@]}"; do
   done
 
   # 8. Run pbjs & pbts directly (they come with protobufjs package)
-  echo "   Running pbjs for $svc..."
+ echo "   Running pbjs for $svc..."
   npx pbjs \
-    -t static-module \
-    -w es6 \
-    --no-long \
-    -o "$OUT_DIR/message.js" \
+    --target static-module \
+    --wrap es6 \
+    --es6 \
+    --force-number \
+    --out "$OUT_DIR/message.js" \
     "${PROTO_SOURCES[@]}"
 
   echo "   Running pbts for $svc..."
   npx pbts \
-    -o "$OUT_DIR/message.d.ts" \
+    --out "$OUT_DIR/message.d.ts" \
     "$OUT_DIR/message.js"
-
   # 9. Patch the generated code:
   #    a) Fix the import so Node.js ESM finds minimal.js
   echo "   Patching generated files..."
