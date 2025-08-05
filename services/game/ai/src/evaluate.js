@@ -27,7 +27,7 @@ export function evaluateNode(gameStateNode) {
   
   return {
     optimistic: gameStateNode.evaluation.beta,
-    pessimistic: gameStateNode.evaluation.alpha,
+    pessimistic: gameStateNode.evaluation.alpha,  
   };
 }
 
