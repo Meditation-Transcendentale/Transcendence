@@ -227,6 +227,10 @@ class Stats {
 
 		this.ref.username.innerText = params.get("u") as string;
 
+		this.ref.brHistory.remove();
+		this.brPlayerStats!.div.remove();
+		this.ref.swPong.removeAttribute("down");
+
 		this.ref.history.appendChild(this.ref.classicHistory);
 		this.ref.stats.appendChild(this.classicPlayerStats!.div);
 		this.mode = 1;

@@ -525,8 +525,8 @@ Effect.ShadersStore['combineFragmentShader'] = `
 		ivec2 n = ivec2(mod(floor(vUV * resolution * 0.5 * f), 2.));
 		float weight = M2[n.x][n.y]- 0.5;
 		//cloud.rgb -= 0.3;
+		cloud.rgb = floor(cloud.rgb * 32. + 0.5) * (1. / 32.);
 		cloud.rgb = cloud.rgb + 0.1 * cloud.a * weight;
-		cloud.rgb = floor(cloud.rgb * 16. + 0.5) * (1. / 16.);
 		cloud.rgb = (cloud.rgb - 0.5) * 1.3 + 0.5;
 
 		vec4 color = texture2D(textureSampler, vUV);
@@ -535,8 +535,10 @@ Effect.ShadersStore['combineFragmentShader'] = `
 		f = (noise == 1. ? hash(time * 0.00001 + vUV.y) : 1.);
 		n = ivec2(mod(floor(vUV * resolution * f), 4.));
 		weight = M4[n.x][n.y]- 0.65;
+		//grass.rgb = floor(grass.rgb * 7. + 0.5) * (1. / 7.);
 		grass.rgb = grass.rgb + 0.4 * weight;
-		grass.rgb = (grass.rgb - 0.5) * 1.3 + 0.5;
+		//grass.rgb += 0.2;
+		grass.rgb = (grass.rgb - 0.5) * 1.4 + 0.5;
 
 		
 		float a = clamp(2. * (grass.a - color.a), 0., 1.);
@@ -747,7 +749,7 @@ void main() {
 	 red = red * red * red;
 
 	 //vec3 result = mix(skycolour, cloudcolour, clamp(f + c, 0.0, 1.0));
-	 gl_FragColor = vec4( result * red, f + c );
+	 gl_FragColor = vec4( result * red, (f + c) * 1.);
 }
 `
 

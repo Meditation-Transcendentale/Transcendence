@@ -124,7 +124,7 @@ export default class Play {
 			this.state = playState.create;
 		})
 		this.ref.swJoin.addEventListener("click", () => {
-			getRequest("lobby/list")
+			getRequest("lobby/list", "no-cache")
 				.then((json: any) => { console.log(json); this.parseListResp(json) })
 				.catch((err) => { console.log(err) });
 			App3D.setCSS3dObjectEnable(this.ref.create.id, false);
@@ -278,6 +278,7 @@ export default class Play {
 			let e = document.createElement("div");
 			e.innerText = elem.gameId ? elem.gameId : elem.lobbyId;
 			e.appendChild(createButton("Join", (btn: HTMLInputElement) => {
+				Popup.removePopup();
 				Router.nav(`/lobby?id=${elem.lobbyId}`, false, false);
 			}))
 			div.appendChild(e);
@@ -344,6 +345,7 @@ map: ${state.map}`;
 		btn.value = "JOIN";
 		btn.addEventListener(("click"), () => {
 			Router.nav(`/lobby?id=${lobbyId}`, false, false);
+			Popup.removePopup();
 		})
 		join.appendChild(btn);
 		Popup.addPopup(this.ref.lobbyInfoWindow.html);

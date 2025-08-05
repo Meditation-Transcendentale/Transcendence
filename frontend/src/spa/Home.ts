@@ -11,6 +11,7 @@ interface homeHtmlReference {
 	stats: { html: HTMLElement, id: number },
 	play: { html: HTMLElement, id: number },
 	bricks: { html: HTMLElement, id: number },
+	exemple: { html: HTMLElement, id: number }
 };
 
 class Home {
@@ -24,7 +25,8 @@ class Home {
 		this.ref = {
 			stats: { html: div.querySelector("#home-stats") as HTMLElement, id: -1 },
 			play: { html: div.querySelector("#home-play") as HTMLElement, id: -1 },
-			bricks: { html: div.querySelector("#home-bricks") as HTMLElement, id: -1 }
+			bricks: { html: div.querySelector("#home-bricks") as HTMLElement, id: -1 },
+			exemple: { html: div.querySelector("#home-exemple") as HTMLElement, id: -1 }
 		};
 
 
@@ -47,6 +49,14 @@ class Home {
 			width: 1,
 			height: 1,
 			world: Matrix.RotationY(Math.PI * 1.2).multiply(Matrix.Translation(5, 5, -10)),
+			enable: false
+		})
+
+		this.ref.exemple.id = App3D.addCSS3dObject({
+			html: this.ref.exemple.html,
+			width: 1,
+			height: 1,
+			world: Matrix.RotationY(Math.PI * 1).multiply(Matrix.Translation(0, 6, -10)),
 			enable: false
 		})
 
@@ -145,6 +155,7 @@ class Home {
 		App3D.setCSS3dObjectEnable(this.ref.stats.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.play.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.bricks.id, true);
+		App3D.setCSS3dObjectEnable(this.ref.exemple.id, true);
 		//(document.querySelector("#main-container") as HTMLDivElement)?.remove();
 
 		// document.querySelector("#main-container")?.appendChild(this.div);
@@ -180,6 +191,7 @@ class Home {
 		App3D.setCSS3dObjectEnable(this.ref.stats.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.play.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.bricks.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.exemple.id, false);
 
 		//App3D.unloadVue('home');
 		this.div.remove();

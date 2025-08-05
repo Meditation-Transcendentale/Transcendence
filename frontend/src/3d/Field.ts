@@ -159,6 +159,12 @@ export class Field {
 	}
 
 	public setEnable(status: boolean) {
+		if (status) {
+			this.camera.attachControl();
+		} else {
+			this.camera.detachControl();
+		}
+
 		this.pipeline.setEnable(status);
 	}
 

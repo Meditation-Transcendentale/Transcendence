@@ -1,8 +1,9 @@
 import { User } from "./User";
 
-export async function getRequest(path: string): Promise<JSON> {
+export async function getRequest(path: string, cache: string = "default"): Promise<JSON> {
 	const response = await fetch(`https://${window.location.hostname}:7000/api/${encodeURI(path)}`, {
 		method: 'GET',
+		cache: cache as RequestCache,
 		headers: {
 			'Accept': 'application/json',
 			'Content-Type': 'application/json'
@@ -73,7 +74,7 @@ export async function deleteRequest(path: string, body: {}): Promise<JSON> {
 export async function meRequest(cache: string = "default") {
 	const response = await fetch(`https://${window.location.hostname}:7000/api/info/me`, {
 		method: 'GET',
-		cache: cache,
+		cache: cache as RequestCache,
 		headers: {
 			'Accept': 'application/json',
 		},
