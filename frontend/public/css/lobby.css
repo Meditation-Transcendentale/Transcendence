@@ -1,41 +1,98 @@
-#lobby {
-	width: 100%;
-	height: 100%;
+#players-window {
+	display: inline-block;
+	width: 100vh;
+	height: 100vh;
+	/*width: fit-content;*/
+	overflow: scroll;
+	pointer-events: auto;
 }
 
-
-#ready-btn-window {
-	top: 47%;
-	left: 5%;
-	width: 25vh;
-	height: 20vh;
-	text-align: center;
-	z-index: 1;
-}
-
-#ready-btn-window>.window-bar {
-	text-align: left;
-}
-
-#ready-btn {
-	width: 90%;
-	height: 15vh;
-	/*height: 100%;*/
-	text-align: center;
-	border: 0.2vh white solid;
-	margin-top: 1vh;
-	margin-bottom: 1vh;
-	font-weight: 500;
-	letter-spacing: 2vh;
-	line-height: 0;
+#players-window>.window-bar {
 	font-size: 3vh;
 }
 
-#ready-btn:hover {
-	color: var(--window-background);
-	background-color: var(--window-color)
+#players-window>table {
+	display: inline-block;
+	border-collapse: collapse;
+	width: 100%;
+	color: white;
 }
 
-#ready-btn:active {
-	border-color: blue;
+
+
+#players-window th {
+	padding-right: 2vh;
+	padding-left: 0.5vh;
+	text-align: left;
+	color: white;
+	overflow: hidden;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 100%;
+}
+
+#players-window>table {
+	display: inline-block;
+	border-collapse: collapse;
+	font-weight: 100;
+	letter-spacing: -0.4vh;
+	font-size: 4vh;
+	width: 100%;
+	height: 50%;
+	text-align: left;
+}
+
+#players-windw thead>td>th {
+	padding-right: 2vh;
+}
+
+#players-window thead>tr>th:nth-child(2) {
+	text-align: center;
+}
+
+#player-window thead th {
+	position: sticky;
+	top: 2.6vh;
+	background-color: black;
+}
+
+.list-body>tr>td {
+	color: white;
+	overflow: hidden;
+	white-space: nowrap;
+	max-width: 100%;
+	padding-right: 2vh;
+	padding-left: 0.5vh;
+	text-overflow: "...";
+	border-top: 0.1vh solid #ccc;
+}
+
+.list-body .username {
+	text-align: left;
+	min-width: 160%;
+}
+
+.list-body .status {
+	text-align: center;
+	min-width: 20%;
+}
+
+/**/
+/* .list-body>tr:nth-child(1) { */
+/* 	text-align: left; */
+/* 	min-width: 80%; */
+/* } */
+/**/
+/* .list-body>tr:nth-child(2) { */
+/* 	text-align: center; */
+/* } */
+
+/*.list-body>tr:hover>td {*/
+/*	color: black;*/
+/*	background-color: white;*/
+/*}*/
+
+.list-body td[click]:hover {
+	color: black;
+	background-color: white;
 }

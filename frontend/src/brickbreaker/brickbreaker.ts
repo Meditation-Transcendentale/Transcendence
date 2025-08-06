@@ -40,15 +40,15 @@ export class BrickBreaker {
 		this.camera = this.scene.getCameraByName("brick") as ArcRotateCamera;
 		this.camera.attachControl(this.canvas, true);
 		this.camera.parent = this.root
-		// const layers = Math.ceil((Math.random() * 5) + 1);
-		this.layers = 2;
+		this.layers = Math.ceil((Math.random() * 5) + 1);
+		// this.layers = 2;
 		this.cols = Math.ceil((Math.random() * 5) + 1);
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
 
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
-		this.ball = new Ball(this.scene, ballMaterial, this.root);
-		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
+		this.ball = new Ball(this.scene, ballMaterial, this.root, this.layers * this.cols, this);
+		this.player = new Player(this.scene, new Vector3(0, 1, 0), this);
 
 		this.ball.updatePosition(0, 1);
 		this.ball.setVelocity(new Vector3(0, 0, 0));

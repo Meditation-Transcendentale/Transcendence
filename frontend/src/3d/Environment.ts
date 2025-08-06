@@ -8,15 +8,15 @@ import {
 	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
-	//Inspector,
+	// Inspector,
 	MeshBuilder,
 	Scene,
 	StandardMaterial,
 	Vector3,
-	Inspector,
 	UniversalCamera,
 	TransformNode,
-	LoadAssetContainerAsync
+	LoadAssetContainerAsync,
+	Mesh
 } from "@babylonImport";
 import { Field } from "./Field";
 
@@ -41,6 +41,14 @@ export class Environment {
 
 	private updateHome: boolean = true;
 
+	//private cameraDiv: HTMLDivElement;
+	private perspective!: number;
+
+	private width: number;
+	private height: number;
+
+	private gameMeshes: Array<Mesh>;
+
 
 
 	constructor(engine: Engine, canvas: HTMLCanvasElement) {
@@ -51,7 +59,6 @@ export class Environment {
 		this.scene.clearColor = new Color4(0., 0., 0., 1);
 
 		this.scene.setRenderingAutoClearDepthStencil(0, true);
-
 
 		window.addEventListener("keydown", (ev) => {
 			// Alt+I
@@ -73,6 +80,8 @@ export class Environment {
 			}
 		});
 
+		// this.scene.useRightHandedSystem = true;
+
 
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
@@ -80,7 +89,15 @@ export class Environment {
 
 		// this.gears = new Gears(this.scene);
 		this.field = new Field(this.scene);
+		this.width = engine.getRenderWidth();
+		this.height = engine.getRenderHeight();
 
+		//const perspec = this.scene.getEngine().getRenderHeight() * 0.5 * cam!.getProjectionMatrix().m[5];
+		//this.cameraDiv = document.querySelector("#camera") as HTMLDivElement;
+		//this.cameraDiv.style.width = `${this.width}px`;
+		//this.cameraDiv.style.height = `${this.height}px`;
+		//
+		this.gameMeshes = new Array<Mesh>;
 	}
 
 	private createMesh() {
@@ -106,6 +123,8 @@ export class Environment {
 		material.emissiveFresnelParameters = fresnel;
 		arenaMesh.material = material;
 
+		this.gameMeshes.push(arenaMesh);
+
 	}
 	public async init() {
 
@@ -116,8 +135,10 @@ export class Environment {
 		//this.camera_br.attachControl(this.canvas, true);
 		this.camera_pong = new ArcRotateCamera('pong', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
+
 		loaded.addAllToScene();
 		loaded.meshes[1].parent = this.pongRoot;
+		this.gameMeshes.push(loaded.meshes[1] as Mesh);
 
 
 		//this.scene.debugLayer.show();
@@ -130,12 +151,12 @@ export class Environment {
 			mesh.receiveShadows = true;
 		})
 
-		this.scene.fogMode = Scene.FOGMODE_LINEAR;
+		this.scene.fogMode = Scene.FOGMODE_NONE;
 		this.scene.fogDensity = 0.2;
 		this.scene.fogStart = 100;
 		this.scene.fogEnd = 120;
-		this.scene.fogColor = new Color3(.4, .43, .45);
-		this.scene.clearColor = this.scene.fogColor.toColor4();
+		this.scene.fogColor = new Color3(0., 0., 0.);
+		this.scene.clearColor = new Color4(0., 0., 0., 0.);
 
 		// const pp = new DefaultRenderingPipeline("default", true, this.scene, [this.scene.activeCamera as Camera]);
 		// pp.bloomEnabled = true;
@@ -143,12 +164,17 @@ export class Environment {
 		// pp.bloomKernel = 16;
 		// pp.bloomScale = 0.25;
 
-		//Inspector.Show(this.scene, {});
+		// Inspector.Show(this.scene, {});
+		//this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
+		//document.body.style.perspective = `${this.perspective}px`;
+		//
 
+		for (let i = 0; i < this.gameMeshes.length; i++) {
+			this.gameMeshes[i].setEnabled(false);
+		}
 	}
 
-	public render() {
-		const time = performance.now() * 0.001;
+	public render(time: number) {
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
 		if (this.updateHome) {
@@ -157,22 +183,51 @@ export class Environment {
 		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
+		//this.updateCameraDiv();
+	}
+
+	private updateCameraDiv() {
+		const world = this.scene.activeCamera?.getWorldMatrix();
+		const r = world!.getRotationMatrix().transpose().m;
+		const m = world!.m;
+		this.cameraDiv.style.transform = `translateZ(${this.perspective}px) matrix3d(${m[0]},${-r[1]},${-r[2]},${m[3]},${-r[4]},${-m[5]},${-r[6]},${m[7]},${-r[8]},${r[9]},${m[10]},${m[11]},${m[12]},${-m[13]},${m[14]},${m[15]}) translate(${this.width * 0.5}px, ${this.height * 0.5}px)`;
 	}
 
 	public enableHome() {
 		this.updateHome = true;
-		this.scene.fogMode = Scene.FOGMODE_LINEAR;
+		//this.scene.fogMode = Scene.FOGMODE_LINEAR;
+		this.scene.activeCamera = this.fieldCamera;
+		for (let i = 0; i < this.gameMeshes.length; i++) {
+			this.gameMeshes[i].setEnabled(false);
+		}
+		this.fieldCamera.setEnabled(true);
 
 	}
 
 	public disableHome() {
 		this.updateHome = false;
 		this.scene.fogMode = Scene.FOGMODE_NONE;
+		for (let i = 0; i < this.gameMeshes.length; i++) {
+			this.gameMeshes[i].setEnabled(true);
+		}
+		this.fieldCamera.setEnabled(false);
+
 	}
 
-	public setVue(vue: string): Vue {
-		// return this.gears.setVue(vue);
-		return this.field.setVue(vue);
+	public setVue(vue: string) {
+		this.field.setVue(vue);
+	}
+
+	public get fieldCamera(): Camera {
+		return this.field.camera;
+	}
+
+	public onHover(status: number) {
+		this.field.onHover(status);
+	}
+
+	public resize() {
+		this.field.resize();
 	}
 
 	public dispose() {

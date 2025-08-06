@@ -1,3 +1,4 @@
+import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
 //import { homeVue } from "../Vue";
 import { meRequest, postRequest } from "./requests";
@@ -7,47 +8,74 @@ import { raiseStatus } from "./utils";
 
 
 interface homeHtmlReference {
-	info: HTMLInputElement,
-	stats: HTMLInputElement,
-	play: HTMLInputElement,
-	friendlist: HTMLInputElement,
-	br: HTMLInputElement,
-	quit: HTMLInputElement
+	stats: { html: HTMLElement, id: number },
+	play: { html: HTMLElement, id: number },
+	bricks: { html: HTMLElement, id: number },
+	exemple: { html: HTMLElement, id: number }
 };
 
 class Home {
 	private div: HTMLDivElement;
 	private ref: homeHtmlReference;
 
+
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 
 		this.ref = {
-			info: div.querySelector("#home-info") as HTMLInputElement,
-			stats: div.querySelector("#home-stats") as HTMLInputElement,
-			play: div.querySelector("#home-play") as HTMLInputElement,
-			friendlist: div.querySelector("#home-friendlist") as HTMLInputElement,
-			br: div.querySelector("#home-br") as HTMLInputElement,
-			quit: div.querySelector("#home-quit") as HTMLInputElement
+			stats: { html: div.querySelector("#home-stats") as HTMLElement, id: -1 },
+			play: { html: div.querySelector("#home-play") as HTMLElement, id: -1 },
+			bricks: { html: div.querySelector("#home-bricks") as HTMLElement, id: -1 },
+			exemple: { html: div.querySelector("#home-exemple") as HTMLElement, id: -1 }
 		};
 
-		console.log("play: ", this.ref.play);
-		console.log("jhfrkejhgrkhgerg", document.querySelector("play-frame"));
 
-		App3D.setVue('home');
-		const homeVue = App3D.getVue('home');
-		homeVue?.windowAddEvent('play', 'click', () => {
-			Router.nav('/play');
+		this.ref.stats.id = App3D.addCSS3dObject({
+			html: this.ref.stats.html,
+			width: 1,
+			height: 1,
+			world: Matrix.RotationY(Math.PI * 0.8).multiply(Matrix.Translation(-5, 4, -10)),
+			enable: false
 		})
-		homeVue?.windowAddEvent('stats', 'click', () => {
-			Router.nav(`/stats?u=${User.username}`)
+		this.ref.play.id = App3D.addCSS3dObject({
+			html: this.ref.play.html,
+			width: 1,
+			height: 1,
+			world: Matrix.RotationY(Math.PI * 1.1).multiply(Matrix.Translation(0, 3, -10)),
+			enable: false
 		})
-		homeVue?.windowAddEvent('/!\\TEST/!\\', 'click', () => {
-			Router.nav('/test')
+		this.ref.bricks.id = App3D.addCSS3dObject({
+			html: this.ref.bricks.html,
+			width: 1,
+			height: 1,
+			world: Matrix.RotationY(Math.PI * 1.2).multiply(Matrix.Translation(5, 5, -10)),
+			enable: false
 		})
-		homeVue?.windowAddEvent('info', 'click', () => {
-			Router.nav("/info")
+
+		this.ref.exemple.id = App3D.addCSS3dObject({
+			html: this.ref.exemple.html,
+			width: 1,
+			height: 1,
+			world: Matrix.RotationY(Math.PI * 1).multiply(Matrix.Translation(0, 6, -10)),
+			enable: false
 		})
+
+		this.ref.stats.html.addEventListener("click", () => {
+			Router.nav(`/stats?u=${User.username}`);
+		})
+
+		this.ref.play.html.addEventListener("click", () => {
+			Router.nav("/play");
+		})
+
+		this.ref.bricks.html.addEventListener("click", () => {
+			Router.nav("/brick")
+		})
+
+		this.ref.exemple.html.addEventListener("click", () => {
+			Router.nav("/exemple")
+		})
+
 
 
 
@@ -124,10 +152,15 @@ class Home {
 	}
 
 	public load(params: URLSearchParams) {
-		App3D.loadVue('home');
+		//App3D.loadVue('home');
 		//meRequest()
 		//.catch(() => window.location.reload());
-		// (document.querySelector("#main-container") as HTMLDivElement).innerHTML = "";
+		App3D.setVue("home");
+		App3D.setCSS3dObjectEnable(this.ref.stats.id, true);
+		App3D.setCSS3dObjectEnable(this.ref.play.id, true);
+		App3D.setCSS3dObjectEnable(this.ref.bricks.id, true);
+		App3D.setCSS3dObjectEnable(this.ref.exemple.id, true);
+		//(document.querySelector("#main-container") as HTMLDivElement)?.remove();
 
 		// document.querySelector("#main-container")?.appendChild(this.div);
 
@@ -159,7 +192,12 @@ class Home {
 	}
 
 	public async unload() {
-		App3D.unloadVue('home');
+		App3D.setCSS3dObjectEnable(this.ref.stats.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.play.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.bricks.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.exemple.id, false);
+
+		//App3D.unloadVue('home');
 		this.div.remove();
 	}
 

@@ -1,5 +1,10 @@
 @import url("font.css");
 
+::selection {
+	color: black !important;
+	background: White !important;
+}
+
 html,
 body {
 	width: 100%;
@@ -10,6 +15,17 @@ body {
 
 body {
 	background-color: black;
+	perspective: 1500px;
+	transform-style: preserve-3d;
+}
+
+#camera {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	transform-style: preserve-3d;
+	pointer-events: none;
+	z-index: 0;
 }
 
 :root {
@@ -17,8 +33,11 @@ body {
 	height: 100%;
 	width: 100%;
 
-	--frame-color: #8E1616;
+	/*--frame-color: #8E1616;*/
+	--frame-color: #a498fe;
 	--frame-text-color: #000;
+
+	--frame-butterfly-color: #dedafe;
 
 	--text-color: #000;
 	--text-background: #fff;
@@ -29,6 +48,9 @@ body {
 	--font-window-bar: bold small-caps 2vh de-valancia;
 	--font-window-content: de-valancia 2vh 100;
 	--font-readable: normal normal 2vh dotrice;
+	/*--font-speak: normal normal 3vh ydmyungjo;*/
+	--font-speak: normal normal 3vh ptolemy;
+	--font-submit: normal normal 3vh ptolemy;
 
 	--input-on-color: white;
 	--input-on-background: blue;
@@ -111,20 +133,33 @@ canvas {
 	min-height: 100px;
 	min-width: 100px;
 	overflow: hidden;
-	transition:
-		top 2s,
-		left 2s,
-		width 5s, 0.3s height 5s, 0.3s;
+	/* transition: */
+	/* 	top 2s, */
+	/* 	left 2s, */
+	/* 	width 5s, 0.3s height 5s, 0.3s; */
 	z-index: 2;
 }
 
-.frame-butterfly {
+.frame-new {
 	position: absolute;
-	top: 0;
-	left: 0;
-	border: 2px solid var(--frame-color);
+	pointer-events: auto;
+	width: 100px;
+	height: 100px;
 	overflow: hidden;
+	background-color: var(--frame-color);
 	z-index: 2;
+}
+
+.frame:hover {
+	mix-blend-mode: difference;
+	background-color: white;
+	border-color: black;
+}
+
+.frame:hover>.frame-text {
+	mix-blend-mode: difference;
+	background-color: black;
+	color: white;
 }
 
 .frame-text {
@@ -152,7 +187,6 @@ canvas {
 	animation-timing-function: step-start;
 }
 
-.sub-container>span,
 .text {
 	vertical-align: top;
 	display: inline;
@@ -171,6 +205,8 @@ canvas {
 	background-color: var(--window-background);
 	color: var(--window-color);
 	border: 0.3vh white solid;
+	box-shadow: 1px 1px 1px white, -1px -1px 1px white;
+	pointer-events: auto;
 }
 
 
@@ -179,7 +215,6 @@ input[off] {
 	color: grey;
 	background-color: #222;
 	border-color: grey !important;
-	pointer-events: none;
 }
 
 
@@ -209,7 +244,7 @@ input[off] {
 
 #main-container {
 	position: absolute;
-	width: 50%;
+	width: 100%;
 	height: 100%;
 	right: 0;
 	z-index: 0;
@@ -218,12 +253,21 @@ input[off] {
 
 
 .sub-container {
-	width: 100%;
+	width: 50%;
 	height: 100%;
+	pointer-events: auto;
 }
 
 input {
 	all: unset;
+}
+
+input[type=text] {
+	cursor: text;
+}
+
+input[type="button"] {
+	cursor: cell;
 }
 
 input[on] {
@@ -237,9 +281,174 @@ input[on] {
 	letter-spacing: normal;
 }
 
+.frame-butterfly {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 4px solid var(--frame-butterfly-color);
+	overflow: hidden;
+	z-index: 2;
+}
+
 .line {
 	position: absolute;
-	height: 0.1vh;
-	background-color: blue;
+	height: 4px;
+	background-color: var(--frame-butterfly-color);
 	z-index: 0;
+}
+
+.speak {
+	position: absolute;
+	width: fit-content;
+	height: fit-content;
+	font: var(--font-speak);
+
+	background-color: transparent;
+	color: white;
+	-webkit-text-stroke: 3px;
+	-webkit-text-stroke-color: black;
+	font-size: 10vh;
+	font-weight: bold;
+	pointer-events: auto;
+
+}
+
+.speak::before {
+	content: "<<";
+}
+
+.speak::after {
+	content: ">>";
+}
+
+.submit {
+	position: absolute;
+	width: fit-content;
+	height: fit-content;
+	font: var(--font-submit);
+
+	background-color: transparent;
+	color: white;
+	-webkit-text-stroke: 3px;
+	-webkit-text-stroke-color: black;
+	font-size: 10vh;
+	font-weight: bold;
+	pointer-events: auto;
+}
+
+.submit::before {
+	content: "[";
+}
+
+.submit::after {
+	content: "]";
+}
+
+
+
+.switch {
+	position: absolute;
+	display: block;
+	background-color: transparent;
+	height: fit-content;
+	/*width: 40vh;*/
+	align-content: center;
+	border-radius: 0 1px 0 0;
+	box-shadow: 1px 1px 5px grey, -1px -1px 5px grey;
+}
+
+.switch-input {
+	display: block;
+	width: fit-content;
+	height: fit-content;
+	font: var(--font-speak);
+	margin: auto;
+
+	background-color: transparent;
+	color: white;
+	-webkit-text-stroke: 2px;
+	-webkit-text-stroke-color: black;
+	font-size: 7vh;
+	font-weight: bold;
+	text-align: center;
+	pointer-events: auto;
+
+	transition: letter-spacing 0.2s;
+}
+
+
+.switch-input[down] {
+	color: black;
+	-webkit-text-stroke: 1.5px;
+	-webkit-text-stroke-color: white;
+	letter-spacing: -2vh;
+	background-color: transparent;
+}
+
+
+
+.switch-input[down]:hover {
+	letter-spacing: 0vh;
+}
+
+.blur-popup {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	backdrop-filter: blur(5px);
+	pointer-events: all;
+	z-index: 10;
+}
+
+.blur-popup>* {
+	z-index: 11;
+}
+
+#notification-container {
+	display: block;
+	position: absolute;
+	top: 0%;
+	right: 0%;
+	width: fit-content;
+	min-width: 10vh;
+	min-height: 10vh;
+	height: fit-content;
+	pointer-events: auto;
+	/*z-index: 39;*/
+}
+
+#notification-container:hover * {
+	opacity: 1;
+	animation: none;
+}
+
+.notification {
+	display: block;
+	position: relative;
+	right: 0%;
+	width: fit-content;
+	height: fit-content;
+	font: var(--font-speak);
+	font-size: 3vh;
+	color: black;
+	opacity: 0;
+	animation: fade-out var(--duration) linear;
+	/*z-index: 40;*/
+}
+
+.notification:hover {
+	color: white;
+}
+
+@keyframes fade-out {
+
+	0%,
+	80% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+
 }

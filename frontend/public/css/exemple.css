@@ -1,0 +1,28 @@
+#exemple-exemple * {
+	font-size: 10vh;
+}
+
+#exemple-popup {
+	top: 50%;
+	left: 50%;
+}
+
+#exemple-popup * {
+	font-size: 5vh;
+}
+
+#exemple-popup>input:hover,
+#exemple-exemple>input:hover {
+	color: black;
+	background-color: white;
+}
+
+#exemple-notif {
+	color: white;
+	background-color: black;
+}
+
+#exemple-notif:hover {
+	color: black;
+	background-color: white;
+}

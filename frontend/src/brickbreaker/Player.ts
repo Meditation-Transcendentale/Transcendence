@@ -9,17 +9,18 @@ export class Player {
 	private isAlive: boolean = true;
 	private materialGoal: StandardMaterial;
 	private materialShield: StandardMaterial;
+	private shieldMat: ShaderMaterial;
 	private velocity: Vector3;
 
 	private angleFactor: number;
-	// private oldAngleFactor: number;
 	private lastInputDelay: number;
 	private isActive: number = 0.0;
+	private alpha: number = 0.25;
 	private inputDown: boolean = false;
 	private inputPointer: any;
 
 	private keysPressed: Set<string> = new Set();
-	private pointer: Vector2 = new Vector2(0, 0);
+	private pointer: Vector2;
 
 	private scene: Scene;
 
@@ -37,8 +38,9 @@ export class Player {
 		this.goal.material = this.materialGoal;
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
+		this.pointer = new Vector2(game.root.position.x, game.root.position.z);
 
-		this.shield = MeshBuilder.CreateCylinder("shield", { height: 0.25, diameter: 1.65, tessellation: 64, arc: 0.5, enclose: true, updatable: true }, this.scene);
+		this.shield = MeshBuilder.CreateCylinder("shield", { height: 0.25, diameter: 1.8, tessellation: 64, arc: 0.5, enclose: true, updatable: true }, this.scene);
 		this.shield.parent = game.root;
 		this.shield.rotation.y = Math.PI;
 		this.materialShield = new StandardMaterial("shieldMat", this.scene);
@@ -46,7 +48,6 @@ export class Player {
 		this.shield.material = this.materialShield;
 
 		this.angleFactor = 0.5;
-		// this.oldAngleFactor = 0.5;
 		this.isActive = 0.0;
 		this.lastInputDelay = performance.now();
 
@@ -54,7 +55,6 @@ export class Player {
 
 		window.addEventListener("keydown", (e) => {
 			this.keysPressed.add(e.code);
-			// console.log(e.code);
 		});
 		window.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
 		window.addEventListener("pointermove", (e) => {
@@ -64,7 +64,6 @@ export class Player {
 
 		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
 		this.pointerSurface.parent = game.root;
-		console.log(`pointer pos= ${this.pointerSurface.position}`)
 		const invMat = new StandardMaterial("surfaceMat", this.scene);
 		invMat.diffuseColor.set(0, 0, 0);
 		invMat.alpha = 0;
@@ -76,9 +75,12 @@ export class Player {
 		Effect.ShadersStore['customFragmentShader'] = `
 			precision highp float;
 
+			// Varying
+			varying float vAlpha;
+
 			void main(void) {
 				vec3 color = vec3(0.0,0.0,1.0);
-				gl_FragColor = vec4( color, 1.0);
+				gl_FragColor = vec4( color, vAlpha);
 			}
 		`;
 
@@ -90,21 +92,21 @@ export class Player {
 			attribute vec3 normal;
 			attribute vec2 uv;
 			attribute float angleFactor;
-			attribute float isActive;
 			attribute vec3 paddlePosition;
 			attribute vec3 paddleRotation;
+			attribute float alpha;
 			
 			// Uniforms
 			uniform mat4 world;
 			uniform mat4 worldViewProjection;
 
+			// Varying
+			varying float vAlpha;
+
 			const float PI = 3.14159265;
 
 			void main(void) {
-				if (isActive == 0.0){
-					gl_Position = worldViewProjection * vec4(0.0, 0.0, 0.0, 1.0);
-					return;
-				} 
+				vAlpha = alpha;
 
 				float angle = atan(position.z, position.x) + (PI / 2.0);
 				float newAngle = mix(angle, 0.0, angleFactor) - paddleRotation.y + PI * 1.5;
@@ -112,16 +114,17 @@ export class Player {
 				vec2 newXZ = vec2(cos(newAngle), sin(newAngle)) * radius;
 				vec3 newPosition = vec3(newXZ.x, position.y, newXZ.y);
 
-				newPosition -= paddlePosition;
+				newPosition += paddlePosition * vec3(-1., 1., -1.);
 				gl_Position = worldViewProjection * vec4(newPosition, 1.0);
 			}
 		`;
 
-		let shaderMaterial = new ShaderMaterial('custom', this.scene, 'custom', {
-			attributes: ['position', 'normal', 'angleFactor', 'isActive', 'paddlePosition', 'paddleRotation'],
+		this.shieldMat = new ShaderMaterial('custom', this.scene, 'custom', {
+			attributes: ['position', 'normal', 'angleFactor', 'isActive', 'paddlePosition', 'paddleRotation', 'alpha'],
 			uniforms: ['world', 'worldViewProjection']
 		});
-		this.shield.material = shaderMaterial;
+		this.shieldMat.alpha = this.alpha;
+		this.shield.material = this.shieldMat;
 	}
 
 	public die(): void {
@@ -135,16 +138,17 @@ export class Player {
 	update(): void {
 		this.movePlayer();
 		this.spawnShield();
+		this.shieldMat.alpha = this.alpha;
 		const vertexCount = this.shield.getTotalVertices();
 
 		const angleFactorArray = new Float32Array(vertexCount);
-		const isActiveArray = new Float32Array(vertexCount);
+		const alphaArray = new Float32Array(vertexCount);
 		const paddlePositionArray = new Float32Array(vertexCount * 3);
 		const paddleRotationArray = new Float32Array(vertexCount * 3);
 
 		for (let i = 0; i < vertexCount; i++) {
 			angleFactorArray[i] = this.angleFactor;
-			isActiveArray[i] = this.isActive;
+			alphaArray[i] = this.alpha;
 			const index = 3 * i;
 			paddlePositionArray[index] = this.goal.position.x;
 			paddlePositionArray[index + 1] = this.goal.position.y;
@@ -154,8 +158,8 @@ export class Player {
 			paddleRotationArray[index + 2] = this.goal.rotation.z;
 		}
 
+		this.shield.setVerticesBuffer(new VertexBuffer(this.scene.getEngine(), alphaArray, "alpha", true, false, 1));
 		this.shield.setVerticesBuffer(new VertexBuffer(this.scene.getEngine(), angleFactorArray, "angleFactor", true, false, 1));
-		this.shield.setVerticesBuffer(new VertexBuffer(this.scene.getEngine(), isActiveArray, "isActive", true, false, 1));
 		this.shield.setVerticesBuffer(new VertexBuffer(this.scene.getEngine(), paddlePositionArray, "paddlePosition", true, false, 3));
 		this.shield.setVerticesBuffer(new VertexBuffer(this.scene.getEngine(), paddleRotationArray, "paddleRotation", true, false, 3));
 	}
@@ -163,10 +167,14 @@ export class Player {
 	private spawnShield(): void {
 		if (!this.isAlive) return;
 
-		if (this.angleFactor != 1 && this.inputDown == true)
+		if (this.angleFactor != 1 && this.inputDown == true){
 			this.isActive = 1.0;
-		else
+			this.alpha = 1.0;
+		}
+		else{
 			this.isActive = 0.0;
+			this.alpha = 0.25;
+		}
 
 		if (this.inputDown === true) {
 			this.lastInputDelay = performance.now();
@@ -201,7 +209,7 @@ export class Player {
 	}
 
 	private movePlayer() {
-		let speed = 0.3;
+		let speed = 1;
 		if (this.isKeyPressed("Space")) {
 			this.inputDown = true;
 		} else if (this.inputDown == true) {
@@ -217,15 +225,15 @@ export class Player {
 			targetPosition.z -= this.game.root.position.z;
 
 			let direction = targetPosition.subtract(this.goal.position);
+			direction.y = 0;
 			const distance = direction.length();
-			direction.y = this.goal.position.y;
 
 			if (distance < 0.01) {
 				this.velocity = Vector3.Zero();
 			} else {
 				this.goal.rotation.y = Math.atan2(direction.x, direction.z);
 				direction.normalize();
-				speed *= Math.min(distance, 1);
+				speed *= Math.min(distance * 2, 1);
 				this.velocity = Vector3.Lerp(this.velocity, direction.scale(speed), 0.5);
 			}
 		}

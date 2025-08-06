@@ -248,6 +248,8 @@ services:
       - cdn_data:/usr/share/nginx/html
     ports:
       - "3002:443"
+    networks:
+      - transcendence-network
     depends_on:
       database_certs-init:
         condition: service_completed_successfully

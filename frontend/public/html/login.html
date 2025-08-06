@@ -1,20 +1,20 @@
 <div id="login" class="sub-container">
 	<link rel="stylesheet" type="text/css" href="/css/login.css">
-	<span>TO  DISABlE AUTHENTIFICATION</span><br/>
-	<span>in main.ts, uncomment</span><br/>
-	<span>'Router.AUTHENTIFICATION = false'</span>
-	<div id="login-window" class="window">
-		<div class="window-bar">LOGIN</div>
-		<div class="window-content">
-			<form id="login-form" autocomplete="off">
-				<input id="login-username" class="readable" type="text" placeholder="Username">
-				<input id="login-password" class="readable" type="password" placeholder="Password">
-				<input id="login-submit" type="submit" value="Login">
-			</form>
-			<div id='sepv'></div>
-			<div id='seph'></div>
-			<div id="requirement">8 character minimun, 15max, one caps, forbidden * / []</div>
-		</div>
-
+	<div id="login-form" class="speak auth">
+		<input id="login-username" type="text" placeholder="username">
+		<span>||</span>
+		<input id="login-password" type="password" placeholder="password">
+	</div>
+	<div id="switch" class="switch">
+		<input id="switch-login" class="switch-input" type="button" value="LOGIN"/>
+		<input id="switch-register" class="switch-input" type="button" value="REGISTER"/>
+	</div>
+	<div id="register-form" class="speak auth">
+		<input id="register-username" type="text" placeholder="username">
+		<span>||</span>
+		<input id="register-password" type="password" placeholder="password">
+	</div>
+	<div id="auth-submit-d" class="submit">
+		<input id="auth-enter" class="submit" type="button" value="ENTER"/>
 	</div>
 </div>

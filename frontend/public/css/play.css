@@ -1,13 +1,29 @@
 /*######################CREATE#################*/
+#play-create,
+#play-join {
+	width: 200vh;
+	height: 200vh;
+	pointer-events: none;
+}
 
+#play-join .window-bar,
+#play-create .window-bar {
+	font-size: 4vh;
+	border-bottom: 0.4vh #aaa solid;
+}
+
+#play-join *,
+#play-create * {
+	pointer-events: auto;
+}
 
 #create-map-window {
 	display: block;
-	width: 35vh;
-	height: 20vh;
-	top: 15vh;
-	left: 10vh;
-	max-height: 20vh;
+	width: 35%;
+	height: 20%;
+	top: 15%;
+	left: 10%;
+	max-height: 20%;
 	overflow: hidden;
 }
 
@@ -17,24 +33,24 @@
 	width: 100%;
 	overflow: hidden;
 	background-color: white;
-	column-gap: 0.3vh;
+	column-gap: 0.3%;
 }
 
 #create-map {
-	width: 15vh;
+	width: 100%;
 	display: grid;
 	grid-column: 1 / 1;
 	height: fit-content;
 	grid-template-columns: 1 auto auto auto;
 	background-color: white;
-	row-gap: 0.2vh;
+	row-gap: 0.2%;
 	overflow: scroll;
 }
 
 #create-map>input {
-	padding-left: 1vh;
+	padding-left: 1%;
 	background-color: var(--window-background);
-	font-size: 2vh;
+	font-size: 5vh;
 	font-weight: 100;
 }
 
@@ -48,7 +64,7 @@
 	grid-column: 2 / 2;
 	width: 100%;
 	font-weight: 100;
-	font-size: 2vh;
+	font-size: 4vh;
 	color: var(--window-color);
 	background-color: var(--window-background);
 }
@@ -56,7 +72,7 @@
 /*####*/
 
 #create-mod-window {
-	width: 40vh;
+	width: 40%;
 	top: 30%;
 	left: 40%;
 	z-index: 2;
@@ -83,17 +99,17 @@
 	/*margin-top: 0.5vh;*/
 	/*margin-bottom: 0.5vh;*/
 	overflow: hidden;
-	width: 20vh;
+	width: 40vh;
 }
 
 #create-mod>input {
 	display: inline-block;
 	line-height: 0vh;
-	padding-left: 1vh;
+	padding-left: 2vh;
 	background-color: var(--window-background);
-	font-size: 2.5vh;
-	height: 3vh;
-	max-height: 3.4vh;
+	font-size: 5vh;
+	height: 6vh;
+	max-height: 7vh;
 	font-weight: 100;
 	transition: font-size 0.2s;
 	vertical-align: middle;
@@ -102,23 +118,23 @@
 #create-mod>input:hover {
 	color: var(--window-background) !important;
 	background-color: var(--window-color) !important;
-	font-size: 2.6vh;
+	font-size: 5.2vh;
 }
 
 #create-mod>input[on] {
-	font-size: 2.8vh;
+	font-size: 5.6vh;
 }
 
 #create-mod>input[on]:hover {
 	background-color: #abc4eb !important;
-	font-size: 2.7vh;
+	font-size: 5.4vh;
 }
 
 #mod-description {
 	grid-column: 2 / 2;
 	width: 100%;
 	font-weight: 100;
-	font-size: 2vh;
+	font-size: 4vh;
 	color: var(--window-color);
 	background-color: var(--window-background);
 }
@@ -129,7 +145,7 @@
 #create-btn-window {
 	top: 47%;
 	left: 5%;
-	width: 40vh;
+	width: 80vh;
 	height: fit-content;
 	text-align: center;
 	z-index: 1;
@@ -141,15 +157,15 @@
 
 #create-btn {
 	width: 90%;
-	height: 3.4vh;
+	height: 6.8vh;
 	text-align: center;
-	border: 0.2vh white solid;
-	margin-top: 1vh;
-	margin-bottom: 1vh;
+	border: 0.4vh white solid;
+	margin-top: 2vh;
+	margin-bottom: 2vh;
 	font-weight: 200;
-	letter-spacing: 2vh;
+	letter-spacing: 4vh;
 	line-height: 0;
-	font-size: 3vh;
+	font-size: 6vh;
 }
 
 #create-btn:hover {
@@ -164,65 +180,59 @@
 
 
 /*######################JOIN###################*/
-.a {
-	width: fit-content;
-}
+/*.a {*/
+/*	width: fit-content;*/
+/*}*/
+/**/
+/*.d {*/
+/*	vertical-align: top;*/
+/*	display: inline-block;*/
+/*	white-space: nowrap;*/
+/*	color: black;*/
+/*	background-color: white;*/
+/*	font-size: 4vh;*/
+/*	font-family: monospace;*/
+/*	margin-bottom: 10px;*/
+/*	overflow: hidden;*/
+/*	animation: typing 0.5s steps(20, end);*/
+/*}*/
+/**/
+/*@keyframes typing {*/
+/*	from {*/
+/*		width: 0*/
+/*	}*/
+/**/
+/*	to {*/
+/*		width: 100%*/
+/*	}*/
+/*}*/
+/**/
 
-.d {
-	vertical-align: top;
-	display: inline-block;
-	white-space: nowrap;
-	color: black;
-	background-color: white;
-	font-size: 2vh;
-	font-family: monospace;
-	margin-bottom: 10px;
-	overflow: hidden;
-	animation: typing 0.5s steps(20, end);
-}
-
-@keyframes typing {
-	from {
-		width: 0
-	}
-
-	to {
-		width: 100%
-	}
-}
-
-
-#play-join {
-	width: 100%;
-	height: 100%;
-	font-size: 2vh;
-}
-
-#play-join>.sep {
-	height: 1vh;
-}
 
 #join-input-container {
-	height: 10vh;
+	height: 20vh;
 	top: 40%;
-	width: 30vh;
+	width: 60vh;
 }
 
 #join-id {
 	position: relative;
 	text-align: center;
 	top: 20%;
-	left: 1vh;
-	width: 28vh;
+	left: 2vh;
+	width: 56vh;
+	font-size: 5vh;
 	transform: translateY(-50%);
 	color: white;
-	border-top: 0.1vh white solid;
-	border-bottom: 0.1vh white solid;
+	border-top: 0.4vh white solid;
+	border-bottom: 0.4vh white solid;
+	overflow: hidden;
 }
 
 #join-id::placeholder {
 	color: #999;
 }
+
 
 #join-indic {
 	position: relative;
@@ -241,50 +251,52 @@
 #join-list-container {
 	display: inline-block;
 	top: 30%;
-	left: 40%;
-	height: 30vh;
+	left: 30%;
+	height: 60vh;
 	width: fit-content;
 	overflow: scroll;
+	pointer-events: all;
 }
 
 #join-list-container>table {
 	display: inline-block;
 	border-collapse: collapse;
 	width: 100%;
+	height: 100%;
 	color: white;
 }
 
 
 
 #join-list th {
-	padding-right: 2vh;
-	padding-left: 0.5vh;
+	padding-right: 4vh;
+	padding-left: 1vh;
 	text-align: left;
 	color: white;
 	overflow: hidden;
 	white-space: nowrap;
 	overflow: hidden;
-	max-width: 20vh;
+	max-width: 40vh;
 }
 
 #join-list {
 	display: inline-block;
 	border-collapse: collapse;
 	font-weight: 100;
-	letter-spacing: -0.4vh;
-	font-size: 2vh;
+	letter-spacing: -0.8vh;
+	font-size: 4vh;
 	width: 100%;
 	height: 50%;
 	text-align: left;
 }
 
 #join-list>thead>td>th {
-	padding-right: 2vh;
+	padding-right: 4vh;
 }
 
 #join-list thead th {
 	position: sticky;
-	top: 2.6vh;
+	top: 5.2vh;
 	background-color: black;
 }
 
@@ -293,11 +305,11 @@
 	color: white;
 	overflow: hidden;
 	white-space: nowrap;
-	max-width: 20vh;
-	padding-right: 2vh;
-	padding-left: 0.5vh;
+	max-width: 40vh;
+	padding-right: 4vh;
+	padding-left: 1vh;
 	text-overflow: "...";
-	border-top: 0.1vh solid #ccc;
+	border-top: 0.2vh solid #ccc;
 }
 
 .list-body>tr:hover>td {
@@ -314,4 +326,62 @@
 	0% {
 		opacity: 1;
 	}
+}
+
+
+#play-lobby-info {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: fit-content;
+	width: fit-content;
+	transform: translate(-50%, -50%);
+}
+
+#play-lobby-info * {
+	font-size: 5vh;
+}
+
+#lobby-info li {
+	display: block;
+}
+
+#lobby-info {
+	display: grid;
+	height: 50vh;
+}
+
+#lobby-status {
+	grid-column: 1/1;
+	width: 40vh;
+	overflow: hidden;
+}
+
+#lobby-info>ul {
+	grid-column: 2/2;
+	width: 40vh;
+	height: 30vh;
+	overflow: scroll;
+}
+
+#lobby-join {
+	grid-column: 1/3;
+	bottom: 0%;
+	height: fit-content;
+}
+
+#lobby-join>input {
+	height: fit-content;
+	width: 90%;
+	margin-left: 5%;
+	font-size: 6vh;
+	text-align: center;
+	border: 0.4vh white solid;
+	animation: blink 1.5s linear infinite;
+}
+
+#lobby-join>input:hover {
+	color: black;
+	background-color: white;
+	animation: none;
 }

@@ -65,12 +65,8 @@
 
 ### BrickBreaker
 
-
 - custom system
 - access inside front
-- shield visual cooldown
-- player orientation visual
-- speed player
 - mouse disabled or change cursor
 
 
