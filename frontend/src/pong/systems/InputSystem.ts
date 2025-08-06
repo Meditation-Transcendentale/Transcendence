@@ -45,10 +45,11 @@ export class InputSystem extends System {
 			let offsetChange = 0;
 			let upKeys = [];
 			let downKeys = [];
+			console.log(input.gameMode);
 			if ((input.gameMode === "online" || input.gameMode === "ia") && paddle.id == localPaddleId) {
 				upKeys = ["KeyW", "ArrowUp"];
 				downKeys = ["KeyS", "ArrowDown"];
-			} else {
+			} else if (input.gameMode === "local"){
 				if (paddle.id == localPaddleId) {
 					upKeys = ["KeyW"];
 					downKeys = ["KeyS"];

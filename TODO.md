@@ -62,6 +62,9 @@
 
 - test spectator
 - test overall
+- delay ball at start
+- move camera
+- Wrong game mode send after the first game
 
 ### BrickBreaker
 
