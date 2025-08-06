@@ -26,9 +26,7 @@ export class InputSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
-		// console.log("update input");
 		const now = performance.now();
-		// console.log("input: ", now);
 		const dt = deltaTime / 1000;
 		for (const entity of entities) {
 			if (
@@ -40,27 +38,21 @@ export class InputSystem extends System {
 			}
 
 			const input = entity.getComponent(InputComponent)!;
-			if (!input.isLocal) continue;
-
 			const paddle = entity.getComponent(PaddleComponent)!;
 			const transform = entity.getComponent(TransformComponent)!;
+			if (!input.isLocal) continue;
 
 			let offsetChange = 0;
 			let upKeys = [];
 			let downKeys = [];
-			if (input.gameMode === "online" || input.gameMode === "ia") {
-				if (paddle.id == 0) {
-					upKeys = ["KeyW", "ArrowUp"];
-					downKeys = ["KeyS", "ArrowDown"];
-				} else {
-					downKeys = ["KeyW", "ArrowUp"];
-					upKeys = ["KeyS", "ArrowDown"];
-				}
+			if ((input.gameMode === "online" || input.gameMode === "ia") && paddle.id == localPaddleId) {
+				upKeys = ["KeyW", "ArrowUp"];
+				downKeys = ["KeyS", "ArrowDown"];
 			} else {
-				if (paddle.id == 0) {
+				if (paddle.id == localPaddleId) {
 					upKeys = ["KeyW"];
 					downKeys = ["KeyS"];
-				} else if (paddle.id == 1) {
+				} else {
 					upKeys = ["ArrowDown"];
 					downKeys = ["ArrowUp"];
 				}
@@ -71,9 +63,11 @@ export class InputSystem extends System {
 
 			paddle.move = 0;
 			if (UpPressed && !DownPressed) {
+				console.log("UP");
 				paddle.move = 1;
 			}
 			else if (DownPressed && !UpPressed) {
+				console.log("DOWN");
 				paddle.move = -1;
 			}
 
@@ -97,7 +91,7 @@ export class InputSystem extends System {
 				const payload: userinterface.IClientMessage = {
 					paddleUpdate: {
 						paddleId: paddle.id,
-						move: paddle.move, //remplacer par paddle.offset
+						move: paddle.move
 					}
 				};
 

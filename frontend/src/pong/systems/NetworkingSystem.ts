@@ -89,10 +89,10 @@ export class NetworkingSystem extends System {
 					matchedEntities.forEach(e => {
 						const paddleComp = e.getComponent(PaddleComponent)!;
 						const inputComp = e.getComponent(InputComponent)!;
-						// console.log(paddleComp.id);
-						if (inputComp.gameMode === "online" && !inputComp.isLocal) {
+						if (inputComp.gameMode === "online" && paddleComp.id != localPaddleId) {
 							paddleComp.offset = p.offset;
 						}
+
 
 						paddleComp.serverOffset = p.offset;
 						if (paddleComp.id == 2 || paddleComp.id == 3)
