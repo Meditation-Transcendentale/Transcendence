@@ -65,7 +65,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IBall, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IBall, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified Ball message, length delimited. Does not implicitly {@link shared.Ball.verify|verify} messages.
@@ -73,7 +73,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IBall, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IBall, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a Ball message from the specified reader or buffer.
@@ -81,18 +81,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns Ball
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.Ball;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.Ball;
 
         /**
          * Decodes a Ball message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns Ball
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.Ball;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.Ball;
 
         /**
          * Verifies a Ball message.
@@ -186,7 +186,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IPaddle, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IPaddle, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified Paddle message, length delimited. Does not implicitly {@link shared.Paddle.verify|verify} messages.
@@ -194,7 +194,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IPaddle, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IPaddle, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a Paddle message from the specified reader or buffer.
@@ -202,18 +202,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns Paddle
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.Paddle;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.Paddle;
 
         /**
          * Decodes a Paddle message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns Paddle
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.Paddle;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.Paddle;
 
         /**
          * Verifies a Paddle message.
@@ -289,7 +289,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IPaddleInput, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IPaddleInput, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified PaddleInput message, length delimited. Does not implicitly {@link shared.PaddleInput.verify|verify} messages.
@@ -297,7 +297,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IPaddleInput, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IPaddleInput, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PaddleInput message from the specified reader or buffer.
@@ -305,18 +305,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns PaddleInput
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.PaddleInput;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PaddleInput;
 
         /**
          * Decodes a PaddleInput message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns PaddleInput
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.PaddleInput;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PaddleInput;
 
         /**
          * Verifies a PaddleInput message.
@@ -386,7 +386,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IGoal, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IGoal, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified Goal message, length delimited. Does not implicitly {@link shared.Goal.verify|verify} messages.
@@ -394,7 +394,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IGoal, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IGoal, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a Goal message from the specified reader or buffer.
@@ -402,18 +402,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns Goal
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.Goal;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.Goal;
 
         /**
          * Decodes a Goal message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns Goal
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.Goal;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.Goal;
 
         /**
          * Verifies a Goal message.
@@ -513,7 +513,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IGameEvent, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IGameEvent, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GameEvent message, length delimited. Does not implicitly {@link shared.GameEvent.verify|verify} messages.
@@ -521,7 +521,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IGameEvent, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IGameEvent, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GameEvent message from the specified reader or buffer.
@@ -529,18 +529,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns GameEvent
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.GameEvent;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.GameEvent;
 
         /**
          * Decodes a GameEvent message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns GameEvent
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.GameEvent;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.GameEvent;
 
         /**
          * Verifies a GameEvent message.
@@ -652,7 +652,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IGameStateInfo, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IGameStateInfo, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GameStateInfo message, length delimited. Does not implicitly {@link shared.GameStateInfo.verify|verify} messages.
@@ -660,7 +660,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IGameStateInfo, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IGameStateInfo, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GameStateInfo message from the specified reader or buffer.
@@ -668,18 +668,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns GameStateInfo
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.GameStateInfo;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.GameStateInfo;
 
         /**
          * Decodes a GameStateInfo message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns GameStateInfo
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.GameStateInfo;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.GameStateInfo;
 
         /**
          * Verifies a GameStateInfo message.
@@ -797,7 +797,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IMatchState, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IMatchState, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified MatchState message, length delimited. Does not implicitly {@link shared.MatchState.verify|verify} messages.
@@ -805,7 +805,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IMatchState, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IMatchState, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a MatchState message from the specified reader or buffer.
@@ -813,18 +813,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns MatchState
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.MatchState;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.MatchState;
 
         /**
          * Decodes a MatchState message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns MatchState
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.MatchState;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.MatchState;
 
         /**
          * Verifies a MatchState message.
@@ -894,7 +894,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IMatchCreateRequest, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IMatchCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified MatchCreateRequest message, length delimited. Does not implicitly {@link shared.MatchCreateRequest.verify|verify} messages.
@@ -902,7 +902,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IMatchCreateRequest, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IMatchCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a MatchCreateRequest message from the specified reader or buffer.
@@ -910,18 +910,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns MatchCreateRequest
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.MatchCreateRequest;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.MatchCreateRequest;
 
         /**
          * Decodes a MatchCreateRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns MatchCreateRequest
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.MatchCreateRequest;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.MatchCreateRequest;
 
         /**
          * Verifies a MatchCreateRequest message.
@@ -991,7 +991,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IMatchCreateResponse, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IMatchCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified MatchCreateResponse message, length delimited. Does not implicitly {@link shared.MatchCreateResponse.verify|verify} messages.
@@ -999,7 +999,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IMatchCreateResponse, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IMatchCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a MatchCreateResponse message from the specified reader or buffer.
@@ -1007,18 +1007,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns MatchCreateResponse
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.MatchCreateResponse;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.MatchCreateResponse;
 
         /**
          * Decodes a MatchCreateResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns MatchCreateResponse
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.MatchCreateResponse;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.MatchCreateResponse;
 
         /**
          * Verifies a MatchCreateResponse message.
@@ -1088,7 +1088,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IMatchSetup, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IMatchSetup, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified MatchSetup message, length delimited. Does not implicitly {@link shared.MatchSetup.verify|verify} messages.
@@ -1096,7 +1096,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IMatchSetup, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IMatchSetup, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a MatchSetup message from the specified reader or buffer.
@@ -1104,18 +1104,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns MatchSetup
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.MatchSetup;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.MatchSetup;
 
         /**
          * Decodes a MatchSetup message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns MatchSetup
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.MatchSetup;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.MatchSetup;
 
         /**
          * Verifies a MatchSetup message.
@@ -1191,7 +1191,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IMatchInput, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IMatchInput, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified MatchInput message, length delimited. Does not implicitly {@link shared.MatchInput.verify|verify} messages.
@@ -1199,7 +1199,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IMatchInput, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IMatchInput, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a MatchInput message from the specified reader or buffer.
@@ -1207,18 +1207,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns MatchInput
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.MatchInput;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.MatchInput;
 
         /**
          * Decodes a MatchInput message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns MatchInput
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.MatchInput;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.MatchInput;
 
         /**
          * Verifies a MatchInput message.
@@ -1288,7 +1288,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IMatchQuit, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IMatchQuit, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified MatchQuit message, length delimited. Does not implicitly {@link shared.MatchQuit.verify|verify} messages.
@@ -1296,7 +1296,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IMatchQuit, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IMatchQuit, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a MatchQuit message from the specified reader or buffer.
@@ -1304,18 +1304,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns MatchQuit
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.MatchQuit;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.MatchQuit;
 
         /**
          * Decodes a MatchQuit message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns MatchQuit
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.MatchQuit;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.MatchQuit;
 
         /**
          * Verifies a MatchQuit message.
@@ -1379,7 +1379,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IMatchStart, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IMatchStart, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified MatchStart message, length delimited. Does not implicitly {@link shared.MatchStart.verify|verify} messages.
@@ -1387,7 +1387,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IMatchStart, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IMatchStart, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a MatchStart message from the specified reader or buffer.
@@ -1395,18 +1395,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns MatchStart
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.MatchStart;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.MatchStart;
 
         /**
          * Decodes a MatchStart message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns MatchStart
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.MatchStart;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.MatchStart;
 
         /**
          * Verifies a MatchStart message.
@@ -1476,7 +1476,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IMatchEnd, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IMatchEnd, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified MatchEnd message, length delimited. Does not implicitly {@link shared.MatchEnd.verify|verify} messages.
@@ -1484,7 +1484,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IMatchEnd, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IMatchEnd, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a MatchEnd message from the specified reader or buffer.
@@ -1492,18 +1492,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns MatchEnd
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.MatchEnd;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.MatchEnd;
 
         /**
          * Decodes a MatchEnd message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns MatchEnd
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.MatchEnd;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.MatchEnd;
 
         /**
          * Verifies a MatchEnd message.
@@ -1591,7 +1591,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IPhysicsRequest, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: shared.IPhysicsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified PhysicsRequest message, length delimited. Does not implicitly {@link shared.PhysicsRequest.verify|verify} messages.
@@ -1599,7 +1599,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IPhysicsRequest, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: shared.IPhysicsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PhysicsRequest message from the specified reader or buffer.
@@ -1607,18 +1607,18 @@ export namespace shared {
          * @param [length] Message length if known beforehand
          * @returns PhysicsRequest
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): shared.PhysicsRequest;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PhysicsRequest;
 
         /**
          * Decodes a PhysicsRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns PhysicsRequest
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): shared.PhysicsRequest;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PhysicsRequest;
 
         /**
          * Verifies a PhysicsRequest message.
@@ -1689,7 +1689,7 @@ export namespace google {
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: google.protobuf.IEmpty, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+            public static encode(message: google.protobuf.IEmpty, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Encodes the specified Empty message, length delimited. Does not implicitly {@link google.protobuf.Empty.verify|verify} messages.
@@ -1697,7 +1697,7 @@ export namespace google {
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encodeDelimited(message: google.protobuf.IEmpty, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+            public static encodeDelimited(message: google.protobuf.IEmpty, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Decodes an Empty message from the specified reader or buffer.
@@ -1705,18 +1705,18 @@ export namespace google {
              * @param [length] Message length if known beforehand
              * @returns Empty
              * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): google.protobuf.Empty;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.Empty;
 
             /**
              * Decodes an Empty message from the specified reader or buffer, length delimited.
              * @param reader Reader or buffer to decode from
              * @returns Empty
              * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): google.protobuf.Empty;
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.protobuf.Empty;
 
             /**
              * Verifies an Empty message.
@@ -1809,7 +1809,7 @@ export namespace physics {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: physics.IPhysicsRequest, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: physics.IPhysicsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified PhysicsRequest message, length delimited. Does not implicitly {@link physics.PhysicsRequest.verify|verify} messages.
@@ -1817,7 +1817,7 @@ export namespace physics {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: physics.IPhysicsRequest, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: physics.IPhysicsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PhysicsRequest message from the specified reader or buffer.
@@ -1825,18 +1825,18 @@ export namespace physics {
          * @param [length] Message length if known beforehand
          * @returns PhysicsRequest
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): physics.PhysicsRequest;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): physics.PhysicsRequest;
 
         /**
          * Decodes a PhysicsRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns PhysicsRequest
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): physics.PhysicsRequest;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): physics.PhysicsRequest;
 
         /**
          * Verifies a PhysicsRequest message.
@@ -1960,7 +1960,7 @@ export namespace physics {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: physics.IPhysicsResponse, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: physics.IPhysicsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified PhysicsResponse message, length delimited. Does not implicitly {@link physics.PhysicsResponse.verify|verify} messages.
@@ -1968,7 +1968,7 @@ export namespace physics {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: physics.IPhysicsResponse, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: physics.IPhysicsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PhysicsResponse message from the specified reader or buffer.
@@ -1976,18 +1976,18 @@ export namespace physics {
          * @param [length] Message length if known beforehand
          * @returns PhysicsResponse
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): physics.PhysicsResponse;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): physics.PhysicsResponse;
 
         /**
          * Decodes a PhysicsResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns PhysicsResponse
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): physics.PhysicsResponse;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): physics.PhysicsResponse;
 
         /**
          * Verifies a PhysicsResponse message.
@@ -2057,7 +2057,7 @@ export namespace physics {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: physics.IMatchStateResponse, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encode(message: physics.IMatchStateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified MatchStateResponse message, length delimited. Does not implicitly {@link physics.MatchStateResponse.verify|verify} messages.
@@ -2065,7 +2065,7 @@ export namespace physics {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: physics.IMatchStateResponse, writer?: $protobuf.default.Writer): $protobuf.default.Writer;
+        public static encodeDelimited(message: physics.IMatchStateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a MatchStateResponse message from the specified reader or buffer.
@@ -2073,18 +2073,18 @@ export namespace physics {
          * @param [length] Message length if known beforehand
          * @returns MatchStateResponse
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.default.Reader|Uint8Array), length?: number): physics.MatchStateResponse;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): physics.MatchStateResponse;
 
         /**
          * Decodes a MatchStateResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
          * @returns MatchStateResponse
          * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.default.Reader|Uint8Array)): physics.MatchStateResponse;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): physics.MatchStateResponse;
 
         /**
          * Verifies a MatchStateResponse message.
