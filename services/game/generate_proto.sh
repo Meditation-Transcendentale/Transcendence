@@ -22,7 +22,7 @@ fi
 # 2. Check if protobufjs is installed
 if ! npx --yes pbjs --version > /dev/null 2>&1; then
   echo "📦 Installing protobufjs..."
-  npm install -g protobufjs
+  npm install -g protobufjs-cli
 fi
 
 # 3. Shared directory containing all .proto files
@@ -68,8 +68,6 @@ for svc in "${SERVICES[@]}"; do
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/physics.proto"
-        # If you have a separate gamemanager.proto, include it here:
-        # "$SHARED_PROTO_DIR/gamemanager.proto"
       )
       ;;
     "pong-physics")
@@ -87,7 +85,7 @@ for svc in "${SERVICES[@]}"; do
       )
       ;;
     "ai")
-      # pongbr-physics needs shared types + physics messages for battle royale
+      # ai needs shared types
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
       )
@@ -127,49 +125,53 @@ for svc in "${SERVICES[@]}"; do
     fi
   done
 
-  # 8. Run pbjs & pbts directly (they come with protobufjs package)
- echo "   Running pbjs for $svc..."
-  npx pbjs \
-    --target static-module \
-    --wrap es6 \
-    --es6 \
-    --force-number \
-    --out "$OUT_DIR/message.js" \
-    "${PROTO_SOURCES[@]}"
+  # 8. Debug: Show what we're processing
+  echo "   Proto sources: ${PROTO_SOURCES[*]}"
+  echo "   Output: $OUT_DIR/message.js"
 
+  # 9. Run pbjs to generate JavaScript
+  echo "   Running pbjs for $svc..."
+  if ! npx pbjs \
+    -t static-module \
+    -w es6 \
+	--no-long \
+    -o "$OUT_DIR/message.js" \
+    "${PROTO_SOURCES[@]}" 2> "/tmp/pbjs_error_${svc}.log"; then
+    
+    echo "❌ pbjs failed for $svc. Error details:"
+    cat "/tmp/pbjs_error_${svc}.log"
+    exit 1
+  fi
+
+  # 10. Run pbts to generate TypeScript definitions
   echo "   Running pbts for $svc..."
-  npx pbts \
-    --out "$OUT_DIR/message.d.ts" \
-    "$OUT_DIR/message.js"
-  # 9. Patch the generated code:
-  #    a) Fix the import so Node.js ESM finds minimal.js
+  if ! npx pbts \
+    -o "$OUT_DIR/message.d.ts" \
+    "$OUT_DIR/message.js" 2> "/tmp/pbts_error_${svc}.log"; then
+    
+    echo "❌ pbts failed for $svc. Error details:"
+    cat "/tmp/pbts_error_${svc}.log"
+    # Continue anyway since TypeScript definitions are optional
+  fi
+
+  # 11. Patch the generated code for ESM compatibility
   echo "   Patching generated files..."
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS uses different sed syntax
-    sed -i '' '
-      s|^import \* as \$protobuf from "protobufjs/minimal";|import * as $protobuf from "protobufjs/minimal.js";|
-    ' "$OUT_DIR/message.js"
-    
-    #    b) Swap Reader/Writer/util → default.Reader / default.Writer / default.util
-    sed -i '' 's|\$protobuf\.Reader|\$protobuf.default.Reader|g' "$OUT_DIR/message.js"
-    sed -i '' 's|\$protobuf\.Writer|\$protobuf.default.Writer|g' "$OUT_DIR/message.js"
-    sed -i '' 's|\$protobuf\.util|\$protobuf.default.util|g' "$OUT_DIR/message.js"
-    
-    #    c) Replace any roots["default"] → default.roots
-    sed -i '' 's|\$protobuf\.roots\["default"\]|\$protobuf.default.roots|g' "$OUT_DIR/message.js"
-  else
-    # Linux sed syntax
-    sed -i '
-      s|^import \* as \$protobuf from "protobufjs/minimal";|import * as $protobuf from "protobufjs/minimal.js";|
-    ' "$OUT_DIR/message.js"
-    
-    #    b) Swap Reader/Writer/util → default.Reader / default.Writer / default.util
-    sed -i 's|\$protobuf\.Reader|\$protobuf.default.Reader|g' "$OUT_DIR/message.js"
-    sed -i 's|\$protobuf\.Writer|\$protobuf.default.Writer|g' "$OUT_DIR/message.js"
-    sed -i 's|\$protobuf\.util|\$protobuf.default.util|g' "$OUT_DIR/message.js"
-    
-    #    c) Replace any roots["default"] → default.roots
-    sed -i 's|\$protobuf\.roots\["default"\]|\$protobuf.default.roots|g' "$OUT_DIR/message.js"
+  if [ -f "$OUT_DIR/message.js" ]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      # macOS uses different sed syntax
+      sed -i '' 's|^import \* as \$protobuf from "protobufjs/minimal";|import * as $protobuf from "protobufjs/minimal.js";|' "$OUT_DIR/message.js"
+      sed -i '' 's|\$protobuf\.Reader|\$protobuf.default.Reader|g' "$OUT_DIR/message.js"
+      sed -i '' 's|\$protobuf\.Writer|\$protobuf.default.Writer|g' "$OUT_DIR/message.js"
+      sed -i '' 's|\$protobuf\.util|\$protobuf.default.util|g' "$OUT_DIR/message.js"
+      sed -i '' 's|\$protobuf\.roots\["default"\]|\$protobuf.default.roots|g' "$OUT_DIR/message.js"
+    else
+      # Linux sed syntax
+      sed -i 's|^import \* as \$protobuf from "protobufjs/minimal";|import * as $protobuf from "protobufjs/minimal.js";|' "$OUT_DIR/message.js"
+      sed -i 's|\$protobuf\.Reader|\$protobuf.default.Reader|g' "$OUT_DIR/message.js"
+      sed -i 's|\$protobuf\.Writer|\$protobuf.default.Writer|g' "$OUT_DIR/message.js"
+      sed -i 's|\$protobuf\.util|\$protobuf.default.util|g' "$OUT_DIR/message.js"
+      sed -i 's|\$protobuf\.roots\["default"\]|\$protobuf.default.roots|g' "$OUT_DIR/message.js"
+    fi
   fi
 
   echo "✅ Completed: $svc"
