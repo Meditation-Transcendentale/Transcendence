@@ -1,36 +1,33 @@
-import dotenv from 'dotenv';
-import natsClient from '../../game-manager/src/natsClient';
-import { decodeStateUpdate } from './proto/helper';
-import GameStateNode from './GameStateNode';
-import topLevelSearch from './bstar';
+import dotenv from "dotenv";
+import { AiManager } from "./AiManager.js";
 
 dotenv.config();
 
-const SERVICE_NAME = process.env.SERVICE_NAME || 'service';
-const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
+const SERVICE_NAME = process.env.SERVICE_NAME ?? "service";
+const NATS_URL = process.env.NATS_URL ?? "nats://localhost:4222";
+
+const am = new AiManager();
 
 async function main() {
-	console.log (`[${SERVICE_NAME}]: started`);
+  console.log(`[${SERVICE_NAME}] started`);
 
-	const am = new AiManager();
-	await am.init(NATS_URL);
+  await am.init(NATS_URL);
 
-	am.start();
-
-	console.log(`[${SERVICE_NAME}] NATS subscriptions established`);
+  console.log(`[${SERVICE_NAME}] NATS subscriptions established`);
 }
 
-main().catch(err => {
-	console.error (`[${SERVICE_NAME}] fatal error: ${err}.`);
-	process.exit(1);
-})
+main().catch((err) => {
+  console.error(`[${SERVICE_NAME}] fatal error:`, err);
+  process.exit(1);
+});
 
-// async function processState (state) {
-// 	const ballState = {	
-// 		ballPos: { x_b: state.ball.x, y_b: state.ball.y },
-// 		ballVel: { vx_b: state.ball.vx, vy_b: state.ball.vy}
-// 	};
-// 	const aiPaddlePos = state.paddles[0].move
-// 	const playerPaddlePos = 
-// 	const root = GameStateNode(ballState, )
-// }
+async function shutdown(signal) {
+  console.log(`[${SERVICE_NAME}] ${signal} received, draining...`);
+  try {
+    await am.stop?.();
+  } catch {}
+  process.exit(0);
+}
+
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));

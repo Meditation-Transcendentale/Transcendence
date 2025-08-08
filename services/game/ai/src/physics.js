@@ -37,10 +37,11 @@ export function predictBallState(ballPos, ballVel) {
   
   remainder = yFromBottom % (MAP_HEIGHT - BALL_DIAM - WALL_SIZE);
 
+  let finalY;
   if (bounces % 2 == 1) {
-    const finalY = -mapMax + remainder;
+    finalY = -mapMax + remainder;
   } else {
-    const finalY = mapMax - remainder;
+    finalY = mapMax - remainder;
     v_by = -v_by;
   }
 

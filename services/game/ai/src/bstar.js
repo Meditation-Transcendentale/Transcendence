@@ -197,7 +197,7 @@ function lowLevelSearch(strategy, currentNode, lambda, gamma) {
 function topLevelSearch(root) {
     expand(root);
     while (true) {
-        const relevantNodes = tlSelectRelevantNodes(root);
+        const relevantNodes = topLevelSelectRelevantNodes(root);
         let nextMove;
         if (relevantNodes.length <= 1)
             return (relevantNodes[0]);
