@@ -11,19 +11,19 @@ const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 
 async function main() {
 	console.log (`[${SERVICE_NAME}]: started`);
-	const nc = await natsClient.connect(NATS_URL);
 
-	const subGetState = nc.subscribe(`games.ia.*.match.state`);
-	(async () => {
-		for await (const msg of subGetState) {
-			const [, , gameId] = msg.subject.split('.');
-			const state = decodeStateUpdate(msg.data);
-			const nextPosition = processState(state);
-			processMove(nextPosition);
-		}
-	})();
+	const am = new AiManager();
+	await am.init(NATS_URL);
+
+	am.start();
+
 	console.log(`[${SERVICE_NAME}] NATS subscriptions established`);
 }
+
+main().catch(err => {
+	console.error (`[${SERVICE_NAME}] fatal error: ${err}.`);
+	process.exit(1);
+})
 
 // async function processState (state) {
 // 	const ballState = {	
@@ -34,16 +34,3 @@ async function main() {
 // 	const playerPaddlePos = 
 // 	const root = GameStateNode(ballState, )
 // }
-
-async function start() {
-	const nc = await connect({ servers: NATS_URL });
-	console.log(`[${SERVICE_NAME}] connected to NATS`);
-
-	const sub = nc.subscribe(`${SERVICE_NAME}.ping`);
-	for await (const msg of sub) {
-		console.log(`${SERVICE_NAME} received:`, msg.data.toString());
-		nc.publish(`${SERVICE_NAME}.pong`, Buffer.from(`pong from ${SERVICE_NAME}`));
-	}
-}
-
-start();
