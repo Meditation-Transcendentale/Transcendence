@@ -37,7 +37,7 @@ _No body_
 |-----------|------------------------------|------------------------------------------------------------------|
 | `mode`    | `"pong"` \| `"pongIO"` \| `"pongBR"` \| `"tournament"` | Which game mode to play.                                        |
 | `map`     | `string`                     | Identifier of the map or arena.                                  |
-| `submode` | `"local"` \| `"ia"` \| `"online"` | *Only when* `mode == "pong"`.  `"local"`: two players on same keyboard `"vs-ia"`: single player vs. bot `"online"`: create a lobby others can join |
+| `submode` | `"local"` \| `"ai"` \| `"online"` | *Only when* `mode == "pong"`.  `"local"`: two players on same keyboard `"vs-ai"`: single player vs. bot `"online"`: create a lobby others can join |
 
 <details>
 <summary>Request</summary>

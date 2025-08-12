@@ -6,7 +6,7 @@ export default {
 	NATS_URL: 'nats://nats_game:4222',
 	WS_PATH: '/lobbies',
 	MAX_PLAYERS: {
-		ia: 1,
+		ai: 1,
 		online: 2,
 		local: 1,
 		br: 1,

@@ -22,12 +22,9 @@ export function evaluateNode(gameStateNode) {
   
   const uncertainty = calculate_uncertainty(gameStateNode);
   
-  gameStateNode.evaluation.alpha = base_score - uncertainty;
-  gameStateNode.evaluation.beta = base_score + uncertainty;
-  
   return {
-    optimistic: gameStateNode.evaluation.beta,
-    pessimistic: gameStateNode.evaluation.alpha,  
+    alpha: base_score + uncertainty,
+    beta: base_score - uncertainty,  
   };
 }
 

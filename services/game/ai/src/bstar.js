@@ -1,5 +1,5 @@
-import { GameStateNode } from "./GameStateNode";
-import { expand } from "./expand"
+import { GameStateNode } from "./GameStateNode.js";
+import { expand } from "./expand.js"
 
 /**
  * Remove all the nodes that are already not relevant (best case is already worse than worst from others)
@@ -7,15 +7,21 @@ import { expand } from "./expand"
  */
 function topLevelSelectRelevantNodes(root) {
     const nodes = root.children;
+    console.log("1");
     if (!nodes)
         return [];
     const relevantNodes = [];
+    console.log("2");
     const sortedNodes = nodes.sort((a, b) => b.evaluation.alpha - a.evaluation.alpha);
+    console.log(`${sortedNodes[0]}`);
     const bestPessValue = Math.max(...sortedNodes.map(node => node.evaluation.beta));
+    console.log(`${bestPessValue}`);
     for (j of sortedNodes) {
+        console.log(`J=${j.aiPaddlePos}|${j.playerPaddlePos}|${j.evaluation.alpha}|${j.evaluation.beta}`);
         if (j.evaluation.alpha > bestPessValue)
             relevantNodes.push(j);
     }
+    console.log("4");
     return (relevantNodes);
 }
 
@@ -194,10 +200,12 @@ function lowLevelSearch(strategy, currentNode, lambda, gamma) {
     currentNode.evaluation.beta = newPessimisticValue;
 }
 
-function topLevelSearch(root) {
+export  function topLevelSearch(root) {
     expand(root);
     while (true) {
+        console.log("New loop");
         const relevantNodes = topLevelSelectRelevantNodes(root);
+        console.log("1");
         let nextMove;
         if (relevantNodes.length <= 1)
             return (relevantNodes[0]);

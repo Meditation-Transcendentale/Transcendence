@@ -1,6 +1,6 @@
 // nats.subscribe.match.start.json
 // game.${mode}.${gameId}.match.start
-// mode : "ia", "local", "online", "pongbr", "pongio"
+// mode : "ai", "local", "online", "pongbr", "pongio"
 {
 	// empty ?
 }

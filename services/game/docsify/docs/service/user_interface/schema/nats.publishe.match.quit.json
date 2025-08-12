@@ -1,7 +1,7 @@
 // nats.publishe.match.quit.json
 // nats.subscribe.match.quit.json
 // game.${mode}.${gameId}.match.quit
-// mode : "ia", "local", "online", "pongbr", "pongio"
+// mode : "ai", "local", "online", "pongbr", "pongio"
 {
 	"uuid": {
 		"type": "string",

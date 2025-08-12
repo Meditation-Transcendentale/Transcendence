@@ -9,7 +9,7 @@ export class Game {
 			case "local":
 				this.state = this.initializeStatePong();
 				break;
-			case "ia":
+			case "ai":
 				this.state = this.initializeStatePong();
 				break;
 			case "online":

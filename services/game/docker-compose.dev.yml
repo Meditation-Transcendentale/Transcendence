@@ -164,24 +164,24 @@ services:
       - game-network
       - metrics-network
 
-  # ai:
-  #   container_name: ai_service
-  #   build: ./services/game/ai
-  #   volumes:
-  #     - ./services/game/ai/src:/app/src
-  #     - ./services/game/ai/test:/app/test
-  #     - ./services/game/ai/package.json:/app/package.json
-  #     - ./services/game/ai/.env.example:/app/.env
-  #   command: npm run dev
-  #   restart: unless-stopped
-  #   environment:
-  #     - SERVICE_NAME=ai
-  #     - NATS_URL=${NATS_GAME_URL}
-  #     - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
-  #   depends_on:
-  #     - nats_game
-  #   networks:
-  #     - game-network
+  ai:
+    container_name: ai_service
+    build: ./services/game/ai
+    volumes:
+      - ./services/game/ai/src:/app/src
+      - ./services/game/ai/test:/app/test
+      - ./services/game/ai/package.json:/app/package.json
+      - ./services/game/ai/.env.example:/app/.env
+    command: npm run dev
+    restart: unless-stopped
+    environment:
+      - SERVICE_NAME=ai
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+    depends_on:
+      - nats_game
+    networks:
+      - game-network
 
 
 networks:

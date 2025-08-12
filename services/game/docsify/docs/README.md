@@ -47,7 +47,7 @@ _No body_
 |-----------|------------------------------|------------------------------------------------------------------|
 | `mode`    | `"pong"` \| `"pongIO"` \| `"pongBR"`  | Which game mode to play.                                        |
 | `map`     | `string`                     | Identifier of the map or arena.                                  |
-| `submode` | `"local"` \| `"vs-ia"` \| `"online"` | *Only when* `mode == "pong"`.  `"local"`: two players on same keyboard `"vs-ia"`: single player vs. bot `"online"`: create a lobby others can join |
+| `submode` | `"local"` \| `"vs-ai"` \| `"online"` | *Only when* `mode == "pong"`.  `"local"`: two players on same keyboard `"vs-ai"`: single player vs. bot `"online"`: create a lobby others can join |
 
 <details>
 <summary>Request</summary>
@@ -56,7 +56,7 @@ _No body_
 {
   "mode": "pong | pongIO | pongBR",
   "map": "classic",
-  "submode": "local | vs-ia | online"
+  "submode": "local | vs-ai | online"
 }
 ```
 </details>

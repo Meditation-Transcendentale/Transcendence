@@ -8,7 +8,7 @@
 		  },
           "mode": {
             "type": "string",
-            "enum": ["local", "ia", "online", "pongbr","pongio"]
+            "enum": ["local", "ai", "online", "pongbr","pongio"]
           },
           "maxPlayers": { 
 			  "type": "integer"
