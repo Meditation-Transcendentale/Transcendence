@@ -59,21 +59,17 @@ export class AiManager {
                 if (!state?.balls?.length) continue;
                 if (!state?.paddles || state.paddles.length < 2) continue;
 
-                console.log("no proto error");
                 const now = performance.now();
-                console.log(`now=${now} - lastRun=${match.lastRun}`);
                 if (now - match.lastRun >= 1000) {
+                    console.log(`ALGO RUN`);
                     const node = this.stateToNode(state);
-                    console.log("1");
                     const result = topLevelSearch(node);
-                    console.log("2");
                     match.targetOffset = result?.aiPaddlePos;
                     match.lastRun = now;
                     console.log(`targetOffset=${match.targetOffset}`);
                 }
 
                 if (match.targetOffset == null) continue;
-                console.log("targetOffset is not null")
                 const myPaddle = state.paddles[1];
                 const actualMove = myPaddle.move;
                 const pos = myPaddle.offset;
@@ -92,7 +88,7 @@ export class AiManager {
                     }
                 }
                 else{
-                    console.log("no need to move");
+                    // console.log("no need to move");
                 }
             }
         })().catch(() => { });

@@ -1,56 +1,75 @@
-import {
-    h_alignment,
-    h_return_quality,
-    h_opponent_difficulty,
-    h_centering,
-    h_corner_target
-} from './heuristics.js'
+import { MAP_HEIGHT, PADDLE_HEIGHT, WALL_SIZE } from './constants.js';
 
-export function evaluateNode(gameStateNode) {
-  const targetY = gameStateNode.ballState.ballPos[1];
-  const velY = gameStateNode.ballState.ballVel[1];
-  const myPaddleY = gameStateNode.aiPaddlePos;
-  const opponentPaddleY = gameStateNode.playerPaddlePos;
-  
-  const base_score = (
-    h_alignment(myPaddleY, targetY) * 2.0 +
-    h_return_quality(velY) * 1.5 +
-    h_opponent_difficulty(targetY, opponentPaddleY) * 1.8 +
-    h_centering(myPaddleY) * 0.8 +
-    h_corner_target(targetY) * 1.2
-  );
-  
-  const uncertainty = calculate_uncertainty(gameStateNode);
-  
-  return {
-    alpha: base_score + uncertainty,
-    beta: base_score - uncertainty,  
-  };
-}
+function nz(x, eps = 1e-9) { return Math.abs(x) < eps ? (x < 0 ? -eps : eps) : x; }
 
-function calculate_uncertainty(gameStateNode) {
-  let uncertainty = 5;
-  
-  const targetY = gameStateNode.ballState.ballPos[1];
-  const velY = gameStateNode.ballState.ballVel[1];
-  const myPaddleY = gameStateNode.aiPaddlePos;
-  const opponentPaddleY = gameStateNode.playerPaddlePos;
-  
-  uncertainty += Math.abs(targetY - myPaddleY) * 0.1;
-  
-  uncertainty += Math.abs(velY) * 0.5;
-  
-  if (Math.abs(targetY - opponentPaddleY) > 20) {
-    uncertainty *= 0.7;
-  }
-  
-  const ballSpeed = Math.sqrt(
-    gameStateNode.ballState.ballVel[0] ** 2 + 
-    gameStateNode.ballState.ballVel[1] ** 2
-  );
-  if (ballSpeed > 15) {
-    uncertainty *= 1.3;
-  }
-  
-  return uncertainty;
+/**
+ * Scale-invariant, smooth evaluation.
+ * - All features are normalized by vertical span.
+ * - Magnitudes compressed by tanh/log1p (no hard caps).
+ * - Uncertainty uses local sensitivity (derivatives), shrinks near good alignment.
+ * - Ensures beta <= alpha with finite values.
+ */
+export function evaluateNode(node) {
+  const ballY = node.ballState.ballPos[1];
+  const vx    = node.ballState.ballVel[0];
+  const vy    = node.ballState.ballVel[1];
+  const aiY   = node.aiPaddlePos;
+  const plY   = node.playerPaddlePos;
+
+  // Natural vertical scale
+  const VSPAN = Math.max(1e-6, MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE);
+
+  // Normalized offsets
+  const d_ai  = (ballY - aiY) / VSPAN;         // how far the AI is from the ball line
+  const d_pl  = (ballY - plY) / VSPAN;         // how far the player is from the ball line
+  const ang   = vy / nz(vx);                   // slope-like; sign preserved
+
+  // Smooth, bounded feature transforms
+  // Alignment (best when |d_ai| -> 0): in [-1, 0], approaches 0 as alignment improves
+  const f_align = -Math.tanh(Math.abs(d_ai));
+
+  // Opponent difficulty (easier when |d_pl| large): in [0, 1]
+  const f_opp = Math.tanh(Math.abs(d_pl));
+
+  // Angle control (prefer moderate |ang|): high |ang| penalized, in [-1, 0]
+  const f_angle = -Math.tanh(Math.abs(ang));
+
+  // Speed awareness (scale-free): grows slowly with total speed
+  const speed = Math.hypot(vx, vy);
+  const f_speed = Math.log1p(speed); // unbounded but slow-growing
+
+  // Centering preference (keeps paddle agile): in [-1, 0]
+  const f_center = -Math.tanh(Math.abs(aiY / VSPAN));
+
+  // Weighted sum (weights moderate; overall score is naturally bounded by construction except f_speed)
+  // Keep f_speed as a mild additive bias so faster rallies don’t dominate numerically.
+  const base =
+      50 * f_align   +   // dominate by alignment
+      35 * f_opp     +
+      30 * f_angle   +
+      15 * f_center  +
+       8 * f_speed;
+
+  // Local sensitivity → uncertainty.
+  // Derivative of tanh(x) is sech^2(x) = 1 - tanh^2(x). Use it around the decision-relevant terms.
+  const sens_align = 1 - Math.tanh(Math.abs(d_ai))**2;             // high when misaligned ~0
+  const sens_angle = 1 - Math.tanh(Math.abs(ang))**2;               // high when angle moderate
+  const sens_speed = 1 / (1 + speed);                               // decays with speed
+  // Combine into a strictly-positive width. No hard caps; all terms are bounded by design.
+  const width =
+      4
+    + 22 * sens_align
+    + 12 * sens_angle
+    +  6 * sens_speed;
+
+  // Interval with invariant beta <= alpha
+  let alpha = base + width;
+  let beta  = base - width;
+
+  // Finite safety (no clipping): replace non-finite with zeros, then re-enforce ordering
+  if (!Number.isFinite(alpha)) alpha = 0;
+  if (!Number.isFinite(beta))  beta  = 0;
+  if (beta > alpha) { const m = (alpha + beta) / 2; alpha = m; beta = m; }
+
+  return { alpha, beta };
 }
