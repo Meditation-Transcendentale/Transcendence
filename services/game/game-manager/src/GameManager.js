@@ -113,6 +113,7 @@ export class GameManager {
 		const match = this.games.get(gameId);
 		if (!match || match.status !== 'running') return;
 
+		console.log(`${request.paddleId}|${request.move}`);
 		// queue inputs for next tick
 		this.handleInput({
 			gameId,

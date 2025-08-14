@@ -1,7 +1,8 @@
 import natsClient from './natsClient.js';
 import {
     decodeStateUpdate,
-    decodeMatchCreateRequest
+    decodeMatchCreateRequest,
+    encodeMatchInput
 } from './proto/helper.js';
 import { predictBallState } from './physics.js';
 import { topLevelSearch } from './bstar.js';
@@ -64,9 +65,9 @@ export class AiManager {
                     console.log(`ALGO RUN`);
                     const node = this.stateToNode(state);
                     const result = topLevelSearch(node);
-                    match.targetOffset = result?.aiPaddlePos;
+                    match.targetOffset = node.ballState.ballVel[0] >= 0 ? result?.aiPaddlePos : result?.futureBallState.ballPos[1];
                     match.lastRun = now;
-                    console.log(`targetOffset=${match.targetOffset}`);
+                    console.log(`${node.ballState.ballVel[0] >= 0 }|targetOffset=${match.targetOffset}`);
                 }
 
                 if (match.targetOffset == null) continue;
@@ -81,8 +82,8 @@ export class AiManager {
                 else if (diff < -0.1) desiredMove = -1;
                 if (desiredMove !== actualMove) {
                     try {
-                        console.log ("need to move");
-                        this.nc.publish(`games.ai.${gameId}.match.input`, encodeMatchInput({ paddleId: 1, move: desiredMove }));
+                        console.log (`MOVE:${desiredMove}|${match.targetOffset}|games.ai.${gameId}.match.input`);
+                        this.nc.publish(`games.ai.${gameId.toString()}.match.input`, encodeMatchInput({ paddleId: 1, move: desiredMove }));
                     } catch {
                         continue;
                     }
@@ -103,12 +104,15 @@ export class AiManager {
         })().catch(() => { });
     }
 
+    
     async stop() {
         try { await this.subCreate?.drain(); } catch { }
         try { await this.subState?.drain(); } catch { }
         try { await this.subEnd?.drain(); } catch { }
         try { await this.nc?.drain(); } catch { }
     }
+    
+    async 
 
     stateToNode(state) {
         const b = state.balls[0];

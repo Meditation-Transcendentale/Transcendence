@@ -41,6 +41,7 @@ export function encodeMatchInput(payload) {
 		.encode(Proto.shared.MatchInput.create(payload))
 		.finish();
 }
+
 export function decodeMatchInput(buffer) {
 	return Proto.shared.MatchInput.decode(buffer);
 }
