@@ -62,12 +62,10 @@ export class AiManager {
 
                 const now = performance.now();
                 if (now - match.lastRun >= 1000) {
-                    console.log(`ALGO RUN`);
                     const node = this.stateToNode(state);
                     const result = topLevelSearch(node);
                     match.targetOffset = node.ballState.ballVel[0] >= 0 ? result?.aiPaddlePos : result?.futureBallState.ballPos[1];
                     match.lastRun = now;
-                    console.log(`${node.ballState.ballVel[0] >= 0 }|targetOffset=${match.targetOffset}`);
                 }
 
                 if (match.targetOffset == null) continue;
@@ -82,14 +80,10 @@ export class AiManager {
                 else if (diff < -0.1) desiredMove = -1;
                 if (desiredMove !== actualMove) {
                     try {
-                        console.log (`MOVE:${desiredMove}|${match.targetOffset}|games.ai.${gameId}.match.input`);
                         this.nc.publish(`games.ai.${gameId.toString()}.match.input`, encodeMatchInput({ paddleId: 1, move: desiredMove }));
                     } catch {
                         continue;
                     }
-                }
-                else{
-                    // console.log("no need to move");
                 }
             }
         })().catch(() => { });
@@ -97,7 +91,6 @@ export class AiManager {
         const subEndGame = this.nc.subscribe(`games.ai.*.match.end`);
         (async () => {
             for await (const msg of subEndGame) {
-                console.log(`NATS: END`);
                 const [, , gameId] = msg.subject.split('.');
                 this.games.delete(gameId);
             }

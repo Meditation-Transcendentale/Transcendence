@@ -9,7 +9,7 @@ export function evaluateNode(node) {
   const aiY   = node.aiPaddlePos;
   const plY   = node.playerPaddlePos;
 
-  const VSPAN = Math.max(1e-6, MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE);
+  const VSPAN = MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE;
 
   const d_ai  = (ballY - aiY) / VSPAN;
   const d_pl  = (ballY - plY) / VSPAN;
