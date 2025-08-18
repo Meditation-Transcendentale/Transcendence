@@ -94,14 +94,18 @@ export class Pong {
 		}
 		console.log("UU", uuid)
 		const wsUrl = `wss://${window.location.hostname}:7000/game?` +
-		`uuid=${encodeURIComponent(uuid)}&` +
-		`gameId=${encodeURIComponent(gameId)}`;
+			`uuid=${encodeURIComponent(uuid)}&` +
+			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
-		
+
 		localPaddleId = await this.waitForRegistration();
 
 		if (!this.inited) {
 			await this.init();
+		}
+		if (this.uiSystem) {
+			this.uiSystem.resetUI();
+			//this.uiSystem.enableUI();
 		}
 
 		// 4) Plug networking into ECS
@@ -131,10 +135,8 @@ export class Pong {
 
 	}
 	public stop(): void {
-		if (this.scoreUI?.dispose) {
-			this.scoreUI.dispose();
-		} else if (this.scoreUI?.parentNode) {
-			this.scoreUI.parentNode.removeChild(this.scoreUI);
+		if (this.uiSystem) {
+			this.uiSystem.disableUI();
 		}
 
 

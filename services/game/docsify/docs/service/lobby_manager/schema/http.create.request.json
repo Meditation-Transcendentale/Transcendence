@@ -2,7 +2,7 @@
 {
     "mode": {
       "type": "string",
-      "enum": ["local", "ia", "online", "pongio", "pongbr", ],
+      "enum": ["local", "ai", "online", "pongio", "pongbr", ],
       "description": "Which game mode to play."
     },
     "map": {

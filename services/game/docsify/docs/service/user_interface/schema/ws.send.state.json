@@ -1,7 +1,7 @@
 // ws.send.state.json
 // ws.send.state.json
 // game.${mode}.${gameId}.match.state
-// mode : "ia", "local", "online", "pongbr", "pongio"
+// mode : "ai", "local", "online", "pongbr", "pongio"
 // pong
 {
     "gameId": {

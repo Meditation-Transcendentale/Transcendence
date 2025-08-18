@@ -34,6 +34,14 @@ export function decodeMatchQuit(buffer) {
 /**
  * MatchInput
  */
+export function encodeMatchInput(payload) {
+	const err = Proto.shared.MatchInput.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.shared.MatchInput
+		.encode(Proto.shared.MatchInput.create(payload))
+		.finish();
+}
+
 export function decodeMatchInput(buffer) {
 	return Proto.shared.MatchInput.decode(buffer);
 }

@@ -101,6 +101,7 @@ export default class LobbyService {
 
 	async ready(lobbyId, userId) {
 		console.log("HERE");
+		console.log("hoho");
 		const lobby = this.lobbies.get(lobbyId)
 		if (!lobby) throw new Error('Lobby not found')
 
@@ -111,7 +112,7 @@ export default class LobbyService {
 			const reqBuf = encodeMatchCreateRequest({
 				players: [...lobby.players.keys()],
 			})
-
+			console.log("all ready");
 			try {
 				const replyBuf = await natsClient.request(
 					`games.${lobby.mode}.match.create`,

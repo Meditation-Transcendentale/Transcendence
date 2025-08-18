@@ -1,6 +1,6 @@
 // nats.request.matchcreate.json
 // game.${mode}.match.create
-// mode : "ia", "local", "online", "pongbr", "pongio"
+// mode : "ai", "local", "online", "pongbr", "pongio"
 {
 	"players": {
 		"type": "array",
