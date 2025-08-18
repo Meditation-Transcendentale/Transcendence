@@ -11,6 +11,13 @@ export class UISystem extends System {
 	public endUI: any;
 	private gameEnded: boolean = false;
 	private pong: Pong;
+	private endUITexture: AdvancedDynamicTexture | null = null;
+	private scoreUITexture: AdvancedDynamicTexture | null = null;
+
+	private scoreTextBlock: TextBlock | null = null;
+	private endUIPanel: Rectangle | null = null;
+	private endUITitle: TextBlock | null = null;
+	private endUIButton: Button | null = null;
 
 	constructor(pong: Pong) {
 		super();
@@ -21,7 +28,6 @@ export class UISystem extends System {
 
 	update(entities: Entity[], deltaTime: number): void {
 		const now = performance.now();
-		// console.log("ui: ", now);
 		entities.forEach((entity: Entity) => {
 			if (entity.hasComponent(UIComponent)) {
 				const ui = entity.getComponent(UIComponent);
@@ -32,9 +38,7 @@ export class UISystem extends System {
 				}
 				if ((ui?.score.x == 5 || ui?.score.y == 5) && !this.gameEnded) {
 					this.gameEnded = true;
-					this.scoreUI.dispose();
 					setTimeout(() => {
-						// console.log("x: ", ui.score.x, " y: ", ui.score.y);
 						this.endUI = this.gameEndUI(ui.score.x > ui.score.y, ui.gameMode);
 					}, 100);
 				}
@@ -43,79 +47,178 @@ export class UISystem extends System {
 	}
 
 	gameScoreUI() {
-		const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("ScoreUI");
+		if (!this.scoreUITexture) {
+			this.scoreUITexture = AdvancedDynamicTexture.CreateFullscreenUI("ScoreUI");
 
-		const score = new TextBlock("score");
-		score.text = `${this.scoreValue.x} : ${this.scoreValue.y}`;
-		score.color = "#ffffff";
-		score.fontSize = 75;
-		score.fontFamily = "monospace";
-		score.outlineWidth = 0;
-		score.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-		score.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-		score.top = "90px";
+			this.scoreTextBlock = new TextBlock("score");
+			this.scoreTextBlock.text = `${this.scoreValue.x} : ${this.scoreValue.y}`;
+			this.scoreTextBlock.color = "#ffffff";
+			this.scoreTextBlock.fontSize = 75;
+			this.scoreTextBlock.fontFamily = "monospace";
+			this.scoreTextBlock.outlineWidth = 0;
+			this.scoreTextBlock.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+			this.scoreTextBlock.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+			this.scoreTextBlock.top = "90px";
 
-		advancedTexture.addControl(score);
+			this.scoreUITexture.addControl(this.scoreTextBlock);
+		}
 
 		return {
 			update: () => {
-				score.text = `${this.scoreValue.x} : ${this.scoreValue.y}`;
+				if (this.scoreTextBlock) {
+					this.scoreTextBlock.text = `${this.scoreValue.x} : ${this.scoreValue.y}`;
+				}
 			},
 			dispose: () => {
-				advancedTexture.dispose();
+				if (this.scoreUITexture) {
+					this.scoreUITexture.dispose();
+					this.scoreUITexture = null;
+					this.scoreTextBlock = null;
+				}
 			}
 		}
 	}
 
 	gameEndUI(playerWin: boolean, gameMode: string) {
-		const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("EndUI");
+		if (!this.endUITexture) {
+			this.endUITexture = AdvancedDynamicTexture.CreateFullscreenUI("EndUI");
 
-		const panel = new Rectangle();
-		panel.width = "100%";
-		panel.height = "10%";
-		panel.cornerRadius = 4;
-		panel.thickness = 0;
-		panel.background = "#7f7f7f33";
-		panel.isPointerBlocker = false;
-		panel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-		panel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-		advancedTexture.addControl(panel);
+			this.endUIPanel = new Rectangle();
+			this.endUIPanel.width = "100%";
+			this.endUIPanel.height = "10%";
+			this.endUIPanel.cornerRadius = 4;
+			this.endUIPanel.thickness = 0;
+			this.endUIPanel.background = "#7f7f7f33";
+			this.endUIPanel.isPointerBlocker = false;
+			this.endUIPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+			this.endUIPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+			this.endUITexture.addControl(this.endUIPanel);
 
-		console.log(playerWin);
+			this.endUITitle = new TextBlock();
+			this.endUITitle.fontSize = 50;
+			this.endUITitle.fontFamily = "Segoe UI";
+			this.endUITitle.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+			this.endUITitle.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+			this.endUIPanel.addControl(this.endUITitle);
 
-		const title = new TextBlock();
-		if (gameMode === "local")
-			title.text = playerWin ? "PLayer 1 Won!" : "Player 2 Won!";
-		else
-			title.text = playerWin ? "You Won!" : "You Lost!";
-		title.color = playerWin ? "#7CFC00" : "#FF4C4C";
-		title.fontSize = 50;
-		title.fontFamily = "Segoe UI";
-		title.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-		title.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-		panel.addControl(title);
+			this.endUIButton = Button.CreateSimpleButton("quit", "Exit");
+			this.endUIButton.width = "150px";
+			this.endUIButton.height = "40px";
+			this.endUIButton.color = "white";
+			this.endUIButton.background = "red";
+			this.endUIButton.cornerRadius = 10;
+			this.endUIButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+			this.endUIButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+			this.endUIButton.top = "-20px";
 
-		const quitButton = Button.CreateSimpleButton("quit", "Exit");
-		quitButton.width = "150px";
-		quitButton.height = "40px";
-		quitButton.color = "white";
-		quitButton.background = "red";
-		quitButton.cornerRadius = 10;
-		quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-		quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-		quitButton.top = "-20px";
+			this.endUIButton.onPointerUpObservable.add(() => {
+				this.pong.stop();
+			});
+			this.endUITexture.addControl(this.endUIButton);
+		}
 
-		quitButton.onPointerUpObservable.add(() => {
-			advancedTexture.dispose();
-			this.endUI.dispose();
-			this.pong.dispose();
-		});
-		advancedTexture.addControl(quitButton);
+		if (this.endUITitle) {
+			if (gameMode === "local") {
+				this.endUITitle.text = playerWin ? "Player 1 Won!" : "Player 2 Won!";
+			} else {
+				this.endUITitle.text = playerWin ? "You Won!" : "You Lost!";
+			}
+			this.endUITitle.color = playerWin ? "#7CFC00" : "#FF4C4C";
+		}
+
+		this.showEndUI();
 
 		return {
 			dispose: () => {
-				advancedTexture.dispose();
+				this.hideEndUI();
 			}
 		};
 	}
+
+	public enableUI() {
+		if (this.scoreUITexture) {
+			try {
+				if (this.scoreUITexture.layer && 'isEnabled' in this.scoreUITexture.layer) {
+					this.scoreUITexture.layer.isEnabled = true;
+				} else {
+					if (this.scoreTextBlock) {
+						this.scoreTextBlock.isVisible = true;
+					}
+				}
+			} catch (e) {
+				if (this.scoreTextBlock) {
+					this.scoreTextBlock.isVisible = true;
+				}
+			}
+		}
+	}
+
+	public disableUI() {
+		if (this.scoreUITexture) {
+			try {
+				if (this.scoreUITexture.layer && 'isEnabled' in this.scoreUITexture.layer) {
+					this.scoreUITexture.layer.isEnabled = false;
+				} else {
+					if (this.scoreTextBlock) {
+						this.scoreTextBlock.isVisible = false;
+					}
+				}
+			} catch (e) {
+				if (this.scoreTextBlock) {
+					this.scoreTextBlock.isVisible = false;
+				}
+			}
+		}
+
+		this.hideEndUI();
+	}
+
+	public showEndUI() {
+		if (this.endUITexture) {
+			try {
+				if (this.endUITexture.layer && 'isEnabled' in this.endUITexture.layer) {
+					this.endUITexture.layer.isEnabled = true;
+				} else {
+					// Use individual control visibility
+					if (this.endUIPanel) this.endUIPanel.isVisible = true;
+					if (this.endUITitle) this.endUITitle.isVisible = true;
+					if (this.endUIButton) this.endUIButton.isVisible = true;
+				}
+			} catch (e) {
+				// Fallback to individual control visibility
+				if (this.endUIPanel) this.endUIPanel.isVisible = true;
+				if (this.endUITitle) this.endUITitle.isVisible = true;
+				if (this.endUIButton) this.endUIButton.isVisible = true;
+			}
+		}
+	}
+
+	public hideEndUI() {
+		if (this.endUITexture) {
+			try {
+				if (this.endUITexture.layer && 'isEnabled' in this.endUITexture.layer) {
+					this.endUITexture.layer.isEnabled = false;
+				} else {
+					if (this.endUIPanel) this.endUIPanel.isVisible = false;
+					if (this.endUITitle) this.endUITitle.isVisible = false;
+					if (this.endUIButton) this.endUIButton.isVisible = false;
+				}
+			} catch (e) {
+				if (this.endUIPanel) this.endUIPanel.isVisible = false;
+				if (this.endUITitle) this.endUITitle.isVisible = false;
+				if (this.endUIButton) this.endUIButton.isVisible = false;
+			}
+		}
+	}
+
+	public resetUI() {
+		this.gameEnded = false;
+		this.scoreValue.set(0, 0);
+
+		this.scoreUI.update();
+
+		this.hideEndUI();
+		this.enableUI();
+	}
+
 }
