@@ -50,7 +50,7 @@ for svc in "${SERVICES[@]}"; do
       OUT_DIR="../../frontend/src/pong/utils/proto"
       ;;
     notifications)
-      OUT_DIR="../../service/notifications/notfications-manager/src/proto"
+      OUT_DIR="../../services/notifications/notifications-manager/src/proto"
       ;;
     frontend-pongbr)
       OUT_DIR="../../frontend/src/pongbr/utils/proto"
