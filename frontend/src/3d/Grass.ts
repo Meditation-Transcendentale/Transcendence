@@ -20,7 +20,7 @@ const optionsA: _thinInstancesOptions = {
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 1,
-	scale: new Vector3(0.8, .8, 0.8)
+	scale: new Vector3(0.8, 0.8, 0.8)
 };
 
 const optionsB: _thinInstancesOptions = {
@@ -89,6 +89,8 @@ export class Grass {
 
 	private noiseTexture!: ProceduralTexture;
 
+	private globalGrassScale: Vector3;
+
 	private meshA!: Mesh;
 	private meshB!: Mesh;
 	private meshC!: Mesh;
@@ -109,10 +111,13 @@ export class Grass {
 		this.scene = scene;
 		this.cursor = cursor;
 
+		this.globalGrassScale = new Vector3(1, 1.5, 1);
+
 	}
 
 	public async init() {
 		await this.loadAssests(this.scene);
+
 
 		this.noiseTexture = new ProceduralTexture("noise", 1024, "WindHeight", this.scene);
 		this.noiseTexture.refreshRate = 0;
@@ -303,15 +308,17 @@ export class Grass {
 			const posX = ((i % NUM_X) + 0.5) * CLUSTER_X - width * 0.5 + offsetX;
 			const posZ = (Math.floor(i / NUM_X) + 0.5) * CLUSTER_Z - depth * 0.5 + offsetZ;
 
-			const size = Math.random() * (1 - options.size) + options.size;
+			//const size = Math.random() * (1 - options.size) + options.size;
+			const minSize = 0.8;
+			const size = Math.random() * (1 - minSize) + minSize;
 			// const rotation = Math.random() * Math.PI * 0.5 - Math.PI * 0.25;
 			const rotation = Math.random() * Math.PI * 2.;
 
 			const matR = Matrix.RotationY(0);
 			const matS = Matrix.Scaling(
-				size * options.scale.x,
-				options.scale.y,
-				size * options.scale.z
+				size * options.scale.x * this.globalGrassScale.x,
+				size * options.scale.y * this.globalGrassScale.y,
+				size * options.scale.z * this.globalGrassScale.z
 			);
 			const matT = Matrix.Translation(
 				posX,
@@ -338,63 +345,6 @@ export class Grass {
 		mesh.thinInstanceSetBuffer('matrix', bufferMatrix, 16, true);
 		mesh.thinInstanceSetBuffer('baseColor', bufferColor, 4, true);
 	}
-
-	private setThinInstances2(mesh: Mesh, width: number, depth: number, options: _thinInstancesOptions) {
-		const NUM_X = options.density * width;
-		const NUM_Z = options.density * depth;
-		const CLUSTER_X = width / NUM_X;
-		const CLUSTER_Z = depth / NUM_Z;
-
-
-		const bufferMatrix = new Float32Array(16 * NUM_X * NUM_Z);
-		const bufferColor = new Float32Array(4 * NUM_X * NUM_Z);
-
-		//const c = Color3.Random();
-		console.log(NUM_X, NUM_Z, CLUSTER_Z, CLUSTER_X);
-
-		for (let i = 0; i < NUM_X * NUM_Z; i++) {
-			const offsetX = (Math.random() - 0.5) * CLUSTER_X;
-			const offsetZ = (Math.random() - 0.5) * CLUSTER_Z;
-
-			const posX = ((i % NUM_X) + 0.5) * CLUSTER_X - width * 0.5 + offsetX;
-			const posZ = (Math.floor(i / NUM_X) + 0.5) * CLUSTER_Z - depth * 0.5 + offsetZ;
-
-			const size = Math.random() * (1 - options.size) + options.size;
-			// const rotation = Math.random() * Math.PI * 0.5 - Math.PI * 0.25;
-			const rotation = Math.random() * Math.PI * 2.;
-
-			const matR = Matrix.RotationY(0);
-			const matS = Matrix.Scaling(
-				size * options.scale.x,
-				size * options.scale.y,
-				size * options.scale.z
-			);
-			const matT = Matrix.Translation(
-				posX,
-				0,
-				posZ
-			);
-
-			const matrix = matR.multiply(matS.multiply(matT));
-
-			const stiffness = Math.random() * (1 - options.stiffness) + options.stiffness;
-			const color = Color4.FromColor3(Color3.Lerp(
-				this.COLOR_A,
-				this.COLOR_B,
-				Math.random()
-			), stiffness);
-			color.r = rotation;
-			//const color = Color4.FromColor3(this.COLOR_A, stiffness);
-
-
-			matrix.copyToArray(bufferMatrix, i * 16);
-			color.toArray(bufferColor, i * 4);
-		}
-
-		mesh.thinInstanceSetBuffer('matrix', bufferMatrix, 16, true);
-		mesh.thinInstanceSetBuffer('baseColor', bufferColor, 4, true);
-	}
-
 
 	public dispose() {
 		this._tiles.forEach((tile) => {

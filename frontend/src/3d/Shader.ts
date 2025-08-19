@@ -536,15 +536,16 @@ Effect.ShadersStore['combineFragmentShader'] = `
 		n = ivec2(mod(floor(vUV * resolution * f), 4.));
 		weight = M4[n.x][n.y]- 0.65;
 		//grass.rgb = floor(grass.rgb * 7. + 0.5) * (1. / 7.);
+		grass.rgb -= 0.1;
 		grass.rgb = grass.rgb + 0.4 * weight;
-		//grass.rgb += 0.2;
-		grass.rgb = (grass.rgb - 0.5) * 1.4 + 0.5;
+		grass.rgb = (grass.rgb - 0.5) * 2. + 0.5;
 
 		
 		float a = clamp(2. * (grass.a - color.a), 0., 1.);
 		color = mix(grass, color, 1. - a);
 
-		gl_FragColor = mix(cloud, color, min(color.a * 2., 1.));
+		//gl_FragColor = mix(cloud, color, min(color.a * 2., 1.));
+		gl_FragColor = color;
 	}
 `
 
@@ -1072,7 +1073,8 @@ export class GrassShader extends CustomMaterial {
 		this.backFaceCulling = false;
 		// this.twoSidedLighting = true;
 		this.diffuseColor = Color3.FromHexString("#4b8024");
-		this.diffuseColor = new Color3(0.6, 1., 0.28);
+		//this.diffuseColor = new Color3(0.6, 1., 0.28);
+		this.diffuseColor = new Color3(1., 1., 1.);
 
 		// this.emissiveColor = new Color3(0.3, 0.3, 0.3);
 
