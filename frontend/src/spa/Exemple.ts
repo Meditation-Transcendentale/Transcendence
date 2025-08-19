@@ -1,7 +1,7 @@
 //faut utiliser "../babyImport.ts" plutot que  "@babylonImport" parce que nikBabylon  et nikEsbuild
 import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
-import { NotifiactionManager } from "./NotifiactionManager";
+import { NotificationManager } from "./NotificationManager";
 import { Popup } from "./Popup";
 
 interface exempleHtmlReference {
@@ -59,7 +59,7 @@ export default class Exemple {
 			n.addEventListener("click", () => { //ducoup on gere ces eventListener
 				Popup.addPopup(this.ref.popupDiv); //ici la div permet de rajouter un popup en faisant appel l'objet accessible partout Popup, il suffit de call Popup.addPopup avec le html qu'on veut utliser comme popup
 			})
-			NotifiactionManager.addDiv(n); //Pour rajouter un notif on fait appel a l'object accessible partout NotificationManager on utilisant la methode addDiv vue qu'on veut rajouter une div t'as capté
+			NotificationManager.addDiv(n); //Pour rajouter un notif on fait appel a l'object accessible partout NotificationManager on utilisant la methode addDiv vue qu'on veut rajouter une div t'as capté
 		})
 
 		//this.ref.notif.addEventListener("click", () => {
@@ -67,7 +67,7 @@ export default class Exemple {
 		//})
 
 		this.ref.popup.addEventListener("click", () => {
-			NotifiactionManager.addText("ouai, ca va?"); //la version des notif qui sont juste du text, voila plutot explicite
+			NotificationManager.addText("ouai, ca va?"); //la version des notif qui sont juste du text, voila plutot explicite
 			this.state = !this.state;
 			//Popup.removePopup(); //Si jamais on veut supprimer le popup sans passer par la methode par defaut qui est de juste cliquer sur le blur, on peut call removePopup
 			App3D.setVue((this.state ? "exemple1" : "exemple2")); //expliquer dans load

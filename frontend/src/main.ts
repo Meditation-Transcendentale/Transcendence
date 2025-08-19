@@ -1,5 +1,5 @@
 import { App3D } from "./3d/App";
-import { NotifiactionManager } from "./spa/NotifiactionManager";
+import { NotificationManager } from "./spa/NotificationManager";
 import { Popup } from "./spa/Popup";
 import Router from "./spa/Router";
 
@@ -33,7 +33,7 @@ async function init() {
 		App3D.dispose();
 	}
 
-	NotifiactionManager.setEnable(true);
+	NotificationManager.setEnable(true);
 
 	window.addEventListener('keydown', (e) => {
 		if (e.key == 'Escape') {
@@ -41,7 +41,7 @@ async function init() {
 			Popup.removePopup();
 		}
 		if (e.key == "p") {
-			NotifiactionManager.addText(`${performance.now()}`)
+			NotificationManager.addText(`${performance.now()}`)
 		}
 	})
 }

@@ -1,3 +1,11 @@
+import Router from "./Router";
+import { Matrix } from "../babyImport";
+import { App3D } from "../3d/App";
+import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
+// import { lobbyVue } from "../Vue";
+import { User } from "./User";
+import { getRequest } from "./requests";
+
 class NotificationManagerC {
 	private container: HTMLDivElement;
 	private defaultDiv: HTMLDivElement;
@@ -6,6 +14,8 @@ class NotificationManagerC {
 
 	private canceled!: Array<HTMLElement>;
 	private state = false;
+
+	private ws: WebSocket | null;
 
 	private hover = false;
 
@@ -17,6 +27,11 @@ class NotificationManagerC {
 		this.defaultDiv.className = "notification";
 
 		this.canceled = new Array<HTMLElement>;
+
+		this.ws = null;
+
+		this.setupWs();
+
 		this.container.addEventListener("mouseenter", () => {
 			for (let i = 0; i < this.canceled.length; i++) {
 				this.canceled[i]?.remove();
@@ -76,6 +91,49 @@ class NotificationManagerC {
 		}, this.defaultDuration)
 	}
 
+	private setupWs() {
+		if (Router.AUTHENTIFICATION) {
+			const url = `wss://${window.location.hostname}:7000/notification?uuid=${encodeURIComponent(User.uuid as string)}`;
+
+			this.ws = new WebSocket(url);
+
+			this.ws.onopen = () => {
+			console.log('Connected to notifications server')
+			}
+
+			this.ws.onmessage = (event) => {
+				const message = JSON.parse(event.data)
+				console.log('Received message:', message)
+
+				switch (message.type) {
+					case 'notification.friendRequest':
+						const n = 
+						console.log('Friend request:', message.data)
+						break
+					case 'notification.friendAccept':
+						console.log('Friend accepted:', message.data)
+						break
+					case 'notification.gameInvite':
+						console.log('Game invite:', message.data)
+						break
+					case 'notification.status':
+						console.log('Status update:', message.data)
+						break
+					default:
+						console.warn('Unknown message type:', message.type)
+				}
+			}
+
+			this.ws.onerror = (err) => {
+				console.error('WebSocket error:', err)
+			}
+
+			this.ws.onclose = () => {
+				console.log('WebSocket connection closed')
+			}
+		}
+	}
+
 }
 
-export const NotifiactionManager = new NotificationManagerC();
+export const NotificationManager = new NotificationManagerC();

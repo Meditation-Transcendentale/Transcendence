@@ -6,8 +6,10 @@ interface athHtmlReference {
 	menu: HTMLDivElement,
 	setting: HTMLInputElement,
 	quit: HTMLInputElement,
+	notifDiv: HTMLDivElement,
+	popup: HTMLInputElement,
+	notif: HTMLInputElement
 }
-
 
 
 class Ath {
@@ -17,6 +19,7 @@ class Ath {
 
 	private quit: AthQuit;
 	private setting: AthSetting;
+	private notifs: AthNotifications;
 
 	private loaded = false;
 
@@ -26,6 +29,9 @@ class Ath {
 			menu: div.querySelector("#menu") as HTMLDivElement,
 			setting: div.querySelector("#setting-btn") as HTMLInputElement,
 			quit: div.querySelector("#quit-btn") as HTMLInputElement,
+			notifDiv: div.querySelector("#notif") as HTMLDivElement,
+			popup: div.querySelector("#popup-input") as HTMLInputElement,
+			notif: div.querySelector("#notif-input") as HTMLInputElement,
 		}
 		this.css = div.querySelector("link") as HTMLElement;
 
@@ -82,6 +88,26 @@ class Ath {
 	// 			})
 	// 	}
 	// }
+}
+
+interface notifsHtmlReference {
+	friendRequest: HTMLInputElement,
+	gameInvite: HTMLInputElement
+}
+
+class AthNotifications {
+	private div: HTMLDivElement;
+	private ref: notifsHtmlReference;
+
+	constructor (div: HTMLDivElement) {
+		this.div = div.querySelector("#notif") as HTMLDivElement;
+
+		this.ref = {
+
+		}
+
+
+	}
 }
 
 interface quitHtmlReference {
