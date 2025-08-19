@@ -1,6 +1,10 @@
 #exemple-exemple * {
 	font-size: 10vh;
 }
+#exemple-exemple  {
+	width: 89%;
+	height: 91%;
+}
 
 #exemple-popup {
 	top: 50%;

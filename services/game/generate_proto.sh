@@ -38,6 +38,7 @@ SERVICES=(
   "frontend-pong"
   "frontend-pongbr"
   "ai"
+  "notifications"
 )
 
 echo "🛠 Starting protobuf generation for all services..."
@@ -47,6 +48,9 @@ for svc in "${SERVICES[@]}"; do
   case "$svc" in
     frontend-pong)
       OUT_DIR="../../frontend/src/pong/utils/proto"
+      ;;
+    notifications)
+      OUT_DIR="../../service/notifications/notfications-manager/src/proto"
       ;;
     frontend-pongbr)
       OUT_DIR="../../frontend/src/pongbr/utils/proto"
@@ -102,6 +106,12 @@ for svc in "${SERVICES[@]}"; do
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/lobby.proto"
+      )
+      ;;
+    "notifications")
+      # lobby-manager needs shared types + lobby-specific messages
+      PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/notif.proto"
       )
       ;;
     "frontend-pong"|"frontend-pongbr")
