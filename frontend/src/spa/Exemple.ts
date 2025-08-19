@@ -47,9 +47,9 @@ export default class Exemple {
 		//et on recupre sont id pour pouvoir l'enable / disable tranquil
 		this.ref.exempleDiv.id = App3D.addCSS3dObject({
 			html: this.ref.exempleDiv.html, //le html qui seras utiliser
-			width: 1.9, //le scaling de la largeur sauf que /!\ enfait c'est inversé < 1 s'a agrandi | > 1 sa reduit
-			height: 1.9, //le meme principe que pour la largeur
-			world: Matrix.RotationY(Math.PI * 0.5).multiply(Matrix.Translation(15, 2, 8)), //les transformation a aplique au html la Translation correspond a sa position dans le monde et la rotation t'as capté
+			width: 1, //le scaling de la largeur sauf que /!\ enfait c'est inversé < 1 s'a agrandi | > 1 sa reduit
+			height: 1, //le meme principe que pour la largeur
+			world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 6, 30)),
 			enable: false //disable par defaut mais faut quand meme le préciser t'as vus
 		})
 

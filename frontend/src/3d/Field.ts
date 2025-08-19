@@ -240,13 +240,13 @@ export class Field {
 				break;
 			}
 			case 'exemple1': {
-				this.camera.position.set(20, 1, 7);
-				this.camera.setTarget(new Vector3(15, 2, 8).scale(2));
+				this.camera.position.set(0, 6, 40);
+				this.camera.setTarget(new Vector3(0, 6, 30));
 				break;
 			}
 			case 'exemple2': {
-				this.camera.position.set(17, 0.5, 8);
-				this.camera.setTarget(new Vector3(15, 2, 8));
+				this.camera.position.set(0, 6, 40);
+				this.camera.setTarget(new Vector3(0, 6, 30));
 				break;
 			}
 		}
