@@ -8,6 +8,7 @@ import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
+import { encodeNotificationMessage, encodeFriendUpdate } from "./proto/helper.js";
 
 dotenv.config({ path: "../../../../.env" });
 
@@ -127,8 +128,7 @@ app.post('/add', handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, 'user.addFriendRequest', { userId: user.id, friendId: friend.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_SENT });
-	console.log(`publishing on: notification.${friend.uuid}.friendRequest`)
-	nats.publish(`notification.${friend.uuid}.friendRequest`, jc.encode({ senderID: user.uuid }));
+	nats.publish(`notification.${friend.uuid}.friendRequest`, encodeNotificationMessage({ friendUpdate: encodeFriendUpdate({ sender: user.uuid }) }));
 }));
 
 app.post('/accept', handleErrors(async (req, res) => {
@@ -152,8 +152,7 @@ app.post('/accept', handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, 'user.acceptFriendRequest', { friendshipId: friendship.id });
 	
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_REQUEST_ACCEPTED });
-	console.log(`publishing on: notification.${friend.uuid}.friendAccept`)
-	nats.publish(`notification.${friend.uuid}.friendAccept`, jc.encode({ senderID: user.uuid}));
+	nats.publish(`notification.${friend.uuid}.friendAccept`, encodeNotificationMessage({ friendUpdate: encodeFriendUpdate({ sender: user.uuid }) }));
 }));
 
 app.delete('/decline', handleErrors(async (req, res) => {

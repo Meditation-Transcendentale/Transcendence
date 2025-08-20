@@ -3,15 +3,17 @@ import config from './config.js'
 import natsClient from './natsClient.js'
 import {
 	encodeMatchCreateRequest,
-	decodeMatchCreateResponse
+	decodeMatchCreateResponse,
+	encodeNotificationMessage,
+	encodeStatusUpdate
 } from './proto/helper.js'
 
 // Simple Lobby model
 class Lobby {
-	constructor({ id, mode, map }) {
+	constructor({ id, mode, map}) {
 		this.id = id
 		this.mode = mode
-		this.map = map
+		this.map = map;
 		console.log(mode);
 		this.maxPlayers = config.MAX_PLAYERS[mode] ?? 2
 		// userId -> { isReady, lastSeen }
@@ -27,6 +29,7 @@ class Lobby {
 		if (this.players.has(userId)) {
 			throw new Error(`Player already in lobby`)
 		}
+		natsClient.publish(`notification.${userId}.status`, encodeNotificationMessage({ statusUpdate: encodeStatusUpdate({ sender: userId, status: "in lobby", option: this.id }) }));
 		this.players.set(userId, { isReady: false })
 	}
 
@@ -74,7 +77,7 @@ export default class LobbyService {
 
 	create({ mode, map }) {
 		const id = Date.now().toString()
-		const lobby = new Lobby({ id, mode, map })
+		const lobby = new Lobby({ id, mode, map})
 		this.lobbies.set(id, lobby)
 		console.log(`Lobby ID = ${id}`)
 		return lobby.getState()
@@ -100,8 +103,6 @@ export default class LobbyService {
 	 */
 
 	async ready(lobbyId, userId) {
-		console.log("HERE");
-		console.log("hoho");
 		const lobby = this.lobbies.get(lobbyId)
 		if (!lobby) throw new Error('Lobby not found')
 

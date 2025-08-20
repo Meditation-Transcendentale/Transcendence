@@ -12,8 +12,9 @@ message GameInvite {
 }
 
 message StatusUpdate {
-  string status = 1;
-  string option = 2;
+  string sender = 1;
+  string status = 2;
+  string option = 3;
 }
 
 message NotificationMessage {
