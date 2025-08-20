@@ -63,10 +63,10 @@ export class Field {
 		this.grass = new Grass(this.scene, 20, this.cursor);
 		this.butterfly = new Butterfly(this.scene, this.cursorButterfly);
 
-		this.camera = new FreeCamera("fieldCamera", new Vector3(0, 4, 40), this.scene, true);
+		this.camera = new FreeCamera("fieldCamera", new Vector3(0, 6, 40), this.scene, true);
 		//this.camera = new ArcRotateCamera("fieldCamera", 0, 0, 10, Vector3.Zero(), this.scene);
 		//this.camera = new UniversalCamera("fieldCamera", Vector3.Zero(), this.scene);
-		this.camera.setTarget(new Vector3(0., 6, 30))
+		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
 		this.camera.attachControl();
 		this.camera.minZ = 0.01;
