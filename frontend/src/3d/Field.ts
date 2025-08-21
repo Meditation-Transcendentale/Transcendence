@@ -18,6 +18,7 @@ import { Butterfly } from "./Butterfly";
 import { Pipeline } from "./Pipeline";
 import { DitherMaterial } from "./Shader.ts";
 import { Interpolator } from "./Interpolator";
+import { Monolith } from "./Monolith";
 
 
 const playdiv = document.createElement("div");
@@ -75,7 +76,6 @@ export class Field {
 
 
 
-		//////
 		this.test = MeshBuilder.CreatePlane("test", { size: 2 }, this.scene);
 		this.test.material = new StandardMaterial("test", this.scene);
 		this.test.material.backFaceCulling = false;
@@ -116,6 +116,14 @@ export class Field {
 		this.camera.layerMask = 0x0000FFFF;
 		this.scene.customRenderTargets = [];
 		this.scene.customRenderTargets.push(this.rt);
+
+		const monolith = new Monolith(scene, 20, Vector3.Zero(), {
+			portalShape: 'pyramid',
+			materialType: 'metal',
+			voxelResolution: 100
+		});
+
+		monolith.init();
 
 		this.pipeline = new Pipeline(this.scene, this.camera, this.rt);
 
