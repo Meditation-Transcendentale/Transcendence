@@ -9,17 +9,23 @@ Effect.ShadersStore["CausticVertexShader"] = `
 	uniform mat4	world;
 	uniform mat4	view;
 	uniform mat4	projection;
+
 	uniform float	worldScale;
+	uniform vec3	lightDirection;
+	uniform float	waterY;
+
+	uniform sampler2D waterNormal;
+	uniform sampler2D textureSampler;
 
 	varying vec4	vWorldPos;
 	varying vec3	oldPos;
+	varying vec3	newPos;
 
 	void main() {
 		vec4 p = vec4(position, 1.);
-		p = world * p;
-		vWorldPos.xyz = clamp((p.xyz + worldScale * 0.5) / worldScale, 0., 1.);
+		oldPos = world * p;
+
 		p  = view * p;	
-		vWorldPos.w = clamp(-p.z / worldScale, 0., 1.);
 		
 		gl_Position = projection * p;
 	}
