@@ -1,7 +1,6 @@
 import Router from "./Router";
-import { Matrix } from "../babyImport";
-import { App3D } from "../3d/App";
-import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
+import { decodeNotificationMessage } from "./proto/helper";
+import { notif } from "./proto/message.js";
 // import { lobbyVue } from "../Vue";
 import { User } from "./User";
 import { getRequest } from "./requests";
@@ -98,30 +97,28 @@ class NotificationManagerC {
 			this.ws = new WebSocket(url);
 
 			this.ws.onopen = () => {
-			console.log('Connected to notifications server')
+				console.log('Connected to notifications server')
 			}
 
 			this.ws.onmessage = (event) => {
-				const message = JSON.parse(event.data)
-				console.log('Received message:', message)
 
-				switch (message.type) {
-					case 'notification.friendRequest':
-						const n = 
-						console.log('Friend request:', message.data)
-						break
-					case 'notification.friendAccept':
-						console.log('Friend accepted:', message.data)
-						break
-					case 'notification.gameInvite':
-						console.log('Game invite:', message.data)
-						break
-					case 'notification.status':
-						console.log('Status update:', message.data)
-						break
-					default:
-						console.warn('Unknown message type:', message.type)
-				}
+				// let newNotification: notif.NotificationMessage;
+				// try {
+				// 	newNotification = decodeNotificationMessage(event.data);
+				// } catch (err) {
+				// 	console.error ("Failed to decode NotificationMessage", err);
+				// 	return ;
+				// }
+
+				// if (newNotification.friendUpdate != null) {
+				// 	console.log (`FRIEND UPDATE: ${newNotification.friendUpdate.sender}`);
+				// }
+				// if (newNotification.gameInvite != null ) {
+				// 	console.log (`GAME INVITE: ${newNotification.gameInvite.sender}|${newNotification.gameInvite.lobbyid}`);
+				// }
+				// if (newNotification.statusUpdate != null) {
+				// 	console.log (`NEW STATUS: ${newNotification.statusUpdate.sender}|${newNotification.statusUpdate.option}`);
+				// }
 			}
 
 			this.ws.onerror = (err) => {

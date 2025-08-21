@@ -29,7 +29,7 @@ class Lobby {
 		if (this.players.has(userId)) {
 			throw new Error(`Player already in lobby`)
 		}
-		natsClient.publish(`notification.${userId}.status`, encodeNotificationMessage({ statusUpdate: encodeStatusUpdate({ sender: userId, status: "in lobby", option: this.id }) }));
+		natsClient.publish(`notification.${userId}.status`, encodeStatusUpdate({ sender: userId, status: "in lobby", option: this.id }));
 		this.players.set(userId, { isReady: false })
 	}
 

@@ -19,7 +19,7 @@ class Ath {
 
 	private quit: AthQuit;
 	private setting: AthSetting;
-	private notifs: AthNotifications;
+	// private notifs: AthNotifications;
 
 	private loaded = false;
 
@@ -95,20 +95,20 @@ interface notifsHtmlReference {
 	gameInvite: HTMLInputElement
 }
 
-class AthNotifications {
-	private div: HTMLDivElement;
-	private ref: notifsHtmlReference;
+// class AthNotifications {
+// 	private div: HTMLDivElement;
+// 	private ref: notifsHtmlReference;
 
-	constructor (div: HTMLDivElement) {
-		this.div = div.querySelector("#notif") as HTMLDivElement;
+// 	constructor (div: HTMLDivElement) {
+// 		this.div = div.querySelector("#notif") as HTMLDivElement;
 
-		this.ref = {
+// 		this.ref = {
 
-		}
+// 		}
 
 
-	}
-}
+// 	}
+// }
 
 interface quitHtmlReference {
 	quitY: HTMLInputElement,

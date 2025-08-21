@@ -8,8 +8,10 @@ import config from './config.js';
 import client from 'prom-client';
 import fs from 'fs';
 import { 
-         encodeStatusUpdate,
          encodeNotificationMessage,
+         decodeFriendUpdate,
+         decodeStatusUpdate,
+         decodeGameInvite
  } from './proto/helper.js';
 
 dotenv.config({ path: "../../../../.env"})
@@ -73,8 +75,7 @@ async function start() {
       if (!wasReconnected)
         userSockets.set(ws.uuid, ws);
 
-      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: encodeStatusUpdate({ send: ws.uuid, status: "online"}) }), nc, jc);
-
+      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: { send: ws.uuid, status: "online"}}), nc, jc);   
       console.log(
         `[${SERVICE_NAME}] ${ws.uuid} ${wasReconnected ? 'reconnected' : 'connected'}`
       )
@@ -91,7 +92,7 @@ async function start() {
     },
 
     close: (ws, code, message) => {
-      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: encodeStatusUpdate({ send: ws.uuid, status: "offline"}) }), nc, jc);
+      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: { send: ws.uuid, status: "offline"}}), nc, jc);
       userSockets.delete(ws.uuid)
       console.log(`[${SERVICE_NAME}] ${ws.uuid} disconnected`)
     }
@@ -117,9 +118,27 @@ async function start() {
           console.log(`Received [${eventType}] notification for ${uuid}`);
       
           if (!userSockets.has(uuid)) return;
-      
-          if (eventType == 'status') sendStatus(uuid, msg.data, nc, jc);
-          else userSockets.get(uuid).send(msg.data);
+
+          let data;
+          console.log(`event type: ${eventType}`);
+          switch (eventType)
+          {
+            case 'status':
+              data = decodeStatusUpdate(msg.data);
+              sendStatus(uuid, data, nc, jc);
+              break;
+            case 'friendRequest':
+            case 'friendAccept':
+              data = decodeFriendUpdate(msg.data);
+              userSockets.get(uuid).send(encodeNotificationMessage({ friendUpdate: data }));
+              break;
+            case 'gameInvite':
+              data = decodeGameInvite(msg.data);
+              userSockets.get(uuid).send(encodeNotificationMessage({ gameInvite: data }));
+              break;
+            default:
+              throw ('eventType not found');
+          };
 
         } catch (err) {
           console.error("Failed to process notification:", err);
@@ -129,7 +148,7 @@ async function start() {
   console.log('[NATS] Subscribed to notification.>');
 };
 
-async function sendStatus (senderId, sendingData, nc, jc) {
+async function sendStatus (senderId, data, nc, jc) {
   try {
     const resp = await friendlist_Request(senderId, nc, jc);
 
@@ -137,7 +156,8 @@ async function sendStatus (senderId, sendingData, nc, jc) {
       console.log(`[${SERVICE_NAME}] No friends online to notify for ${senderId}`);
       return;
     }
-
+  
+    const sendingData = encodeNotificationMessage({ statusUpdate: data });
     for (const friend of resp.message) {
       const sockets = userSockets.get(friend.friend_uuid);
       if (!sockets) continue;

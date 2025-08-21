@@ -37,7 +37,7 @@ export function startWsServer({ port, handlers }) {
 			ws.isAlive = true;
 			ws.subscribe(gameId);
 			handlers.registerGame?.(ws);
-			natsClient.publish(`notification.${ws.uuid}.status`, encodeNotificationMessage({ statusUpdate: encodeStatusUpdate({ sender: ws.uuid, status: "in game", option: gameId }) }));
+			natsClient.publish(`notification.${ws.uuid}.status`, encodeStatusUpdate({ sender: ws.uuid, status: "in game", option: gameId }));
 		},
 
 		message: (ws, raw, isBinary) => {
@@ -55,7 +55,7 @@ export function startWsServer({ port, handlers }) {
 		close: ws => {
 			ws.isAlive = false;
 			//status -> online /!\ MIGHT CONFLICT WITH NOTIF WS WHICH SET OFFLINE
-			natsClient.publish(`notification.${ws.uuid}.status`, encodeNotificationMessage({ statusUpdate: encodeStatusUpdate({ sender: ws.uuid, status: "online" }) }));
+			natsClient.publish(`notification.${ws.uuid}.status`, encodeStatusUpdate({ sender: ws.uuid, status: "online" }));
 			handlers.quit(ws);
 		}
 
