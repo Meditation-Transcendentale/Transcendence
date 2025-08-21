@@ -18,6 +18,7 @@ import { Butterfly } from "./Butterfly";
 import { Pipeline } from "./Pipeline";
 import { DitherMaterial } from "./Shader.ts";
 import { Interpolator } from "./Interpolator";
+import { Water } from "./Water";
 
 
 const playdiv = document.createElement("div");
@@ -37,6 +38,7 @@ export class Field {
 	private sun: Sun;
 	private grass: Grass;
 	private butterfly: Butterfly;
+	private water: Water;
 	private ground: Mesh;
 
 	public camera: FreeCamera;
@@ -88,15 +90,16 @@ export class Field {
 		this.test2.material.backFaceCulling = false;
 		this.test2.position.set(10, 0, -20);
 		this.test2.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
+		this.test2.layerMask = 0x01000001;
 
-		this.test22 = MeshBuilder.CreateBox("test2", { width: 50, depth: 10, height: 10 }, this.scene);
-		this.test22.material = new StandardMaterial("test2", this.scene);
+		this.test22 = MeshBuilder.CreateBox("test22", { width: 50, depth: 10, height: 10 }, this.scene);
+		this.test22.material = new StandardMaterial("test22", this.scene);
 		this.test22.material.backFaceCulling = false;
 		this.test22.position.set(10, 0, -20);
 		this.test22.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
 		this.test22.material.disableColorWrite = true;
 		this.test22.material.forceDepthWrite = true;
-		this.test22.layerMask = 0x10000000;
+		//this.test22.layerMask = 0x10000000;
 
 
 
@@ -107,20 +110,21 @@ export class Field {
 		// m.specularColor = new Color3(0.5, 0.5, 0.5);
 		m.specularColor = Color3.Black();
 		this.ground.material = m;
-		this.ground.layerMask = 0x10000000;
-
+		this.ground.layerMask = 0x01000001;
+		//
 		this.rt = new RenderTargetTexture("grass", { width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio }, this.scene);
-		console.log("GRASS RT SIZE", this.rt.getSize());
-		this.rt.activeCamera = this.camera;
+		//console.log("GRASS RT SIZE", this.rt.getSize());
+		//this.rt.activeCamera = this.camera;
 		//this.rt.skipInitialClear = true;
-		this.camera.layerMask = 0x0000FFFF;
+		this.camera.layerMask = 0x0FFFFFF0;
 		this.scene.customRenderTargets = [];
-		this.scene.customRenderTargets.push(this.rt);
+		//this.scene.customRenderTargets.push(this.rt);
 
 		this.pipeline = new Pipeline(this.scene, this.camera, this.rt);
 
 		/////
 
+		this.water = new Water(this.scene, this.camera);
 	}
 
 	public async load() {
@@ -143,20 +147,27 @@ export class Field {
 			this.cursor.z = performance.now() * 0.001;
 		})
 
-		this.rt.renderList = [];
-		this.rt.renderList.push(this.test22);
-		this.rt.renderList.push(this.ground);
-		for (let i = 0; i < this.grass._tiles.length; i++) {
-			this.rt.renderList.push(this.grass._tiles[i]._mesh);
-		}
+		//this.rt.renderList = [];
+		//this.rt.renderList.push(this.test22);
+		//this.rt.renderList.push(this.ground);
+		//for (let i = 0; i < this.grass._tiles.length; i++) {
+		//	this.rt.renderList.push(this.grass._tiles[i]._mesh);
+		//}
+
+		this.water.rt.renderList = [];
+		this.water.rt.renderList.push(this.test2);
+		this.water.rt.renderList.push(this.ground);
 
 		this.glowLayer.dispose();
+
+		this.water.setMaterial();
 	}
 
 	public update(time: number, deltaTime: number) {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
 		this.pipeline.update(time);
+		this.water.update();
 	}
 
 	public onHover(status: number) {
@@ -221,7 +232,7 @@ export class Field {
 			}
 			case 'pongBR': {
 				this.scene.activeCamera = this.scene.getCameraByName('br');
-				this.scene.activeCamera?.attachControl();
+				this.scene.activeCamera?.attachControl(); https://cyn-prod.com/stylized-paint-shader-breakdown
 
 				break;
 			}

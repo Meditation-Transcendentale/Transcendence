@@ -1,4 +1,5 @@
 import { Color3, CustomMaterial, Effect, Scene, Texture, Vector3 } from "@babylonImport"
+import "./Shader/GeometryShader.ts";
 
 
 Effect.IncludesShadersStore["noises"] = `
@@ -1076,8 +1077,8 @@ export class GrassShader extends CustomMaterial {
 		this.backFaceCulling = false;
 		// this.twoSidedLighting = true;
 		this.diffuseColor = Color3.FromHexString("#4b8024");
-		//this.diffuseColor = new Color3(0.6, 1., 0.28);
-		this.diffuseColor = new Color3(1., 1., 1.);
+		this.diffuseColor = new Color3(0.6, 1., 0.28);
+		//this.diffuseColor = new Color3(1., 1., 1.);
 
 		// this.emissiveColor = new Color3(0.3, 0.3, 0.3);
 

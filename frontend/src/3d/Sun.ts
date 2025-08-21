@@ -12,7 +12,7 @@ export class Sun {
 
 
 		this.light = new DirectionalLight("light", new Vector3(0, -1, -0.5), this.scene);
-		this.light.intensity = 0.5;
+		this.light.intensity = 1.;
 
 		this.hemish = new HemisphericLight("hemish", new Vector3(1, 1, 1), this.scene);
 		this.hemish.intensity = 0.2;
