@@ -92,7 +92,8 @@ class NotificationManagerC {
 
 	private setupWs() {
 		if (Router.AUTHENTIFICATION) {
-			const url = `wss://${window.location.hostname}:7000/notification?uuid=${encodeURIComponent(User.uuid as string)}`;
+			console.log ("slt", User.uuid as string);
+			const url = `wss://${window.location.hostname}:7000/notifications?uuid=${encodeURIComponent(User.uuid as string)}`;
 
 			this.ws = new WebSocket(url);
 
@@ -102,23 +103,23 @@ class NotificationManagerC {
 
 			this.ws.onmessage = (event) => {
 
-				// let newNotification: notif.NotificationMessage;
-				// try {
-				// 	newNotification = decodeNotificationMessage(event.data);
-				// } catch (err) {
-				// 	console.error ("Failed to decode NotificationMessage", err);
-				// 	return ;
-				// }
+				let newNotification: notif.NotificationMessage;
+				try {
+					newNotification = decodeNotificationMessage(event.data);
+				} catch (err) {
+					console.error ("Failed to decode NotificationMessage", err);
+					return ;
+				}
 
-				// if (newNotification.friendUpdate != null) {
-				// 	console.log (`FRIEND UPDATE: ${newNotification.friendUpdate.sender}`);
-				// }
-				// if (newNotification.gameInvite != null ) {
-				// 	console.log (`GAME INVITE: ${newNotification.gameInvite.sender}|${newNotification.gameInvite.lobbyid}`);
-				// }
-				// if (newNotification.statusUpdate != null) {
-				// 	console.log (`NEW STATUS: ${newNotification.statusUpdate.sender}|${newNotification.statusUpdate.option}`);
-				// }
+				if (newNotification.friendUpdate != null) {
+					console.log (`FRIEND UPDATE: ${newNotification.friendUpdate.sender}`);
+				}
+				if (newNotification.gameInvite != null ) {
+					console.log (`GAME INVITE: ${newNotification.gameInvite.sender}|${newNotification.gameInvite.lobbyid}`);
+				}
+				if (newNotification.statusUpdate != null) {
+					console.log (`NEW STATUS: ${newNotification.statusUpdate.sender}|${newNotification.statusUpdate.option}`);
+				}
 			}
 
 			this.ws.onerror = (err) => {
