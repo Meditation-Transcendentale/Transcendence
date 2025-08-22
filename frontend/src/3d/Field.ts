@@ -56,6 +56,8 @@ export class Field {
 	private rt: RenderTargetTexture;
 	private rtRatio = 1;
 
+	public fieldDepth = 10;
+
 	constructor(scene: Scene) {
 		this.scene = scene;
 		this.cursor = new Vector3();
@@ -78,27 +80,27 @@ export class Field {
 
 
 		//////
-		this.test = MeshBuilder.CreatePlane("test", { size: 2 }, this.scene);
-		this.test.material = new StandardMaterial("test", this.scene);
-		this.test.material.backFaceCulling = false;
-		this.test.position.set(0, 4, 0);
-		this.test.rotation.y = 1 * Math.PI;
-		this.test.setEnabled(false);
+		//this.test = MeshBuilder.CreatePlane("test", { size: 2 }, this.scene);
+		//this.test.material = new StandardMaterial("test", this.scene);
+		//this.test.material.backFaceCulling = false;
+		//this.test.position.set(0, 4, 0);
+		//this.test.rotation.y = 1 * Math.PI;
+		//this.test.setEnabled(false);
 
 		this.test2 = MeshBuilder.CreateBox("test2", { width: 50, depth: 10, height: 10 }, this.scene);
 		this.test2.material = new DitherMaterial("test2", this.scene);
 		this.test2.material.backFaceCulling = false;
-		this.test2.position.set(10, 0, -20);
+		this.test2.position.set(10, -this.fieldDepth, -20);
 		this.test2.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
 		this.test2.layerMask = 0x01000001;
 
-		this.test22 = MeshBuilder.CreateBox("test22", { width: 50, depth: 10, height: 10 }, this.scene);
-		this.test22.material = new StandardMaterial("test22", this.scene);
-		this.test22.material.backFaceCulling = false;
-		this.test22.position.set(10, 0, -20);
-		this.test22.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
-		this.test22.material.disableColorWrite = true;
-		this.test22.material.forceDepthWrite = true;
+		//this.test22 = MeshBuilder.CreateBox("test22", { width: 50, depth: 10, height: 10 }, this.scene);
+		//this.test22.material = new StandardMaterial("test22", this.scene);
+		//this.test22.material.backFaceCulling = false;
+		//this.test22.position.set(10, 0, -20);
+		//this.test22.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
+		//this.test22.material.disableColorWrite = true;
+		//this.test22.material.forceDepthWrite = true;
 		//this.test22.layerMask = 0x10000000;
 
 
@@ -110,6 +112,7 @@ export class Field {
 		// m.specularColor = new Color3(0.5, 0.5, 0.5);
 		m.specularColor = Color3.Black();
 		this.ground.material = m;
+		this.ground.position.y = - this.fieldDepth;
 		this.ground.layerMask = 0x01000001;
 		//
 		this.rt = new RenderTargetTexture("grass", { width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio }, this.scene);
@@ -125,6 +128,7 @@ export class Field {
 		/////
 
 		this.water = new Water(this.scene, this.camera);
+		this.grass.depth = this.fieldDepth;
 	}
 
 	public async load() {
@@ -136,7 +140,7 @@ export class Field {
 
 		window.addEventListener("mousemove", (ev) => {
 			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
-			let delta = Math.abs(this.camera.position.y - 1) / ray.y;
+			let delta = Math.abs(this.camera.position.y + this.fieldDepth - 1) / ray.y;
 
 			this.cursorButterfly.x = this.camera.position.x - ray.x * delta;
 			this.cursorButterfly.y = 0;

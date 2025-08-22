@@ -1,4 +1,4 @@
-import { AbstractMesh, ArcRotateCamera, Camera, Mesh, MeshBuilder, RenderTargetTexture, Scene, ShaderMaterial, UniversalCamera, Vector3 } from "@babylonImport";
+import { AbstractMesh, ArcRotateCamera, Camera, Color3, Mesh, MeshBuilder, RenderTargetTexture, Scene, ShaderMaterial, StandardMaterial, UniversalCamera, Vector3 } from "@babylonImport";
 
 export class Water {
 	private scene: Scene;
@@ -48,9 +48,12 @@ export class Water {
 
 		});
 
-		this.lightMesh = MeshBuilder.CreateGround("lightMesh", { width: this.size, height: this.size, subdivisions: 50 }, this.scene);
-		this.lightMesh.position.set(0, this.height, 0);
-		this.lightMesh.layerMask = 0x00000001;
+		this.lightMesh = MeshBuilder.CreateGround("water", { width: this.size, height: this.size, subdivisions: 50 }, this.scene);
+		this.lightMesh.position.set(0, 0, 0);
+		this.lightMesh.material = new StandardMaterial("water", this.scene);
+		this.lightMesh.material.backFaceCulling = false;
+		(this.lightMesh.material as StandardMaterial).diffuseColor = Color3.Blue();
+		this.lightMesh.layerMask = 0x01000000;
 
 
 	}

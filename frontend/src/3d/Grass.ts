@@ -103,6 +103,8 @@ export class Grass {
 	private _pastTime = 0.0;
 	public cursor!: Vector3;
 
+	public depth = 50.;
+
 	constructor(scene: Scene, size: number, cursor: Vector3) {
 		this._size = size;
 		this._tiles = [];
@@ -146,10 +148,10 @@ export class Grass {
 		/////////////////////////////
 		const o = new Vector3(0, -0.5, 0);
 		const size = this._size * 0.5
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, 0, 0)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, 0, 0)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, 0, -size * 2)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, 0, -size * 2)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, -this.depth, 0)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, -this.depth, 0)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, -this.depth, -size * 2)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, -this.depth, -size * 2)), this._size, this._size));
 
 
 		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 3, 0, 0)), this._size, this._size));
