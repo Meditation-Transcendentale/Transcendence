@@ -19,6 +19,7 @@ import { Pipeline } from "./Pipeline";
 import { DitherMaterial } from "./Shader.ts";
 import { Interpolator } from "./Interpolator";
 import { Monolith } from "./Monolith";
+import { createFortressMonolith, createTempleMonolith } from "./Builder";
 
 
 const playdiv = document.createElement("div");
@@ -116,14 +117,21 @@ export class Field {
 		this.camera.layerMask = 0x0000FFFF;
 		this.scene.customRenderTargets = [];
 		this.scene.customRenderTargets.push(this.rt);
+		const monolith = createTempleMonolith(scene, 10);
 
-		const monolith = new Monolith(scene, 20, Vector3.Zero(), {
-			portalShape: 'pyramid',
-			materialType: 'metal',
-			voxelResolution: 100
+		monolith.enableShaderAnimation(true);
+		monolith.setAnimationSpeed(5.);
+		monolith.setAnimationIntensity(0.5);
+
+		// In render loop - minimal CPU work!
+		scene.registerBeforeRender(() => {
+			monolith.update(performance.now(), this.camera);
 		});
 
-		monolith.init();
+		//fortress.setAnimationStyle('gentle');
+		//scene.registerBeforeRender(() => {
+		//	fortress.update(performance.now(), this.camera);
+		//});
 
 		this.pipeline = new Pipeline(this.scene, this.camera, this.rt);
 
