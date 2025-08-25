@@ -708,7 +708,8 @@ export const notif = $root.notif = (() => {
          * Properties of a NotificationMessage.
          * @memberof notif
          * @interface INotificationMessage
-         * @property {notif.IFriendUpdate|null} [friendUpdate] NotificationMessage friendUpdate
+         * @property {notif.IFriendUpdate|null} [friendRequest] NotificationMessage friendRequest
+         * @property {notif.IFriendUpdate|null} [friendAccept] NotificationMessage friendAccept
          * @property {notif.IGameInvite|null} [gameInvite] NotificationMessage gameInvite
          * @property {notif.IStatusUpdate|null} [statusUpdate] NotificationMessage statusUpdate
          */
@@ -729,12 +730,20 @@ export const notif = $root.notif = (() => {
         }
 
         /**
-         * NotificationMessage friendUpdate.
-         * @member {notif.IFriendUpdate|null|undefined} friendUpdate
+         * NotificationMessage friendRequest.
+         * @member {notif.IFriendUpdate|null|undefined} friendRequest
          * @memberof notif.NotificationMessage
          * @instance
          */
-        NotificationMessage.prototype.friendUpdate = null;
+        NotificationMessage.prototype.friendRequest = null;
+
+        /**
+         * NotificationMessage friendAccept.
+         * @member {notif.IFriendUpdate|null|undefined} friendAccept
+         * @memberof notif.NotificationMessage
+         * @instance
+         */
+        NotificationMessage.prototype.friendAccept = null;
 
         /**
          * NotificationMessage gameInvite.
@@ -757,12 +766,12 @@ export const notif = $root.notif = (() => {
 
         /**
          * NotificationMessage payload.
-         * @member {"friendUpdate"|"gameInvite"|"statusUpdate"|undefined} payload
+         * @member {"friendRequest"|"friendAccept"|"gameInvite"|"statusUpdate"|undefined} payload
          * @memberof notif.NotificationMessage
          * @instance
          */
         Object.defineProperty(NotificationMessage.prototype, "payload", {
-            get: $util.oneOfGetter($oneOfFields = ["friendUpdate", "gameInvite", "statusUpdate"]),
+            get: $util.oneOfGetter($oneOfFields = ["friendRequest", "friendAccept", "gameInvite", "statusUpdate"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
@@ -790,12 +799,14 @@ export const notif = $root.notif = (() => {
         NotificationMessage.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.friendUpdate != null && Object.hasOwnProperty.call(message, "friendUpdate"))
-                $root.notif.FriendUpdate.encode(message.friendUpdate, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.friendRequest != null && Object.hasOwnProperty.call(message, "friendRequest"))
+                $root.notif.FriendUpdate.encode(message.friendRequest, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.friendAccept != null && Object.hasOwnProperty.call(message, "friendAccept"))
+                $root.notif.FriendUpdate.encode(message.friendAccept, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             if (message.gameInvite != null && Object.hasOwnProperty.call(message, "gameInvite"))
-                $root.notif.GameInvite.encode(message.gameInvite, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                $root.notif.GameInvite.encode(message.gameInvite, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             if (message.statusUpdate != null && Object.hasOwnProperty.call(message, "statusUpdate"))
-                $root.notif.StatusUpdate.encode(message.statusUpdate, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                $root.notif.StatusUpdate.encode(message.statusUpdate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             return writer;
         };
 
@@ -833,14 +844,18 @@ export const notif = $root.notif = (() => {
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.friendUpdate = $root.notif.FriendUpdate.decode(reader, reader.uint32());
+                        message.friendRequest = $root.notif.FriendUpdate.decode(reader, reader.uint32());
                         break;
                     }
                 case 2: {
-                        message.gameInvite = $root.notif.GameInvite.decode(reader, reader.uint32());
+                        message.friendAccept = $root.notif.FriendUpdate.decode(reader, reader.uint32());
                         break;
                     }
                 case 3: {
+                        message.gameInvite = $root.notif.GameInvite.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 4: {
                         message.statusUpdate = $root.notif.StatusUpdate.decode(reader, reader.uint32());
                         break;
                     }
@@ -880,12 +895,22 @@ export const notif = $root.notif = (() => {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             let properties = {};
-            if (message.friendUpdate != null && message.hasOwnProperty("friendUpdate")) {
+            if (message.friendRequest != null && message.hasOwnProperty("friendRequest")) {
                 properties.payload = 1;
                 {
-                    let error = $root.notif.FriendUpdate.verify(message.friendUpdate);
+                    let error = $root.notif.FriendUpdate.verify(message.friendRequest);
                     if (error)
-                        return "friendUpdate." + error;
+                        return "friendRequest." + error;
+                }
+            }
+            if (message.friendAccept != null && message.hasOwnProperty("friendAccept")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.notif.FriendUpdate.verify(message.friendAccept);
+                    if (error)
+                        return "friendAccept." + error;
                 }
             }
             if (message.gameInvite != null && message.hasOwnProperty("gameInvite")) {
@@ -923,10 +948,15 @@ export const notif = $root.notif = (() => {
             if (object instanceof $root.notif.NotificationMessage)
                 return object;
             let message = new $root.notif.NotificationMessage();
-            if (object.friendUpdate != null) {
-                if (typeof object.friendUpdate !== "object")
-                    throw TypeError(".notif.NotificationMessage.friendUpdate: object expected");
-                message.friendUpdate = $root.notif.FriendUpdate.fromObject(object.friendUpdate);
+            if (object.friendRequest != null) {
+                if (typeof object.friendRequest !== "object")
+                    throw TypeError(".notif.NotificationMessage.friendRequest: object expected");
+                message.friendRequest = $root.notif.FriendUpdate.fromObject(object.friendRequest);
+            }
+            if (object.friendAccept != null) {
+                if (typeof object.friendAccept !== "object")
+                    throw TypeError(".notif.NotificationMessage.friendAccept: object expected");
+                message.friendAccept = $root.notif.FriendUpdate.fromObject(object.friendAccept);
             }
             if (object.gameInvite != null) {
                 if (typeof object.gameInvite !== "object")
@@ -954,10 +984,15 @@ export const notif = $root.notif = (() => {
             if (!options)
                 options = {};
             let object = {};
-            if (message.friendUpdate != null && message.hasOwnProperty("friendUpdate")) {
-                object.friendUpdate = $root.notif.FriendUpdate.toObject(message.friendUpdate, options);
+            if (message.friendRequest != null && message.hasOwnProperty("friendRequest")) {
+                object.friendRequest = $root.notif.FriendUpdate.toObject(message.friendRequest, options);
                 if (options.oneofs)
-                    object.payload = "friendUpdate";
+                    object.payload = "friendRequest";
+            }
+            if (message.friendAccept != null && message.hasOwnProperty("friendAccept")) {
+                object.friendAccept = $root.notif.FriendUpdate.toObject(message.friendAccept, options);
+                if (options.oneofs)
+                    object.payload = "friendAccept";
             }
             if (message.gameInvite != null && message.hasOwnProperty("gameInvite")) {
                 object.gameInvite = $root.notif.GameInvite.toObject(message.gameInvite, options);

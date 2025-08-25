@@ -1,3 +1,4 @@
+import { NotificationManager } from "./NotificationManager";
 import { Popup } from "./Popup";
 import { cdnRequest, meRequest, patchRequest, postRequest } from "./requests";
 import { User } from "./User";
@@ -19,6 +20,7 @@ class Ath {
 
 	private quit: AthQuit;
 	private setting: AthSetting;
+	private notif: AthNotif;
 	// private notifs: AthNotifications;
 
 	private loaded = false;
@@ -37,11 +39,10 @@ class Ath {
 
 		this.quit = new AthQuit(div);
 		this.setting = new AthSetting(div);
-
+		this.notif = new AthNotif(div);
 		this.ref.setting.addEventListener('click', () => {
 			this.setting.load();
 		})
-
 
 		this.ref.quit.addEventListener("click", () => {
 			this.quit.load();
@@ -52,6 +53,7 @@ class Ath {
 		// this.ref.settingEdit.addEventListener("click", () => { //FOR Username
 		// })
 
+		NotificationManager.setupWs();
 
 		console.log("USER", User);
 	}
@@ -95,20 +97,20 @@ interface notifsHtmlReference {
 	gameInvite: HTMLInputElement
 }
 
-// class AthNotifications {
-// 	private div: HTMLDivElement;
-// 	private ref: notifsHtmlReference;
+class AthNotifications {
+	private div: HTMLDivElement;
+	private ref: notifsHtmlReference;
 
-// 	constructor (div: HTMLDivElement) {
-// 		this.div = div.querySelector("#notif") as HTMLDivElement;
+	constructor (div: HTMLDivElement) {
+		this.div = div.querySelector("#notif") as HTMLDivElement;
 
-// 		this.ref = {
+		this.ref = {
 
-// 		}
+		}
 
 
-// 	}
-// }
+	}
+}
 
 interface quitHtmlReference {
 	quitY: HTMLInputElement,
@@ -223,6 +225,7 @@ class AthSetting {
 		})
 
 
+
 	}
 
 	public load() {
@@ -252,5 +255,6 @@ class AthSetting {
 
 
 }
+
 
 export default Ath;

@@ -19,8 +19,9 @@ message StatusUpdate {
 
 message NotificationMessage {
   oneof payload {
-    FriendUpdate friendUpdate = 1;
-    GameInvite gameInvite = 2;
-    StatusUpdate statusUpdate = 3;
+    FriendUpdate friendRequest = 1;
+    FriendUpdate friendAccept = 2;
+    GameInvite gameInvite = 3;
+    StatusUpdate statusUpdate = 4;
   }
 }

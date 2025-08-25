@@ -2,6 +2,7 @@ import { App3D } from "./3d/App";
 import { NotificationManager } from "./spa/NotificationManager";
 import { Popup } from "./spa/Popup";
 import Router from "./spa/Router";
+import { postRequest } from "./spa/requests";
 
 //async function init() {
 //	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
@@ -42,6 +43,9 @@ async function init() {
 		}
 		if (e.key == "p") {
 			NotificationManager.addText(`${performance.now()}`)
+		}
+		if (e.key == "t") {
+			postRequest("friends/add", { inputUsername: "Erwan"});
 		}
 	})
 }

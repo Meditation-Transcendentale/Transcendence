@@ -29,8 +29,6 @@ class NotificationManagerC {
 
 		this.ws = null;
 
-		this.setupWs();
-
 		this.container.addEventListener("mouseenter", () => {
 			for (let i = 0; i < this.canceled.length; i++) {
 				this.canceled[i]?.remove();
@@ -90,13 +88,13 @@ class NotificationManagerC {
 		}, this.defaultDuration)
 	}
 
-	private setupWs() {
+	public setupWs() {
 		if (Router.AUTHENTIFICATION) {
-			console.log ("slt", User.uuid as string);
 			const url = `wss://${window.location.hostname}:7000/notifications?uuid=${encodeURIComponent(User.uuid as string)}`;
 
 			this.ws = new WebSocket(url);
 
+			this.ws.binaryType = "arraybuffer";
 			this.ws.onopen = () => {
 				console.log('Connected to notifications server')
 			}
@@ -104,21 +102,27 @@ class NotificationManagerC {
 			this.ws.onmessage = (event) => {
 
 				let newNotification: notif.NotificationMessage;
+				console.log (`Yes:${event.data}`);
 				try {
-					newNotification = decodeNotificationMessage(event.data);
+					newNotification = decodeNotificationMessage(new Uint8Array(event.data));
 				} catch (err) {
-					console.error ("Failed to decode NotificationMessage", err);
-					return ;
+					console.error("Failed to decode NotificationMessage", err);
+					return;
 				}
-
-				if (newNotification.friendUpdate != null) {
-					console.log (`FRIEND UPDATE: ${newNotification.friendUpdate.sender}`);
+				
+				console.log (`NEW NOTIF ${newNotification.friendRequest}`);
+				if (newNotification.friendRequest != null) {
+					console.log(`FRIEND REQUEST: ${newNotification.friendRequest.sender}`);
+					
 				}
-				if (newNotification.gameInvite != null ) {
-					console.log (`GAME INVITE: ${newNotification.gameInvite.sender}|${newNotification.gameInvite.lobbyid}`);
+				if (newNotification.friendAccept != null) {
+					console.log(`FRIEND ACCEPT: ${newNotification.friendAccept.sender}`);
+				}
+				if (newNotification.gameInvite != null) {
+					console.log(`GAME INVITE: ${newNotification.gameInvite.sender}|${newNotification.gameInvite.lobbyid}`);
 				}
 				if (newNotification.statusUpdate != null) {
-					console.log (`NEW STATUS: ${newNotification.statusUpdate.sender}|${newNotification.statusUpdate.option}`);
+					console.log(`NEW STATUS: ${newNotification.statusUpdate.sender}|${newNotification.statusUpdate.status}|${newNotification.statusUpdate?.option}`);
 				}
 			}
 

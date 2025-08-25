@@ -7,14 +7,15 @@ import { v4 as uuidv4 } from 'uuid'
 import config from './config.js';
 import client from 'prom-client';
 import fs from 'fs';
-import { 
-         encodeNotificationMessage,
-         decodeFriendUpdate,
-         decodeStatusUpdate,
-         decodeGameInvite
- } from './proto/helper.js';
+import {
+  encodeNotificationMessage,
+  decodeNotificationMessage,
+  decodeFriendUpdate,
+  decodeStatusUpdate,
+  decodeGameInvite
+} from './proto/helper.js';
 
-dotenv.config({ path: "../../../../.env"})
+dotenv.config({ path: "../../../../.env" })
 
 
 const SERVICE_NAME = 'notifications'
@@ -24,12 +25,12 @@ const userSockets = new Map()
 async function start() {
 
   const jc = JSONCodec();
-  
-  const nc = await connect({ 
+
+  const nc = await connect({
     servers: process.env.NATS_URL,
     token: process.env.NATS_TOKEN,
     tls: { rejectUnauthorized: false }
-   })
+  })
   // console.log('[NATS] Connected to', process.env.NATS_URL);
 
   const app = Fastify({
@@ -40,27 +41,31 @@ async function start() {
     }
   });
   await app.register(fastifyCors, { origin: '*' });
-  
+
   client.collectDefaultMetrics();
-  
+
   app.get('/metrics', async (req, res) => {
     res.type('text/plain');
     res.send(await client.register.metrics());
   });
-  
+
   await app.listen({ port: config.PORT, host: '0.0.0.0' });
-	app.log.info(`HTTP API listening on ${config.PORT}`);
+  app.log.info(`HTTP API listening on ${config.PORT}`);
 
 
+  const uWsApp = uWS.SSLApp({
+    key_file_name: process.env.SSL_KEY,
+    cert_file_name: process.env.SSL_CERT
+  });
 
-  uWS.App().ws(config.WS_PATH, {
+  uWsApp.ws(config.WS_PATH, {
     idleTimeout: 120,
 
     upgrade: (res, req, context) => {
       const query = req.getQuery()
       const params = new URLSearchParams(query)
       const uuid = params.get('uuid') || uuidv4()
-      
+
       res.upgrade(
         { uuid },
         req.getHeader('sec-websocket-key'),
@@ -71,11 +76,12 @@ async function start() {
     },
     //IL FAUT ENCODE STATUS
     open: async (ws) => {
+      console.log("NOTIF CO");
       const wasReconnected = userSockets.has(ws.uuid)
       if (!wasReconnected)
         userSockets.set(ws.uuid, ws);
 
-      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: { send: ws.uuid, status: "online"}}), nc, jc);   
+      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: { sender: ws.uuid, status: "online" } }), nc, jc);
       console.log(
         `[${SERVICE_NAME}] ${ws.uuid} ${wasReconnected ? 'reconnected' : 'connected'}`
       )
@@ -84,7 +90,7 @@ async function start() {
     message: (ws, message, isBinary) => { //debug purpose, nothing coming from the client
       // try {
       //   const raw = Buffer.from(message).toString()
-      //   const { type, data } = JSON.parse(raw)
+      //   const { type, data } = JSON.parse(raw) 
       //   console.log(`[${SERVICE_NAME}] received message from ${ws.uuid}:`, { type, data })
       // } catch (err) {
       //   console.error(`[${SERVICE_NAME}] Error processing message`, err)
@@ -92,7 +98,7 @@ async function start() {
     },
 
     close: (ws, code, message) => {
-      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: { send: ws.uuid, status: "offline"}}), nc, jc);
+      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: { sender: ws.uuid, status: "offline" } }), nc, jc);
       userSockets.delete(ws.uuid)
       console.log(`[${SERVICE_NAME}] ${ws.uuid} disconnected`)
     }
@@ -107,48 +113,52 @@ async function start() {
   console.log('[NATS] Setting up subscription...');
   nc.subscribe(`notification.*.*`, {
     callback: (_err, msg) => {
-        if (_err)
-        {
-          console.error (`NATS subscription error:`, _err); 
-          return;
-        }
-        try {
-      
-          const [, uuid, eventType] = msg.subject.split('.');
-          console.log(`Received [${eventType}] notification for ${uuid}`);
-      
-          if (!userSockets.has(uuid)) return;
-
-          let data;
-          console.log(`event type: ${eventType}`);
-          switch (eventType)
-          {
-            case 'status':
-              data = decodeStatusUpdate(msg.data);
-              sendStatus(uuid, data, nc, jc);
-              break;
-            case 'friendRequest':
-            case 'friendAccept':
-              data = decodeFriendUpdate(msg.data);
-              userSockets.get(uuid).send(encodeNotificationMessage({ friendUpdate: data }));
-              break;
-            case 'gameInvite':
-              data = decodeGameInvite(msg.data);
-              userSockets.get(uuid).send(encodeNotificationMessage({ gameInvite: data }));
-              break;
-            default:
-              throw ('eventType not found');
-          };
-
-        } catch (err) {
-          console.error("Failed to process notification:", err);
-        }
+      if (_err) {
+        console.error(`NATS subscription error:`, _err);
+        return;
       }
-    });
+      try {
+
+        const [, uuid, eventType] = msg.subject.split('.');
+        console.log(`Received [${eventType}] notification for ${uuid}`);
+
+        if (!userSockets.has(uuid)) return;
+
+        let data;
+        console.log(`event type: ${eventType}`);
+        switch (eventType) {
+          case 'status':
+            data = decodeStatusUpdate(msg.data);
+            sendStatus(uuid, data, nc, jc);
+            break;
+          case 'friendRequest':
+            data = decodeFriendUpdate(msg.data);
+            console.log (data);
+            const xd = encodeNotificationMessage({ friendRequest: data });
+            userSockets.get(uuid).send(encodeNotificationMessage({ friendRequest: data }), true);
+            console.log(decodeNotificationMessage(xd));
+            break;
+          case 'friendAccept':
+            data = decodeFriendUpdate(msg.data);
+            userSockets.get(uuid).send(encodeNotificationMessage({ friendAccept: data }), true);
+            break;
+          case 'gameInvite':
+            data = decodeGameInvite(msg.data);
+            userSockets.get(uuid).send(encodeNotificationMessage({ gameInvite: data }), true);
+            break;
+          default:
+            throw ('eventType not found');
+        };
+
+      } catch (err) {
+        console.error("Failed to process notification:", err);
+      }
+    }
+  });
   console.log('[NATS] Subscribed to notification.>');
 };
 
-async function sendStatus (senderId, data, nc, jc) {
+async function sendStatus(senderId, data, nc, jc) {
   try {
     const resp = await friendlist_Request(senderId, nc, jc);
 
@@ -156,14 +166,14 @@ async function sendStatus (senderId, data, nc, jc) {
       console.log(`[${SERVICE_NAME}] No friends online to notify for ${senderId}`);
       return;
     }
-  
+
     const sendingData = encodeNotificationMessage({ statusUpdate: data });
     for (const friend of resp.message) {
       const sockets = userSockets.get(friend.friend_uuid);
       if (!sockets) continue;
 
       try {
-        sockets.send(sendingData);
+        sockets.send(sendingData, true);
       } catch (e) {
         console.warn(`[${SERVICE_NAME}] Failed to send to ${friend.friend_uuid}:`, e);
       }
@@ -184,7 +194,7 @@ async function friendlist_Request(uuid, nc, jc) {
     const userResult = jc.decode(userResp.data);
 
     if (!userResult.success) {
-      console.log ("user not found");
+      console.log("user not found");
       throw { status: userResult.status || 404, message: userResult.message || 'User not found' };
     }
     const friendResp = await nc.request('user.getFriendlist', jc.encode({ userId: userResult.data.id }));
@@ -198,7 +208,7 @@ async function friendlist_Request(uuid, nc, jc) {
       message: friendResult.data || []
     };
   }
-  catch (err){
+  catch (err) {
     if (err.status) {
       throw err;
     }

@@ -3584,8 +3584,11 @@ export namespace notif {
     /** Properties of a NotificationMessage. */
     interface INotificationMessage {
 
-        /** NotificationMessage friendUpdate */
-        friendUpdate?: (notif.IFriendUpdate|null);
+        /** NotificationMessage friendRequest */
+        friendRequest?: (notif.IFriendUpdate|null);
+
+        /** NotificationMessage friendAccept */
+        friendAccept?: (notif.IFriendUpdate|null);
 
         /** NotificationMessage gameInvite */
         gameInvite?: (notif.IGameInvite|null);
@@ -3603,8 +3606,11 @@ export namespace notif {
          */
         constructor(properties?: notif.INotificationMessage);
 
-        /** NotificationMessage friendUpdate. */
-        public friendUpdate?: (notif.IFriendUpdate|null);
+        /** NotificationMessage friendRequest. */
+        public friendRequest?: (notif.IFriendUpdate|null);
+
+        /** NotificationMessage friendAccept. */
+        public friendAccept?: (notif.IFriendUpdate|null);
 
         /** NotificationMessage gameInvite. */
         public gameInvite?: (notif.IGameInvite|null);
@@ -3613,7 +3619,7 @@ export namespace notif {
         public statusUpdate?: (notif.IStatusUpdate|null);
 
         /** NotificationMessage payload. */
-        public payload?: ("friendUpdate"|"gameInvite"|"statusUpdate");
+        public payload?: ("friendRequest"|"friendAccept"|"gameInvite"|"statusUpdate");
 
         /**
          * Creates a new NotificationMessage instance using the specified properties.
