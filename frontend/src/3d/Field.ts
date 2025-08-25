@@ -45,6 +45,7 @@ export class Field {
 	private glowLayer: GlowLayer;
 
 	private cursor: Vector3;
+	private cursorMonolith: Vector3;
 	private cursorButterfly: Vector3;
 
 	private pipeline: Pipeline;
@@ -59,6 +60,7 @@ export class Field {
 	constructor(scene: Scene) {
 		this.scene = scene;
 		this.cursor = new Vector3();
+		this.cursorMonolith = new Vector3();
 		this.cursorButterfly = new Vector3();
 
 		this.sun = new Sun(this.scene);
@@ -117,11 +119,12 @@ export class Field {
 		this.camera.layerMask = 0x0000FFFF;
 		this.scene.customRenderTargets = [];
 		this.scene.customRenderTargets.push(this.rt);
-		const monolith = createTempleMonolith(scene, 10);
+		const monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
 
 		monolith.enableShaderAnimation(true);
 		monolith.setAnimationSpeed(5.);
 		monolith.setAnimationIntensity(0.5);
+		//monolith.getPerformanceReport();
 
 		// In render loop - minimal CPU work!
 		scene.registerBeforeRender(() => {
@@ -157,6 +160,10 @@ export class Field {
 			this.cursor.x = this.camera.position.x - ray.x * delta;
 			this.cursor.y = this.camera.position.z - ray.z * delta;
 			this.cursor.z = performance.now() * 0.001;
+
+			//const pick = this.scene.pick(ev.clientX, ev.clientY);
+			//if (pick?.hit)
+			//	this.cursorMonolith.copyFrom(pick.pickedPoint!);
 		})
 
 		this.rt.renderList = [];

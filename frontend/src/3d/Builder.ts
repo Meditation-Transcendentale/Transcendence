@@ -2,8 +2,8 @@ import { Vector3 } from "@babylonImport";
 import { Monolith } from "./Monolith";
 import { SDFBuilder } from "./Sdf";
 
-export function createTempleMonolith(scene: any, size: number): Monolith {
-	const monolith = new Monolith(scene, size, Vector3.Zero());
+export function createTempleMonolith(scene: any, size: number, cursor: Vector3): Monolith {
+	const monolith = new Monolith(scene, size, cursor);
 
 	const basePlatform = SDFBuilder.box(
 		new Vector3(size * 1.2, size * 0.2, size * 1.2),
