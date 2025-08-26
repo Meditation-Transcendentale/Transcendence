@@ -47,12 +47,12 @@ export class Pipeline {
 			// effect.setTextureFromPostProcess("combineSampler", this.cloudTexture);
 		}
 
-		this.sharpen = new PostProcess("sharpen", "sharpen", ["resolution"], null, 1., this.camera);
-		//console.log("SHARPEN SIZE:", this.sharpen.texelSize)
-		this.sharpen.autoClear = false;
-		this.sharpen.onApply = (effect) => {
-			effect.setFloat2("resolution", window.innerWidth, window.innerHeight);
-		}
+		//this.sharpen = new PostProcess("sharpen", "sharpen", ["resolution"], null, 1., this.camera);
+		////console.log("SHARPEN SIZE:", this.sharpen.texelSize)
+		//this.sharpen.autoClear = false;
+		//this.sharpen.onApply = (effect) => {
+		//	effect.setFloat2("resolution", window.innerWidth, window.innerHeight);
+		//}
 
 		this.glitch = new PostProcess("glitch", "glitch", ["origin", "time", "ratio"], null, 1., this.camera);
 		this.glitch.autoClear = false;
@@ -85,14 +85,14 @@ export class Pipeline {
 			this.cloudTexture.refreshRate = 1;
 			this.grassTexture.refreshRate = 1;
 			this.camera.attachPostProcess(this.combine);
-			this.camera.attachPostProcess(this.sharpen);
+			//this.camera.attachPostProcess(this.sharpen);
 			this.camera.attachPostProcess(this.glitch);
 			this.enable = true;
 		} else if (!status && this.enable) {
 			this.cloudTexture.refreshRate = 0;
 			this.grassTexture.refreshRate = 0;
 			this.camera.detachPostProcess(this.glitch);
-			this.camera.detachPostProcess(this.sharpen);
+			//this.camera.detachPostProcess(this.sharpen);
 			this.camera.detachPostProcess(this.combine);
 			this.enable = false;
 		}

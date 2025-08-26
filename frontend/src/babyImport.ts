@@ -60,6 +60,8 @@ export { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTa
 export { PolygonMeshBuilder } from "@babylonjs/core";
 export { Observer } from "@babylonjs/core";
 export { VertexBuffer } from "@babylonjs/core";
+export { GPUPicker } from "@babylonjs/core";
+export { Ray } from "@babylonjs/core";
 
 import "@babylonjs/core/Culling/ray";
 

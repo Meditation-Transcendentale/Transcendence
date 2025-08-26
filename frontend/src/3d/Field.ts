@@ -18,6 +18,8 @@ import { Butterfly } from "./Butterfly";
 import { Pipeline } from "./Pipeline";
 import { DitherMaterial } from "./Shader.ts";
 import { Interpolator } from "./Interpolator";
+import { Monolith } from "./Monolith";
+import { createFortressMonolith, createTempleMonolith } from "./Builder";
 
 
 const playdiv = document.createElement("div");
@@ -43,6 +45,7 @@ export class Field {
 	private glowLayer: GlowLayer;
 
 	private cursor: Vector3;
+	private cursorMonolith: Vector3;
 	private cursorButterfly: Vector3;
 
 	private pipeline: Pipeline;
@@ -57,16 +60,17 @@ export class Field {
 	constructor(scene: Scene) {
 		this.scene = scene;
 		this.cursor = new Vector3();
+		this.cursorMonolith = new Vector3();
 		this.cursorButterfly = new Vector3();
 
 		this.sun = new Sun(this.scene);
 		this.grass = new Grass(this.scene, 20, this.cursor);
 		this.butterfly = new Butterfly(this.scene, this.cursorButterfly);
 
-		this.camera = new FreeCamera("fieldCamera", new Vector3(0, 4, 40), this.scene, true);
+		this.camera = new FreeCamera("fieldCamera", new Vector3(0, 6, 40), this.scene, true);
 		//this.camera = new ArcRotateCamera("fieldCamera", 0, 0, 10, Vector3.Zero(), this.scene);
 		//this.camera = new UniversalCamera("fieldCamera", Vector3.Zero(), this.scene);
-		this.camera.setTarget(new Vector3(0., 6, 30))
+		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
 		this.camera.attachControl();
 		this.camera.minZ = 0.01;
@@ -75,7 +79,6 @@ export class Field {
 
 
 
-		//////
 		this.test = MeshBuilder.CreatePlane("test", { size: 2 }, this.scene);
 		this.test.material = new StandardMaterial("test", this.scene);
 		this.test.material.backFaceCulling = false;
@@ -116,6 +119,22 @@ export class Field {
 		this.camera.layerMask = 0x0000FFFF;
 		this.scene.customRenderTargets = [];
 		this.scene.customRenderTargets.push(this.rt);
+		const monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
+
+		monolith.enableShaderAnimation(true);
+		monolith.setAnimationSpeed(4.);
+		monolith.setAnimationIntensity(0.05);
+		//monolith.getPerformanceReport();
+
+		// In render loop - minimal CPU work!
+		scene.registerBeforeRender(() => {
+			monolith.update(performance.now(), this.camera);
+		});
+
+		//fortress.setAnimationStyle('gentle');
+		//scene.registerBeforeRender(() => {
+		//	fortress.update(performance.now(), this.camera);
+		//});
 
 		this.pipeline = new Pipeline(this.scene, this.camera, this.rt);
 
@@ -141,6 +160,10 @@ export class Field {
 			this.cursor.x = this.camera.position.x - ray.x * delta;
 			this.cursor.y = this.camera.position.z - ray.z * delta;
 			this.cursor.z = performance.now() * 0.001;
+
+			//const pick = this.scene.pick(ev.clientX, ev.clientY);
+			//if (pick?.hit)
+			//	this.cursorMonolith.copyFrom(pick.pickedPoint!);
 		})
 
 		this.rt.renderList = [];
