@@ -1,5 +1,6 @@
 import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray } from "@babylonImport";
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
+import { MonolithMaterial } from "./MonolithMaterial";
 
 type MonolithOptions = {
 	height: number;
@@ -31,16 +32,19 @@ interface BoundingBox {
 export class Monolith {
 	public scene: Scene;
 	private voxelMesh: Mesh | null = null;
-	private material!: StandardMaterial | ShaderMaterial;
+	private material!: MonolithMaterial;
 	private options: MonolithOptions;
 	private sdfSystem: SDFSystem;
 	private cursor: Vector3;
 	private sdfTree: SDFNode | null = null;
 	private voxelGrid: VoxelGrid | null = null;
-	private tempMatrix = new Matrix();
 	private gpuPicker: GPUPicker | null = null;
 	private isPickingEnabled: boolean = true;
 	private voxelPositions: Vector3[] = [];
+	private lastPickTime = 0;
+	private pickThrottleMs = 50;
+	private matrixBuffer: Float32Array | null = null;
+	private lastVoxelCount = 0;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
@@ -118,9 +122,8 @@ export class Monolith {
 	private createMaterial() {
 		if (this.options.enableShaderAnimation) {
 			this.material = this.createOptimizedShaderMaterial();
-		} else {
-			this.material = this.createStandardMaterial();
 		}
+
 	}
 
 	private createStandardMaterial(): StandardMaterial {
@@ -132,93 +135,123 @@ export class Monolith {
 		return material;
 	}
 
-	private createOptimizedShaderMaterial(): ShaderMaterial {
+	private createOptimizedShaderMaterial(): MonolithMaterial {
 		this.defineOptimizedShaders();
 
-		const shaderMaterial = new ShaderMaterial("optimizedAnimatedVoxel", this.scene, {
-			vertex: "optimizedAnimatedVoxel",
-			fragment: "optimizedAnimatedVoxel",
-		}, {
-			attributes: ["position", "normal", "world0", "world1", "world2", "world3", "instanceID", "origin"],
-			uniforms: ["viewProjection", "time", "animationSpeed", "animationIntensity", "worldCenter"],
-			samplers: [],
-			needAlphaBlending: false,
-			needAlphaTesting: false
-		});
+		//const shaderMaterial = new ShaderMaterial("optimizedAnimatedVoxel", this.scene, {
+		//	vertex: "optimizedAnimatedVoxel",
+		//	fragment: "optimizedAnimatedVoxel",
+		//}, {
+		//	attributes: ["position", "normal", "world0", "world1", "world2", "world3", "instanceID", "origin"],
+		//	uniforms: ["viewProjection", "time", "animationSpeed", "animationIntensity", "worldCenter"],
+		//	samplers: [],
+		//	needAlphaBlending: false,
+		//	needAlphaTesting: false
+		//});
+
+		const shaderMaterial = new MonolithMaterial("monolithMaterial", this.scene);
 
 		shaderMaterial.setFloat("time", 0);
 		shaderMaterial.setFloat("animationSpeed", this.options.animationSpeed);
 		shaderMaterial.setFloat("animationIntensity", this.options.animationIntensity);
-		shaderMaterial.setVector3("worldCenter", Vector3.Zero());
+		shaderMaterial.setVec3("worldCenter", Vector3.Zero());
+
+		shaderMaterial.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
+		shaderMaterial.setFloat("mouseInfluenceRadius", 1.)
+		//shaderMaterial.diffuseColor = new Color3(0);
 
 		return shaderMaterial;
 	}
 
 	private defineOptimizedShaders() {
 		Effect.ShadersStore["optimizedAnimatedVoxelVertexShader"] = `
-            precision highp float;
-            
-            attribute vec3 position;
-            attribute vec3 normal;
-            attribute vec4 world0;
-            attribute vec4 world1;
-            attribute vec4 world2;
-            attribute vec4 world3;
-            attribute float instanceID;
-            
-            uniform mat4 viewProjection;
-            uniform float time;
-            uniform float animationSpeed;
-            uniform float animationIntensity;
-            uniform vec3 worldCenter;
-			uniform vec3 origin;
-            
-            varying vec3 vNormal;
-            varying vec3 vWorldPosition;
-            varying float vInstanceID;
-            
-            // Optimized noise functions
-            float hash(float p) { p = fract(p * 0.1031); p *= p + 33.33; p *= p + p; return fract(p); }
-            float hash(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
-            
-            vec3 hash3(float p) {
-                vec3 q = vec3(hash(p), hash(p + 1.0), hash(p + 2.0));
-                return q * 2.0 - 1.0;
-            }
-            
-            void main() {
-                mat4 finalWorld = mat4(world0, world1, world2, world3);
-                vec3 worldPos = finalWorld[3].xyz;
-                
-                // Distance-based animation falloff
-                float distanceFromCenter = length(worldPos - worldCenter);
-                float falloff = 1.0 / (1.0 + distanceFromCenter * 0.1);
-				float distanceFromOrigin = length(worldPos - origin);
-				float influence = smoothstep(0.0, 0.5, 1.5 - distanceFromOrigin);
-                
-                // Multi-layered animation
-                vec3 animOffset = hash3(instanceID);
-                float t = time * animationSpeed + dot(animOffset, vec3(1.0, 2.0, 3.0));
-                
-                vec3 displacement = vec3(
-                    sin(t) * animOffset.x,
-                    sin(t * 1.3 + animOffset.y) * animOffset.y,
-                    cos(t * 0.8 + animOffset.z) * animOffset.z
-                ) * animationIntensity * falloff;
-                
-                finalWorld[3].xyz += displacement * influence;
-                
-                vec4 worldPosition = finalWorld * vec4(position, 1.0);
-                gl_Position = viewProjection * worldPosition;
-                
-                vNormal = normalize((finalWorld * vec4(normal, 0.0)).xyz);
-                vWorldPosition = worldPosition.xyz;
-                vInstanceID = instanceID;
-            }
+precision highp float;
+
+
+uniform mat4 viewProjection;
+uniform float time;
+uniform float animationSpeed;
+uniform float animationIntensity;
+uniform vec3 worldCenter;
+uniform vec3 origin;
+
+// New uniforms for dual animation
+uniform float baseWaveIntensity; // Default wave strength
+uniform float mouseInfluenceRadius; // How far mouse effect reaches
+
+varying vec3 vNormal;
+varying vec3 vWorldPosition;
+varying float vInstanceID;
+varying vec3 vViewDirection;
+varying float vDistanceToCamera;
+varying vec3 vLocalPosition;
+
+// Noise functions
+float hash(float p) { 
+    p = fract(p * 0.1031); 
+    p *= p + 33.33; 
+    return fract(p * (p + p)); 
+}
+
+vec3 hash3(float p) {
+    vec3 q = vec3(hash(p), hash(p + 1.0), hash(p + 2.0));
+    return q * 2.0 - 1.0;
+}
+
+void main() {
+    mat4 finalWorld = mat4(world0, world1, world2, world3);
+    vec3 worldPos = finalWorld[3].xyz;
+    
+    // Random per-voxel offset
+    vec3 animOffset = hash3(instanceID);
+    float t = time * animationSpeed;
+    
+    // === BASE WAVE ANIMATION (Always Active) ===
+    // Subtle wave that moves through the entire structure
+    float wavePhase = t + dot(worldPos, vec3(0.1, 0.05, 0.08));
+    vec3 baseWave = vec3(
+        sin(wavePhase + animOffset.x * 3.14159) * 0.3,
+        sin(wavePhase * 0.7 + animOffset.y * 3.14159) * 0.2,
+        cos(wavePhase * 0.9 + animOffset.z * 3.14159) * 0.25
+    ) * baseWaveIntensity;
+    
+    // Add vertical wave that travels up the structure
+    float verticalWave = sin(worldPos.y * 0.3 - t * 2.0) * 0.1 * baseWaveIntensity;
+    baseWave.x += verticalWave;
+    baseWave.z += verticalWave * 0.5;
+    
+    // === MOUSE INFLUENCE ANIMATION ===
+    float distanceToMouse = length(worldPos - origin);
+    float mouseInfluence = smoothstep(mouseInfluenceRadius, 0.0, distanceToMouse);
+    
+    // Enhanced mouse animation - stronger and more directional
+    vec3 mouseDirection = normalize(worldPos - origin + vec3(0.001)); // Avoid zero division
+    vec3 mouseAnimation = vec3(
+        sin(t * 3.0 + animOffset.x * 6.28) * animOffset.x,
+        sin(t * 2.5 + animOffset.y * 6.28) * animOffset.y,
+        cos(t * 2.8 + animOffset.z * 6.28) * animOffset.z
+    ) * animationIntensity;
+    
+    // Add radial push/pull effect
+    float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
+    mouseAnimation += mouseDirection * radialPulse * animationIntensity;
+    
+    // === COMBINE ANIMATIONS ===
+    vec3 totalDisplacement = baseWave + (mouseAnimation * mouseInfluence);
+    
+    finalWorld[3].xyz += totalDisplacement;
+    
+    vec4 worldPosition = finalWorld * vec4(position, 1.0);
+    gl_Position = viewProjection * worldPosition;
+    
+    vNormal = normalize((finalWorld * vec4(normal, 0.0)).xyz);
+    vWorldPosition = worldPosition.xyz;
+    vInstanceID = instanceID;
+}
         `;
 
 		Effect.ShadersStore["optimizedAnimatedVoxelFragmentShader"] = `
-            precision highp float;
+  precision highp float;
             
             varying vec3 vNormal;
             varying vec3 vWorldPosition;
@@ -242,8 +275,7 @@ export class Monolith {
                 vec3 finalColor = baseColor * lighting;
                 gl_FragColor = vec4(finalColor, 1.0);
             }
-        `;
-	}
+	`};
 
 	public setupGPUPicking() {
 		if (!this.voxelMesh) {
@@ -261,6 +293,9 @@ export class Monolith {
 				if (!this.isPickingEnabled || !this.gpuPicker) return;
 				//if (pointerInfo.type !== PointerEventTypes.POINTERDOWN) return;
 
+				const now = performance.now();
+				//if (now - this.lastPickTime < this.pickThrottleMs) return;
+				this.lastPickTime = now;
 
 				if (this.gpuPicker.pickingInProgress) return;
 
@@ -482,7 +517,10 @@ export class Monolith {
 	}
 
 	private async createOptimizedVoxelMesh(positions: Vector3[]): Promise<Mesh> {
-
+		if (!this.matrixBuffer || positions.length !== this.lastVoxelCount) {
+			this.matrixBuffer = new Float32Array(positions.length * 16);
+			this.lastVoxelCount = positions.length;
+		}
 		const baseCube = MeshBuilder.CreateBox('voxel_base', {
 			size: this.options.voxelSize,
 			updatable: false
@@ -490,7 +528,7 @@ export class Monolith {
 		//baseCube.thinInstanceEnablePicking = true;
 		this.voxelPositions = [...positions];
 		const totalMatrices = positions.length;
-		const matrixBuffer = new Float32Array(totalMatrices * 16);
+		const matrixBuffer = this.matrixBuffer;
 		const instanceIDBuffer = new Float32Array(totalMatrices);
 
 		console.log(`📊 Calculating center and building instance data...`);
@@ -685,7 +723,6 @@ export class Monolith {
 		if (this.options.enableShaderAnimation !== enabled) {
 			console.log(`🎬 ${enabled ? 'Enabling' : 'Disabling'} shader animation...`);
 			this.options.enableShaderAnimation = enabled;
-			this.material.dispose();
 			this.createMaterial();
 
 			if (this.voxelMesh && this.voxelGrid) {
@@ -738,10 +775,15 @@ export class Monolith {
 	}
 
 	public update(time: number, camera: Camera) {
-		if (this.options.enableShaderAnimation && this.material instanceof ShaderMaterial) {
-			this.material.setFloat("time", time * 0.001);
-			this.material.setVector3("origin", this.cursor);
-		}
+		this.material.setFloat("time", time * 0.001);
+		this.material.setVec3("origin", this.cursor);
+		this.material.setFloat("animationSpeed", this.options.animationSpeed);
+		this.material.setFloat("animationIntensity", this.options.animationIntensity);
+		this.material.setVec3("worldCenter", Vector3.Zero());
+
+		this.material.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
+		this.material.setFloat("mouseInfluenceRadius", 1.)
+
 	}
 
 	public getMesh(): Mesh | null {
@@ -753,7 +795,6 @@ export class Monolith {
 			this.voxelMesh.dispose();
 			this.voxelMesh = null;
 		}
-		this.material?.dispose();
 		this.voxelGrid = null;
 		console.log(`🗑️ Monolith disposed`);
 	}

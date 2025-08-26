@@ -122,8 +122,8 @@ export class Field {
 		const monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
 
 		monolith.enableShaderAnimation(true);
-		monolith.setAnimationSpeed(5.);
-		monolith.setAnimationIntensity(0.5);
+		monolith.setAnimationSpeed(4.);
+		monolith.setAnimationIntensity(0.05);
 		//monolith.getPerformanceReport();
 
 		// In render loop - minimal CPU work!
