@@ -91,13 +91,13 @@ export class Field {
 		//this.test.rotation.y = 1 * Math.PI;
 		//this.test.setEnabled(false);
 
-
-		this.test2 = MeshBuilder.CreateBox("test2", { width: 50, depth: 10, height: 10 }, this.scene);
-		this.test2.material = new DitherMaterial("test2", this.scene);
-		this.test2.material.backFaceCulling = false;
-		this.test2.position.set(10, -this.fieldDepth, -20);
-		this.test2.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
-		this.test2.layerMask = 0x01000001;
+		//
+		//this.test2 = MeshBuilder.CreateBox("test2", { width: 50, depth: 10, height: 10 }, this.scene);
+		//this.test2.material = new DitherMaterial("test2", this.scene);
+		//this.test2.material.backFaceCulling = false;
+		//this.test2.position.set(10, -this.fieldDepth, -20);
+		//this.test2.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
+		//this.test2.layerMask = 0x01000001;
 
 		//this.test22 = MeshBuilder.CreateBox("test22", { width: 50, depth: 10, height: 10 }, this.scene);
 		//this.test22.material = new StandardMaterial("test22", this.scene);
