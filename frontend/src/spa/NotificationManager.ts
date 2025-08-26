@@ -3,8 +3,9 @@ import { decodeNotificationMessage } from "./proto/helper";
 import { notif } from "./proto/message.js";
 // import { lobbyVue } from "../Vue";
 import { User } from "./User";
-import { getRequest } from "./requests";
+import { getRequest, postRequest, deleteRequest } from "./requests";
 import { Popup } from "./Popup";
+
 
 class NotificationManagerC {
 	private container: HTMLDivElement;
@@ -130,8 +131,17 @@ class NotificationManagerC {
 					const popSpan = document.createElement('span');
 					getRequest(`info/uuid/${newNotification.friendRequest.sender}`)
 						.then((json) => {
-							n.innerText = `Friend Request: ${(json as any).username}`;
-							popSpan.innerText = `${(json as any).username} wants to be friend with you.`;
+							const senderUsername = (json as any).username;
+							n.innerText = `Friend Request: ${senderUsername}`;
+							popSpan.innerText = `${senderUsername} wants to be friends.`;
+							p.querySelector("#friend-request-yes")?.addEventListener('click', () => {
+								postRequest(`friends/accept`, { inputUsername: senderUsername })
+									.then(() => { Popup.removePopup() })
+							});
+							p.querySelector("#friend-request-no")?.addEventListener('click', () => {
+								deleteRequest(`friends/decline`, { inputUsername: senderUsername })
+									.then(() => { Popup.removePopup() })
+							});
 						});
 					p.appendChild(popSpan);
 					n.addEventListener("click", () => {
@@ -140,10 +150,34 @@ class NotificationManagerC {
 					NotificationManager.addDiv(n);
 				}
 				if (newNotification.friendAccept != null) {
-					console.log(`FRIEND ACCEPT: ${newNotification.friendAccept.sender}`);
+					const n = this.defaultDiv.cloneNode(true) as HTMLDivElement;
+					getRequest(`info/uuid/${newNotification.friendAccept.sender}`)
+						.then((json) => {
+							const senderUsername = (json as any).username;
+							n.innerText = `${senderUsername} accepted to be friends.`;
+						});
+					NotificationManager.addDiv(n);
 				}
 				if (newNotification.gameInvite != null) {
 					console.log(`GAME INVITE: ${newNotification.gameInvite.sender}|${newNotification.gameInvite.lobbyid}`);
+					const n = this.defaultDiv.cloneNode(true) as HTMLDivElement;
+					const p = this.defaultFriendPopup.cloneNode(true) as HTMLDivElement;
+					const popSpan = document.createElement('span');
+					getRequest(`info/uuid/${newNotification.gameInvite.sender}`)
+						.then((json) => {
+							const senderUsername = (json as any).username;
+							n.innerText = `Game invite: ${senderUsername}.`;
+							popSpan.innerText = `${senderUsername} invited you to a game.`;
+							p.querySelector("#game-invite-yes")?.addEventListener('click', () => {
+							});
+							p.querySelector("#game-invite-no")?.addEventListener('click', () => {
+							});
+						});
+					p.appendChild(popSpan);
+					n.addEventListener("click", () => {
+						Popup.addPopup(p);
+					})
+					NotificationManager.addDiv(n);
 				}
 				if (newNotification.statusUpdate != null) {
 					console.log(`NEW STATUS: ${newNotification.statusUpdate.sender}|${newNotification.statusUpdate.status}|${newNotification.statusUpdate?.option}`);
@@ -169,10 +203,10 @@ class NotificationManagerC {
 		windowBar.className = 'window-bar';
 		windowBar.textContent = title;
 
-		const windowContent = document.createElement('div');
+		const windowContent: HTMLDivElement = document.createElement('div');
 		windowContent.className = 'window-content';
 
-		const yesBtn = document.createElement('input');
+		const yesBtn: HTMLInputElement = document.createElement('input');
 		yesBtn.id = `${id}-yes`;
 		yesBtn.type = 'button';
 		yesBtn.value = 'ACCEPT';

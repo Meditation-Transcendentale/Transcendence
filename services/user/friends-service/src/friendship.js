@@ -143,7 +143,6 @@ app.post('/accept', handleErrors(async (req, res) => {
 	}
 
 	const friend = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: requestFrom });
-
 	const friendship = await natsRequest(nats, jc, 'user.getFriendshipFromUser1Username', { userId: user.id, friendId: friend.id });
 	if (friendship.status !== 'pending') {
 		throw { status : statusCode.NOT_FOUND, message: returnMessages.FRIEND_REQUEST_NOT_FOUND };

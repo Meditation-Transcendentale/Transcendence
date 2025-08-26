@@ -74,9 +74,7 @@ async function start() {
         context
       )
     },
-    //IL FAUT ENCODE STATUS
     open: async (ws) => {
-      console.log("NOTIF CO");
       const wasReconnected = userSockets.has(ws.uuid)
       if (!wasReconnected)
         userSockets.set(ws.uuid, ws);
@@ -88,13 +86,6 @@ async function start() {
     },
 
     message: (ws, message, isBinary) => { //debug purpose, nothing coming from the client
-      // try {
-      //   const raw = Buffer.from(message).toString()
-      //   const { type, data } = JSON.parse(raw) 
-      //   console.log(`[${SERVICE_NAME}] received message from ${ws.uuid}:`, { type, data })
-      // } catch (err) {
-      //   console.error(`[${SERVICE_NAME}] Error processing message`, err)
-      // }
     },
 
     close: (ws, code, message) => {
@@ -125,7 +116,6 @@ async function start() {
         if (!userSockets.has(uuid)) return;
 
         let data;
-        console.log(`event type: ${eventType}`);
         switch (eventType) {
           case 'status':
             data = decodeStatusUpdate(msg.data);
@@ -133,10 +123,7 @@ async function start() {
             break;
           case 'friendRequest':
             data = decodeFriendUpdate(msg.data);
-            console.log (data);
-            const xd = encodeNotificationMessage({ friendRequest: data });
             userSockets.get(uuid).send(encodeNotificationMessage({ friendRequest: data }), true);
-            console.log(decodeNotificationMessage(xd));
             break;
           case 'friendAccept':
             data = decodeFriendUpdate(msg.data);
