@@ -120,12 +120,12 @@ export class MonolithMaterial extends CustomMaterial {
 		// this.emissiveColor = new Color3(0.1, 0.1, 0.1);
 		// this.diffuseColor = new Color3(0., 0., 1.);
 		//
-		this.specularPower = 2;
+		this.specularPower = 5;
 		// this.ambientColor = Color3.FromHexString("#c1121f")
 		this.diffuseColor = Color3.FromHexString("#ffffff");
 		this.diffuseColor = Color3.FromHexString("#000000");
 		//this.specularColor = Color3.FromHexString("#c1121f");
-		//this.specularColor = Color3.FromHexString("#03045e");
+		this.specularColor = Color3.FromHexString("#ffffff");
 		this.backFaceCulling = false;
 	}
 

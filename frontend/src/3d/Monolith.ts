@@ -1,4 +1,4 @@
-import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray } from "@babylonImport";
+import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./MonolithMaterial";
 
@@ -149,6 +149,7 @@ export class Monolith {
 		//	needAlphaTesting: false
 		//});
 
+		const light = new PointLight("monolithLight", new Vector3(0, 5., 0), this.scene);
 		const shaderMaterial = new MonolithMaterial("monolithMaterial", this.scene);
 
 		shaderMaterial.setFloat("time", 0);
