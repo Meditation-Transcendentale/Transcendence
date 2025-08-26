@@ -24,6 +24,7 @@ export class Pipeline {
 		this.ray = new Vector2(0, 0);
 		this.hover = 0;
 
+<<<<<<< HEAD
 		//this.combine = new PostProcess("cloud", "combine", ["resolution", "worldPos", "time", "noise"], ["cloudSampler", "grassSampler"], 1., this.camera);
 		////this.combine.autoClear = false;
 		//this.cloudTexture = new ProceduralTexture("cloud", 256, "cloud", this.scene);

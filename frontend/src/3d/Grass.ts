@@ -121,10 +121,10 @@ export class Grass {
 
 		this.setThinInstances(this.meshA, this._size, this._size, optionsA);
 		this.setThinInstances(this.meshB, this._size, this._size, optionsB);
-		this.setThinInstances(this.meshC, this._size, this._size, optionsC);
-		this.setThinInstances(this.meshD, this._size * 2, this._size * 2, optionsD);
-		this.setThinInstances(this.meshD1, this._size, this._size, optionsD);
-		this.setThinInstances(this.meshE, this._size * 4, this._size * 4, optionsE);
+		//this.setThinInstances(this.meshC, this._size, this._size, optionsC);
+		//this.setThinInstances(this.meshD, this._size * 2, this._size * 2, optionsD);
+		//this.setThinInstances(this.meshD1, this._size, this._size, optionsD);
+		//this.setThinInstances(this.meshE, this._size * 4, this._size * 4, optionsE);
 
 		console.log("NB GRASS:", this.meshA.thinInstanceCount * 2 + this.meshB.thinInstanceCount * 4 + this.meshC.thinInstanceCount * 6 + this.meshD.thinInstanceCount * 4 + this.meshD1.thinInstanceCount * 4 + this.meshE.thinInstanceCount * 4)
 
