@@ -4,6 +4,7 @@ import { notif } from "./proto/message.js";
 // import { lobbyVue } from "../Vue";
 import { User } from "./User";
 import { getRequest } from "./requests";
+import { Popup } from "./Popup";
 
 class NotificationManagerC {
 	private container: HTMLDivElement;
@@ -14,9 +15,16 @@ class NotificationManagerC {
 	private canceled!: Array<HTMLElement>;
 	private state = false;
 
+	private css: HTMLLinkElement;
+
 	private ws: WebSocket | null;
 
+
+	private defaultFriendPopup: HTMLDivElement;
+	private defaultGamePopup: HTMLDivElement;
+
 	private hover = false;
+
 
 	constructor() {
 		this.container = document.createElement("div");
@@ -24,6 +32,14 @@ class NotificationManagerC {
 
 		this.defaultDiv = document.createElement("div");
 		this.defaultDiv.className = "notification";
+
+		this.defaultFriendPopup = this.createWindow('friend-request', 'FRIEND REQUEST');
+		this.defaultGamePopup = this.createWindow('game-invite', 'INVITATION TO GAME');
+
+		this.css = document.createElement('link');
+		this.css.rel = 'stylesheet';
+		this.css.type = 'text/css';
+		this.css.href = '/css/style.css';
 
 		this.canceled = new Array<HTMLElement>;
 
@@ -49,7 +65,6 @@ class NotificationManagerC {
 			}
 			this.hover = false;
 		})
-
 	}
 
 	public addDiv(div: HTMLDivElement) {
@@ -102,18 +117,27 @@ class NotificationManagerC {
 			this.ws.onmessage = (event) => {
 
 				let newNotification: notif.NotificationMessage;
-				console.log (`Yes:${event.data}`);
 				try {
 					newNotification = decodeNotificationMessage(new Uint8Array(event.data));
 				} catch (err) {
 					console.error("Failed to decode NotificationMessage", err);
 					return;
 				}
-				
-				console.log (`NEW NOTIF ${newNotification.friendRequest}`);
+
 				if (newNotification.friendRequest != null) {
-					console.log(`FRIEND REQUEST: ${newNotification.friendRequest.sender}`);
-					
+					const n = this.defaultDiv.cloneNode(true) as HTMLDivElement;
+					const p = this.defaultFriendPopup.cloneNode(true) as HTMLDivElement;
+					const popSpan = document.createElement('span');
+					getRequest(`info/uuid/${newNotification.friendRequest.sender}`)
+						.then((json) => {
+							n.innerText = `Friend Request: ${(json as any).username}`;
+							popSpan.innerText = `${(json as any).username} wants to be friend with you.`;
+						});
+					p.appendChild(popSpan);
+					n.addEventListener("click", () => {
+						Popup.addPopup(p);
+					})
+					NotificationManager.addDiv(n);
 				}
 				if (newNotification.friendAccept != null) {
 					console.log(`FRIEND ACCEPT: ${newNotification.friendAccept.sender}`);
@@ -136,6 +160,35 @@ class NotificationManagerC {
 		}
 	}
 
+	private createWindow(id: string, title: string): HTMLDivElement {
+		const windowDiv: HTMLDivElement = document.createElement('div');
+		windowDiv.id = id;
+		windowDiv.className = 'window';
+
+		const windowBar: HTMLDivElement = document.createElement('div');
+		windowBar.className = 'window-bar';
+		windowBar.textContent = title;
+
+		const windowContent = document.createElement('div');
+		windowContent.className = 'window-content';
+
+		const yesBtn = document.createElement('input');
+		yesBtn.id = `${id}-yes`;
+		yesBtn.type = 'button';
+		yesBtn.value = 'ACCEPT';
+
+		const noBtn: HTMLInputElement = document.createElement('input');
+		noBtn.id = `${id}-no`;
+		noBtn.type = 'button';
+		noBtn.value = 'DECLINE';
+
+		windowContent.appendChild(yesBtn);
+		windowContent.appendChild(noBtn);
+		windowDiv.appendChild(windowBar);
+		windowDiv.appendChild(windowContent);
+
+		return windowDiv;
+	}
 }
 
 export const NotificationManager = new NotificationManagerC();

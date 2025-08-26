@@ -124,7 +124,7 @@ app.get('/uuid/:uuid', handleErrors(async (req, res) => {
 	if (!user) {
 		return res.code(statusCode.NOT_FOUND).send({ message: returnMessages.USER_NOT_FOUND });
 	}
-
+	console.log(user.username);
 	res.code(statusCode.SUCCESS).send({ username: user.username });
 }));
 
