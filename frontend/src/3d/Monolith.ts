@@ -36,6 +36,7 @@ export class Monolith {
 	private options: MonolithOptions;
 	private sdfSystem: SDFSystem;
 	private cursor: Vector3;
+	private oldcursor: Vector3;
 	private sdfTree: SDFNode | null = null;
 	private voxelGrid: VoxelGrid | null = null;
 	private gpuPicker: GPUPicker | null = null;
@@ -45,11 +46,14 @@ export class Monolith {
 	private pickThrottleMs = 50;
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
+	private trailPositions: Vector3[] = [];
+	private maxTrailLength = 10;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
 		this.sdfSystem = new SDFSystem();
 		this.cursor = cursor;
+		this.oldcursor = new Vector3(0.);
 
 		this.options = {
 			height: size,
@@ -303,10 +307,10 @@ void main() {
 				this.gpuPicker.pickAsync(event.clientX, event.clientY, false).then((pickInfo) => {
 					if (pickInfo && pickInfo.thinInstanceIndex != null) {
 
-						// Use the stored voxel positions instead
 						if (this.voxelPositions && pickInfo.thinInstanceIndex < this.voxelPositions.length) {
 							const voxelPosition = this.voxelPositions[pickInfo.thinInstanceIndex];
 
+							this.oldcursor.copyFrom(this.cursor);
 							this.cursor.copyFrom(voxelPosition);
 						} else {
 							console.warn("❌ Invalid instance index or missing voxel positions");
@@ -778,12 +782,13 @@ void main() {
 	public update(time: number, camera: Camera) {
 		this.material.setFloat("time", time * 0.001);
 		this.material.setVec3("origin", this.cursor);
+		this.material.setVec3("oldOrigin", this.oldcursor);
 		this.material.setFloat("animationSpeed", this.options.animationSpeed);
 		this.material.setFloat("animationIntensity", this.options.animationIntensity);
 		this.material.setVec3("worldCenter", Vector3.Zero());
 
 		this.material.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
-		this.material.setFloat("mouseInfluenceRadius", 1.)
+		this.material.setFloat("mouseInfluenceRadius", 0.8)
 
 	}
 
