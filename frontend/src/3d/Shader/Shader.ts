@@ -1,5 +1,6 @@
 import { Color3, CustomMaterial, Effect, Scene, Texture, Vector3 } from "@babylonImport"
 import "./GeometryShader.ts";
+import "./UnderwaterShader.ts";
 
 
 Effect.IncludesShadersStore["noises"] = `
@@ -1070,7 +1071,7 @@ export class GrassShader extends CustomMaterial {
 			float distToCamera = length(vPositionW.xyz - vEyePosition.xyz);
 			float distToSurface = max(-vPositionW.y,0.);
 			gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0., 1.);
-			gl_FragColor.rgb *= exp(-waterAbsortion * (distToCamera + distToSurface));
+			//gl_FragColor.rgb *= exp(-waterAbsortion * (distToCamera + distToSurface));
 		`)
 
 		this.Fragment_Before_Fog(`

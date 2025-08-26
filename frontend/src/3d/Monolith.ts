@@ -1,6 +1,7 @@
 import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
+import { UIaddNumber } from "./UtilsUI";
 
 type MonolithOptions = {
 	height: number;
@@ -66,6 +67,10 @@ export class Monolith {
 			mergeTolerance: 0.001,
 			...options
 		};
+
+		UIaddNumber("animationIntensity", this.options.animationIntensity, (v: number) => {
+			this.options.animationIntensity = v;
+		})
 
 		console.log(`🔧 Monolith Configuration:
    Size: ${size}
@@ -149,7 +154,7 @@ export class Monolith {
 		//	needAlphaTesting: false
 		//});
 
-		const light = new PointLight("monolithLight", new Vector3(0, 5., 0), this.scene);
+		//const light = new PointLight("monolithLight", new Vector3(0, 5., 0), this.scene);
 		const shaderMaterial = new MonolithMaterial("monolithMaterial", this.scene);
 
 		shaderMaterial.setFloat("time", 0);

@@ -103,7 +103,7 @@ export function UIaddColor(name: string, col: Color3, eventListener: any): HTMLE
 	div.className = "color-picker";
 	const color = document.createElement("input");
 	color.type = "color";
-	color.value = "#ffffff"
+	color.value = col.toHexString();
 	color.addEventListener("change", () => {
 		col.fromHexString(color.value);
 		eventListener();

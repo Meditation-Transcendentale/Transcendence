@@ -62,6 +62,9 @@ export { Observer } from "@babylonjs/core";
 export { VertexBuffer } from "@babylonjs/core";
 export { GPUPicker } from "@babylonjs/core";
 export { Ray } from "@babylonjs/core";
+export { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
+export { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
+export { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 
 import "@babylonjs/core/Culling/ray";
 

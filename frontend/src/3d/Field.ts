@@ -9,6 +9,7 @@ import {
 	Quaternion,
 	ArcRotateCamera,
 	UniversalCamera,
+	DepthRenderer,
 } from "@babylonImport";
 import { Vue } from "../Vue";
 import "./Shader/Shader.ts";
@@ -40,7 +41,7 @@ export class Field {
 	private sun: Sun;
 	private grass: Grass;
 	private butterfly: Butterfly;
-	//private water: Water;
+	private water: Water;
 	private ground: Mesh;
 
 	public camera: FreeCamera;
@@ -61,6 +62,8 @@ export class Field {
 
 	public fieldDepth = 0;
 
+	private depthRender: DepthRenderer;
+
 	constructor(scene: Scene) {
 		this.scene = scene;
 		this.cursor = new Vector3();
@@ -80,6 +83,7 @@ export class Field {
 		this.camera.minZ = 0.01;
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.intensity = 0.5;
+		this.depthRender = this.scene.enableDepthRenderer();
 
 
 
@@ -110,15 +114,15 @@ export class Field {
 
 
 
-		this.ground = MeshBuilder.CreateGround("ground", { size: 200. }, this.scene);
+		//this.ground = MeshBuilder.CreateGround("ground", { size: 200. }, this.scene);
 		const m = new StandardMaterial("ground", this.scene);
 		m.diffuseColor = Color3.Black();
 		// m.diffuseColor = new Color3(0.5, 0.5, 0.5);
 		// m.specularColor = new Color3(0.5, 0.5, 0.5);
 		m.specularColor = Color3.Black();
-		this.ground.material = m;
-		this.ground.position.y = - this.fieldDepth;
-		this.ground.layerMask = 0x01000001;
+		//this.ground.material = m;
+		//this.ground.position.y = - this.fieldDepth;
+		//this.ground.layerMask = 0x01000001;
 		//
 		this.rt = new RenderTargetTexture("grass", { width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio }, this.scene);
 		//console.log("GRASS RT SIZE", this.rt.getSize());
@@ -144,11 +148,11 @@ export class Field {
 		//	fortress.update(performance.now(), this.camera);
 		//});
 
-		this.pipeline = new Pipeline(this.scene, this.camera, this.rt);
+		this.pipeline = new Pipeline(this.scene, this.camera, this.depthRender.getDepthMap());
 
 		/////
 
-		//this.water = new Water(this.scene, this.camera);
+		this.water = new Water(this.scene, this.camera);
 		this.grass.depth = this.fieldDepth;
 	}
 
@@ -186,7 +190,7 @@ export class Field {
 		//this.water.rt.renderList = [];
 		//this.water.rt.renderList.push(this.test2);
 		//this.water.rt.renderList.push(this.ground);
-
+		//
 		this.glowLayer.dispose();
 
 		//this.water.setMaterial();
@@ -196,7 +200,7 @@ export class Field {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
 		this.pipeline.update(time);
-		//this.water.update();
+		this.water.update();
 	}
 
 	public onHover(status: number) {
@@ -216,6 +220,7 @@ export class Field {
 
 	public resize() {
 		this.rt.resize({ width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio })
+		this.depthRender.getDepthMap().resize({ width: this.scene.getEngine().getRenderWidth(), height: this.scene.getEngine().getRenderHeight() })
 	}
 
 	public setVue(vue: string) {
