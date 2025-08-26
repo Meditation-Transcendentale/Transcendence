@@ -1,6 +1,6 @@
 import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
-import { MonolithMaterial } from "./MonolithMaterial";
+import { MonolithMaterial } from "./Shader/MonolithMaterial";
 
 type MonolithOptions = {
 	height: number;

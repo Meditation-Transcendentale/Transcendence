@@ -3,7 +3,7 @@
 
 import { Camera, Color3, Color4, LoadAssetContainerAsync, Matrix, Mesh, ProceduralTexture, Scene, Vector3 } from "@babylonImport";
 import { Tile } from "./Tile";
-import { GrassShader } from "./Shader";
+import { GrassShader } from "./Shader/Shader";
 
 
 

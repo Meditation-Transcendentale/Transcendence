@@ -11,16 +11,16 @@ import {
 	UniversalCamera,
 } from "@babylonImport";
 import { Vue } from "../Vue";
-import "./Shader.ts";
+import "./Shader/Shader.ts";
 import { Sun } from "./Sun";
 import { Grass } from "./Grass";
 import { Butterfly } from "./Butterfly";
 import { Pipeline } from "./Pipeline";
-import { DitherMaterial } from "./Shader.ts";
 import { Interpolator } from "./Interpolator";
 import { Water } from "./Water";
 import { Monolith } from "./Monolith";
 import { createFortressMonolith, createTempleMonolith } from "./Builder";
+import { DitherMaterial } from "./Shader/Shader.ts";
 
 
 const playdiv = document.createElement("div");
@@ -40,7 +40,7 @@ export class Field {
 	private sun: Sun;
 	private grass: Grass;
 	private butterfly: Butterfly;
-	private water: Water;
+	//private water: Water;
 	private ground: Mesh;
 
 	public camera: FreeCamera;
@@ -59,7 +59,7 @@ export class Field {
 	private rt: RenderTargetTexture;
 	private rtRatio = 1;
 
-	public fieldDepth = 10;
+	public fieldDepth = 0;
 
 	constructor(scene: Scene) {
 		this.scene = scene;
@@ -148,7 +148,7 @@ export class Field {
 
 		/////
 
-		this.water = new Water(this.scene, this.camera);
+		//this.water = new Water(this.scene, this.camera);
 		this.grass.depth = this.fieldDepth;
 	}
 
@@ -183,20 +183,20 @@ export class Field {
 		//	this.rt.renderList.push(this.grass._tiles[i]._mesh);
 		//}
 
-		this.water.rt.renderList = [];
-		this.water.rt.renderList.push(this.test2);
-		this.water.rt.renderList.push(this.ground);
+		//this.water.rt.renderList = [];
+		//this.water.rt.renderList.push(this.test2);
+		//this.water.rt.renderList.push(this.ground);
 
 		this.glowLayer.dispose();
 
-		this.water.setMaterial();
+		//this.water.setMaterial();
 	}
 
 	public update(time: number, deltaTime: number) {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
 		this.pipeline.update(time);
-		this.water.update();
+		//this.water.update();
 	}
 
 	public onHover(status: number) {

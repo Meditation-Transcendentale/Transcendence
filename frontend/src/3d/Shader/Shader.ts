@@ -1,5 +1,5 @@
 import { Color3, CustomMaterial, Effect, Scene, Texture, Vector3 } from "@babylonImport"
-import "./Shader/GeometryShader.ts";
+import "./GeometryShader.ts";
 
 
 Effect.IncludesShadersStore["noises"] = `
