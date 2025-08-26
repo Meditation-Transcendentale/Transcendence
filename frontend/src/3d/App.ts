@@ -54,16 +54,6 @@ class app3d {
 
 		this.cssRenderer = new CSSRenderer(this.environment.fieldCamera, this.engine.getRenderWidth(), this.engine.getRenderHeight());
 
-		const vec = new Vector3();
-		const col = new Color3();
-		let f = 0;
-		let b = false;
-		UIaddVec3("testof the angry gnome", vec, () => {
-			console.log(vec);
-		})
-		UIaddColor("colorofdoomcomming", col, () => { console.log(col.toString()) })
-		UIaddNumber("float", f, (n: number) => { f = n; console.log(f) });
-		UIaddToggle("toggle", b, (t: boolean) => { b = t; console.log(b) })
 	}
 
 

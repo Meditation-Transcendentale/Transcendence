@@ -16,7 +16,7 @@ type _thinInstancesOptions = {
 };
 
 const optionsA: _thinInstancesOptions = {
-	density: 6,
+	density: 4,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.5,
@@ -120,7 +120,7 @@ export class Grass {
 		this.noiseTexture.refreshRate = 0;
 
 		this.setThinInstances(this.meshA, this._size, this._size, optionsA);
-		this.setThinInstances(this.meshB, this._size, this._size, optionsB);
+		//this.setThinInstances(this.meshB, this._size, this._size, optionsB);
 		//this.setThinInstances(this.meshC, this._size, this._size, optionsC);
 		//this.setThinInstances(this.meshD, this._size * 2, this._size * 2, optionsD);
 		//this.setThinInstances(this.meshD1, this._size, this._size, optionsD);
@@ -148,10 +148,10 @@ export class Grass {
 		/////////////////////////////
 		const o = new Vector3(0, -0.5, 0);
 		const size = this._size * 0.5
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, -this.depth, 0)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, -this.depth, 0)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, -this.depth, -size * 2)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, -this.depth, -size * 2)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, -this.depth, size)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, -this.depth, size)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, -this.depth, -size)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, -this.depth, -size)), this._size, this._size));
 
 
 		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 3, 0, 0)), this._size, this._size));
