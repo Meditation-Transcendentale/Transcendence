@@ -8,7 +8,7 @@ import {
 	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
-	// Inspector,
+	//Inspector,
 	MeshBuilder,
 	Scene,
 	StandardMaterial,

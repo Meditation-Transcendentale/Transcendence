@@ -3,7 +3,7 @@
 
 import { Camera, Color3, Color4, LoadAssetContainerAsync, Matrix, Mesh, ProceduralTexture, Scene, Vector3 } from "@babylonImport";
 import { Tile } from "./Tile";
-import { GrassShader } from "./Shader";
+import { GrassShader } from "./Shader/Shader";
 
 
 
@@ -19,8 +19,8 @@ const optionsA: _thinInstancesOptions = {
 	density: 6,
 	stiffness: 0.4,
 	rotation: 0.2,
-	size: 1,
-	scale: new Vector3(0.8, .8, 0.8)
+	size: 0.5,
+	scale: new Vector3(1.5, 1.5, 1.5)
 };
 
 const optionsB: _thinInstancesOptions = {
@@ -103,6 +103,8 @@ export class Grass {
 	private _pastTime = 0.0;
 	public cursor!: Vector3;
 
+	public depth = 50.;
+
 	constructor(scene: Scene, size: number, cursor: Vector3) {
 		this._size = size;
 		this._tiles = [];
@@ -144,17 +146,20 @@ export class Grass {
 		/////////////////////////////
 		//
 		/////////////////////////////
-		const o = new Vector3(0, -0.5, -10);
+		const o = new Vector3(0, -0.5, 0);
 		const size = this._size * 0.5
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, 0, 0)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, 0, 0)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, -this.depth, 0)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, -this.depth, 0)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, -this.depth, -size * 2)), this._size, this._size));
+		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, -this.depth, -size * 2)), this._size, this._size));
 
-		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 3, 0, 0)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 3, 0, 0)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size, 0, -size * 2)), this._size, this._size));
-		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size, 0, -size * 2)), this._size, this._size));
-		//
-		//
+
+		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 3, 0, 0)), this._size, this._size));
+		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 3, 0, 0)), this._size, this._size));
+		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size, 0, -size * 2)), this._size, this._size));
+		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size, 0, -size * 2)), this._size, this._size));
+		////
+		////
 		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(size * 3, 0, -size * 2)), this._size, this._size));
 		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(-size * 3, 0, -size * 2)), this._size, this._size));
 		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(size * 5, 0, 0)), this._size, this._size));
@@ -215,7 +220,7 @@ export class Grass {
 		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 4, 0, 20 + size * 11)), this._size * 4, this._size * 4));
 		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 12, 0, 20 + size * 11)), this._size * 4, this._size * 4));
 		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 12, 0, 20 + size * 11)), this._size * 4, this._size * 4));
-
+		//
 
 
 	}
@@ -310,7 +315,7 @@ export class Grass {
 			const matR = Matrix.RotationY(0);
 			const matS = Matrix.Scaling(
 				size * options.scale.x,
-				options.scale.y,
+				size * options.scale.y,
 				size * options.scale.z
 			);
 			const matT = Matrix.Translation(

@@ -1,5 +1,5 @@
 import { GlowLayer, LoadAssetContainerAsync, Matrix, Mesh, Scene, TransformNode, Vector3 } from "@babylonImport";
-import { ButterflyMaterial } from "./Shader";
+import { ButterflyMaterial } from "./Shader/Shader";
 
 export class Butterfly {
 

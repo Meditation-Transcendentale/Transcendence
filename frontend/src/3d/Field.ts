@@ -11,15 +11,16 @@ import {
 	UniversalCamera,
 } from "@babylonImport";
 import { Vue } from "../Vue";
-import "./Shader.ts";
+import "./Shader/Shader.ts";
 import { Sun } from "./Sun";
 import { Grass } from "./Grass";
 import { Butterfly } from "./Butterfly";
 import { Pipeline } from "./Pipeline";
-import { DitherMaterial } from "./Shader.ts";
 import { Interpolator } from "./Interpolator";
+import { Water } from "./Water";
 import { Monolith } from "./Monolith";
 import { createFortressMonolith, createTempleMonolith } from "./Builder";
+import { DitherMaterial } from "./Shader/Shader.ts";
 
 
 const playdiv = document.createElement("div");
@@ -39,6 +40,7 @@ export class Field {
 	private sun: Sun;
 	private grass: Grass;
 	private butterfly: Butterfly;
+	//private water: Water;
 	private ground: Mesh;
 
 	public camera: FreeCamera;
@@ -56,6 +58,8 @@ export class Field {
 
 	private rt: RenderTargetTexture;
 	private rtRatio = 1;
+
+	public fieldDepth = 0;
 
 	constructor(scene: Scene) {
 		this.scene = scene;
@@ -79,27 +83,30 @@ export class Field {
 
 
 
-		this.test = MeshBuilder.CreatePlane("test", { size: 2 }, this.scene);
-		this.test.material = new StandardMaterial("test", this.scene);
-		this.test.material.backFaceCulling = false;
-		this.test.position.set(0, 4, 0);
-		this.test.rotation.y = 1 * Math.PI;
-		this.test.setEnabled(false);
+		//////
+		//this.test = MeshBuilder.CreatePlane("test", { size: 2 }, this.scene);
+		//this.test.material = new StandardMaterial("test", this.scene);
+		//this.test.material.backFaceCulling = false;
+		//this.test.position.set(0, 4, 0);
+		//this.test.rotation.y = 1 * Math.PI;
+		//this.test.setEnabled(false);
+
 
 		this.test2 = MeshBuilder.CreateBox("test2", { width: 50, depth: 10, height: 10 }, this.scene);
 		this.test2.material = new DitherMaterial("test2", this.scene);
 		this.test2.material.backFaceCulling = false;
-		this.test2.position.set(10, 0, -20);
+		this.test2.position.set(10, -this.fieldDepth, -20);
 		this.test2.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
+		this.test2.layerMask = 0x01000001;
 
-		this.test22 = MeshBuilder.CreateBox("test2", { width: 50, depth: 10, height: 10 }, this.scene);
-		this.test22.material = new StandardMaterial("test2", this.scene);
-		this.test22.material.backFaceCulling = false;
-		this.test22.position.set(10, 0, -20);
-		this.test22.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
-		this.test22.material.disableColorWrite = true;
-		this.test22.material.forceDepthWrite = true;
-		this.test22.layerMask = 0x10000000;
+		//this.test22 = MeshBuilder.CreateBox("test22", { width: 50, depth: 10, height: 10 }, this.scene);
+		//this.test22.material = new StandardMaterial("test22", this.scene);
+		//this.test22.material.backFaceCulling = false;
+		//this.test22.position.set(10, 0, -20);
+		//this.test22.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
+		//this.test22.material.disableColorWrite = true;
+		//this.test22.material.forceDepthWrite = true;
+		//this.test22.layerMask = 0x10000000;
 
 
 
@@ -110,15 +117,16 @@ export class Field {
 		// m.specularColor = new Color3(0.5, 0.5, 0.5);
 		m.specularColor = Color3.Black();
 		this.ground.material = m;
-		this.ground.layerMask = 0x10000000;
-
+		this.ground.position.y = - this.fieldDepth;
+		this.ground.layerMask = 0x01000001;
+		//
 		this.rt = new RenderTargetTexture("grass", { width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio }, this.scene);
-		console.log("GRASS RT SIZE", this.rt.getSize());
-		this.rt.activeCamera = this.camera;
+		//console.log("GRASS RT SIZE", this.rt.getSize());
+		//this.rt.activeCamera = this.camera;
 		//this.rt.skipInitialClear = true;
-		this.camera.layerMask = 0x0000FFFF;
+		this.camera.layerMask = 0x0FFFFFF0;
 		this.scene.customRenderTargets = [];
-		this.scene.customRenderTargets.push(this.rt);
+		//this.scene.customRenderTargets.push(this.rt);
 		const monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
 
 		monolith.enableShaderAnimation(true);
@@ -140,6 +148,8 @@ export class Field {
 
 		/////
 
+		//this.water = new Water(this.scene, this.camera);
+		this.grass.depth = this.fieldDepth;
 	}
 
 	public async load() {
@@ -151,7 +161,7 @@ export class Field {
 
 		window.addEventListener("mousemove", (ev) => {
 			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
-			let delta = Math.abs(this.camera.position.y - 1) / ray.y;
+			let delta = Math.abs(this.camera.position.y + this.fieldDepth - 1) / ray.y;
 
 			this.cursorButterfly.x = this.camera.position.x - ray.x * delta;
 			this.cursorButterfly.y = 0;
@@ -166,20 +176,27 @@ export class Field {
 			//	this.cursorMonolith.copyFrom(pick.pickedPoint!);
 		})
 
-		this.rt.renderList = [];
-		this.rt.renderList.push(this.test22);
-		this.rt.renderList.push(this.ground);
-		for (let i = 0; i < this.grass._tiles.length; i++) {
-			this.rt.renderList.push(this.grass._tiles[i]._mesh);
-		}
+		//this.rt.renderList = [];
+		//this.rt.renderList.push(this.test22);
+		//this.rt.renderList.push(this.ground);
+		//for (let i = 0; i < this.grass._tiles.length; i++) {
+		//	this.rt.renderList.push(this.grass._tiles[i]._mesh);
+		//}
+
+		//this.water.rt.renderList = [];
+		//this.water.rt.renderList.push(this.test2);
+		//this.water.rt.renderList.push(this.ground);
 
 		this.glowLayer.dispose();
+
+		//this.water.setMaterial();
 	}
 
 	public update(time: number, deltaTime: number) {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
 		this.pipeline.update(time);
+		//this.water.update();
 	}
 
 	public onHover(status: number) {
@@ -244,7 +261,7 @@ export class Field {
 			}
 			case 'pongBR': {
 				this.scene.activeCamera = this.scene.getCameraByName('br');
-				this.scene.activeCamera?.attachControl();
+				this.scene.activeCamera?.attachControl(); https://cyn-prod.com/stylized-paint-shader-breakdown
 
 				break;
 			}

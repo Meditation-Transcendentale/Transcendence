@@ -1,5 +1,4 @@
 import { AbstractMesh, Camera, Matrix, PostProcess, Quaternion, ShaderMaterial, Vector3, Vector4 } from "@babylonImport";
-import { DitherMaterial } from "./3d/Shader";
 
 
 interface vueOptions {

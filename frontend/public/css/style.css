@@ -258,7 +258,7 @@ input[off] {
 	pointer-events: auto;
 }
 
-input {
+input:not([type="color"], [type="checkbox"], [type="number"]) {
 	all: unset;
 }
 
@@ -451,4 +451,26 @@ input[on] {
 		opacity: 0;
 	}
 
+}
+
+details {
+	position: absolute;
+	left: 0;
+	top: 0;
+	pointer-events: auto;
+	z-index: 50;
+	overflow: scroll;
+	background-color: white;
+	color: black;
+}
+
+input[type="number"] {
+	max-width: 6vh;
+	color: black;
+	background-color: white;
+}
+
+
+details>div::before {
+	content: attr(name)": ";
 }
