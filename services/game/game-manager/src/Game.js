@@ -9,13 +9,13 @@ export class Game {
 			case "local":
 				this.state = this.initializeStatePong();
 				break;
-			case "ia":
+			case "ai":
 				this.state = this.initializeStatePong();
 				break;
 			case "online":
 				this.state = this.initializeStatePong();
 				break;
-			case "pongBR":
+			case "br":
 				this.state = this.initializeStatePongBR();
 				break;
 			case "pongIO":
@@ -62,7 +62,7 @@ export class Game {
 			tick: 0,
 			balls: [],
 			paddles: {},
-			score: {},
+			score: [0, 0],
 			ranks: [],
 			stage: 0,
 		};
@@ -72,6 +72,10 @@ export class Game {
 
 	getState() {
 		return this.state;
+	}
+
+	getPlayers() {
+		return this.players;
 	}
 
 	updateState(newState) {

@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonImport";
 import { ECSManager } from "../ecs/ECSManager.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
@@ -15,23 +15,24 @@ export interface GameTemplateConfig {
 	wallWidth: number;
 }
 
-export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number): void {
-	console.log("localplayerif in template=" + localPaddleId);
+export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string): void {
+	// console.log("localplayerif in template=" + localPaddleId);
 
 	const scoreUI = new Entity();
-	scoreUI.addComponent(new UIComponent());
+	scoreUI.addComponent(new UIComponent(gameMode));
 	ecs.addEntity(scoreUI);
 
 	for (let i = 0; i < 2; i++) {
 		const paddleEntity = new Entity();
 		const posX = config.arenaSizeX / 2 / 10 * 9;
-		const x = i ? -posX : posX;
+		const x = i % 2 ? -posX : posX;
 		const rotation_y = i % 2 ? -90 * Math.PI / 180 : 90 * Math.PI / 180;
 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.25, 0), 0));
-		if (i === localPaddleId)
-			paddleEntity.addComponent(new InputComponent(true));
+		if (i === localPaddleId || gameMode == "local"){
+			paddleEntity.addComponent(new InputComponent(true, gameMode));
+		}
 		else
-			paddleEntity.addComponent(new InputComponent());
+			paddleEntity.addComponent(new InputComponent(false, gameMode));
 		paddleEntity.addComponent(new TransformComponent(
 			new Vector3(x, 0.25, 0),
 			new Vector3(0, rotation_y, 0),

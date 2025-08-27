@@ -1,15 +1,19 @@
-<div id="info" class="container">
-	<div id="update-info">
-		<input id="info-username" type="text"/><br>
-		<img id="info-avatar" src="default_avatar.jpg" height="200" width="200">
-		<input id="info-edit" type="button" value="Edit"/>
+<div id="info" class="sub-container">
+	<link rel="stylesheet" type="text/css" href="/css/info.css">
+	<div id="info-user-win" class="window">
+		<div class="window-bar">USER</div>
+		<div id="info-user" class="window-content">
+			<span>Username :</span>
+			<input id="user-input" class="readable" type="input" placeholder="Username"/><br/>
+			<span>Avatar :</span>
+			<input id="avatar-input" type="file"/><br/>
+			<img id="avatar-img" width="200" />
+			<input id="info-user-submit" type="button" value="submit"/>
+		</div>
 	</div>
-	<input id="update-password" type="button" value="change password">
-	<input id="update-2fa" type="checkbox">2FA</input>
-	<div id="info-popup" class="popup">
-		<input id="info-valid-password" type="password" placeholder="Password" autocomplete="off">
-		<input id="info-new-password" type="password" placeholder="New Password" autocomplete="off">
-		<input id="info-valid-2fa" type="text" placeholder="2FA TOKEN">
-		<input id="info-valid-submit" type="button" value="Submit">
+	<div id="info-security-win" class="window">
+		<div class="window-bar">SECURITY</div>
+		<div id="info-security" class="window-content">
+		</div>
 	</div>
 </div>

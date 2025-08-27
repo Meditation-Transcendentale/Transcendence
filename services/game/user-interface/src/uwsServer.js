@@ -1,9 +1,13 @@
 // src/uwsServer.js
-import { App } from 'uWebSockets.js';
+import { readFileSync } from 'fs';
+import { App, SSLApp } from 'uWebSockets.js';
 import { decodeClientMessage } from './proto/helper.js';
 
 export function startWsServer({ port, handlers }) {
-	const app = App().ws('/*', {
+	const app = SSLApp({
+		key_file_name: process.env.SSL_KEY,
+		cert_file_name: process.env.SSL_CERT
+	}).ws('/*', {
 		idleTimeout: 30,
 		maxBackpressure: 1024,
 
@@ -13,7 +17,8 @@ export function startWsServer({ port, handlers }) {
 				{
 					uuid: params.get('uuid'),
 					role: params.get('role'),
-					gameId: params.get('gameId')
+					gameId: params.get('gameId'),
+					isAlive: false
 				},
 				req.getHeader('sec-websocket-key'),
 				req.getHeader('sec-websocket-protocol'),
@@ -24,6 +29,7 @@ export function startWsServer({ port, handlers }) {
 
 		open: ws => {
 			const { gameId } = ws;
+			ws.isAlive = true;
 			ws.subscribe(gameId);
 			handlers.registerGame?.(ws);
 		},
@@ -38,7 +44,13 @@ export function startWsServer({ port, handlers }) {
 			else {
 				console.warn('Unknown ClientMessage payload');
 			}
+		},
+
+		close: ws => {
+			ws.isAlive = false;
+			handlers.quit(ws);
 		}
+
 	})
 		.listen(port, token => {
 			if (!token) throw new Error(`uWS listen failed on port ${port}`);

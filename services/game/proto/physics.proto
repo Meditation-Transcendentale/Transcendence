@@ -10,20 +10,23 @@ import "shared.proto"; // Import core shared types
 // Unified physics request/response messages
 // (Not part of lobby or UI, but used by pong‐physics and game‐manager)
 message PhysicsRequest {
-  string        gameId = 1;
-  int64         tick   = 2;
+  string gameId = 1;
+  int64 tick = 2;
   repeated shared.PaddleInput input = 3;
-  int32         stage  = 4; // BR mode stage; others: ignored
+  int32 stage = 4; // BR mode stage; others: ignored
 }
 
 message PhysicsResponse {
-  string       gameId  = 1;
-  int64        tick    = 2;
-  repeated shared.Ball balls   = 3;
+  string gameId = 1;
+  int64 tick = 2;
+  repeated shared.Ball balls = 3;
   repeated shared.Paddle paddles = 4;
-  shared.Goal  goal    = 5; // classic mode goal event; empty otherwise
+  shared.Goal goal = 5;     // classic mode goal event; empty otherwise
+  repeated int32 ranks = 6; // BR: ranking per player
+  int32 stage = 7;          // BR mode stage; others: ignored
+  bool end = 8;
+  repeated shared.GameEvent events = 9; // Phase transition events
+  shared.GameStateInfo gameState = 10;  // Current game state
 }
 
-message MatchStateResponse {
-  shared.MatchState state = 1;
-}
+message MatchStateResponse { shared.MatchState state = 1; }

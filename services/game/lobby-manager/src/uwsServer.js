@@ -1,4 +1,5 @@
 // src/uwsServer.js
+import { readFileSync } from 'fs';
 import uWS from 'uWebSockets.js';
 import {
 	decodeClientMessage,
@@ -8,7 +9,13 @@ import {
 const sockets = new Map(); // lobbyId → Set<ws>
 
 export function createUwsApp(path, lobbyService) {
-	const app = uWS.App();
+	const key = readFileSync(process.env.SSL_KEY || './ssl/key.pem', 'utf8');
+	const cert = readFileSync(process.env.SSL_CERT || './ssl/cert.pem', 'utf8');
+	const app = uWS.SSLApp({
+		key_file_name: process.env.SSL_KEY,
+		cert_file_name: process.env.SSL_CERT
+	});
+	console.log("LES CLEES LA CON DE TOI", process.env.SSL_KEY, process.env.SSL_KEY)
 
 	app.ws(path, {
 		idleTimeout: 60,

@@ -1,4 +1,4 @@
-import { Vector3, ArcRotateCamera, Scalar } from "@babylonjs/core";
+import { Vector3, ArcRotateCamera, Scalar } from "@babylonImport";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { InputComponent } from "../components/InputComponent.js";
@@ -24,6 +24,8 @@ export class CameraFollowSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		const now = performance.now();
+		// console.log("camera: ", now);
 		const localPaddle = entities.find(entity => {
 			const input = entity.getComponent(InputComponent);
 			return input && input.isLocal;

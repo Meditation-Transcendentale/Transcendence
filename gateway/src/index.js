@@ -13,12 +13,23 @@ import https from "https";
 
 dotenv.config({ path: "../../.env" });
 
+const FRONTEND_PORT = 8080;
+const hostIP = process.env.HOSTNAME;
+const hostOrigin = `https://${hostIP}:${FRONTEND_PORT}`;
 const app = fastify({
-	logger: true,
+	// logger: true,
 	https: {
 		key: fs.readFileSync(process.env.SSL_KEY),
 		cert: fs.readFileSync(process.env.SSL_CERT)
 	}
+});
+
+app.addHook('onSend', (req, reply, payload, done) => {
+	reply.header('X-Content-Type-Options', 'nosniff');
+	reply.header('X-Frame-Options', 'DENY');
+	reply.header('X-XSS-Protection', '1; mode=block');
+	reply.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+	done();
 });
 
 app.register(fastifyCookie);
@@ -36,7 +47,7 @@ app.register(fastifyRateLimit, {
 });
 
 app.register(fastifyCORS, {
-	origin: ['http://10.19.219.174:8080', 'http://localhost:8081', 'http://172.19.0.2:8081', 'http://172.17.0.1:8080', 'http://localhost:8080', "http://192.168.1.84:8080"],
+	origin: ["*"],
 	methods: ['GET', 'POST', 'PATCH', 'DELETE'],
 	allowedHeaders: ['Content-Type'],
 	credentials: true
@@ -48,6 +59,20 @@ app.setErrorHandler((error, req, res) => {
 });
 
 const verifyJWT = async (req, res) => {
+	if (req.raw.url && req.raw.url.endsWith('/metrics') || req.raw.url.endsWith('/health')) {
+		if (req.raw.url.endsWith('/health')) {
+			return;
+		}
+		const metricsAuth = req.headers['authorization'];
+		if (metricsAuth && metricsAuth.startsWith('Basic ')) {
+			const base64Credentials = metricsAuth.split(' ')[1];
+			const [username, password] = Buffer.from(base64Credentials, 'base64').toString('utf-8').split(':');
+			if (username === 'metrics' && password === process.env.METRICS_PASSWORD) {
+				return;
+			}
+		}
+		return res.code(403).send({ message: 'Forbidden' });
+	}
 
 	const token = req.cookies.accessToken;
 	if (!token) {
@@ -122,6 +147,27 @@ app.register(fastifyHttpProxy, {
 	}
 });
 
+//app.register(fastifyHttpProxy, {
+//	upstream: 'https://lobby_manager:5011',
+//	prefix: '/lobbies',
+//});
+
+app.register(fastifyHttpProxy, {
+	upstream: 'https://lobby_manager:5001',
+	prefix: '/lobby',
+	http2: false,
+	preHandler: verifyJWT,
+	replyOptions: {
+		rewriteRequestHeaders: (req, headers) => {
+			if (req.user) {
+				headers['user'] = JSON.stringify(req.user);
+			}
+			headers['x-api-key'] = process.env.API_GATEWAY_KEY;
+			return headers;
+		}
+	}
+});
+
 app.register(fastifyHttpProxy, {
 	upstream: 'https://get-info-service:4005',
 	prefix: '/info',
@@ -161,6 +207,10 @@ app.register(fastifyHttpProxy, {
 	replyOptions: {
 		rewriteRequestHeaders: addApiKeyHeader
 	}
+});
+
+app.get('/health', (req, res) => {
+	res.status(200).send('OK');
 });
 
 const start = async () => {

@@ -1,0 +1,71 @@
+@font-face {
+	font-family: sensible-senseless;
+	src: url('/assets/sensiblesenseless.otf');
+}
+
+@font-face {
+	font-family: owlcave;
+	src: url('/assets/owlcave.woff');
+}
+
+@font-face {
+	font-family: radio;
+	src: url('/assets/radio.otf');
+}
+
+@font-face {
+	font-family: susle;
+	src: url('/assets/susle.otf');
+}
+
+@font-face {
+	font-family: de-valancia;
+	src: url('/assets/de-valancia.otf');
+}
+
+@font-face {
+	font-family: droid-1997;
+	src: url('/assets/droid_1997.otf');
+}
+
+@font-face {
+	font-family: telegrama;
+	src: url('/assets/telegrama/outline_font/telegrama_raw_osn.otf');
+}
+
+@font-face {
+	font-family: selobae;
+	src: url('/assets/SELOBAE.otf');
+}
+
+@font-face {
+	font-family: selobae-rough;
+	src: url('/assets/SELOBAEROUGH.otf');
+}
+
+@font-face {
+	font-family: lou;
+	src: url('/assets/Lou.otf');
+}
+
+
+@font-face {
+	font-family: dotrice-bold;
+	src: url('/assets/hdad-dotrice-1.001/Dotrice-Bold-Condensed.otf');
+}
+
+@font-face {
+	font-family: dotrice;
+	src: url('/assets/hdad-dotrice-1.001/Dotrice-Condensed.otf');
+}
+
+/* Fonts made by <a href="http://www.webfontfree.com" target="_blank">Web Free Fonts</a> is licensed by <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC 4.0 BY</a> */
+@font-face {
+	font-family: ydmyungjo;
+	src: url('/assets/YDMjo55.ttf')
+}
+
+@font-face {
+	font-family: ptolemy;
+	src: url('/assets/gotico-antiqua_Ptolemy/Ptolemy-Great-Primer18.woff2')
+}

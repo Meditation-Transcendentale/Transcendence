@@ -258,8 +258,8 @@ export class Game {
 			: Math.PI + (Math.random() * angleRange - angleRange / 2); // 157.5° … 202.5°
 
 		vel.x = Math.cos(baseAngle) * speed;
-		vel.y = 0;
-		// vel.y = Math.sin(baseAngle) * speed;
+		// vel.y = 0;
+		vel.y = Math.sin(baseAngle) * speed;
 	}
 	launchBall() {
 		const ball = this.entityManager.getEntitiesWithComponents(['ball'])[0];

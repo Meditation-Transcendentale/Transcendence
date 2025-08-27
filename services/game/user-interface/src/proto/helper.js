@@ -105,3 +105,10 @@ export function decodeMatchEnd(buffer) {
 	return Proto.userinterface.MatchEnd.decode(buffer);
 }
 
+export function encodeErrorMessage(payload) {
+	const err = Proto.userinterface.ErrorMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.userinterface.ErrorMessage
+		.encode(Proto.userinterface.ErrorMessage.create(payload))
+		.finish();
+}

@@ -5,6 +5,8 @@ import { connect, JSONCodec } from 'nats'
 import uWS from 'uWebSockets.js'
 import { v4 as uuidv4 } from 'uuid'
 import config from './config.js';
+import client from 'prom-client';
+import fs from 'fs';
 
 dotenv.config({ path: "../../../../.env"})
 
@@ -15,16 +17,34 @@ const userSockets = new Map()
 
 async function start() {
   
-  const nc = await connect({ servers: process.env.NATS_URL })
-  console.log('[NATS] Connected to', process.env.NATS_URL);
+  const nc = await connect({ 
+    servers: process.env.NATS_URL,
+    token: process.env.NATS_TOKEN,
+    tls: { rejectUnauthorized: false }
+   })
+  // console.log('[NATS] Connected to', process.env.NATS_URL);
   const jc = JSONCodec()
 
-  const app = Fastify({ logger: true });
+  const app = Fastify({
+    logger: true,
+    https: {
+      key: fs.readFileSync(process.env.SSL_KEY),
+      cert: fs.readFileSync(process.env.SSL_CERT)
+    }
+  });
   await app.register(fastifyCors, { origin: '*' });
+  
+  client.collectDefaultMetrics();
+  
+  app.get('/metrics', async (req, res) => {
+    res.type('text/plain');
+    res.send(await client.register.metrics());
+  });
   
   await app.listen({ port: config.PORT, host: '0.0.0.0' });
 	app.log.info(`HTTP API listening on ${config.PORT}`);
-  
+
+
 
   uWS.App().ws(config.WS_PATH, {
     idleTimeout: 120,

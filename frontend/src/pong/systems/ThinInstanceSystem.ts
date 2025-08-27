@@ -1,4 +1,4 @@
-import { Camera } from "@babylonjs/core";
+import { Camera } from "@babylonImport";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { ThinInstanceManager } from "../rendering/ThinInstanceManager.js";
@@ -27,6 +27,7 @@ export class ThinInstanceSystem extends System {
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
+		// console.log("Thin instance system:", performance.now());
 		this.frameCount++;
 		this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
 

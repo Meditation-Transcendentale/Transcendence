@@ -27,6 +27,10 @@ export function decodeMatchCreateResponse(buffer) {
 	return Proto.shared.MatchCreateResponse.decode(buffer);
 }
 
+export function decodeMatchQuit(buffer) {
+	return Proto.shared.MatchQuit.decode(buffer);
+}
+
 /**
  * MatchInput
  */
@@ -46,7 +50,7 @@ export function encodePhysicsRequest(payload) {
 }
 
 export function decodePhysicsResponse(buffer) {
-	return Proto.shared.PhysicsResponse.decode(buffer);
+	return Proto.physics.PhysicsResponse.decode(buffer);
 }
 
 /**

@@ -82,6 +82,9 @@ export default async function statsRoutes(app) {
 				[`history`]: playerStats
 			}
 		});
-
 	}));
+
+	app.get('/health', (req, res) => {
+		res.status(200).send('OK');
+	});
 }

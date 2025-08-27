@@ -1,0 +1,109 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'register'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/register/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  - job_name: 'auth'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/auth/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+  - job_name: 'stats'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/stats/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
+  - job_name: 'friends'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/friends/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
+  - job_name: 'get-info'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/info/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
+  - job_name: 'update-info'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/update-info/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
+  - job_name: 'game-manager'
+    static_configs:
+      - targets: ['game_manager:5050']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
+  - job_name: 'user-interface'
+    static_configs:
+      - targets: ['user_interface:5051']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
+  - job_name: 'pong-physics'
+    static_configs:
+      - targets: ['pong_physics:5052']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
+  - job_name: 'pongBR-physics'
+    static_configs:
+      - targets: ['pongbr_physics:5053']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4
+  - job_name: 'notifications-manager'
+    static_configs:
+      - targets: ['notifications_manager:7001']
+    metrics_path: '/metrics'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: "metrics"
+      password: 7e93dc7cd89f8e080cfea82396e8edede4f76bf6a840e7e997a50c6662e3c5b4

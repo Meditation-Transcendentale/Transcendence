@@ -1,5 +1,11 @@
-<div id="lobby" class="instant">
-	<input type="button" id="lobby-ready" value="Ready" disabled/>
-	<input type="button" id="lobby-quit" value="Quit"/>
-	<div type="button" id="lobby-player-list"></div>
+<div id="lobby" class="sub-container">
+	<link rel="stylesheet" type="text/css" href="/css/lobby.css">
+	<div id="players-window" class="window">
+			<div class="window-bar">PLAYERS LIST</div>
+			<table class="window-content">
+				<thead>	<tr><th>Username</th><th>Ready</th></tr></thead>
+				<tbody id="players-list" class="list-body"></tbody>
+			</table>
+			</div>
+	</div>
 </div>

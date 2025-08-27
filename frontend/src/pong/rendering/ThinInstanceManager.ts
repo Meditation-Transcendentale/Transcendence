@@ -1,6 +1,7 @@
-import { Mesh, Matrix, Vector3, Quaternion, Camera } from "@babylonjs/core";
+import { Camera, Vector3, Mesh, Matrix, Quaternion } from "@babylonImport";
 import { Entity } from "../ecs/Entity.js";
 import { TransformComponent } from "../components/TransformComponent.js";
+import { PaddleComponent } from "../components/PaddleComponent.js";
 
 export class ThinInstanceManager {
 	private mesh: Mesh;
@@ -11,6 +12,8 @@ export class ThinInstanceManager {
 	private updateThreshold: number;
 	private cullThreshold: number;
 
+	// private instanceColors: Float32Array;
+
 	constructor(mesh: Mesh, capacity: number, updateThreshold: number = 300, cullThreshold: number = 500) {
 		this.mesh = mesh;
 		this.capacity = capacity;
@@ -18,6 +21,21 @@ export class ThinInstanceManager {
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16);
 		this.updateThreshold = updateThreshold;
 		this.cullThreshold = cullThreshold;
+		// this.instanceColors = new Float32Array(capacity * 4);
+		// for (let i = 0; i < capacity; i++) {
+		// 	if (i === 0 || i === 1) {
+		// 		this.instanceColors[i * 4 + 0] = 1; // rouge
+		// 		this.instanceColors[i * 4 + 1] = 1;
+		// 		this.instanceColors[i * 4 + 2] = 1;
+		// 		this.instanceColors[i * 4 + 3] = 1; // alpha
+		// 	} else {
+		// 		this.instanceColors[i * 4 + 0] = 1; // rouge
+		// 		this.instanceColors[i * 4 + 1] = 0;
+		// 		this.instanceColors[i * 4 + 2] = 0;
+		// 		this.instanceColors[i * 4 + 3] = 1; // alpha
+		// 	}
+		// }
+		// this.mesh.thinInstanceSetBuffer("instanceColor", this.instanceColors, 4);
 	}
 
 	private computeWorldMatrix(entity: Entity, allEntities: Entity[]): Matrix {
@@ -57,14 +75,14 @@ export class ThinInstanceManager {
 				const pos = Vector3.TransformCoordinates(Vector3.Zero(), matrix);
 				const distance = Vector3.Distance(camera.position, pos);
 				let shouldUpdate = true;
-				if (distance > this.cullThreshold) {
-					shouldUpdate = false;
-				} else if (distance > this.updateThreshold) {
-					if (frameCount % 5 !== 0) {
-						shouldUpdate = false;
-					}
-				}
-				shouldUpdate = true;
+				// if (distance > this.cullThreshold) {
+				// 	shouldUpdate = false;
+				// } else if (distance > this.updateThreshold) {
+				// 	if (frameCount % 5 !== 0) {
+				// 		shouldUpdate = false;
+				// 	}
+				// }
+				// shouldUpdate = true;
 				if (shouldUpdate) {
 					matrix.copyToArray(this.instanceTransforms, count * 16);
 				}

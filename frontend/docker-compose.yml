@@ -10,18 +10,61 @@
 #       timeout: 10s
 #       retries: 3
 services:
-  frontend:
+  builder:
+    container_name: builder_frontend
+    user: "0:0"
     build: 
-      context: ./
-      dockerfile: Dockerfile.dev
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: builder
     ports:
-      - "8080:8081"
+      - "7070:7070"
     volumes:
-      - .:/app
+      - ./frontend/src:/app/src:ro
       - /app/node_modules
+      - bomba:/app/dist
+    networks:
+      - front
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/8081"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD-SHELL", "ls"]
+      start_period: 3s
+      start_interval: 4s
+      interval: 3600s
+      timeout: 5s
       retries: 3
+
+
+  server:
+    container_name: nginx_frontend
+    user: "0:0"
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: nginx
+    ports:
+      - "7000:7000"
+    volumes:
+      - bomba:/usr/share/nginx/html/dist
+      - ./shared/certs:/app/certs:ro
+      - ./frontend/public:/usr/share/nginx/html/public
+    networks:
+      - front
+      - transcendence-network
+    restart: always
+    depends_on:
+      api-gateway:
+        condition: service_started
+  
+volumes:
+  bomba:
+    driver: local
+        
+networks:
+  front:
+    name: front
+    driver: bridge
+  # api-network:
+  #   name: api-network
+  #   external: true
+   

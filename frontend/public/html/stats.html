@@ -1,12 +1,29 @@
-<div id="stats" class="container instant">
-	<div id="stats-username"></div><br>
-	<div id="stats-menu" class="container instant">
-		<input id="classic-menu" type="button" value="Classic">
-		<input id="br-menu" type="button" value="BR">
-		<input id="io-menu" type="button" value="IO">
+<div id="stats" class="sub-container">
+	<link rel="stylesheet" type="text/css" href="/css/stats.css">
+	<div id="stats-container">
+		<div id="stats-username-window" class="window">
+			<div class="window-bar">USERNAME</div>
+			<div class="window-content">
+				<div id="stats-username" class="readable"></div>
+			</div>
+		</div>
+		<div id="stats-table-window" class="window">
+			<div class="window-bar">STATS</div>
+			</div>
+		<div id="stats-history-window" class="window">
+			<div class="window-bar">HISTORY</div>	
+			<table id="classic-history" class="window-content match-history">
+					<thead>	<tr><th>Scored</th><th>Conceded</th><th>Creation Time</th></tr></thead>
+					<tbody class="history-body"></tbody>
+			</table>
+			<table id="br-history" class="window-content match-history">
+					<thead>	<tr><th>Placement</th><th>Kills</th><th>Creation Time</th></tr></thead>
+					<tbody class="history-body"></tbody>
+			</table>
+		</div>
 	</div>
-	<div id="stats-container" class="container instant">
-		<div id="stats-table" class="container instant"></div>
-		<div id="stats-history" class="container instant"></div>
+	<div id="stats-switch" class="switch">
+		<input id="pong-switch" class="switch-input" type="button" value="PONG"/>
+		<input id="br-switch" class="switch-input" type="button" value="BR"/>
 	</div>
 </div>

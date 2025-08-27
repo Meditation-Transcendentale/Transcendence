@@ -12,9 +12,12 @@ services:
       # - ./lobby-manager/test:/app/test
       - ./lobby-manager/package.json:/app/package.json
       - ./lobby-manager/.env.example:/app/.env
+      - ../../shared/certs:/app/certs:ro
     depends_on:
       - nats
     command: npm run dev
+    networks:
+      - transcendence-network
     environment:
       - NATS_URL=nats://nats:4222
       - PORT=5001
@@ -46,6 +49,7 @@ services:
       - ./user-interface/test:/app/test
       - ./user-interface/package.json:/app/package.json
       - ./user-interface/.env.example:/app/.env
+      - ../../shared/certs:/app/certs:ro
     command: npm run start
     ports:
     - "5004:5004"
@@ -119,6 +123,7 @@ services:
     depends_on:
       - nats
 
+<<<<<<< HEAD
   tournament:
     build:
       context: ./tournament
@@ -135,3 +140,7 @@ services:
       - PORT=5009
     ports:
       - "5009:5009"
+=======
+
+
+>>>>>>> main

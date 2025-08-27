@@ -1,10 +1,17 @@
 // src/natsClient.js
 import { connect } from 'nats';
+import dotenv from 'dotenv';
 let nc;
+
+dotenv.config();
 
 export default {
 	async connect(url) {
-		nc = await connect({ servers: url });
+		nc = await connect({ 
+			servers: url,
+			token: process.env.NATS_GAME_TOKEN,
+			tls: { rejectUnauthorized: false }
+		});
 		return nc;
 	},
 

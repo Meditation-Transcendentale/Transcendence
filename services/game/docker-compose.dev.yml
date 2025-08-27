@@ -1,121 +1,189 @@
 services:
-  nats:
+  nats_game:
     image: nats:latest
-    ports:
-      - "4222:4222"
+    container_name: nats_game
+    environment:
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+    volumes:
+      - ./services/game/nats-server.conf:/nats-server.conf:ro
+      - ./shared/certs:/etc/certs:ro
+    command: ["-c", "/nats-server.conf"]
+    networks:
+      - game-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+
 
   lobby-manager:
+    container_name: lobby_manager
     build:
-      context: ./lobby-manager
+      context: ./services/game/lobby-manager
     volumes:
-      - ./lobby-manager/src:/app/src
+      - ./services/game/lobby-manager/src:/app/src
       # - ./lobby-manager/test:/app/test
-      - ./lobby-manager/package.json:/app/package.json
-      - ./lobby-manager/.env.example:/app/.env
+      - ./services/game/lobby-manager/package.json:/app/package.json
+      - ./services/game/lobby-manager/.env.example:/app/.env
+      - ./services/user/shared:/usr/src/app/shared
+      - ./shared/certs:/app/certs:ro
+
     depends_on:
-      - nats
+      nats_game:
+        condition: service_started
+      database_certs-init:
+        condition: service_completed_successfully
     command: npm run dev
     environment:
-      - NATS_URL=nats://nats:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - PORT=5001
     ports:
       - "5001:5001"
       - "5011:5011"
+    networks:
+      - game-network
+      - transcendence-network
 
   game-manager:
-    build: ./game-manager
+    container_name: game_manager
+    build: ./services/game/game-manager
     volumes:
-      - ./game-manager/src:/app/src
-      - ./game-manager/test:/app/test
-      - ./game-manager/package.json:/app/package.json
-      - ./game-manager/.env.example:/app/.env
-    command: npm run dev
+      - ./services/game/game-manager/src:/app/src
+      - ./services/game/game-manager/test:/app/test
+      - ./services/game/game-manager/package.json:/app/package.json
+      - ./services/game/game-manager/.env.example:/app/.env
+      - ./shared/certs:/app/certs:ro
     restart: unless-stopped
     environment:
       - SERVICE_NAME=game-manager
-      - NATS_URL=nats://nats:4222
-      - PORT=5003
-    depends_on:
-      - nats
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      # - PORT=5003
     ports:
       - "5003:5003"
+      # - "5050:5050" # For metrics
+    networks:
+      - game-network
+      - metrics-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+      nats_game:
+        condition: service_started
 
   user-interface:
-    build: ./user-interface
+    container_name: user_interface
+    build: ./services/game/user-interface
     volumes:
-      - ./user-interface/src:/app/src
-      - ./user-interface/test:/app/test
-      - ./user-interface/package.json:/app/package.json
-      - ./user-interface/.env.example:/app/.env
+      - ./services/game/user-interface/src:/app/src
+      - ./services/game/user-interface/test:/app/test
+      - ./services/game/user-interface/package.json:/app/package.json
+      - ./services/game/user-interface/.env.example:/app/.env
+      - ./shared/certs:/app/certs:ro
     command: npm run start
     ports:
     - "5004:5004"
+    # - "5051:5051" # For metrics
     restart: unless-stopped
     environment:
       - SERVICE_NAME=user-interface
-      - NATS_URL=nats://nats:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
     depends_on:
-      - nats
+      database_certs-init:
+        condition: service_completed_successfully
+      nats_game:
+        condition: service_started
+    networks:
+      - game-network
+      - transcendence-network
+      - metrics-network
+    
 
   pong-physics:
-    build: ./pong-physics
+    container_name: pong_physics
+    build: ./services/game/pong-physics
     volumes:
-      - ./pong-physics/src:/app/src
-      - ./pong-physics/test:/app/test
-      - ./pong-physics/package.json:/app/package.json
-      - ./pong-physics/.env.example:/app/.env
-    command: npm run dev
+      - ./services/game/pong-physics/src:/app/src
+      - ./services/game/pong-physics/test:/app/test
+      - ./services/game/pong-physics/package.json:/app/package.json
+      - ./services/game/pong-physics/.env.example:/app/.env
+      - ./shared/certs:/app/certs:ro
+    # command: npm run dev
     restart: unless-stopped
     environment:
       - SERVICE_NAME=pong-physics
-      - NATS_URL=nats://nats:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+    # ports:
+    # - "5052:5052" # For metrics
     depends_on:
-      - nats
+      database_certs-init:
+        condition: service_completed_successfully
+      nats_game:
+        condition: service_started
+    networks:
+      - game-network
+      - metrics-network
 
   pongbr-physics:
-    build: ./pongBR-physics
+    container_name: pongBR_physics
+    build: ./services/game/pongBR-physics
     volumes:
       # - ./profiler-logs:/app/profiler-logs
-      - ./pongBR-physics/src:/app/src
-      - ./pongBR-physics/test:/app/test
-      - ./pongBR-physics/package.json:/app/package.json
-      - ./pongBR-physics/.env.example:/app/.env
-    command: npm run dev
+      - ./services/game/pongBR-physics/src:/app/src
+      - ./services/game/pongBR-physics/test:/app/test
+      - ./services/game/pongBR-physics/package.json:/app/package.json
+      - ./services/game/pongBR-physics/.env.example:/app/.env
+      - ./shared/certs:/app/certs:ro
+    # command: npm run dev
     # ports:
-    # - "9229:9229"
+    # - "5053:5053" # For metrics
     restart: unless-stopped
     environment:
       - SERVICE_NAME=pongBR-physics
-      - NATS_URL=nats://nats:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
     depends_on:
-      - nats
-
-  pongio-physics:
-    build: ./pongIO-physics
-    volumes:
-      - ./pongIO-physics/src:/app/src
-      - ./pongIO-physics/test:/app/test
-      - ./pongIO-physics/package.json:/app/package.json
-      - ./pongIO-physics/.env.example:/app/.env
-    command: npm run dev
-    restart: unless-stopped
-    environment:
-      - SERVICE_NAME=pongIO-physics
-      - NATS_URL=nats://nats:4222
-    depends_on:
-      - nats
+      database_certs-init:
+        condition: service_completed_successfully
+      nats_game:
+        condition: service_started
+    networks:
+      - game-network
+      - metrics-network
 
   ai:
-    build: ./ai
+    container_name: ai_service
+    build: ./services/game/ai
     volumes:
-      - ./ai/src:/app/src
-      - ./ai/test:/app/test
-      - ./ai/package.json:/app/package.json
-      - ./ai/.env.example:/app/.env
+      - ./services/game/ai/src:/app/src
+      - ./services/game/ai/test:/app/test
+      - ./services/game/ai/package.json:/app/package.json
+      - ./services/game/ai/.env.example:/app/.env
     command: npm run dev
     restart: unless-stopped
     environment:
       - SERVICE_NAME=ai
-      - NATS_URL=nats://nats:4222
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
     depends_on:
-      - nats
+      - nats_game
+    networks:
+      - game-network
+
+
+networks:
+  game-network:
+    driver: bridge

@@ -50,5 +50,8 @@ __snapshots__/
 cert-database/
 stat.md
 
-# Virtual env
-**/.venv
+metrics/grafana/plugins
+metrics/grafana/csv
+metrics/grafana/pdf
+metrics/grafana/png
+

@@ -49,7 +49,7 @@ WS ws://${SERVER_ADDRESS}:${SERVER_PORT}?uuid=${UUID}&gameId=${GAMEID}&role=${RO
   - Publishes game start when all players are connected `game.${mode}.${gameId}.match.start` 
   - Publishes client status on connection/in game / in disconnects/ to `user.${uuid}.status.${new_status}` 
 
-- **IA Service**  
+- **AI Service**  
   - Manages bot instances that connect over the Game WebSocket just like human clients
 
 ---

@@ -12,6 +12,7 @@ class Lobby {
 		this.id = id
 		this.mode = mode
 		this.map = map
+		console.log(mode);
 		this.maxPlayers = config.MAX_PLAYERS[mode] ?? 2
 		// userId -> { isReady, lastSeen }
 		this.players = new Map()
@@ -41,7 +42,7 @@ class Lobby {
 
 	allReady() {
 		return (
-			this.players.size > 0 &&
+			this.players.size == this.maxPlayers &&
 			[...this.players.values()].every(p => p.isReady)
 		)
 	}
@@ -75,6 +76,7 @@ export default class LobbyService {
 		const id = Date.now().toString()
 		const lobby = new Lobby({ id, mode, map })
 		this.lobbies.set(id, lobby)
+		console.log(`Lobby ID = ${id}`)
 		return lobby.getState()
 	}
 
@@ -99,6 +101,7 @@ export default class LobbyService {
 
 	async ready(lobbyId, userId) {
 		console.log("HERE");
+		console.log("hoho");
 		const lobby = this.lobbies.get(lobbyId)
 		if (!lobby) throw new Error('Lobby not found')
 
@@ -109,7 +112,7 @@ export default class LobbyService {
 			const reqBuf = encodeMatchCreateRequest({
 				players: [...lobby.players.keys()],
 			})
-
+			console.log("all ready");
 			try {
 				let replyBuf;
 				if (lobby.mode == `tournament`) //no

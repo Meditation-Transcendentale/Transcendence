@@ -15,6 +15,7 @@ services:
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
     depends_on:
@@ -31,6 +32,7 @@ services:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
       - user_shared:/app/shared
+      - cdn_data:/app/cdn_data
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -41,6 +43,8 @@ services:
       - FT_API_SECRET=${FT_API_SECRET}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
+      - CDN_URL=${CDN_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -57,6 +61,7 @@ services:
       - ./shared/db:/app/data
       - ./shared/certs:/app/certs:ro
       - user_shared:/app/shared
+      - cdn_data:/app/cdn_data
     environment:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
@@ -64,6 +69,8 @@ services:
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
+      - CDN_URL=${CDN_URL}
     networks:
       - transcendence-network
     depends_on:
@@ -87,9 +94,9 @@ services:
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
-    restart: always
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
@@ -111,6 +118,7 @@ services:
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
     depends_on:
@@ -131,11 +139,14 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=${DATABASE_URL}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     networks:
       - transcendence-network
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
+      nats:
+        condition: service_started
 
   api-gateway:
     build:
@@ -147,9 +158,11 @@ services:
       - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
+      - HOSTNAME=${HOSTNAME}
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - METRICS_PASSWORD=${METRICS_PASSWORD}
     networks:
       - transcendence-network
     depends_on:
@@ -159,10 +172,12 @@ services:
   notifications-manager:
     build:
       context: ./services/notifications/notifications-manager
+    container_name: notifications_manager
     volumes:
       - ./services/notifications/notifications-manager/src:/app/src
       - ./services/notifications/notifications-manager/package.json:/app/package.json
       - ./services/notifications/notifications-manager/.env.example:/app/.env
+      - ./shared/certs:/app/certs:ro
     environment:
       - NODE_ENV=development
       - JWT_SECRETKEY=${JWT_SECRETKEY}
@@ -170,6 +185,7 @@ services:
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
       - NATS_URL=${NATS_URL}
+      - NATS_TOKEN=${NATS_TOKEN}
     ports:
       - "7001:7001"
       - "7011:7011"
@@ -181,6 +197,7 @@ services:
         condition: service_started
     networks:
       - transcendence-network
+      - metrics-network
 
   docs-service:
     build:
@@ -209,7 +226,6 @@ services:
       update_user_info-service:
         condition: service_started
         
-  
   database_certs-init:
     build:
       context: ./database_certs-init
@@ -223,6 +239,41 @@ services:
       - SSL_CERT=${SSL_CERT}
     networks:
       - transcendence-network
+  
+  cdn:
+    build: ./services/cdn
+    container_name: cdn
+    volumes:
+      - ./shared/certs:/app/certs:ro
+      - cdn_data:/usr/share/nginx/html
+    ports:
+      - "3002:443"
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus
+  #   volumes:
+  #     - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - ./prometheus/web-config.yml:/etc/prometheus/web-config.yml
+  #     - ./shared/certs:/etc/prometheus/certs:ro
+  #   ports:
+  #     - "9090:9090"
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--web.config.file=/etc/prometheus/web-config.yml'
+  #     - '--web.listen-address=:9090'
+  #     - '--web.enable-lifecycle'
+  #   depends_on:
+  #     database_certs-init:
+  #       condition: service_completed_successfully
+  #   networks:
+  #     - transcendence-network
 
 volumes:
   user_shared:
@@ -231,7 +282,17 @@ volumes:
       type: none
       o: bind
       device: ./services/user/shared
+  cdn_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/cdn/public
 
 networks:
   transcendence-network:
     driver: bridge
+    name: api-network
+  metrics-network:
+    driver: bridge
+    name: metrics-network
