@@ -32,7 +32,7 @@ interface BoundingBox {
 
 export class Monolith {
 	public scene: Scene;
-	private voxelMesh: Mesh | null = null;
+	public voxelMesh: Mesh | null = null;
 	private material!: MonolithMaterial;
 	private options: MonolithOptions;
 	private sdfSystem: SDFSystem;
@@ -46,6 +46,8 @@ export class Monolith {
 	private pickThrottleMs = 50;
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
+
+	public depthMaterial: ShaderMaterial;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
@@ -83,6 +85,12 @@ export class Monolith {
 		this.createMaterial();
 		this.buildDefaultSDF();
 		//this.voxelMesh!.thinInstanceEnablePicking = true;
+		//
+
+		this.depthMaterial = new ShaderMaterial("monolithDepth", this.scene, "monolithDepth", {
+			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
+			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "worldCenter", "origin"]
+		})
 	}
 
 	private applyQualitySettings() {
@@ -781,7 +789,7 @@ void main() {
 	}
 
 	public update(time: number, camera: Camera) {
-		this.material.setFloat("time", time * 0.001);
+		this.material.setFloat("time", time);
 		this.material.setVec3("origin", this.cursor);
 		this.material.setFloat("animationSpeed", this.options.animationSpeed);
 		this.material.setFloat("animationIntensity", this.options.animationIntensity);
@@ -789,6 +797,16 @@ void main() {
 
 		this.material.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
 		this.material.setFloat("mouseInfluenceRadius", 1.)
+
+		this.depthMaterial.setFloat("time", time);
+		this.depthMaterial.setVector3("origin", this.cursor);
+		this.depthMaterial.setFloat("animationSpeed", this.options.animationSpeed);
+		this.depthMaterial.setFloat("animationIntensity", this.options.animationIntensity);
+		this.depthMaterial.setVector3("worldCenter", Vector3.Zero());
+
+		this.depthMaterial.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
+		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.)
+
 
 	}
 

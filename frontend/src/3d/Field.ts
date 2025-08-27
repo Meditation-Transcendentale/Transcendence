@@ -42,6 +42,7 @@ export class Field {
 	private grass: Grass;
 	private butterfly: Butterfly;
 	private water: Water;
+	private monolith: Monolith;
 	private ground: Mesh;
 
 	public camera: FreeCamera;
@@ -50,6 +51,7 @@ export class Field {
 	private cursor: Vector3;
 	private cursorMonolith: Vector3;
 	private cursorButterfly: Vector3;
+	private cursorWater: Vector3;
 
 	private pipeline: Pipeline;
 	//////
@@ -69,6 +71,7 @@ export class Field {
 		this.cursor = new Vector3();
 		this.cursorMonolith = new Vector3();
 		this.cursorButterfly = new Vector3();
+		this.cursorWater = new Vector3();
 
 		this.sun = new Sun(this.scene);
 		this.grass = new Grass(this.scene, 20, this.cursor);
@@ -114,15 +117,15 @@ export class Field {
 
 
 
-		//this.ground = MeshBuilder.CreateGround("ground", { size: 200. }, this.scene);
+		this.ground = MeshBuilder.CreateGround("ground", { size: 200. }, this.scene);
 		const m = new StandardMaterial("ground", this.scene);
 		m.diffuseColor = Color3.Black();
 		// m.diffuseColor = new Color3(0.5, 0.5, 0.5);
 		// m.specularColor = new Color3(0.5, 0.5, 0.5);
 		m.specularColor = Color3.Black();
-		//this.ground.material = m;
-		//this.ground.position.y = - this.fieldDepth;
-		//this.ground.layerMask = 0x01000001;
+		this.ground.material = m;
+		this.ground.position.y = - this.fieldDepth;
+		this.ground.layerMask = 0x01000001;
 		//
 		this.rt = new RenderTargetTexture("grass", { width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio }, this.scene);
 		//console.log("GRASS RT SIZE", this.rt.getSize());
@@ -131,17 +134,17 @@ export class Field {
 		this.camera.layerMask = 0x0FFFFFF0;
 		this.scene.customRenderTargets = [];
 		//this.scene.customRenderTargets.push(this.rt);
-		const monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
+		this.monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
 
-		monolith.enableShaderAnimation(true);
-		monolith.setAnimationSpeed(4.);
-		monolith.setAnimationIntensity(0.05);
+		this.monolith.enableShaderAnimation(true);
+		this.monolith.setAnimationSpeed(4.);
+		this.monolith.setAnimationIntensity(0.05);
 		//monolith.getPerformanceReport();
 
 		// In render loop - minimal CPU work!
-		scene.registerBeforeRender(() => {
-			monolith.update(performance.now(), this.camera);
-		});
+		// scene.registerBeforeRender(() => {
+		// 	this.monolith.update(performance.now(), this.camera);
+		// });
 
 		//fortress.setAnimationStyle('gentle');
 		//scene.registerBeforeRender(() => {
@@ -152,7 +155,7 @@ export class Field {
 
 		/////
 
-		this.water = new Water(this.scene, this.camera);
+		this.water = new Water(this.scene, this.camera, this.cursor);
 		this.grass.depth = this.fieldDepth;
 	}
 
@@ -175,6 +178,10 @@ export class Field {
 			this.cursor.y = this.camera.position.z - ray.z * delta;
 			this.cursor.z = performance.now() * 0.001;
 
+			this.cursorWater.x = (this.cursor.x / 40) + 0.5;
+			this.cursorWater.y = (this.cursor.y / 40) + 0.5;
+			this.cursorWater.z = this.cursor.z;
+
 			//const pick = this.scene.pick(ev.clientX, ev.clientY);
 			//if (pick?.hit)
 			//	this.cursorMonolith.copyFrom(pick.pickedPoint!);
@@ -191,6 +198,12 @@ export class Field {
 		//this.water.rt.renderList.push(this.test2);
 		//this.water.rt.renderList.push(this.ground);
 		//
+		//
+
+		for (let i = 0; i < this.grass._tiles.length; i++) {
+			this.depthRender.setMaterialForRendering(this.grass._tiles[i]._mesh, this.grass.grassDepthMaterial);
+		}
+		this.depthRender.setMaterialForRendering(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial)
 		this.glowLayer.dispose();
 
 		//this.water.setMaterial();
@@ -200,7 +213,8 @@ export class Field {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
 		this.pipeline.update(time);
-		this.water.update();
+		this.water.update(time, 0.016);
+		this.monolith.update(time, this.camera);
 	}
 
 	public onHover(status: number) {

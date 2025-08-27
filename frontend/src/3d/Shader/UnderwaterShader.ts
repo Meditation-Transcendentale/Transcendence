@@ -86,7 +86,9 @@ Effect.ShadersStore["underwaterFragmentShader"] = `
 		//gl_FragColor = vec4(vec3(transmittance), 1.);
 		vec4 alpha = vec4(1.) - vec4(min(transmittance, vec3(1.)), 0.);
 		gl_FragColor = mix(color, vec4(0.,0.,1.,1.), alpha);
-//gl_FragColor = color;
-		
+
+		// float d = texture2D(depthTexture, vUV).r;
+		// gl_FragColor = vec4(1. - d, color.g, 0., 1.);
 	}
-`
+`;
+

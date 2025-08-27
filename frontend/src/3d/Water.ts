@@ -8,22 +8,30 @@ import {
 	SolidParticleSystem,
 	SolidParticle,
 	Vector3,
-	RenderTargetTexture
+	RenderTargetTexture,
+	ProceduralTexture,
+	Engine,
+	Vector2,
+	UniversalCamera,
+	ShaderMaterial
 } from "@babylonImport";
 import { UIaddNumber } from "./UtilsUI";
 
 export class Water {
 	private scene: Scene;
 	private camera: Camera;
-	//private causticCamera: UniversalCamera;
+	// private causticCamera: UniversalCamera;
 
-	//private lightMesh: Mesh;
-	//private lightMaterial: ShaderMaterial;
-	//private defaultMaterial: ShaderMaterial;
+	// private lightMesh: Mesh;
+	// private lightMaterial: ShaderMaterial;
+	// private defaultMaterial: ShaderMaterial;
+	//
+	private waterMesh: Mesh;
+	private waterMaterial: ShaderMaterial;
 
 
 
-	private size = 20;
+	private size = 40;
 	private height = 40;
 
 	//public rt: RenderTargetTexture;
@@ -32,17 +40,28 @@ export class Water {
 	private worldScale = 40;
 
 	private sps: SolidParticleSystem;
-	private particleNumber = 1000;
+	private particleNumber = 2000;
 	private particleMesh: Mesh;
 	private particleSize = 0.02;
 	private particleMaterial: StandardMaterial;
-	private particleRadius = 20;
+	private particleRadius = 10;
 	private particleDirection = new Vector3(0.5, -1, 0.1).normalize();
 	private particleSpeed = 0.01;
 
-	constructor(scene: Scene, camera: Camera) {
+	private waterRt1: ProceduralTexture;
+	private waterRt2: ProceduralTexture;
+	private waterRtDelta = 0.0039;
+	private waterRt: boolean;
+	private waterIntensity: number;
+
+	private cursor: Vector3;
+
+	private once = 1.;
+
+	constructor(scene: Scene, camera: Camera, cursor: Vector3) {
 		this.scene = scene;
 		this.camera = camera;
+		this.cursor = cursor;
 
 		this.sps = new SolidParticleSystem("SPS", this.scene);
 		this.sps.billboard = true;
@@ -79,7 +98,26 @@ export class Water {
 			this.particleSpeed = speed;
 		})
 
-		//this.causticCamera = new UniversalCamera("causticCamera", new Vector3(0, this.height + 10, 0), this.scene);
+		// this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurface", this.scene, null, false, false, Engine.TEXTURETYPE_FLOAT);
+		this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurface", this.scene, null);
+		this.waterRt2 = new ProceduralTexture("waterSurface2", 256, "waterSurface", this.scene, null);
+
+		this.waterRt1.wrapR = 0;
+		this.waterRt1.wrapU = 0;
+		this.waterRt1.wrapV = 0;
+		this.waterRt2.wrapR = 0;
+		this.waterRt2.wrapU = 0;
+		this.waterRt2.wrapV = 0;
+
+		this.waterRt1.autoClear = false;
+		this.waterRt2.autoClear = false;
+		this.waterRt1.refreshRate = 1;
+		this.waterRt2.refreshRate = 1;
+		this.waterRt = false;
+		UIaddNumber("water delta", this.waterRtDelta, (n: number) => { this.waterRtDelta = n })
+
+
+		//this.causticCamera = new UniversalCamera("causticCamera", new Vector3(0, this.height + 20, 0), this.scene);
 		//this.causticCamera.setTarget(new Vector3(0, 0, 0));
 		//this.causticCamera.layerMask = 0x0000ffff;
 		//this.causticCamera.mode = Camera.ORTHOGRAPHIC_CAMERA;
@@ -104,14 +142,29 @@ export class Water {
 		//
 		//});
 		//
-		//this.lightMesh = MeshBuilder.CreateGround("water", { width: this.size, height: this.size, subdivisions: 50 }, this.scene);
-		//this.lightMesh.position.set(0, 0, 0);
-		//this.lightMesh.material = new StandardMaterial("water", this.scene);
-		//this.lightMesh.material.backFaceCulling = false;
-		//(this.lightMesh.material as StandardMaterial).diffuseColor = Color3.Blue();
-		//this.lightMesh.layerMask = 0x01000000;
+		// this.lightMesh = MeshBuilder.CreateGround("water", { width: this.size, height: this.size, subdivisions: 50 }, this.scene);
+		// this.lightMesh.position.set(0, 0, 0);
+		// this.lightMesh.material = new StandardMaterial("water", this.scene);
+		// this.lightMesh.material.backFaceCulling = false;
+		// (this.lightMesh.material as StandardMaterial).diffuseColor = Color3.Blue();
+		// this.lightMesh.layerMask = 0x01000000;
 		//
 
+		this.waterMesh = MeshBuilder.CreateGround("water", { width: this.size, height: this.size, subdivisions: 100 }, this.scene);
+		this.waterMesh.position.set(0, 20, 0);
+
+		this.waterIntensity = 1.;
+		UIaddNumber("water intensity", this.waterIntensity, (n: number) => {
+			this.waterIntensity = n;
+		})
+
+		this.waterMaterial = new ShaderMaterial("water", this.scene, "waterCustom", {
+			attributes: ["position", "normal"],
+			uniforms: ["world", "viewProjection", "intensity"],
+			samplers: ["heightMap"],
+		})
+		this.waterMaterial.backFaceCulling = false;
+		this.waterMesh.material = this.waterMaterial;
 	}
 
 	private emitParticle(particle: SolidParticle, start: number) {
@@ -133,8 +186,33 @@ export class Water {
 		//this.rt.setMaterialForRendering(this.rt.renderList as AbstractMesh[], this.defaultMaterial);
 	}
 
-	public update() {
+	public update(time: number, deltaTime: number) {
 		this.sps.setParticles();
-		//this.defaultMaterial.setFloat("worldScale", this.worldScale);
+
+
+		this.waterRt1.setFloat("time", time);
+		this.waterRt1.setFloat("deltaTime", deltaTime);
+		this.waterRt1.setFloat("delta", this.waterRtDelta);
+		this.waterRt1.setVector3("cursor", this.cursor);
+		this.waterRt1.setTexture("surface", this.waterRt2);
+		this.waterRt1.setInt("start", this.once)
+
+		this.waterRt2.setFloat("time", time);
+		this.waterRt2.setFloat("deltaTime", deltaTime);
+		this.waterRt2.setFloat("delta", this.waterRtDelta);
+		this.waterRt2.setVector3("cursor", this.cursor);
+		this.waterRt2.setTexture("surface", this.waterRt1);
+		this.waterRt1.setInt("start", this.once)
+
+		this.waterMaterial.setFloat("intensity", this.waterIntensity);
+		this.waterMaterial.setTexture("heightMap", this.waterRt ? this.waterRt1 : this.waterRt2);
+
+		// this.waterRt ? this.waterRt1.resetRefreshCounter() : this.waterRt2.resetRefreshCounter();
+		this.waterRt = !this.waterRt;
+		this.once = 0.;
+
+
+
+		// this.defaultMaterial.setFloat("worldScale", this.worldScale);
 	}
 }

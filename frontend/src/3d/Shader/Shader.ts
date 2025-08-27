@@ -1,6 +1,9 @@
 import { Color3, CustomMaterial, Effect, Scene, Texture, Vector3 } from "@babylonImport"
 import "./GeometryShader.ts";
 import "./UnderwaterShader.ts";
+import "./depthShaders.ts";
+import "./waterSurfaceShader.ts"
+import "./waterShader.ts";
 
 
 Effect.IncludesShadersStore["noises"] = `
@@ -870,7 +873,7 @@ export class GrassShader extends CustomMaterial {
 		`);
 
 		this.Vertex_After_WorldPosComputed(`
-				worldPos.y += noiseB.g * 1.5;
+				// worldPos.y += noiseB.g * 1.5;
 		`)
 
 		this.Vertex_Before_NormalUpdated(
