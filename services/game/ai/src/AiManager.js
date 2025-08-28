@@ -9,6 +9,7 @@ import { topLevelSearch } from './bstar.js';
 import { performance } from 'node:perf_hooks';
 import { GameStateNode } from './GameStateNode.js';
 
+//paddle 0 = 13, paddle 1 = -13
 export class AiManager {
     constructor(nc) {
         this.nc = nc;
@@ -64,17 +65,16 @@ export class AiManager {
                 if (now - match.lastRun >= 1000) {
                     const node = this.stateToNode(state);
                     const result = topLevelSearch(node);
-                    match.targetOffset = node.ballState.ballVel[0] >= 0 ? result?.aiPaddlePos : result?.futureBallState.ballPos[1];
+                    match.targetOffset = node.ballState.ballVel[0] <= 0 ? result?.aiPaddlePos : result?.futureBallState.ballPos[1];
                     match.lastRun = now;
+                    console.log(`${node.ballState.ballVel[0] <= 0}|aiPaddlePos:${result.aiPaddlePos}|${result.ballState.ballPos[1]}|${result.futureBallState.ballPos[1]}`)
                 }
-
                 if (match.targetOffset == null) continue;
                 const myPaddle = state.paddles[1];
                 const actualMove = myPaddle.move;
                 const pos = myPaddle.offset;
 
                 const diff = match.targetOffset - pos;
-
                 let desiredMove = 0;
                 if (diff > 0.1) desiredMove = 1;
                 else if (diff < -0.1) desiredMove = -1;

@@ -1,11 +1,10 @@
-export const PADDLE_PLAYER_X = -13.5;
-export const PADDLE_AI_X = 13.5;
+export const PADDLE_PLAYER_X = 13.5;
+export const PADDLE_AI_X = -13.5;
 export const PADDLE_WIDTH = 0.4;
 export const PADDLE_HEIGHT = 3;
 export const MAP_HEIGHT = 20;
 export const MAP_WIDTH = 30;
 export const BALL_DIAM = 1.;
-export const WALL_SIZE = 0; // to zero
 export const BALL_ACCELERATION = 1.1;
 export const STEP_SIZE = 0.1;
 export const MAX_PADDLE_SPEED = 0.16;

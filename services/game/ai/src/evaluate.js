@@ -1,4 +1,4 @@
-import { MAP_HEIGHT, PADDLE_HEIGHT, WALL_SIZE } from './constants.js';
+import { MAP_HEIGHT, PADDLE_HEIGHT } from './constants.js';
 
 function nz(x, eps = 1e-9) { return Math.abs(x) < eps ? (x < 0 ? -eps : eps) : x; }
 
@@ -9,7 +9,7 @@ export function evaluateNode(node) {
   const aiY   = node.aiPaddlePos;
   const plY   = node.playerPaddlePos;
 
-  const VSPAN = MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE;
+  const VSPAN = MAP_HEIGHT - PADDLE_HEIGHT;
 
   const d_ai  = (ballY - aiY) / VSPAN;
   const d_pl  = (ballY - plY) / VSPAN;
