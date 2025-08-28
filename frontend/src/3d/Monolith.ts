@@ -48,6 +48,7 @@ export class Monolith {
 	private lastVoxelCount = 0;
 	private trailPositions: Vector3[] = [];
 	private maxTrailLength = 10;
+	private textAtlas: MonolithTextAtlas | null = null;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
@@ -79,7 +80,6 @@ export class Monolith {
    Max Voxels: ${this.options.maxVoxelCount}`);
 
 		this.applyQualitySettings();
-		this.createMaterial();
 		this.buildDefaultSDF();
 		//this.voxelMesh!.thinInstanceEnablePicking = true;
 	}
@@ -121,37 +121,10 @@ export class Monolith {
 
 	public async init() {
 		await this.generateVoxelSystem();
+		//this.textAtlas = new MonolithTextAtlas(this);
 	}
 
-	private createMaterial() {
-		if (this.options.enableShaderAnimation) {
-			this.material = this.createOptimizedShaderMaterial();
-		}
-
-	}
-
-	private createStandardMaterial(): StandardMaterial {
-		const material = new StandardMaterial('monolith_standard', this.scene);
-		material.diffuseColor = new Color3(0.8, 0.8, 0.8);
-		material.emissiveColor = new Color3(0.1, 0.1, 0.1);
-		material.specularColor = new Color3(0.2, 0.2, 0.2);
-		material.roughness = 0.8;
-		return material;
-	}
-
-	private createOptimizedShaderMaterial(): MonolithMaterial {
-		this.defineOptimizedShaders();
-
-		//const shaderMaterial = new ShaderMaterial("optimizedAnimatedVoxel", this.scene, {
-		//	vertex: "optimizedAnimatedVoxel",
-		//	fragment: "optimizedAnimatedVoxel",
-		//}, {
-		//	attributes: ["position", "normal", "world0", "world1", "world2", "world3", "instanceID", "origin"],
-		//	uniforms: ["viewProjection", "time", "animationSpeed", "animationIntensity", "worldCenter"],
-		//	samplers: [],
-		//	needAlphaBlending: false,
-		//	needAlphaTesting: false
-		//});
+	private createMaterial(): MonolithMaterial {
 
 		const light = new PointLight("monolithLight", new Vector3(0, 5., 0), this.scene);
 		const shaderMaterial = new MonolithMaterial("monolithMaterial", this.scene);
@@ -163,124 +136,11 @@ export class Monolith {
 
 		shaderMaterial.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
 		shaderMaterial.setFloat("mouseInfluenceRadius", 1.)
+		this.material = shaderMaterial;
 		//shaderMaterial.diffuseColor = new Color3(0);
 
 		return shaderMaterial;
 	}
-
-	private defineOptimizedShaders() {
-		Effect.ShadersStore["optimizedAnimatedVoxelVertexShader"] = `
-precision highp float;
-
-
-uniform mat4 viewProjection;
-uniform float time;
-uniform float animationSpeed;
-uniform float animationIntensity;
-uniform vec3 worldCenter;
-uniform vec3 origin;
-
-// New uniforms for dual animation
-uniform float baseWaveIntensity; // Default wave strength
-uniform float mouseInfluenceRadius; // How far mouse effect reaches
-
-varying vec3 vNormal;
-varying vec3 vWorldPosition;
-varying float vInstanceID;
-varying vec3 vViewDirection;
-varying float vDistanceToCamera;
-varying vec3 vLocalPosition;
-
-// Noise functions
-float hash(float p) { 
-    p = fract(p * 0.1031); 
-    p *= p + 33.33; 
-    return fract(p * (p + p)); 
-}
-
-vec3 hash3(float p) {
-    vec3 q = vec3(hash(p), hash(p + 1.0), hash(p + 2.0));
-    return q * 2.0 - 1.0;
-}
-
-void main() {
-    mat4 finalWorld = mat4(world0, world1, world2, world3);
-    vec3 worldPos = finalWorld[3].xyz;
-    
-    // Random per-voxel offset
-    vec3 animOffset = hash3(instanceID);
-    float t = time * animationSpeed;
-    
-    // === BASE WAVE ANIMATION (Always Active) ===
-    // Subtle wave that moves through the entire structure
-    float wavePhase = t + dot(worldPos, vec3(0.1, 0.05, 0.08));
-    vec3 baseWave = vec3(
-        sin(wavePhase + animOffset.x * 3.14159) * 0.3,
-        sin(wavePhase * 0.7 + animOffset.y * 3.14159) * 0.2,
-        cos(wavePhase * 0.9 + animOffset.z * 3.14159) * 0.25
-    ) * baseWaveIntensity;
-    
-    // Add vertical wave that travels up the structure
-    float verticalWave = sin(worldPos.y * 0.3 - t * 2.0) * 0.1 * baseWaveIntensity;
-    baseWave.x += verticalWave;
-    baseWave.z += verticalWave * 0.5;
-    
-    // === MOUSE INFLUENCE ANIMATION ===
-    float distanceToMouse = length(worldPos - origin);
-    float mouseInfluence = smoothstep(mouseInfluenceRadius, 0.0, distanceToMouse);
-    
-    // Enhanced mouse animation - stronger and more directional
-    vec3 mouseDirection = normalize(worldPos - origin + vec3(0.001)); // Avoid zero division
-    vec3 mouseAnimation = vec3(
-        sin(t * 3.0 + animOffset.x * 6.28) * animOffset.x,
-        sin(t * 2.5 + animOffset.y * 6.28) * animOffset.y,
-        cos(t * 2.8 + animOffset.z * 6.28) * animOffset.z
-    ) * animationIntensity;
-    
-    // Add radial push/pull effect
-    float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
-    mouseAnimation += mouseDirection * radialPulse * animationIntensity;
-    
-    // === COMBINE ANIMATIONS ===
-    vec3 totalDisplacement = baseWave + (mouseAnimation * mouseInfluence);
-    
-    finalWorld[3].xyz += totalDisplacement;
-    
-    vec4 worldPosition = finalWorld * vec4(position, 1.0);
-    gl_Position = viewProjection * worldPosition;
-    
-    vNormal = normalize((finalWorld * vec4(normal, 0.0)).xyz);
-    vWorldPosition = worldPosition.xyz;
-    vInstanceID = instanceID;
-}
-        `;
-
-		Effect.ShadersStore["optimizedAnimatedVoxelFragmentShader"] = `
-  precision highp float;
-            
-            varying vec3 vNormal;
-            varying vec3 vWorldPosition;
-            varying float vInstanceID;
-            
-            void main() {
-                // Enhanced lighting
-                vec3 lightDir1 = normalize(vec3(0.5, 1.0, 0.3));
-                vec3 lightDir2 = normalize(vec3(-0.3, 0.5, -0.8));
-                
-                float NdotL1 = max(dot(normalize(vNormal), lightDir1), 0.0);
-                float NdotL2 = max(dot(normalize(vNormal), lightDir2), 0.0) * 0.3;
-                
-                float lighting = 0.3 + NdotL1 * 0.6 + NdotL2;
-                
-                // Subtle color variation based on position
-                vec3 baseColor = vec3(0.8, 0.8, 0.8);
-                float colorMod = sin(vInstanceID * 0.1) * 0.05;
-                baseColor += colorMod;
-                
-                vec3 finalColor = baseColor * lighting;
-                gl_FragColor = vec4(finalColor, 1.0);
-            }
-	`};
 
 	public setupGPUPicking() {
 		if (!this.voxelMesh) {
@@ -798,6 +658,7 @@ void main() {
 		this.material.setFloat("mouseInfluenceRadius", 0.8)
 		//this.setRectangularDeadZone(new Vector3(0, 7, 2), 1.5, 1.5, 1);
 
+
 	}
 
 	public getMesh(): Mesh | null {
@@ -812,4 +673,34 @@ void main() {
 		this.voxelGrid = null;
 		console.log(`🗑️ Monolith disposed`);
 	}
+
+	public showText(blockId: string, text: string, x: number = 0, y: number = 0, z: number = 3, size: number = 2.0) {
+		if (this.textAtlas) {
+			this.textAtlas.setText(blockId, text, new Vector3(x, y, z), size);
+		}
+	}
+
+	public glowText(blockId: string, intensity: number = 1.0) {
+		if (this.textAtlas) {
+			this.textAtlas.setGlow(blockId, intensity);
+		}
+	}
+
+	public hideText(blockId: string) {
+		if (this.textAtlas) {
+			this.textAtlas.clearText(blockId);
+		}
+	}
+
+	public debugAtlas() {
+		if (this.textAtlas) {
+			this.textAtlas.debugAtlas();
+		}
+	}
+
+	public getTextBlocks(): string[] {
+		return this.textAtlas?.getAvailableBlocks() || [];
+	}
 }
+
+
