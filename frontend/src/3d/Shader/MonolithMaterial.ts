@@ -18,6 +18,10 @@ export class MonolithMaterial extends CustomMaterial {
 		this.AddUniform('worldCenter', 'vec3', Vector3.Zero());
 		this.AddUniform('origin', 'vec3', Vector3.Zero());
 		this.AddUniform('oldOrigin', 'vec3', Vector3.Zero());
+		this.AddUniform('deadZoneCenter', 'vec3', Vector3.Zero());
+		this.AddUniform('deadZoneWidth', 'float', 1.0);
+		this.AddUniform('deadZoneHeight', 'float', 1.0);
+		this.AddUniform('deadZoneDepth', 'float', 1.0);
 
 		this.Vertex_Begin(`
 			#define MAINUV1 1
@@ -59,6 +63,13 @@ vec3 worldPos2 = finalWorld[3].xyz;
 // Random per-voxel offset
 vec3 animOffset = hash3(instanceID);
 float t = time * animationSpeed;
+// === RECTANGULAR DEAD ZONE CALCULATION ===
+vec3 offsetFromDeadZone = abs(worldPos2 - deadZoneCenter);
+vec3 deadZoneSize = vec3(deadZoneWidth, deadZoneHeight, deadZoneDepth);
+vec3 normalizedOffset = offsetFromDeadZone / deadZoneSize;
+float maxNormalizedOffset = max(max(normalizedOffset.x, normalizedOffset.y), normalizedOffset.z);
+float deadZoneMask = step(1.0, maxNormalizedOffset); 
+
 // === BASE WAVE ANIMATION (Always Active) ===
 float wavePhase = t + dot(worldPos2, vec3(0.1, 0.05, 0.08));
 vec3 baseWave = vec3(
@@ -89,7 +100,7 @@ float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
 mouseAnimation += mouseDirection * radialPulse * animationIntensity;
 mouseAnimation+= pushDirection * pushStrength * 0.05 * mouseInfluence;
 // === COMBINE ANIMATIONS ===
-vec3 totalDisplacement = baseWave + (mouseAnimation * mouseInfluence);
+vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) * deadZoneMask;
 worldPos.xyz += totalDisplacement;
 
 		`)

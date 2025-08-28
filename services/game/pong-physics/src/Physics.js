@@ -144,7 +144,7 @@ export const Physics = {
 						const normalX = avgMTVx / mag;
 						const normalY = avgMTVy / mag;
 						const dot = ballVel.x * normalX + ballVel.y * normalY;
-						const restitution = 1;
+						const restitution = 1.;
 						ballVel.x -= 2 * dot * normalX * restitution;
 						ballVel.y -= 2 * dot * normalY * restitution;
 					}
@@ -205,7 +205,7 @@ export const Physics = {
 						const bounceAngle = mappedY * maxBounceAngle;
 
 						const isLeftPaddle = paddlePos.x < 0;
-						const directionX = isLeftPaddle ? +1.2 : -1.2;
+						const directionX = isLeftPaddle ? +1.1 : -1.1;
 						const speed = Math.hypot(ballVel.x, ballVel.y);
 
 						ballVel.x = speed * Math.cos(-bounceAngle) * directionX;

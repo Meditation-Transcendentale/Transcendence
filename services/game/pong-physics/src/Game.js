@@ -38,6 +38,7 @@ export class Game {
 
 		for (let i = 0; i < 2; i++) {
 			const offset = (config.arenaWidth / 2 * config.paddleOffsetRatio) * config.scaleFactor;
+			console.log("pos=", offset);
 			const x = (i === 0 ? 1 : -1) * offset;
 			const y = 0;
 			const rotation_y = (i === 0 ? 90 : -90) * Math.PI / 180;

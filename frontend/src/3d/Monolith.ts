@@ -724,6 +724,13 @@ void main() {
 		progressCallback(localProcessed, localGenerated);
 	}
 
+	public setRectangularDeadZone(center: Vector3, width: number, height: number, depth: number) {
+		this.material.setVec3("deadZoneCenter", center);
+		this.material.setFloat("deadZoneWidth", width);
+		this.material.setFloat("deadZoneHeight", height);
+		this.material.setFloat("deadZoneDepth", depth);
+	}
+
 	public enableShaderAnimation(enabled: boolean) {
 		if (this.options.enableShaderAnimation !== enabled) {
 			console.log(`🎬 ${enabled ? 'Enabling' : 'Disabling'} shader animation...`);
@@ -789,6 +796,7 @@ void main() {
 
 		this.material.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
 		this.material.setFloat("mouseInfluenceRadius", 0.8)
+		//this.setRectangularDeadZone(new Vector3(0, 7, 2), 1.5, 1.5, 1);
 
 	}
 

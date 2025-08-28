@@ -9,13 +9,13 @@ import { evaluateNode } from './evaluate.js';
  * @returns the range of Y positions
  */
 function generateFullRange() {
-  const lower = -(MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) * 0.5;
-  const upper = (MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) * 0.5;
-  const range = [];
-  for (let y = lower; y <= upper; y += STEP_SIZE) {
-    range.push(Math.round(y * 100) / 100);
-  }
-  return range;
+	const lower = -(MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) * 0.5;
+	const upper = (MAP_HEIGHT - PADDLE_HEIGHT - WALL_SIZE) * 0.5;
+	const range = [];
+	for (let y = lower; y <= upper; y += STEP_SIZE) {
+		range.push(Math.round(y * 100) / 100);
+	}
+	return range;
 }
 
 /**
@@ -24,21 +24,21 @@ function generateFullRange() {
  * @param {*} node to expand
  */
 export function expand(node) {
-  const isAIMove = node.futureBallState.ballVel[0] >= 0;
-  const paddlePositions = generateFullRange();
-  for (const paddlePos of paddlePositions) {
-    const distanceToBall = Math.abs(paddlePos - node.futureBallState.ballPos[1]);
-    const newVelY = node.ballState.ballVel[1] * ((paddlePos - node.futureBallState.ballPos[1] >= 0) == (node.ballState.ballVel[1] >= 0) ? -BALL_ACCELERATION : BALL_ACCELERATION) * distanceToBall;
-    const newVelX = node.ballState.ballVel[0] * -BALL_ACCELERATION;
-    const newBallVel = [newVelX, newVelY];
-    const futureBallState = predictBallState(node.futureBallState.ballPos, newBallVel);
-    let newNode;
-    if (isAIMove)
-      newNode = new GameStateNode(node.futureBallState, paddlePos, node.playerPaddlePos, futureBallState);
-    else
-      newNode = new GameStateNode(node.futureBallState, node.aiPaddlePos, paddlePos, futureBallState);
-    newNode.evaluation = evaluateNode(newNode);
-    node.children.push(newNode);
-    newNode.parent = node;
-  }
+	const isAIMove = node.futureBallState.ballVel[0] >= 0;
+	const paddlePositions = generateFullRange();
+	for (const paddlePos of paddlePositions) {
+		const distanceToBall = Math.abs(paddlePos - node.futureBallState.ballPos[1]);
+		const newVelY = node.ballState.ballVel[1] * ((paddlePos - node.futureBallState.ballPos[1] >= 0) == (node.ballState.ballVel[1] >= 0) ? -BALL_ACCELERATION : BALL_ACCELERATION) * distanceToBall;
+		const newVelX = node.ballState.ballVel[0] * -BALL_ACCELERATION;
+		const newBallVel = [newVelX, newVelY];
+		const futureBallState = predictBallState(node.futureBallState.ballPos, newBallVel);
+		let newNode;
+		if (isAIMove)
+			newNode = new GameStateNode(node.futureBallState, paddlePos, node.playerPaddlePos, futureBallState);
+		else
+			newNode = new GameStateNode(node.futureBallState, node.aiPaddlePos, paddlePos, futureBallState);
+		newNode.evaluation = evaluateNode(newNode);
+		node.children.push(newNode);
+		newNode.parent = node;
+	}
 }
