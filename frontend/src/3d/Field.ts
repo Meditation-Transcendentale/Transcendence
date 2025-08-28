@@ -132,17 +132,11 @@ export class Field {
 		monolith.enableShaderAnimation(true);
 		monolith.setAnimationSpeed(4.);
 		monolith.setAnimationIntensity(0.05);
-		//monolith.getPerformanceReport();
 
-		// In render loop - minimal CPU work!
 		scene.registerBeforeRender(() => {
 			monolith.update(performance.now(), this.camera);
 		});
 
-		//fortress.setAnimationStyle('gentle');
-		//scene.registerBeforeRender(() => {
-		//	fortress.update(performance.now(), this.camera);
-		//});
 
 		this.pipeline = new Pipeline(this.scene, this.camera, this.rt);
 
@@ -227,8 +221,8 @@ export class Field {
 				break;
 			}
 			case 'home': {
-				this.camera.position.set(0, 2, 10);
-				this.camera.setTarget(new Vector3(0, 3, -10));
+				this.camera.position.set(0, 5, 15);
+				this.camera.setTarget(new Vector3(0, 7, 0));
 				//Interpolator.addElem({
 				//	start: this.camera.position,
 				//	end: new Vector3(0, 2, 10),
