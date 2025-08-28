@@ -213,7 +213,7 @@ export class Field {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
 		this.pipeline.update(time);
-		this.water.update(time, 0.016);
+		this.water.update(time, 0.0041);
 		this.monolith.update(time, this.camera);
 	}
 

@@ -13,13 +13,16 @@ uniform float	intensity;
 uniform sampler2D	heightMap;
 
 varying float	height;
+varying vec3	vNormalW;
 
 void main(void) {
 	vec4	worldPos = world * vec4(position, 1.);
-	height = texture2D(heightMap, worldPos.xz / 40. + 0.5).r;
+	vec4 info = texture2D(heightMap, worldPos.xz / 40. + 0.5);
 
 	// worldPos.y += (height * 2. - 1.) * intensity;
-	worldPos.y += height * intensity;
+	height = info.r * 2. - 1.;
+	worldPos.y += height * intensity - intensity * 0.5;
+	vNormalW = 	info.gba;
 	gl_Position = viewProjection * worldPos;
 }
 `;
@@ -27,10 +30,12 @@ void main(void) {
 Effect.ShadersStore["waterCustomFragmentShader"] = `
 precision highp	float;
 
-varying float height;
+varying float	height;
+varying vec3	vNormalW;
 
 void main(void) {
 	gl_FragColor.rgb = vec3(height);
+	gl_FragColor.rgb = vNormalW;
 	gl_FragColor.a = 1.;
 }
 `;

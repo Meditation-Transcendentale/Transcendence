@@ -54,6 +54,7 @@ export class Water {
 	private waterRt: boolean;
 	private waterIntensity: number;
 
+	private dropStrengh = 0.01;
 	private cursor: Vector3;
 
 	private once = 1.;
@@ -98,9 +99,9 @@ export class Water {
 			this.particleSpeed = speed;
 		})
 
-		// this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurface", this.scene, null, false, false, Engine.TEXTURETYPE_FLOAT);
-		this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurface", this.scene, null);
-		this.waterRt2 = new ProceduralTexture("waterSurface2", 256, "waterSurface", this.scene, null);
+		this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurfaceInteraction", this.scene, null, false, false, Engine.TEXTURETYPE_FLOAT);
+		// this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurfaceInteraction", this.scene, null);
+		this.waterRt2 = new ProceduralTexture("waterSurface2", 256, "waterSurface", this.scene, null, false, false, Engine.TEXTURETYPE_FLOAT);
 
 		this.waterRt1.wrapR = 0;
 		this.waterRt1.wrapU = 0;
@@ -115,6 +116,9 @@ export class Water {
 		this.waterRt2.refreshRate = 1;
 		this.waterRt = false;
 		UIaddNumber("water delta", this.waterRtDelta, (n: number) => { this.waterRtDelta = n })
+		UIaddNumber("drop strengh", this.dropStrengh, (n: number) => {
+			this.dropStrengh = n;
+		})
 
 
 		//this.causticCamera = new UniversalCamera("causticCamera", new Vector3(0, this.height + 20, 0), this.scene);
@@ -153,7 +157,7 @@ export class Water {
 		this.waterMesh = MeshBuilder.CreateGround("water", { width: this.size, height: this.size, subdivisions: 100 }, this.scene);
 		this.waterMesh.position.set(0, 20, 0);
 
-		this.waterIntensity = 1.;
+		this.waterIntensity = 4.;
 		UIaddNumber("water intensity", this.waterIntensity, (n: number) => {
 			this.waterIntensity = n;
 		})
@@ -191,28 +195,23 @@ export class Water {
 
 
 		this.waterRt1.setFloat("time", time);
-		this.waterRt1.setFloat("deltaTime", deltaTime);
-		this.waterRt1.setFloat("delta", this.waterRtDelta);
-		this.waterRt1.setVector3("cursor", this.cursor);
+		this.waterRt1.setVector3("origin", this.cursor);
 		this.waterRt1.setTexture("surface", this.waterRt2);
-		this.waterRt1.setInt("start", this.once)
+		this.waterRt1.setFloat("strengh", this.dropStrengh);
+
 
 		this.waterRt2.setFloat("time", time);
-		this.waterRt2.setFloat("deltaTime", deltaTime);
-		this.waterRt2.setFloat("delta", this.waterRtDelta);
-		this.waterRt2.setVector3("cursor", this.cursor);
-		this.waterRt2.setTexture("surface", this.waterRt1);
-		this.waterRt1.setInt("start", this.once)
+		this.waterRt2.setFloat("worldSize", this.size);
 
 		this.waterMaterial.setFloat("intensity", this.waterIntensity);
 		this.waterMaterial.setTexture("heightMap", this.waterRt ? this.waterRt1 : this.waterRt2);
 
+
 		// this.waterRt ? this.waterRt1.resetRefreshCounter() : this.waterRt2.resetRefreshCounter();
-		this.waterRt = !this.waterRt;
-		this.once = 0.;
+		// this.waterRt = !this.waterRt;
+		//
 
 
 
-		// this.defaultMaterial.setFloat("worldScale", this.worldScale);
 	}
 }
