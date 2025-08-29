@@ -122,7 +122,7 @@ app.post('/add', handleErrors(async (req, res) => {
 	if (user.id === friend.id) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_FRIEND_REQUEST };
 	}
-	checkFriendshipStatus(user, friend);
+	await checkFriendshipStatus(user, friend);
 
 	await natsRequest(nats, jc, 'user.addFriendRequest', { userId: user.id, friendId: friend.id });
 

@@ -11,6 +11,7 @@ import { connect, JSONCodec } from "nats";
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
 import { twoFARoutes } from "./2FA.js";
+import { statusRoutes } from "./status.js";
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from "../../shared/natsRequest.mjs";
@@ -243,6 +244,7 @@ app.patch('/password', handleErrors(async (req, res) => {
 }));
 
 twoFARoutes(app);
+statusRoutes(app);
 
 app.get('/health', (req, res) => {
 	res.status(200).send('OK');

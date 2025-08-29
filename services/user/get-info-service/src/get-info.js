@@ -111,7 +111,7 @@ app.get('/status', handleErrors(async (req, res) => {
 
 	const status = await natsRequest(nats, jc, 'user.getUserStatus', { userId: user.id } );
 
-	res.code(statusCode.SUCCESS).send({ status: status.status });
+	res.code(statusCode.SUCCESS).send({ statusInfos: status });
 
 }));
 

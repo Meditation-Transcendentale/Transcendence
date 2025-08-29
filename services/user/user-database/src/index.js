@@ -178,6 +178,16 @@ handleErrorsNats(async () => {
 			const { userId } = jc.decode(msg.data);
 			const status = userService.getUserStatus(userId);
 			nats.publish(msg.reply, jc.encode({ success: true, data: status }));
-		})
+		}),
+		handleNatsSubscription("status.addUserStatus", async (msg) => {
+			const { userId, status } = jc.decode(msg.data);
+			userService.addUserStatus(userId, status);
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
+		handleNatsSubscription("status.updateUserStatus", async (msg) => {
+			const { userId, status, lobby_gameId } = jc.decode(msg.data);
+			userService.updateStatus(userId, status, lobby_gameId);
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
 	]);
 })();
