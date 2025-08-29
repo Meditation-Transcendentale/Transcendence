@@ -73,6 +73,7 @@ const returnMessages = {
 	STATUS_ADDED: 'Status added successfully',
 	STATUS_UPDATED: 'Status updated successfully',
 	STATUS_NOT_FOUND: 'Status not found for this user',
+	BAD_GAME_ID: 'Invalid game or lobby ID',
 
 }
 

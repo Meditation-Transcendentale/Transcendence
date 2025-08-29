@@ -221,8 +221,9 @@ const userService = {
 		addUserStatusStmt.run(userId, status);
 	},
 	updateStatus: (userId, status, lobby_gameId) => {
+		console.log("Updating status for user:", userId, "to status:", status, "and lobby_gameId:", lobby_gameId);
 		const validStatuses = ['online', 'offline', 'in_lobby', 'in_game'];
-		if (!validStatuses.includes(status)) {
+		if (status && !validStatuses.includes(status)) {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.INVALID_STATUS };
 		}
 		updateStatusStmt.run(status, lobby_gameId, userId);

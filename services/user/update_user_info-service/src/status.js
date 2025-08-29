@@ -35,7 +35,7 @@ const statusRoutes = (app) => {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.NOTHING_TO_UPDATE };
 		}
 
-		const { status, lobby_gameId } = req.body;
+		let { status, lobby_gameId } = req.body;
 
 		if (!status && !lobby_gameId) {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.NOTHING_TO_UPDATE };
@@ -48,7 +48,28 @@ const statusRoutes = (app) => {
 			throw { status: statusCode.BAD_REQUEST, message: returnMessages.STATUS_NOT_FOUND };
 		}
 
-		await natsRequest(nats, jc, 'status.updateUserStatus', { userId: user.id, status: req.body.status, lobby_gameId: req.body.lobby_gameId });
+		if (!status) {
+			status = existingStatus.status;
+		}
+		if (!lobby_gameId) {
+			lobby_gameId = existingStatus.lobby_gameId;
+		}
+
+		await natsRequest(nats, jc, 'status.updateUserStatus', { userId: user.id, status, lobby_gameId });
+
+		res.code(statusCode.SUCCESS).send({ message: returnMessages.STATUS_UPDATED });
+	}));
+
+	app.patch('/clear-game-id', handleErrors(async (req, res) => {
+
+		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
+		
+		const existingStatus = await natsRequest(nats, jc, 'user.getUserStatus', { userId: user.id });
+		if (!existingStatus) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.STATUS_NOT_FOUND };
+		}
+
+		await natsRequest(nats, jc, 'status.updateUserStatus', { userId: user.id, status: existingStatus.status, lobby_gameId: null });
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.STATUS_UPDATED });
 	}));
