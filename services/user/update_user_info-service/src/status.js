@@ -15,19 +15,6 @@ const nats = await connect({
 const jc = JSONCodec();
 
 const statusRoutes = (app) => {
-	app.post('/add-user-status', handleErrors(async (req, res) => {
-
-		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
-
-		const existingStatus = await natsRequest(nats, jc, 'user.getUserStatus', { userId: user.id });
-		if (existingStatus) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.STATUS_ALREADY_EXISTS };
-		}
-
-		await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "registered" });
-
-		res.code(statusCode.CREATED).send({ message: returnMessages.STATUS_ADDED });
-	}));
 
 	app.patch('/update-status', handleErrors(async (req, res) => {
 
