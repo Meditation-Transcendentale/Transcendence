@@ -13,7 +13,10 @@ import {
 	Engine,
 	Vector2,
 	UniversalCamera,
-	ShaderMaterial
+	ShaderMaterial,
+	EffectWrapper,
+	Effect,
+	EffectRenderer
 } from "@babylonImport";
 import { UIaddNumber } from "./UtilsUI";
 
@@ -59,6 +62,16 @@ export class Water {
 
 	private once = 1.;
 
+	private rtA: RenderTargetTexture;
+	public rtB: RenderTargetTexture;
+	public rtC: RenderTargetTexture;
+
+	private surfaceEffect: EffectWrapper;
+	private normalEffect: EffectWrapper;
+	private causticEffect: EffectWrapper;
+
+	private effectRenderer: EffectRenderer;
+
 	constructor(scene: Scene, camera: Camera, cursor: Vector3) {
 		this.scene = scene;
 		this.camera = camera;
@@ -99,22 +112,22 @@ export class Water {
 			this.particleSpeed = speed;
 		})
 
-		this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurfaceInteraction", this.scene, null, false, false, Engine.TEXTURETYPE_FLOAT);
-		// this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurfaceInteraction", this.scene, null);
-		this.waterRt2 = new ProceduralTexture("waterSurface2", 256, "waterSurface", this.scene, null, false, false, Engine.TEXTURETYPE_FLOAT);
-
-		this.waterRt1.wrapR = 0;
-		this.waterRt1.wrapU = 0;
-		this.waterRt1.wrapV = 0;
-		this.waterRt2.wrapR = 0;
-		this.waterRt2.wrapU = 0;
-		this.waterRt2.wrapV = 0;
-
-		this.waterRt1.autoClear = false;
-		this.waterRt2.autoClear = false;
-		this.waterRt1.refreshRate = 1;
-		this.waterRt2.refreshRate = 1;
-		this.waterRt = false;
+		// this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurfaceInteraction", this.scene, null, false, false, Engine.TEXTURETYPE_FLOAT);
+		// // this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurfaceInteraction", this.scene, null);
+		// this.waterRt2 = new ProceduralTexture("waterSurface2", 256, "waterSurface", this.scene, null, false, false, Engine.TEXTURETYPE_FLOAT);
+		//
+		// this.waterRt1.wrapR = 0;
+		// this.waterRt1.wrapU = 0;
+		// this.waterRt1.wrapV = 0;
+		// this.waterRt2.wrapR = 0;
+		// this.waterRt2.wrapU = 0;
+		// this.waterRt2.wrapV = 0;
+		//
+		// this.waterRt1.autoClear = false;
+		// this.waterRt2.autoClear = false;
+		// this.waterRt1.refreshRate = 1;
+		// this.waterRt2.refreshRate = 1;
+		// this.waterRt = false;
 		UIaddNumber("water delta", this.waterRtDelta, (n: number) => { this.waterRtDelta = n })
 		UIaddNumber("drop strengh", this.dropStrengh, (n: number) => {
 			this.dropStrengh = n;
@@ -152,10 +165,61 @@ export class Water {
 		// this.lightMesh.material.backFaceCulling = false;
 		// (this.lightMesh.material as StandardMaterial).diffuseColor = Color3.Blue();
 		// this.lightMesh.layerMask = 0x01000000;
-		//
+
+
+		this.rtA = new RenderTargetTexture("waterA", { width: 256, height: 256 }, this.scene, {
+			format: Engine.TEXTUREFORMAT_RGBA,
+			type: Engine.TEXTURETYPE_HALF_FLOAT
+		});
+		this.rtB = this.rtA.clone();
+		this.rtC = this.rtA.clone();
+
+		this.surfaceEffect = new EffectWrapper({
+			name: "waterSurface",
+			engine: this.scene.getEngine(),
+			useShaderStore: true,
+			fragmentShader: "waterSurface",
+			uniforms: ["time", "worldSize"]
+		});
+
+		this.normalEffect = new EffectWrapper({
+			name: "waterNormal",
+			engine: this.scene.getEngine(),
+			useShaderStore: true,
+			fragmentShader: "waterSurfaceNormal",
+			uniforms: ["delta"],
+			samplers: ["surface"]
+		})
+
+		this.causticEffect = new EffectWrapper({
+			name: "waterCaustic",
+			engine: this.scene.getEngine(),
+			useShaderStore: true,
+			fragmentShader: "waterSurfaceCaustic",
+			uniforms: ["delta"],
+			samplers: ["surface"]
+		})
+
+		this.surfaceEffect.onApplyObservable.add(() => {
+			this.surfaceEffect.effect.setFloat("time", performance.now() * 0.001);
+			this.surfaceEffect.effect.setFloat("worldSize", this.size);
+		})
+
+		this.normalEffect.onApplyObservable.add(() => {
+			this.normalEffect.effect.setFloat("delta", this.waterRtDelta);
+			this.normalEffect.effect.setTexture("surface", this.rtA);
+		})
+
+		this.causticEffect.onApplyObservable.add(() => {
+			this.causticEffect.effect.setFloat("delta", this.waterRtDelta);
+			this.causticEffect.effect.setTexture("surfaca", this.rtA);
+		})
+
+		this.effectRenderer = new EffectRenderer(this.scene.getEngine());
+
 
 		this.waterMesh = MeshBuilder.CreateGround("water", { width: this.size, height: this.size, subdivisions: 100 }, this.scene);
-		this.waterMesh.position.set(0, 20, 0);
+		this.waterMesh.position.set(0, 30, 0);
 
 		this.waterIntensity = 4.;
 		UIaddNumber("water intensity", this.waterIntensity, (n: number) => {
@@ -169,6 +233,7 @@ export class Water {
 		})
 		this.waterMaterial.backFaceCulling = false;
 		this.waterMesh.material = this.waterMaterial;
+		this.waterMesh.setEnabled(false);
 	}
 
 	private emitParticle(particle: SolidParticle, start: number) {
@@ -193,25 +258,28 @@ export class Water {
 	public update(time: number, deltaTime: number) {
 		this.sps.setParticles();
 
-
-		this.waterRt1.setFloat("time", time);
-		this.waterRt1.setVector3("origin", this.cursor);
-		this.waterRt1.setTexture("surface", this.waterRt2);
-		this.waterRt1.setFloat("strengh", this.dropStrengh);
-
-
-		this.waterRt2.setFloat("time", time);
-		this.waterRt2.setFloat("worldSize", this.size);
+		//
+		// this.waterRt1.setFloat("time", time);
+		// this.waterRt1.setVector3("origin", this.cursor);
+		// this.waterRt1.setTexture("surface", this.waterRt2);
+		// this.waterRt1.setFloat("strengh", this.dropStrengh);
+		//
+		//
+		// this.waterRt2.setFloat("time", time);
+		// this.waterRt2.setFloat("worldSize", this.size);
 
 		this.waterMaterial.setFloat("intensity", this.waterIntensity);
-		this.waterMaterial.setTexture("heightMap", this.waterRt ? this.waterRt1 : this.waterRt2);
+		this.waterMaterial.setTexture("heightMap", this.rtC);
+		// this.waterMaterial.setTexture("heightMap", this.waterRt ? this.waterRt1 : this.waterRt2);
+		//
+
+		this.effectRenderer.render(this.surfaceEffect, this.rtA);
+		this.effectRenderer.render(this.normalEffect, this.rtB);
+		this.effectRenderer.render(this.causticEffect, this.rtC);
 
 
 		// this.waterRt ? this.waterRt1.resetRefreshCounter() : this.waterRt2.resetRefreshCounter();
 		// this.waterRt = !this.waterRt;
 		//
-
-
-
 	}
 }

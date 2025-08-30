@@ -20,7 +20,7 @@ export class Pipeline {
 
 	private enable: boolean;
 
-	constructor(scene: Scene, camera: Camera, depth: RenderTargetTexture) {
+	constructor(scene: Scene, camera: Camera, depth: RenderTargetTexture, waterSurface: RenderTargetTexture, caustic: RenderTargetTexture) {
 		this.scene = scene;
 		this.camera = camera;
 		this.ray = new Vector2(0, 0);
@@ -83,24 +83,32 @@ export class Pipeline {
 			"cameraWorld",
 			"resolution",
 			"waterHeigth",
+			"waterMaxDisplacement",
 			"waterAbsorption",
 			"density",
 			"noiseOffset",
-			"time"
-		], ["depthTexture"], 1., this.camera);
+			"time",
+			"lightScattering"
+		], ["depthTexture", "surfaceTexture", "causticTexture"], 1., this.camera);
 
 		let waterHeight = 20;
-		let maxDist = 50;
+		let maxDist = 100;
 		let stepLength = 1;
 		let waterAbso = new Color3(0.35, 0.07, 0.03).scaleInPlace(0.1);
 		let density = 1;
-		let noiseOffset = 0.1;
+		let noiseOffset = 1;
+		let waterMaxDisplacement = 1;
+		let scatter = 0.2;
 		UIaddNumber("water heigth", waterHeight, (n: number) => { waterHeight = n });
 		UIaddNumber("max dist", maxDist, (n: number) => { maxDist = n });
 		UIaddNumber("step length", stepLength, (n: number) => { stepLength = n });
 		UIaddNumber("density", density, (n: number) => { density = n });
 		UIaddNumber("noiseOffset", noiseOffset, (n: number) => { noiseOffset = n });
+		UIaddNumber("waterMaxDisplacement", waterMaxDisplacement, (n: number) => { waterMaxDisplacement = n });
 		UIaddColor("water abso", waterAbso, () => { });
+		UIaddNumber("light scattering", scatter, (n: number) => {
+			scatter = n;
+		})
 
 		const ipro = new Matrix();
 		const iview = new Matrix();
@@ -122,10 +130,14 @@ export class Pipeline {
 			effect.setVector3("cameraPosition", this.camera.position);
 			effect.setMatrix("cameraWorld", this.camera.worldMatrixFromCache);
 			effect.setFloat("density", density);
+			effect.setFloat("waterMaxDisplacement", waterMaxDisplacement);
 
 			effect.setFloat("time", performance.now() * 0.001);
 
 			effect.setTexture("depthTexture", this.depth);
+			effect.setTexture("surfaceTexture", waterSurface);
+			effect.setTexture("causticTexture", caustic);
+			effect.setFloat("lightScattering", scatter);
 		}
 
 		console.log("FOV", this.camera.fov);

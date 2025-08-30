@@ -151,11 +151,11 @@ export class Field {
 		//	fortress.update(performance.now(), this.camera);
 		//});
 
-		this.pipeline = new Pipeline(this.scene, this.camera, this.depthRender.getDepthMap());
+		this.water = new Water(this.scene, this.camera, this.cursor);
+		this.pipeline = new Pipeline(this.scene, this.camera, this.depthRender.getDepthMap(), this.water.rtB, this.water.rtC);
 
 		/////
 
-		this.water = new Water(this.scene, this.camera, this.cursor);
 		this.grass.depth = this.fieldDepth;
 	}
 

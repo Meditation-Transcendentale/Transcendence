@@ -20,9 +20,9 @@ void main(void) {
 	vec4 info = texture2D(heightMap, worldPos.xz / 40. + 0.5);
 
 	// worldPos.y += (height * 2. - 1.) * intensity;
-	height = info.r * 2. - 1.;
-	worldPos.y += height * intensity - intensity * 0.5;
-	vNormalW = 	info.gba;
+	height = info.r;
+	// worldPos.y += height * intensity - intensity * 0.5;
+	vNormalW = 	info.rgb;
 	gl_Position = viewProjection * worldPos;
 }
 `;
@@ -35,7 +35,7 @@ varying vec3	vNormalW;
 
 void main(void) {
 	gl_FragColor.rgb = vec3(height);
-	gl_FragColor.rgb = vNormalW;
+	// gl_FragColor.rgb = vNormalW;
 	gl_FragColor.a = 1.;
 }
 `;

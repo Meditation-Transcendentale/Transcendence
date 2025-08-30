@@ -1,41 +1,7 @@
 import { Effect } from "@babylonImport";
 
-Effect.ShadersStore["waterSurfaceInteractionPixelShader"] = `
-precision highp float;
 
-#define M_PI 3.1415926535897932384626433832795
-
-uniform sampler2D	surface;
-uniform float	time;
-uniform vec3	origin;
-uniform float	worldSize;
-uniform float	strengh;
-
-varying vec2	vUV;
-
-void main(void) {
-	vec4 info = texture(surface, vUV);
-	// vec2 pos = (vUV - 0.5) * worldSize;
-	vec2 pos = origin.xy * 0.025 + 0.5;
-	
-
-	// float drop = (max(0., 1. - length(origin.xy - pos))) / max((time - origin.z) * 100., 1.);
-	// float drop = max(0.0, 1. - length(origin.xy - pos) / ) /  max((time - origin.z) * 100., 1.);
-	float drop = max(0.0, 1. - length(pos - vUV) / 0.03 ) * float(abs(time - origin.z) < 0.00001);// max((time - origin.z) * 100., 1.);
-	// drop *= 10.;
-    drop = 0.5 - cos(drop * M_PI) * 0.5;
-	drop *= strengh;
-
-	// float i = info.r + drop;
-	// info.g += i - info.r;
-	// info.r = i;
-
-	info.r += drop;
-	gl_FragColor = info;
-}
-`;
-
-Effect.ShadersStore["waterSurfacePixelShader"] = `
+Effect.ShadersStore["waterSurfaceFragmentShader"] = `
 precision highp float;
 
 #define M_PI 3.1415926535897932384626433832795
@@ -103,3 +69,66 @@ void main(void) {
 	// gl_FragColor.a = 1.;
 }
 `;
+
+Effect.ShadersStore["waterSurfaceNormalFragmentShader"] = `
+precision highp	float;
+
+uniform sampler2D	surface;
+uniform float	delta;
+
+varying vec2	vUV;
+
+void main(void) {
+	vec4 center = texture2D(surface, vUV);
+	
+	vec3 dx = vec3(delta, texture(surface, vUV + vec2(delta, 0.)).r - center.r, 0.0);
+	vec3 dy = vec3(0.0, texture(surface, vUV + vec2(0., delta)).r - center.r, delta);
+
+	center.bga = normalize(cross(dy, dx)) * 0.5 + 0.5;
+
+	gl_FragColor = center;
+}
+`;
+
+Effect.ShadersStore["waterSurfaceCausticFragmentShader"] = `
+precision highp	float;
+
+uniform sampler2D	surface;
+uniform float	delta;
+
+varying vec2	vUV;
+
+const mat3 Sx = mat3( -1, -2, -1, 0, 0, 0, 1, 2, 1 );
+const mat3 Sy = mat3( -1, 0, 1, -2, 0, 2, -1, 0, 1 );
+
+void main() {
+	vec2 dx = vec2(delta, 0.);
+	vec2 dy = vec2(0., delta);
+
+	float center = texture(surface, vUV).r;
+	
+	float c00 = texture(surface, vUV -dx + dy).r;
+	float c01 = texture(surface, vUV -dx).r;
+	float c02 = texture(surface, vUV -dx - dy).r;
+
+	float c10 = texture(surface, vUV  - dy).r;
+	float c11 = center;
+	float c12 = texture(surface, vUV  + dy).r;
+
+	float c20 = texture(surface, vUV + dx - dy).r;
+	float c21 = texture(surface, vUV + dx).r;
+	float c22 = texture(surface, vUV + dx + dy).r;
+
+	float xSobel = Sx[0][0] * c00 + Sx[1][0] * c01 + Sx[2][0] * c02 + \
+				Sx[0][1] * c10 + Sx[1][1] * c11 + Sx[2][1] * c12 + \
+				Sx[0][2] * c20 + Sx[1][2] * c21 + Sx[2][2] * c22;
+	
+	float ySobel = Sy[0][0] * c00 + Sy[1][0] * c01 + Sy[2][0] * c02 + \
+                      Sy[0][1] * c10 + Sy[1][1] * c11 + Sy[2][1] * c12 + \
+                      Sy[0][2] * c20 + Sy[1][2] * c21 + Sy[2][2] * c22;
+
+	float edge = sqrt(pow(xSobel, 2.) + pow(ySobel, 2.));
+	gl_FragColor.rgb = vec3(edge);
+	gl_FragColor.a = 1.;
+}
+`
