@@ -258,7 +258,7 @@ input[off] {
 	pointer-events: auto;
 }
 
-input:not([type="color"], [type="checkbox"], [type="number"]) {
+input:not([type="color"], [type="checkbox"], [type="number"], [type="range"]) {
 	all: unset;
 }
 
@@ -473,4 +473,8 @@ input[type="number"] {
 
 details>div::before {
 	content: attr(name)": ";
+}
+
+input[type="range"] {
+	vertical-align: middle;
 }

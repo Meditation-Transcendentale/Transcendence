@@ -139,3 +139,40 @@ export function UIaddToggle(name: string, value: boolean, eventListener: any): H
 	document.querySelector("#utils-details")?.appendChild(div);
 	return div;
 }
+
+export function UIaddSlider(name: string, value: number, eventListener?: any, step = 1, min = -100, max = 100) {
+	const div = document.createElement("div");
+	div.className = "toggle";
+	const r = document.createElement("input");
+	const n = document.createElement("input");
+	r.type = "range";
+	r.value = value.toString();
+	if (eventListener !== undefined) {
+		r.addEventListener("input", () => {
+			n.value = r.value;
+			eventListener(Number(r.value));
+		});
+	}
+	r.step = step.toString();
+	r.max = max.toString();
+	r.min = min.toString();
+
+	n.type = "number";
+	n.value = value.toString();
+	if (eventListener !== undefined) {
+		n.addEventListener("input", () => {
+			r.value = n.value;
+			eventListener(Number(n.value))
+		});
+	}
+	n.step = step.toString();
+	n.max = max.toString();
+	n.min = min.toString();
+
+	div.appendChild(r);
+	div.appendChild(n);
+	div.setAttribute("name", name);
+	document.querySelector("#utils-details")?.appendChild(div);
+	return div;
+}
+

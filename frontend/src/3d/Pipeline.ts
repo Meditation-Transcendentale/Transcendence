@@ -1,5 +1,5 @@
 import { Camera, Color3, Engine, Matrix, PostProcess, ProceduralTexture, RenderTargetTexture, Scene, Texture, Vector2 } from "@babylonImport";
-import { UIaddColor, UIaddNumber } from "./UtilsUI";
+import { UIaddColor, UIaddNumber, UIaddSlider } from "./UtilsUI";
 
 export class Pipeline {
 	private scene: Scene;
@@ -69,6 +69,7 @@ export class Pipeline {
 		//
 		//
 		//	
+		//
 
 		this.underwater = new PostProcess("underwater", "underwater", [
 			"projection",
@@ -106,9 +107,9 @@ export class Pipeline {
 		UIaddNumber("noiseOffset", noiseOffset, (n: number) => { noiseOffset = n });
 		UIaddNumber("waterMaxDisplacement", waterMaxDisplacement, (n: number) => { waterMaxDisplacement = n });
 		UIaddColor("water abso", waterAbso, () => { });
-		UIaddNumber("light scattering", scatter, (n: number) => {
+		UIaddSlider("light scattering", scatter, (n: number) => {
 			scatter = n;
-		})
+		}, 0.01, 0, 1);
 
 		const ipro = new Matrix();
 		const iview = new Matrix();
