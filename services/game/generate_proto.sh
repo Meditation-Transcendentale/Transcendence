@@ -39,6 +39,7 @@ SERVICES=(
   "frontend-pongbr"
   "ai"
   "notifications"
+  "tournament"
 )
 
 echo "🛠 Starting protobuf generation for all services..."
@@ -116,6 +117,12 @@ for svc in "${SERVICES[@]}"; do
       ;;
     "frontend-pong"|"frontend-pongbr")
       # Frontend games need shared types + UI messages
+      PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/shared.proto"
+        "$SHARED_PROTO_DIR/ui.proto"
+      )
+      ;;
+    "tournament")
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/ui.proto"

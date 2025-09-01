@@ -1,4 +1,6 @@
-import config from './config.js'
+import { decode } from 'nats/lib/nats-base-client/encoders.js';
+import config from './config.js';
+import { decodeMatchEnd } from './proto/helper';
 
 class MatchNode {
     constructor() {
@@ -40,7 +42,8 @@ class Tournament {
                 const [, , gameId] = msg.subject.split(".");
                 match = this.findMatchByGameId(this.root, gameId);
                 if (!match) { return; }
-                const data = this.jc.decode(msg.data);
+                const data = decodeMatchEnd(msg.data);
+                // const data = this.jc.decode(msg.data);
                 match.setResult(data);
                 if (match == this.root) return;
                 if (!areAllMatchesFinishedAtDepth(this.root, match.depth)) {
