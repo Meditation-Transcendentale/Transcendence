@@ -28,7 +28,9 @@ const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_
 const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
 const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getUserForFriendResearchStmt = database.prepare("SELECT username FROM users WHERE username = ?");
-const getUserStatusStmt = database.prepare("SELECT status FROM active_user WHERE user_id = ?");
+const getUserStatusStmt = database.prepare("SELECT status, lobby_gameId FROM active_user WHERE user_id = ?");
+const addUserStatusStmt = database.prepare("INSERT INTO active_user (user_id, status) VALUES (?, ?)");
+const updateStatusStmt = database.prepare("UPDATE active_user SET status = ?, lobby_gameId = ? WHERE user_id = ?");
 const getBlockedUsersStmt = database.prepare(`
 	SELECT bu.id, u1.username AS blocker_username, u2.username AS blocked_username 
 	FROM blocked_users bu
@@ -206,11 +208,26 @@ const userService = {
 	},
 	getUserStatus: (userId) => {
 		const status = getUserStatusStmt.get(userId);
-		if (!status) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.PLAYER_INACTIVE };
-		}
+		// if (!status) {
+		// 	throw { status: statusCode.NOT_FOUND, message: returnMessages.PLAYER_INACTIVE };
+		// }
 		return status;
+	},
+	addUserStatus: (userId, status) => {
+		const validStatuses = ['registered', 'online', 'offline', 'in_lobby', 'in_game'];
+		if (!validStatuses.includes(status)) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.INVALID_STATUS };
+		}
+		addUserStatusStmt.run(userId, status);
+	},
+	updateStatus: (userId, status, lobby_gameId) => {
+		const validStatuses = ['registered', 'online', 'offline', 'in_lobby', 'in_game'];
+		if (status && !validStatuses.includes(status)) {
+			throw { status: statusCode.BAD_REQUEST, message: returnMessages.INVALID_STATUS };
+		}
+		updateStatusStmt.run(status, lobby_gameId, userId);
 	}
+
 };
 
 export default userService;

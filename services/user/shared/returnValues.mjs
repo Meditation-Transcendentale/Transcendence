@@ -68,6 +68,12 @@ const returnMessages = {
 	AVATAR_UPDATED: 'Avatar updated successfully',
 	INVALID_TYPE: 'Invalid image type',
 	UUID_REQUIRED: 'UUID is required',
+	STATUS_ALREADY_EXISTS: 'Status already exists for this user',
+	INVALID_STATUS: 'Invalid status value',
+	STATUS_ADDED: 'Status added successfully',
+	STATUS_UPDATED: 'Status updated successfully',
+	STATUS_NOT_FOUND: 'Status not found for this user',
+	BAD_GAME_ID: 'Invalid game or lobby ID',
 
 }
 

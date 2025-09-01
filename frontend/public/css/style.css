@@ -298,6 +298,7 @@ input[on] {
 }
 
 .speak {
+	cursor: pointer;
 	position: absolute;
 	width: fit-content;
 	height: fit-content;
@@ -305,20 +306,24 @@ input[on] {
 
 	background-color: transparent;
 	color: white;
-	-webkit-text-stroke: 3px;
-	-webkit-text-stroke-color: black;
-	font-size: 10vh;
+	/*-webkit-text-stroke: 3px;*/
+	/*-webkit-text-stroke-color: black;*/
+	font-size: 5vh;
 	font-weight: bold;
 	pointer-events: auto;
 
 }
 
+.speak:hover {
+	color: blue;
+}
+
 .speak::before {
-	content: "<<";
+	/*content: "<<";*/
 }
 
 .speak::after {
-	content: ">>";
+	/*content: ">>";*/
 }
 
 .submit {

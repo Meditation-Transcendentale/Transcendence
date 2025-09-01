@@ -34,21 +34,21 @@ class Home {
 			html: this.ref.stats.html,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(Math.PI * 0.8).multiply(Matrix.Translation(-5, 4, -10)),
+			world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 9, 1.6)),
 			enable: false
 		})
 		this.ref.play.id = App3D.addCSS3dObject({
 			html: this.ref.play.html,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(Math.PI * 1.1).multiply(Matrix.Translation(0, 3, -10)),
+			world: (Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 7, 1.8))),
 			enable: false
 		})
 		this.ref.bricks.id = App3D.addCSS3dObject({
 			html: this.ref.bricks.html,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(Math.PI * 1.2).multiply(Matrix.Translation(5, 5, -10)),
+			world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 5.05, 1.83)),
 			enable: false
 		})
 
@@ -56,7 +56,7 @@ class Home {
 			html: this.ref.exemple.html,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(Math.PI * 1).multiply(Matrix.Translation(0, 6, -10)),
+			world: Matrix.RotationY(Math.PI * 1).multiply(Matrix.Translation(15, 6, -10)),
 			enable: false
 		})
 
