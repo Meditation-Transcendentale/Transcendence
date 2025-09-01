@@ -1,6 +1,7 @@
 import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
+import { SimpleTextRenderer } from "./SimpleTextRenderer";
 
 type MonolithOptions = {
 	height: number;
@@ -32,7 +33,7 @@ interface BoundingBox {
 export class Monolith {
 	public scene: Scene;
 	private voxelMesh: Mesh | null = null;
-	private material!: MonolithMaterial;
+	public material!: MonolithMaterial;
 	private options: MonolithOptions;
 	private sdfSystem: SDFSystem;
 	private cursor: Vector3;
@@ -48,7 +49,7 @@ export class Monolith {
 	private lastVoxelCount = 0;
 	private trailPositions: Vector3[] = [];
 	private maxTrailLength = 10;
-	private textAtlas: MonolithTextAtlas | null = null;
+	private simpleText: SimpleTextRenderer | null = null;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
@@ -81,6 +82,8 @@ export class Monolith {
 
 		this.applyQualitySettings();
 		this.buildDefaultSDF();
+
+		this.simpleText = new SimpleTextRenderer(this, this.scene);
 		//this.voxelMesh!.thinInstanceEnablePicking = true;
 	}
 
@@ -121,7 +124,6 @@ export class Monolith {
 
 	public async init() {
 		await this.generateVoxelSystem();
-		//this.textAtlas = new MonolithTextAtlas(this);
 	}
 
 	private createMaterial(): MonolithMaterial {
@@ -673,33 +675,16 @@ export class Monolith {
 		this.voxelGrid = null;
 		console.log(`🗑️ Monolith disposed`);
 	}
-
-	public showText(blockId: string, text: string, x: number = 0, y: number = 0, z: number = 3, size: number = 2.0) {
-		if (this.textAtlas) {
-			this.textAtlas.setText(blockId, text, new Vector3(x, y, z), size);
+	public showText(text: string, x: number = 0, y: number = 0, z: number = 3) {
+		if (this.simpleText) {
+			this.simpleText.showText(text, x, y, z);
 		}
 	}
 
-	public glowText(blockId: string, intensity: number = 1.0) {
-		if (this.textAtlas) {
-			this.textAtlas.setGlow(blockId, intensity);
+	public hideText() {
+		if (this.simpleText) {
+			this.simpleText.hideText();
 		}
-	}
-
-	public hideText(blockId: string) {
-		if (this.textAtlas) {
-			this.textAtlas.clearText(blockId);
-		}
-	}
-
-	public debugAtlas() {
-		if (this.textAtlas) {
-			this.textAtlas.debugAtlas();
-		}
-	}
-
-	public getTextBlocks(): string[] {
-		return this.textAtlas?.getAvailableBlocks() || [];
 	}
 }
 
