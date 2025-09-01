@@ -1,7 +1,6 @@
 import {
   MAP_HEIGHT,
   BALL_DIAM,
-  WALL_SIZE,
   PADDLE_PLAYER_X,
   PADDLE_AI_X,
   PADDLE_WIDTH
@@ -17,33 +16,46 @@ export function predictBallState(ballPos, ballVel) {
   const [x_b, y_b] = ballPos;
   let [v_bx, v_by] = ballVel;
 
-  const mapMax = (MAP_HEIGHT - BALL_DIAM) * 0.5 - WALL_SIZE;
+  const mapMax = (MAP_HEIGHT - BALL_DIAM) * 0.5;
 
-  let timeToPaddle, nextReceiverX, predictedY, yFromBottom, bounces, remainder;
+  let timeToPaddle, nextReceiverX;
 
-  if (v_bx < 0) {
-    timeToPaddle = (Math.abs(PADDLE_PLAYER_X - x_b) - (PADDLE_WIDTH + BALL_DIAM) * 0.5) / Math.abs(v_bx);
-    nextReceiverX = PADDLE_PLAYER_X + (PADDLE_WIDTH + BALL_DIAM) * 0.5;
+  if (v_bx > 0) {
+    timeToPaddle = (Math.abs(PADDLE_PLAYER_X - x_b) - (PADDLE_WIDTH + BALL_DIAM) * 0.5) / (Math.abs(v_bx) + 0.0001);
+    nextReceiverX = PADDLE_PLAYER_X - (PADDLE_WIDTH + BALL_DIAM) * 0.5;
   } else {
-    timeToPaddle = (Math.abs(PADDLE_AI_X - x_b) - (PADDLE_WIDTH + BALL_DIAM) * 0.5) / Math.abs(v_bx);
-    nextReceiverX = PADDLE_AI_X - (PADDLE_WIDTH + BALL_DIAM) * 0.5;
+    timeToPaddle = (Math.abs(PADDLE_AI_X - x_b) - (PADDLE_WIDTH + BALL_DIAM) * 0.5) / (Math.abs(v_bx) + 0.0001);
+    nextReceiverX = PADDLE_AI_X + (PADDLE_WIDTH + BALL_DIAM) * 0.5;
   }
 
-  predictedY = y_b + v_by * timeToPaddle;
+  const predictedY = y_b + v_by * timeToPaddle;
 
-  yFromBottom = predictedY - mapMax;
+  const playableHeight = MAP_HEIGHT - BALL_DIAM;
+  let yInPlayable = predictedY + mapMax;
 
-  bounces = Math.floor(yFromBottom, (MAP_HEIGHT - BALL_DIAM - WALL_SIZE)); 
-  
-  remainder = yFromBottom % (MAP_HEIGHT - BALL_DIAM - WALL_SIZE);
+  let currentVy = v_by;
+  if (yInPlayable < 0 || yInPlayable > playableHeight) {
+    let workingY = yInPlayable;
+    let bounceCount = 0;
 
-  let finalY;
-  if (bounces % 2 == 1) {
-    finalY = -mapMax + remainder;
-  } else {
-    finalY = mapMax - remainder;
-    v_by = -v_by;
+    while (workingY < 0 || workingY > playableHeight) {
+      if (workingY < 0) {
+        workingY = -workingY;
+        bounceCount++;
+      } else if (workingY > playableHeight) {
+        workingY = 2 * playableHeight - workingY;
+        bounceCount++;
+      }
+    }
+
+    yInPlayable = workingY;
+
+    if (bounceCount % 2 === 1) {
+      currentVy = -currentVy;
+    }
   }
+
+  const finalY = yInPlayable - mapMax;
 
   return {
     ballPos: [nextReceiverX, Math.round(finalY * 100) / 100],
