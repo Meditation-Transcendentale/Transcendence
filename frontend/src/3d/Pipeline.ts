@@ -9,7 +9,7 @@ export class Pipeline {
 	private copyPostProcess: PostProcess;
 	private underwaterPostProcess: PostProcess;
 	private underwaterApplyPostProcess: PostProcess;
-	private underwaterRatio = 0.25;
+	private underwaterRatio = 0.5;
 
 	private depthRT: RenderTargetTexture;
 	private waveRT: RenderTargetTexture;
@@ -68,16 +68,18 @@ export class Pipeline {
 		this.dataUBO.addUniform("waveMaxDisplacement", 1);
 		this.dataUBO.addUniform("density", 1);
 		this.dataUBO.addUniform("lightScattering", 1);
+		this.dataUBO.addUniform("ambientMultiplier", 1);
 		this.dataUBO.addUniform("waterAbsorption", 3);
 
-		const noiseOffsetDefault = .5;
-		const stepSizeDefault = .5;
+		const noiseOffsetDefault = 1;
+		const stepSizeDefault = 1;
 		const maxDistanceDefault = 50.;
 		const worldSizeDefault = 40.;
 		const waterHeightDefault = 20;
 		const waveMaxDisplacementDefault = 1;
-		const densityDefault = 1;
+		const densityDefault = 0.1;
 		const lightScatteringDefault = 0.2;
+		const ambientMultiplierDefault = 4;
 		const waterAbsorptionDefault = new Vector3(0.35, 0.07, 0.03);
 		this.dataUBO.updateFloat("noiseOffset", noiseOffsetDefault);
 		this.dataUBO.updateFloat("stepSize", stepSizeDefault);
@@ -87,6 +89,7 @@ export class Pipeline {
 		this.dataUBO.updateFloat("waveMaxDisplacement", waveMaxDisplacementDefault);
 		this.dataUBO.updateFloat("density", densityDefault);
 		this.dataUBO.updateFloat("lightScattering", lightScatteringDefault);
+		this.dataUBO.updateFloat("ambientMultiplier", ambientMultiplierDefault);
 		this.dataUBO.updateVector3("waterAbsorption", waterAbsorptionDefault);
 
 		UIaddSlider("noiseOffset", noiseOffsetDefault, (n: number) => { this.dataUBO.updateFloat("noiseOffset", n) }, 0.1, 0, 2);
@@ -95,8 +98,9 @@ export class Pipeline {
 		UIaddSlider("worldSize", worldSizeDefault, (n: number) => { this.dataUBO.updateFloat("worldSize", n) }, 1, 0, 100);
 		UIaddSlider("waterHeight", waterHeightDefault, (n: number) => { this.dataUBO.updateFloat("waterHeight", n) }, 1, 0, 100);
 		UIaddSlider("waveMaxDisplacement", waveMaxDisplacementDefault, (n: number) => { this.dataUBO.updateFloat("waveMaxDisplacement", n) }, 0.5, 0, 20);
-		UIaddSlider("density", densityDefault, (n: number) => { this.dataUBO.updateFloat("density", n) }, 0.1, 0, 20);
+		UIaddSlider("density", densityDefault, (n: number) => { this.dataUBO.updateFloat("density", n) }, 0.05, 0, 2);
 		UIaddSlider("lightScattering", lightScatteringDefault, (n: number) => { this.dataUBO.updateFloat("lightScattering", n) }, 0.01, 0, 1);
+		UIaddSlider("ambientMultiplier", ambientMultiplierDefault, (n: number) => { this.dataUBO.updateFloat("ambientMultiplier", n) }, 0.1, 0, 10);
 		UIaddVec3("waterAbsorption", waterAbsorptionDefault, () => { this.dataUBO.updateVector3("waterAbsorption", waterAbsorptionDefault) })
 
 		const iview = new Matrix();
@@ -132,7 +136,8 @@ export class Pipeline {
 			uniforms: ["waterAbsorption"],
 			samplers: ["sceneTexture"],
 			size: this.underwaterRatio,
-			camera: this.camera
+			camera: this.camera,
+			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
 		});
 
 

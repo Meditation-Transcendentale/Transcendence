@@ -18,7 +18,7 @@ import {
 	Effect,
 	EffectRenderer
 } from "@babylonImport";
-import { UIaddNumber } from "./UtilsUI";
+import { UIaddNumber, UIaddSlider } from "./UtilsUI";
 
 export class Water {
 	private scene: Scene;
@@ -47,9 +47,9 @@ export class Water {
 	private particleMesh: Mesh;
 	private particleSize = 0.02;
 	private particleMaterial: StandardMaterial;
-	private particleRadius = 10;
+	private particleRadius = 15;
 	private particleDirection = new Vector3(0.5, -1, 0.1).normalize();
-	private particleSpeed = 0.01;
+	private particleSpeed = 0.005;
 
 	private waterRt1: ProceduralTexture;
 	private waterRt2: ProceduralTexture;
@@ -57,7 +57,7 @@ export class Water {
 	private waterRt: boolean;
 	private waterIntensity: number;
 
-	private dropStrengh = 0.01;
+	private dropStrengh = 0.001;
 	private cursor: Vector3;
 
 	private once = 1.;
@@ -108,9 +108,9 @@ export class Water {
 			return particle;
 		}
 
-		UIaddNumber("particle speed", this.particleSpeed, (speed: number) => {
-			this.particleSpeed = speed;
-		})
+		//UIaddNumber("particle speed", this.particleSpeed, (speed: number) => {
+		//	this.particleSpeed = speed;
+		//})
 
 		// this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurfaceInteraction", this.scene, null, false, false, Engine.TEXTURETYPE_FLOAT);
 		// // this.waterRt1 = new ProceduralTexture("waterSurface1", 256, "waterSurfaceInteraction", this.scene, null);
@@ -186,7 +186,7 @@ export class Water {
 			engine: this.scene.getEngine(),
 			useShaderStore: true,
 			fragmentShader: "waterSurface",
-			uniforms: ["time", "worldSize"]
+			uniforms: ["time", "worldSize", "initialSpeed", "speedRamp"]
 		});
 
 		this.normalEffect = new EffectWrapper({
@@ -207,9 +207,16 @@ export class Water {
 			samplers: ["surface"]
 		})
 
+		let initialSpeedDefault = 1.;
+		let speedRampDefault = 1.07;
+		UIaddSlider("wave initial speed", initialSpeedDefault, (n: number) => { initialSpeedDefault = n }, 0.05, 0, 2);
+		UIaddSlider("wave speed ramp", speedRampDefault, (n: number) => { speedRampDefault = n }, 0.05, 0, 2)
+
 		this.surfaceEffect.onApplyObservable.add(() => {
 			this.surfaceEffect.effect.setFloat("time", performance.now() * 0.001);
 			this.surfaceEffect.effect.setFloat("worldSize", this.size);
+			this.surfaceEffect.effect.setFloat("initialSpeed", initialSpeedDefault);
+			this.surfaceEffect.effect.setFloat("speedRamp", speedRampDefault);
 		})
 
 		this.normalEffect.onApplyObservable.add(() => {

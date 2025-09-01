@@ -11,6 +11,9 @@ uniform float		worldSize;
 
 varying vec2	vUV;
 
+uniform float	initialSpeed;
+uniform float	speedRamp;
+
 const float	_VertexFrequency = 0.34;
 const float	_VertexAmplitude = 3.;
 const float	_VertexInitialSpeed = 2.;
@@ -28,7 +31,7 @@ const float _VertexSpeedRamp = 1.07;
 vec4	fbm(vec3 v) {
 	float f = _VertexFrequency;
 	float a = _VertexAmplitude;
-	float speed = _VertexInitialSpeed;
+	float speed = initialSpeed;
 	float seed = _VertexSeed;
 	vec3 p = v;
 	float amplitudeSum = 0.0f;
@@ -50,7 +53,7 @@ vec4	fbm(vec3 v) {
 		amplitudeSum += a;
 		f *= _VertexFrequencyMult;
 		a *= _VertexAmplitudeMult;
-		speed *= _VertexSpeedRamp;
+		speed *= speedRamp;
 		seed += _VertexSeedIter;
 	}
 

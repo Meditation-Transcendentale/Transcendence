@@ -180,6 +180,7 @@ layout(std140) uniform data {
 	float	waveMaxDisplacement;
 	float	density;
 	float	lightScattering;
+	float	ambientMultiplier;
 	vec3	waterAbsorption;
 };
 
@@ -255,27 +256,35 @@ void main(void) {
 	float h = 0.;
 	float d = 0.;
 	vec2 uv;
+
+	float surfaceTransmittance = 1.;
+	float rayTransmittance = 1.;
+	float surfaceLuminance = 0.;
 	while (travel < maxDist) {
 		h = texture(waveTexture, p.xz * (1. / worldSize) + 0.5).r  * waveMaxDisplacement + waterHeight;
 		s = waterSdf(p, p.y > 0. ? h : waterHeight);
 		d = density * float(s < 0.);
-		s = abs(s);
-		r = min(stepSize, s);
+		//s = abs(s);
+		r = min(stepSize, abs(s));
 
 		uv = (p.xz + (h - p.y) * 0.2)* (1. / worldSize) + 0.5;
 
-		fogColor.rgb += d * r * texture(causticTexture, uv).r * heyney_greenstein(dot(ray, vec3(0., -1, 0.)), lightScattering) * float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
-		transmittance *= exp(-waterAbsorption * d * r);
+		//surfaceLuminance += texture(causticTexture, uv).r;
+		rayTransmittance *= exp(-d * r);
+		surfaceTransmittance  *=  exp(-d * 0.01 * (h - p.y));// * float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
+		surfaceLuminance += ambientMultiplier * r * texture(causticTexture, uv).r * exp(-d * (h - p.y)) * float(s < 0.) * \
+			heyney_greenstein(dot(ray, vec3(0., -1, 0.)), lightScattering) *  float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
+//* heyney_greenstein(dot(ray, vec3(0., -1, 0.)), lightScattering) 
+
 		r = stepSize;
 		p += ray * r;
 
 		travel += r;
 	}
-	vec4 alpha = vec4(min(transmittance, vec3(1.)), 1.);
-	// gl_FragColor.rgb = vec3(maxDist / maxDistance);
-	// gl_FragColor.rgb = vec3(1.) * float(s < EPS);
-	gl_FragColor.rgb = alpha.rgb;
-	gl_FragColor.a = fogColor.r;
+	gl_FragColor.r = min(rayTransmittance, 1.);
+	gl_FragColor.g = min(surfaceLuminance , 1.);
+	gl_FragColor.b = 0.;
+	gl_FragColor.a = 1.;
 }
 `;
 
@@ -290,9 +299,10 @@ uniform vec3	waterAbsorption;
 varying vec2	vUV;
 
 void main(void) {
-	vec4	fog = texture(textureSampler, vUV);
+	vec4	transmittances = texture(textureSampler, vUV);
 	vec4	color = texture(sceneTexture, vUV);
-	gl_FragColor.rgb = (color.rgb + fog.a * 10.) * fog.rgb;
+	//gl_FragColor.rgb = (color.rgb * transmittances.r + transmittances.g) ;//* exp(-waterAbsorption);
+	gl_FragColor.rgb = (color.rgb * transmittances.r + transmittances.g) * exp(-waterAbsorption);
 	gl_FragColor.a = 1.;
 }
 `;
