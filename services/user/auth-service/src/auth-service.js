@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
-import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrors, handleErrorsValid } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
 
@@ -113,12 +113,12 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 		
 	const isPasswordValid = await bcrypt.compare(password, user.password);
 	if (!isPasswordValid) {
-		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.BAD_PASSWORD };
+		throw { status: userReturn.USER_022.code, message: userReturn.USER_022.message };
 	}
 
 	if (user.two_fa_enabled == true) {
 		if (!token) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
+			throw { status: userReturn.USER_023.code, message: userReturn.USER_023.message };
 		}
 
 		const agent = new https.Agent({
@@ -166,7 +166,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 	let retCode = statusCode.SUCCESS, retMessage = returnMessages.LOGGED_IN;
 
 	if (!token) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
+		throw { status: userReturn.USER_023.code, message: userReturn.USER_023.message };
 	}
 
 	// console.log("google token : ", token);
@@ -270,13 +270,13 @@ app.post('/auth', handleErrorsValid(async (req, res) => {
 	const { token } = req.body;
 
 	if (!token) {
-		return res.code(statusCode.BAD_REQUEST).send({ valid: false, message: returnMessages.MISSING_TOKEN });
+		return res.code(userReturn.USER_023.code).send({ valid: false, message: userReturn.USER_023.message });
 	}
 	try {
 		const decodedToken = jwt.verify(token, process.env.JWT_SECRETKEY);
 		return res.code(statusCode.SUCCESS).send({ valid: true, user: decodedToken });
 	} catch (error) {
-		return res.code(statusCode.UNAUTHORIZED).send({ valid: false, message: returnMessages.INVALID_TOKEN });
+		return res.code(userReturn.USER_013.code).send({ valid: false, message: userReturn.USER_013.message });
 	}
 }));
 
@@ -284,7 +284,7 @@ app.post('/logout', handleErrors(async (req, res) => {
 
 	const token = req.cookies.accessToken;
 	if (!token) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
+		throw { status: userReturn.USER_023.code, message: userReturn.USER_023.message };
 	}
 
 	res.clearCookie('accessToken', { path: '/' });
