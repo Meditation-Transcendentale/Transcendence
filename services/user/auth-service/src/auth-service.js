@@ -113,12 +113,12 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 		
 	const isPasswordValid = await bcrypt.compare(password, user.password);
 	if (!isPasswordValid) {
-		throw { status: userReturn.USER_022.code, message: userReturn.USER_022.message };
+		throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
 	}
 
 	if (user.two_fa_enabled == true) {
 		if (!token) {
-			throw { status: userReturn.USER_023.code, message: userReturn.USER_023.message };
+			throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
 		}
 
 		const agent = new https.Agent({
@@ -128,10 +128,10 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 		try {
 			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
 			if (response.data.valid == false) {
-				throw { status: statusCode.UNAUTHORIZED, message: response.data.message };
+				throw { status: statusCode.UNAUTHORIZED, code: response.data.code, message: response.data.message };
 			}
 		} catch (error) {
-			throw { status: statusCode.UNAUTHORIZED, message: error.response.data.message };
+			throw { status: statusCode.UNAUTHORIZED, code: error.response.data.code, message: error.response.data.message };
 		}
 	}
 
@@ -144,7 +144,7 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 async function getAvatarCdnUrl(picture, uuid) {
 	const response = await fetch(picture);
 	if (response.status !== 200) {
-		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
+		throw { status: statusCode.INTERNAL_SERVER_ERROR, code: 500, message: returnMessages.INTERNAL_SERVER_ERROR };
 	}
 
 	const arrayBuffer = await response.arrayBuffer();
@@ -166,7 +166,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 	let retCode = statusCode.SUCCESS, retMessage = returnMessages.LOGGED_IN;
 
 	if (!token) {
-		throw { status: userReturn.USER_023.code, message: userReturn.USER_023.message };
+		throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
 	}
 
 	// console.log("google token : ", token);
@@ -225,7 +225,7 @@ async function get42accessToken(code) {
 		return { token42: cached42Token.token};
 	} catch (error) {
 		console.error('Error fetching 42 access token:', error);
-		throw { status: statusCode.INTERNAL_SERVER_ERROR, message: returnMessages.INTERNAL_SERVER_ERROR };
+		throw { status: statusCode.INTERNAL_SERVER_ERROR, code: 500, message: returnMessages.INTERNAL_SERVER_ERROR };
 	}
 }
 
@@ -244,7 +244,7 @@ app.get('/42', handleErrors(async (req, res) => {
 			}
 		});
 	} catch (error) {
-		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.UNAUTHORIZED };
+		throw { status: statusCode.UNAUTHORIZED, code: 401, message: returnMessages.UNAUTHORIZED };
 	}
 
 	const username = response.data.login;
@@ -284,7 +284,7 @@ app.post('/logout', handleErrors(async (req, res) => {
 
 	const token = req.cookies.accessToken;
 	if (!token) {
-		throw { status: userReturn.USER_023.code, message: userReturn.USER_023.message };
+		throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
 	}
 
 	res.clearCookie('accessToken', { path: '/' });

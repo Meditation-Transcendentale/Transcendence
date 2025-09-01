@@ -7,7 +7,8 @@ const handleErrors = (fn) => async (req, res) => {
 		console.error(`Error in ${req.method} ${req.url}:`, error);
 		const status = error.status || statusCode.INTERNAL_SERVER_ERROR;
 		const message = error.message || returnMessages.INTERNAL_SERVER_ERROR;
-		res.code(status).send({ message });
+		const code = error.code || 500;
+		res.code(status).send({ message, code });
 	}
 };
 
@@ -18,7 +19,8 @@ const handleErrorsNats = (fn) => async (msg) => {
 		console.error(`Error in NATS message:`, error);
 		const status = error.status || statusCode.INTERNAL_SERVER_ERROR;
 		const message = error.message || returnMessages.INTERNAL_SERVER_ERROR;
-		nats.publish(msg.reply, jc.encode({ status, message }));
+		const code = error.code || 500;
+		nats.publish(msg.reply, jc.encode({ status, message, code }));
 	}
 };
 

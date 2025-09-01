@@ -36,7 +36,7 @@ const statService = {
 	isUserIdExisting: (playerId) => {
 		const player = isUserIdExistingStmt.get(playerId);
 		if (!player) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
+			throw { status: 404, code: 4042, message: returnMessages.USER_NOT_FOUND };
 		}
 	}
 }

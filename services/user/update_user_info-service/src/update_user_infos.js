@@ -12,7 +12,7 @@ import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client
 
 import { twoFARoutes } from "./2FA.js";
 import { statusRoutes } from "./status.js";
-import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from "../../shared/natsRequest.mjs";
 
@@ -106,21 +106,21 @@ async function checkPassword2FA(user, password, token) {
 
 	if (user.two_fa_enabled == true) {
 		if (!token) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
+			throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
 		}
 
 		try {
 			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
 			if (response.data.valid == false) {
-				throw { status: statusCode.UNAUTHORIZED, message: response.data.message };
+				throw { status: statusCode.UNAUTHORIZED, code: response.data.code, message: response.data.message };
 			}
 		} catch (error) {
-			throw { status: statusCode.UNAUTHORIZED, message: error.response.data.message };
+			throw { status: statusCode.UNAUTHORIZED, code: error.response.data.code, message: error.response.data.message };
 		}
 	} else {
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 		if (!isPasswordValid) {
-			throw { status: statusCode.UNAUTHORIZED, message: returnMessages.BAD_PASSWORD };
+			throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
 		}
 	}
 }
@@ -140,7 +140,7 @@ async function getAvatarCdnUrl(avatar, uuid) {
 	const fileType = await fileTypeFromBuffer(buffer);
 
 	if (!fileType || !fileType.mime.startsWith('image/')) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.INVALID_TYPE };
+		throw { status: userReturn.USER_012.http, code: userReturn.USER_012.code, message: userReturn.USER_012.message };
 	}
 	await removeOldAvatars(uuid);
 
@@ -157,13 +157,13 @@ app.patch('/username', handleErrors(async (req, res) => {
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 		
 	if (!req.body) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.NOTHING_TO_UPDATE };
+		throw { status: userReturn.USER_021.http, code: userReturn.USER_021.code, message: userReturn.USER_021.message };
 	}
 
 	const { username, password, token } = req.body;
 
 	if (username && USERNAME_REGEX.test(username) === false) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.USERNAME_INVALID };
+		throw { status: userReturn.USER_010.http, code: userReturn.USER_010.code, message: userReturn.USER_010.message };
 	} else {
 		await checkPassword2FA(user, password, token);
 		await natsRequest(nats, jc, 'user.updateUsername', { username, userId: user.id });
@@ -179,7 +179,7 @@ app.patch('/avatar', handleErrors(async (req, res) => {
 
 	const avatar = await req.file();
 	if (!avatar) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.AVATAR_REQUIRED };
+		throw { status: userReturn.USER_007.http, code: userReturn.USER_007.code, message: userReturn.USER_007.message };
 	}
 
 	const cdnPath = await getAvatarCdnUrl(avatar, user.uuid);
@@ -197,41 +197,41 @@ app.patch('/password', handleErrors(async (req, res) => {
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
 	if (!req.body) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.NOTHING_TO_UPDATE };
+		throw { status: userReturn.USER_021.http, code: userReturn.USER_021.code, message: userReturn.USER_021.message };
 	}
 
 	const { password, newPassword, token } = req.body;
 
 	if (!password) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_REQUIRED };
+		throw { status: userReturn.USER_005.http, code: userReturn.USER_005.code, message: userReturn.USER_005.message };
 	}
 	
 	if (!newPassword) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.NEW_PASSWORD_REQUIRED };
+		throw { status: userReturn.USER_006.http, code: userReturn.USER_006.code, message: userReturn.USER_006.message };
 	}
 
 	if (PASSWORD_REGEX.test(newPassword) === false) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_INVALID };
+		throw { status: userReturn.USER_009.http, code: userReturn.USER_009.code, message: userReturn.USER_009.message };
 	}
 
 	const isPasswordValid = await bcrypt.compare(password, user.password);
 	if (!isPasswordValid) {
-		throw { status: statusCode.UNAUTHORIZED, message: returnMessages.BAD_PASSWORD };
+		throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
 	}
 
 	if (user.two_fa_enabled) {
 
 		if (!token) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN };
+			throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
 		}
 
 		try {
 			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ id: user.id }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
 			if (response.data.valid == false) {
-				throw { status: statusCode.UNAUTHORIZED, message: response.data.message };
+				throw { status: statusCode.UNAUTHORIZED, code: response.data.code, message: response.data.message };
 			}
 		} catch (error) {
-			throw { status: statusCode.UNAUTHORIZED, message: error.response.data.message };
+			throw { status: statusCode.UNAUTHORIZED, code: error.response.data.code, message: error.response.data.message };
 		}
 	}
 
