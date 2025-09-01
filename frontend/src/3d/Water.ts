@@ -172,7 +172,14 @@ export class Water {
 			type: Engine.TEXTURETYPE_HALF_FLOAT
 		});
 		this.rtB = this.rtA.clone();
-		this.rtC = this.rtA.clone();
+		this.rtC = new RenderTargetTexture("waterC", { width: 256, height: 256 }, this.scene, {
+			format: Engine.TEXTUREFORMAT_R,
+			type: Engine.TEXTURETYPE_HALF_FLOAT,
+		});
+		this.rtC.wrapR = 0;
+		this.rtC.wrapU = 0;
+		this.rtC.wrapV = 0;
+
 
 		this.surfaceEffect = new EffectWrapper({
 			name: "waterSurface",

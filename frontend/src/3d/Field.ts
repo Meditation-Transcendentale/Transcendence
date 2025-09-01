@@ -163,8 +163,8 @@ export class Field {
 		await this.butterfly.init();
 		await this.grass.init();
 
-		this.glowLayer.addIncludedOnlyMesh(this.butterfly.mesh);
-		this.glowLayer.setMaterialForRendering(this.butterfly.mesh, this.butterfly.glowMat);
+		//this.glowLayer.addIncludedOnlyMesh(this.butterfly.mesh);
+		//this.glowLayer.setMaterialForRendering(this.butterfly.mesh, this.butterfly.glowMat);
 
 		window.addEventListener("mousemove", (ev) => {
 			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
@@ -203,7 +203,7 @@ export class Field {
 		for (let i = 0; i < this.grass._tiles.length; i++) {
 			this.depthRender.setMaterialForRendering(this.grass._tiles[i]._mesh, this.grass.grassDepthMaterial);
 		}
-		this.depthRender.setMaterialForRendering(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial)
+		//this.depthRender.setMaterialForRendering(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial)
 		this.glowLayer.dispose();
 
 		//this.water.setMaterial();

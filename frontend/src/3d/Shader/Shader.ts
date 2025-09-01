@@ -4,7 +4,7 @@ import "./UnderwaterShader.ts";
 import "./depthShaders.ts";
 import "./waterSurfaceShader.ts"
 import "./waterShader.ts";
-
+import "./copyShader.ts";
 
 Effect.IncludesShadersStore["noises"] = `
 uint murmurHash12(uvec2 src) {

@@ -1,6 +1,6 @@
 import { Effect } from "@babylonImport";
 
-Effect.ShadersStore["underwaterFragmentShader"] = `
+Effect.ShadersStore["OLDunderwaterFragmentShader"] = `
 	precision highp float;
 
 	#define M_PI 3.1415926535897932384626433832795
@@ -131,7 +131,7 @@ Effect.ShadersStore["underwaterFragmentShader"] = `
 
 
 
-Effect.ShadersStore["TESTunderwaterFragmentShader"] = `
+Effect.ShadersStore["underwaterFragmentShader"] = `
 -Make use of UBO
 
 void main() {
@@ -147,13 +147,17 @@ void main() {
 		-set new stepSize to be:
 					- if inside sdf min(sdf, stepSize)
 					- if outsite sdf max(sdf, stepSize)
+
+		-godrays: beerlaw from surface * godrayintensity
+		-ambient: beerlaw * surface
+		-hit: beearlaw to hit
 		
 		
 
 }
 `;
 
-Effect.ShadersStore["TESTunderwaterFragmentShader"] = `
+Effect.ShadersStore["underwaterFragmentShader"] = `
 precision highp float;
 
 #define M_PI 3.1415926535897932384626433832795
@@ -223,24 +227,9 @@ float travelStartOffset(void) {
 
 float waterSdf(vec3 p, float h) {
 	p.y -= waterHeight * 0.5;
-	vec3 q = abs(p) - vec3(worldSize * 0.5, waterHeight * 0.5, worldSize * 0.5);
+	vec3 q = abs(p) - vec3(worldSize * 0.5, h * 0.5, worldSize * 0.5);
 	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
-
-bool inWorld(vec3 p) {
-		return abs(p.x) < worldSize * 0.5 && abs(p.z) < worldSize * 0.5 && p.y < waterHeight + waveMaxDisplacement;
-}
-
-vec2 getDensity(vec3 p) {
-		if (inWorld(p)) {
-			float h = texture(waveTexture, p.xz * (1. / worldSize) + 0.5).r * waveMaxDisplacement + waterHeight;
-			float d =  h > p.y ? density : 0.;
-			return vec2(d, h - p.y);
-			// return max(0., h - p.y) * 0.1;
-		}
-		return vec2(0., 100.);
-	}
-
 
 void main(void) {
 	vec3 position = cameraPosition;
@@ -262,29 +251,48 @@ void main(void) {
 	float maxDist = min(maxDistance, distanceToHit);
 
 	float s = 100.;//waterSdf(p);
-	float r = 0.;
+	float r = travel;
 	float h = 0.;
 	float d = 0.;
+	vec2 uv;
 	while (travel < maxDist) {
-		p += ray * r;
-		h = texture(waveTexture, p.xz * (1. / worldSize) + 0.5).r * waveMaxDisplacement + waterHeight;
-		s = waterSdf(p, h);
+		h = texture(waveTexture, p.xz * (1. / worldSize) + 0.5).r  * waveMaxDisplacement + waterHeight;
+		s = waterSdf(p, p.y > 0. ? h : waterHeight);
 		d = density * float(s < 0.);
 		s = abs(s);
-		// r = stepSize;
 		r = min(stepSize, s);
 
+		uv = (p.xz + (h - p.y) * 0.2)* (1. / worldSize) + 0.5;
 
-		fogColor.rgb += d * r * texture(causticTexture, (p.xz + (h - p.y) * 0.2)* (1. / worldSize) + 0.5).r * heyney_greenstein(dot(ray, vec3(0., -1, 0.)), lightScattering);
+		fogColor.rgb += d * r * texture(causticTexture, uv).r * heyney_greenstein(dot(ray, vec3(0., -1, 0.)), lightScattering) * float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
 		transmittance *= exp(-waterAbsorption * d * r);
+		r = stepSize;
+		p += ray * r;
 
 		travel += r;
 	}
-
-		vec4 alpha = vec4(min(transmittance, vec3(1.)), 1.);
+	vec4 alpha = vec4(min(transmittance, vec3(1.)), 1.);
 	// gl_FragColor.rgb = vec3(maxDist / maxDistance);
 	// gl_FragColor.rgb = vec3(1.) * float(s < EPS);
-	gl_FragColor = (color + fogColor * 10.) * alpha;
+	gl_FragColor.rgb = alpha.rgb;
+	gl_FragColor.a = fogColor.r;
+}
+`;
+
+Effect.ShadersStore["underwaterApplyFragmentShader"] = `
+precision highp float;
+
+uniform sampler2D	textureSampler;
+uniform sampler2D	sceneTexture;
+
+uniform vec3	waterAbsorption;
+
+varying vec2	vUV;
+
+void main(void) {
+	vec4	fog = texture(textureSampler, vUV);
+	vec4	color = texture(sceneTexture, vUV);
+	gl_FragColor.rgb = (color.rgb + fog.a * 10.) * fog.rgb;
 	gl_FragColor.a = 1.;
 }
 `;

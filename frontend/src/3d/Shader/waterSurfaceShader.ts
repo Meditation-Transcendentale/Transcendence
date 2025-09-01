@@ -128,7 +128,7 @@ void main() {
                       Sy[0][2] * c20 + Sy[1][2] * c21 + Sy[2][2] * c22;
 
 	float edge = sqrt(pow(xSobel, 2.) + pow(ySobel, 2.));
-	gl_FragColor.rgb = vec3(edge);
+	gl_FragColor.rgb = vec3(edge );
 	gl_FragColor.a = 1.;
 }
 `
