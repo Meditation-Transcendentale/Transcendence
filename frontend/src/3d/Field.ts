@@ -117,14 +117,14 @@ export class Field {
 
 
 
-		this.ground = MeshBuilder.CreateGround("ground", { size: 200. }, this.scene);
+		this.ground = MeshBuilder.CreateGround("ground", { size: 40. }, this.scene);
 		const m = new StandardMaterial("ground", this.scene);
 		m.diffuseColor = Color3.Black();
 		// m.diffuseColor = new Color3(0.5, 0.5, 0.5);
 		// m.specularColor = new Color3(0.5, 0.5, 0.5);
 		m.specularColor = Color3.Black();
 		this.ground.material = m;
-		this.ground.position.y = - this.fieldDepth;
+		this.ground.position.y = 0.;
 		this.ground.layerMask = 0x01000001;
 		//
 		this.rt = new RenderTargetTexture("grass", { width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio }, this.scene);

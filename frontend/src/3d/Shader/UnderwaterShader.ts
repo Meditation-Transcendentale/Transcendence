@@ -160,15 +160,14 @@ precision highp float;
 #define EPS	0.1
 
 layout(std140) uniform camera {
-	float	maxZ;
-	vec3	direction; //seems useless;
-	vec3	position;
+	float	cameraMaxZ;
+	vec3	cameraPosition;
 	mat4	projection;
 	mat4	iprojection;
 	mat4	iview;
 	mat4	world;
 };
-laytout(std140) uniform data {
+layout(std140) uniform data {
 	float	noiseOffset;
 	float	stepSize;
 	float	maxDistance;
@@ -189,15 +188,21 @@ uniform sampler2D	waveTexture;
 uniform sampler2D	causticTexture;
 
 
+varying vec2 vUV;
+
+float heyney_greenstein(float angle, float scattering) {
+			return (1. - angle * angle) / (4. * M_PI * pow(1. + scattering * scattering - (2.0 * scattering) * angle, 1.5));
+}
+
 vec3 worldPosFromDepth(){
 	float depth = texture2D(depthTexture, vUV).r;
 	vec4 ndc = vec4(
 		(vUV.x - 0.5) * 2.0,
 				(vUV.y - 0.5) * 2.0,
-			camera.projection[2].z + camera.projection[3].z / (depth * camera.maxZ),
+			projection[2].z + projection[3].z / (depth * cameraMaxZ),
 		1.0
 			);
-	vec4 worldSpaceCoord = camera.iview * camera.iprojection * ndc;
+	vec4 worldSpaceCoord = iview * iprojection * ndc;
 	worldSpaceCoord /= worldSpaceCoord.w;
 	return worldSpaceCoord.xyz;
 }
@@ -209,22 +214,42 @@ float hash(float p) {
 }
 
 float travelStartOffset(void) {
-	vec2 uv = vUV * resotution * 0.5;
+	vec2 uv = vUV * resolution * 0.5;
 	uv -= fract(uv);
 	uv *= 0.1;
-	return hash(uv.x * uv.y + time) * data.noiseOffset;
+	return hash(uv.x * uv.y + time) * noiseOffset;
 }
 
-varying vec2 vUV;
+
+float waterSdf(vec3 p, float h) {
+	p.y -= waterHeight * 0.5;
+	vec3 q = abs(p) - vec3(worldSize * 0.5, waterHeight * 0.5, worldSize * 0.5);
+	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+}
+
+bool inWorld(vec3 p) {
+		return abs(p.x) < worldSize * 0.5 && abs(p.z) < worldSize * 0.5 && p.y < waterHeight + waveMaxDisplacement;
+}
+
+vec2 getDensity(vec3 p) {
+		if (inWorld(p)) {
+			float h = texture(waveTexture, p.xz * (1. / worldSize) + 0.5).r * waveMaxDisplacement + waterHeight;
+			float d =  h > p.y ? density : 0.;
+			return vec2(d, h - p.y);
+			// return max(0., h - p.y) * 0.1;
+		}
+		return vec2(0., 100.);
+	}
+
 
 void main(void) {
-	vec3 position = camera.position;
+	vec3 position = cameraPosition;
 
 	vec3 worldPos = worldPosFromDepth();
 
 
-	float distanceToHit = length(worldPos - camera.position);
-	vec3 ray = normalize(viewDir);
+	float distanceToHit = length(worldPos - cameraPosition);
+	vec3 ray = normalize(worldPos - cameraPosition);
 
 	vec4 color = texture2D(textureSampler, vUV);
 	float travel = travelStartOffset();
@@ -232,13 +257,34 @@ void main(void) {
 
 	vec4 fogColor = vec4(0.,0.,0.,0.);
 
-	float maxDist = min(maxDistance, distance);
 	vec2 v = vec2(0., 100.);
 	vec3 p = position + travel * ray;
-	float maxDistance = min(data.maxDistance, distanceToHit);
+	float maxDist = min(maxDistance, distanceToHit);
 
+	float s = 100.;//waterSdf(p);
+	float r = 0.;
+	float h = 0.;
+	float d = 0.;
+	while (travel < maxDist) {
+		p += ray * r;
+		h = texture(waveTexture, p.xz * (1. / worldSize) + 0.5).r * waveMaxDisplacement + waterHeight;
+		s = waterSdf(p, h);
+		d = density * float(s < 0.);
+		s = abs(s);
+		// r = stepSize;
+		r = min(stepSize, s);
+
+
+		fogColor.rgb += d * r * texture(causticTexture, (p.xz + (h - p.y) * 0.2)* (1. / worldSize) + 0.5).r * heyney_greenstein(dot(ray, vec3(0., -1, 0.)), lightScattering);
+		transmittance *= exp(-waterAbsorption * d * r);
+
+		travel += r;
+	}
+
+		vec4 alpha = vec4(min(transmittance, vec3(1.)), 1.);
+	// gl_FragColor.rgb = vec3(maxDist / maxDistance);
+	// gl_FragColor.rgb = vec3(1.) * float(s < EPS);
+	gl_FragColor = (color + fogColor * 10.) * alpha;
+	gl_FragColor.a = 1.;
 }
-
-
-
 `;

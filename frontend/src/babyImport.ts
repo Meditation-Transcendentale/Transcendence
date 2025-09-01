@@ -66,6 +66,7 @@ export { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSyst
 export { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
 export { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 export { EffectWrapper, EffectRenderer } from "@babylonjs/core/Materials/effectRenderer";
+export { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 
 import "@babylonjs/core/Culling/ray";
 

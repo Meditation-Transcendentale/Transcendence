@@ -472,7 +472,10 @@ input[type="number"] {
 
 
 details>div::before {
+	display: inline-block;
 	content: attr(name)": ";
+	width: 20vh;
+	overflow: scroll;
 }
 
 input[type="range"] {

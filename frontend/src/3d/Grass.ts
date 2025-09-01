@@ -331,7 +331,7 @@ export class Grass {
 			);
 			const matT = Matrix.Translation(
 				posX,
-				0,
+				0.5,
 				posZ
 			);
 
