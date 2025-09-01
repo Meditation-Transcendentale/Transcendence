@@ -26,6 +26,7 @@ export class MonolithMaterial extends CustomMaterial {
 		this.AddUniform('showText', 'float', 1.0);
 		this.AddUniform('textPosition', 'vec3', Vector3.Zero());
 		this.AddUniform('textTexture', 'sampler2D', 0);
+		this.AddUniform('textGlow', 'float', 0.0);
 
 		this.Vertex_Begin(`
 			#define MAINUV1 1
@@ -34,6 +35,7 @@ export class MonolithMaterial extends CustomMaterial {
 
 			
 			attribute float instanceID;
+			    varying vec3 vOriginalWorldPos;
 
 		`)
 
@@ -92,7 +94,6 @@ float mouseInfluence = smoothstep(mouseInfluenceRadius, 0.0, distanceToMouse);
 vec3 mouseMovement = origin - oldOrigin;
 float mouseSpeed = length(mouseMovement);
 vec3 mouseDirection = mouseMovement ; // Movement direction
-// Push voxels away from mouse direction
 vec3 pushDirection = normalize(worldPos2 - origin + vec3(0.001)); // Direction from mouse to voxel
 float pushStrength = mouseSpeed * 2.0; // Scale with mouse speed
 vec3 mouseAnimation = vec3(
@@ -105,12 +106,14 @@ mouseAnimation += mouseDirection * radialPulse * animationIntensity;
 mouseAnimation+= pushDirection * pushStrength * 0.05 * mouseInfluence;
 // === COMBINE ANIMATIONS ===
 vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) * deadZoneMask;
+vec3 originalWorldPos = worldPos.xyz;
 worldPos.xyz += totalDisplacement;
 
 		`)
 
 		this.Vertex_MainEnd(`
 			//vFly = vec3(0., vec2(1. - clamp(direction.z, 0.0, 1.)));
+    vOriginalWorldPos = originalWorldPos;
 		`)
 
 
@@ -120,7 +123,7 @@ worldPos.xyz += totalDisplacement;
     //uniform vec3 textPosition;
     //uniform float textSize;
     //uniform float showText;
-
+    varying vec3 vOriginalWorldPos;
 		`)
 
 		this.Fragment_Definitions(`
@@ -128,35 +131,41 @@ worldPos.xyz += totalDisplacement;
 		`)
 
 		this.Fragment_MainEnd(`
- vec3 worldPos = vPositionW;
-    //vec3 baseColor2 = vec3(0.3, 0.25, 0.2);
-    vec3 baseColor2 = color.xyz;
+    vec3 originalPos = vOriginalWorldPos; // Use original position for stable text
+    vec3 baseColor2 = vec3(0.3, 0.25, 0.2);
     
     if(showText > 0.5) {
-        // Calculate offset from text center
-        vec3 textOffset = worldPos - textPosition;
-        
-        // Use only X and Y for the text plane (front face)
+        vec3 textOffset = originalPos - textPosition;
         vec2 textUV = vec2(
-            (-textOffset.x / textSize) + 0.5,  // X offset
-            (textOffset.y / textSize) + 0.5   // Y offset  
+            (-textOffset.x / textSize) + 0.5,
+            (textOffset.y / textSize) + 0.5
         );
         
-        // Make text area more visible for debugging
         if(textUV.x >= 0.0 && textUV.x <= 1.0 && textUV.y >= 0.0 && textUV.y <= 1.0) {
-            // Show the text area as green first
-            //baseColor2 = vec3(0.0, 1.0, 0.0);
-            
-            // Sample the texture
             vec4 textColor = texture2D(textTexture, textUV);
             
-            // Where there's text (white pixels), make it red
             if(textColor.r > 0.5) {
-                baseColor2 = vec3(1.0, 0.0, 0.0);
+                // Carved text effect (darker stone)
+                baseColor2 = mix(baseColor2, baseColor2 * 0.2, textColor.a);
+                
+                // Add mystical glow effect
+                if(textGlow > 0.0) {
+                    vec3 glowColor = vec3(0.0, 1.0, 0.5); // Cyan/green mystical glow
+                    
+                    // Pulsing animation
+                    float pulse = sin(time * 4.0) * 0.5 + 0.5;
+                    
+                    // Add glow to the text areas
+                    baseColor2 += glowColor * textGlow * textColor.a * (0.7 + pulse * 0.3);
+                    
+                    // Optional: Add outer glow (spreads beyond text)
+                    float outerGlow = smoothstep(1.0, 0.0, length(textUV - vec2(0.5, 0.5)) * 2.0);
+                    baseColor2 += glowColor * textGlow * outerGlow * 0.2;
+                }
             }
         }
     } 
-    gl_FragColor.rgb = baseColor2;
+    gl_FragColor.rgb += baseColor2;
 
 			gl_FragColor.a = 1.;
 		`)

@@ -44,7 +44,7 @@ export class Monolith {
 	private isPickingEnabled: boolean = true;
 	private voxelPositions: Vector3[] = [];
 	private lastPickTime = 0;
-	private pickThrottleMs = 50;
+	private pickThrottleMs = 10;
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
 	private trailPositions: Vector3[] = [];
@@ -158,10 +158,10 @@ export class Monolith {
 			//this.scene.onPointerObservable.add((pointerInfo) => {
 			window.addEventListener("mousemove", (event) => {
 				if (!this.isPickingEnabled || !this.gpuPicker) return;
-				//if (pointerInfo.type !== PointerEventTypes.POINTERDOWN) return;
+				//if (.type !== PointerEventTypes.POINTERDOWN) return;
 
 				const now = performance.now();
-				//if (now - this.lastPickTime < this.pickThrottleMs) return;
+				if (now - this.lastPickTime < this.pickThrottleMs) return;
 				this.lastPickTime = now;
 
 				if (this.gpuPicker.pickingInProgress) return;
@@ -169,6 +169,7 @@ export class Monolith {
 				this.gpuPicker.pickAsync(event.clientX, event.clientY, false).then((pickInfo) => {
 					if (pickInfo && pickInfo.thinInstanceIndex != null) {
 
+						this.options.animationIntensity = 0.05;
 						if (this.voxelPositions && pickInfo.thinInstanceIndex < this.voxelPositions.length) {
 							const voxelPosition = this.voxelPositions[pickInfo.thinInstanceIndex];
 
@@ -178,6 +179,7 @@ export class Monolith {
 							console.warn("❌ Invalid instance index or missing voxel positions");
 						}
 					} else {
+						this.options.animationIntensity = 0;
 					}
 				}).catch((error) => {
 					console.warn("GPU picking failed:", error);
