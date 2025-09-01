@@ -64,26 +64,5 @@ export function expand(node) {
         newNode.evaluation = evaluateNode(newNode);
         node.children.push(newNode);
         newNode.parent = node;
-        // console.log(`isAIMove:${isAIMove}|paddlePos${paddlePos}|${relativeIntersectY}|`)
     }
 }
-
-// export function expand(node) {
-// 	const isAIMove = node.futureBallState.ballVel[0] >= 0;
-// 	const paddlePositions = generateFullRange();
-// 	for (const paddlePos of paddlePositions) {
-// 		const distanceToBall = Math.abs(paddlePos - node.futureBallState.ballPos[1]);
-// 		const newVelY = node.ballState.ballVel[1] * ((paddlePos - node.futureBallState.ballPos[1] >= 0) == (node.ballState.ballVel[1] >= 0) ? -BALL_ACCELERATION : BALL_ACCELERATION) * distanceToBall;
-// 		const newVelX = node.ballState.ballVel[0] * -BALL_ACCELERATION;
-// 		const newBallVel = [newVelX, newVelY];
-// 		const futureBallState = predictBallState(node.futureBallState.ballPos, newBallVel);
-// 		let newNode;
-// 		if (isAIMove)
-// 			newNode = new GameStateNode(node.futureBallState, paddlePos, node.playerPaddlePos, futureBallState);
-// 		else
-// 			newNode = new GameStateNode(node.futureBallState, node.aiPaddlePos, paddlePos, futureBallState);
-// 		newNode.evaluation = evaluateNode(newNode);
-// 		node.children.push(newNode);
-// 		newNode.parent = node;
-// 	}
-// }

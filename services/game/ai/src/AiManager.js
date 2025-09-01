@@ -41,7 +41,6 @@ export class AiManager {
         const subGetState = this.nc.subscribe(`games.ai.*.match.state`);
         (async () => {
             for await (const msg of subGetState) {
-                // console.log(`NATS: state`);
                 const [, , gameId] = msg.subject.split('.');
 
                 const match = this.games.get(gameId);
@@ -63,12 +62,11 @@ export class AiManager {
 
                 const now = performance.now();
                 if (now - match.lastRun >= 1000) {
-                    const node = this.stateToNode(state);
-                    const result = topLevelSearch(node);
-                    match.targetOffset = node.ballState.ballVel[0] <= 0 ? result?.aiPaddlePos : result?.futureBallState.ballPos[1];
-                    match.lastRun = now;
-                    console.log(`${node.ballState.ballVel[0] <= 0}|aiPaddlePos:${result.aiPaddlePos}|${result.ballState.ballPos[1]}|${result.futureBallState.ballPos[1]}`)
-                }
+                        const node = this.stateToNode(state);
+                        const result = topLevelSearch(node);
+                        match.targetOffset = node.ballState.ballVel[0] <= 0 ? result.aiPaddlePos : result.futureBallState.ballPos[1];
+                        match.lastRun = now;
+                    }
                 if (match.targetOffset == null) continue;
                 const myPaddle = state.paddles[1];
                 const actualMove = myPaddle.move;
