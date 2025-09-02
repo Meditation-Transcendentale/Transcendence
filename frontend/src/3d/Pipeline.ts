@@ -1,5 +1,5 @@
 import { Camera, Color3, Engine, Matrix, PostProcess, ProceduralTexture, RenderTargetTexture, Scene, Texture, UniformBuffer, Vector2, Vector3 } from "@babylonImport";
-import { UIaddColor, UIaddNumber, UIaddSlider, UIaddSliderVec3, UIaddVec3 } from "./UtilsUI";
+import { UIaddColor, UIaddNumber, UIaddSlider, UIaddSliderVec3, UIaddToggle, UIaddVec3 } from "./UtilsUI";
 
 export class Pipeline {
 	private scene: Scene;
@@ -147,7 +147,10 @@ export class Pipeline {
 			effect.setTextureFromPostProcess("sceneTexture", this.copyPostProcess);
 		}
 
-
+		this.setEnable(false);
+		UIaddToggle("toggle fog", this.enabled, (n: boolean) => {
+			this.setEnable(n);
+		})
 
 
 		//this.camera.detachPostProcess(this.underwaterPostProcess);
@@ -160,10 +163,14 @@ export class Pipeline {
 
 	public setEnable(status: boolean) {
 		if (status && !this.enabled) {
+			this.camera.attachPostProcess(this.copyPostProcess);
 			this.camera.attachPostProcess(this.underwaterPostProcess);
+			this.camera.attachPostProcess(this.underwaterApplyPostProcess);
 			this.enabled = true;
 		} else if (!status && this.enabled) {
+			this.camera.detachPostProcess(this.copyPostProcess);
 			this.camera.detachPostProcess(this.underwaterPostProcess);
+			this.camera.detachPostProcess(this.underwaterApplyPostProcess);
 			this.enabled = false;
 		}
 	}

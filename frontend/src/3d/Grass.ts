@@ -17,7 +17,7 @@ type _thinInstancesOptions = {
 };
 
 const optionsA: _thinInstancesOptions = {
-	density: 6,
+	density: 5,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.5,

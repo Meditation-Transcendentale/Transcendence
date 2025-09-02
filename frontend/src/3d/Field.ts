@@ -154,12 +154,13 @@ export class Field {
 		monolith.addText('stats', "STATS", 0, 9, 1.7, 2.0);
 		//monolith.showText("STATS", 0, 9, 1.7);
 		monolith.addText('about', "ABOUT", 0, 5.5, 1.7, 2.0);
+		this.monolith = monolith;
 		//monolith.showText("TEST");
 		//monolith.material.debugUniforms();
 
-		scene.registerBeforeRender(() => {
-			monolith.update(performance.now(), this.camera);
-		});
+		//scene.registerBeforeRender(() => {
+		//	monolith.update(performance.now(), this.camera);
+		//});
 
 
 		this.water = new Water(this.scene, this.camera, this.cursor);
@@ -214,6 +215,7 @@ export class Field {
 		for (let i = 0; i < this.grass._tiles.length; i++) {
 			this.depthRender.setMaterialForRendering(this.grass._tiles[i]._mesh, this.grass.grassDepthMaterial);
 		}
+		//this.depthRender.enabled = false;
 		//this.depthRender.setMaterialForRendering(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial)
 		this.glowLayer.dispose();
 
@@ -223,9 +225,9 @@ export class Field {
 	public update(time: number, deltaTime: number) {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
+		this.monolith.update(time, this.camera);
 		this.pipeline.update(time);
 		this.water.update(time, 0.0041);
-		this.monolith.update(time, this.camera);
 	}
 
 	public onHover(status: number) {

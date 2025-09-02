@@ -46,7 +46,7 @@ export class Monolith {
 	private isPickingEnabled: boolean = true;
 	private voxelPositions: Vector3[] = [];
 	private lastPickTime = 0;
-	private pickThrottleMs = 10;
+	private pickThrottleMs = 30;
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
 	private trailPositions: Vector3[] = [];

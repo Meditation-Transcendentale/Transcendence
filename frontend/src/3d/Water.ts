@@ -43,7 +43,7 @@ export class Water {
 	private worldScale = 40;
 
 	private sps: SolidParticleSystem;
-	private particleNumber = 2000;
+	private particleNumber = 100;
 	private particleMesh: Mesh;
 	private particleSize = 0.02;
 	private particleMaterial: StandardMaterial;
