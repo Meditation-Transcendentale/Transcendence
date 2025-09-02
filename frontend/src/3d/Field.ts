@@ -131,7 +131,13 @@ export class Field {
 
 		monolith.enableShaderAnimation(true);
 		monolith.setAnimationSpeed(4.);
-		monolith.setAnimationIntensity(0.05);
+		monolith.setAnimationIntensity(0.5);
+		monolith.addText('play', "PLAY", 0, 7.1, 1.7, 2.0);
+		monolith.addText('stats', "STATS", 0, 9, 1.7, 2.0);
+		//monolith.showText("STATS", 0, 9, 1.7);
+		monolith.addText('about', "ABOUT", 0, 5.5, 1.7, 2.0);
+		//monolith.showText("TEST");
+		//monolith.material.debugUniforms();
 
 		scene.registerBeforeRender(() => {
 			monolith.update(performance.now(), this.camera);

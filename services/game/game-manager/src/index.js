@@ -12,9 +12,9 @@ const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 async function main() {
 	const gm = new GameManager();
 	await gm.init(NATS_URL);
-	
+
 	gm.start();
-	
+
 	console.log('[game-manager] up and running');
 }
 

@@ -305,17 +305,17 @@ input[on] {
 	font: var(--font-speak);
 
 	background-color: transparent;
-	color: white;
+	color: transparent;
 	/*-webkit-text-stroke: 3px;*/
 	/*-webkit-text-stroke-color: black;*/
-	font-size: 5vh;
+	font-size: 7vh;
 	font-weight: bold;
 	pointer-events: auto;
 
 }
 
 .speak:hover {
-	color: blue;
+	/*color: blue;*/
 }
 
 .speak::before {
