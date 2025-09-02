@@ -134,22 +134,33 @@ export class Field {
 		this.camera.layerMask = 0x0FFFFFF0;
 		this.scene.customRenderTargets = [];
 		//this.scene.customRenderTargets.push(this.rt);
-		this.monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
+		let monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
 
-		this.monolith.enableShaderAnimation(true);
-		this.monolith.setAnimationSpeed(4.);
-		this.monolith.setAnimationIntensity(0.05);
-		//monolith.getPerformanceReport();
+		//<<<<<<< HEAD
+		//		this.monolith.enableShaderAnimation(true);
+		//		this.monolith.setAnimationSpeed(4.);
+		//		this.monolith.setAnimationIntensity(0.05);
+		//		//monolith.getPerformanceReport();
+		//
+		//		// In render loop - minimal CPU work!
+		//		// scene.registerBeforeRender(() => {
+		//		// 	this.monolith.update(performance.now(), this.camera);
+		//		// });
+		//=======
+		monolith.enableShaderAnimation(true);
+		monolith.setAnimationSpeed(4.);
+		monolith.setAnimationIntensity(0.5);
+		monolith.addText('play', "PLAY", 0, 7.1, 1.7, 2.0);
+		monolith.addText('stats', "STATS", 0, 9, 1.7, 2.0);
+		//monolith.showText("STATS", 0, 9, 1.7);
+		monolith.addText('about', "ABOUT", 0, 5.5, 1.7, 2.0);
+		//monolith.showText("TEST");
+		//monolith.material.debugUniforms();
 
-		// In render loop - minimal CPU work!
-		// scene.registerBeforeRender(() => {
-		// 	this.monolith.update(performance.now(), this.camera);
-		// });
+		scene.registerBeforeRender(() => {
+			monolith.update(performance.now(), this.camera);
+		});
 
-		//fortress.setAnimationStyle('gentle');
-		//scene.registerBeforeRender(() => {
-		//	fortress.update(performance.now(), this.camera);
-		//});
 
 		this.water = new Water(this.scene, this.camera, this.cursor);
 		this.pipeline = new Pipeline(this.scene, this.camera, this.depthRender.getDepthMap(), this.water.rtB, this.water.rtC);
@@ -246,8 +257,8 @@ export class Field {
 				break;
 			}
 			case 'home': {
-				this.camera.position.set(0, 2, 10);
-				this.camera.setTarget(new Vector3(0, 3, -10));
+				this.camera.position.set(0, 5, 15);
+				this.camera.setTarget(new Vector3(0, 7, 0));
 				//Interpolator.addElem({
 				//	start: this.camera.position,
 				//	end: new Vector3(0, 2, 10),

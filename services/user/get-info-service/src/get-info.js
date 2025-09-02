@@ -5,7 +5,7 @@ import { connect, JSONCodec } from 'nats';
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
-import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { statusCode, returnMessages, friendshipReturn, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
 
@@ -97,7 +97,7 @@ app.get('/username/:username', handleErrors(async (req, res) => {
 	const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
 
 	if (asker.username === req.params.username) {
-		return res.code(statusCode.BAD_REQUEST).send({ message: returnMessages.SELF_RESEARCH });
+		throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
 	}
 	
 	const user = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: req.params.username } );
@@ -111,18 +111,18 @@ app.get('/status', handleErrors(async (req, res) => {
 
 	const status = await natsRequest(nats, jc, 'user.getUserStatus', { userId: user.id } );
 
-	res.code(statusCode.SUCCESS).send({ status: status.status });
+	res.code(statusCode.SUCCESS).send({ statusInfos: status });
 
 }));
 
 app.get('/uuid/:uuid', handleErrors(async (req, res) => {
 
 	if (!req.params.uuid) {
-		return res.code(statusCode.BAD_REQUEST).send({ message: returnMessages.UUID_REQUIRED });
+		throw { status: userReturn.USER_008.http, code: userReturn.USER_008.code, message: userReturn.USER_008.message };
 	}
 	const user = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: req.params.uuid });
 	if (!user) {
-		return res.code(statusCode.NOT_FOUND).send({ message: returnMessages.USER_NOT_FOUND });
+		throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 	}
 
 	res.code(statusCode.SUCCESS).send({ username: user.username });

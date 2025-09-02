@@ -298,27 +298,32 @@ input[on] {
 }
 
 .speak {
+	cursor: pointer;
 	position: absolute;
 	width: fit-content;
 	height: fit-content;
 	font: var(--font-speak);
 
 	background-color: transparent;
-	color: white;
-	-webkit-text-stroke: 3px;
-	-webkit-text-stroke-color: black;
-	font-size: 10vh;
+	color: transparent;
+	/*-webkit-text-stroke: 3px;*/
+	/*-webkit-text-stroke-color: black;*/
+	font-size: 7vh;
 	font-weight: bold;
 	pointer-events: auto;
 
 }
 
+.speak:hover {
+	/*color: blue;*/
+}
+
 .speak::before {
-	content: "<<";
+	/*content: "<<";*/
 }
 
 .speak::after {
-	content: ">>";
+	/*content: ">>";*/
 }
 
 .submit {

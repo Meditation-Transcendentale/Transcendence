@@ -84,7 +84,7 @@ export default class Exemple {
 			exempleDiv: { html: div.querySelector("#exemple-exemple") as HTMLDivElement, id: -1 },
 			popupDiv: div.querySelector("#exemple-popup") as HTMLDivElement,
 			notifDiv: div.querySelector("#exemple-notif") as HTMLDivElement,
-			exemple: div.querySelector("#exemple-exemple-input") as HTMLInputElement, // This might be null after boot terminal init
+			exemple: div.querySelector("#exemple-exemple-input") as HTMLInputElement,
 			popup: div.querySelector("#exemple-popup-input") as HTMLInputElement,
 			notif: div.querySelector("#exemple-notif-input") as HTMLInputElement,
 		}
