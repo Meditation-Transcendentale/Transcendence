@@ -1,7 +1,7 @@
 import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
-import { SimpleTextRenderer } from "./SimpleTextRenderer";
+import { TextRenderer } from "./SimpleTextRenderer";
 
 type MonolithOptions = {
 	height: number;
@@ -49,7 +49,7 @@ export class Monolith {
 	private lastVoxelCount = 0;
 	private trailPositions: Vector3[] = [];
 	private maxTrailLength = 10;
-	private simpleText: SimpleTextRenderer | null = null;
+	private text: TextRenderer | null = null;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
@@ -83,7 +83,7 @@ export class Monolith {
 		this.applyQualitySettings();
 		this.buildDefaultSDF();
 
-		this.simpleText = new SimpleTextRenderer(this, this.scene);
+		this.text = new TextRenderer(this, this.scene);
 		//this.voxelMesh!.thinInstanceEnablePicking = true;
 	}
 
@@ -677,16 +677,45 @@ export class Monolith {
 		this.voxelGrid = null;
 		console.log(`🗑️ Monolith disposed`);
 	}
-	public showText(text: string, x: number = 0, y: number = 0, z: number = 3) {
-		if (this.simpleText) {
-			this.simpleText.showText(text, x, y, z);
+
+	public addText(id: string, text: string, x: number = 0, y: number = 0, z: number = 3, size: number = 1.5) {
+		if (this.text) {
+			this.text.addTextZone(id, text, x, y, z, size);
 		}
 	}
 
-	public hideText() {
-		if (this.simpleText) {
-			this.simpleText.hideText();
+	public updateText(id: string, newText: string) {
+		if (this.text) {
+			this.text.updateTextZone(id, newText);
 		}
+	}
+
+	public removeText(id: string) {
+		if (this.text) {
+			this.text.removeTextZone(id);
+		}
+	}
+
+	public showText(id: string) {
+		if (this.text) {
+			this.text.showZone(id);
+		}
+	}
+
+	public setTextGlow(id: string, intensity: number) {
+		if (this.text) {
+			this.text.setGlow(id, intensity);
+		}
+	}
+
+	public hideAllText() {
+		if (this.text) {
+			this.text.hideAllText();
+		}
+	}
+
+	public getTextZones(): string[] {
+		return this.text?.getZones() || [];
 	}
 }
 

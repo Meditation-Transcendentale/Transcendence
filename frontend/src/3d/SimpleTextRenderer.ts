@@ -1,99 +1,239 @@
 import { Ray, Scene, Texture, Vector3 } from "@babylonImport";
 import { Monolith } from "./Monolith";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
-import { PointerEventTypes } from "@babylonjs/core";
+import { Matrix, PointerEventTypes } from "@babylonjs/core";
 
-export class SimpleTextRenderer {
-	private canvas: HTMLCanvasElement;
-	private ctx: CanvasRenderingContext2D;
-	private texture: Texture | null = null;
+interface TextZone {
+	id: string;
+	text: string;
+	position: Vector3;
+	size: number;
+	bounds: { min: Vector3, max: Vector3 };
+	isHovering: boolean;
+	glow: number;
+	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
+	texture: Texture | null;
+}
+
+export class TextRenderer {
 	private monolith: Monolith;
 	private scene: Scene;
-	private isHovering: boolean = false;
-	private textBounds: { min: Vector3, max: Vector3 } | null = null;
+	private textZones: TextZone[] = [];
+	private currentActiveZone: string | null = null;
 
 	constructor(monolith: Monolith, scene: Scene) {
 		this.monolith = monolith;
 		this.scene = scene;
-		this.canvas = document.createElement('canvas');
-		this.canvas.width = 256;
-		this.canvas.height = 128;
-		this.ctx = this.canvas.getContext('2d')!;
 		this.setupHoverDetection();
+
+		this.scene.registerBeforeRender(() => {
+			this.update();
+		});
 	}
-	showText(text: string, x: number, y: number, z: number, size: number = 1.5) {
-		console.log(`🎨 Drawing text: "${text}"`);
 
-		this.ctx.fillStyle = '#000000';
-		this.ctx.fillRect(0, 0, 256, 128);
+	addTextZone(id: string, text: string, x: number, y: number, z: number, size: number = 1.5) {
+		console.log(`🎨 Adding text zone "${id}": "${text}"`);
 
-		this.ctx.fillStyle = '#ffffff';
-		this.ctx.font = 'bold 32px Arial';
-		this.ctx.textAlign = 'center';
-		this.ctx.textBaseline = 'middle';
-		this.ctx.fillText(text, 128, 64);
+		// Create canvas for this zone
+		const canvas = document.createElement('canvas');
+		canvas.width = 256;
+		canvas.height = 128;
+		const ctx = canvas.getContext('2d')!;
 
-		if (this.texture) {
-			this.texture.dispose();
-		}
+		// Draw text on canvas
+		ctx.fillStyle = '#000000';
+		ctx.fillRect(0, 0, 256, 128);
+		ctx.fillStyle = '#ffffff';
+		ctx.font = 'bold 32px Arial';
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		ctx.fillText(text, 128, 64);
 
-		this.texture = Texture.CreateFromBase64String(
-			this.canvas.toDataURL(),
-			'simple_text',
+		// Create texture
+		const texture = Texture.CreateFromBase64String(
+			canvas.toDataURL(),
+			`text_${id}`,
 			this.monolith.scene
 		);
 
-		this.textBounds = {
+		// Calculate bounds
+		const bounds = {
 			min: new Vector3(x - size / 2, y - size / 2, z - 1),
 			max: new Vector3(x + size / 2, y + size / 2, z + 1)
 		};
 
-		const material = this.monolith.material as MonolithMaterial;
+		// Create text zone
+		const zone: TextZone = {
+			id,
+			text,
+			position: new Vector3(x, y, z),
+			size,
+			bounds,
+			isHovering: false,
+			glow: 0,
+			canvas,
+			ctx,
+			texture
+		};
 
-		if (material) {
-			this.scene.registerBeforeRender(() => {
-				material.setTexture('textTexture', this.texture);
-				material.setVec3('textPosition', new Vector3(x, y, z));
-				material.setFloat('textSize', 5.0);
-				material.setFloat('showText', 1.0);
-			});
+		this.textZones.push(zone);
+
+		// If this is the first zone, make it active
+		if (!this.currentActiveZone) {
+			this.setActiveZone(id);
 		}
 	}
 
+	removeTextZone(id: string) {
+		const zoneIndex = this.textZones.findIndex(zone => zone.id === id);
+		if (zoneIndex !== -1) {
+			const zone = this.textZones[zoneIndex];
+			if (zone.texture) {
+				zone.texture.dispose();
+			}
+			this.textZones.splice(zoneIndex, 1);
 
-	private setupHoverDetection() {
-		window.addEventListener("mousemove", (info) => {
-			//this.monolith.scene.onPointerObservable.add((info) => {
-			//if (info.type === PointerEventTypes.POINTERMOVE) {
-			this.checkHover(info);
-			//}
+			if (this.currentActiveZone === id) {
+				this.currentActiveZone = this.textZones.length > 0 ? this.textZones[0].id : null;
+				this.updateShaderUniforms();
+			}
+
+			console.log(`🗑️ Removed text zone "${id}"`);
+		}
+	}
+
+	updateTextZone(id: string, newText: string) {
+		const zone = this.textZones.find(zone => zone.id === id);
+		if (!zone) return;
+
+		zone.text = newText;
+
+		// Redraw canvas
+		zone.ctx.fillStyle = '#000000';
+		zone.ctx.fillRect(0, 0, 256, 128);
+		zone.ctx.fillStyle = '#ffffff';
+		zone.ctx.font = 'bold 32px Arial';
+		zone.ctx.textAlign = 'center';
+		zone.ctx.textBaseline = 'middle';
+		zone.ctx.fillText(newText, 128, 64);
+
+		// Update texture
+		if (zone.texture) {
+			zone.texture.dispose();
+		}
+		zone.texture = Texture.CreateFromBase64String(
+			zone.canvas.toDataURL(),
+			`text_${id}`,
+			this.monolith.scene
+		);
+
+		// Update shader if this is the active zone
+		if (this.currentActiveZone === id) {
+			this.updateShaderUniforms();
+		}
+	}
+
+	setActiveZone(id: string) {
+		const zoneExists = this.textZones.some(zone => zone.id === id);
+		if (zoneExists) {
+			this.currentActiveZone = id;
+			this.updateShaderUniforms();
+			console.log(`🎯 Active text zone: "${id}"`);
+		}
+	}
+
+	private updateShaderUniforms() {
+		const material = this.monolith.material as MonolithMaterial;
+		if (!material) return;
+
+		this.scene.registerBeforeRender(() => {
+			material.setFloat('textCount', this.textZones.length);
+
+			this.textZones.forEach((zone, index) => {
+				material.setTexture(`textTexture${index}`, zone.texture);
+				material.setVec3(`textPosition${index}`, zone.position);
+				material.setFloat(`textSize${index}`, 5.0);
+				material.setFloat(`textGlow${index}`, zone.glow);
+			});
 		});
 	}
 
-	private checkHover(info: any) {
-		if (!this.textBounds) return;
+	private setupHoverDetection() {
+		window.addEventListener("mousemove", (event) => {
+			this.checkAllZonesHover(event);
+		});
+	}
 
-		// Create picking ray
+	private update() {
+		for (const zone of this.textZones) {
+			if (zone.isHovering) {
+				zone.glow += 0.01;
+				if (zone.glow > 2.0)
+					zone.glow = 2.0;
+
+			}
+			else {
+				zone.glow -= 0.02;
+				if (zone.glow < 0)
+					zone.glow = 0;
+
+			}
+		}
+
+	}
+
+	private checkAllZonesHover(event: MouseEvent) {
+		let anyHoverChanged = false;
+		let newActiveZone = null;
+
+		for (const zone of this.textZones) {
+			const wasHovering = zone.isHovering;
+			zone.isHovering = this.checkZoneHover(zone, event);
+
+			if (zone.isHovering) {
+				newActiveZone = zone.id;
+				zone.glow += 0.01;
+				if (zone.glow > 2.0)
+					zone.glow = 2.0;
+
+			}
+			else {
+				zone.glow -= 0.01;
+				if (zone.glow < 0)
+					zone.glow = 0;
+
+			}
+
+			if (wasHovering !== zone.isHovering) {
+				anyHoverChanged = true;
+
+				if (zone.isHovering) {
+					console.log(`✨ Text hover detected on zone "${zone.id}"`);
+				}
+			}
+		}
+
+		if (newActiveZone && newActiveZone !== this.currentActiveZone) {
+			this.setActiveZone(newActiveZone);
+		} else if (!newActiveZone && anyHoverChanged) {
+			this.updateShaderUniforms();
+		}
+	}
+
+	private checkZoneHover(zone: TextZone, event: MouseEvent): boolean {
 		const ray = this.monolith.scene.createPickingRay(
-			info.clientX,
-			info.clientY,
+			event.clientX,
+			event.clientY,
 			null,
 			this.monolith.scene.activeCamera,
 			false
 		);
-		//console.log("hoverrrrr")
-		// Check if ray intersects text bounds (simplified)
-		const wasHovering = this.isHovering;
-		this.isHovering = this.rayIntersectsBox(ray, this.textBounds);
 
-		// Update glow if hover state changed
-		if (wasHovering !== this.isHovering) {
-			this.updateGlow();
-		}
+		return this.rayIntersectsBox(ray, zone.bounds);
 	}
 
 	private rayIntersectsBox(ray: Ray, bounds: { min: Vector3, max: Vector3 }): boolean {
-		// Simple ray-box intersection
 		const dirfrac = new Vector3(
 			1.0 / ray.direction.x,
 			1.0 / ray.direction.y,
@@ -113,28 +253,29 @@ export class SimpleTextRenderer {
 		return tmax >= 0 && tmin <= tmax;
 	}
 
-	private updateGlow() {
-		const material = this.monolith.getMesh()?.material as MonolithMaterial;
-		if (material) {
-			material.setFloat('textGlow', this.isHovering ? 4. : 0.0);
-
-			if (this.isHovering) {
-				console.log('✨ Text hover detected');
+	public setGlow(id: string, intensity: number) {
+		const zone = this.textZones.find(zone => zone.id === id);
+		if (zone) {
+			const material = this.monolith.getMesh()?.material as MonolithMaterial;
+			if (material && this.currentActiveZone === id) {
+				//material.setFloat('textGlow', intensity);
 			}
 		}
 	}
 
-	public setGlow(intensity: number) {
+	public hideAllText() {
 		const material = this.monolith.getMesh()?.material as MonolithMaterial;
 		if (material) {
-			material.setFloat('textGlow', intensity);
+			material.setFloat('showText', 0.0);
 		}
+		this.currentActiveZone = null;
 	}
 
-	hideText() {
-		const material = this.monolith.getMesh()?.material as MonolithMaterial;
-		if (material) {
-			material.setInt('showText', 0);
-		}
+	public showZone(id: string) {
+		this.setActiveZone(id);
+	}
+
+	public getZones(): string[] {
+		return this.textZones.map(zone => zone.id);
 	}
 }

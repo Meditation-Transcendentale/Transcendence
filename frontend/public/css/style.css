@@ -305,7 +305,7 @@ input[on] {
 	font: var(--font-speak);
 
 	background-color: transparent;
-	color: white;
+	color: transparent;
 	/*-webkit-text-stroke: 3px;*/
 	/*-webkit-text-stroke-color: black;*/
 	font-size: 7vh;
@@ -315,7 +315,7 @@ input[on] {
 }
 
 .speak:hover {
-	color: blue;
+	/*color: blue;*/
 }
 
 .speak::before {
