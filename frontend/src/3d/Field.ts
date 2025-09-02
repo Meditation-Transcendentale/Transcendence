@@ -9,6 +9,7 @@ import {
 	Quaternion,
 	ArcRotateCamera,
 	UniversalCamera,
+	DepthRenderer,
 } from "@babylonImport";
 import { Vue } from "../Vue";
 import "./Shader/Shader.ts";
@@ -40,7 +41,8 @@ export class Field {
 	private sun: Sun;
 	private grass: Grass;
 	private butterfly: Butterfly;
-	//private water: Water;
+	private water: Water;
+	private monolith: Monolith;
 	private ground: Mesh;
 
 	public camera: FreeCamera;
@@ -49,6 +51,7 @@ export class Field {
 	private cursor: Vector3;
 	private cursorMonolith: Vector3;
 	private cursorButterfly: Vector3;
+	private cursorWater: Vector3;
 
 	private pipeline: Pipeline;
 	//////
@@ -61,11 +64,14 @@ export class Field {
 
 	public fieldDepth = 0;
 
+	private depthRender: DepthRenderer;
+
 	constructor(scene: Scene) {
 		this.scene = scene;
 		this.cursor = new Vector3();
 		this.cursorMonolith = new Vector3();
 		this.cursorButterfly = new Vector3();
+		this.cursorWater = new Vector3();
 
 		this.sun = new Sun(this.scene);
 		this.grass = new Grass(this.scene, 20, this.cursor);
@@ -80,6 +86,7 @@ export class Field {
 		this.camera.minZ = 0.01;
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.intensity = 0.5;
+		this.depthRender = this.scene.enableDepthRenderer();
 
 
 
@@ -110,14 +117,14 @@ export class Field {
 
 
 
-		this.ground = MeshBuilder.CreateGround("ground", { size: 200. }, this.scene);
+		this.ground = MeshBuilder.CreateGround("ground", { size: 40. }, this.scene);
 		const m = new StandardMaterial("ground", this.scene);
 		m.diffuseColor = Color3.Black();
 		// m.diffuseColor = new Color3(0.5, 0.5, 0.5);
 		// m.specularColor = new Color3(0.5, 0.5, 0.5);
 		m.specularColor = Color3.Black();
 		this.ground.material = m;
-		this.ground.position.y = - this.fieldDepth;
+		this.ground.position.y = 0.;
 		this.ground.layerMask = 0x01000001;
 		//
 		this.rt = new RenderTargetTexture("grass", { width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio }, this.scene);
@@ -127,8 +134,19 @@ export class Field {
 		this.camera.layerMask = 0x0FFFFFF0;
 		this.scene.customRenderTargets = [];
 		//this.scene.customRenderTargets.push(this.rt);
-		const monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
+		let monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
 
+		//<<<<<<< HEAD
+		//		this.monolith.enableShaderAnimation(true);
+		//		this.monolith.setAnimationSpeed(4.);
+		//		this.monolith.setAnimationIntensity(0.05);
+		//		//monolith.getPerformanceReport();
+		//
+		//		// In render loop - minimal CPU work!
+		//		// scene.registerBeforeRender(() => {
+		//		// 	this.monolith.update(performance.now(), this.camera);
+		//		// });
+		//=======
 		monolith.enableShaderAnimation(true);
 		monolith.setAnimationSpeed(4.);
 		monolith.setAnimationIntensity(0.5);
@@ -136,19 +154,20 @@ export class Field {
 		monolith.addText('stats', "STATS", 0, 9, 1.7, 2.0);
 		//monolith.showText("STATS", 0, 9, 1.7);
 		monolith.addText('about', "ABOUT", 0, 5.5, 1.7, 2.0);
+		this.monolith = monolith;
 		//monolith.showText("TEST");
 		//monolith.material.debugUniforms();
 
-		scene.registerBeforeRender(() => {
-			monolith.update(performance.now(), this.camera);
-		});
+		//scene.registerBeforeRender(() => {
+		//	monolith.update(performance.now(), this.camera);
+		//});
 
 
-		this.pipeline = new Pipeline(this.scene, this.camera, this.rt);
+		this.water = new Water(this.scene, this.camera, this.cursor);
+		this.pipeline = new Pipeline(this.scene, this.camera, this.depthRender.getDepthMap(), this.water.rtB, this.water.rtC);
 
 		/////
 
-		//this.water = new Water(this.scene, this.camera);
 		this.grass.depth = this.fieldDepth;
 	}
 
@@ -156,8 +175,8 @@ export class Field {
 		await this.butterfly.init();
 		await this.grass.init();
 
-		this.glowLayer.addIncludedOnlyMesh(this.butterfly.mesh);
-		this.glowLayer.setMaterialForRendering(this.butterfly.mesh, this.butterfly.glowMat);
+		//this.glowLayer.addIncludedOnlyMesh(this.butterfly.mesh);
+		//this.glowLayer.setMaterialForRendering(this.butterfly.mesh, this.butterfly.glowMat);
 
 		window.addEventListener("mousemove", (ev) => {
 			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
@@ -170,6 +189,10 @@ export class Field {
 			this.cursor.x = this.camera.position.x - ray.x * delta;
 			this.cursor.y = this.camera.position.z - ray.z * delta;
 			this.cursor.z = performance.now() * 0.001;
+
+			this.cursorWater.x = (this.cursor.x / 40) + 0.5;
+			this.cursorWater.y = (this.cursor.y / 40) + 0.5;
+			this.cursorWater.z = this.cursor.z;
 
 			//const pick = this.scene.pick(ev.clientX, ev.clientY);
 			//if (pick?.hit)
@@ -186,7 +209,14 @@ export class Field {
 		//this.water.rt.renderList = [];
 		//this.water.rt.renderList.push(this.test2);
 		//this.water.rt.renderList.push(this.ground);
+		//
+		//
 
+		for (let i = 0; i < this.grass._tiles.length; i++) {
+			this.depthRender.setMaterialForRendering(this.grass._tiles[i]._mesh, this.grass.grassDepthMaterial);
+		}
+		//this.depthRender.enabled = false;
+		//this.depthRender.setMaterialForRendering(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial)
 		this.glowLayer.dispose();
 
 		//this.water.setMaterial();
@@ -195,8 +225,9 @@ export class Field {
 	public update(time: number, deltaTime: number) {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
+		this.monolith.update(time, this.camera);
 		this.pipeline.update(time);
-		//this.water.update();
+		this.water.update(time, 0.0041);
 	}
 
 	public onHover(status: number) {
@@ -216,6 +247,7 @@ export class Field {
 
 	public resize() {
 		this.rt.resize({ width: this.scene.getEngine().getRenderWidth() * this.rtRatio, height: this.scene.getEngine().getRenderHeight() * this.rtRatio })
+		this.depthRender.getDepthMap().resize({ width: this.scene.getEngine().getRenderWidth(), height: this.scene.getEngine().getRenderHeight() })
 	}
 
 	public setVue(vue: string) {

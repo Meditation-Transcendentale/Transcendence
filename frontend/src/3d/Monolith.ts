@@ -1,6 +1,7 @@
 import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
+
 import { TextRenderer } from "./SimpleTextRenderer";
 
 type MonolithOptions = {
@@ -32,6 +33,7 @@ interface BoundingBox {
 
 export class Monolith {
 	public scene: Scene;
+
 	private voxelMesh: Mesh | null = null;
 	public material!: MonolithMaterial;
 	private options: MonolithOptions;
@@ -44,12 +46,14 @@ export class Monolith {
 	private isPickingEnabled: boolean = true;
 	private voxelPositions: Vector3[] = [];
 	private lastPickTime = 0;
-	private pickThrottleMs = 10;
+	private pickThrottleMs = 30;
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
 	private trailPositions: Vector3[] = [];
 	private maxTrailLength = 10;
 	private text: TextRenderer | null = null;
+
+	public depthMaterial: ShaderMaterial;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
@@ -73,6 +77,7 @@ export class Monolith {
 			...options
 		};
 
+
 		console.log(`🔧 Monolith Configuration:
    Size: ${size}
    Voxel Size: ${this.options.voxelSize}
@@ -85,6 +90,12 @@ export class Monolith {
 
 		this.text = new TextRenderer(this, this.scene);
 		//this.voxelMesh!.thinInstanceEnablePicking = true;
+		//
+
+		this.depthMaterial = new ShaderMaterial("monolithDepth", this.scene, "monolithDepth", {
+			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
+			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "worldCenter", "origin"]
+		})
 	}
 
 	private applyQualitySettings() {
@@ -128,7 +139,7 @@ export class Monolith {
 
 	private createMaterial(): MonolithMaterial {
 
-		const light = new PointLight("monolithLight", new Vector3(0, 5., 0), this.scene);
+		//const light = new PointLight("monolithLight", new Vector3(0, 5., 0), this.scene);
 		const shaderMaterial = new MonolithMaterial("monolithMaterial", this.scene);
 
 		shaderMaterial.setFloat("time", 0);
@@ -651,7 +662,7 @@ export class Monolith {
 	}
 
 	public update(time: number, camera: Camera) {
-		this.material.setFloat("time", time * 0.001);
+		this.material.setFloat("time", time);
 		this.material.setVec3("origin", this.cursor);
 		this.material.setVec3("oldOrigin", this.oldcursor);
 		this.material.setFloat("animationSpeed", this.options.animationSpeed);
@@ -661,6 +672,16 @@ export class Monolith {
 		this.material.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
 		this.material.setFloat("mouseInfluenceRadius", 0.8)
 		//this.setRectangularDeadZone(new Vector3(0, 7, 2), 1.5, 1.5, 1);
+
+
+		this.depthMaterial.setFloat("time", time);
+		this.depthMaterial.setVector3("origin", this.cursor);
+		this.depthMaterial.setFloat("animationSpeed", this.options.animationSpeed);
+		this.depthMaterial.setFloat("animationIntensity", this.options.animationIntensity);
+		this.depthMaterial.setVector3("worldCenter", Vector3.Zero());
+
+		this.depthMaterial.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
+		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.)
 
 
 	}
