@@ -147,7 +147,7 @@ export class Pipeline {
 			effect.setTextureFromPostProcess("sceneTexture", this.copyPostProcess);
 		}
 
-		this.setEnable(false);
+		//this.setEnable(false);
 		UIaddToggle("toggle fog", this.enabled, (n: boolean) => {
 			this.setEnable(n);
 		})
@@ -168,9 +168,9 @@ export class Pipeline {
 			this.camera.attachPostProcess(this.underwaterApplyPostProcess);
 			this.enabled = true;
 		} else if (!status && this.enabled) {
-			this.camera.detachPostProcess(this.copyPostProcess);
-			this.camera.detachPostProcess(this.underwaterPostProcess);
 			this.camera.detachPostProcess(this.underwaterApplyPostProcess);
+			this.camera.detachPostProcess(this.underwaterPostProcess);
+			this.camera.detachPostProcess(this.copyPostProcess);
 			this.enabled = false;
 		}
 	}

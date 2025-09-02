@@ -258,9 +258,9 @@ input[off] {
 	pointer-events: auto;
 }
 
-input:not([type="color"], [type="checkbox"], [type="number"], [type="range"]) {
-	all: unset;
-}
+/*input:not([type="color"], [type="checkbox"], [type="number"], [type="range"]) {*/
+/*	all: unset;*/
+/*}*/
 
 input[type=text] {
 	cursor: text;
@@ -305,7 +305,7 @@ input[on] {
 	font: var(--font-speak);
 
 	background-color: transparent;
-	color: transparent;
+	color: white;
 	/*-webkit-text-stroke: 3px;*/
 	/*-webkit-text-stroke-color: black;*/
 	font-size: 7vh;
@@ -359,6 +359,7 @@ input[on] {
 	/*width: 40vh;*/
 	align-content: center;
 	border-radius: 0 1px 0 0;
+	pointer-events: auto;
 	box-shadow: 1px 1px 5px grey, -1px -1px 5px grey;
 }
 
@@ -370,31 +371,27 @@ input[on] {
 	margin: auto;
 
 	background-color: transparent;
-	color: white;
+	color: blue;
 	-webkit-text-stroke: 2px;
-	-webkit-text-stroke-color: black;
+	-webkit-text-stroke-color: blue;
 	font-size: 7vh;
 	font-weight: bold;
 	text-align: center;
-	pointer-events: auto;
+	pointer-events: all;
 
 	transition: letter-spacing 0.2s;
 }
 
 
 .switch-input[down] {
-	color: black;
+	color: grey;
 	-webkit-text-stroke: 1.5px;
-	-webkit-text-stroke-color: white;
-	letter-spacing: -2vh;
+	-webkit-text-stroke-color: grey;
+	letter-spacing: 0vh;
 	background-color: transparent;
 }
 
 
-
-.switch-input[down]:hover {
-	letter-spacing: 0vh;
-}
 
 .blur-popup {
 	position: absolute;
