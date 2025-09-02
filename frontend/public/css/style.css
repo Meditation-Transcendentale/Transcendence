@@ -476,6 +476,7 @@ details>div::before {
 	content: attr(name)": ";
 	width: 20vh;
 	overflow: scroll;
+	white-space-collapse: preserve;
 }
 
 input[type="range"] {

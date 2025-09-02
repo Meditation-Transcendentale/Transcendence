@@ -1,5 +1,5 @@
 import { Camera, Color3, Engine, Matrix, PostProcess, ProceduralTexture, RenderTargetTexture, Scene, Texture, UniformBuffer, Vector2, Vector3 } from "@babylonImport";
-import { UIaddColor, UIaddNumber, UIaddSlider, UIaddVec3 } from "./UtilsUI";
+import { UIaddColor, UIaddNumber, UIaddSlider, UIaddSliderVec3, UIaddVec3 } from "./UtilsUI";
 
 export class Pipeline {
 	private scene: Scene;
@@ -9,7 +9,7 @@ export class Pipeline {
 	private copyPostProcess: PostProcess;
 	private underwaterPostProcess: PostProcess;
 	private underwaterApplyPostProcess: PostProcess;
-	private underwaterRatio = 0.5;
+	private underwaterRatio = 0.25;
 
 	private depthRT: RenderTargetTexture;
 	private waveRT: RenderTargetTexture;
@@ -71,8 +71,8 @@ export class Pipeline {
 		this.dataUBO.addUniform("ambientMultiplier", 1);
 		this.dataUBO.addUniform("waterAbsorption", 3);
 
-		const noiseOffsetDefault = 1;
-		const stepSizeDefault = 1;
+		const noiseOffsetDefault = 0.5;
+		const stepSizeDefault = 0.5;
 		const maxDistanceDefault = 50.;
 		const worldSizeDefault = 40.;
 		const waterHeightDefault = 20;
@@ -101,7 +101,8 @@ export class Pipeline {
 		UIaddSlider("density", densityDefault, (n: number) => { this.dataUBO.updateFloat("density", n) }, 0.05, 0, 2);
 		UIaddSlider("lightScattering", lightScatteringDefault, (n: number) => { this.dataUBO.updateFloat("lightScattering", n) }, 0.01, 0, 1);
 		UIaddSlider("ambientMultiplier", ambientMultiplierDefault, (n: number) => { this.dataUBO.updateFloat("ambientMultiplier", n) }, 0.1, 0, 10);
-		UIaddVec3("waterAbsorption", waterAbsorptionDefault, () => { this.dataUBO.updateVector3("waterAbsorption", waterAbsorptionDefault) })
+		//UIaddVec3("waterAbsorption", waterAbsorptionDefault, () => { this.dataUBO.updateVector3("waterAbsorption", waterAbsorptionDefault) })
+		UIaddSliderVec3("water absorption", waterAbsorptionDefault, () => { this.dataUBO.updateVector3("waterAbsorption", waterAbsorptionDefault) }, 0.05, 0., 1.);
 
 		const iview = new Matrix();
 		let binded = false;

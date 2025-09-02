@@ -273,7 +273,7 @@ void main(void) {
 		rayTransmittance *= exp(-d * r);
 		surfaceTransmittance  *=  exp(-d * 0.01 * (h - p.y));// * float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
 		surfaceLuminance += ambientMultiplier * r * texture(causticTexture, uv).r * exp(-d * (h - p.y)) * float(s < 0.) * \
-			heyney_greenstein(dot(ray, vec3(0., -1, 0.)), lightScattering) *  float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
+			heyney_greenstein(dot(ray, vec3(0., 1, 0.)), lightScattering) *  float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
 //* heyney_greenstein(dot(ray, vec3(0., -1, 0.)), lightScattering) 
 
 		r = stepSize;
