@@ -258,9 +258,9 @@ input[off] {
 	pointer-events: auto;
 }
 
-input {
-	all: unset;
-}
+/*input:not([type="color"], [type="checkbox"], [type="number"], [type="range"]) {*/
+/*	all: unset;*/
+/*}*/
 
 input[type=text] {
 	cursor: text;
@@ -298,6 +298,7 @@ input[on] {
 }
 
 .speak {
+	cursor: pointer;
 	position: absolute;
 	width: fit-content;
 	height: fit-content;
@@ -305,20 +306,24 @@ input[on] {
 
 	background-color: transparent;
 	color: white;
-	-webkit-text-stroke: 3px;
-	-webkit-text-stroke-color: black;
-	font-size: 10vh;
+	/*-webkit-text-stroke: 3px;*/
+	/*-webkit-text-stroke-color: black;*/
+	font-size: 7vh;
 	font-weight: bold;
 	pointer-events: auto;
 
 }
 
+.speak:hover {
+	/*color: blue;*/
+}
+
 .speak::before {
-	content: "<<";
+	/*content: "<<";*/
 }
 
 .speak::after {
-	content: ">>";
+	/*content: ">>";*/
 }
 
 .submit {
@@ -354,6 +359,7 @@ input[on] {
 	/*width: 40vh;*/
 	align-content: center;
 	border-radius: 0 1px 0 0;
+	pointer-events: auto;
 	box-shadow: 1px 1px 5px grey, -1px -1px 5px grey;
 }
 
@@ -365,31 +371,27 @@ input[on] {
 	margin: auto;
 
 	background-color: transparent;
-	color: white;
+	color: blue;
 	-webkit-text-stroke: 2px;
-	-webkit-text-stroke-color: black;
+	-webkit-text-stroke-color: blue;
 	font-size: 7vh;
 	font-weight: bold;
 	text-align: center;
-	pointer-events: auto;
+	pointer-events: all;
 
 	transition: letter-spacing 0.2s;
 }
 
 
 .switch-input[down] {
-	color: black;
+	color: grey;
 	-webkit-text-stroke: 1.5px;
-	-webkit-text-stroke-color: white;
-	letter-spacing: -2vh;
+	-webkit-text-stroke-color: grey;
+	letter-spacing: 0vh;
 	background-color: transparent;
 }
 
 
-
-.switch-input[down]:hover {
-	letter-spacing: 0vh;
-}
 
 .blur-popup {
 	position: absolute;
@@ -502,4 +504,34 @@ input[on] {
 		opacity: 0;
 	}
 
+}
+
+details {
+	position: absolute;
+	left: 0;
+	top: 0;
+	pointer-events: auto;
+	z-index: 50;
+	overflow: scroll;
+	background-color: white;
+	color: black;
+}
+
+input[type="number"] {
+	max-width: 6vh;
+	color: black;
+	background-color: white;
+}
+
+
+details>div::before {
+	display: inline-block;
+	content: attr(name)": ";
+	width: 20vh;
+	overflow: scroll;
+	white-space-collapse: preserve;
+}
+
+input[type="range"] {
+	vertical-align: middle;
 }

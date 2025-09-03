@@ -1,5 +1,10 @@
 import { Color3, CustomMaterial, Effect, Scene, Texture, Vector3 } from "@babylonImport"
-
+import "./GeometryShader.ts";
+import "./UnderwaterShader.ts";
+import "./depthShaders.ts";
+import "./waterSurfaceShader.ts"
+import "./waterShader.ts";
+import "./copyShader.ts";
 
 Effect.IncludesShadersStore["noises"] = `
 uint murmurHash12(uvec2 src) {
@@ -868,7 +873,7 @@ export class GrassShader extends CustomMaterial {
 		`);
 
 		this.Vertex_After_WorldPosComputed(`
-				worldPos.y += noiseB.g * 1.5;
+				// worldPos.y += noiseB.g * 1.5;
 		`)
 
 		this.Vertex_Before_NormalUpdated(
@@ -898,6 +903,9 @@ export class GrassShader extends CustomMaterial {
 			#define NORMAL
 			#define MAINUV1 1
 			#define M_PI 3.1415926535897932384626433832795
+
+			const vec3 waterAbsortion = vec3(0.35, 0.07, 0.03) * 0.1;
+			//const vec3 waterAbsortion = vec3(2., 0.3, 0.05) * 0.1;
 
 			varying vec3 vPositionM;
 		`
@@ -1063,6 +1071,10 @@ export class GrassShader extends CustomMaterial {
 			// gl_FragColor.rgb = vec3(normalW * 0.5 + 0.5);
 			// gl_FragColor.rgb = vec3(ddt);
 			// gl_FragColor.rgb = vec3(vPositionM.rg, 0.);
+			float distToCamera = length(vPositionW.xyz - vEyePosition.xyz);
+			float distToSurface = max(-vPositionW.y,0.);
+			gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0., 1.);
+			//gl_FragColor.rgb *= exp(-waterAbsortion * (distToCamera + distToSurface));
 		`)
 
 		this.Fragment_Before_Fog(`
@@ -1076,8 +1088,9 @@ export class GrassShader extends CustomMaterial {
 		this.backFaceCulling = false;
 		// this.twoSidedLighting = true;
 		this.diffuseColor = Color3.FromHexString("#4b8024");
+		this.diffuseColor = Color3.FromHexString("#ae8307")
 		//this.diffuseColor = new Color3(0.6, 1., 0.28);
-		this.diffuseColor = new Color3(1., 1., 1.);
+		//this.diffuseColor = new Color3(1., 1., 1.);
 
 		// this.emissiveColor = new Color3(0.3, 0.3, 0.3);
 
@@ -1188,6 +1201,9 @@ export class DitherMaterial extends CustomMaterial {
 
 		this.Fragment_Begin(`
 			#define MAINUV1 1
+
+			const vec3 waterAbsortion = vec3(0.35, 0.07, 0.03) * 0.1;
+			//const vec3 waterAbsortion = vec3(2, 0.3, 0.05) * 0.1;
 		`)
 
 		this.Fragment_Definitions(`
@@ -1196,17 +1212,12 @@ export class DitherMaterial extends CustomMaterial {
 			`)
 
 		this.Fragment_MainEnd(`
-		// float f = noise(vMainUV1 * 1000.) * 0.5 + 0.5;
-		// gl_FragColor.rgb = (on > 0. ? vec3(0.,0.,gradientNoise(vPositionW.xyz + time * 1000., 4.) * 0.5 +0.5) : gl_FragColor.rgb);
-		gl_FragColor.rgb = (on > 0. ? vec3(gradientNoise(vPositionW.xyz + time * 1000., 4.) * 0.5 +0.5) * vec3(0., 0.0625, 0.62109375) : gl_FragColor.rgb);
-		vec3 dith = min(vec3(1., 1., 1.),   gl_FragColor.rgb);
-		 // dith = floor(dith * 8. + 0.5) * (1. / 8.);
-		gl_FragColor.rgb = (dith - 0.5) * 1.2 + 0.5; //Apply contrast
-		// gl_FragColor.rgb = vec3(vMainUV1, 0.);
-		
-			// gl_FragColor.rgb = vec3(vNormalW * 0.5 + 0.5);
-			gl_FragColor.a = 0.5;
+			float distToSurface = max(-vPositionW.y,0.);
+			float distToCamera = length(vPositionW.xyz - vEyePosition.xyz) ;
+			gl_FragColor.rgb *= exp(-waterAbsortion * (distToCamera + distToSurface));
 		`)
+
+		//this.diffuseColor = new Color3(0.6, 1., 0.28);
 
 
 	}

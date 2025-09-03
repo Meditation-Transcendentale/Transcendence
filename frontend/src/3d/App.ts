@@ -1,10 +1,11 @@
 
-import { Engine, Matrix } from "@babylonImport";
+import { Color3, Engine, Matrix, Vector3 } from "@babylonImport";
 
 import { Environment } from "./Environment";
 import { Vue } from "../Vue";
 import { css3dObject, CSSRenderer } from "./CSSRenderer";
 import { Interpolator } from "./Interpolator";
+import { UIaddColor, UIaddNumber, UIaddToggle, UIaddVec3 } from "./UtilsUI";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -52,6 +53,7 @@ class app3d {
 		this.vues = new Map<string, Vue>;
 
 		this.cssRenderer = new CSSRenderer(this.environment.fieldCamera, this.engine.getRenderWidth(), this.engine.getRenderHeight());
+
 	}
 
 

@@ -20,7 +20,8 @@ async function handleNatsSubscription(subject, handler) {
 		} catch (error) {
 			const status = error.status || 500;
 			const message = error.message || "Internal Server Error";
-			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
+			const code = error.code || 500;
+			nats.publish(msg.reply, jc.encode({ success: false, status, message, code }));
 		}
 	}
 }

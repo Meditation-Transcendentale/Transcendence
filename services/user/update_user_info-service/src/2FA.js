@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import bcrypt from "bcrypt";
 import { connect, JSONCodec } from 'nats';
 
-import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrorsValid, handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
 
@@ -56,20 +56,20 @@ const twoFARoutes = (app) => {
 		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 			
 		if (user.two_fa_enabled) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_ALREADY_ENABLED };
+			throw { status: userReturn.USER_024.http, code: userReturn.USER_024.code, message: userReturn.USER_024.message };
 		}
 		if (user.provider !== 'local') {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.CANT_ENABLE_2FA };
+			throw { status: userReturn.USER_029.http, code: userReturn.USER_029.code, message: userReturn.USER_029.message };
 		}
 
 		const password  = req.body.password;
 		if (!password) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_REQUIRED };
+			throw { status: userReturn.USER_005.http, code: userReturn.USER_005.code, message: userReturn.USER_005.message };
 		}
 
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 		if (!isPasswordValid) {
-			throw { status: statusCode.UNAUTHORIZED, message: returnMessages.BAD_PASSWORD };
+			throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
 		}
 
 		const secret = generateSecret();
@@ -89,21 +89,21 @@ const twoFARoutes = (app) => {
 		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
 		if (!user.two_fa_enabled) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_NOT_ENABLED, valid: false };
+			throw { status: userReturn.USER_026.http, code: userReturn.USER_026.code, message: userReturn.USER_026.message, valid: false };
 		}
 
 		const token = req.body.token;
 		if (!token) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.MISSING_TOKEN, valid: false };
+			throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message, valid: false };
 		}
 		const secret = JSON.parse(user.two_fa_secret);
 		if (!secret) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_NOT_ENABLED, valid: false };
+			throw { status: userReturn.USER_026.http, code: userReturn.USER_026.code, message: userReturn.USER_026.message, valid: false };
 		}
 
 		const isTokenValid = verifyToken(secret, token);
 		if (!isTokenValid) {
-			throw { status: statusCode.UNAUTHORIZED, message: returnMessages.INVALID_CODE, valid: false };
+			throw { status: userReturn.USER_014.http, code: userReturn.USER_014.code, message: userReturn.USER_014.message, valid: false };
 		}
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.TWO_FA_VERIFIED, valid: true });
@@ -115,17 +115,17 @@ const twoFARoutes = (app) => {
 		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
 		if (!user.two_fa_enabled) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.TWO_FA_NOT_ENABLED };
+			throw { status: userReturn.USER_026.http, code: userReturn.USER_026.code, message: userReturn.USER_026.message };
 		}
 		
 		const password = req.body.password;
 		if (!password) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_REQUIRED };
+			throw { status: userReturn.USER_005.http, code: userReturn.USER_005.code, message: userReturn.USER_005.message };
 		}
 
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 		if (!isPasswordValid) {
-			throw { status: statusCode.UNAUTHORIZED, message: returnMessages.BAD_PASSWORD };
+			throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
 		}
 
 		await natsRequest(nats, jc, 'user.disable2FA', { userId: user.id });
