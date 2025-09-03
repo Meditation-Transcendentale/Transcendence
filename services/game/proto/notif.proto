@@ -4,13 +4,24 @@ package notif;
 
 import "google/protobuf/empty.proto";
 
-message Friend { string sender = 1; }
+message FriendUpdate { string sender = 1; }
 
 message GameInvite {
   string sender = 1;
   string lobbyid = 2;
 }
+
 message StatusUpdate {
-  string status = 1;
-  string option = 2;
+  string sender = 1;
+  string status = 2;
+  string option = 3;
+}
+
+message NotificationMessage {
+  oneof payload {
+    FriendUpdate friendRequest = 1;
+    FriendUpdate friendAccept = 2;
+    GameInvite gameInvite = 3;
+    StatusUpdate statusUpdate = 4;
+  }
 }

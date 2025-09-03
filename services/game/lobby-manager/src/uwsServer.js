@@ -15,7 +15,6 @@ export function createUwsApp(path, lobbyService) {
 		key_file_name: process.env.SSL_KEY,
 		cert_file_name: process.env.SSL_CERT
 	});
-	console.log("LES CLEES LA CON DE TOI", process.env.SSL_KEY, process.env.SSL_KEY)
 
 	app.ws(path, {
 		idleTimeout: 60,

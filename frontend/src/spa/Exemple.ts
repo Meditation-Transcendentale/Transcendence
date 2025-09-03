@@ -1,7 +1,7 @@
 //faut utiliser "../babyImport.ts" plutot que  "@babylonImport" parce que nikBabylon  et nikEsbuild
 import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
-import { NotifiactionManager } from "./NotifiactionManager";
+import { NotificationManager } from "./NotificationManager";
 import { Popup } from "./Popup";
 
 interface exempleHtmlReference {

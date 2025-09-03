@@ -1,7 +1,12 @@
 // src/uwsServer.js
 import { readFileSync } from 'fs';
 import { App, SSLApp } from 'uWebSockets.js';
-import { decodeClientMessage } from './proto/helper.js';
+import natsClient from './natsClient.js';
+import {
+	decodeClientMessage,
+	encodeNotificationMessage,
+	encodeStatusUpdate
+} from './proto/helper.js';
 
 export function startWsServer({ port, handlers }) {
 	const app = SSLApp({
@@ -32,6 +37,7 @@ export function startWsServer({ port, handlers }) {
 			ws.isAlive = true;
 			ws.subscribe(gameId);
 			handlers.registerGame?.(ws);
+			natsClient.publish(`notification.${ws.uuid}.status`, encodeStatusUpdate({ sender: ws.uuid, status: "in game", option: gameId }));
 		},
 
 		message: (ws, raw, isBinary) => {
@@ -48,6 +54,8 @@ export function startWsServer({ port, handlers }) {
 
 		close: ws => {
 			ws.isAlive = false;
+			//status -> online /!\ MIGHT CONFLICT WITH NOTIF WS WHICH SET OFFLINE
+			natsClient.publish(`notification.${ws.uuid}.status`, encodeStatusUpdate({ sender: ws.uuid, status: "online" }));
 			handlers.quit(ws);
 		}
 

@@ -124,7 +124,6 @@ app.get('/uuid/:uuid', handleErrors(async (req, res) => {
 	if (!user) {
 		throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 	}
-
 	res.code(statusCode.SUCCESS).send({ username: user.username });
 }));
 

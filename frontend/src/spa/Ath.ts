@@ -1,3 +1,4 @@
+import { NotificationManager } from "./NotificationManager";
 import { Popup } from "./Popup";
 import { cdnRequest, meRequest, patchRequest, postRequest } from "./requests";
 import { User } from "./User";
@@ -7,8 +8,6 @@ interface athHtmlReference {
 	setting: HTMLInputElement,
 	quit: HTMLInputElement,
 }
-
-
 
 class Ath {
 	private div: HTMLDivElement;
@@ -25,17 +24,17 @@ class Ath {
 		this.ref = {
 			menu: div.querySelector("#menu") as HTMLDivElement,
 			setting: div.querySelector("#setting-btn") as HTMLInputElement,
-			quit: div.querySelector("#quit-btn") as HTMLInputElement,
+			quit: div.querySelector("#quit-btn") as HTMLInputElement
 		}
 		this.css = div.querySelector("link") as HTMLElement;
 
 		this.quit = new AthQuit(div);
 		this.setting = new AthSetting(div);
+		// this.notif = new AthNotif(div);
 
 		this.ref.setting.addEventListener('click', () => {
 			this.setting.load();
 		})
-
 
 		this.ref.quit.addEventListener("click", () => {
 			this.quit.load();
@@ -43,9 +42,12 @@ class Ath {
 
 
 
+
+
 		// this.ref.settingEdit.addEventListener("click", () => { //FOR Username
 		// })
 
+		NotificationManager.setupWs();
 
 		console.log("USER", User);
 	}
@@ -197,6 +199,7 @@ class AthSetting {
 		})
 
 
+
 	}
 
 	public load() {
@@ -226,5 +229,6 @@ class AthSetting {
 
 
 }
+
 
 export default Ath;
