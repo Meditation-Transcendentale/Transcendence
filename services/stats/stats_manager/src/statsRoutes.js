@@ -53,26 +53,26 @@ function calculateStats(playerStats, mode) {
 
 export default async function statsRoutes(app) {
 
-	app.get('/player/:username/:mode', { schema: playerStatsSchema }, handleErrors(async (req, res) => {
+	app.get('/player/:username/:mode', handleErrors(async (req, res) => {
 
 		const { username, mode } = req.params;
 
 		const user = await nc.request('user.getUserFromUsername', jc.encode({ username }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
 		if (!userResult.success) {
-			throw { status: userResult.status, message: userResult.message };
+			throw { status: userResult.status, code: userResult.code, message: userResult.message };
 		}
 		const playerId = userResult.data.id;
 
 		if (!['classic', 'br', 'io'].includes(mode)) {
-			throw { status: statusCode.BAD_REQUEST, message: returnMessages.BAD_REQUEST };
+			throw { status: 400, code: 40030, message: 'Invalid game mode' };
 		}
 
 		const response = await nc.request(`stats.getPlayerStats.${mode}`, jc.encode(playerId), { timeout: 1000 });
 
 		const result = jc.decode(response.data);
 		if (!result.success) {
-			throw { status: result.status, message: result.message };
+			throw { status: result.status, code: result.code, message: result.message };
 		}
 		const playerStats = result.data;
 

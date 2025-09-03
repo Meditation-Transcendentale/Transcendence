@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { statusCode, returnMessages, userReturn, friendshipReturn, statusReturn } from "../../shared/returnValues.mjs";
 
 const database = new Database(process.env.DATABASE_URL, {fileMustExist: true });
 database.pragma("journal_mode=WAL");
@@ -28,8 +28,10 @@ const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_
 const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
 const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getUserForFriendResearchStmt = database.prepare("SELECT username FROM users WHERE username = ?");
-const getUserStatusStmt = database.prepare("SELECT status FROM active_user WHERE user_id = ?");
 const getAllUsersStmt = database.prepare("SELECT uuid, username, password FROM users");
+const getUserStatusStmt = database.prepare("SELECT status, lobby_gameId FROM active_user WHERE user_id = ?");
+const addUserStatusStmt = database.prepare("INSERT INTO active_user (user_id, status) VALUES (?, ?)");
+const updateStatusStmt = database.prepare("UPDATE active_user SET status = ?, lobby_gameId = ? WHERE user_id = ?");
 const getBlockedUsersStmt = database.prepare(`
 	SELECT bu.id, u1.username AS blocker_username, u2.username AS blocked_username 
 	FROM blocked_users bu
@@ -66,7 +68,7 @@ const userService = {
 	getUserFromUsername: (username) => {
 		const user = getUserByUsernameStmt.get(username);
 		if (!user) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
 		return user;
 	},
@@ -83,7 +85,7 @@ const userService = {
 	checkUsernameAvailability: (username) => {
 		const user = checkUsernameAvailabilityStmt.get(username);
 		if (user) {
-			throw { status: statusCode.CONFLICT, message: returnMessages.USERNAME_ALREADY_USED };
+			throw { status: userReturn.USER_002.http, code: userReturn.USER_002.code, message: userReturn.USER_002.message };
 		}
 	},
 	registerUser: (uuid, username, hashedPassword) => {
@@ -92,21 +94,21 @@ const userService = {
 	getUserFromId: (id) => {
 		const user = getUserByIdStmt.get(id);
 		if (!user) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
 		return user;
 	},
 	getUserFromUUID: (uuid) => {
 		const user = getUserFromUUIDStmt.get(uuid);
 		if (!user) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
 		return user;
 	},
 	getUserFromHeader: (headers) => {
 		const userHeader = headers['user'];
 		if (!userHeader) {
-			throw { status : statusCode.BAD_REQUEST, message: returnMessages.UNAUTHORIZED };
+			throw { status : statusCode.UNAUTHORIZED, code: 401, message: returnMessages.UNAUTHORIZED };
 		}
 		const userToken = JSON.parse(userHeader);
 		const user = userService.getUserFromUUID(userToken.uuid);
@@ -118,14 +120,14 @@ const userService = {
 	getFriendshipFromId: (friendshipId) => {
 		const friendship = getFriendshipByIdStmt.get(friendshipId);
 		if (!friendship) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIENDSHIP_NOT_FOUND };
+			throw { status: friendshipReturn.FRIEND_001.http, code: friendshipReturn.FRIEND_001.code, message: friendshipReturn.FRIEND_001.message };
 		}
 		return friendship;
 	},
 	getFriendshipFromUser1Username: (userId, friendId) => {
 		const friendship = getFriendshipByUser1UsernameStmt.get(friendId, userId);
 		if (!friendship) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIENDSHIP_NOT_FOUND };
+			throw { status: friendshipReturn.FRIEND_001.http, code: friendshipReturn.FRIEND_001.code, message: friendshipReturn.FRIEND_001.message };
 		}
 		return friendship;
 	},
@@ -138,7 +140,7 @@ const userService = {
 	getFriendsRequests: (userId) => {
 		const friendRequestsList = getFriendsRequestsStmt.all(userId);
 		if (friendRequestsList.length === 0) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIEND_REQUEST_NOT_FOUND };
+			throw { status: friendshipReturn.FRIEND_002.http, code: friendshipReturn.FRIEND_002.code, message: friendshipReturn.FRIEND_002.message };
 		}
 		return friendRequestsList;
 	},
@@ -165,7 +167,7 @@ const userService = {
 	getBlockedUsers: (userId) => {
 		const blockedUsers = getBlockedUsersStmt.all(userId);
 		if (blockedUsers.length === 0) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.NO_BLOCKED_USERS };
+			throw { status: friendshipReturn.FRIEND_019.http, code: friendshipReturn.FRIEND_019.code, message: friendshipReturn.FRIEND_019.message };
 		}
 		return blockedUsers;
 	},
@@ -187,29 +189,29 @@ const userService = {
 	getUserInfo: (userId) => {
 		const userInfo = getUserInfoStmt.get(userId);
 		if (!userInfo) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
 		return userInfo;
 	},
 	getFriendlist: (userId) => {
 		const friendlist = getFriendlistStmt.all(userId, userId, userId, userId);
 		if (friendlist.length === 0) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.FRIENDLIST_NOT_FOUND };
+			throw { status: friendshipReturn.FRIEND_020.http, code: friendshipReturn.FRIEND_020.code, message: friendshipReturn.FRIEND_020.message };
 		}
 		return friendlist;
 	},
 	getUserForFriendResearch: (username) => {
 		const user = getUserForFriendResearchStmt.get(username);
 		if (!user) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.USER_NOT_FOUND };
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
 		return user;
 	},
 	getUserStatus: (userId) => {
 		const status = getUserStatusStmt.get(userId);
-		if (!status) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.PLAYER_INACTIVE };
-		}
+		// if (!status) {
+		// 	throw { status: statusCode.NOT_FOUND, message: returnMessages.PLAYER_INACTIVE };
+		// }
 		return status;
 	},
 	getAllUsers: () => {
@@ -218,7 +220,22 @@ const userService = {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.NO_USERS_FOUND };
 		}
 		return users;
+	},
+	addUserStatus: (userId, status) => {
+		const validStatuses = ['registered', 'online', 'offline', 'in_lobby', 'in_game'];
+		if (!validStatuses.includes(status)) {
+			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
+		}
+		addUserStatusStmt.run(userId, status);
+	},
+	updateStatus: (userId, status, lobby_gameId) => {
+		const validStatuses = ['registered', 'online', 'offline', 'in_lobby', 'in_game'];
+		if (status && !validStatuses.includes(status)) {
+			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
+		}
+		updateStatusStmt.run(status, lobby_gameId, userId);
 	}
+
 };
 
 export default userService;

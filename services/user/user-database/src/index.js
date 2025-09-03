@@ -20,7 +20,8 @@ async function handleNatsSubscription(subject, handler) {
 		} catch (error) {
 			const status = error.status || 500;
 			const message = error.message || "Internal Server Error";
-			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
+			const code = error.code || 500;
+			nats.publish(msg.reply, jc.encode({ success: false, status, message, code }));
 		}
 	}
 }
@@ -182,6 +183,16 @@ handleErrorsNats(async () => {
 		handleNatsSubscription("user.getAllUsers", async (msg) => {
 			const users = userService.getAllUsers();
 			nats.publish(msg.reply, jc.encode({ success: true, data: users }));
+		}),
+		handleNatsSubscription("status.addUserStatus", async (msg) => {
+			const { userId, status } = jc.decode(msg.data);
+			userService.addUserStatus(userId, status);
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
+		handleNatsSubscription("status.updateUserStatus", async (msg) => {
+			const { userId, status, lobby_gameId } = jc.decode(msg.data);
+			userService.updateStatus(userId, status, lobby_gameId);
+			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 	]);
 })();

@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
-import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
+import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
 
@@ -106,11 +106,11 @@ app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
 	const { username, password } = req.body;
 
 	if (USERNAME_REGEX.test(username) === false) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.USERNAME_INVALID };
+		throw { status: userReturn.USER_010.http, code: userReturn.USER_010.code, message: userReturn.USER_010.message };
 	}
 
 	if (PASSWORD_REGEX.test(password) === false) {
-		throw { status: statusCode.BAD_REQUEST, message: returnMessages.PASSWORD_INVALID };
+		throw { status: userReturn.USER_009.http, code: userReturn.USER_009.code, message: userReturn.USER_009.message };
 	}
 
 	await natsRequest(nats, jc, "user.checkUsernameAvailability", { username });
@@ -119,6 +119,10 @@ app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
 	const uuid = uuidv4();
 
 	await natsRequest(nats, jc, 'user.registerUser', { uuid, username, hashedPassword });
+
+	const user = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid });
+
+	await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "registered" });
 
 	res.code(statusCode.CREATED).send({ message: returnMessages.USER_CREATED });
 }));
