@@ -15,7 +15,7 @@ class Ath {
 	private css: HTMLElement;
 
 	private quit: AthQuit;
-	private setting: AthSetting;
+	private profile: Profile;
 
 	private loaded = false;
 
@@ -29,11 +29,12 @@ class Ath {
 		this.css = div.querySelector("link") as HTMLElement;
 
 		this.quit = new AthQuit(div);
-		this.setting = new AthSetting(div);
+		this.profile = new Profile(div.querySelector("#profile-div") as HTMLDivElement);
+		//this.setting = new AthSetting(div);
 		// this.notif = new AthNotif(div);
 
 		this.ref.setting.addEventListener('click', () => {
-			this.setting.load();
+			this.profile.load();
 		})
 
 		this.ref.quit.addEventListener("click", () => {
@@ -230,5 +231,41 @@ class AthSetting {
 
 }
 
+
+interface profilHtmlReference {
+	username: HTMLInputElement,
+	avatar: HTMLImageElement,
+	avatarFile: HTMLInputElement,
+	security: HTMLInputElement,
+	stats: HTMLDivElement
+}
+
+class Profile {
+	private div: HTMLDivElement;
+	private ref: profilHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+
+		this.ref = {
+			username: div.querySelector("#username-input") as HTMLInputElement,
+			avatar: div.querySelector("#avatar-image") as HTMLImageElement,
+			avatarFile: div.querySelector("#avatar-file") as HTMLInputElement,
+			security: div.querySelector("#security-input") as HTMLInputElement,
+			stats: div.querySelector("#stats-div") as HTMLDivElement,
+		}
+
+		this.ref.avatarFile.addEventListener('change', () => {
+			this.ref.avatar.src = URL.createObjectURL(this.ref.avatarFile.files[0]);
+		})
+
+	}
+
+	public load() {
+		Popup.addPopup(this.div);
+	}
+
+
+}
 
 export default Ath;
