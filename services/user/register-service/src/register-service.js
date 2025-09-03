@@ -122,7 +122,7 @@ app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid });
 
-	await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "registered" });
+	await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "offline" });
 
 	res.code(statusCode.CREATED).send({ message: returnMessages.USER_CREATED });
 }));

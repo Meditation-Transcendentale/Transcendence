@@ -222,14 +222,14 @@ const userService = {
 		return users;
 	},
 	addUserStatus: (userId, status) => {
-		const validStatuses = ['registered', 'online', 'offline', 'in_lobby', 'in_game'];
+		const validStatuses = ['online', 'offline', 'in_lobby', 'in_game'];
 		if (!validStatuses.includes(status)) {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
 		}
 		addUserStatusStmt.run(userId, status);
 	},
 	updateStatus: (userId, status, lobby_gameId) => {
-		const validStatuses = ['registered', 'online', 'offline', 'in_lobby', 'in_game'];
+		const validStatuses = ['online', 'offline', 'in_lobby', 'in_game'];
 		if (status && !validStatuses.includes(status)) {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
 		}
