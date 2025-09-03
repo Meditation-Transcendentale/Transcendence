@@ -3724,7 +3724,8 @@ export const shared = $root.shared = (() => {
          * Properties of a MatchEnd.
          * @memberof shared
          * @interface IMatchEnd
-         * @property {number|null} [winner] MatchEnd winner
+         * @property {string|null} [winnerUuid] MatchEnd winnerUuid
+         * @property {Array.<number>|null} [score] MatchEnd score
          */
 
         /**
@@ -3736,6 +3737,7 @@ export const shared = $root.shared = (() => {
          * @param {shared.IMatchEnd=} [properties] Properties to set
          */
         function MatchEnd(properties) {
+            this.score = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -3743,12 +3745,20 @@ export const shared = $root.shared = (() => {
         }
 
         /**
-         * MatchEnd winner.
-         * @member {number} winner
+         * MatchEnd winnerUuid.
+         * @member {string} winnerUuid
          * @memberof shared.MatchEnd
          * @instance
          */
-        MatchEnd.prototype.winner = 0;
+        MatchEnd.prototype.winnerUuid = "";
+
+        /**
+         * MatchEnd score.
+         * @member {Array.<number>} score
+         * @memberof shared.MatchEnd
+         * @instance
+         */
+        MatchEnd.prototype.score = $util.emptyArray;
 
         /**
          * Creates a new MatchEnd instance using the specified properties.
@@ -3774,8 +3784,14 @@ export const shared = $root.shared = (() => {
         MatchEnd.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.winner != null && Object.hasOwnProperty.call(message, "winner"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.winner);
+            if (message.winnerUuid != null && Object.hasOwnProperty.call(message, "winnerUuid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.winnerUuid);
+            if (message.score != null && message.score.length) {
+                writer.uint32(/* id 2, wireType 2 =*/18).fork();
+                for (let i = 0; i < message.score.length; ++i)
+                    writer.int32(message.score[i]);
+                writer.ldelim();
+            }
             return writer;
         };
 
@@ -3813,7 +3829,18 @@ export const shared = $root.shared = (() => {
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.winner = reader.int32();
+                        message.winnerUuid = reader.string();
+                        break;
+                    }
+                case 2: {
+                        if (!(message.score && message.score.length))
+                            message.score = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.score.push(reader.int32());
+                        } else
+                            message.score.push(reader.int32());
                         break;
                     }
                 default:
@@ -3851,9 +3878,16 @@ export const shared = $root.shared = (() => {
         MatchEnd.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.winner != null && message.hasOwnProperty("winner"))
-                if (!$util.isInteger(message.winner))
-                    return "winner: integer expected";
+            if (message.winnerUuid != null && message.hasOwnProperty("winnerUuid"))
+                if (!$util.isString(message.winnerUuid))
+                    return "winnerUuid: string expected";
+            if (message.score != null && message.hasOwnProperty("score")) {
+                if (!Array.isArray(message.score))
+                    return "score: array expected";
+                for (let i = 0; i < message.score.length; ++i)
+                    if (!$util.isInteger(message.score[i]))
+                        return "score: integer[] expected";
+            }
             return null;
         };
 
@@ -3869,8 +3903,15 @@ export const shared = $root.shared = (() => {
             if (object instanceof $root.shared.MatchEnd)
                 return object;
             let message = new $root.shared.MatchEnd();
-            if (object.winner != null)
-                message.winner = object.winner | 0;
+            if (object.winnerUuid != null)
+                message.winnerUuid = String(object.winnerUuid);
+            if (object.score) {
+                if (!Array.isArray(object.score))
+                    throw TypeError(".shared.MatchEnd.score: array expected");
+                message.score = [];
+                for (let i = 0; i < object.score.length; ++i)
+                    message.score[i] = object.score[i] | 0;
+            }
             return message;
         };
 
@@ -3887,10 +3928,17 @@ export const shared = $root.shared = (() => {
             if (!options)
                 options = {};
             let object = {};
+            if (options.arrays || options.defaults)
+                object.score = [];
             if (options.defaults)
-                object.winner = 0;
-            if (message.winner != null && message.hasOwnProperty("winner"))
-                object.winner = message.winner;
+                object.winnerUuid = "";
+            if (message.winnerUuid != null && message.hasOwnProperty("winnerUuid"))
+                object.winnerUuid = message.winnerUuid;
+            if (message.score && message.score.length) {
+                object.score = [];
+                for (let j = 0; j < message.score.length; ++j)
+                    object.score[j] = message.score[j];
+            }
             return object;
         };
 

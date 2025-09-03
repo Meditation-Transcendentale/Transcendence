@@ -88,8 +88,8 @@ message MatchStart {}
 
 message MatchEnd { 
   string winnerUuid = 1;
-  
-  }
+  repeated int32 score = 2;
+}
 
 message PhysicsRequest {
   string gameId = 1;

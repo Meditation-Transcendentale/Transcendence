@@ -4,7 +4,6 @@ import { User } from "./User";
 
 
 interface tournamentHtmlReference {
-	quit: HTMLInputElement;
 	tree: HTMLDivElement;
 }
 
@@ -20,6 +19,7 @@ interface MatchNode {
 	winner: Player | null;
 	gameId: string | null;
 	depth: number;
+	score: Array<number>;
 	left: MatchNode | null;
 	right: MatchNode | null;
   }
@@ -30,7 +30,6 @@ export default class Tournament {
 	private ref: tournamentHtmlReference;
 	private ws: WebSocket | null;
 	private id: string | null;
-	private mode: string | null; //
 	private players: Map<Player, boolean> | null; //key:player value:isReady
 	private tree: MatchNode | null;	
 
@@ -40,23 +39,15 @@ export default class Tournament {
 		this.div = div;
 		this.ws = null;
 		this.id = null;
-		this.mode = null;
 		this.tree = null;
 		this.players = null;
 		this.ref = {
-			quit: div.querySelector("#tournament-quit") as HTMLInputElement,
 			tree: div.querySelector("#tournament-tree") as HTMLDivElement
 		};
 
 		// this.ref.ready.addEventListener("click", () => {
 		// 	this.ws?.send(encodeClientMessage({ ready: { tournamentId: this.id as string } })); //encodeClientMessage to fix
 		// })
-
-		this.ref.quit.addEventListener("click", () => {
-			this.ws?.close();
-			User.status = null;
-			Router.nav(`/play`, false, false); //
-		})
 
 	}
 
@@ -120,7 +111,7 @@ export default class Tournament {
 			if (payload.start != null) {
 				const gameId = payload.start.gameId;
 				const map = "default"; //payload.start.map;
-				Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${map}`), false, false);
+				Router.nav(encodeURI(`/game?id=${gameId}&mode=tournament&map=${map}`), false, false);
 				this.ws?.close();
 			}
 		}

@@ -1447,8 +1447,11 @@ export namespace shared {
     /** Properties of a MatchEnd. */
     interface IMatchEnd {
 
-        /** MatchEnd winner */
-        winner?: (number|null);
+        /** MatchEnd winnerUuid */
+        winnerUuid?: (string|null);
+
+        /** MatchEnd score */
+        score?: (number[]|null);
     }
 
     /** Represents a MatchEnd. */
@@ -1460,8 +1463,11 @@ export namespace shared {
          */
         constructor(properties?: shared.IMatchEnd);
 
-        /** MatchEnd winner. */
-        public winner: number;
+        /** MatchEnd winnerUuid. */
+        public winnerUuid: string;
+
+        /** MatchEnd score. */
+        public score: number[];
 
         /**
          * Creates a new MatchEnd instance using the specified properties.

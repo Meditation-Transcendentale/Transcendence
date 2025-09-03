@@ -10,7 +10,8 @@ import {
 	encodeStateUpdate,
 	encodeMatchSetup,
 	decodeStateUpdate,
-	decodeMatchQuit
+	decodeMatchQuit,
+	encodeMatchEnd
 } from './proto/helper.js';
 
 export class GameManager {
@@ -184,7 +185,15 @@ export class GameManager {
 
 		match.status = 'ended';
 
-		this.nc.publish(`games.${match.mode}.${gameId}.match.end`, new Uint8Array());
+		if (match.mode != `br`) {
+			const buf = encodeMatchEnd({
+				winnerUuid: match.state.score[0] == 5 ? match.state.paddles[0].playerId : match.state.paddles[1].playerId,
+				score: match.state.score
+			});
+			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
+		}
+		else
+			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, new Uint8Array());
 		this.games.delete(gameId);
 
 		console.log(`[GameManager] Ended match ${gameId}`);

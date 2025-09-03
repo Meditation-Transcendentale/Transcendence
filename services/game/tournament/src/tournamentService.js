@@ -1,4 +1,3 @@
-import { decode } from 'nats/lib/nats-base-client/encoders.js';
 import config from './config.js';
 import { decodeMatchEnd } from './proto/helper';
 
@@ -17,8 +16,8 @@ class MatchNode {
 
     setResult(matchData) {
         this.score = matchData.score;
-        this.winner_uuid = matchData.uuid;
-        if (this.parent) this.parent.receiveWinner(matchData.uuid);
+        this.winner_uuid = matchData.winnerUuid;
+        if (this.parent) this.parent.receiveWinner(matchData.winnerUuid);
     }
 
     receiveWinner(playerId) {
@@ -43,7 +42,6 @@ class Tournament {
                 match = this.findMatchByGameId(this.root, gameId);
                 if (!match) { return; }
                 const data = decodeMatchEnd(msg.data);
-                // const data = this.jc.decode(msg.data);
                 match.setResult(data);
                 if (match == this.root) return;
                 if (!areAllMatchesFinishedAtDepth(this.root, match.depth)) {
@@ -212,7 +210,7 @@ export default class tournamentService {
             })
             try {
                 const replyBuf = await natsClient.request(
-                    `games.online.match.create`,
+                    `games.tournament.match.create`,
                     reqBuf, {}
                 )
                 const resp = decodeMatchCreateResponse(replyBuf);

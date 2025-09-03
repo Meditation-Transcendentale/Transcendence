@@ -1,114 +1,100 @@
 import * as Proto from './message.js';
 
 /**
- * ClientMessage (Client → Server)
+ * MatchCreateRequest ↔ MatchCreateResponse
  */
-export function encodeClientMessage(payload) {
-	const err = Proto.userinterface.ClientMessage.verify(payload);
+export function encodeMatchCreateRequest(payload) {
+	const err = Proto.shared.MatchCreateRequest.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.userinterface.ClientMessage
-		.encode(Proto.userinterface.ClientMessage.create(payload))
+	return Proto.shared.MatchCreateRequest
+		.encode(Proto.shared.MatchCreateRequest.create(payload))
 		.finish();
 }
 
-export function decodeClientMessage(buffer) {
-	return Proto.userinterface.ClientMessage.decode(buffer);
+export function decodeMatchCreateRequest(buffer) {
+	return Proto.shared.MatchCreateRequest.decode(buffer);
 }
 
-/**
- * WelcomeMessage (Server → Client)
- */
-export function encodeWelcomeMessage(payload) {
-	const err = Proto.userinterface.WelcomeMessage.verify(payload);
+export function encodeMatchCreateResponse(payload) {
+	const err = Proto.shared.MatchCreateResponse.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.userinterface.WelcomeMessage
-		.encode(Proto.userinterface.WelcomeMessage.create(payload))
+	return Proto.shared.MatchCreateResponse
+		.encode(Proto.shared.MatchCreateResponse.create(payload))
 		.finish();
 }
 
+export function decodeMatchCreateResponse(buffer) {
+	return Proto.shared.MatchCreateResponse.decode(buffer);
+}
+
+export function decodeMatchQuit(buffer) {
+	return Proto.shared.MatchQuit.decode(buffer);
+}
+
 /**
- * GameStartMessage (Server → Client)
+ * MatchInput
  */
-export function encodeGameStartMessage(payload) {
-	const err = Proto.userinterface.GameStartMessage.verify(payload);
+export function decodeMatchInput(buffer) {
+	return Proto.shared.MatchInput.decode(buffer);
+}
+
+/**
+ * PhysicsRequest ↔ PhysicsResponse
+ */
+export function encodePhysicsRequest(payload) {
+	const err = Proto.shared.PhysicsRequest.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.userinterface.GameStartMessage
-		.encode(Proto.userinterface.GameStartMessage.create(payload))
+	return Proto.shared.PhysicsRequest
+		.encode(Proto.shared.PhysicsRequest.create(payload))
 		.finish();
 }
 
+export function decodePhysicsResponse(buffer) {
+	return Proto.physics.PhysicsResponse.decode(buffer);
+}
+
 /**
- * GameEndMessage (Server → Client)
+ * MatchState (for sending state updates)
  */
-export function encodeGameEndMessage(payload) {
-	const err = Proto.userinterface.GameEndMessage.verify(payload);
+export function encodeStateUpdate(payload) {
+	const err = Proto.shared.MatchState.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.userinterface.GameEndMessage
-		.encode(Proto.userinterface.GameEndMessage.create(payload))
+	return Proto.shared.MatchState
+		.encode(Proto.shared.MatchState.create(payload))
 		.finish();
 }
 
-/**
- * ServerMessage (Server → Client)
- */
-export function encodeServerMessage(payload) {
-	const err = Proto.userinterface.ServerMessage.verify(payload);
-	if (err) throw new Error(err);
-	return Proto.userinterface.ServerMessage
-		.encode(Proto.userinterface.ServerMessage.create(payload))
-		.finish();
-}
-
-export function decodeServerMessage(buffer) {
-	return Proto.userinterface.ServerMessage.decode(buffer);
-}
-
-/**
- * StateMessage (NATS or WebSocket → update UI)
- */
-export function decodeStateMessage(buffer) {
+export function decodeStateUpdate(buffer) {
 	return Proto.shared.MatchState.decode(buffer);
 }
 
 /**
- * Match lifecycle over NATS
+ * MatchSetup (NATS lifecycle)
  */
+export function encodeMatchSetup(payload) {
+	const err = Proto.shared.MatchSetup.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.shared.MatchSetup
+		.encode(Proto.shared.MatchSetup.create(payload))
+		.finish();
+}
+
 export function decodeMatchSetup(buffer) {
-	return Proto.userinterface.MatchSetup.decode(buffer);
+	return Proto.shared.MatchSetup.decode(buffer);
 }
 
-export function encodeMatchInput(payload) {
-	const err = Proto.userinterface.MatchInput.verify(payload);
+/**
+ * MatchEnd (NATS lifecycle)
+ */
+export function encodeMatchEnd(payload) {
+	const err = Proto.shared.MatchEnd.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.userinterface.MatchInput
-		.encode(Proto.userinterface.MatchInput.create(payload))
-		.finish();
-}
-
-export function encodeMatchQuit(payload) {
-	const err = Proto.userinterface.MatchQuit.verify(payload);
-	if (err) throw new Error(err);
-	return Proto.userinterface.MatchQuit
-		.encode(Proto.userinterface.MatchQuit.create(payload))
-		.finish();
-}
-
-export function encodeMatchStart(payload) {
-	const err = Proto.userinterface.MatchStart.verify(payload);
-	if (err) throw new Error(err);
-	return Proto.userinterface.MatchStart
-		.encode(Proto.userinterface.MatchStart.create(payload))
+	return Proto.shared.MatchEnd
+		.encode(Proto.shared.MatchEnd.create(payload))
 		.finish();
 }
 
 export function decodeMatchEnd(buffer) {
-	return Proto.userinterface.MatchEnd.decode(buffer);
+	return Proto.shared.MatchEnd.decode(buffer);
 }
 
-export function encodeErrorMessage(payload) {
-	const err = Proto.userinterface.ErrorMessage.verify(payload);
-	if (err) throw new Error(err);
-	return Proto.userinterface.ErrorMessage
-		.encode(Proto.userinterface.ErrorMessage.create(payload))
-		.finish();
-}
