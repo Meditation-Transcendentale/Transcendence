@@ -1,0 +1,15 @@
+services:
+  hundred-players-test:
+    build:
+      context: ./100pTestContainer
+    container_name: hundred_players_test
+    environment:
+      - NODE_ENV=development
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+    networks:
+      - transcendence-network
+    depends_on:
+      database_certs-init:
+        condition: service_completed_successfully

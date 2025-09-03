@@ -128,6 +128,23 @@ app.get('/uuid/:uuid', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ username: user.username });
 }));
 
+app.post(`/users`, handleErrors(async (req, res) => {
+
+	const pw = req.body.pw;
+
+	if (!pw || !pw.length) {
+		return res.code(statusCode.UNAUTHORIZED).send({ message: returnMessages.UNAUTHORIZED });
+	}
+	if (pw !== process.env.PSSWD) {
+		return res.code(statusCode.UNAUTHORIZED).send({ message: returnMessages.UNAUTHORIZED });
+	}
+	const users = await natsRequest(nats, jc, 'user.getAllUsers');
+
+	res.code(statusCode.SUCCESS).send({ users: users });
+}));
+
+
+
 app.get('/health', (req, res) => {
 	res.status(200).send('OK');
 });

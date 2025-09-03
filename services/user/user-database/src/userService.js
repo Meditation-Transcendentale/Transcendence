@@ -29,6 +29,7 @@ const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, tw
 const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getUserForFriendResearchStmt = database.prepare("SELECT username FROM users WHERE username = ?");
 const getUserStatusStmt = database.prepare("SELECT status FROM active_user WHERE user_id = ?");
+const getAllUsersStmt = database.prepare("SELECT uuid, username, password FROM users");
 const getBlockedUsersStmt = database.prepare(`
 	SELECT bu.id, u1.username AS blocker_username, u2.username AS blocked_username 
 	FROM blocked_users bu
@@ -210,6 +211,13 @@ const userService = {
 			throw { status: statusCode.NOT_FOUND, message: returnMessages.PLAYER_INACTIVE };
 		}
 		return status;
+	},
+	getAllUsers: () => {
+		const users = getAllUsersStmt.all();
+		if (users.length === 0) {
+			throw { status: statusCode.NOT_FOUND, message: returnMessages.NO_USERS_FOUND };
+		}
+		return users;
 	}
 };
 

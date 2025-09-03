@@ -178,6 +178,10 @@ handleErrorsNats(async () => {
 			const { userId } = jc.decode(msg.data);
 			const status = userService.getUserStatus(userId);
 			nats.publish(msg.reply, jc.encode({ success: true, data: status }));
-		})
+		}),
+		handleNatsSubscription("user.getAllUsers", async (msg) => {
+			const users = userService.getAllUsers();
+			nats.publish(msg.reply, jc.encode({ success: true, data: users }));
+		}),
 	]);
 })();

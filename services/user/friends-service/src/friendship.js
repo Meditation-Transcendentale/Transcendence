@@ -89,7 +89,6 @@ async function checkFriendshipStatus(user, friend) {
 	const isBlocked = await natsRequest(nats, jc, 'user.isBlocked', { userId: user.id, blockedUserId: friend.id });
 	const isBlockedBy = await natsRequest(nats, jc, 'user.isBlocked', { userId: friend.id, blockedUserId: user.id });
 
-
 	if (friendship) {
 		if (friendship.status === 'accepted') {
 			throw { status : statusCode.CONFLICT, message: returnMessages.ALREADY_FRIEND };
@@ -122,7 +121,7 @@ app.post('/add', handleErrors(async (req, res) => {
 	if (user.id === friend.id) {
 		throw { status : statusCode.BAD_REQUEST, message: returnMessages.AUTO_FRIEND_REQUEST };
 	}
-	checkFriendshipStatus(user, friend);
+	await checkFriendshipStatus(user, friend);
 
 	await natsRequest(nats, jc, 'user.addFriendRequest', { userId: user.id, friendId: friend.id });
 
