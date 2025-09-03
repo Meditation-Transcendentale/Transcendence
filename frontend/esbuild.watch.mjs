@@ -165,6 +165,22 @@ let encodectx = await esbuild.context({
 	resolveExtensions: ['.ts', '.js'],
 })
 
+let notifencodectx = await esbuild.context({
+	entryPoints: ['src/spa/proto/helper.ts'],
+	bundle: true,
+	outfile: "./dist/spa/proto/helper.js",
+	// outdir: "./dist/pongbr",
+	treeShaking: false,
+	legalComments: 'none',
+	format: "esm",
+	// minify: true,
+	// minifySyntax: true,
+	// minifyWhitespace: true,
+	// minifyIdentifiers: true,
+	splitting: false,
+	resolveExtensions: ['.ts', '.js'],
+})
+
 let babyctx = await esbuild.context({
 	entryPoints: ['src/babyImport.ts'],
 	bundle: true,
@@ -203,6 +219,7 @@ await pongbrctx.watch();
 await brickctx.watch();
 await encodectx.watch();
 await babyctx.watch();
+await notifencodectx.watch();
 //console.log(spactxs);
 for (const ctx of spactxs) {
 	await Object(ctx).watch();

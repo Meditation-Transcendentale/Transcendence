@@ -1,7 +1,8 @@
 import { App3D } from "./3d/App";
-import { NotifiactionManager } from "./spa/NotifiactionManager";
+import { NotificationManager } from "./spa/NotificationManager";
 import { Popup } from "./spa/Popup";
 import Router from "./spa/Router";
+import { postRequest } from "./spa/requests";
 
 //async function init() {
 //	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
@@ -33,7 +34,7 @@ async function init() {
 		App3D.dispose();
 	}
 
-	NotifiactionManager.setEnable(true);
+	NotificationManager.setEnable(true);
 
 	window.addEventListener('keydown', (e) => {
 		if (e.key == 'Escape') {
@@ -41,7 +42,10 @@ async function init() {
 			Popup.removePopup();
 		}
 		if (e.key == "p") {
-			NotifiactionManager.addText(`${performance.now()}`)
+			NotificationManager.addText(`${performance.now()}`)
+		}
+		if (e.key == "t") {
+			postRequest("friends/add", { inputUsername: "Erwan"});
 		}
 	})
 }

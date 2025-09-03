@@ -258,9 +258,9 @@ input[off] {
 	pointer-events: auto;
 }
 
-input:not([type="color"], [type="checkbox"], [type="number"]) {
-	all: unset;
-}
+/*input:not([type="color"], [type="checkbox"], [type="number"], [type="range"]) {*/
+/*	all: unset;*/
+/*}*/
 
 input[type=text] {
 	cursor: text;
@@ -308,14 +308,14 @@ input[on] {
 	color: white;
 	/*-webkit-text-stroke: 3px;*/
 	/*-webkit-text-stroke-color: black;*/
-	font-size: 5vh;
+	font-size: 7vh;
 	font-weight: bold;
 	pointer-events: auto;
 
 }
 
 .speak:hover {
-	color: blue;
+	/*color: blue;*/
 }
 
 .speak::before {
@@ -359,6 +359,7 @@ input[on] {
 	/*width: 40vh;*/
 	align-content: center;
 	border-radius: 0 1px 0 0;
+	pointer-events: auto;
 	box-shadow: 1px 1px 5px grey, -1px -1px 5px grey;
 }
 
@@ -370,31 +371,27 @@ input[on] {
 	margin: auto;
 
 	background-color: transparent;
-	color: white;
+	color: blue;
 	-webkit-text-stroke: 2px;
-	-webkit-text-stroke-color: black;
+	-webkit-text-stroke-color: blue;
 	font-size: 7vh;
 	font-weight: bold;
 	text-align: center;
-	pointer-events: auto;
+	pointer-events: all;
 
 	transition: letter-spacing 0.2s;
 }
 
 
 .switch-input[down] {
-	color: black;
+	color: grey;
 	-webkit-text-stroke: 1.5px;
-	-webkit-text-stroke-color: white;
-	letter-spacing: -2vh;
+	-webkit-text-stroke-color: grey;
+	letter-spacing: 0vh;
 	background-color: transparent;
 }
 
 
-
-.switch-input[down]:hover {
-	letter-spacing: 0vh;
-}
 
 .blur-popup {
 	position: absolute;
@@ -445,6 +442,57 @@ input[on] {
 	color: white;
 }
 
+#friend-request {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 4vh;
+	width: 70vh;
+	height: 30vh;
+}
+
+#friend-request .window-bar {
+	font-size: 3.5vh;
+}
+
+
+#friend-request span {
+	display: block;
+	position: absolute;
+	top: 20%;
+
+	font-size: 4vh;
+	width: 70vh;
+	text-align: center;
+}
+
+#friend-request input {
+	display: block;
+	font-size: 4vh;
+	width: 50%;
+	text-align: center;
+	padding: 2vh 0;
+}
+
+#friend-request-yes {
+	position: absolute;
+	bottom: 0%;
+	left: 0%;
+}
+
+#friend-request-no {
+	position: absolute;
+	bottom: 0%;
+	right: 0%;
+}
+
+#friend-request input:hover {
+	color: black;
+	background-color: white;
+}
+
+
 @keyframes fade-out {
 
 	0%,
@@ -477,5 +525,13 @@ input[type="number"] {
 
 
 details>div::before {
+	display: inline-block;
 	content: attr(name)": ";
+	width: 20vh;
+	overflow: scroll;
+	white-space-collapse: preserve;
+}
+
+input[type="range"] {
+	vertical-align: middle;
 }

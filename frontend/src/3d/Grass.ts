@@ -1,9 +1,10 @@
 
 // import { Tile } from "./Tile";
 
-import { Camera, Color3, Color4, LoadAssetContainerAsync, Matrix, Mesh, ProceduralTexture, Scene, Vector3 } from "@babylonImport";
+import { Camera, Color3, Color4, Effect, LoadAssetContainerAsync, Matrix, Mesh, ProceduralTexture, Scene, ShaderMaterial, Vector3 } from "@babylonImport";
 import { Tile } from "./Tile";
 import { GrassShader } from "./Shader/Shader";
+import "./Shader/depthShaders";
 
 
 
@@ -16,7 +17,7 @@ type _thinInstancesOptions = {
 };
 
 const optionsA: _thinInstancesOptions = {
-	density: 4,
+	density: 5,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.5,
@@ -86,6 +87,7 @@ export class Grass {
 	private _size: number;
 
 	private _grassShader!: GrassShader;
+	public grassDepthMaterial: ShaderMaterial;
 
 	private noiseTexture!: ProceduralTexture;
 
@@ -110,6 +112,12 @@ export class Grass {
 		this._tiles = [];
 		this.scene = scene;
 		this.cursor = cursor;
+
+		this.grassDepthMaterial = new ShaderMaterial("grassDepth", scene, "grassDepth", {
+			attributes: ["position", "world0", "world1", "world2", "world3", "baseColor"],
+			uniforms: ["world", "viewProjection", "depthValues", "time", "origin"],
+		})
+		this.grassDepthMaterial.backFaceCulling = false;
 
 	}
 
@@ -233,6 +241,9 @@ export class Grass {
 
 		this._pastTime = time;
 
+		this.grassDepthMaterial.setFloat("time", time);
+		this.grassDepthMaterial.setVector3("origin", this.cursor);
+
 
 		camera._updateFrustumPlanes();
 		for (let i = 0; i < this._tiles.length; i++) {
@@ -320,7 +331,7 @@ export class Grass {
 			);
 			const matT = Matrix.Translation(
 				posX,
-				0,
+				0.5,
 				posZ
 			);
 

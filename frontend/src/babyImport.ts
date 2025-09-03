@@ -3,7 +3,7 @@ import "@babylonjs/loaders/glTF/2.0/";
 import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // load shaders
 // import * as POST from "@babylonjs/core/PostProcesses";
 
-export { Inspector } from '@babylonjs/inspector';
+//export { Inspector } from '@babylonjs/inspector';
 // import {
 // 	VolumetricLightScatteringPostProcess
 // } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
@@ -57,11 +57,16 @@ export { Plane } from "@babylonjs/core/Maths/math.plane";
 export { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 export { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 export { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
-export { PolygonMeshBuilder } from "@babylonjs/core";
-export { Observer } from "@babylonjs/core";
-export { VertexBuffer } from "@babylonjs/core";
-export { GPUPicker } from "@babylonjs/core";
-export { Ray } from "@babylonjs/core";
+export { PolygonMeshBuilder } from "@babylonjs/core/Meshes/polygonMesh";
+export { Observer } from "@babylonjs/core/Misc/observable";
+export { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
+export { GPUPicker } from "@babylonjs/core/Collisions/gpuPicker";
+export { Ray } from "@babylonjs/core/Culling/ray";
+export { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
+export { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
+export { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
+export { EffectWrapper, EffectRenderer } from "@babylonjs/core/Materials/effectRenderer";
+export { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 
 import "@babylonjs/core/Culling/ray";
 

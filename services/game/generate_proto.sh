@@ -40,6 +40,8 @@ SERVICES=(
   "ai"
   "notifications"
   "tournament"
+  "friends-service"
+  "spa"
 )
 
 echo "🛠 Starting protobuf generation for all services..."
@@ -51,10 +53,16 @@ for svc in "${SERVICES[@]}"; do
       OUT_DIR="../../frontend/src/pong/utils/proto"
       ;;
     notifications)
-      OUT_DIR="../../services/notifications/notfications-manager/src/proto"
+      OUT_DIR="../../services/notifications/notifications-manager/src/proto"
       ;;
     frontend-pongbr)
       OUT_DIR="../../frontend/src/pongbr/utils/proto"
+      ;;
+    friends-service)
+      OUT_DIR="../../services/user/friends-service/src/proto"
+      ;;
+    spa)
+      OUT_DIR="../../frontend/src/spa/proto"
       ;;
     *)
       OUT_DIR="$svc/src/proto"
@@ -100,6 +108,7 @@ for svc in "${SERVICES[@]}"; do
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/ui.proto"
+        "$SHARED_PROTO_DIR/notif.proto"
       )
       ;;
     "lobby-manager")
@@ -107,6 +116,7 @@ for svc in "${SERVICES[@]}"; do
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/lobby.proto"
+        "$SHARED_PROTO_DIR/notif.proto"
       )
       ;;
     "notifications")
@@ -126,6 +136,14 @@ for svc in "${SERVICES[@]}"; do
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/ui.proto"
+    "friends-service")
+      PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/notif.proto"
+      )
+      ;;
+    "spa")
+      PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/notif.proto"
       )
       ;;
     *)
