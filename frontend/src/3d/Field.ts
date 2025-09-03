@@ -151,9 +151,10 @@ export class Field {
 		monolith.setAnimationSpeed(4.);
 		monolith.setAnimationIntensity(0.5);
 		monolith.addText('play', "PLAY", 0, 7.1, 1.7, 2.0);
-		monolith.addText('stats', "STATS", 0, 9, 1.7, 2.0);
-		//monolith.showText("STATS", 0, 9, 1.7);
-		monolith.addText('about', "ABOUT", 0, 5.5, 1.7, 2.0);
+		monolith.addText('create', "CREATE", 2., 7.5, 0., 2.0);
+		monolith.addText('join', "JOIN", -1.9, 5.5, 0., 2.0);
+		monolith.setTextFace('create', 'left');
+		monolith.setTextFace('join', 'left');
 		this.monolith = monolith;
 		//monolith.showText("TEST");
 		//monolith.material.debugUniforms();
@@ -254,8 +255,8 @@ export class Field {
 		//const final = new Vue();
 		switch (vue) {
 			case 'play': {
-				this.camera.position.set(-20, 1, 30);
-				this.camera.setTarget(new Vector3(-20, 4, 20));
+				this.camera.position.set(-13, 4, -7);
+				this.camera.setTarget(new Vector3(20, 11, -8));
 				break;
 			}
 			case 'home': {

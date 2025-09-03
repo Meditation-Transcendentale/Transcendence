@@ -47,6 +47,10 @@ export class MonolithMaterial extends CustomMaterial {
 		this.AddUniform('textGlow1', 'float', 0.0);
 		this.AddUniform('textGlow2', 'float', 0.0);
 		this.AddUniform('textGlow3', 'float', 0.0);
+		this.AddUniform('textFace0', 'vec3', Vector3.Zero());
+		this.AddUniform('textFace1', 'vec3', Vector3.Zero());
+		this.AddUniform('textFace2', 'vec3', Vector3.Zero());
+		this.AddUniform('textFace3', 'vec3', Vector3.Zero());
 
 		this.AddUniform('textCount', 'float', 0.0);
 
@@ -188,6 +192,28 @@ if(textGlow0 > 0.0) {
     }
 }
 
+//if(textGlow1 > 0.0) {
+//    vec3 textOffset = worldPos2 - textPosition1;
+//    float distance = length(textOffset);
+//    float phasing = smoothstep(textSize1 * 1.8, textSize1 * 0.4, distance) * textGlow1;
+//
+//    if(phasing > 0.0) {
+//        float phaseOffset = hash(instanceID) * 6.28;
+//        float phaseAmount = sin(time * 1.5 + phaseOffset) * 0.5 + 0.5;
+//        phaseAmount *= phasing;
+//
+//        vec3 dimensionOffset = vec3(
+//            sin(instanceID * 0.1) * 0.1,
+//            cos(instanceID * 0.13) * 0.15,
+//            sin(instanceID * 0.17) * 0.18
+//        );
+//
+//        worldPos.xyz += dimensionOffset * phaseAmount;
+//
+//        worldPos.xyz = textPosition1 + (worldPos.xyz - textPosition1) * (1.0 - phaseAmount * 0.3);
+//    }
+//}
+
 // === COMBINE ANIMATIONS ===
 vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) * deadZoneMask;
 worldPos.xyz += totalDisplacement;
@@ -203,38 +229,38 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 
 
 //TORNADO
-if(textGlow1 > 0.0) {
-    vec3 textOffset = worldPos2 - textPosition1;
-    float distance = length(textOffset);
-    float fracturing = smoothstep(textSize1 * 1.5, textSize1 * 0.5, distance) * textGlow1 * 0.01;
-
-    if(fracturing > 0.0) {
-        float fragmentCount = 8.0;
-        float fragmentId = mod(instanceID, fragmentCount);
-
-        vec3 fragmentOffset = vec3(
-            cos(fragmentId * 0.785) * 0.3,
-            sin(fragmentId * 1.047) * 0.25,
-            cos(fragmentId * 1.396) * 0.28
-        );
-
-        float expansion = sin(time * 2.0 + distance) * 0.5 + 0.5 * textGlow1;
-        fragmentOffset *= fracturing * expansion;
-
-        worldPos.xyz += fragmentOffset;
-
-        float rotationSpeed = fracturing * 3.0;
-        float angle = time * rotationSpeed + fragmentId;
-        mat3 rotation = mat3(
-            cos(angle), -sin(angle), 0,
-            sin(angle), cos(angle), 0,
-            0, 0, 1
-        );
-
-        vec3 centeredPos = worldPos.xyz - textPosition0;
-        worldPos.xyz = textPosition1 + rotation * centeredPos;
-    }
-}
+//if(textGlow1 > 0.0) {
+//    vec3 textOffset = worldPos2 - textPosition1;
+//    float distance = length(textOffset);
+//    float fracturing = smoothstep(textSize1 * 1.5, textSize1 * 0.5, distance) * textGlow1 * 0.01;
+//
+//    if(fracturing > 0.0) {
+//        float fragmentCount = 8.0;
+//        float fragmentId = mod(instanceID, fragmentCount);
+//
+//        vec3 fragmentOffset = vec3(
+//            cos(fragmentId * 0.785) * 0.3,
+//            sin(fragmentId * 1.047) * 0.25,
+//            cos(fragmentId * 1.396) * 0.28
+//        );
+//
+//        float expansion = sin(time * 2.0 + distance) * 0.5 + 0.5 * textGlow1;
+//        fragmentOffset *= fracturing * expansion;
+//
+//        worldPos.xyz += fragmentOffset;
+//
+//        float rotationSpeed = fracturing * 3.0;
+//        float angle = time * rotationSpeed + fragmentId;
+//        mat3 rotation = mat3(
+//            cos(angle), -sin(angle), 0,
+//            sin(angle), cos(angle), 0,
+//            0, 0, 1
+//        );
+//
+//        vec3 centeredPos = worldPos.xyz - textPosition0;
+//        worldPos.xyz = textPosition1 + rotation * centeredPos;
+//    }
+//}
 
 //if(textGlow0 > 0.0) {
 //    vec3 textOffset = worldPos2 - textPosition0;
@@ -340,10 +366,6 @@ if(textGlow1 > 0.0) {
 
 		this.Fragment_Begin(`
 			#define MAINUV1 1
-    //  uniform sampler2D textTexture;
-    //uniform vec3 textPosition;
-    //uniform float textSize;
-    //uniform float showText;
     varying vec3 vOriginalWorldPos;
 			varying float oclusion;
 		`)
@@ -353,21 +375,47 @@ if(textGlow1 > 0.0) {
 		`)
 
 		this.Fragment_MainEnd(`
-    vec3 originalPos = vOriginalWorldPos; // Use original position for stable text
+    vec3 originalPos = vOriginalWorldPos; 
     vec3 baseColor2 = vec3(0.3, 0.25, 0.2);
 	 vec3 faceNormal = normalize(vNormalW);
+	//vec3 textFace0 = vec3(0., 0., 1.);
+	//vec3 textFace1 = vec3(0., 0., 1.);
+	//vec3 textFace2 = vec3(0., 0., 1.);
+	//vec3 textFace3 = vec3(0., 0., 1.);
 
 	 if(textCount > 0.0) {
         // Zone 0
         if(textSize0 > 0.0) {
             vec3 textOffset0 = originalPos - textPosition0;
-            vec2 textUV0 = vec2(
-                (-textOffset0.x / textSize0) + 0.5,
-                (textOffset0.y / textSize0) + 0.5
-            );
-			bool isFrontFace = faceNormal.z > 0.5;
+			vec3 face = textFace0;
+			vec2 textUV0;
+			
+			// Front/Back faces 
+			if(abs(face.z) > 0.5) {
+				textUV0 = vec2(
+					(-textOffset0.x / textSize0) + 0.5,
+					(textOffset0.y / textSize0) + 0.5
+				);
+			}
+
+			// Left/Right faces   
+			else if(abs(face.x) > 0.5) {
+				textUV0 = vec2(
+					(-textOffset0.z / textSize0) + 0.5,
+					(textOffset0.y / textSize0) + 0.5
+				);
+			}
+
+			// Top/Bottom faces 
+			else if(abs(face.y) > 0.5) {
+				textUV0 = vec2(
+					(textOffset0.x / textSize0) + 0.5,
+					(textOffset0.z / textSize0) + 0.5
+				);
+			}
+			bool isCorrectFace = dot(faceNormal, textFace0) > 0.5;
             
-            if(isFrontFace && textUV0.x >= 0.0 && textUV0.x <= 1.0 && textUV0.y >= 0.0 && textUV0.y <= 1.0) {
+            if(isCorrectFace && textUV0.x >= 0.0 && textUV0.x <= 1.0 && textUV0.y >= 0.0 && textUV0.y <= 1.0) {
                 vec4 textColor0 = texture2D(textTexture0, textUV0);
                 if(textColor0.r > 0.5) {
                     baseColor2 = mix(baseColor2, baseColor2 * 0.2, textColor0.a);
@@ -412,13 +460,36 @@ if(textGlow1 > 0.0) {
         // Zone 1
         if(textSize1 > 0.0) {
             vec3 textOffset1 = originalPos - textPosition1;
-            vec2 textUV1 = vec2(
-                (-textOffset1.x / textSize1) + 0.5,
-                (textOffset1.y / textSize1) + 0.5
-            );
-            
-			bool isFrontFace = faceNormal.z > 0.5;
-            if(isFrontFace && textUV1.x >= 0.0 && textUV1.x <= 1.0 && textUV1.y >= 0.0 && textUV1.y <= 1.0) {
+           			vec3 face = textFace1;
+			vec2 textUV1;
+			
+			// Front/Back faces 
+			if(abs(face.z) > 0.5) {
+				textUV1 = vec2(
+					(-textOffset1.x / textSize1) + 0.5,
+					(textOffset1.y / textSize1) + 0.5
+				);
+			}
+
+			// Left/Right faces   
+			else if(abs(face.x) > 0.5) {
+				textUV1 = vec2(
+					(-textOffset1.z / textSize1) + 0.5,
+					(textOffset1.y / textSize1) + 0.5
+				);
+			}
+
+			// Top/Bottom faces 
+			else if(abs(face.y) > 0.5) {
+				textUV1 = vec2(
+					(textOffset1.x / textSize1) + 0.5,
+					(textOffset1.z / textSize1) + 0.5
+				);
+			}
+ 
+ bool isCorrectFace = dot(faceNormal, textFace1) > 0.7;
+
+            if(isCorrectFace && textUV1.x >= 0.0 && textUV1.x <= 1.0 && textUV1.y >= 0.0 && textUV1.y <= 1.0) {
                 vec4 textColor1 = texture2D(textTexture1, textUV1);
                 if(textColor1.r > 0.5) {
                     baseColor2 = mix(baseColor2, baseColor2 * 0.2, textColor1.a);
@@ -432,13 +503,36 @@ if(textGlow1 > 0.0) {
         }
         if(textSize2 > 0.0) {
             vec3 textOffset2 = originalPos - textPosition2;
-            vec2 textUV2 = vec2(
-                (-textOffset2.x / textSize2) + 0.5,
-                (textOffset2.y / textSize2) + 0.5
-            );
-            
-			bool isFrontFace = faceNormal.z > 0.5;
-            if(isFrontFace && textUV2.x >= 0.0 && textUV2.x <= 1.0 && textUV2.y >= 0.0 && textUV2.y <= 1.0) {
+			vec3 face = textFace2;
+			vec2 textUV2;
+			
+			// Front/Back faces 
+			if(abs(face.z) > 0.5) {
+				textUV2 = vec2(
+					(-textOffset2.x / textSize2) + 0.5,
+					(textOffset2.y / textSize2) + 0.5
+				);
+			}
+
+			// Left/Right faces   
+			else if(abs(face.x) > 0.5) {
+				textUV2 = vec2(
+					(-textOffset2.z / textSize2) + 0.5,
+					(textOffset2.y / textSize2) + 0.5
+				);
+			}
+
+			// Top/Bottom faces 
+			else if(abs(face.y) > 0.5) {
+				textUV2 = vec2(
+					(textOffset2.x / textSize2) + 0.5,
+					(textOffset2.z / textSize2) + 0.5
+				);
+			}
+
+             bool isCorrectFace = dot(faceNormal, textFace2) > 0.7;
+
+            if(isCorrectFace && textUV2.x >= 0.0 && textUV2.x <= 1.0 && textUV2.y >= 0.0 && textUV2.y <= 1.0) {
                 vec4 textColor2 = texture2D(textTexture2, textUV2);
                 if(textColor2.r > 0.5) {
                     baseColor2 = mix(baseColor2, baseColor2 * 0.2, textColor2.a);

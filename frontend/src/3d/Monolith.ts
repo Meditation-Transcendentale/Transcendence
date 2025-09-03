@@ -735,6 +735,11 @@ export class Monolith {
 		}
 	}
 
+	public setTextFace(id: string, face: 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom') {
+		if (this.text) {
+			this.text.setTextFace(id, face);
+		}
+	}
 	public getTextZones(): string[] {
 		return this.text?.getZones() || [];
 	}

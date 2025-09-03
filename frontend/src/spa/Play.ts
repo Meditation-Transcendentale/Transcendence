@@ -94,23 +94,23 @@ export default class Play {
 
 		this.ref.switch.id = App3D.addCSS3dObject({
 			html: this.ref.switch.html,
-			width: 1.2,
-			height: 1.2,
-			world: Matrix.RotationY(Math.PI * 1.2).multiply(Matrix.Translation(-17, 3, 25)),
+			width: 1.5,
+			height: 1.5,
+			world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-2, 6.6, 0)),
 			enable: false
 		})
 		this.ref.create.id = App3D.addCSS3dObject({
 			html: this.ref.create.html,
 			width: 1.5,
 			height: 1.5,
-			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-22, 2, 23)),
+			world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-4, 5, -8)),
 			enable: false
 		})
 		this.ref.join.id = App3D.addCSS3dObject({
 			html: this.ref.join.html,
 			width: 1.5,
 			height: 1.5,
-			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-23, 3, 23)),
+			world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-5, 5, -10)),
 			enable: false
 		})
 
