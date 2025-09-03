@@ -131,7 +131,7 @@ app.get('/uuid/:uuid', handleErrors(async (req, res) => {
 app.post(`/users`, handleErrors(async (req, res) => {
 
 	const pw = req.body.pw;
-
+``
 	if (!pw || !pw.length) {
 		return res.code(statusCode.UNAUTHORIZED).send({ message: returnMessages.UNAUTHORIZED });
 	}

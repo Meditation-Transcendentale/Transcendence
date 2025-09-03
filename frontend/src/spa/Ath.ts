@@ -184,7 +184,7 @@ class AthSetting {
 		})
 
 		this.ref.editAvatar.addEventListener("click", () => {
-			alert("fix cdn");
+			this.avatarUpdate()
 		})
 
 		this.ref.username.addEventListener("keydown", () => {
@@ -223,6 +223,29 @@ class AthSetting {
 	//		}
 	//	}
 	//}
+
+	private avatarUpdate() {
+			const body = new FormData();
+			body.append('avatar', this.ref.avatarChange.files[0]);
+			patchRequest("update-info/avatar", body, false)
+				.then((json)=>{
+					// const url = URL.createObjectURL(json.data.cdnPath)
+					const url = new URL(json.data.cdnPath);
+					console.log(json.data.cdnPath);
+					this.ref.avatarImg.src = `https://${window.location.hostname}:7000${encodeURI(url.pathname)}`;
+				})
+				// .then(() => {
+				// 	meRequest()
+				// 		.then(() => { console.log(User) })
+				// 		.catch((err) => { console.log(err) })
+				// 	cdnRequest(User.avatar as string)
+				// 		.then((json) => { console.log(json) })
+				// 		.catch((err) => { console.log(err) })
+				// })
+				// .catch(() => {
+				// 	console.error("Error changing avatar");
+				// })
+	}
 
 
 }
