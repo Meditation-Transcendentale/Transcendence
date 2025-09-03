@@ -2,6 +2,7 @@ import { Camera, Vector3, Mesh, Matrix, Quaternion } from "@babylonImport";
 import { Entity } from "../ecs/Entity.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
+import { WallComponent } from "../components/WallComponent.js";
 
 export class ThinInstanceManager {
 	private mesh: Mesh;

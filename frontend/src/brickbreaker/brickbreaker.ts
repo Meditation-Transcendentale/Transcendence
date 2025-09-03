@@ -176,31 +176,31 @@ export class BrickBreaker {
 		return this.bricks;
 	}
 
-	public dispose() {
-		this.ball.ball.dispose();
-		this.player.goal.dispose();
-		this.player.shield.dispose();
-		this.player.pointerSurface.dispose();
-		this.arena.dispose();
+	// public dispose() {
+	// 	this.ball.ball.dispose();
+	// 	this.player.goal.dispose();
+	// 	this.player.shield.dispose();
+	// 	this.player.pointerSurface.dispose();
+	// 	this.arena.dispose();
 
-		this.bricks.forEach(brickCol => {
-			brickCol.forEach(brick => {
-				brick.dispose();
-			});
-		});
+	// 	this.bricks.forEach(brickCol => {
+	// 		brickCol.forEach(brick => {
+	// 			brick.dispose();
+	// 		});
+	// 	});
 
-		this.camera.dispose();
-		this.light.dispose();
-		this.engine.clear(new Color4(1, 1, 1, 1), true, true);
-		this.engine.stopRenderLoop();
+	// 	this.camera.dispose();
+	// 	this.light.dispose();
+	// 	this.engine.clear(new Color4(1, 1, 1, 1), true, true);
+	// 	this.engine.stopRenderLoop();
 
-		this.scene?.dispose();
-		this.engine?.dispose();
+	// 	this.scene?.dispose();
+	// 	this.engine?.dispose();
 
-		clearTimeout(resizeTimeout);
-		this.engine.dispose();
-		// Router.nav(`/play`, false, false);
-	}
+	// 	clearTimeout(resizeTimeout);
+	// 	this.engine.dispose();
+	// 	// Router.nav(`/play`, false, false);
+	// }
 
 	private resizeGame() {
 		window.addEventListener("resize", () => {

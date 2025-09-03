@@ -7,6 +7,7 @@ import { WallComponent } from "../components/WallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputComponent } from "../components/InputComponent.js";
 import { UIComponent } from "../components/UIComponent.js";
+import Game from "../../spa/Game.js";
 
 export interface GameTemplateConfig {
 	numberOfBalls: number;
@@ -15,13 +16,13 @@ export interface GameTemplateConfig {
 	wallWidth: number;
 }
 
-export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string): void {
-	// console.log("localplayerif in template=" + localPaddleId);
+export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string): void {
 
 	const scoreUI = new Entity();
 	scoreUI.addComponent(new UIComponent(gameMode));
 	ecs.addEntity(scoreUI);
 
+	// console.log("create player === ", gameMode);
 	for (let i = 0; i < 2; i++) {
 		const paddleEntity = new Entity();
 		const posX = config.arenaSizeX / 2 / 10 * 9;
@@ -40,6 +41,17 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 		));
 		ecs.addEntity(paddleEntity);
 	}
+}
+
+export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string): void {
+	// console.log("localplayerif in template=" + localPaddleId);
+
+	const ballEntity = new Entity();
+	const pos = new Vector3(0, 0, 0);
+	const vel = new Vector3(0, 0, 0);
+	ballEntity.addComponent(new BallComponent(0, pos, vel));
+	ballEntity.addComponent(new TransformComponent(pos, Vector3.Zero(), new Vector3(1, 1, 1)));
+	ecs.addEntity(ballEntity);
 
 	for (let i = 0; i < 2; i++) {
 		let x = i % 2 ? config.arenaSizeX / 2 + config.wallWidth / 4 : 0;
@@ -48,7 +60,7 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 		const scale_x = i % 2 ? 1 / 2 : 1;
 		const scale_z = i % 2 ? 1 : 1 / config.arenaSizeZ * (config.arenaSizeX + config.wallWidth);
 		let wallEntity = new Entity();
-		wallEntity.addComponent(new WallComponent(0, new Vector3(x, 0, z)));
+		wallEntity.addComponent(new WallComponent(i, new Vector3(x, 0, z)));
 		wallEntity.addComponent(new TransformComponent(
 			new Vector3(x, 0, z),
 			new Vector3(0, rotation_y, 0),
@@ -57,7 +69,7 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 		ecs.addEntity(wallEntity);
 
 		wallEntity = new Entity();
-		wallEntity.addComponent(new WallComponent(0, new Vector3(-x, 0, -z)));
+		wallEntity.addComponent(new WallComponent(i, new Vector3(-x, 0, -z)));
 		wallEntity.addComponent(new TransformComponent(
 			new Vector3(-x, 0, -z),
 			new Vector3(0, rotation_y, 0),
@@ -65,11 +77,4 @@ export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, 
 		));
 		ecs.addEntity(wallEntity);
 	}
-
-	const ballEntity = new Entity();
-	const pos = new Vector3(0, 0, 0);
-	const vel = new Vector3(0, 0, 0);
-	ballEntity.addComponent(new BallComponent(0, pos, vel));
-	ballEntity.addComponent(new TransformComponent(pos, Vector3.Zero(), new Vector3(1, 1, 1)));
-	ecs.addEntity(ballEntity);
 }

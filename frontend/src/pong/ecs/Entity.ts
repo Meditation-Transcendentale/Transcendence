@@ -1,8 +1,8 @@
 import { Component } from "./Component.js";
 
 export class Entity {
-	private static _idCounter = 0;
-	public readonly id: number;
+	public static _idCounter = 0;
+	public id: number;
 	public components: Map<string, Component> = new Map();
 
 	constructor() {

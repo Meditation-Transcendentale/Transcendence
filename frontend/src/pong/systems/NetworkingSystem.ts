@@ -78,11 +78,10 @@ export class NetworkingSystem extends System {
 				});
 
 				paddles.forEach(p => {
-					// if (p.id === localPaddleId) return;
 
 					const matchedEntities = entities.filter(e =>
 						e.hasComponent(PaddleComponent) &&
-						(e.getComponent(PaddleComponent)!.id === p.id || e.getComponent(PaddleComponent)!.id - 2 === p.id)
+						(e.getComponent(PaddleComponent)!.id === p.id)
 					);
 					if (!matchedEntities) return;
 
@@ -93,13 +92,7 @@ export class NetworkingSystem extends System {
 							paddleComp.offset = p.offset;
 						}
 
-
 						paddleComp.serverOffset = p.offset;
-						if (paddleComp.id == 2 || paddleComp.id == 3)
-							paddleComp.offset = p.offset;
-
-
-
 						const tf = e.getComponent(TransformComponent)!;
 						const rot = tf.rotation;
 						const right = Vector3.TransformCoordinates(
