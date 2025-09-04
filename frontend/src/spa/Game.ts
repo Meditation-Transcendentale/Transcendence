@@ -42,11 +42,14 @@ export default class Game {
 			this.pong = new Pong(document.querySelector("#canvas"), params.get("id"), params.get("mod"), App3D.scene);
 		let gameId = params.get("id");
 		let uuid = User.uuid;
+		let gameMode = params.get("mod");
 		if (!gameId)
 			gameId = "";
 		if (!uuid)
 			uuid = "";
-		this.pong.start(gameId, uuid);
+		if (!gameMode)
+			gameMode = "";
+		this.pong.start(gameId, uuid, gameMode);
 	}
 
 }

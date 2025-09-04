@@ -9,7 +9,7 @@ import { ThinInstanceSystem } from "./systems/ThinInstanceSystem.js";
 import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { getOrCreateUUID } from "./utils/getUUID.js";
-import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
+import { createGameTemplate, GameTemplateConfig, createPlayer } from "./templates/GameTemplate.js";
 import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
 import { createCamera, createBaseMeshes, createInstanceManagers } from "./utils/initGame.js";
@@ -48,6 +48,8 @@ export class Pong {
 	private networkingSystem!: NetworkingSystem;
 	private inputSystem!: InputSystem;
 
+	private config: any;
+
 	constructor(canvas: any, gameId: any, gameMode: any, scene: Scene) {
 		this.canvas = canvas;
 		this.scene = scene;
@@ -55,22 +57,24 @@ export class Pong {
 		this.gameMode = gameMode;
 		this.engine = this.scene.getEngine() as Engine;
 		this.inited = false;
-	}
 
-	public async init() {
-		const config = {
+		this.config = {
 			numberOfBalls: 1,
 			arenaSizeX: 30,
 			arenaSizeZ: 20,
 			wallWidth: 1
 		};
 
+	}
+
+	public async init() {
+		
 		this.pongRoot = new TransformNode("pongRoot", this.scene);
 		this.pongRoot.position.set(2000, -3500, -3500);
 		this.cam = this.scene.getCameraByName('pong') as ArcRotateCamera;
 		this.cam.parent = this.pongRoot;
 		this.cam.minZ = 0.2;
-		this.baseMeshes = createBaseMeshes(this.scene, config, this.pongRoot);
+		this.baseMeshes = createBaseMeshes(this.scene, this.config, this.pongRoot);
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
 		this.uuid = getOrCreateUUID();
 
@@ -80,17 +84,22 @@ export class Pong {
 
 		// localPaddleId = await this.waitForRegistration();
 		//this.camera = createCamera(this.scene, this.canvas, localPaddleId, this.gameMode);
-		this.initECS(config, this.instanceManagers, this.uuid);
+		this.initECS(this.config, this.instanceManagers, this.uuid);
 		this.stateManager = new StateManager(this.ecs);
 		this.inited = true;
 
 
 	}
-	public async start(gameId: string, uuid: string) {
+	public async start(gameId: string, uuid: string, gameMode: string) {
+		this.gameMode = gameMode;
 		if (this.wsManager) {
 			this.wsManager.socket.close();
 			this.ecs.removeSystem(this.inputSystem);
 			this.ecs.removeSystem(this.networkingSystem);
+			//delete player && UI
+			this.ecs.removeEntityById(7);
+			this.ecs.removeEntityById(6);
+			this.ecs.removeEntityById(5);
 		}
 		console.log("UU", uuid)
 		const wsUrl = `wss://${window.location.hostname}:7000/game?` +
@@ -116,6 +125,10 @@ export class Pong {
 			this.uuid
 		);
 		this.ecs.addSystem(this.networkingSystem);
+
+		//add player
+		createPlayer(this.ecs, this.config, localPaddleId, this.gameMode);
+
 		console.log("start");
 		//this.engine = new Engine(this.canvas, true);
 		//engine = this.engine;
