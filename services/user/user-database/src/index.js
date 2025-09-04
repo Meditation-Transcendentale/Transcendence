@@ -141,7 +141,7 @@ handleErrorsNats(async () => {
 		}),
 		handleNatsSubscription("user.updateAvatar", async (msg) => {
 			const { avatar, userId } = jc.decode(msg.data);
-			console.log("Updating avatar for user:", userId, "with avatar:", avatar);
+			// console.log("Updating avatar for user:", userId, "with avatar:", avatar);
 			userService.updateAvatar(avatar, userId);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
@@ -179,6 +179,10 @@ handleErrorsNats(async () => {
 			const { userId } = jc.decode(msg.data);
 			const status = userService.getUserStatus(userId);
 			nats.publish(msg.reply, jc.encode({ success: true, data: status }));
+		}),
+		handleNatsSubscription("user.getAllUsers", async (msg) => {
+			const users = userService.getAllUsers();
+			nats.publish(msg.reply, jc.encode({ success: true, data: users }));
 		}),
 		handleNatsSubscription("status.addUserStatus", async (msg) => {
 			const { userId, status } = jc.decode(msg.data);

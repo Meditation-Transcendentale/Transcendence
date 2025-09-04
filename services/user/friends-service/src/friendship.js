@@ -90,7 +90,6 @@ async function checkFriendshipStatus(user, friend) {
 	const isBlocked = await natsRequest(nats, jc, 'user.isBlocked', { userId: user.id, blockedUserId: friend.id });
 	const isBlockedBy = await natsRequest(nats, jc, 'user.isBlocked', { userId: friend.id, blockedUserId: user.id });
 
-
 	if (friendship) {
 		if (friendship.status === 'accepted') {
 			throw { status : friendshipReturn.FRIEND_012.http, code: friendshipReturn.FRIEND_012.code, message: friendshipReturn.FRIEND_012.message };
