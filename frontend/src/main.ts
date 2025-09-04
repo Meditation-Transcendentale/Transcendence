@@ -10,7 +10,6 @@ import Router from "./spa/Router";
 //}
 //
 
-
 async function init() {
 	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
 

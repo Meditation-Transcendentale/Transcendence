@@ -12,18 +12,24 @@ interface playHtmlReference {
 	swJoin: HTMLInputElement
 	join: { html: HTMLDivElement, id: number },
 	create: { html: HTMLDivElement, id: number },
-	brMod: HTMLInputElement;
-	tournamentMod: HTMLInputElement;
-	defaultMap: HTMLInputElement;
-	localMod: HTMLInputElement;
-	onlineMod: HTMLInputElement;
-	aiMod: HTMLInputElement;
+	//brMod: HTMLInputElement;
+	//tournamentMod: HTMLInputElement;
+	//defaultMap: HTMLInputElement;
+	//localMod: HTMLInputElement;
+	//onlineMod: HTMLInputElement;
+	//aiMod: HTMLInputElement;
 	createBtn: HTMLInputElement;
 	createWin: HTMLDivElement;
 	list: HTMLTableElement;
 	joinId: HTMLInputElement;
 	lobbyInfoWindow: { html: HTMLDivElement, id: number };
 	lobbyInfo: HTMLDivElement;
+	brMode: HTMLInputElement;
+	createGame: HTMLInputElement;
+	pongMode: HTMLInputElement;
+	tournamentMode: HTMLInputElement;
+	brickMode: HTMLInputElement;
+	pongModes: HTMLInputElement;
 };
 
 enum playState {
@@ -70,18 +76,24 @@ export default class Play {
 			swJoin: div.querySelector("#join-switch") as HTMLInputElement,
 			create: { html: div.querySelector("#play-create") as HTMLDivElement, id: -1 },
 			join: { html: div.querySelector("#play-join") as HTMLDivElement, id: -1 },
-			brMod: div.querySelector("#br-mod") as HTMLInputElement,
-			tournamentMod: div.querySelector("#tournament-mod") as HTMLInputElement,
-			defaultMap: div.querySelector("#default-map") as HTMLInputElement,
-			localMod: div.querySelector("#local-mod") as HTMLInputElement,
-			onlineMod: div.querySelector("#online-mod") as HTMLInputElement,
-			aiMod: div.querySelector("#ai-mod") as HTMLInputElement,
+			//brMod: div.querySelector("#br-mod") as HTMLInputElement,
+			//tournamentMod: div.querySelector("#tournament-mod") as HTMLInputElement,
+			//defaultMap: div.querySelector("#default-map") as HTMLInputElement,
+			//localMod: div.querySelector("#local-mod") as HTMLInputElement,
+			//onlineMod: div.querySelector("#online-mod") as HTMLInputElement,
+			//aiMod: div.querySelector("#ai-mod") as HTMLInputElement,
 			createBtn: div.querySelector("#create-btn") as HTMLInputElement,
 			createWin: div.querySelector("#create-btn-window") as HTMLDivElement,
 			list: div.querySelector("#join-list") as HTMLTableElement,
 			joinId: div.querySelector("#join-id") as HTMLInputElement,
 			lobbyInfoWindow: { html: div.querySelector("#play-lobby-info") as HTMLDivElement, id: -1 },
-			lobbyInfo: div.querySelector("#lobby-info") as HTMLDivElement
+			lobbyInfo: div.querySelector("#lobby-info") as HTMLDivElement,
+			brMode: div.querySelector("#br-mode") as HTMLInputElement,
+			pongMode: div.querySelector("#pong-mode") as HTMLInputElement,
+			tournamentMode: div.querySelector("#tournament-mode") as HTMLInputElement,
+			brickMode: div.querySelector("#brick-mod") as HTMLInputElement,
+			createGame: div.querySelector("#create-game") as HTMLInputElement,
+			pongModes: div.querySelector("#create-pong") as HTMLInputElement
 		}
 
 
@@ -114,7 +126,6 @@ export default class Play {
 			enable: false
 		})
 
-
 		this.ref.swJoin.toggleAttribute("down");
 		this.ref.swCreate.addEventListener("click", () => {
 			App3D.setCSS3dObjectEnable(this.ref.create.id, true);
@@ -134,65 +145,87 @@ export default class Play {
 			this.state = playState.join;
 		})
 
+		//this.ref.pongModes.disabled = true;
 		this.ref.createWin.toggleAttribute("off");
 
-
-
-		this.ref.brMod.addEventListener("click", () => {
-			this.createState.mod = this.ref.brMod.toggleAttribute("on") ? "br" : null;
-			this.ref.tournamentMod.removeAttribute("on");
-			this.ref.localMod.removeAttribute("on");
-			this.ref.onlineMod.removeAttribute("on");
-			this.ref.aiMod.removeAttribute("on");
+		this.ref.brMode.addEventListener("click", () => {
+			this.createState.mod = this.ref.brMode.toggleAttribute("on") ? "br" : null;
+			this.ref.tournamentMode.removeAttribute("on");
+			this.ref.pongMode.removeAttribute("on");
+			//this.ref.brickMode.removeAttribute("on");
+			this.ref.pongModes.classList.remove('window--play-disabled')
+			this.ref.pongModes.classList.add('window--play-enable')
+			this.ref.createGame.classList.remove('window--play-enable')
+			this.ref.createGame.classList.add('window--play-disabled')
+			document.getElementById('create-pong')?.classList.add('enabled');
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 		})
 
-		this.ref.tournamentMod.addEventListener("click", () => {
-			this.createState.mod = this.ref.tournamentMod.toggleAttribute("on") ? "tournament" : null;
-			this.ref.brMod.removeAttribute("on");
-			this.ref.localMod.removeAttribute("on");
-			this.ref.onlineMod.removeAttribute("on");
-			this.ref.aiMod.removeAttribute("on");
+		this.ref.pongMode.addEventListener("click", () => {
+			this.createState.mod = this.ref.pongMode.toggleAttribute("on") ? "br" : null;
+			this.ref.tournamentMode.removeAttribute("on");
+			this.ref.brMode.removeAttribute("on");
+			//this.ref.brickMode.removeAttribute("on");
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 		})
 
-		this.ref.localMod.addEventListener("click", () => {
-			this.createState.mod = this.ref.localMod.toggleAttribute("on") ? "local" : null;
-			this.ref.tournamentMod.removeAttribute("on");
-			this.ref.brMod.removeAttribute("on");
-			this.ref.onlineMod.removeAttribute("on");
-			this.ref.aiMod.removeAttribute("on");
-			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
-			else { this.ref.createWin.setAttribute("off", "") }
-		})
-
-		this.ref.onlineMod.addEventListener("click", () => {
-			this.createState.mod = this.ref.onlineMod.toggleAttribute("on") ? "online" : null;
-			this.ref.tournamentMod.removeAttribute("on");
-			this.ref.localMod.removeAttribute("on");
-			this.ref.brMod.removeAttribute("on");
-			this.ref.aiMod.removeAttribute("on");
-			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
-			else { this.ref.createWin.setAttribute("off", "") }
-		})
-
-		this.ref.aiMod.addEventListener("click", () => {
-			this.createState.mod = this.ref.aiMod.toggleAttribute("on") ? "ai" : null;
-			this.ref.tournamentMod.removeAttribute("on");
-			this.ref.localMod.removeAttribute("on");
-			this.ref.onlineMod.removeAttribute("on");
-			this.ref.brMod.removeAttribute("on");
-			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
-			else { this.ref.createWin.setAttribute("off", "") }
-		})
-
-		this.ref.defaultMap.addEventListener("click", () => {
-			this.createState.map = this.ref.defaultMap.toggleAttribute("on") ? "default" : null;
-			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
-			else { this.ref.createWin.setAttribute("off", "") }
-		})
+		//this.ref.brMod.addEventListener("click", () => {
+		//	this.createState.mod = this.ref.brMod.toggleAttribute("on") ? "br" : null;
+		//	this.ref.tournamentMod.removeAttribute("on");
+		//	this.ref.localMod.removeAttribute("on");
+		//	this.ref.onlineMod.removeAttribute("on");
+		//	this.ref.aiMod.removeAttribute("on");
+		//	if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+		//	else { this.ref.createWin.setAttribute("off", "") }
+		//})
+		//
+		//this.ref.tournamentMod.addEventListener("click", () => {
+		//	this.createState.mod = this.ref.tournamentMod.toggleAttribute("on") ? "tournament" : null;
+		//	this.ref.brMod.removeAttribute("on");
+		//	this.ref.localMod.removeAttribute("on");
+		//	this.ref.onlineMod.removeAttribute("on");
+		//	this.ref.aiMod.removeAttribute("on");
+		//	if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+		//	else { this.ref.createWin.setAttribute("off", "") }
+		//})
+		//
+		//this.ref.localMod.addEventListener("click", () => {
+		//	this.createState.mod = this.ref.localMod.toggleAttribute("on") ? "local" : null;
+		//	this.ref.tournamentMod.removeAttribute("on");
+		//	this.ref.brMod.removeAttribute("on");
+		//	this.ref.onlineMod.removeAttribute("on");
+		//	this.ref.aiMod.removeAttribute("on");
+		//	if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+		//	else { this.ref.createWin.setAttribute("off", "") }
+		//})
+		//
+		//this.ref.onlineMod.addEventListener("click", () => {
+		//	this.createState.mod = this.ref.onlineMod.toggleAttribute("on") ? "online" : null;
+		//	this.ref.tournamentMod.removeAttribute("on");
+		//	this.ref.localMod.removeAttribute("on");
+		//	this.ref.brMod.removeAttribute("on");
+		//	this.ref.aiMod.removeAttribute("on");
+		//	if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+		//	else { this.ref.createWin.setAttribute("off", "") }
+		//})
+		//
+		//this.ref.aiMod.addEventListener("click", () => {
+		//	this.createState.mod = this.ref.aiMod.toggleAttribute("on") ? "ai" : null;
+		//	this.ref.tournamentMod.removeAttribute("on");
+		//	this.ref.localMod.removeAttribute("on");
+		//	this.ref.onlineMod.removeAttribute("on");
+		//	this.ref.brMod.removeAttribute("on");
+		//	if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+		//	else { this.ref.createWin.setAttribute("off", "") }
+		//})
+		//
+		//this.ref.defaultMap.addEventListener("click", () => {
+		//	this.createState.map = this.ref.defaultMap.toggleAttribute("on") ? "default" : null;
+		//	if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+		//	else { this.ref.createWin.setAttribute("off", "") }
+		//})
 
 		this.ref.createBtn.addEventListener("click", () => {
 			console.log(`create game-> mod:${this.createState.mod}, map:${this.createState.map}`)
