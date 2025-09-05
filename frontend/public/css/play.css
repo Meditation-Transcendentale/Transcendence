@@ -36,6 +36,16 @@
 /*	column-gap: 0.3%;*/
 /*}*/
 
+#create-bar {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+#create-return {
+
+}
+
 #create-window {
 	display: flex;
 	flex-direction: column;
