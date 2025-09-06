@@ -136,6 +136,8 @@ for svc in "${SERVICES[@]}"; do
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/ui.proto"
+      )
+      ;;
     "friends-service")
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/notif.proto"
@@ -143,6 +145,8 @@ for svc in "${SERVICES[@]}"; do
       ;;
     "spa")
       PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/shared.proto"
+        "$SHARED_PROTO_DIR/lobby.proto"
         "$SHARED_PROTO_DIR/notif.proto"
       )
       ;;

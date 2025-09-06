@@ -87,7 +87,7 @@ message MatchQuit { string uuid = 1; }
 message MatchStart {}
 
 message MatchEnd { 
-  string winnerUuid = 1;
+  int32 winnerId = 1;
   repeated int32 score = 2;
 }
 

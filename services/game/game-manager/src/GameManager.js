@@ -187,7 +187,7 @@ export class GameManager {
 
 		if (match.mode != `br`) {
 			const buf = encodeMatchEnd({
-				winnerUuid: match.state.score[0] == 5 ? match.state.paddles[0].playerId : match.state.paddles[1].playerId,
+				winnerId: match.state.score[0] == 5 ? match.state.paddles[0].playerId : match.state.paddles[1].playerId,
 				score: match.state.score
 			});
 			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);

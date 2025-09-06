@@ -5,12 +5,14 @@ import {
 	encodeMatchCreateRequest,
 	decodeMatchCreateResponse,
 	encodeNotificationMessage,
+	encodeTournamentCreateRequest,
+	decodeTournamentCreateResponse,
 	encodeStatusUpdate
 } from './proto/helper.js'
 
 // Simple Lobby model
 class Lobby {
-	constructor({ id, mode, map}) {
+	constructor({ id, mode, map }) {
 		this.id = id
 		this.mode = mode
 		this.map = map;
@@ -20,6 +22,7 @@ class Lobby {
 		this.players = new Map()
 		this.createdAt = Date.now()
 		this.gameId = null
+		this.tournamentId = null;
 	}
 
 	addPlayer(userId) {
@@ -61,7 +64,8 @@ class Lobby {
 			})),
 			status,
 			mode: this.mode,
-			gameId: this.gameId
+			gameId: this.gameId,
+			tournamentId: this.tournamentId,
 		}
 	}
 }
@@ -77,7 +81,7 @@ export default class LobbyService {
 
 	create({ mode, map }) {
 		const id = Date.now().toString()
-		const lobby = new Lobby({ id, mode, map})
+		const lobby = new Lobby({ id, mode, map })
 		this.lobbies.set(id, lobby)
 		console.log(`Lobby ID = ${id}`)
 		return lobby.getState()
@@ -110,34 +114,39 @@ export default class LobbyService {
 		const state = lobby.getState()
 
 		if (lobby.allReady()) {
-			const reqBuf = encodeMatchCreateRequest({
-				players: [...lobby.players.keys()],
-			})
-			console.log("all ready");
-			try {
-				let replyBuf;
-				if (lobby.mode == `tournament`) //no
-				{
-					replyBuf = await natsClient.request(
-						`games.tournament.create`,
-						reqBuf, {}
-					)
-				} else {
-					replyBuf = await natsClient.request(
+			if (lobby.mode == `tournament`) {
+				const reqBufTournament = encodeTournamentCreateRequest({
+					players: [...lobby.players.keys()],
+				});
+				const replyBufTournament = await natsClientClient.request(
+					`games.tournament.create`,
+					reqBufTournament, {}
+				);
+
+				const respTournament = decodeTournamentCreateResponse(replyBufTournament);
+				lobby.tournamentId = respTournament.tournamentId;
+				state.tournamentId = respTournament.tournamentId;
+			}
+			else {
+				const reqBuf = encodeMatchCreateRequest({
+					players: [...lobby.players.keys()],
+				})
+				console.log("all ready");
+				try {
+					const replyBuf = await natsClient.request(
 						`games.${lobby.mode}.match.create`,
 						reqBuf, {}
 					)
+					console.log('raw reply hex:', Buffer.from(replyBuf).toString('hex'));
+					const resp = decodeMatchCreateResponse(replyBuf)
+					console.log('decoded resp:', resp);
+					lobby.gameId = resp.gameId
+					state.gameId = resp.gameId
+				} catch (err) {
+					console.error('Failed to create game:', err)
 				}
-				console.log('raw reply hex:', Buffer.from(replyBuf).toString('hex'));
-				const resp = decodeMatchCreateResponse(replyBuf)
-				console.log('decoded resp:', resp);
-				lobby.gameId = resp.gameId
-				state.gameId = resp.gameId
-			} catch (err) {
-				console.error('Failed to create game:', err)
 			}
 		}
-
 		return state
 	}
 

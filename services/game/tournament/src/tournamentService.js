@@ -3,12 +3,12 @@ import { decodeMatchEnd } from './proto/helper';
 
 class MatchNode {
     constructor() {
-        this.player1_uuid = null; //uuid
-        this.player2_uuid = null; //uuid
+        this.player1 = null; //uuid
+        this.player2 = null; //uuid
         this.left = null; //MatchNode
         this.right = null; //MatchNode
         this.parent = null; //MatchNode
-        this.winner_uuid = null; //uuid
+        this.winner = null; //uuid
         this.gameId = null;
         this.score = null;
         this.depth = null;
@@ -16,12 +16,12 @@ class MatchNode {
 
     setResult(matchData) {
         this.score = matchData.score;
-        this.winner_uuid = matchData.winnerUuid;
-        if (this.parent) this.parent.receiveWinner(matchData.winnerUuid);
+        this.winner = matchData.winnerId == 0 ? player1 : player2;
+        if (this.parent) this.parent.receiveWinner(this.winner);
     }
 
     receiveWinner(playerId) {
-        playerId == this.left.winner_uuid ? player1_uuid = playerId : player2_uuid = playerId;
+        playerId == this.left.winner ? player1 = playerId : player2 = playerId;
     }
 }
 
@@ -43,13 +43,24 @@ class Tournament {
                 if (!match) { return; }
                 const data = decodeMatchEnd(msg.data);
                 match.setResult(data);
-                if (match == this.root) return;
+                if (match == this.root) {
+                    sendGgwp();
+                    return;
+                }
                 if (!areAllMatchesFinishedAtDepth(this.root, match.depth)) {
                     this.sendReadyCheck();
                     this.sendUpdate();
                 }
             }
         })
+    }
+
+    sendGgwp() {
+        const ggwpBuf = this.jc.encode({
+            type: `ggwp`,
+            winnerUuid: this.winner
+        });
+        this.uwsApp.publish(this.id, ggwpBuf);
     }
 
     sendReadyCheck() {
@@ -82,8 +93,8 @@ class Tournament {
         const leaves = [];
         for (let i = 0; i < players.length; i += 2) {
             const node = new MatchNode();
-            node.player1_uuid = players[i].key;
-            node.player2_uuid = players[i + 1].key;
+            node.player1 = players[i].key;
+            node.player2 = players[i + 1].key;
             leaves.push(node);
         }
         function pairMatches(nodes, depth) {
@@ -108,7 +119,7 @@ class Tournament {
     findMatchByPlayer(root, playerId) {
         if (!root) return null;
 
-        if (root.player1_uuid === playerId || root.player2_uuid === playerId) return root;
+        if (root.player1 === playerId || root.player2 === playerId) return root;
 
         const leftResult = findMatchByPlayer(root.left, playerId);
         if (leftResult) return leftResult;
@@ -162,7 +173,7 @@ class Tournament {
 
     areAllMatchesFinishedAtDepth(root, depth) {
         const nodes = getNodesAtDepth(root, depth);
-        return nodes.every(node => node.winner_uuid !== null);
+        return nodes.every(node => node.winner !== null);
     }
 
     getPlayerByUuid(uuid) {

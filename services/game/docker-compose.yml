@@ -123,24 +123,20 @@ services:
     depends_on:
       - nats
 
-<<<<<<< HEAD
   tournament:
-    build:
-      context: ./tournament
+    build: ./tournament
     volumes:
       - ./tournament/src:/app/src
-      # - ./lobby-manager/test:/app/test
+      - ./tournament/test:/app/test
       - ./tournament/package.json:/app/package.json
       - ./tournament/.env.example:/app/.env
     depends_on:
       - nats
     command: npm run dev
+    restart: unless-stopped
     environment:
+      - SERVICE_NAME=tournament
       - NATS_URL=nats://nats:4222
       - PORT=5009
     ports:
       - "5009:5009"
-=======
-
-
->>>>>>> main

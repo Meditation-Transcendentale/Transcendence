@@ -3724,7 +3724,7 @@ export const shared = $root.shared = (() => {
          * Properties of a MatchEnd.
          * @memberof shared
          * @interface IMatchEnd
-         * @property {string|null} [winnerUuid] MatchEnd winnerUuid
+         * @property {number|null} [winnerId] MatchEnd winnerId
          * @property {Array.<number>|null} [score] MatchEnd score
          */
 
@@ -3745,12 +3745,12 @@ export const shared = $root.shared = (() => {
         }
 
         /**
-         * MatchEnd winnerUuid.
-         * @member {string} winnerUuid
+         * MatchEnd winnerId.
+         * @member {number} winnerId
          * @memberof shared.MatchEnd
          * @instance
          */
-        MatchEnd.prototype.winnerUuid = "";
+        MatchEnd.prototype.winnerId = 0;
 
         /**
          * MatchEnd score.
@@ -3784,8 +3784,8 @@ export const shared = $root.shared = (() => {
         MatchEnd.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.winnerUuid != null && Object.hasOwnProperty.call(message, "winnerUuid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.winnerUuid);
+            if (message.winnerId != null && Object.hasOwnProperty.call(message, "winnerId"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.winnerId);
             if (message.score != null && message.score.length) {
                 writer.uint32(/* id 2, wireType 2 =*/18).fork();
                 for (let i = 0; i < message.score.length; ++i)
@@ -3829,7 +3829,7 @@ export const shared = $root.shared = (() => {
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.winnerUuid = reader.string();
+                        message.winnerId = reader.int32();
                         break;
                     }
                 case 2: {
@@ -3878,9 +3878,9 @@ export const shared = $root.shared = (() => {
         MatchEnd.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.winnerUuid != null && message.hasOwnProperty("winnerUuid"))
-                if (!$util.isString(message.winnerUuid))
-                    return "winnerUuid: string expected";
+            if (message.winnerId != null && message.hasOwnProperty("winnerId"))
+                if (!$util.isInteger(message.winnerId))
+                    return "winnerId: integer expected";
             if (message.score != null && message.hasOwnProperty("score")) {
                 if (!Array.isArray(message.score))
                     return "score: array expected";
@@ -3903,8 +3903,8 @@ export const shared = $root.shared = (() => {
             if (object instanceof $root.shared.MatchEnd)
                 return object;
             let message = new $root.shared.MatchEnd();
-            if (object.winnerUuid != null)
-                message.winnerUuid = String(object.winnerUuid);
+            if (object.winnerId != null)
+                message.winnerId = object.winnerId | 0;
             if (object.score) {
                 if (!Array.isArray(object.score))
                     throw TypeError(".shared.MatchEnd.score: array expected");
@@ -3931,9 +3931,9 @@ export const shared = $root.shared = (() => {
             if (options.arrays || options.defaults)
                 object.score = [];
             if (options.defaults)
-                object.winnerUuid = "";
-            if (message.winnerUuid != null && message.hasOwnProperty("winnerUuid"))
-                object.winnerUuid = message.winnerUuid;
+                object.winnerId = 0;
+            if (message.winnerId != null && message.hasOwnProperty("winnerId"))
+                object.winnerId = message.winnerId;
             if (message.score && message.score.length) {
                 object.score = [];
                 for (let j = 0; j < message.score.length; ++j)
@@ -5638,6 +5638,258 @@ export const lobby = $root.lobby = (() => {
         return StartMessage;
     })();
 
+    lobby.StartTournamentMessage = (function() {
+
+        /**
+         * Properties of a StartTournamentMessage.
+         * @memberof lobby
+         * @interface IStartTournamentMessage
+         * @property {string|null} [lobbyId] StartTournamentMessage lobbyId
+         * @property {string|null} [tournamentId] StartTournamentMessage tournamentId
+         * @property {string|null} [map] StartTournamentMessage map
+         */
+
+        /**
+         * Constructs a new StartTournamentMessage.
+         * @memberof lobby
+         * @classdesc Represents a StartTournamentMessage.
+         * @implements IStartTournamentMessage
+         * @constructor
+         * @param {lobby.IStartTournamentMessage=} [properties] Properties to set
+         */
+        function StartTournamentMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * StartTournamentMessage lobbyId.
+         * @member {string} lobbyId
+         * @memberof lobby.StartTournamentMessage
+         * @instance
+         */
+        StartTournamentMessage.prototype.lobbyId = "";
+
+        /**
+         * StartTournamentMessage tournamentId.
+         * @member {string} tournamentId
+         * @memberof lobby.StartTournamentMessage
+         * @instance
+         */
+        StartTournamentMessage.prototype.tournamentId = "";
+
+        /**
+         * StartTournamentMessage map.
+         * @member {string} map
+         * @memberof lobby.StartTournamentMessage
+         * @instance
+         */
+        StartTournamentMessage.prototype.map = "";
+
+        /**
+         * Creates a new StartTournamentMessage instance using the specified properties.
+         * @function create
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {lobby.IStartTournamentMessage=} [properties] Properties to set
+         * @returns {lobby.StartTournamentMessage} StartTournamentMessage instance
+         */
+        StartTournamentMessage.create = function create(properties) {
+            return new StartTournamentMessage(properties);
+        };
+
+        /**
+         * Encodes the specified StartTournamentMessage message. Does not implicitly {@link lobby.StartTournamentMessage.verify|verify} messages.
+         * @function encode
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {lobby.IStartTournamentMessage} message StartTournamentMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        StartTournamentMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.lobbyId != null && Object.hasOwnProperty.call(message, "lobbyId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.lobbyId);
+            if (message.tournamentId != null && Object.hasOwnProperty.call(message, "tournamentId"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.tournamentId);
+            if (message.map != null && Object.hasOwnProperty.call(message, "map"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.map);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified StartTournamentMessage message, length delimited. Does not implicitly {@link lobby.StartTournamentMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {lobby.IStartTournamentMessage} message StartTournamentMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        StartTournamentMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a StartTournamentMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {lobby.StartTournamentMessage} StartTournamentMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        StartTournamentMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.StartTournamentMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.lobbyId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.tournamentId = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.map = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a StartTournamentMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {lobby.StartTournamentMessage} StartTournamentMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        StartTournamentMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a StartTournamentMessage message.
+         * @function verify
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        StartTournamentMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                if (!$util.isString(message.lobbyId))
+                    return "lobbyId: string expected";
+            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
+                if (!$util.isString(message.tournamentId))
+                    return "tournamentId: string expected";
+            if (message.map != null && message.hasOwnProperty("map"))
+                if (!$util.isString(message.map))
+                    return "map: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a StartTournamentMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {lobby.StartTournamentMessage} StartTournamentMessage
+         */
+        StartTournamentMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.StartTournamentMessage)
+                return object;
+            let message = new $root.lobby.StartTournamentMessage();
+            if (object.lobbyId != null)
+                message.lobbyId = String(object.lobbyId);
+            if (object.tournamentId != null)
+                message.tournamentId = String(object.tournamentId);
+            if (object.map != null)
+                message.map = String(object.map);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a StartTournamentMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {lobby.StartTournamentMessage} message StartTournamentMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        StartTournamentMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.lobbyId = "";
+                object.tournamentId = "";
+                object.map = "";
+            }
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                object.lobbyId = message.lobbyId;
+            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
+                object.tournamentId = message.tournamentId;
+            if (message.map != null && message.hasOwnProperty("map"))
+                object.map = message.map;
+            return object;
+        };
+
+        /**
+         * Converts this StartTournamentMessage to JSON.
+         * @function toJSON
+         * @memberof lobby.StartTournamentMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        StartTournamentMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for StartTournamentMessage
+         * @function getTypeUrl
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        StartTournamentMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/lobby.StartTournamentMessage";
+        };
+
+        return StartTournamentMessage;
+    })();
+
     lobby.Player = (function() {
 
         /**
@@ -6437,6 +6689,7 @@ export const lobby = $root.lobby = (() => {
          * @property {lobby.IStartMessage|null} [start] ServerMessage start
          * @property {lobby.IUpdateMessage|null} [update] ServerMessage update
          * @property {lobby.IErrorMessage|null} [error] ServerMessage error
+         * @property {lobby.IStartTournamentMessage|null} [startTournament] ServerMessage startTournament
          */
 
         /**
@@ -6478,17 +6731,25 @@ export const lobby = $root.lobby = (() => {
          */
         ServerMessage.prototype.error = null;
 
+        /**
+         * ServerMessage startTournament.
+         * @member {lobby.IStartTournamentMessage|null|undefined} startTournament
+         * @memberof lobby.ServerMessage
+         * @instance
+         */
+        ServerMessage.prototype.startTournament = null;
+
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
 
         /**
          * ServerMessage payload.
-         * @member {"start"|"update"|"error"|undefined} payload
+         * @member {"start"|"update"|"error"|"startTournament"|undefined} payload
          * @memberof lobby.ServerMessage
          * @instance
          */
         Object.defineProperty(ServerMessage.prototype, "payload", {
-            get: $util.oneOfGetter($oneOfFields = ["start", "update", "error"]),
+            get: $util.oneOfGetter($oneOfFields = ["start", "update", "error", "startTournament"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
@@ -6522,6 +6783,8 @@ export const lobby = $root.lobby = (() => {
                 $root.lobby.UpdateMessage.encode(message.update, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             if (message.error != null && Object.hasOwnProperty.call(message, "error"))
                 $root.lobby.ErrorMessage.encode(message.error, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            if (message.startTournament != null && Object.hasOwnProperty.call(message, "startTournament"))
+                $root.lobby.StartTournamentMessage.encode(message.startTournament, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             return writer;
         };
 
@@ -6568,6 +6831,10 @@ export const lobby = $root.lobby = (() => {
                     }
                 case 3: {
                         message.error = $root.lobby.ErrorMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 4: {
+                        message.startTournament = $root.lobby.StartTournamentMessage.decode(reader, reader.uint32());
                         break;
                     }
                 default:
@@ -6634,6 +6901,16 @@ export const lobby = $root.lobby = (() => {
                         return "error." + error;
                 }
             }
+            if (message.startTournament != null && message.hasOwnProperty("startTournament")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.lobby.StartTournamentMessage.verify(message.startTournament);
+                    if (error)
+                        return "startTournament." + error;
+                }
+            }
             return null;
         };
 
@@ -6663,6 +6940,11 @@ export const lobby = $root.lobby = (() => {
                 if (typeof object.error !== "object")
                     throw TypeError(".lobby.ServerMessage.error: object expected");
                 message.error = $root.lobby.ErrorMessage.fromObject(object.error);
+            }
+            if (object.startTournament != null) {
+                if (typeof object.startTournament !== "object")
+                    throw TypeError(".lobby.ServerMessage.startTournament: object expected");
+                message.startTournament = $root.lobby.StartTournamentMessage.fromObject(object.startTournament);
             }
             return message;
         };
@@ -6694,6 +6976,11 @@ export const lobby = $root.lobby = (() => {
                 object.error = $root.lobby.ErrorMessage.toObject(message.error, options);
                 if (options.oneofs)
                     object.payload = "error";
+            }
+            if (message.startTournament != null && message.hasOwnProperty("startTournament")) {
+                object.startTournament = $root.lobby.StartTournamentMessage.toObject(message.startTournament, options);
+                if (options.oneofs)
+                    object.payload = "startTournament";
             }
             return object;
         };

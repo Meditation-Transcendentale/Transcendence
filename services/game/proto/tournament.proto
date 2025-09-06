@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package tournament;
+
+import "google/protobuf/empty.proto";
+
+message matchNode {
+
+}
+
+message TournamentCreateRequest {
+    repeated string players = 1;
+}
+
+message TournamentCreateResponse {
+    string tournamentId = 1;
+}

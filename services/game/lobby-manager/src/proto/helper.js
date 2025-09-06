@@ -107,3 +107,18 @@ export function encodeNotificationMessage(payload) {
 export function decodeNotificationMessage(buffer) {
 	return Proto.notif.NotificationMessage.decode(buffer);
 }
+
+/**
+ * MatchStartTournament
+ */
+export function encodeMatchStartTournament(payload) {
+	const err = Proto.lobby.MatchStartTournament.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.lobby.MatchStartTournament
+		.encode(Proto.lobby.MatchStartTournament.create(payload))
+		.finish();
+}
+
+export function decodeMatchStartTournament(buffer) {
+	return Proto.lobby.MatchStartTournament.decode(buffer);
+}

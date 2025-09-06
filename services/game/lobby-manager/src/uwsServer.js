@@ -80,6 +80,17 @@ export function createUwsApp(path, lobbyService) {
 					// sockets.delete(ws.lobbyId);
 					return;
 				}
+				if (newState.tournamentId) {
+					const startTournamentBuf = encodeServerMessage({
+						startTournament: {
+							lobbyId: newState.lobbyId,
+							tournamentId: newState.tournamentId,
+							map: newState.map
+						}
+					});
+					app.publish(ws.lobbyId, startTournamentBuf, true);
+					return;
+				}
 			}
 
 			if (newState) {
