@@ -3,9 +3,50 @@ syntax = "proto3";
 package tournament;
 
 import "google/protobuf/empty.proto";
+import "shared.proto";
 
-message matchNode {
+message MatchNode {
+    string player1Uuid = 1;
+    string player2Uuid = 2;
+    repeated int32 score = 3;
+    string gameId = 4;
+    optional MatchNode parent = 5;
+    optional MatchNode left_child = 6;
+    optional MatchNode right_child = 7;   
+}
 
+message Player {
+  string uuid  = 1;
+  bool ready = 2;
+  bool connected = 3;
+  bool eliminated = 4;
+}
+
+message TournamentUpdateMessage {
+    string tournamentId = 1;
+    repeated Players players = 2;
+    MatchNode tournamentRoot = 3;
+}
+
+message TournamentClientReadyMessage {
+    string tournamentId = 1;
+}
+
+message TournamentReadyCheckMessage {
+    MatchNode tournamentRoot = 2;
+}
+
+message TournamentFinishedMessage {
+    
+}
+
+message TournamentQuitMessage {
+    string uuid = 1;
+    string tournamentId = 2;
+}
+
+message TournamentErrorMessage {
+    string message = 1;
 }
 
 message TournamentCreateRequest {
@@ -14,4 +55,19 @@ message TournamentCreateRequest {
 
 message TournamentCreateResponse {
     string tournamentId = 1;
+}
+
+message TournamentClientMessage {
+    oneof payload {
+        TournamentQuitMessage quit = 1;
+        TournamentClientReadyMessage ready = 2;
+    }
+}
+
+message TournamentServerMessage {
+    oneof payload {
+        TournamentUpdateMessage update = 1;
+        TournamentErrorMessage error = 2;
+        TournamentReadyCheckMessage readyCheck = 3;
+    }
 }

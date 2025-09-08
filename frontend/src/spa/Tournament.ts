@@ -1,4 +1,4 @@
-import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
+import { decodeServerMessage, encodeClientMessage } from "./proto/helper";
 import Router from "./Router";
 import { User } from "./User";
 
@@ -32,9 +32,7 @@ export default class Tournament {
 	private id: string | null;
 	private players: Map<Player, boolean> | null; //key:player value:isReady
 	private tree: MatchNode | null;	
-
-	private gameIP = window.location.hostname;
-
+	
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 		this.ws = null;
@@ -66,7 +64,7 @@ export default class Tournament {
 	}
 
 	private setupWs(id: string) {
-		const url = `ws://${this.gameIP}:5019/tournament?uuid=${encodeURIComponent(User.uuid as string)}&tournamentId=${encodeURIComponent(id as string)}`;
+		const url = `wss://${window.location.hostname}:7000/tournament?uuid=${encodeURIComponent(User.uuid as string)}&tournamentId=${encodeURIComponent(id as string)}`;
 		console.log("URL", url);
 		this.ws = new WebSocket(url);
 
@@ -76,6 +74,7 @@ export default class Tournament {
 		}
 
 		this.ws.onmessage = (msg) => {
+			const data = deco
 			const data = JSON.parse(msg.data);
 			switch (data.type) {
 				case 'error':

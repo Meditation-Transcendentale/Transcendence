@@ -1447,8 +1447,8 @@ export namespace shared {
     /** Properties of a MatchEnd. */
     interface IMatchEnd {
 
-        /** MatchEnd winnerUuid */
-        winnerUuid?: (string|null);
+        /** MatchEnd winnerId */
+        winnerId?: (number|null);
 
         /** MatchEnd score */
         score?: (number[]|null);
@@ -1463,8 +1463,8 @@ export namespace shared {
          */
         constructor(properties?: shared.IMatchEnd);
 
-        /** MatchEnd winnerUuid. */
-        public winnerUuid: string;
+        /** MatchEnd winnerId. */
+        public winnerId: number;
 
         /** MatchEnd score. */
         public score: number[];

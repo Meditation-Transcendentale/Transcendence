@@ -75,10 +75,10 @@ INSERT INTO match_stats (match_id, user_id, is_winner, goals_scored, goals_conce
 (12, 1, 1, 5, 2, NULL, NULL), 
 (12, 2, 0, 2, 5, NULL, NULL);
 
-INSERT INTO friendslist (user_id_1, user_id_2, status) VALUES 
-(1, 2, 'accepted'), 
-(1, 3, 'pending'), 
-(1, 4, 'accepted'), 
+-- INSERT INTO friendslist (user_id_1, user_id_2, status) VALUES 
+-- (1, 2, 'accepted'), 
+-- (1, 3, 'pending'), 
+-- (1, 4, 'accepted'), 
 -- (1, 5, 'pending'), 
 -- (1, 6, 'accepted'), 
 -- (2, 3, 'accepted'),
@@ -112,10 +112,10 @@ INSERT INTO friendslist (user_id_1, user_id_2, status) VALUES
 -- (9, 1, 'pending'),
 -- (10, 1, 'pending');
 
-INSERT INTO blocked_users (blocker_id, blocked_id) VALUES 
-(1, 9), 
-(6, 2),
-(3, 10);
+-- INSERT INTO blocked_users (blocker_id, blocked_id) VALUES 
+-- (1, 9), 
+-- (6, 2),
+-- (3, 10);
 
 INSERT INTO active_user (user_id, status) VALUES 
 (1, 'in_lobby'), 

@@ -1,5 +1,6 @@
 import config from './config.js';
 import { decodeMatchEnd } from './proto/helper';
+import natsClient from './natsClient.js';
 
 class MatchNode {
     constructor() {
@@ -26,16 +27,14 @@ class MatchNode {
 }
 
 class Tournament {
-    constructor(nc, jc, id, players, uwsApp) {
-        this.nc = nc;
-        this.jc = jc;
+    constructor(id, players, uwsApp) {
         this.uwsApp = uwsApp;
         this.id = id;
-        this.players = new Map(shuffle(players).map(p => [p, { ready: false }]));
+        this.players = new Map(shuffle(players).map(p => [p, { isReady: false, isConnected: false, isEliminated: false }]));
         this.root = this.buildTournamentTree(this.players);
         this.current_round = 0;
 
-        const subTournamentEndGame = nc.subscribe('games.tournament.*.match.end');
+        const subTournamentEndGame = natsClient.subscribe('games.tournament.*.match.end');
         (async () => {
             for await (const msg of subTournamentEndGame) {
                 const [, , gameId] = msg.subject.split(".");
@@ -45,7 +44,7 @@ class Tournament {
                 match.setResult(data);
                 if (match == this.root) {
                     sendGgwp();
-                    return;
+                    continue;
                 }
                 if (!areAllMatchesFinishedAtDepth(this.root, match.depth)) {
                     this.sendReadyCheck();
@@ -64,27 +63,29 @@ class Tournament {
     }
 
     sendReadyCheck() {
-        const readyBuf = this.jc.encode({
-            type: `ready_check`
+        const readyBuf = encodeServerMessage({
+            readyCheck: {
+                tournamentRoot: this.root
+            }
         });
-        [...this.players.keys()].forEach((key) => {
-            this.players.set(key, false);
-        });
-        this.uwsApp.publish(this.id, readyBuf);
+        this.uwsApp.publish(this.id, readyBuf, true);
     }
 
     sendUpdate() {
-        const updateBuf = this.jc.encode({
-            type: `update`,
-            players: [...this.players.entries()].map(([player_uuid, isReady]) => ({
-                uuid: player_uuid,
-                ready: isReady,
-            })),
-            tree: this.root
+        const updateBuf = encodeServerMessage({
+            update: {
+                tournamentId: this.id,
+                players: [...this.players.entries()].map(([player_uuid, playerData]) => ({
+                    uuid: player_uuid,
+                    isReady: playerData.isReady,
+                    isConnected: playerData.isConnected,
+                    isEliminated: playerData.isEliminated,
+                })),
+                tournamentRoot: this.root
+            }
         });
-        this.uwsApp.publish(this.id, updateBuf);
+        this.uwsApp.publish(this.id, updateBuf, true);
     }
-
     buildTournamentTree(players) {
         if (players.length === 0 || players.length % 2 !== 0) {
             throw new Error("Empty or odd playerlist");
@@ -138,18 +139,18 @@ class Tournament {
         return findMatchByGameId(root.right, gameId);
     }
 
-    markReady(playerId) {
-        const player = this.players.get(playerId);
-        if (!p) throw new Error('Player not in tournament');
-        player.ready = true;
+    markReady(player) {
+        player.isReady = true;
     }
 
     getState() {
         return {
             tournamentId: this.id,
-            players: [...this.players.entries()].map(([player_uuid, isReady]) => ({
+            players: [...this.players.entries()].map(([player_uuid, isReady, isConnected, isEliminated]) => ({
                 uuid: player_uuid,
                 ready: isReady,
+                connected: isConnected,
+                eliminated: isEliminated
             })),
             tree: this.root
         }
@@ -180,23 +181,46 @@ class Tournament {
         return this.players.get(uuid);
     }
 
+    areAllPlayersReady() {
+
+    }
+
+    addPlayer(userId) {
+        if (this.players.has(userId)) {
+            throw new Error(`Player already in lobby`)
+        }
+        natsClient.publish(`notification.${userId}.status`, encodeStatusUpdate({ sender: userId, status: "in tournament", option: this.id }));
+        this.players.set(userId, { isReady: false, isConnected: true, isEliminated: false })
+    }
 }
 
 export default class tournamentService {
-    constructor(nc, jc) {
+    constructor() {
         this.tournaments = new Map();
         this.interval = setInterval(() => this.cleanup(),
             config.HEARTBEAT_INTERVAL
         )
-        this.nc = nc;
-        this.jc = jc;
     }
 
     create(players, uwsApp) {
         const id = Date.now().toString();
-        const tournament = new Tournament(this.nc, this.jc, id, players, uwsApp);
+        const tournament = new Tournament(id, players, uwsApp);
         this.tournaments.set(id, tournament);
         return (id);
+    }
+
+    join(tournamentId, userId) {
+        const tournament = this.tournaments.get(tournamentId)
+        if (!tournamentId) throw new Error('Lobby not found')
+        tournament.addPlayer(userId)
+        return tournament.getState()
+    }
+
+    quit(tournamentId, userId) {
+        const tournament = this.tournaments.get(tournamentId)
+        if (!tournament) return null
+        tournament.removePlayer(userId)
+        return tournament.getState()
     }
 
     async ready(tournamentId, playerId) {
@@ -204,17 +228,20 @@ export default class tournamentService {
         if (!tournament) throw new Error('Tournament not found');
 
         const player = tournament.players.get(playerId);
-        if (!player) throw new Error('Player eliminated | not in tournament')
+        if (!player) throw new Error('Player not in tournament')
 
         const match = tournament.findMatchByPlayer(playerId);
         if (!match) throw new Error('Match not found')
 
-        tournament.markReady(playerId);
+        tournament.markReady(player);
 
         tournament.sendUpdate();
 
         const state = tournament.getState();
 
+        if (tournament.areAllPlayersReady) {
+
+        }
         if (tournament.getPlayerByUuid(match.player1_uuid).ready && tournament.getPlayerByUuid(match.player2_uuid).ready) { //add MatchCreate encode/decode functions
             const reqBuf = encodeMatchCreateRequest({
                 players: [match.player1.uuid, match.player2.uuid],
@@ -248,7 +275,8 @@ export default class tournamentService {
         }
     }
 
-    getTournament(tournamentId){
+
+    getTournament(tournamentId) {
         return (this.tournaments.get(tournamentId));
     }
 

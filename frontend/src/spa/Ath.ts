@@ -30,7 +30,6 @@ class Ath {
 
 		this.quit = new AthQuit(div);
 		this.setting = new AthSetting(div);
-		// this.notif = new AthNotif(div);
 
 		this.ref.setting.addEventListener('click', () => {
 			this.setting.load();
