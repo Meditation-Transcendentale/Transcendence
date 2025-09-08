@@ -33,7 +33,7 @@ export class Pong {
 	private inputManager!: InputManager;
 
 	private visualEffectSystem!: VisualEffectSystem;
-	private uiSystem!: UISystem;
+	// private uiSystem!: UISystem;
 
 	private uuid!: string;
 	private baseMeshes: any;
@@ -50,11 +50,11 @@ export class Pong {
 
 	private config: any;
 
-	constructor(canvas: any, gameId: any, gameMode: any, scene: Scene) {
+	constructor(canvas: any, gameId: any, scene: Scene) {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.gameId = gameId;
-		this.gameMode = gameMode;
+		// this.gameMode = gameMode;
 		this.engine = this.scene.getEngine() as Engine;
 		this.inited = false;
 
@@ -88,16 +88,17 @@ export class Pong {
 		this.stateManager = new StateManager(this.ecs);
 		this.inited = true;
 
-
 	}
+
 	public async start(gameId: string, uuid: string, gameMode: string) {
+		const maps = 0;
 		this.gameMode = gameMode;
 		if (this.wsManager) {
 			this.wsManager.socket.close();
 			this.ecs.removeSystem(this.inputSystem);
 			this.ecs.removeSystem(this.networkingSystem);
-			//delete player && UI
-			this.ecs.removeEntityById(7);
+			//delete player
+			// this.ecs.removeEntityById(7);
 			this.ecs.removeEntityById(6);
 			this.ecs.removeEntityById(5);
 		}
@@ -112,10 +113,15 @@ export class Pong {
 		if (!this.inited) {
 			await this.init();
 		}
-		if (this.uiSystem) {
-			this.uiSystem.resetUI();
-			//this.uiSystem.enableUI();
+		if (maps == 1){
+			this.pongRoot.position.set(0, 0, 0);
+		} else if (maps == 2){
+			this.pongRoot.position.set(10, 0, 10);
 		}
+		// if (this.uiSystem) {
+		// 	this.uiSystem.resetUI();
+		// 	//this.uiSystem.enableUI();
+		// }
 
 		// 4) Plug networking into ECS
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
@@ -148,9 +154,9 @@ export class Pong {
 
 	}
 	public stop(): void {
-		if (this.uiSystem) {
-			this.uiSystem.disableUI();
-		}
+		// if (this.uiSystem) {
+		// 	this.uiSystem.disableUI();
+		// }
 
 
 		this.pongRoot.setEnabled(false);
@@ -158,8 +164,6 @@ export class Pong {
 
 		console.log("render loop stopped and game paused");
 	}
-
-
 
 	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
 		this.ecs = new ECSManager();
@@ -172,9 +176,9 @@ export class Pong {
 		this.ecs.addSystem(new MovementSystem());
 		this.visualEffectSystem = new VisualEffectSystem(this.scene);
 		this.ecs.addSystem(this.visualEffectSystem);
-		this.uiSystem = new UISystem(this);
-		this.scoreUI = this.uiSystem.scoreUI;
-		this.ecs.addSystem(this.uiSystem);
+		// this.uiSystem = new UISystem(this);
+		// this.scoreUI = this.uiSystem.scoreUI;
+		// this.ecs.addSystem(this.uiSystem);
 
 		createGameTemplate(this.ecs, config, localPaddleId, this.gameMode);
 	}

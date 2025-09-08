@@ -6,7 +6,7 @@ import { PaddleComponent } from "../components/PaddleComponent.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputComponent } from "../components/InputComponent.js";
-import { UIComponent } from "../components/UIComponent.js";
+// import { UIComponent } from "../components/UIComponent.js";
 import Game from "../../spa/Game.js";
 
 export interface GameTemplateConfig {
@@ -18,9 +18,9 @@ export interface GameTemplateConfig {
 
 export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string): void {
 
-	const scoreUI = new Entity();
-	scoreUI.addComponent(new UIComponent(gameMode));
-	ecs.addEntity(scoreUI);
+	// const scoreUI = new Entity();
+	// scoreUI.addComponent(new UIComponent(gameMode));
+	// ecs.addEntity(scoreUI);
 
 	// console.log("create player === ", gameMode);
 	for (let i = 0; i < 2; i++) {
@@ -44,7 +44,6 @@ export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localP
 }
 
 export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string): void {
-	// console.log("localplayerif in template=" + localPaddleId);
 
 	const ballEntity = new Entity();
 	const pos = new Vector3(0, 0, 0);

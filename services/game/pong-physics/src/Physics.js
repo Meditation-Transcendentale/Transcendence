@@ -85,8 +85,12 @@ export const Physics = {
 			updateAABB(pos, collider);
 			tree.insert(entity, collider.aabb);
 		}
-
+		
 		for (let step = 0; step < subSteps; step++) {
+			if (game.start == false && Date.now() - game.now >= game.delay)
+				game.start = true;
+			if (game.start == true && game.launch == false && Date.now() - game.now >= game.delay / 2)
+				game.launchBall();
 			movementSystem(em, dt);
 
 			for (let i = 0, len = collidableEntities.length; i < len; i++) {
@@ -260,7 +264,7 @@ export const Physics = {
 			else if (input.type === 'resetBall') {
 				game.resetBall();
 			}
-			else if (input.type === 'serve') {
+			else if (input.type === 'serve' ) {
 				game.launchBall();
 			}
 		}

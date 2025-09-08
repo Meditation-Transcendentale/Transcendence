@@ -39,7 +39,7 @@ export default class Game {
 		// this.pongbr?.dispose();
 		//(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "-1";
 		if (!this.pong)
-			this.pong = new Pong(document.querySelector("#canvas"), params.get("id"), params.get("mod"), App3D.scene);
+			this.pong = new Pong(document.querySelector("#canvas"), params.get("id"), App3D.scene);
 		let gameId = params.get("id");
 		let uuid = User.uuid;
 		let gameMode = params.get("mod");
