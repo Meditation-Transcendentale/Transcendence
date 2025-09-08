@@ -42,17 +42,31 @@
 	justify-content: space-between;
 }
 
-#create-return {
+.window-title {
+	flex: 1;
+}
 
+.create-return-disable {
+	display:none;
+}
+
+.create-return-enable {
+	background-color: var(--window-color);
+	color: var(--window-background);
+}
+
+.create-return-enable:hover {
+	color: var(--window-color) !important;
+	background-color: var(--window-background);
 }
 
 #create-window {
 	display: flex;
 	flex-direction: column;
-	width: 50%;
+	width: 60%;
 	/*height: 16.5%;*/
-	top: 20%;
-	left: 10%;
+	top: 30%;
+	left: 20%;
 	max-height: 20%;
 	overflow: hidden;
 }
@@ -265,6 +279,7 @@ opacity: 0.4;
 /*####*/
 
 #create-btn-window {
+	display: none;
 	top: 47%;
 	left: 5%;
 	width: 80vh;

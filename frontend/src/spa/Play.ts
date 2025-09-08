@@ -30,6 +30,10 @@ interface playHtmlReference {
 	tournamentMode: HTMLInputElement;
 	brickMode: HTMLInputElement;
 	pongModes: HTMLInputElement;
+	createReturn: HTMLInputElement;
+	ponglocal: HTMLInputElement;
+	pongai: HTMLInputElement;
+	pongonline: HTMLInputElement;
 };
 
 enum playState {
@@ -91,8 +95,12 @@ export default class Play {
 			brMode: div.querySelector("#br-mode") as HTMLInputElement,
 			pongMode: div.querySelector("#pong-mode") as HTMLInputElement,
 			tournamentMode: div.querySelector("#tournament-mode") as HTMLInputElement,
-			brickMode: div.querySelector("#brick-mod") as HTMLInputElement,
+			brickMode: div.querySelector("#brick-mode") as HTMLInputElement,
 			createGame: div.querySelector("#create-game") as HTMLInputElement,
+			createReturn: div.querySelector("#create-return") as HTMLInputElement,
+			ponglocal: div.querySelector("#pong-local") as HTMLInputElement,
+			pongai: div.querySelector("#pong-ai") as HTMLInputElement,
+			pongonline: div.querySelector("#pong-online") as HTMLInputElement,
 			pongModes: div.querySelector("#create-pong") as HTMLInputElement
 		}
 
@@ -148,28 +156,95 @@ export default class Play {
 		//this.ref.pongModes.disabled = true;
 		this.ref.createWin.toggleAttribute("off");
 
-		this.ref.brMode.addEventListener("click", () => {
-			this.createState.mod = this.ref.brMode.toggleAttribute("on") ? "br" : null;
+		this.ref.pongMode.addEventListener("click", () => {
 			this.ref.tournamentMode.removeAttribute("on");
-			this.ref.pongMode.removeAttribute("on");
+			this.ref.brMode.removeAttribute("on");
 			//this.ref.brickMode.removeAttribute("on");
 			this.ref.pongModes.classList.remove('window--play-disabled')
 			this.ref.pongModes.classList.add('window--play-enable')
 			this.ref.createGame.classList.remove('window--play-enable')
 			this.ref.createGame.classList.add('window--play-disabled')
+			this.ref.createReturn.classList.remove('create-return-disable')
+			this.ref.createReturn.classList.add('create-return-enable')
 			document.getElementById('create-pong')?.classList.add('enabled');
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 		})
 
-		this.ref.pongMode.addEventListener("click", () => {
-			this.createState.mod = this.ref.pongMode.toggleAttribute("on") ? "br" : null;
-			this.ref.tournamentMode.removeAttribute("on");
+		this.ref.createReturn.addEventListener("click", () => {
+			this.returnButton();
+		})
+
+		this.ref.ponglocal.addEventListener("click", () => {
+			this.createState.mod = "local";
+			this.ref.pongonline.removeAttribute("on");
 			this.ref.brMode.removeAttribute("on");
-			//this.ref.brickMode.removeAttribute("on");
+			this.ref.pongai.removeAttribute("on");
+			this.ref.tournamentMode.removeAttribute("on");
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
+			this.returnButton();
+			this.create();
 		})
+
+		this.ref.pongonline.addEventListener("click", () => {
+			this.createState.mod = "online";
+			this.ref.ponglocal.removeAttribute("on");
+			this.ref.brMode.removeAttribute("on");
+			this.ref.pongai.removeAttribute("on");
+			this.ref.tournamentMode.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.returnButton();
+			this.create();
+		})
+
+		this.ref.pongai.addEventListener("click", () => {
+			this.createState.mod = "ai";
+			this.ref.pongonline.removeAttribute("on");
+			this.ref.brMode.removeAttribute("on");
+			this.ref.pongai.removeAttribute("on");
+			this.ref.tournamentMode.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.returnButton();
+			this.create();
+		})
+
+
+		this.ref.brMode.addEventListener("click", () => {
+			this.createState.mod = "br";
+			this.ref.pongonline.removeAttribute("on");
+			this.ref.ponglocal.removeAttribute("on");
+			this.ref.pongai.removeAttribute("on");
+			this.ref.tournamentMode.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.returnButton();
+			this.create();
+		})
+
+		this.ref.brickMode.addEventListener("click", () => {
+			this.createState.mod = "brick";
+			this.ref.brMode.removeAttribute("on");
+			this.ref.pongonline.removeAttribute("on");
+			this.ref.ponglocal.removeAttribute("on");
+			this.ref.pongai.removeAttribute("on");
+			this.ref.tournamentMode.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.returnButton();
+			Router.nav("/brick")
+		})
+
+		//this.ref.pongMode.addEventListener("click", () => {
+		//	this.createState.mod = this.ref.pongMode.toggleAttribute("on") ? "br" : null;
+		//	this.ref.tournamentMode.removeAttribute("on");
+		//	this.ref.brMode.removeAttribute("on");
+		//	//this.ref.brickMode.removeAttribute("on");
+		//	if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+		//	else { this.ref.createWin.setAttribute("off", "") }
+		//})
 
 		//this.ref.brMod.addEventListener("click", () => {
 		//	this.createState.mod = this.ref.brMod.toggleAttribute("on") ? "br" : null;
@@ -281,6 +356,25 @@ export default class Play {
 		App3D.setCSS3dObjectEnable(this.ref.join.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.lobbyInfoWindow.id, false);
 		this.css.remove();
+	}
+
+	private returnButton() {
+		this.ref.pongModes.classList.add('window--play-disabled')
+		this.ref.pongModes.classList.remove('window--play-enable')
+		this.ref.createGame.classList.add('window--play-enable')
+		this.ref.createGame.classList.remove('window--play-disabled')
+		this.ref.createReturn.classList.add('create-return-disable')
+		this.ref.createReturn.classList.remove('create-return-enable')
+	}
+
+	private create() {
+		postRequest("lobby/create", {
+			mode: this.createState.mod,
+			map: this.createState.map
+		})
+			.then((json) => { this.createResolve(json) })
+
+			.catch((resp) => { this.createReject(resp) });
 	}
 
 	private createResolve(json: any) {
