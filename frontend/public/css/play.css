@@ -1,5 +1,6 @@
 /*######################CREATE#################*/
 #play-create,
+#play-create-option,
 #play-join {
 	width: 200vh;
 	height: 200vh;
@@ -8,6 +9,11 @@
 
 #play-join .window-bar,
 #play-create .window-bar {
+	font-size: 4vh;
+	border-bottom: 0.4vh #aaa solid;
+}
+
+#play-create-option .window-bar {
 	font-size: 4vh;
 	border-bottom: 0.4vh #aaa solid;
 }
@@ -44,6 +50,7 @@
 
 .window-title {
 	flex: 1;
+	user-select: none;
 }
 
 .create-return-disable {
@@ -63,11 +70,12 @@
 #create-window {
 	display: flex;
 	flex-direction: column;
+	align-content: space-around;
 	width: 60%;
 	/*height: 16.5%;*/
 	top: 30%;
 	left: 20%;
-	max-height: 20%;
+	max-height: 30%;
 	overflow: hidden;
 }
 
@@ -78,6 +86,36 @@
 	overflow: hidden;
 	background-color: white;
 	/*column-gap: 0.3%;*/
+}
+
+#create-window>.window-content-map {
+
+	display:flex;
+	flex-direction: row;
+	width: 100%;
+	overflow: hidden;
+	background-color: white;
+	/*column-gap: 0.3%;*/
+}
+
+
+.map-description {
+	/*background-color: var(--window-color);*/
+	/*color: var(--window-background);*/
+}
+
+#pong-map
+{
+	display:flex;
+	flex-direction: column;
+	width: 100%;
+	/*grid-column: 1 / 1;*/
+	/*height: fit-content;*/
+	/*grid-template-columns: 1 auto auto auto;*/
+	background-color: white;
+	/*row-gap: 0.3%;*/
+	overflow: hidden;
+
 }
 
 #create-game {
@@ -92,6 +130,15 @@
 	overflow: hidden;
 }
 
+#pong-map>input
+{
+	padding-left: 1%;
+	color: var(--window-color);
+	background-color: var(--window-background);
+	font-size: 5vh;
+	font-weight: 100;
+}
+
 #create-game>input {
 	padding-left: 1%;
 	color: var(--window-color);
@@ -100,17 +147,29 @@
 	font-weight: 100;
 }
 
+#pong-map>input:hover,
 #create-game>input:hover {
 	color: var(--window-background);
 	background-color: var(--window-color)
 }
+#pong-map>input[on],
 #create-game>input[on] {
 	font-size: 5.6vh;
 }
 
+#pong-map>input[on]:hover,
 #create-game>input[on]:hover {
 	background-color: #abc4eb !important;
 	font-size: 5.4vh;
+}
+
+#description {
+	padding-left: 1%;
+	width: 100%;
+	color: var(--window-color);
+	background-color: var(--window-background);
+	font-size: 5vh;
+	font-weight: 100;
 }
 
 #create-pong{

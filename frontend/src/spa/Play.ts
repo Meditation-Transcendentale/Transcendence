@@ -12,6 +12,7 @@ interface playHtmlReference {
 	swJoin: HTMLInputElement
 	join: { html: HTMLDivElement, id: number },
 	create: { html: HTMLDivElement, id: number },
+	createOption: { html: HTMLDivElement, id: number },
 	//brMod: HTMLInputElement;
 	//tournamentMod: HTMLInputElement;
 	//defaultMap: HTMLInputElement;
@@ -31,9 +32,13 @@ interface playHtmlReference {
 	brickMode: HTMLInputElement;
 	pongModes: HTMLInputElement;
 	createReturn: HTMLInputElement;
+	createReturnOption: HTMLInputElement;
 	ponglocal: HTMLInputElement;
 	pongai: HTMLInputElement;
 	pongonline: HTMLInputElement;
+	voidmap: HTMLInputElement;
+	monolithmap: HTMLInputElement;
+	grassmap: HTMLInputElement;
 };
 
 enum playState {
@@ -79,6 +84,7 @@ export default class Play {
 			swCreate: div.querySelector("#create-switch") as HTMLInputElement,
 			swJoin: div.querySelector("#join-switch") as HTMLInputElement,
 			create: { html: div.querySelector("#play-create") as HTMLDivElement, id: -1 },
+			createOption: { html: div.querySelector("#play-create-option") as HTMLDivElement, id: -1 },
 			join: { html: div.querySelector("#play-join") as HTMLDivElement, id: -1 },
 			//brMod: div.querySelector("#br-mod") as HTMLInputElement,
 			//tournamentMod: div.querySelector("#tournament-mod") as HTMLInputElement,
@@ -98,9 +104,13 @@ export default class Play {
 			brickMode: div.querySelector("#brick-mode") as HTMLInputElement,
 			createGame: div.querySelector("#create-game") as HTMLInputElement,
 			createReturn: div.querySelector("#create-return") as HTMLInputElement,
+			createReturnOption: div.querySelector("#create-return-option") as HTMLInputElement,
 			ponglocal: div.querySelector("#pong-local") as HTMLInputElement,
 			pongai: div.querySelector("#pong-ai") as HTMLInputElement,
 			pongonline: div.querySelector("#pong-online") as HTMLInputElement,
+			voidmap: div.querySelector("#void-map") as HTMLInputElement,
+			monolithmap: div.querySelector("#monolith-map") as HTMLInputElement,
+			grassmap: div.querySelector("#grass-map") as HTMLInputElement,
 			pongModes: div.querySelector("#create-pong") as HTMLInputElement
 		}
 
@@ -117,6 +127,13 @@ export default class Play {
 			width: 1.5,
 			height: 1.5,
 			world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-2, 6.6, 0)),
+			enable: false
+		})
+		this.ref.createOption.id = App3D.addCSS3dObject({
+			html: this.ref.createOption.html,
+			width: 1.5,
+			height: 1.5,
+			world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-5, 5, -8)),
 			enable: false
 		})
 		this.ref.create.id = App3D.addCSS3dObject({
@@ -175,6 +192,11 @@ export default class Play {
 			this.returnButton();
 		})
 
+		this.ref.createReturnOption.addEventListener("click", () => {
+			this.createOption(false);
+			//this.returnButton();
+		})
+
 		this.ref.ponglocal.addEventListener("click", () => {
 			this.createState.mod = "local";
 			this.ref.pongonline.removeAttribute("on");
@@ -184,7 +206,8 @@ export default class Play {
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 			this.returnButton();
-			this.create();
+			this.createOption(true);
+			//this.create();
 		})
 
 		this.ref.pongonline.addEventListener("click", () => {
@@ -196,19 +219,21 @@ export default class Play {
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 			this.returnButton();
-			this.create();
+			this.createOption(true);
+			//this.create();
 		})
 
 		this.ref.pongai.addEventListener("click", () => {
 			this.createState.mod = "ai";
 			this.ref.pongonline.removeAttribute("on");
 			this.ref.brMode.removeAttribute("on");
-			this.ref.pongai.removeAttribute("on");
+			this.ref.ponglocal.removeAttribute("on");
 			this.ref.tournamentMode.removeAttribute("on");
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 			this.returnButton();
-			this.create();
+			this.createOption(true);
+			//this.create();
 		})
 
 
@@ -296,11 +321,29 @@ export default class Play {
 		//	else { this.ref.createWin.setAttribute("off", "") }
 		//})
 		//
-		//this.ref.defaultMap.addEventListener("click", () => {
-		//	this.createState.map = this.ref.defaultMap.toggleAttribute("on") ? "default" : null;
-		//	if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
-		//	else { this.ref.createWin.setAttribute("off", "") }
-		//})
+		this.ref.grassmap.addEventListener("click", () => {
+			this.createState.map = "grass";
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.createOption(false);
+			this.create();
+		})
+
+		this.ref.voidmap.addEventListener("click", () => {
+			this.createState.map = "void";
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.createOption(false);
+			this.create();
+		})
+
+		this.ref.monolithmap.addEventListener("click", () => {
+			this.createState.map = "monolith";
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.createOption(false);
+			this.create();
+		})
 
 		this.ref.createBtn.addEventListener("click", () => {
 			console.log(`create game-> mod:${this.createState.mod}, map:${this.createState.map}`)
@@ -375,6 +418,52 @@ export default class Play {
 			.then((json) => { this.createResolve(json) })
 
 			.catch((resp) => { this.createReject(resp) });
+	}
+
+	private createOption(on: boolean) {
+		const mode = this.createState.mod;
+
+		switch (mode) {
+			case 'brick':
+				this.toggleMainWindow(!on);
+				break;
+
+			case 'ai':
+			case 'local':
+			case 'online':
+				this.toggleMainWindow(!on);
+				this.toggleOptionWindow(on);
+				this.toggleReturnButton(on);
+				break;
+
+			case 'br':
+				this.toggleMainWindow(false);
+				this.toggleOptionWindow(true);
+				break;
+
+			default:
+				this.toggleMainWindow(true);
+				this.toggleOptionWindow(false);
+				this.toggleReturnButton(false);
+				break;
+		}
+	}
+	private toggleMainWindow(show: boolean) {
+		App3D.setCSS3dObjectEnable(this.ref.create.id, show);
+	}
+
+	private toggleOptionWindow(show: boolean) {
+		App3D.setCSS3dObjectEnable(this.ref.createOption.id, show);
+	}
+
+	private toggleReturnButton(enable: boolean) {
+		if (enable) {
+			this.ref.createReturnOption.classList.remove('create-return-disable');
+			this.ref.createReturnOption.classList.add('create-return-enable');
+		} else {
+			this.ref.createReturnOption.classList.add('create-return-disable');
+			this.ref.createReturnOption.classList.remove('create-return-enable');
+		}
 	}
 
 	private createResolve(json: any) {
