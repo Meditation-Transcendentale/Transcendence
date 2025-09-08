@@ -237,7 +237,6 @@ interface profilHtmlReference {
 	avatar: HTMLImageElement,
 	avatarFile: HTMLInputElement,
 	security: HTMLInputElement,
-	stats: HTMLDivElement
 }
 
 class Profile {
@@ -252,7 +251,6 @@ class Profile {
 			avatar: div.querySelector("#avatar-image") as HTMLImageElement,
 			avatarFile: div.querySelector("#avatar-file") as HTMLInputElement,
 			security: div.querySelector("#security-input") as HTMLInputElement,
-			stats: div.querySelector("#stats-div") as HTMLDivElement,
 		}
 
 		this.ref.avatarFile.addEventListener('change', () => {

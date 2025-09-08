@@ -11,8 +11,23 @@
 		</label>
 		<input id="username-input" type="text">
 		<input id="edit-input" type="button" value="Edit">
-		<input id="security-input" type="button" value="security">
-		<div id="stats-div"></div>
+		<details id="stats-details">
+			<summary >Stats</summary>
+		<div id="stats-div">
+			<div id="stats-table">
+			</div>
+			<div id="stats-history">
+				<table id="classic-history" class="window-content match-history">
+						<thead>	<tr><th>Scored</th><th>Conceded</th><th>Creation Time</th></tr></thead>
+						<tbody class="history-body"></tbody>
+				</table>
+				<table id="br-history" class="window-content match-history">
+						<thead>	<tr><th>Placement</th><th>Kills</th><th>Creation Time</th></tr></thead>
+						<tbody class="history-body"></tbody>
+				</table>
+			</div>
+		</div>
+		</details>
 	</div>
 	<div id="quit-window" class="window">
 		<div class="window-bar">QUIT</div>

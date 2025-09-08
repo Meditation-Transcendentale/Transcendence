@@ -71,6 +71,12 @@
 	background-color: white;
 }
 
+
+
+/*########################*/
+/*	  PROFILE         */
+/*########################*/
+
 #profile-div {
 	position: absolute;
 	width: 80%;
@@ -85,4 +91,13 @@
 #avatar-image {
 	width: 10vh;
 	height: 10vh;
+}
+
+#stats-details>summary {
+	background: black;
+	color: white;
+}
+
+#stats-div {
+	width: 100%;
 }
