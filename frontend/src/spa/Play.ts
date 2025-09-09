@@ -49,7 +49,7 @@ enum playState {
 
 interface createState {
 	mod: string | null,
-	map: string | null,
+	map: string,
 }
 
 type lobby = {
@@ -353,7 +353,7 @@ export default class Play {
 				mode: this.createState.mod,
 				map: this.createState.map
 			})
-				.then((json) => { this.createResolve(json) })
+				.then((json) => { this.createResolve(json, this.createState.map) })
 
 				.catch((resp) => { this.createReject(resp) });
 		})

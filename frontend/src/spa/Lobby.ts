@@ -95,6 +95,7 @@ export default class Lobby {
 		}
 		this.id = params.get("id") as string;
 		this.map = params.get("map") as string;
+		console.log(`LOBBY MAP = ${this.map}`);
 		this.setupWs(this.id);
 		this.ref.playersList.innerHTML = "";
 
