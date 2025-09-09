@@ -68,7 +68,7 @@ export class Pong {
 	}
 
 	public async init() {
-		
+
 		this.pongRoot = new TransformNode("pongRoot", this.scene);
 		this.pongRoot.position.set(2000, -3500, -3500);
 		this.cam = this.scene.getCameraByName('pong') as ArcRotateCamera;
@@ -108,18 +108,32 @@ export class Pong {
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 
-		localPaddleId = await this.waitForRegistration();
-
 		if (!this.inited) {
 			await this.init();
 		}
-		if (maps == "monolith"){
+		if (maps == "monolith") {
 			this.pongRoot.position.set(0.1, 10, 0);
 			this.pongRoot.scalingDeterminant = 0.07;
-		} else if (maps == "grass"){
+		} else if (maps == "grass") {
 			this.pongRoot.position.set(5, 0, 5);
 			this.pongRoot.scalingDeterminant = 0.25;
+		} else if (maps == "void") {
+			this.pongRoot.position.set(100, 0, 100);
+			this.pongRoot.scalingDeterminant = 0.25;
 		}
+		localPaddleId = await this.waitForRegistration();
+
+		//if (maps == "monolith") {
+		//	this.pongRoot.position.set(0.1, 10, 0);
+		//	this.pongRoot.scalingDeterminant = 0.07;
+		//} else if (maps == "grass") {
+		//	this.pongRoot.position.set(5, 0, 5);
+		//	this.pongRoot.scalingDeterminant = 0.25;
+		//} else if (maps == "void") {
+		//	this.pongRoot.position.set(100, 0, 100);
+		//	this.pongRoot.scalingDeterminant = 0.25;
+		//}
+
 		// if (this.uiSystem) {
 		// 	this.uiSystem.resetUI();
 		// 	//this.uiSystem.enableUI();
