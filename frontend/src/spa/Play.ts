@@ -246,6 +246,7 @@ export default class Play {
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 			this.returnButton();
+			//this.createOption(true);
 			this.create();
 		})
 
@@ -259,6 +260,7 @@ export default class Play {
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 			this.returnButton();
+			this.createOption(true);
 			Router.nav("/brick")
 		})
 
@@ -394,10 +396,13 @@ export default class Play {
 	}
 
 	public async unload() {
+		this.returnButton();
+		this.createOption(false);
 		App3D.setCSS3dObjectEnable(this.ref.switch.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.create.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.join.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.lobbyInfoWindow.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.createOption.id, false);
 		this.css.remove();
 	}
 
@@ -415,7 +420,7 @@ export default class Play {
 			mode: this.createState.mod,
 			map: this.createState.map
 		})
-			.then((json) => { this.createResolve(json) })
+			.then((json) => { this.createResolve(json, this.createState.map) })
 
 			.catch((resp) => { this.createReject(resp) });
 	}
@@ -466,8 +471,8 @@ export default class Play {
 		}
 	}
 
-	private createResolve(json: any) {
-		Router.nav(`/lobby?id=${json.lobbyId}`, false, false)
+	private createResolve(json: any, map: string) {
+		Router.nav(`/lobby?id=${json.lobbyId}&map=${map}`, false, false)
 		console.log(json);
 	}
 

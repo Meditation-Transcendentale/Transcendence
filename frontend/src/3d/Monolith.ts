@@ -37,6 +37,7 @@ export class Monolith {
 	private voxelMesh: Mesh | null = null;
 	public material!: MonolithMaterial;
 	private options: MonolithOptions;
+	private defaultCursorPosition!: Vector3;
 	private sdfSystem: SDFSystem;
 	private cursor: Vector3;
 	private oldcursor: Vector3;
@@ -161,6 +162,8 @@ export class Monolith {
 			return;
 		}
 
+		this.defaultCursorPosition = new Vector3(0, -10, 0);
+
 		try {
 			this.gpuPicker = new GPUPicker();
 			this.gpuPicker.setPickingList([this.voxelMesh]);
@@ -191,6 +194,8 @@ export class Monolith {
 						}
 					} else {
 						this.options.animationIntensity = 0;
+						this.oldcursor.copyFrom(this.cursor);
+						this.cursor.copyFrom(this.defaultCursorPosition);
 					}
 				}).catch((error) => {
 					console.warn("GPU picking failed:", error);
@@ -662,6 +667,7 @@ export class Monolith {
 	}
 
 	public update(time: number, camera: Camera) {
+		this.material.setVec3("cameraPosition", camera.globalPosition);
 		this.material.setFloat("time", time);
 		this.material.setVec3("origin", this.cursor);
 		this.material.setVec3("oldOrigin", this.oldcursor);

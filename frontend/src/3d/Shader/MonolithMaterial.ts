@@ -164,7 +164,7 @@ vec3 mouseAnimation = vec3(
 ) * animationIntensity * 3.;
 float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
 mouseAnimation += mouseDirection * radialPulse * animationIntensity;
-mouseAnimation+= pushDirection * pushStrength * 0.05 * mouseInfluence;
+mouseAnimation+= pushDirection * 0.05 * mouseInfluence;
 // In vertex shader
 
 vec3 originalWorldPos = worldPos.xyz;
