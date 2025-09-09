@@ -49,9 +49,6 @@ export function encodePhysicsRequest(payload) {
 		.finish();
 }
 
-export function decodePhysicsResponse(buffer) {
-	return Proto.physics.PhysicsResponse.decode(buffer);
-}
 
 /**
  * MatchState (for sending state updates)
@@ -98,3 +95,38 @@ export function decodeMatchEnd(buffer) {
 	return Proto.shared.MatchEnd.decode(buffer);
 }
 
+export function encodeTournamentCreateRequest(payload) {
+	const err = Proto.tournament.TournamentCreateRequest.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.shared.MatchEnd
+		.encode(Proto.tournament.TournamentCreateRequest.create(payload))
+		.finish();
+}
+
+export function decodeTournamentCreateRequest(buffer) {
+	return Proto.tournament.TournamentCreateRequest.decode(buffer);
+}
+
+export function encodeTournamentCreateResponse(payload) {
+	const err = Proto.tournament.TournamentCreateResponse.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.shared.MatchEnd
+		.encode(Proto.tournament.TournamentCreateResponse.create(payload))
+		.finish();
+}
+
+export function decodeTournamentCreateResponse(buffer) {
+	return Proto.tournament.TournamentCreateResponse.decode(buffer);
+}
+
+export function encodeTournamentServerMessage(payload) {
+	const err = Proto.tournament.TournamentServerMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.shared.MatchEnd
+		.encode(Proto.tournament.TournamentServerMessage.create(payload))
+		.finish();
+}
+
+export function decodeTournamentServerMessage(buffer) {
+	return Proto.tournament.TournamentServerMessage.decode(buffer);
+}

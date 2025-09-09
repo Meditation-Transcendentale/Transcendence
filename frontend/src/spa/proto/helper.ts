@@ -1,5 +1,5 @@
 import * as Proto from './message.js';
-import type { notif, lobby } from './message.js';
+import type { notif, lobby, tournament } from './message.js';
 
 export function encodeFriendUpdate(
     payload: notif.IFriendUpdate
@@ -47,6 +47,27 @@ export function decodeStatusUpdate(
     buffer: Uint8Array
 ): notif.StatusUpdate {
     return Proto.notif.StatusUpdate.decode(buffer);
+}
+
+export function encodeNotificationMessage(
+    payload: notif.INotificationMessage
+): Uint8Array {
+    const err = Proto.notif.NotificationMessage.verify(payload);
+    if (err) throw new Error(err);
+    return Proto.notif.NotificationMessage
+        .encode(Proto.notif.NotificationMessage.create(payload))
+        .finish();
+}
+
+/**
+ * Decode a Lobby ServerMessage received by the front-end.
+ * @param buffer - protobuf‐encoded bytes
+ * @returns a `lobby.ServerMessage` instance
+ */
+export function decodeNotificationMessage(
+    buffer: Uint8Array
+): notif.NotificationMessage{
+    return Proto.notif.NotificationMessage.decode(buffer);
 }
 
 /**
@@ -167,4 +188,20 @@ export function decodeMatchCreateResponse(
     buffer: Uint8Array
 ): lobby.MatchCreateResponse {
     return Proto.lobby.MatchCreateResponse.decode(buffer);
+}
+
+export function encodeTournamentServerMessage(
+    payload: tournament.ITournamentServerMessage
+): Uint8Array {
+    const err = Proto.tournament.TournamentServerMessage.verify(payload);
+    if (err) throw new Error(err);
+    return Proto.tournament.TournamentServerMessage
+        .encode(Proto.tournament.TournamentServerMessage.create(payload))
+        .finish();
+}
+
+export function decodeTournamentServerMessage(
+    buffer: Uint8Array
+): tournament.TournamentServerMessage {
+    return Proto.tournament.TournamentServerMessage.decode(buffer);
 }

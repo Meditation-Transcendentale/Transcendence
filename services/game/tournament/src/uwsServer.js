@@ -45,15 +45,8 @@ export function createUwsApp(path, tournamentService) {
             const buf = new Uint8Array(message);
             const payload = decodeClientMessage(buf);
 
-			if (payload.quit) {
-				const updatedState = lobbyService.quit(payload.quit.tournamentId, payload.quit.uuid);
-                app.publish(ws.tournamentId, updatedState)
-            }
-            if (payload.ready) {
-                newState = await tournamentService.ready(ws.tournamentId, ws.userId);
-
-                if (newState.gameId)
-            }
+			if (payload.quit) lobbyService.quit(payload.quit.tournamentId, payload.quit.uuid);
+            if (payload.ready) await tournamentService.ready(ws, ws.tournamentId, ws.userId);
         },
 
         close: (ws) => {

@@ -73,11 +73,6 @@ export function createUwsApp(path, lobbyService) {
 						}
 					});
 					app.publish(ws.lobbyId, startBuf, true);
-
-					// for (const peer of sockets.get(ws.lobbyId) || []) {
-					// 	peer.close(1000, 'Game starting');
-					// }
-					// sockets.delete(ws.lobbyId);
 					return;
 				}
 				if (newState.tournamentId) {

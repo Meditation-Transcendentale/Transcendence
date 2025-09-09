@@ -20,11 +20,12 @@ message Player {
   bool ready = 2;
   bool connected = 3;
   bool eliminated = 4;
+  bool inGame = 5;
 }
 
 message TournamentUpdateMessage {
     string tournamentId = 1;
-    repeated Players players = 2;
+    repeated Player players = 2;
     MatchNode tournamentRoot = 3;
 }
 
@@ -64,10 +65,15 @@ message TournamentClientMessage {
     }
 }
 
+message TournamentStartGameMessage {
+    string gameId = 1;
+}
+
 message TournamentServerMessage {
     oneof payload {
         TournamentUpdateMessage update = 1;
         TournamentErrorMessage error = 2;
         TournamentReadyCheckMessage readyCheck = 3;
+        TournamentStartGameMessage startGame = 4;
     }
 }

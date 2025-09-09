@@ -1,28 +1,53 @@
-import config from './config.js';
-import { decodeMatchEnd } from './proto/helper';
+    import config from './config.js';
+import {
+    decodeMatchEnd,
+    encodeTournamentServerMessage, 
+    encodeMatchCreateRequest,
+    decodeMatchCreateResponse } from './proto/helper';
 import natsClient from './natsClient.js';
 
 class MatchNode {
     constructor() {
-        this.player1 = null; //uuid
-        this.player2 = null; //uuid
+        this.player1 = null; //map object {uuid -> {isReady/isConnected/isEliminated/isInGame}}
+        this.player2 = null; //map object {uuid -> {isReady/isConnected/isEliminated/isInGame}}
         this.left = null; //MatchNode
         this.right = null; //MatchNode
         this.parent = null; //MatchNode
-        this.winner = null; //uuid
-        this.gameId = null;
-        this.score = null;
-        this.depth = null;
+        this.winner = null; //map object {uuid -> {isReady/isConnected/isEliminated/isInGame}}
+        this.gameId = null; //string
+        this.score = null; //int array
     }
 
     setResult(matchData) {
         this.score = matchData.score;
-        this.winner = matchData.winnerId == 0 ? player1 : player2;
+        this.winner = matchData.winnerId == 0 ? this.player1 : this.player2;
+        this.player1.isReady = false;
+        this.player2.isReady = false;
+        const loser = matchData.winnerId == 0 ? this.player2 : this.player1;
+        loser.isEliminated = true;
+        this.player1.isInGame = false;
+        this.player2.isInGame = false;
         if (this.parent) this.parent.receiveWinner(this.winner);
     }
 
-    receiveWinner(playerId) {
-        playerId == this.left.winner ? player1 = playerId : player2 = playerId;
+    receiveWinner(newWinner) {
+        newWinner == this.left.winner ? this.player1 = newWinner : this.player2 = newWinner;
+    }
+
+    *getActiveMatches() {
+        function* traverse(node) {
+            if (!node) return;
+
+            if (node.player1 && !node.player1.isEliminated && node.player2 && !node.player2.isEliminated && !node.winner) {
+                yield node;
+                return;
+            }
+
+            yield* traverse(node.left);
+            yield* traverse(node.right);
+        }
+
+        yield* traverse(this);
     }
 }
 
@@ -30,7 +55,7 @@ class Tournament {
     constructor(id, players, uwsApp) {
         this.uwsApp = uwsApp;
         this.id = id;
-        this.players = new Map(shuffle(players).map(p => [p, { isReady: false, isConnected: false, isEliminated: false }]));
+        this.players = new Map(shuffle(players).map(p => [p, { isReady: false, isConnected: false, isEliminated: false, isInGame: false }]));
         this.root = this.buildTournamentTree(this.players);
         this.current_round = 0;
 
@@ -42,32 +67,15 @@ class Tournament {
                 if (!match) { return; }
                 const data = decodeMatchEnd(msg.data);
                 match.setResult(data);
-                if (match == this.root) {
-                    sendGgwp();
-                    continue;
-                }
-                if (!areAllMatchesFinishedAtDepth(this.root, match.depth)) {
-                    this.sendReadyCheck();
-                    this.sendUpdate();
-                }
+                if (match == this.root) continue;
+                sendUpdate();
+                if (areAllMatchesFinished()) sendReadyCheck();
             }
         })
     }
 
-    sendGgwp() {
-        const ggwpBuf = this.jc.encode({
-            type: `ggwp`,
-            winnerUuid: this.winner
-        });
-        this.uwsApp.publish(this.id, ggwpBuf);
-    }
-
     sendReadyCheck() {
-        const readyBuf = encodeServerMessage({
-            readyCheck: {
-                tournamentRoot: this.root
-            }
-        });
+        const readyBuf = encodeServerMessage({});
         this.uwsApp.publish(this.id, readyBuf, true);
     }
 
@@ -80,12 +88,14 @@ class Tournament {
                     isReady: playerData.isReady,
                     isConnected: playerData.isConnected,
                     isEliminated: playerData.isEliminated,
+                    isInGame: playerData.isInGame
                 })),
                 tournamentRoot: this.root
             }
         });
         this.uwsApp.publish(this.id, updateBuf, true);
     }
+
     buildTournamentTree(players) {
         if (players.length === 0 || players.length % 2 !== 0) {
             throw new Error("Empty or odd playerlist");
@@ -94,15 +104,14 @@ class Tournament {
         const leaves = [];
         for (let i = 0; i < players.length; i += 2) {
             const node = new MatchNode();
-            node.player1 = players[i].key;
-            node.player2 = players[i + 1].key;
+            node.player1 = players[i];
+            node.player2 = players[i + 1];
             leaves.push(node);
         }
-        function pairMatches(nodes, depth) {
+        function pairMatches(nodes) {
             const nextRound = [];
             for (let i = 0; i < nodes.length; i += 2) {
                 const parent = new MatchNode();
-                parent.depth = depth;
                 const left = nodes[i];
                 const right = nodes[i + 1];
                 parent.left = left;
@@ -111,10 +120,10 @@ class Tournament {
                 right.parent = parent;
                 nextRound.push(parent);
             }
-            return nextRound.length === 1 ? nextRound[0] : pairMatches(nextRound, depth + 1);
+            return nextRound.length === 1 ? nextRound[0] : pairMatches(nextRound);
         }
 
-        return pairMatches(leaves, 0);
+        return pairMatches(leaves);
     }
 
     findMatchByPlayer(root, playerId) {
@@ -139,10 +148,6 @@ class Tournament {
         return findMatchByGameId(root.right, gameId);
     }
 
-    markReady(player) {
-        player.isReady = true;
-    }
-
     getState() {
         return {
             tournamentId: this.id,
@@ -156,38 +161,24 @@ class Tournament {
         }
     }
 
-    getNodesAtDepth(root, targetDepth) {
-        const result = [];
-
-        function traverse(node) {
-            if (!node) return;
-            if (node.depth === targetDepth) result.push(node);
-            else {
-                traverse(node.left);
-                traverse(node.right);
-            }
-        }
-
-        traverse(root);
-        return result;
-    }
-
-    areAllMatchesFinishedAtDepth(root, depth) {
-        const nodes = getNodesAtDepth(root, depth);
-        return nodes.every(node => node.winner !== null);
+    areAllMatchesFinished() {
+        return [...this.players.values()]
+            .every(playerData => !playerData.isInGame);
     }
 
     getPlayerByUuid(uuid) {
         return this.players.get(uuid);
     }
 
-    areAllPlayersReady() {
-
+    allNonEliminatedPlayersReady() {
+        return [...this.players.values()]
+            .filter(playerData => !playerData.isEliminated)
+            .every(playerData => playerData.isReady);
     }
 
     addPlayer(userId) {
         if (this.players.has(userId)) {
-            throw new Error(`Player already in lobby`)
+            throw new Error(`Player already in tournament`)
         }
         natsClient.publish(`notification.${userId}.status`, encodeStatusUpdate({ sender: userId, status: "in tournament", option: this.id }));
         this.players.set(userId, { isReady: false, isConnected: true, isEliminated: false })
@@ -219,48 +210,52 @@ export default class tournamentService {
     quit(tournamentId, userId) {
         const tournament = this.tournaments.get(tournamentId)
         if (!tournament) return null
-        tournament.removePlayer(userId)
-        return tournament.getState()
+        const player = tournament.player.get(userId);
+        if (!player) return null;
+        player.isConnected = false;
+        player.isEliminated = false;
+        tournament.sendUpdate();
+        return tournament.getState();
     }
 
-    async ready(tournamentId, playerId) {
+
+
+    async ready(ws, tournamentId, playerId) {
         const tournament = this.tournaments.get(tournamentId);
         if (!tournament) throw new Error('Tournament not found');
 
         const player = tournament.players.get(playerId);
         if (!player) throw new Error('Player not in tournament')
 
-        const match = tournament.findMatchByPlayer(playerId);
-        if (!match) throw new Error('Match not found')
-
-        tournament.markReady(player);
+        player.isReady = true;
 
         tournament.sendUpdate();
 
-        const state = tournament.getState();
-
-        if (tournament.areAllPlayersReady) {
-
-        }
-        if (tournament.getPlayerByUuid(match.player1_uuid).ready && tournament.getPlayerByUuid(match.player2_uuid).ready) { //add MatchCreate encode/decode functions
-            const reqBuf = encodeMatchCreateRequest({
-                players: [match.player1.uuid, match.player2.uuid],
-            })
-            try {
-                const replyBuf = await natsClient.request(
-                    `games.tournament.match.create`,
-                    reqBuf, {}
-                )
-                const resp = decodeMatchCreateResponse(replyBuf);
-                match.gameId = resp.gameId;
-
-                //send
-            } catch (err) {
-                console.error('Failed to create game:', err);
+        if (tournament.allNonEliminatedPlayersReady()) {
+            for (const match of tournament.root.getActiveMatches()) {
+                const reqBuf = encodeMatchCreateRequest({
+                    players: [match.player1.key, match.player2.key],
+                });
+                try {
+                    const replyBuf = await natsClient.request(
+                        `games.tournament.match.create`,
+                        reqBuf, {}
+                    );
+                    const resp = decodeMatchCreateResponse(replyBuf);
+                    match.gameId = resp.gameId;
+                    const startBuf = encodeTournamentServerMessage({
+                        startGame: {
+                            gameId: match.gameId
+                        }
+                    });
+                    ws.send(startBuf, true);
+                }
+                catch (err) {
+                    const buf = encodeTournamentServerMessage({ error: { message: err.message } });
+                    ws.send(buf, true);
+                }
             }
         }
-
-        return state
     }
 
     cleanup() {

@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import config from './config.js';
 import TournamentService from './tournamentService.js';
-import { decodeTournamentCreate } from './proto/helper.js';
+import { decodeTournamentCreateRequest, encodeTournamentCreateResponse } from './proto/helper.js';
 
 async function start() {
     await natsClient.connect(config.NATS_URL);
@@ -32,12 +32,15 @@ async function start() {
         else console.log(`uWS WebSocket listening on ${config.WS_PORT}`);
     });
 
-    const subNewTournament = nc.subscribe('games.tournament.create');
+    const subNewTournament = natsClient.subscribe('games.tournament.create');
     (async () => {
         for await (const msg of subNewTournament) {
-            const playersList = decodeTournamentCreate(msg.data);
+            const playersList = decodeTournamentCreateRequest(msg.data);
             const tournamentId = tournamentService.create(playersList, uwsApp);
-
+            const respTournamentCreate = encodeTournamentCreateResponse({
+                tournamentId: tournamentId,
+            });
+            msg.respond(respTournamentCreate);
         }
         //send tournament id to the players uuid
     })

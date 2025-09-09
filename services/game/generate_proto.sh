@@ -117,6 +117,7 @@ for svc in "${SERVICES[@]}"; do
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/lobby.proto"
         "$SHARED_PROTO_DIR/notif.proto"
+        "$SHARED_PROTO_DIR/tournament.proto"
       )
       ;;
     "notifications")
@@ -136,6 +137,7 @@ for svc in "${SERVICES[@]}"; do
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/ui.proto"
+        "$SHARED_PROTO_DIR/tournament.proto"
       )
       ;;
     "friends-service")
@@ -148,6 +150,7 @@ for svc in "${SERVICES[@]}"; do
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/lobby.proto"
         "$SHARED_PROTO_DIR/notif.proto"
+        "$SHARED_PROTO_DIR/tournament.proto"
       )
       ;;
     *)
