@@ -1,30 +1,68 @@
 <div id="play" class="sub-container">
 	<link rel="stylesheet" type="text/css" href="/css/play.css">
+	<div id="play-create-option" class="sub-container">
+		<div id="create-window" class="window">
+			<div id="create-bar" class="window-bar">
+				<input id="create-return-option" class="create-return-disable" type="button" value="RETURN"/>
+				<span class="window-title">OPTIONS</span>
+			</div>
+			<div class="window-content-map">
+				<div id="pong-map" class="window-content window--play-enable">
+					<input id="void-map"  type="button"  value="VOID"/>
+					<input id="monolith-map" type="button"  value="MONOLITH"/>
+					<input id="grass-map"  type="button"  value="GRASS"/>
+				</div>
+				<div id="description" class="window-content window--play-enable">
+					<span >MAP DESCRIPTION</span>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div id="play-create" class="sub-container">
-		<div id="create-map-window" class="window">
-			<div class="window-bar">CHOOSE MAP</div>
+		<!--<div id="create-map-window" class="window">-->
+		<!--	<div class="window-bar">CHOOSE MAP</div>-->
+		<!--	<div class="window-content">-->
+		<!--		<div id="create-map" class="window-content">-->
+		<!--			<input id="default-map" type="button" value="DEFAULT"/>-->
+		<!--			<input id="term-map" type="button" value="TERMINATOR" off/>-->
+		<!--			<input id="term-map" type="button" value="TERMINATOR" off/>-->
+		<!--		</div>-->
+		<!--		<div id="map-description" class="window-content">Incradible map woth a lot a functionnality</div>-->
+		<!--	</div>-->
+		<!--</div>-->
+		<div id="create-window" class="window">
+			<div id="create-bar" class="window-bar">
+				<input id="create-return" class="create-return-disable" type="button" value="RETURN"/>
+				<span class="window-title">CHOOSE GAME</span>
+			</div>
 			<div class="window-content">
-				<div id="create-map" class="window-content">
-					<input id="default-map" type="button" value="DEFAULT"/>
-					<input id="term-map" type="button" value="TERMINATOR" off/>
-					<input id="term-map" type="button" value="TERMINATOR" off/>
+				<div id="create-game" class="window-content window--play-enable">
+					<input id="pong-mode"  type="button"  value="PONG"/>
+					<input id="tournament-mode" type="button"  value="TOURNAMENT"/>
+					<input id="brick-mode"  type="button"  value="BRICKBREAKER"/>
+					<input id="br-mode" type="button"  value="BATTLEROYAL"/>
 				</div>
-				<div id="map-description" class="window-content">Incradible map woth a lot a functionnality</div>
+				<div id="create-pong" class="window-content window--play-disabled">
+					<input id="pong-local"  type="button"  value="LOCAL"/>
+					<input id="pong-ai"  type="button"  value="AI"/>
+					<input id="pong-online"  type="button"  value="ONLINE"/>
+				</div>
+				<!--<div id="mod-description" class="window-content">Incradible mod woth a lot a fun</div>-->
 			</div>
 		</div>
-		<div id="create-mod-window" class="window">
-			<div class="window-bar">CHOOSE VARIANT</div>
-			<div class="window-content">
-				<div id="create-mod" class="window-content">
-					<input id="br-mod" type="button" value="BR"/>
-					<input id="tournament-mod" type="button" value="TOURNAMENT"/>
-					<input id="local-mod"  type="button" value="LOCAL"/>
-					<input id="online-mod"  type="button" value="ONLINE"/>
-					<input id="ai-mod" type="button" value="AI"/>
-				</div>
-				<div id="mod-description" class="window-content">Incradible mod woth a lot a fun</div>
-			</div>
-		</div>
+		<!--<div id="create-mod-window" class="window">-->
+		<!--	<div class="window-bar">CHOOSE VARIANT</div>-->
+		<!--	<div class="window-content">-->
+		<!--		<div id="create-mod" class="window-content">-->
+		<!--			<input id="br-mod" type="button" value="BR"/>-->
+		<!--			<input id="tournament-mod" type="button" value="TOURNAMENT"/>-->
+		<!--			<input id="local-mod"  type="button" value="LOCAL"/>-->
+		<!--			<input id="online-mod"  type="button" value="ONLINE"/>-->
+		<!--			<input id="ai-mod" type="button" value="AI"/>-->
+		<!--		</div>-->
+		<!--		<div id="mod-description" class="window-content">Incradible mod woth a lot a fun</div>-->
+		<!--	</div>-->
+		<!--</div>-->
 		<div id="create-btn-window" class="window">
 			<div class="window-bar">CREATE</div>
 			<input id="create-btn" class="window-content" type="button" value="CREATE"/>

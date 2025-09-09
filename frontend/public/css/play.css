@@ -1,5 +1,6 @@
 /*######################CREATE#################*/
 #play-create,
+#play-create-option,
 #play-join {
 	width: 200vh;
 	height: 200vh;
@@ -12,69 +13,263 @@
 	border-bottom: 0.4vh #aaa solid;
 }
 
+#play-create-option .window-bar {
+	font-size: 4vh;
+	border-bottom: 0.4vh #aaa solid;
+}
+
 #play-join *,
-#play-create * {
-	pointer-events: auto;
+/*#play-create * {*/
+/*	pointer-events: auto;*/
+/*}*/
+
+/*#create-map-window {*/
+/*	display: block;*/
+/*	width: 35%;*/
+/*	height: 20%;*/
+/*	top: 15%;*/
+/*	left: 80%;*/
+/*	max-height: 20%;*/
+/*	overflow: hidden;*/
+/*}*/
+/**/
+/*#create-map-window>.window-content {*/
+/*	display: grid;*/
+/**/
+/*	width: 100%;*/
+/*	overflow: hidden;*/
+/*	background-color: white;*/
+/*	column-gap: 0.3%;*/
+/*}*/
+
+#create-bar {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 }
 
-#create-map-window {
-	display: block;
-	width: 35%;
-	height: 20%;
-	top: 15%;
-	left: 10%;
-	max-height: 20%;
+.window-title {
+	flex: 1;
+	user-select: none;
+}
+
+.create-return-disable {
+	display:none;
+}
+
+.create-return-enable {
+	background-color: var(--window-color);
+	color: var(--window-background);
+}
+
+.create-return-enable:hover {
+	color: var(--window-color) !important;
+	background-color: var(--window-background);
+}
+
+#create-window {
+	display: flex;
+	flex-direction: column;
+	align-content: space-around;
+	width: 60%;
+	/*height: 16.5%;*/
+	top: 30%;
+	left: 20%;
+	max-height: 30%;
 	overflow: hidden;
 }
 
-#create-map-window>.window-content {
-	display: grid;
+#create-window>.window-content {
 
+	align-self: space-around;
 	width: 100%;
 	overflow: hidden;
 	background-color: white;
-	column-gap: 0.3%;
+	/*column-gap: 0.3%;*/
 }
 
-#create-map {
+#create-window>.window-content-map {
+
+	display:flex;
+	flex-direction: row;
 	width: 100%;
-	display: grid;
-	grid-column: 1 / 1;
-	height: fit-content;
-	grid-template-columns: 1 auto auto auto;
+	overflow: hidden;
 	background-color: white;
-	row-gap: 0.2%;
-	overflow: scroll;
+	/*column-gap: 0.3%;*/
 }
 
-#create-map>input {
+
+.map-description {
+	/*background-color: var(--window-color);*/
+	/*color: var(--window-background);*/
+}
+
+#pong-map
+{
+	display:flex;
+	flex-direction: column;
+	width: 100%;
+	/*grid-column: 1 / 1;*/
+	/*height: fit-content;*/
+	/*grid-template-columns: 1 auto auto auto;*/
+	background-color: white;
+	/*row-gap: 0.3%;*/
+	overflow: hidden;
+
+}
+
+#create-game {
+	display:flex;
+	flex-direction: column;
+	width: 100%;
+	/*grid-column: 1 / 1;*/
+	/*height: fit-content;*/
+	/*grid-template-columns: 1 auto auto auto;*/
+	background-color: white;
+	/*row-gap: 0.3%;*/
+	overflow: hidden;
+}
+
+#pong-map>input
+{
 	padding-left: 1%;
+	color: var(--window-color);
 	background-color: var(--window-background);
 	font-size: 5vh;
 	font-weight: 100;
 }
 
-#create-map>input:hover {
+#create-game>input {
+	padding-left: 1%;
+	color: var(--window-color);
+	background-color: var(--window-background);
+	font-size: 5vh;
+	font-weight: 100;
+}
+
+#pong-map>input:hover,
+#create-game>input:hover {
 	color: var(--window-background);
 	background-color: var(--window-color)
 }
+#pong-map>input[on],
+#create-game>input[on] {
+	font-size: 5.6vh;
+}
 
+#pong-map>input[on]:hover,
+#create-game>input[on]:hover {
+	background-color: #abc4eb !important;
+	font-size: 5.4vh;
+}
 
-#map-description {
-	grid-column: 2 / 2;
+#description {
+	padding-left: 1%;
 	width: 100%;
-	font-weight: 100;
-	font-size: 4vh;
 	color: var(--window-color);
 	background-color: var(--window-background);
+	font-size: 5vh;
+	font-weight: 100;
 }
+
+#create-pong{
+	display:flex;
+	flex-direction: column;
+	width: 100%;
+	background-color: white;
+	overflow: hidden;
+}
+#create-pong>input {
+	padding-left: 1%;
+	color: var(--window-color);
+	background-color: var(--window-background);
+	font-size: 5vh;
+	font-weight: 100;
+}
+
+#create-pong>input:hover {
+	color: var(--window-background);
+	background-color: var(--window-color)
+}
+#create-pong>input[on] {
+	font-size: 5.6vh;
+}
+
+#create-pong>input[on]:hover {
+	background-color: #abc4eb !important;
+	font-size: 5.4vh;
+}
+
+.window--play-disabled  input{
+display: none;
+pointer-events: none;
+opacity: 0.4;
+}
+.window--play-disabled {
+display: none;
+pointer-events: none;
+opacity: 0.4;
+}
+.window--play-enable{
+}
+
+/*.window--play-disabled input {*/
+/*	display:none;*/
+/*pointer-events: none;*/
+/*opacity: 0.4;*/
+/*	border: none !important;*/
+/*    outline: none !important;*/
+/*	font-size: 0;*/
+/*}*/
+/*#create-pong.disabled * {*/
+/*    pointer-events: none !important;*/
+/*    opacity: 0.4 !important;*/
+/*}*/
+/**/
+/*#create-pong.enabled,*/
+/*#create-pong.enabled * {*/
+/*    pointer-events: auto !important;*/
+/*    opacity: 1 !important;*/
+/*}*/
+/*#create-map {*/
+/*	width: 100%;*/
+/*	display: grid;*/
+/*	grid-column: 1 / 1;*/
+/*	height: fit-content;*/
+/*	grid-template-columns: 1 auto auto auto;*/
+/*	background-color: white;*/
+/*	row-gap: 0.2%;*/
+/*	overflow: scroll;*/
+/*}*/
+/**/
+/*#create-map>input {*/
+/*	padding-left: 1%;*/
+/*	background-color: var(--window-background);*/
+/*	font-size: 5vh;*/
+/*	font-weight: 100;*/
+/*}*/
+/**/
+/*#create-map>input:hover {*/
+/*	color: var(--window-background);*/
+/*	background-color: var(--window-color)*/
+/*}*/
+
+
+/*#map-description {*/
+/*	grid-column: 2 / 2;*/
+/*	width: 100%;*/
+/*	font-weight: 100;*/
+/*	font-size: 4vh;*/
+/*	color: var(--window-color);*/
+/*	background-color: var(--window-background);*/
+/*}*/
 
 /*####*/
 
 #create-mod-window {
 	width: 40%;
 	top: 30%;
-	left: 40%;
+	left: 80%;
 	z-index: 2;
 }
 
@@ -143,6 +338,7 @@
 /*####*/
 
 #create-btn-window {
+	display: none;
 	top: 47%;
 	left: 5%;
 	width: 80vh;
@@ -385,3 +581,48 @@
 	background-color: white;
 	animation: none;
 }
+
+/*#play-switch {*/
+/*	color: red;*/
+/*}*/
+
+/*.switch-play {*/
+/*	position: absolute;*/
+/*	display: block;*/
+/*	background-color: transparent;*/
+/*	height: fit-content;*/
+/*	/*width: 40vh;*/*/
+/*	align-content: center;*/
+/*	border-radius: 0 1px 0 0;*/
+/*	pointer-events: auto;*/
+/*	box-shadow: 1px 1px 5px grey, -1px -1px 5px grey;*/
+/*}*/
+/**/
+/*.switch-input {*/
+/*	display: block;*/
+/*	width: fit-content;*/
+/*	height: fit-content;*/
+/*	font: var(--font-speak);*/
+/*	margin: auto;*/
+/**/
+/*	background-color: transparent;*/
+/*	color: blue;*/
+/*	-webkit-text-stroke: 2px;*/
+/*	-webkit-text-stroke-color: blue;*/
+/*	font-size: 7vh;*/
+/*	font-weight: bold;*/
+/*	text-align: center;*/
+/*	pointer-events: all;*/
+/**/
+/*	transition: letter-spacing 0.2s;*/
+/*}*/
+/**/
+/**/
+/*.switch-input[down] {*/
+/*	color: grey;*/
+/*	-webkit-text-stroke: 1.5px;*/
+/*	-webkit-text-stroke-color: grey;*/
+/*	letter-spacing: 0vh;*/
+/*	background-color: transparent;*/
+/*}*/
+/**/

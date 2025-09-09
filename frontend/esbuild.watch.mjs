@@ -48,6 +48,16 @@ const customAliasPlugin = {
 	},
 };
 
+//fs.watch('public/css', { recursive: true }, (eventType, filename) => {
+//	if (filename && filename.endsWith('.css')) {
+//		console.log(`CSS ${eventType}: ${filename}`);
+//		wss.clients.forEach(client => {
+//			if (client.readyState === 1) {
+//				client.send('reload');
+//			}
+//		});
+//	}
+//});
 
 const appctx = await esbuild.context({
 	entryPoints: ['src/3d/App.ts'],
@@ -197,7 +207,6 @@ let babyctx = await esbuild.context({
 	plugins: [notifyPlugin, shaderPlugin]
 })
 
-
 let onRebuild = function(error, result) {
 	if (error) {
 		console.error('Build failed:', error);
@@ -210,7 +219,6 @@ let onRebuild = function(error, result) {
 		});
 	}
 }
-
 
 await appctx.watch();
 await mainctx.watch();
