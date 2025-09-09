@@ -205,7 +205,7 @@ export class Environment {
 	}
 
 	public disableHome() {
-		this.updateHome = false;
+		//this.updateHome = false;
 		this.scene.fogMode = Scene.FOGMODE_NONE;
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(true);

@@ -28,8 +28,10 @@ export class Ball {
 
 		this.matTouched = new StandardMaterial("touchedMat", this.scene);
 		this.matTouched.diffuseColor.set(0, 0, 1);
+		this.matTouched.specularColor.set(0, 0, 0);
 		this.matUntouched = new StandardMaterial("untouchedMat", this.scene);
 		this.matUntouched.diffuseColor.set(1, 0, 0);
+		this.matUntouched.specularColor.set(0, 0, 0);
 		this.bricksLeft = bricksNumber;
 	}
 
