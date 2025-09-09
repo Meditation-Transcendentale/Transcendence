@@ -45,7 +45,7 @@ export class MovementSystem extends System {
 					const dist = Math.abs(paddle.offset - paddle.serverOffset);
 					if (dist > 0) {
 						console.log("dist", dist);
-						if (dist >= 0.3) {
+						if (dist >= 0.5) {
 							paddle.offset = paddle.serverOffset;
 						} else {
 							const corrected = (1 - 0.3) * paddle.offset + 0.3 * paddle.serverOffset;

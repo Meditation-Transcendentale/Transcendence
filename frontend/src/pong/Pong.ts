@@ -54,7 +54,7 @@ export class Pong {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.gameId = gameId;
-		// this.gameMode = gameMode;
+		this.gameMode = "";
 		this.engine = this.scene.getEngine() as Engine;
 		this.inited = false;
 
@@ -90,8 +90,8 @@ export class Pong {
 
 	}
 
-	public async start(gameId: string, uuid: string, gameMode: string) {
-		const maps = 0;
+	public async start(gameId: string, uuid: string, gameMode: string, maps: string) {
+		// const maps = 0;
 		this.gameMode = gameMode;
 		if (this.wsManager) {
 			this.wsManager.socket.close();
@@ -113,10 +113,12 @@ export class Pong {
 		if (!this.inited) {
 			await this.init();
 		}
-		if (maps == 1){
-			this.pongRoot.position.set(0, 0, 0);
-		} else if (maps == 2){
-			this.pongRoot.position.set(10, 0, 10);
+		if (maps == "monolith"){
+			this.pongRoot.position.set(0.1, 10, 0);
+			this.pongRoot.scalingDeterminant = 0.07;
+		} else if (maps == "grass"){
+			this.pongRoot.position.set(5, 0, 5);
+			this.pongRoot.scalingDeterminant = 0.25;
 		}
 		// if (this.uiSystem) {
 		// 	this.uiSystem.resetUI();
@@ -180,7 +182,7 @@ export class Pong {
 		// this.scoreUI = this.uiSystem.scoreUI;
 		// this.ecs.addSystem(this.uiSystem);
 
-		createGameTemplate(this.ecs, config, localPaddleId, this.gameMode);
+		createGameTemplate(this.ecs, config);
 	}
 
 

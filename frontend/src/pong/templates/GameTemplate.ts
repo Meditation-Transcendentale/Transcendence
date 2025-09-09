@@ -43,7 +43,7 @@ export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localP
 	}
 }
 
-export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string): void {
+export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig): void {
 
 	const ballEntity = new Entity();
 	const pos = new Vector3(0, 0, 0);

@@ -245,10 +245,10 @@ export class Grass {
 		this.grassDepthMaterial.setVector3("origin", this.cursor);
 
 
-		camera._updateFrustumPlanes();
-		for (let i = 0; i < this._tiles.length; i++) {
-			this._tiles[i].isInFrustrum(camera._frustumPlanes);
-		}
+		// camera._updateFrustumPlanes();
+		// for (let i = 0; i < this._tiles.length; i++) {
+		// 	this._tiles[i].isInFrustrum(camera._frustumPlanes);
+		// }
 	}
 
 	public getMesh(): Mesh {

@@ -30,7 +30,7 @@ function createArenaMesh(scene: Scene, config: GameTemplateConfig, pongRoot: Tra
 }
 
 function createBallMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
-	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 1 }, scene);
+	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 1, segments: 16 }, scene);
 	const ballMaterial = new StandardMaterial("ballMaterial", scene);
 	ballMesh.parent = pongRoot;
 	ballMaterial.diffuseColor.set(1, 1, 1);

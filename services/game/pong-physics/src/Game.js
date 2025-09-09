@@ -275,7 +275,7 @@ export class Game {
 		const pos = ball.getComponent('position');
 		pos.x = 0; pos.y = 0;
 		const vel = ball.getComponent('velocity');
-		const speed = this.options.initialBallSpeed || 20;
+		const speed = config.ballSpeed || 10;
 		const angle = (Math.random() * Math.PI / 2) - (Math.PI / 4);
 		const dir = Math.random() < 0.5 ? -1 : 1;
 		vel.x = Math.cos(angle) * speed * dir;

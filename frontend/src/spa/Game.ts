@@ -43,13 +43,16 @@ export default class Game {
 		let gameId = params.get("id");
 		let uuid = User.uuid;
 		let gameMode = params.get("mod");
+		let map = params.get("map");
 		if (!gameId)
 			gameId = "";
 		if (!uuid)
 			uuid = "";
 		if (!gameMode)
 			gameMode = "";
-		this.pong.start(gameId, uuid, gameMode);
+		if (!map)
+			map = "";
+		this.pong.start(gameId, uuid, gameMode, map);
 	}
 
 }
