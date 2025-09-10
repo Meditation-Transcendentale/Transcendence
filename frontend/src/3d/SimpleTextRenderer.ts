@@ -27,10 +27,6 @@ export class TextRenderer {
 		this.monolith = monolith;
 		this.scene = scene;
 		this.setupHoverDetection();
-
-		this.scene.registerBeforeRender(() => {
-			this.update();
-		});
 	}
 
 	addTextZone(id: string, text: string, x: number, y: number, z: number, size: number = 1.5) {
@@ -145,17 +141,17 @@ export class TextRenderer {
 		const material = this.monolith.material as MonolithMaterial;
 		if (!material) return;
 
-		this.scene.registerBeforeRender(() => {
-			material.setFloat('textCount', this.textZones.length);
+		//this.scene.registerBeforeRender(() => {
+		material.setFloat('textCount', this.textZones.length);
 
-			this.textZones.forEach((zone, index) => {
-				material.setTexture(`textTexture${index}`, zone.texture);
-				material.setVec3(`textPosition${index}`, zone.position);
-				material.setFloat(`textSize${index}`, 5.0);
-				material.setFloat(`textGlow${index}`, zone.glow);
-				material.setVec3(`textFace${index}`, zone.face);
-			});
+		this.textZones.forEach((zone, index) => {
+			material.setTexture(`textTexture${index}`, zone.texture);
+			material.setVec3(`textPosition${index}`, zone.position);
+			material.setFloat(`textSize${index}`, 5.0);
+			material.setFloat(`textGlow${index}`, zone.glow);
+			material.setVec3(`textFace${index}`, zone.face);
 		});
+		//});
 	}
 
 	private setupHoverDetection() {
@@ -164,7 +160,7 @@ export class TextRenderer {
 		});
 	}
 
-	private update() {
+	public update() {
 		for (const zone of this.textZones) {
 			if (zone.isHovering) {
 				zone.glow += 0.01;
@@ -179,6 +175,7 @@ export class TextRenderer {
 
 			}
 		}
+		this.updateShaderUniforms();
 
 	}
 

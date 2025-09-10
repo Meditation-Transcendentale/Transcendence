@@ -200,7 +200,7 @@ export class Environment {
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
 		}
-		this.fieldCamera.setEnabled(true);
+		//this.fieldCamera.setEnabled(true);
 
 	}
 
@@ -210,7 +210,7 @@ export class Environment {
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(true);
 		}
-		this.fieldCamera.setEnabled(false);
+		//this.fieldCamera.setEnabled(false);
 
 	}
 

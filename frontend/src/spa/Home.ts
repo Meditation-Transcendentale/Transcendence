@@ -117,9 +117,9 @@ class Home {
 		//meRequest()
 		//.catch(() => window.location.reload());
 		App3D.setVue("home");
-		App3D.setCSS3dObjectEnable(this.ref.stats.id, true);
+		//App3D.setCSS3dObjectEnable(this.ref.stats.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.play.id, true);
-		App3D.setCSS3dObjectEnable(this.ref.bricks.id, true);
+		//App3D.setCSS3dObjectEnable(this.ref.bricks.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.exemple.id, true);
 		//(document.querySelector("#main-container") as HTMLDivElement)?.remove();
 

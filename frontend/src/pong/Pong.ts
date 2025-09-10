@@ -1,5 +1,5 @@
 
-import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, Inspector } from "@babylonImport";
+import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, Inspector, FreeCamera } from "@babylonImport";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -28,7 +28,7 @@ let resizeTimeout: NodeJS.Timeout;
 export class Pong {
 	private engine!: Engine;
 	private scene: Scene;
-	private cam!: ArcRotateCamera;
+	private cam!: FreeCamera;
 
 	private ecs!: ECSManager;
 	public stateManager!: StateManager;
@@ -74,9 +74,7 @@ export class Pong {
 
 		this.pongRoot = new TransformNode("pongRoot", this.scene);
 		this.pongRoot.position.set(2000, -3500, -3500);
-		this.cam = this.scene.getCameraByName('pong') as ArcRotateCamera;
-		this.cam.parent = this.pongRoot;
-		this.cam.minZ = 0.2;
+		this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
 		this.baseMeshes = createBaseMeshes(this.scene, this.config, this.pongRoot);
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
 		this.uuid = getOrCreateUUID();
@@ -114,6 +112,8 @@ export class Pong {
 		if (!this.inited) {
 			await this.init();
 		}
+		this.cam.parent = this.pongRoot;
+		this.cam.minZ = 0.2;
 		if (maps == "monolith") {
 			this.pongRoot.position.set(0.1, 10, 0);
 			this.pongRoot.scalingDeterminant = 0.07;
@@ -187,6 +187,8 @@ export class Pong {
 
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
+		this.cam.parent = null;
+
 
 		console.log("render loop stopped and game paused");
 	}
