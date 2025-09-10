@@ -47,7 +47,7 @@ export class Ball {
 
 			if (player.getAlive()) {
 				const playerGoalPos = player.getPlayerGoal().position;
-				const collideGoal = Math.sqrt((playerGoalPos.x - this.newposition.x)*(playerGoalPos.x - this.newposition.x)+(playerGoalPos.z - this.newposition.z)*(playerGoalPos.z - this.newposition.z)) - 0.25 < 0.35;
+				const collideGoal = Math.sqrt((playerGoalPos.x - this.newposition.x) * (playerGoalPos.x - this.newposition.x) + (playerGoalPos.z - this.newposition.z) * (playerGoalPos.z - this.newposition.z)) - 0.25 < 0.35;
 				const collideShield = this.detectCollisionShield(player);
 
 				if (collideShield) {
@@ -162,7 +162,7 @@ export class Ball {
 		return distance <= ballRadius;
 	}
 
-	private endGame(){
+	private endGame() {
 		// end screen UI
 		this.game.dispose();
 	}

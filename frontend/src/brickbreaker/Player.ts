@@ -145,17 +145,19 @@ export class Player {
 		this.shield.material = this.shieldMat;
 	}
 
-	enableInput(){
-		if (!this.inputActive){
+	enableInput() {
+		if (!this.inputActive) {
 			window.addEventListener("keydown", this.keydownHandler);
 			window.addEventListener("keyup", this.keyupHandler);
 			window.addEventListener("pointermove", this.pointerHandler);
 			this.inputActive = true;
+			this.goal.visibility = 1;
+			this.shield.visibility = 1;
 		}
 	}
 
-	disableInput(){
-		if (this.inputActive){
+	disableInput() {
+		if (this.inputActive) {
 			window.removeEventListener("keydown", this.keydownHandler);
 			window.removeEventListener("keyup", this.keyupHandler);
 			window.removeEventListener("pointermove", this.pointerHandler);
@@ -203,11 +205,11 @@ export class Player {
 	private spawnShield(): void {
 		if (!this.isAlive) return;
 
-		if (this.angleFactor != 1 && this.inputDown == true){
+		if (this.angleFactor != 1 && this.inputDown == true) {
 			this.isActive = 1.0;
 			this.alpha = 1.0;
 		}
-		else{
+		else {
 			this.isActive = 0.0;
 			this.alpha = 0.25;
 		}

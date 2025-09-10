@@ -39,7 +39,7 @@ export class BrickBreaker {
 		this.createArena();
 
 		this.camera = this.scene.getCameraByName("brick") as ArcRotateCamera;
-		this.camera.attachControl(this.canvas, true);
+		//this.camera.attachControl(this.canvas, true);
 		this.camera.parent = this.root
 		this.layers = Math.ceil((Math.random() * 5) + 1);
 		// this.layers = 2;
