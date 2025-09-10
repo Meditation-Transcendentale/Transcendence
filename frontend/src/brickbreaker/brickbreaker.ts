@@ -35,7 +35,7 @@ export class BrickBreaker {
 
 
 		//this.setupCamera();
-		this.setupLight();
+		//this.setupLight();
 		this.createArena();
 
 		this.camera = this.scene.getCameraByName("brick") as ArcRotateCamera;
