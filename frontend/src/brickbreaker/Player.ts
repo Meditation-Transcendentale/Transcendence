@@ -151,8 +151,6 @@ export class Player {
 			window.addEventListener("keyup", this.keyupHandler);
 			window.addEventListener("pointermove", this.pointerHandler);
 			this.inputActive = true;
-			this.goal.visibility = 1;
-			this.shield.visibility = 1;
 		}
 	}
 
@@ -165,12 +163,19 @@ export class Player {
 		}
 	}
 
-	public die(): void {
+	die(): void {
 		this.goal.visibility = 0;
 		this.shield.visibility = 0;
 		this.isAlive = false;
 		//interface de fin de game
 		// this.game.dispose();
+	}
+
+	reset(): void {
+		this.enableInput();
+		this.goal.visibility = 1;
+		this.shield.visibility = 1;
+		this.isAlive = true;
 	}
 
 	update(): void {
