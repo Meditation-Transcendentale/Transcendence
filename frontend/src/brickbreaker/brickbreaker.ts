@@ -68,6 +68,7 @@ export class BrickBreaker {
 		this.renderObserver = this.scene.onBeforeRenderObservable.add(() => {
 			this.update();
 		});
+		this.player.enableInput();
 
 		console.log("BrickBreaker added to render loop");
 	}
@@ -78,6 +79,7 @@ export class BrickBreaker {
 			this.renderObserver = null;
 			console.log("BrickBreaker removed from render loop");
 		}
+		this.player.disableInput();
 	}
 
 	private update(): void {

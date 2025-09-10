@@ -16,6 +16,9 @@ import { createCamera, createBaseMeshes, createInstanceManagers } from "./utils/
 import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
 import Router from "../spa/Router";
 import type { userinterface } from './utils/proto/message.js';
+import { BallComponent } from "./components/BallComponent.js";
+import { Entity } from "./ecs/Entity.js";
+import { Ball } from "../brickbreaker/Ball.js";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
@@ -154,6 +157,7 @@ export class Pong {
 		console.log("start");
 		//this.engine = new Engine(this.canvas, true);
 		//engine = this.engine;
+		this.inputManager.enable();
 		this.pongRoot.setEnabled(true);
 		// this.stateManager.set_ecs(this.ecs);
 		this.stateManager.setter(true);
@@ -173,7 +177,13 @@ export class Pong {
 		// if (this.uiSystem) {
 		// 	this.uiSystem.disableUI();
 		// }
-
+		const ballEntity = this.ecs.entitiesWith(BallComponent)[0] as Entity;
+		const ballComp = ballEntity.getComponent(BallComponent) as BallComponent;
+		ballComp.velocity.x = 0;
+		ballComp.velocity.z = 0;
+		ballComp.position.x = 0;
+		ballComp.position.z = 0;
+		this.inputManager.disable();
 
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);

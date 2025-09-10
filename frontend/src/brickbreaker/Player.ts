@@ -21,6 +21,11 @@ export class Player {
 
 	private keysPressed: Set<string> = new Set();
 	private pointer: Vector2;
+	private inputActive: boolean = false;
+
+	private keydownHandler: (e: KeyboardEvent) => void;
+	private keyupHandler: (e: KeyboardEvent) => void;
+	private pointerHandler: (e: PointerEvent) => void;
 
 	private scene: Scene;
 
@@ -53,14 +58,27 @@ export class Player {
 
 		this.spawnShield();
 
-		window.addEventListener("keydown", (e) => {
+		this.keydownHandler = (e: KeyboardEvent) => {
 			this.keysPressed.add(e.code);
-		});
-		window.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
-		window.addEventListener("pointermove", (e) => {
+		}
+
+		this.keyupHandler = (e: KeyboardEvent) => {
+			this.keysPressed.delete(e.code);
+		}
+
+		this.pointerHandler = (e: PointerEvent) => {
 			this.pointer.x = e.clientX;
 			this.pointer.y = e.clientY;
-		});
+		}
+
+		// window.addEventListener("keydown", (e) => {
+		// 	this.keysPressed.add(e.code);
+		// });
+		// window.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
+		// window.addEventListener("pointermove", (e) => {
+		// 	this.pointer.x = e.clientX;
+		// 	this.pointer.y = e.clientY;
+		// });
 
 		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
 		this.pointerSurface.parent = game.root;
@@ -125,6 +143,24 @@ export class Player {
 		});
 		this.shieldMat.alpha = this.alpha;
 		this.shield.material = this.shieldMat;
+	}
+
+	enableInput(){
+		if (!this.inputActive){
+			window.addEventListener("keydown", this.keydownHandler);
+			window.addEventListener("keyup", this.keyupHandler);
+			window.addEventListener("pointermove", this.pointerHandler);
+			this.inputActive = true;
+		}
+	}
+
+	disableInput(){
+		if (this.inputActive){
+			window.removeEventListener("keydown", this.keydownHandler);
+			window.removeEventListener("keyup", this.keyupHandler);
+			window.removeEventListener("pointermove", this.pointerHandler);
+			this.inputActive = false;
+		}
 	}
 
 	public die(): void {
