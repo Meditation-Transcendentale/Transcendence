@@ -72,7 +72,7 @@ export class Monolith {
 			enableShaderAnimation: false,
 			animationSpeed: 1.0,
 			animationIntensity: 0.1,
-			qualityMode: 'medium',
+			qualityMode: 'low',
 			surfaceOnly: true,
 			mergeTolerance: 0.001,
 			...options
@@ -688,6 +688,8 @@ export class Monolith {
 
 		this.depthMaterial.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
 		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.)
+		if (this.text)
+			this.text.update();
 
 
 	}

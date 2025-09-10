@@ -1,4 +1,4 @@
-import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4, Observer, TransformNode } from "@babylonImport";
+import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4, Observer, TransformNode, FreeCamera } from "@babylonImport";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
 import earcut from "earcut";
@@ -10,7 +10,7 @@ let engine: any;
 export class BrickBreaker {
 	private engine: Engine;
 	private scene: Scene;
-	private camera: ArcRotateCamera;
+	private camera: FreeCamera;
 	private canvas: HTMLCanvasElement;
 	private bricks: Mesh[][];
 	private player: Player;
@@ -22,6 +22,10 @@ export class BrickBreaker {
 	private cols: number;
 	private layers: number;
 	public root: TransformNode;
+	private id: number = 0;
+	private start1: boolean = true;
+
+
 
 	constructor(canvas: HTMLCanvasElement, scene: Scene) {
 		this.canvas = canvas;
@@ -38,9 +42,8 @@ export class BrickBreaker {
 		//this.setupLight();
 		this.createArena();
 
-		this.camera = this.scene.getCameraByName("brick") as ArcRotateCamera;
+		this.camera = this.scene.getCameraByName("fieldCamera") as FreeCamera;
 		//this.camera.attachControl(this.canvas, true);
-		this.camera.parent = this.root
 		this.layers = Math.ceil((Math.random() * 5) + 1);
 		// this.layers = 2;
 		this.cols = Math.ceil((Math.random() * 5) + 1);
@@ -65,33 +68,51 @@ export class BrickBreaker {
 		}
 
 
+		this.camera.parent = this.root
 		this.lastTime = performance.now();
-
-		this.renderObserver = this.scene.onBeforeRenderObservable.add(() => {
-			this.update();
-		});
+		this.start1 = true;
+		this.update();
+		//this.renderObserver = this.scene.onBeforeRenderObservable.add(() => {
+		//	this.update();
+		//});
 		this.player.enableInput();
 
 		console.log("BrickBreaker added to render loop");
 	}
-
-	public stop(): void {
-		if (this.renderObserver) {
-			this.scene.onBeforeRenderObservable.remove(this.renderObserver);
-			this.renderObserver = null;
-			console.log("BrickBreaker removed from render loop");
-		}
-		this.player.disableInput();
-	}
-
-	private update(): void {
+	public update(): void {
 		const currentTime = performance.now();
 		const delta = (currentTime - this.lastTime) / 1000;
 		this.lastTime = currentTime;
 
 		this.player.update();
 		this.ball.update(delta, this.player, this.cols, this.layers, this.bricks);
+
+		this.id = requestAnimationFrame(() => this.update());
+		if (!this.start1) {
+			cancelAnimationFrame(this.id);
+		}
 	}
+
+
+	public stop(): void {
+		//if (this.renderObserver) {
+		//	this.scene.onBeforeRenderObservable.remove(this.renderObserver);
+		//	this.renderObserver = null;
+		//	console.log("BrickBreaker removed from render loop");
+		//}
+		this.camera.parent = null;
+		this.start1 = false;
+		this.player.disableInput();
+	}
+
+	//private update(): void {
+	//	const currentTime = performance.now();
+	//	const delta = (currentTime - this.lastTime) / 1000;
+	//	this.lastTime = currentTime;
+	//
+	//	this.player.update();
+	//	this.ball.update(delta, this.player, this.cols, this.layers, this.bricks);
+	//}
 
 	public reset(): void {
 		this.ball.updatePosition(0, 1);

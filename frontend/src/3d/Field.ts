@@ -63,6 +63,7 @@ export class Field {
 	private rtRatio = 1;
 
 	public fieldDepth = 0;
+	private active: Boolean;
 
 	private depthRender: DepthRenderer;
 
@@ -72,6 +73,7 @@ export class Field {
 		this.cursorMonolith = new Vector3();
 		this.cursorButterfly = new Vector3();
 		this.cursorWater = new Vector3();
+		this.active = true;
 
 		this.sun = new Sun(this.scene);
 		this.grass = new Grass(this.scene, 20, this.cursor);
@@ -136,17 +138,6 @@ export class Field {
 		//this.scene.customRenderTargets.push(this.rt);
 		let monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
 
-		//<<<<<<< HEAD
-		//		this.monolith.enableShaderAnimation(true);
-		//		this.monolith.setAnimationSpeed(4.);
-		//		this.monolith.setAnimationIntensity(0.05);
-		//		//monolith.getPerformanceReport();
-		//
-		//		// In render loop - minimal CPU work!
-		//		// scene.registerBeforeRender(() => {
-		//		// 	this.monolith.update(performance.now(), this.camera);
-		//		// });
-		//=======
 		monolith.enableShaderAnimation(true);
 		monolith.setAnimationSpeed(4.);
 		monolith.setAnimationIntensity(0.5);
@@ -157,13 +148,6 @@ export class Field {
 		monolith.setTextFace('join', 'left');
 		monolith.setTextFace('play', 'front');
 		this.monolith = monolith;
-		//monolith.showText("TEST");
-		//monolith.material.debugUniforms();
-
-		//scene.registerBeforeRender(() => {
-		//	monolith.update(performance.now(), this.camera);
-		//});
-
 
 		this.water = new Water(this.scene, this.camera, this.cursor);
 		this.pipeline = new Pipeline(this.scene, this.camera, this.depthRender.getDepthMap(), this.water.rtB, this.water.rtC);
@@ -227,7 +211,8 @@ export class Field {
 	public update(time: number, deltaTime: number) {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
-		this.monolith.update(time, this.camera);
+		if (this.active)
+			this.monolith.update(time, this.camera);
 		this.pipeline.update(time);
 		this.water.update(time, 0.0041);
 	}
@@ -238,11 +223,11 @@ export class Field {
 	}
 
 	public setEnable(status: boolean) {
-		if (status) {
-			this.camera.attachControl();
-		} else {
-			this.camera.detachControl();
-		}
+		//if (status) {
+		//	this.camera.attachControl();
+		//} else {
+		//	this.camera.detachControl();
+		//}
 
 		this.pipeline.setEnable(status);
 	}
@@ -258,11 +243,15 @@ export class Field {
 			case 'play': {
 				this.camera.position.set(-13, 4, -7);
 				this.camera.setTarget(new Vector3(20, 11, -8));
+				//this.setEnable(true);
 				break;
 			}
 			case 'home': {
 				this.camera.position.set(0, 5, 15);
 				this.camera.setTarget(new Vector3(0, 7, 0));
+				this.active = true;
+				this.setEnable(true);
+				//this.setEnable(true);
 				//Interpolator.addElem({
 				//	start: this.camera.position,
 				//	end: new Vector3(0, 2, 10),
@@ -286,6 +275,7 @@ export class Field {
 			case 'login': {
 				this.camera.position.set(0, 4, 40);
 				this.camera.setTarget(new Vector3(0, 6, 30));
+				this.setEnable(true);
 				break;
 			}
 			case 'register': {
@@ -306,11 +296,17 @@ export class Field {
 				break;
 			}
 			case 'game': {
-				this.scene.activeCamera = this.scene.getCameraByName("pong");
+				this.camera.position.set(0, 50, 0);
+				this.camera.setTarget(new Vector3(0, 0, 0));
+				this.active = false;
+				this.setEnable(false);
 				break;
 			}
 			case 'brick': {
-				this.scene.activeCamera = this.scene.getCameraByName("brick");
+				//this.scene.activeCamera = this.scene.getCameraByName("brick");
+				this.camera.position.set(0, 30, 0);
+				this.camera.setTarget(new Vector3(0, 0, 0));
+				this.setEnable(false);
 				break;
 			}
 			case 'exemple1': {
