@@ -2,6 +2,7 @@ import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, Mes
 import { Ball } from "./Ball";
 import { Player } from "./Player";
 import earcut from "earcut";
+import GameUI from "../spa/GameUI";
 
 let resizeTimeout: number;
 let engine: any;
@@ -47,7 +48,7 @@ export class BrickBreaker {
 
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
-		ballMaterial.specularColor.set(0,0,0);
+		ballMaterial.specularColor.set(0, 0, 0);
 		this.ball = new Ball(this.scene, ballMaterial, this.root, this.layers * this.cols, this);
 		this.player = new Player(this.scene, new Vector3(0, 1, 0), this);
 
@@ -62,6 +63,7 @@ export class BrickBreaker {
 			console.warn("BrickBreaker is already running");
 			return;
 		}
+
 
 		this.lastTime = performance.now();
 

@@ -76,7 +76,6 @@ export default class Play {
 	private gameIP = window.location.hostname;
 	constructor(div: HTMLDivElement) {
 		this.div = div;
-		console.log(div.id);
 
 		this.css = div.querySelector("link") as HTMLLinkElement;
 		this.ref = {
