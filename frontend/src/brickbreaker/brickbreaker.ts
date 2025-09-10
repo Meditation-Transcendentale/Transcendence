@@ -67,6 +67,18 @@ export class BrickBreaker {
 			return;
 		}
 
+		if (this.bricks.length > 0){
+			this.bricks.forEach(layer => {
+				layer.forEach(brick => {
+					brick.setEnabled(false);
+				});
+			});
+		}
+		this.layers = Math.ceil((Math.random() * 5) + 1);
+		this.cols = Math.ceil((Math.random() * 5) + 1);
+		this.ball.bricksLeft = this.layers * this.cols;
+		console.log("bricks :::: ", this.ball.bricksLeft);
+		this.bricks = this.generateBricks(10, this.layers, this.cols);
 
 		this.camera.parent = this.root
 		this.lastTime = performance.now();
@@ -79,7 +91,20 @@ export class BrickBreaker {
 
 		console.log("BrickBreaker added to render loop");
 	}
-	public update(): void {
+
+
+	public stop(): void {
+		if (this.renderObserver) {
+			this.scene.onBeforeRenderObservable.remove(this.renderObserver);
+			this.renderObserver = null;
+			console.log("BrickBreaker removed from render loop");
+		}
+		this.player.disableInput();
+		this.reset();
+	}
+
+	private update(): void {
+
 		const currentTime = performance.now();
 		const delta = (currentTime - this.lastTime) / 1000;
 		this.lastTime = currentTime;
@@ -115,10 +140,12 @@ export class BrickBreaker {
 	//}
 
 	public reset(): void {
-		this.ball.updatePosition(0, 1);
-		this.ball.setVelocity(new Vector3(0, 0, 0));
+		console.log("reset BrickBreaker");
+		// this.ball.updatePosition(0, 1);
+		// this.ball.setVelocity(new Vector3(0, 0, 0));
+		this.ball.reset();
+		this.player.reset();
 		this.lastTime = performance.now();
-
 	}
 
 	private setupCamera() {
