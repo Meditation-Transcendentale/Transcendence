@@ -259,8 +259,8 @@ export default class Play {
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 			this.returnButton();
-			this.createOption(true);
-			Router.nav("/brick")
+			//this.createOption(true);
+			Router.nav("/brick", false, true)
 		})
 
 		//this.ref.pongMode.addEventListener("click", () => {

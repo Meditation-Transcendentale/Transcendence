@@ -155,6 +155,7 @@ export class Field {
 		monolith.addText('join', "JOIN", -1.9, 5.5, 0., 2.0);
 		monolith.setTextFace('create', 'left');
 		monolith.setTextFace('join', 'left');
+		monolith.setTextFace('play', 'front');
 		this.monolith = monolith;
 		//monolith.showText("TEST");
 		//monolith.material.debugUniforms();
