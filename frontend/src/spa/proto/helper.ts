@@ -205,3 +205,20 @@ export function decodeTournamentServerMessage(
 ): tournament.TournamentServerMessage {
     return Proto.tournament.TournamentServerMessage.decode(buffer);
 }
+
+export function encodeTournamentClientMessage(
+    payload: tournament.ITournamentClientMessage
+): Uint8Array {
+    const err = Proto.tournament.TournamentClientMessage.verify(payload);
+    if (err) throw new Error(err);
+    return Proto.tournament.TournamentClientMessage
+        .encode(Proto.tournament.TournamentClientMessage.create(payload))
+        .finish();
+}
+
+=
+export function decodeTournamentClientMessage(
+    buffer: Uint8Array
+): tournament.TournamentClientMessage {
+    return Proto.tournament.TournamentClientMessage.decode(buffer);
+}

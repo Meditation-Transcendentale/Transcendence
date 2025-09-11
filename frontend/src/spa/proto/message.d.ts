@@ -3569,148 +3569,6 @@ export namespace notif {
 /** Namespace tournament. */
 export namespace tournament {
 
-    /** Properties of a MatchNode. */
-    interface IMatchNode {
-
-        /** MatchNode player1Uuid */
-        player1Uuid?: (string|null);
-
-        /** MatchNode player2Uuid */
-        player2Uuid?: (string|null);
-
-        /** MatchNode score */
-        score?: (number[]|null);
-
-        /** MatchNode gameId */
-        gameId?: (string|null);
-
-        /** MatchNode parent */
-        parent?: (tournament.IMatchNode|null);
-
-        /** MatchNode leftChild */
-        leftChild?: (tournament.IMatchNode|null);
-
-        /** MatchNode rightChild */
-        rightChild?: (tournament.IMatchNode|null);
-    }
-
-    /** Represents a MatchNode. */
-    class MatchNode implements IMatchNode {
-
-        /**
-         * Constructs a new MatchNode.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: tournament.IMatchNode);
-
-        /** MatchNode player1Uuid. */
-        public player1Uuid: string;
-
-        /** MatchNode player2Uuid. */
-        public player2Uuid: string;
-
-        /** MatchNode score. */
-        public score: number[];
-
-        /** MatchNode gameId. */
-        public gameId: string;
-
-        /** MatchNode parent. */
-        public parent?: (tournament.IMatchNode|null);
-
-        /** MatchNode leftChild. */
-        public leftChild?: (tournament.IMatchNode|null);
-
-        /** MatchNode rightChild. */
-        public rightChild?: (tournament.IMatchNode|null);
-
-        /** MatchNode _parent. */
-        public _parent?: "parent";
-
-        /** MatchNode _leftChild. */
-        public _leftChild?: "leftChild";
-
-        /** MatchNode _rightChild. */
-        public _rightChild?: "rightChild";
-
-        /**
-         * Creates a new MatchNode instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns MatchNode instance
-         */
-        public static create(properties?: tournament.IMatchNode): tournament.MatchNode;
-
-        /**
-         * Encodes the specified MatchNode message. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
-         * @param message MatchNode message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: tournament.IMatchNode, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified MatchNode message, length delimited. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
-         * @param message MatchNode message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: tournament.IMatchNode, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a MatchNode message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns MatchNode
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.MatchNode;
-
-        /**
-         * Decodes a MatchNode message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns MatchNode
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.MatchNode;
-
-        /**
-         * Verifies a MatchNode message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a MatchNode message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns MatchNode
-         */
-        public static fromObject(object: { [k: string]: any }): tournament.MatchNode;
-
-        /**
-         * Creates a plain object from a MatchNode message. Also converts values to other types if specified.
-         * @param message MatchNode
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: tournament.MatchNode, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this MatchNode to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for MatchNode
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
     /** Properties of a Player. */
     interface IPlayer {
 
@@ -3832,14 +3690,156 @@ export namespace tournament {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    /** Properties of a MatchNode. */
+    interface IMatchNode {
+
+        /** MatchNode player1 */
+        player1?: (tournament.IPlayer|null);
+
+        /** MatchNode player2 */
+        player2?: (tournament.IPlayer|null);
+
+        /** MatchNode score */
+        score?: (number[]|null);
+
+        /** MatchNode gameId */
+        gameId?: (string|null);
+
+        /** MatchNode parent */
+        parent?: (tournament.IMatchNode|null);
+
+        /** MatchNode leftChild */
+        leftChild?: (tournament.IMatchNode|null);
+
+        /** MatchNode rightChild */
+        rightChild?: (tournament.IMatchNode|null);
+
+        /** MatchNode winner */
+        winner?: (tournament.IPlayer|null);
+    }
+
+    /** Represents a MatchNode. */
+    class MatchNode implements IMatchNode {
+
+        /**
+         * Constructs a new MatchNode.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.IMatchNode);
+
+        /** MatchNode player1. */
+        public player1?: (tournament.IPlayer|null);
+
+        /** MatchNode player2. */
+        public player2?: (tournament.IPlayer|null);
+
+        /** MatchNode score. */
+        public score: number[];
+
+        /** MatchNode gameId. */
+        public gameId: string;
+
+        /** MatchNode parent. */
+        public parent?: (tournament.IMatchNode|null);
+
+        /** MatchNode leftChild. */
+        public leftChild?: (tournament.IMatchNode|null);
+
+        /** MatchNode rightChild. */
+        public rightChild?: (tournament.IMatchNode|null);
+
+        /** MatchNode winner. */
+        public winner?: (tournament.IPlayer|null);
+
+        /** MatchNode _parent. */
+        public _parent?: "parent";
+
+        /** MatchNode _leftChild. */
+        public _leftChild?: "leftChild";
+
+        /** MatchNode _rightChild. */
+        public _rightChild?: "rightChild";
+
+        /**
+         * Creates a new MatchNode instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns MatchNode instance
+         */
+        public static create(properties?: tournament.IMatchNode): tournament.MatchNode;
+
+        /**
+         * Encodes the specified MatchNode message. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
+         * @param message MatchNode message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.IMatchNode, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified MatchNode message, length delimited. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
+         * @param message MatchNode message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.IMatchNode, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a MatchNode message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns MatchNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.MatchNode;
+
+        /**
+         * Decodes a MatchNode message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns MatchNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.MatchNode;
+
+        /**
+         * Verifies a MatchNode message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a MatchNode message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns MatchNode
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.MatchNode;
+
+        /**
+         * Creates a plain object from a MatchNode message. Also converts values to other types if specified.
+         * @param message MatchNode
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.MatchNode, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this MatchNode to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for MatchNode
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     /** Properties of a TournamentUpdateMessage. */
     interface ITournamentUpdateMessage {
-
-        /** TournamentUpdateMessage tournamentId */
-        tournamentId?: (string|null);
-
-        /** TournamentUpdateMessage players */
-        players?: (tournament.IPlayer[]|null);
 
         /** TournamentUpdateMessage tournamentRoot */
         tournamentRoot?: (tournament.IMatchNode|null);
@@ -3853,12 +3853,6 @@ export namespace tournament {
          * @param [properties] Properties to set
          */
         constructor(properties?: tournament.ITournamentUpdateMessage);
-
-        /** TournamentUpdateMessage tournamentId. */
-        public tournamentId: string;
-
-        /** TournamentUpdateMessage players. */
-        public players: tournament.IPlayer[];
 
         /** TournamentUpdateMessage tournamentRoot. */
         public tournamentRoot?: (tournament.IMatchNode|null);
@@ -3943,9 +3937,6 @@ export namespace tournament {
 
     /** Properties of a TournamentClientReadyMessage. */
     interface ITournamentClientReadyMessage {
-
-        /** TournamentClientReadyMessage tournamentId */
-        tournamentId?: (string|null);
     }
 
     /** Represents a TournamentClientReadyMessage. */
@@ -3956,9 +3947,6 @@ export namespace tournament {
          * @param [properties] Properties to set
          */
         constructor(properties?: tournament.ITournamentClientReadyMessage);
-
-        /** TournamentClientReadyMessage tournamentId. */
-        public tournamentId: string;
 
         /**
          * Creates a new TournamentClientReadyMessage instance using the specified properties.
@@ -4040,9 +4028,6 @@ export namespace tournament {
 
     /** Properties of a TournamentReadyCheckMessage. */
     interface ITournamentReadyCheckMessage {
-
-        /** TournamentReadyCheckMessage tournamentRoot */
-        tournamentRoot?: (tournament.IMatchNode|null);
     }
 
     /** Represents a TournamentReadyCheckMessage. */
@@ -4053,9 +4038,6 @@ export namespace tournament {
          * @param [properties] Properties to set
          */
         constructor(properties?: tournament.ITournamentReadyCheckMessage);
-
-        /** TournamentReadyCheckMessage tournamentRoot. */
-        public tournamentRoot?: (tournament.IMatchNode|null);
 
         /**
          * Creates a new TournamentReadyCheckMessage instance using the specified properties.

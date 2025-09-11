@@ -5,15 +5,6 @@ package tournament;
 import "google/protobuf/empty.proto";
 import "shared.proto";
 
-message MatchNode {
-    string player1Uuid = 1;
-    string player2Uuid = 2;
-    repeated int32 score = 3;
-    string gameId = 4;
-    optional MatchNode parent = 5;
-    optional MatchNode left_child = 6;
-    optional MatchNode right_child = 7;   
-}
 
 message Player {
   string uuid  = 1;
@@ -23,18 +14,25 @@ message Player {
   bool inGame = 5;
 }
 
+message MatchNode {
+    Player player1 = 1;
+    Player player2 = 2;
+    repeated int32 score = 3;
+    string gameId = 4;
+    optional MatchNode parent = 5;
+    optional MatchNode left_child = 6;
+    optional MatchNode right_child = 7;
+    Player winner = 8;
+}
+
 message TournamentUpdateMessage {
-    string tournamentId = 1;
-    repeated Player players = 2;
-    MatchNode tournamentRoot = 3;
+    MatchNode tournamentRoot = 1;
 }
 
 message TournamentClientReadyMessage {
-    string tournamentId = 1;
 }
 
 message TournamentReadyCheckMessage {
-    MatchNode tournamentRoot = 2;
 }
 
 message TournamentFinishedMessage {

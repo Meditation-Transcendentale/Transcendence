@@ -8736,442 +8736,6 @@ export const tournament = $root.tournament = (() => {
      */
     const tournament = {};
 
-    tournament.MatchNode = (function() {
-
-        /**
-         * Properties of a MatchNode.
-         * @memberof tournament
-         * @interface IMatchNode
-         * @property {string|null} [player1Uuid] MatchNode player1Uuid
-         * @property {string|null} [player2Uuid] MatchNode player2Uuid
-         * @property {Array.<number>|null} [score] MatchNode score
-         * @property {string|null} [gameId] MatchNode gameId
-         * @property {tournament.IMatchNode|null} [parent] MatchNode parent
-         * @property {tournament.IMatchNode|null} [leftChild] MatchNode leftChild
-         * @property {tournament.IMatchNode|null} [rightChild] MatchNode rightChild
-         */
-
-        /**
-         * Constructs a new MatchNode.
-         * @memberof tournament
-         * @classdesc Represents a MatchNode.
-         * @implements IMatchNode
-         * @constructor
-         * @param {tournament.IMatchNode=} [properties] Properties to set
-         */
-        function MatchNode(properties) {
-            this.score = [];
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * MatchNode player1Uuid.
-         * @member {string} player1Uuid
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        MatchNode.prototype.player1Uuid = "";
-
-        /**
-         * MatchNode player2Uuid.
-         * @member {string} player2Uuid
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        MatchNode.prototype.player2Uuid = "";
-
-        /**
-         * MatchNode score.
-         * @member {Array.<number>} score
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        MatchNode.prototype.score = $util.emptyArray;
-
-        /**
-         * MatchNode gameId.
-         * @member {string} gameId
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        MatchNode.prototype.gameId = "";
-
-        /**
-         * MatchNode parent.
-         * @member {tournament.IMatchNode|null|undefined} parent
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        MatchNode.prototype.parent = null;
-
-        /**
-         * MatchNode leftChild.
-         * @member {tournament.IMatchNode|null|undefined} leftChild
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        MatchNode.prototype.leftChild = null;
-
-        /**
-         * MatchNode rightChild.
-         * @member {tournament.IMatchNode|null|undefined} rightChild
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        MatchNode.prototype.rightChild = null;
-
-        // OneOf field names bound to virtual getters and setters
-        let $oneOfFields;
-
-        /**
-         * MatchNode _parent.
-         * @member {"parent"|undefined} _parent
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        Object.defineProperty(MatchNode.prototype, "_parent", {
-            get: $util.oneOfGetter($oneOfFields = ["parent"]),
-            set: $util.oneOfSetter($oneOfFields)
-        });
-
-        /**
-         * MatchNode _leftChild.
-         * @member {"leftChild"|undefined} _leftChild
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        Object.defineProperty(MatchNode.prototype, "_leftChild", {
-            get: $util.oneOfGetter($oneOfFields = ["leftChild"]),
-            set: $util.oneOfSetter($oneOfFields)
-        });
-
-        /**
-         * MatchNode _rightChild.
-         * @member {"rightChild"|undefined} _rightChild
-         * @memberof tournament.MatchNode
-         * @instance
-         */
-        Object.defineProperty(MatchNode.prototype, "_rightChild", {
-            get: $util.oneOfGetter($oneOfFields = ["rightChild"]),
-            set: $util.oneOfSetter($oneOfFields)
-        });
-
-        /**
-         * Creates a new MatchNode instance using the specified properties.
-         * @function create
-         * @memberof tournament.MatchNode
-         * @static
-         * @param {tournament.IMatchNode=} [properties] Properties to set
-         * @returns {tournament.MatchNode} MatchNode instance
-         */
-        MatchNode.create = function create(properties) {
-            return new MatchNode(properties);
-        };
-
-        /**
-         * Encodes the specified MatchNode message. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
-         * @function encode
-         * @memberof tournament.MatchNode
-         * @static
-         * @param {tournament.IMatchNode} message MatchNode message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        MatchNode.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.player1Uuid != null && Object.hasOwnProperty.call(message, "player1Uuid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.player1Uuid);
-            if (message.player2Uuid != null && Object.hasOwnProperty.call(message, "player2Uuid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.player2Uuid);
-            if (message.score != null && message.score.length) {
-                writer.uint32(/* id 3, wireType 2 =*/26).fork();
-                for (let i = 0; i < message.score.length; ++i)
-                    writer.int32(message.score[i]);
-                writer.ldelim();
-            }
-            if (message.gameId != null && Object.hasOwnProperty.call(message, "gameId"))
-                writer.uint32(/* id 4, wireType 2 =*/34).string(message.gameId);
-            if (message.parent != null && Object.hasOwnProperty.call(message, "parent"))
-                $root.tournament.MatchNode.encode(message.parent, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-            if (message.leftChild != null && Object.hasOwnProperty.call(message, "leftChild"))
-                $root.tournament.MatchNode.encode(message.leftChild, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
-            if (message.rightChild != null && Object.hasOwnProperty.call(message, "rightChild"))
-                $root.tournament.MatchNode.encode(message.rightChild, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified MatchNode message, length delimited. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof tournament.MatchNode
-         * @static
-         * @param {tournament.IMatchNode} message MatchNode message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        MatchNode.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a MatchNode message from the specified reader or buffer.
-         * @function decode
-         * @memberof tournament.MatchNode
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {tournament.MatchNode} MatchNode
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        MatchNode.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.MatchNode();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.player1Uuid = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.player2Uuid = reader.string();
-                        break;
-                    }
-                case 3: {
-                        if (!(message.score && message.score.length))
-                            message.score = [];
-                        if ((tag & 7) === 2) {
-                            let end2 = reader.uint32() + reader.pos;
-                            while (reader.pos < end2)
-                                message.score.push(reader.int32());
-                        } else
-                            message.score.push(reader.int32());
-                        break;
-                    }
-                case 4: {
-                        message.gameId = reader.string();
-                        break;
-                    }
-                case 5: {
-                        message.parent = $root.tournament.MatchNode.decode(reader, reader.uint32());
-                        break;
-                    }
-                case 6: {
-                        message.leftChild = $root.tournament.MatchNode.decode(reader, reader.uint32());
-                        break;
-                    }
-                case 7: {
-                        message.rightChild = $root.tournament.MatchNode.decode(reader, reader.uint32());
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a MatchNode message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof tournament.MatchNode
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {tournament.MatchNode} MatchNode
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        MatchNode.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a MatchNode message.
-         * @function verify
-         * @memberof tournament.MatchNode
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        MatchNode.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            let properties = {};
-            if (message.player1Uuid != null && message.hasOwnProperty("player1Uuid"))
-                if (!$util.isString(message.player1Uuid))
-                    return "player1Uuid: string expected";
-            if (message.player2Uuid != null && message.hasOwnProperty("player2Uuid"))
-                if (!$util.isString(message.player2Uuid))
-                    return "player2Uuid: string expected";
-            if (message.score != null && message.hasOwnProperty("score")) {
-                if (!Array.isArray(message.score))
-                    return "score: array expected";
-                for (let i = 0; i < message.score.length; ++i)
-                    if (!$util.isInteger(message.score[i]))
-                        return "score: integer[] expected";
-            }
-            if (message.gameId != null && message.hasOwnProperty("gameId"))
-                if (!$util.isString(message.gameId))
-                    return "gameId: string expected";
-            if (message.parent != null && message.hasOwnProperty("parent")) {
-                properties._parent = 1;
-                {
-                    let error = $root.tournament.MatchNode.verify(message.parent);
-                    if (error)
-                        return "parent." + error;
-                }
-            }
-            if (message.leftChild != null && message.hasOwnProperty("leftChild")) {
-                properties._leftChild = 1;
-                {
-                    let error = $root.tournament.MatchNode.verify(message.leftChild);
-                    if (error)
-                        return "leftChild." + error;
-                }
-            }
-            if (message.rightChild != null && message.hasOwnProperty("rightChild")) {
-                properties._rightChild = 1;
-                {
-                    let error = $root.tournament.MatchNode.verify(message.rightChild);
-                    if (error)
-                        return "rightChild." + error;
-                }
-            }
-            return null;
-        };
-
-        /**
-         * Creates a MatchNode message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof tournament.MatchNode
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {tournament.MatchNode} MatchNode
-         */
-        MatchNode.fromObject = function fromObject(object) {
-            if (object instanceof $root.tournament.MatchNode)
-                return object;
-            let message = new $root.tournament.MatchNode();
-            if (object.player1Uuid != null)
-                message.player1Uuid = String(object.player1Uuid);
-            if (object.player2Uuid != null)
-                message.player2Uuid = String(object.player2Uuid);
-            if (object.score) {
-                if (!Array.isArray(object.score))
-                    throw TypeError(".tournament.MatchNode.score: array expected");
-                message.score = [];
-                for (let i = 0; i < object.score.length; ++i)
-                    message.score[i] = object.score[i] | 0;
-            }
-            if (object.gameId != null)
-                message.gameId = String(object.gameId);
-            if (object.parent != null) {
-                if (typeof object.parent !== "object")
-                    throw TypeError(".tournament.MatchNode.parent: object expected");
-                message.parent = $root.tournament.MatchNode.fromObject(object.parent);
-            }
-            if (object.leftChild != null) {
-                if (typeof object.leftChild !== "object")
-                    throw TypeError(".tournament.MatchNode.leftChild: object expected");
-                message.leftChild = $root.tournament.MatchNode.fromObject(object.leftChild);
-            }
-            if (object.rightChild != null) {
-                if (typeof object.rightChild !== "object")
-                    throw TypeError(".tournament.MatchNode.rightChild: object expected");
-                message.rightChild = $root.tournament.MatchNode.fromObject(object.rightChild);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a MatchNode message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof tournament.MatchNode
-         * @static
-         * @param {tournament.MatchNode} message MatchNode
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        MatchNode.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (options.arrays || options.defaults)
-                object.score = [];
-            if (options.defaults) {
-                object.player1Uuid = "";
-                object.player2Uuid = "";
-                object.gameId = "";
-            }
-            if (message.player1Uuid != null && message.hasOwnProperty("player1Uuid"))
-                object.player1Uuid = message.player1Uuid;
-            if (message.player2Uuid != null && message.hasOwnProperty("player2Uuid"))
-                object.player2Uuid = message.player2Uuid;
-            if (message.score && message.score.length) {
-                object.score = [];
-                for (let j = 0; j < message.score.length; ++j)
-                    object.score[j] = message.score[j];
-            }
-            if (message.gameId != null && message.hasOwnProperty("gameId"))
-                object.gameId = message.gameId;
-            if (message.parent != null && message.hasOwnProperty("parent")) {
-                object.parent = $root.tournament.MatchNode.toObject(message.parent, options);
-                if (options.oneofs)
-                    object._parent = "parent";
-            }
-            if (message.leftChild != null && message.hasOwnProperty("leftChild")) {
-                object.leftChild = $root.tournament.MatchNode.toObject(message.leftChild, options);
-                if (options.oneofs)
-                    object._leftChild = "leftChild";
-            }
-            if (message.rightChild != null && message.hasOwnProperty("rightChild")) {
-                object.rightChild = $root.tournament.MatchNode.toObject(message.rightChild, options);
-                if (options.oneofs)
-                    object._rightChild = "rightChild";
-            }
-            return object;
-        };
-
-        /**
-         * Converts this MatchNode to JSON.
-         * @function toJSON
-         * @memberof tournament.MatchNode
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        MatchNode.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for MatchNode
-         * @function getTypeUrl
-         * @memberof tournament.MatchNode
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        MatchNode.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/tournament.MatchNode";
-        };
-
-        return MatchNode;
-    })();
-
     tournament.Player = (function() {
 
         /**
@@ -9470,14 +9034,486 @@ export const tournament = $root.tournament = (() => {
         return Player;
     })();
 
+    tournament.MatchNode = (function() {
+
+        /**
+         * Properties of a MatchNode.
+         * @memberof tournament
+         * @interface IMatchNode
+         * @property {tournament.IPlayer|null} [player1] MatchNode player1
+         * @property {tournament.IPlayer|null} [player2] MatchNode player2
+         * @property {Array.<number>|null} [score] MatchNode score
+         * @property {string|null} [gameId] MatchNode gameId
+         * @property {tournament.IMatchNode|null} [parent] MatchNode parent
+         * @property {tournament.IMatchNode|null} [leftChild] MatchNode leftChild
+         * @property {tournament.IMatchNode|null} [rightChild] MatchNode rightChild
+         * @property {tournament.IPlayer|null} [winner] MatchNode winner
+         */
+
+        /**
+         * Constructs a new MatchNode.
+         * @memberof tournament
+         * @classdesc Represents a MatchNode.
+         * @implements IMatchNode
+         * @constructor
+         * @param {tournament.IMatchNode=} [properties] Properties to set
+         */
+        function MatchNode(properties) {
+            this.score = [];
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * MatchNode player1.
+         * @member {tournament.IPlayer|null|undefined} player1
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.player1 = null;
+
+        /**
+         * MatchNode player2.
+         * @member {tournament.IPlayer|null|undefined} player2
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.player2 = null;
+
+        /**
+         * MatchNode score.
+         * @member {Array.<number>} score
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.score = $util.emptyArray;
+
+        /**
+         * MatchNode gameId.
+         * @member {string} gameId
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.gameId = "";
+
+        /**
+         * MatchNode parent.
+         * @member {tournament.IMatchNode|null|undefined} parent
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.parent = null;
+
+        /**
+         * MatchNode leftChild.
+         * @member {tournament.IMatchNode|null|undefined} leftChild
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.leftChild = null;
+
+        /**
+         * MatchNode rightChild.
+         * @member {tournament.IMatchNode|null|undefined} rightChild
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.rightChild = null;
+
+        /**
+         * MatchNode winner.
+         * @member {tournament.IPlayer|null|undefined} winner
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.winner = null;
+
+        // OneOf field names bound to virtual getters and setters
+        let $oneOfFields;
+
+        /**
+         * MatchNode _parent.
+         * @member {"parent"|undefined} _parent
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        Object.defineProperty(MatchNode.prototype, "_parent", {
+            get: $util.oneOfGetter($oneOfFields = ["parent"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * MatchNode _leftChild.
+         * @member {"leftChild"|undefined} _leftChild
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        Object.defineProperty(MatchNode.prototype, "_leftChild", {
+            get: $util.oneOfGetter($oneOfFields = ["leftChild"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * MatchNode _rightChild.
+         * @member {"rightChild"|undefined} _rightChild
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        Object.defineProperty(MatchNode.prototype, "_rightChild", {
+            get: $util.oneOfGetter($oneOfFields = ["rightChild"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * Creates a new MatchNode instance using the specified properties.
+         * @function create
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {tournament.IMatchNode=} [properties] Properties to set
+         * @returns {tournament.MatchNode} MatchNode instance
+         */
+        MatchNode.create = function create(properties) {
+            return new MatchNode(properties);
+        };
+
+        /**
+         * Encodes the specified MatchNode message. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {tournament.IMatchNode} message MatchNode message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        MatchNode.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.player1 != null && Object.hasOwnProperty.call(message, "player1"))
+                $root.tournament.Player.encode(message.player1, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.player2 != null && Object.hasOwnProperty.call(message, "player2"))
+                $root.tournament.Player.encode(message.player2, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.score != null && message.score.length) {
+                writer.uint32(/* id 3, wireType 2 =*/26).fork();
+                for (let i = 0; i < message.score.length; ++i)
+                    writer.int32(message.score[i]);
+                writer.ldelim();
+            }
+            if (message.gameId != null && Object.hasOwnProperty.call(message, "gameId"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.gameId);
+            if (message.parent != null && Object.hasOwnProperty.call(message, "parent"))
+                $root.tournament.MatchNode.encode(message.parent, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+            if (message.leftChild != null && Object.hasOwnProperty.call(message, "leftChild"))
+                $root.tournament.MatchNode.encode(message.leftChild, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+            if (message.rightChild != null && Object.hasOwnProperty.call(message, "rightChild"))
+                $root.tournament.MatchNode.encode(message.rightChild, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+            if (message.winner != null && Object.hasOwnProperty.call(message, "winner"))
+                $root.tournament.Player.encode(message.winner, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified MatchNode message, length delimited. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {tournament.IMatchNode} message MatchNode message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        MatchNode.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a MatchNode message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.MatchNode} MatchNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        MatchNode.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.MatchNode();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.player1 = $root.tournament.Player.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
+                        message.player2 = $root.tournament.Player.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 3: {
+                        if (!(message.score && message.score.length))
+                            message.score = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.score.push(reader.int32());
+                        } else
+                            message.score.push(reader.int32());
+                        break;
+                    }
+                case 4: {
+                        message.gameId = reader.string();
+                        break;
+                    }
+                case 5: {
+                        message.parent = $root.tournament.MatchNode.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 6: {
+                        message.leftChild = $root.tournament.MatchNode.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 7: {
+                        message.rightChild = $root.tournament.MatchNode.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 8: {
+                        message.winner = $root.tournament.Player.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a MatchNode message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.MatchNode} MatchNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        MatchNode.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a MatchNode message.
+         * @function verify
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        MatchNode.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            let properties = {};
+            if (message.player1 != null && message.hasOwnProperty("player1")) {
+                let error = $root.tournament.Player.verify(message.player1);
+                if (error)
+                    return "player1." + error;
+            }
+            if (message.player2 != null && message.hasOwnProperty("player2")) {
+                let error = $root.tournament.Player.verify(message.player2);
+                if (error)
+                    return "player2." + error;
+            }
+            if (message.score != null && message.hasOwnProperty("score")) {
+                if (!Array.isArray(message.score))
+                    return "score: array expected";
+                for (let i = 0; i < message.score.length; ++i)
+                    if (!$util.isInteger(message.score[i]))
+                        return "score: integer[] expected";
+            }
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                if (!$util.isString(message.gameId))
+                    return "gameId: string expected";
+            if (message.parent != null && message.hasOwnProperty("parent")) {
+                properties._parent = 1;
+                {
+                    let error = $root.tournament.MatchNode.verify(message.parent);
+                    if (error)
+                        return "parent." + error;
+                }
+            }
+            if (message.leftChild != null && message.hasOwnProperty("leftChild")) {
+                properties._leftChild = 1;
+                {
+                    let error = $root.tournament.MatchNode.verify(message.leftChild);
+                    if (error)
+                        return "leftChild." + error;
+                }
+            }
+            if (message.rightChild != null && message.hasOwnProperty("rightChild")) {
+                properties._rightChild = 1;
+                {
+                    let error = $root.tournament.MatchNode.verify(message.rightChild);
+                    if (error)
+                        return "rightChild." + error;
+                }
+            }
+            if (message.winner != null && message.hasOwnProperty("winner")) {
+                let error = $root.tournament.Player.verify(message.winner);
+                if (error)
+                    return "winner." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a MatchNode message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.MatchNode} MatchNode
+         */
+        MatchNode.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.MatchNode)
+                return object;
+            let message = new $root.tournament.MatchNode();
+            if (object.player1 != null) {
+                if (typeof object.player1 !== "object")
+                    throw TypeError(".tournament.MatchNode.player1: object expected");
+                message.player1 = $root.tournament.Player.fromObject(object.player1);
+            }
+            if (object.player2 != null) {
+                if (typeof object.player2 !== "object")
+                    throw TypeError(".tournament.MatchNode.player2: object expected");
+                message.player2 = $root.tournament.Player.fromObject(object.player2);
+            }
+            if (object.score) {
+                if (!Array.isArray(object.score))
+                    throw TypeError(".tournament.MatchNode.score: array expected");
+                message.score = [];
+                for (let i = 0; i < object.score.length; ++i)
+                    message.score[i] = object.score[i] | 0;
+            }
+            if (object.gameId != null)
+                message.gameId = String(object.gameId);
+            if (object.parent != null) {
+                if (typeof object.parent !== "object")
+                    throw TypeError(".tournament.MatchNode.parent: object expected");
+                message.parent = $root.tournament.MatchNode.fromObject(object.parent);
+            }
+            if (object.leftChild != null) {
+                if (typeof object.leftChild !== "object")
+                    throw TypeError(".tournament.MatchNode.leftChild: object expected");
+                message.leftChild = $root.tournament.MatchNode.fromObject(object.leftChild);
+            }
+            if (object.rightChild != null) {
+                if (typeof object.rightChild !== "object")
+                    throw TypeError(".tournament.MatchNode.rightChild: object expected");
+                message.rightChild = $root.tournament.MatchNode.fromObject(object.rightChild);
+            }
+            if (object.winner != null) {
+                if (typeof object.winner !== "object")
+                    throw TypeError(".tournament.MatchNode.winner: object expected");
+                message.winner = $root.tournament.Player.fromObject(object.winner);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a MatchNode message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {tournament.MatchNode} message MatchNode
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        MatchNode.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults)
+                object.score = [];
+            if (options.defaults) {
+                object.player1 = null;
+                object.player2 = null;
+                object.gameId = "";
+                object.winner = null;
+            }
+            if (message.player1 != null && message.hasOwnProperty("player1"))
+                object.player1 = $root.tournament.Player.toObject(message.player1, options);
+            if (message.player2 != null && message.hasOwnProperty("player2"))
+                object.player2 = $root.tournament.Player.toObject(message.player2, options);
+            if (message.score && message.score.length) {
+                object.score = [];
+                for (let j = 0; j < message.score.length; ++j)
+                    object.score[j] = message.score[j];
+            }
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                object.gameId = message.gameId;
+            if (message.parent != null && message.hasOwnProperty("parent")) {
+                object.parent = $root.tournament.MatchNode.toObject(message.parent, options);
+                if (options.oneofs)
+                    object._parent = "parent";
+            }
+            if (message.leftChild != null && message.hasOwnProperty("leftChild")) {
+                object.leftChild = $root.tournament.MatchNode.toObject(message.leftChild, options);
+                if (options.oneofs)
+                    object._leftChild = "leftChild";
+            }
+            if (message.rightChild != null && message.hasOwnProperty("rightChild")) {
+                object.rightChild = $root.tournament.MatchNode.toObject(message.rightChild, options);
+                if (options.oneofs)
+                    object._rightChild = "rightChild";
+            }
+            if (message.winner != null && message.hasOwnProperty("winner"))
+                object.winner = $root.tournament.Player.toObject(message.winner, options);
+            return object;
+        };
+
+        /**
+         * Converts this MatchNode to JSON.
+         * @function toJSON
+         * @memberof tournament.MatchNode
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        MatchNode.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for MatchNode
+         * @function getTypeUrl
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        MatchNode.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.MatchNode";
+        };
+
+        return MatchNode;
+    })();
+
     tournament.TournamentUpdateMessage = (function() {
 
         /**
          * Properties of a TournamentUpdateMessage.
          * @memberof tournament
          * @interface ITournamentUpdateMessage
-         * @property {string|null} [tournamentId] TournamentUpdateMessage tournamentId
-         * @property {Array.<tournament.IPlayer>|null} [players] TournamentUpdateMessage players
          * @property {tournament.IMatchNode|null} [tournamentRoot] TournamentUpdateMessage tournamentRoot
          */
 
@@ -9490,28 +9526,11 @@ export const tournament = $root.tournament = (() => {
          * @param {tournament.ITournamentUpdateMessage=} [properties] Properties to set
          */
         function TournamentUpdateMessage(properties) {
-            this.players = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
-
-        /**
-         * TournamentUpdateMessage tournamentId.
-         * @member {string} tournamentId
-         * @memberof tournament.TournamentUpdateMessage
-         * @instance
-         */
-        TournamentUpdateMessage.prototype.tournamentId = "";
-
-        /**
-         * TournamentUpdateMessage players.
-         * @member {Array.<tournament.IPlayer>} players
-         * @memberof tournament.TournamentUpdateMessage
-         * @instance
-         */
-        TournamentUpdateMessage.prototype.players = $util.emptyArray;
 
         /**
          * TournamentUpdateMessage tournamentRoot.
@@ -9545,13 +9564,8 @@ export const tournament = $root.tournament = (() => {
         TournamentUpdateMessage.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.tournamentId != null && Object.hasOwnProperty.call(message, "tournamentId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.tournamentId);
-            if (message.players != null && message.players.length)
-                for (let i = 0; i < message.players.length; ++i)
-                    $root.tournament.Player.encode(message.players[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             if (message.tournamentRoot != null && Object.hasOwnProperty.call(message, "tournamentRoot"))
-                $root.tournament.MatchNode.encode(message.tournamentRoot, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                $root.tournament.MatchNode.encode(message.tournamentRoot, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
@@ -9589,16 +9603,6 @@ export const tournament = $root.tournament = (() => {
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.tournamentId = reader.string();
-                        break;
-                    }
-                case 2: {
-                        if (!(message.players && message.players.length))
-                            message.players = [];
-                        message.players.push($root.tournament.Player.decode(reader, reader.uint32()));
-                        break;
-                    }
-                case 3: {
                         message.tournamentRoot = $root.tournament.MatchNode.decode(reader, reader.uint32());
                         break;
                     }
@@ -9637,18 +9641,6 @@ export const tournament = $root.tournament = (() => {
         TournamentUpdateMessage.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
-                if (!$util.isString(message.tournamentId))
-                    return "tournamentId: string expected";
-            if (message.players != null && message.hasOwnProperty("players")) {
-                if (!Array.isArray(message.players))
-                    return "players: array expected";
-                for (let i = 0; i < message.players.length; ++i) {
-                    let error = $root.tournament.Player.verify(message.players[i]);
-                    if (error)
-                        return "players." + error;
-                }
-            }
             if (message.tournamentRoot != null && message.hasOwnProperty("tournamentRoot")) {
                 let error = $root.tournament.MatchNode.verify(message.tournamentRoot);
                 if (error)
@@ -9669,18 +9661,6 @@ export const tournament = $root.tournament = (() => {
             if (object instanceof $root.tournament.TournamentUpdateMessage)
                 return object;
             let message = new $root.tournament.TournamentUpdateMessage();
-            if (object.tournamentId != null)
-                message.tournamentId = String(object.tournamentId);
-            if (object.players) {
-                if (!Array.isArray(object.players))
-                    throw TypeError(".tournament.TournamentUpdateMessage.players: array expected");
-                message.players = [];
-                for (let i = 0; i < object.players.length; ++i) {
-                    if (typeof object.players[i] !== "object")
-                        throw TypeError(".tournament.TournamentUpdateMessage.players: object expected");
-                    message.players[i] = $root.tournament.Player.fromObject(object.players[i]);
-                }
-            }
             if (object.tournamentRoot != null) {
                 if (typeof object.tournamentRoot !== "object")
                     throw TypeError(".tournament.TournamentUpdateMessage.tournamentRoot: object expected");
@@ -9702,19 +9682,8 @@ export const tournament = $root.tournament = (() => {
             if (!options)
                 options = {};
             let object = {};
-            if (options.arrays || options.defaults)
-                object.players = [];
-            if (options.defaults) {
-                object.tournamentId = "";
+            if (options.defaults)
                 object.tournamentRoot = null;
-            }
-            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
-                object.tournamentId = message.tournamentId;
-            if (message.players && message.players.length) {
-                object.players = [];
-                for (let j = 0; j < message.players.length; ++j)
-                    object.players[j] = $root.tournament.Player.toObject(message.players[j], options);
-            }
             if (message.tournamentRoot != null && message.hasOwnProperty("tournamentRoot"))
                 object.tournamentRoot = $root.tournament.MatchNode.toObject(message.tournamentRoot, options);
             return object;
@@ -9755,7 +9724,6 @@ export const tournament = $root.tournament = (() => {
          * Properties of a TournamentClientReadyMessage.
          * @memberof tournament
          * @interface ITournamentClientReadyMessage
-         * @property {string|null} [tournamentId] TournamentClientReadyMessage tournamentId
          */
 
         /**
@@ -9772,14 +9740,6 @@ export const tournament = $root.tournament = (() => {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
-
-        /**
-         * TournamentClientReadyMessage tournamentId.
-         * @member {string} tournamentId
-         * @memberof tournament.TournamentClientReadyMessage
-         * @instance
-         */
-        TournamentClientReadyMessage.prototype.tournamentId = "";
 
         /**
          * Creates a new TournamentClientReadyMessage instance using the specified properties.
@@ -9805,8 +9765,6 @@ export const tournament = $root.tournament = (() => {
         TournamentClientReadyMessage.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.tournamentId != null && Object.hasOwnProperty.call(message, "tournamentId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.tournamentId);
             return writer;
         };
 
@@ -9843,10 +9801,6 @@ export const tournament = $root.tournament = (() => {
                 if (tag === error)
                     break;
                 switch (tag >>> 3) {
-                case 1: {
-                        message.tournamentId = reader.string();
-                        break;
-                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -9882,9 +9836,6 @@ export const tournament = $root.tournament = (() => {
         TournamentClientReadyMessage.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
-                if (!$util.isString(message.tournamentId))
-                    return "tournamentId: string expected";
             return null;
         };
 
@@ -9899,10 +9850,7 @@ export const tournament = $root.tournament = (() => {
         TournamentClientReadyMessage.fromObject = function fromObject(object) {
             if (object instanceof $root.tournament.TournamentClientReadyMessage)
                 return object;
-            let message = new $root.tournament.TournamentClientReadyMessage();
-            if (object.tournamentId != null)
-                message.tournamentId = String(object.tournamentId);
-            return message;
+            return new $root.tournament.TournamentClientReadyMessage();
         };
 
         /**
@@ -9914,15 +9862,8 @@ export const tournament = $root.tournament = (() => {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        TournamentClientReadyMessage.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (options.defaults)
-                object.tournamentId = "";
-            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
-                object.tournamentId = message.tournamentId;
-            return object;
+        TournamentClientReadyMessage.toObject = function toObject() {
+            return {};
         };
 
         /**
@@ -9960,7 +9901,6 @@ export const tournament = $root.tournament = (() => {
          * Properties of a TournamentReadyCheckMessage.
          * @memberof tournament
          * @interface ITournamentReadyCheckMessage
-         * @property {tournament.IMatchNode|null} [tournamentRoot] TournamentReadyCheckMessage tournamentRoot
          */
 
         /**
@@ -9977,14 +9917,6 @@ export const tournament = $root.tournament = (() => {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
-
-        /**
-         * TournamentReadyCheckMessage tournamentRoot.
-         * @member {tournament.IMatchNode|null|undefined} tournamentRoot
-         * @memberof tournament.TournamentReadyCheckMessage
-         * @instance
-         */
-        TournamentReadyCheckMessage.prototype.tournamentRoot = null;
 
         /**
          * Creates a new TournamentReadyCheckMessage instance using the specified properties.
@@ -10010,8 +9942,6 @@ export const tournament = $root.tournament = (() => {
         TournamentReadyCheckMessage.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.tournamentRoot != null && Object.hasOwnProperty.call(message, "tournamentRoot"))
-                $root.tournament.MatchNode.encode(message.tournamentRoot, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
 
@@ -10048,10 +9978,6 @@ export const tournament = $root.tournament = (() => {
                 if (tag === error)
                     break;
                 switch (tag >>> 3) {
-                case 2: {
-                        message.tournamentRoot = $root.tournament.MatchNode.decode(reader, reader.uint32());
-                        break;
-                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -10087,11 +10013,6 @@ export const tournament = $root.tournament = (() => {
         TournamentReadyCheckMessage.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.tournamentRoot != null && message.hasOwnProperty("tournamentRoot")) {
-                let error = $root.tournament.MatchNode.verify(message.tournamentRoot);
-                if (error)
-                    return "tournamentRoot." + error;
-            }
             return null;
         };
 
@@ -10106,13 +10027,7 @@ export const tournament = $root.tournament = (() => {
         TournamentReadyCheckMessage.fromObject = function fromObject(object) {
             if (object instanceof $root.tournament.TournamentReadyCheckMessage)
                 return object;
-            let message = new $root.tournament.TournamentReadyCheckMessage();
-            if (object.tournamentRoot != null) {
-                if (typeof object.tournamentRoot !== "object")
-                    throw TypeError(".tournament.TournamentReadyCheckMessage.tournamentRoot: object expected");
-                message.tournamentRoot = $root.tournament.MatchNode.fromObject(object.tournamentRoot);
-            }
-            return message;
+            return new $root.tournament.TournamentReadyCheckMessage();
         };
 
         /**
@@ -10124,15 +10039,8 @@ export const tournament = $root.tournament = (() => {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        TournamentReadyCheckMessage.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (options.defaults)
-                object.tournamentRoot = null;
-            if (message.tournamentRoot != null && message.hasOwnProperty("tournamentRoot"))
-                object.tournamentRoot = $root.tournament.MatchNode.toObject(message.tournamentRoot, options);
-            return object;
+        TournamentReadyCheckMessage.toObject = function toObject() {
+            return {};
         };
 
         /**

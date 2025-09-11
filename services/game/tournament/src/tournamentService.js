@@ -68,8 +68,8 @@ class Tournament {
                 const data = decodeMatchEnd(msg.data);
                 match.setResult(data);
                 if (match == this.root) continue;
-                sendUpdate();
                 if (areAllMatchesFinished()) sendReadyCheck();
+                sendUpdate();
             }
         })
     }
@@ -82,14 +82,6 @@ class Tournament {
     sendUpdate() {
         const updateBuf = encodeServerMessage({
             update: {
-                tournamentId: this.id,
-                players: [...this.players.entries()].map(([player_uuid, playerData]) => ({
-                    uuid: player_uuid,
-                    isReady: playerData.isReady,
-                    isConnected: playerData.isConnected,
-                    isEliminated: playerData.isEliminated,
-                    isInGame: playerData.isInGame
-                })),
                 tournamentRoot: this.root
             }
         });

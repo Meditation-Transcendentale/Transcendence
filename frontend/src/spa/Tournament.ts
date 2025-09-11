@@ -1,11 +1,14 @@
-import { decodeTournamentServerMessage, encodeClientMessage } from "./proto/helper";
+import { decodeTournamentServerMessage, encodeClientMessage, encodeTournamentClientMessage } from "./proto/helper";
 import { tournament } from "./proto/message.js";
 import Router from "./Router";
 import { User } from "./User";
+import { getRequest } from "./requests";
+import { createButton } from "./utils";
 
 
 interface tournamentHtmlReference {
 	tree: HTMLDivElement;
+	leaveButton: HTMLInputElement;
 }
 
 // interface Player {
@@ -34,10 +37,10 @@ export default class Tournament {
 	private ref: tournamentHtmlReference;
 	private ws: WebSocket | null;
 	private id: string | null;
-	private players: Map<string, tournament.Player> | null; //key:uuid value:Player
+	private players: Map<string, tournament.IPlayer> | null; //key:uuid value:Player
 	// private tree: MatchNode | null;
 	private readyCheckEnabled: boolean;
-	private root: tournament.MatchNode | null;
+	private root: tournament.IMatchNode | null | undefined;
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
@@ -47,7 +50,8 @@ export default class Tournament {
 		this.players = null;
 		this.readyCheckEnabled = false;
 		this.ref = {
-			tree: div.querySelector("#tournament-tree") as HTMLDivElement
+			tree: div.querySelector("#tournament-tree") as HTMLDivElement,
+			leaveButton: div.querySelector("#leave-btn") as HTMLInputElement
 		};
 
 		// this.ref.ready.addEventListener("click", () => {
@@ -68,6 +72,7 @@ export default class Tournament {
 
 	public async unload() {
 		this.div.remove();
+		this.ws?.close();
 	}
 
 	private setupWs(id: string) {
@@ -81,14 +86,14 @@ export default class Tournament {
 		}
 
 		this.ws.onmessage = (msg) => {
+			const buf = new Uint8Array(msg.data as ArrayBuffer);
+			let payload;
 			try {
-				const payload: tournament.TournamentServerMessage = decodeTournamentServerMessage(new Uint8Array(msg.data));
+				payload = decodeTournamentServerMessage(buf);
 			} catch (err) {
 				console.error("Failed to decode Tournament Server Messager", err);
 				return;
 			}
-			const buf = new Uint8Array(msg.data as ArrayBuffer);
-			const payload = decodeTournamentServerMessage(buf);
 			if (payload.error) {
 				this.id = null;
 				this.ws?.close();
@@ -98,42 +103,23 @@ export default class Tournament {
 			}
 
 			if (payload.update) {
-
+				this.root = payload.update.tournamentRoot;
+				if (this.root) this.treeResolve();
 			}
 
 			if (payload.readyCheck) {
-
+				this.readyCheckEnabled = true;
 			}
 
 			if (payload.startGame) {
 				const gameId = payload.startGame?.gameId;
 				//need to close the ws + switch to ingame so being able to reconnect to the tournament at the end of the game
-				const map = "default"; //payload.start.map;
-				Router.nav(encodeURI(`/game?id=${gameId}&mode=tournament&map=${map}`), false, false);
+				if (gameId) {
+					const map = "default"; //payload.start.map;
+					Router.nav(encodeURI(`/game?id=${gameId}&mode=tournament&map=${map}`), false, false);
+					this.readyCheckEnabled = false;
+				}
 				//can only leave through "leave" button on the tournament page, everyother thing make you come back to the tournament
-			}
-			switch (data.type) {
-				case 'update':
-					if (data.update.players != null) {
-						if (!this.players) {
-							this.players = new Map(
-								data.update.players != null
-									? data.update.players
-										.filter(p => p.uuid != null && p.ready != null)
-										.map(p => [p.uuid as string, p.ready as boolean])
-									: []
-							);
-						}
-					}
-					if (data.update.tree != null) {
-						this.tree = payload.update.tree as MatchNode;
-						this.treeResolve();
-					}
-
-			}
-
-			if (payload.start != null) {
-				this.ws?.close();
 			}
 		}
 
@@ -148,44 +134,42 @@ export default class Tournament {
 		}
 	}
 
-	private renderMatchNode(node: MatchNode | null): HTMLDivElement {
+	private renderMatchNode(node: tournament.IMatchNode | null | undefined): HTMLDivElement {
 		const container = document.createElement('div');
 		container.classList.add('match-node');
 
 		const matchInfo = document.createElement('div');
 		matchInfo.classList.add('match-info');
 
-		const p1 = document.createElement('div');
-		p1.textContent = `Player 1: ${node?.player1?.username ?? 'TBD'}`; //how to smoothly get player names ?
+		const p1 = this.fillPlayer(node?.player1, node?.winner);
+		const p2 = this.fillPlayer(node?.player2, node?.winner);
+
+		if (node?.score) {
+			const score1 = document.createElement('div');
+			score1.textContent = node.score[0].toString();
+			p1.appendChild(score1);
+
+			const score2 = document.createElement('div');
+			score2.textContent = node.score[1].toString();
+			p2.appendChild(score2);
+		}
+
 		matchInfo.appendChild(p1);
-
-		const p2 = document.createElement('div');
-		p2.textContent = `Player 2: ${node?.player2?.username ?? 'TBD'}`;
 		matchInfo.appendChild(p2);
-
-		const score = document.createElement('div');
-		score.textContent = node?.score
-			? `Score: ${node.score[0]} vs ${node.score[1]}`
-			: 'Score: - vs -';
-		matchInfo.appendChild(score);
-
-		const winner = document.createElement('div');
-		winner.textContent = `Winner: ${node?.winner?.username ?? 'Pending'}`;
-		matchInfo.appendChild(winner);
 
 		container.appendChild(matchInfo);
 
-		if (node?.left || node?.right) {
+		if (node?.leftChild || node?.rightChild) {
 			const childrenContainer = document.createElement('div');
 			childrenContainer.classList.add('match-children');
 
-			if (node?.left) {
-				const leftNode = this.renderMatchNode(node?.left);
+			if (node?.leftChild) {
+				const leftNode = this.renderMatchNode(node?.leftChild);
 				childrenContainer.appendChild(leftNode);
 			}
 
-			if (node?.right) {
-				const rightNode = this.renderMatchNode(node?.right);
+			if (node?.rightChild) {
+				const rightNode = this.renderMatchNode(node?.rightChild);
 				childrenContainer.appendChild(rightNode);
 			}
 
@@ -195,10 +179,61 @@ export default class Tournament {
 		return container;
 	}
 
+	private fillPlayer(player: tournament.IPlayer | null | undefined, winner: tournament.IPlayer | null | undefined): HTMLDivElement {
+		const playerDiv = document.createElement('div');
+		let exposedName;
+		if (player !== null && player !== undefined) {
+			exposedName = getRequest(`/info/uuid/${player.uuid}`)
+				.then((json: any) => { return (json.username) });
+			if (!player.connected) {
+				const disconnectedIcon = document.createElement("span");
+				disconnectedIcon.textContent = "⚠";
+				disconnectedIcon.className = "disconnected-icon";
+				playerDiv.appendChild(disconnectedIcon);
+				playerDiv.classList.add("disconnected"); //ADD CSS 
+			}
+			else if (player.eliminated) {
+				playerDiv.classList.add("eliminated");
+			}
+			else if (this.readyCheckEnabled && (winner === null || winner === undefined)) {
+				if (!player.ready) {
+					if (player.uuid === User.uuid) {
+						const readyButton = createButton("Ready", (btn: HTMLInputElement) => {
+							this.ws?.send(encodeTournamentClientMessage({ ready: { tournamentId: this.id as string } }));
+							const check = document.createElement("span");
+							check.textContent = "✔";
+							check.className = "ready-checked";
+							btn.replaceWith(check);
+						});
+						playerDiv.appendChild(readyButton);
+					} else {
+						const notReady = document.createElement("span");
+						notReady.textContent = "✖";
+						notReady.className = "notReady-checked";
+						playerDiv.appendChild(notReady);
+					}
+				}
+				else {
+					const check = document.createElement("span");
+					check.textContent = "✔";
+					check.className = "ready-checked";
+					playerDiv.appendChild(check);
+				}
+			}
+			if (player.uuid == winner?.uuid)
+				playerDiv.classList.add("winner");
+		}
+		else {
+			exposedName = `TBD`;
+		}
+		playerDiv.textContent = `${exposedName}`;
+		return (playerDiv);
+	}
+
 
 	private treeResolve(): void {
 		this.ref.tree.innerHTML = '';
-		const treeRoot = this.renderMatchNode(this.tree);
+		const treeRoot = this.renderMatchNode(this.root);
 		this.ref.tree.appendChild(treeRoot);
 	}
 }
