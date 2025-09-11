@@ -4,11 +4,10 @@ import { getRequest } from "./requests";
 import { createDivception, raiseStatus } from "./utils";
 
 type statsHtmlReference = {
-	switch: { html: HTMLDivElement, id: number },
+	switch: HTMLDivElement,
 	swBR: HTMLInputElement,
 	swPong: HTMLInputElement,
-	container: { html: HTMLDivElement, id: number }
-	username: HTMLDivElement,
+	container: HTMLDivElement,
 	stats: HTMLDivElement,
 	history: HTMLDivElement,
 	classicHistory: HTMLTableElement,
@@ -64,7 +63,6 @@ type brPlayerStats = {
 class Stats {
 	private div: HTMLDivElement;
 	private ref: statsHtmlReference;
-	private css: HTMLLinkElement;
 
 	private classicPlayerStats: classicPlayerStats | null;
 	private brPlayerStats: brPlayerStats | null;
@@ -72,27 +70,28 @@ class Stats {
 
 	private mode: number /* 0 == NONE | 1 == PONG | 2 == BR*/
 
+	private player: string;
+
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
-		this.css = div.querySelector("link") as HTMLLinkElement;
 		this.classicPlayerStats = null;
 		this.brPlayerStats = null;
 		this.currentHistory = null;
 		this.mode = 0;
+		this.player = "";
 
 
 
 
 
 		this.ref = {
-			switch: { html: div.querySelector("#stats-switch") as HTMLDivElement, id: -1 },
+			switch: div.querySelector("#stats-switch") as HTMLDivElement,
 			swBR: div.querySelector("#br-switch") as HTMLInputElement,
 			swPong: div.querySelector("#pong-switch") as HTMLInputElement,
-			container: { html: div.querySelector("#stats-container") as HTMLDivElement, id: -1 },
-			username: this.div.querySelector("#stats-username") as HTMLDivElement,
-			stats: this.div.querySelector("#stats-table-window") as HTMLDivElement,
-			history: this.div.querySelector("#stats-history-window") as HTMLDivElement,
+			container: div.querySelector("#stats-container") as HTMLDivElement,
+			stats: this.div.querySelector("#stats-table") as HTMLDivElement,
+			history: this.div.querySelector("#stats-history") as HTMLDivElement,
 			classicHistory: this.div.querySelector("#classic-history") as HTMLTableElement,
 			brHistory: this.div.querySelector("#br-history") as HTMLTableElement
 
@@ -103,22 +102,7 @@ class Stats {
 
 		this.initPlayerStats();
 
-		this.ref.switch.id = App3D.addCSS3dObject({
-			html: this.ref.switch.html,
-			width: 1,
-			height: 1,
-			world: Matrix.RotationY(Math.PI * 1.2).multiply(Matrix.Translation(-17, 3, 25)),
-			enable: false
-		})
 
-		this.ref.container.id = App3D.addCSS3dObject({
-			html: this.ref.container.html,
-			width: 2.,
-			height: 2.,
-			world: Matrix.RotationY(Math.PI * 0.95).multiply(Matrix.Translation(-21, 2, 23)),
-			enable: false
-
-		})
 
 		this.ref.swPong.addEventListener("click", () => {
 			if (this.mode != 1) {
@@ -131,7 +115,7 @@ class Stats {
 			this.ref.swPong.toggleAttribute("down", false);
 			this.ref.swBR.toggleAttribute("down", true);
 
-			getRequest(`stats/player/${this.ref.username.innerText}/classic`)
+			getRequest(`stats/player/${this.player}/classic`)
 				.then((json: any) => {
 					//console.log(json.playerStats);
 					this.classicResolve(json.playerStats);
@@ -149,7 +133,7 @@ class Stats {
 			this.ref.swPong.toggleAttribute("down", true);
 			this.ref.swBR.toggleAttribute("down", false);
 
-			getRequest(`stats/player/${this.ref.username.innerText}/br`)
+			getRequest(`stats/player/${this.player}/br`)
 				.then((json: any) => {
 					//console.log(json.playerStats);
 					this.brResolve(json.playerStats);
@@ -218,14 +202,9 @@ class Stats {
 		//this.ref.stats.appendChild(this.classicPlayerStats.div);
 	}
 
-	public load(params: URLSearchParams) {
-		if (!this.checkParams(params)) { return; }
-		document.head.appendChild(this.css);
-		App3D.setVue('play');
-		App3D.setCSS3dObjectEnable(this.ref.switch.id, true);
-		App3D.setCSS3dObjectEnable(this.ref.container.id, true);
+	public load(player: string) {
+		this.player = player;
 
-		this.ref.username.innerText = params.get("u") as string;
 
 		this.ref.brHistory.remove();
 		this.brPlayerStats!.div.remove();
@@ -235,7 +214,7 @@ class Stats {
 		this.ref.stats.appendChild(this.classicPlayerStats!.div);
 		this.mode = 1;
 		this.ref.swBR.toggleAttribute("down", true);
-		getRequest(`stats/player/${this.ref.username.innerText}/classic`)
+		getRequest(`stats/player/${this.player}/classic`)
 			.then((json: any) => {
 				//console.log(json)
 				this.classicResolve(json.playerStats);
@@ -245,9 +224,6 @@ class Stats {
 	}
 
 	public async unload() {
-		this.css.remove();
-		App3D.setCSS3dObjectEnable(this.ref.switch.id, false);
-		App3D.setCSS3dObjectEnable(this.ref.container.id, false);
 	}
 
 	private checkParams(params: URLSearchParams) {

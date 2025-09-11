@@ -1,6 +1,7 @@
 import { NotificationManager } from "./NotificationManager";
 import { Popup } from "./Popup";
 import { cdnRequest, meRequest, patchRequest, postRequest } from "./requests";
+import Stats from "./Stats";
 import { User } from "./User";
 
 interface athHtmlReference {
@@ -34,7 +35,7 @@ class Ath {
 		// this.notif = new AthNotif(div);
 
 		this.ref.setting.addEventListener('click', () => {
-			this.profile.load();
+			this.profile.load(User.username);
 		})
 
 		this.ref.quit.addEventListener("click", () => {
@@ -203,7 +204,7 @@ class AthSetting {
 
 	}
 
-	public load() {
+	public load(player: string) {
 		this.ref.username.value = User.username as string;
 		this.ref.twofa.value = (User.twofa as number > 0 ? "2FA Enabled" : "2FA Disabled");
 		this.ref.editUsername.toggleAttribute("off", true);
@@ -243,6 +244,8 @@ class Profile {
 	private div: HTMLDivElement;
 	private ref: profilHtmlReference;
 
+	private stats: Stats;
+
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 
@@ -257,9 +260,12 @@ class Profile {
 			this.ref.avatar.src = URL.createObjectURL(this.ref.avatarFile.files[0]);
 		})
 
+		this.stats = new Stats(div.querySelector("#stats-div") as HTMLDivElement)
+
 	}
 
-	public load() {
+	public load(player: string) {
+		this.stats.load(player);
 		Popup.addPopup(this.div);
 	}
 

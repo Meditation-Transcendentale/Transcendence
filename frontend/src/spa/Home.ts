@@ -30,13 +30,13 @@ class Home {
 		};
 
 
-		this.ref.stats.id = App3D.addCSS3dObject({
-			html: this.ref.stats.html,
-			width: 1,
-			height: 1,
-			world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 9, 1.6)),
-			enable: false
-		})
+		//this.ref.stats.id = App3D.addCSS3dObject({
+		//	html: this.ref.stats.html,
+		//	width: 1,
+		//	height: 1,
+		//	world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 9, 1.6)),
+		//	enable: false
+		//})
 		this.ref.play.id = App3D.addCSS3dObject({
 			html: this.ref.play.html,
 			width: 1,
@@ -60,9 +60,9 @@ class Home {
 			enable: false
 		})
 
-		this.ref.stats.html.addEventListener("click", () => {
-			Router.nav(`/stats?u=${User.username}`);
-		})
+		//this.ref.stats.html.addEventListener("click", () => {
+		//	Router.nav(`/stats?u=${User.username}`);
+		//})
 
 		this.ref.play.html.addEventListener("click", () => {
 			Router.nav("/play");
@@ -117,7 +117,7 @@ class Home {
 		//meRequest()
 		//.catch(() => window.location.reload());
 		App3D.setVue("home");
-		App3D.setCSS3dObjectEnable(this.ref.stats.id, true);
+		//App3D.setCSS3dObjectEnable(this.ref.stats.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.play.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.bricks.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.exemple.id, true);
@@ -153,7 +153,7 @@ class Home {
 	}
 
 	public async unload() {
-		App3D.setCSS3dObjectEnable(this.ref.stats.id, false);
+		//App3D.setCSS3dObjectEnable(this.ref.stats.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.play.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.bricks.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.exemple.id, false);

@@ -75,7 +75,7 @@ class RouterC {
 			ts: "./Friendlist",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
-		this.routes.set("/game", {
+		this.routes.set("/cajoue", {
 			html: "/game",
 			ts: "./Game",
 			callback: (url: URL) => { this.loadInMain(url) }
@@ -136,7 +136,7 @@ class RouterC {
 			//this.oldURL = url.href;
 			await meRequest("no-cache")
 				.then(() => {
-					if (url.pathname == "/login" || url.pathname == "/register") {
+					if (url.pathname == "/login" || url.pathname == "/register" || (this.first && url.pathname == "/cajoue")) {
 						url.pathname = "/home";
 						url.search = "";
 					}

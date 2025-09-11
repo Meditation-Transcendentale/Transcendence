@@ -133,7 +133,7 @@ export default class Lobby {
 				if (this.mode === 'br')
 					Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
 				else
-					Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
+					Router.nav(encodeURI(`/cajoue?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
 				this.ws?.close();
 			}
 		}
