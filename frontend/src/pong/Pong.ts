@@ -184,7 +184,16 @@ export class Pong {
 		ballComp.position.x = 0;
 		ballComp.position.z = 0;
 		this.inputManager.disable();
+		const payload: userinterface.IClientMessage = {
+			quit: {
+				uuid: this.uuid,
+				lobbyId: this.uuid
+			}
+		};
 
+		const buffer = encodeClientMessage(payload);
+
+		this.wsManager.socket.send(buffer);
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
 		this.cam.parent = null;

@@ -101,7 +101,6 @@ export class SDFSystem {
 	}
 
 	private evaluateShape(pos: Vector3, shape: SDFShape): number {
-		// Apply transform if present
 		let transformedPos = pos.clone();
 		if (shape.transform) {
 			transformedPos = this.applyTransform(pos, shape.transform);
@@ -137,21 +136,17 @@ export class SDFSystem {
 		}
 	}
 
-	// Transform utilities
 	private applyTransform(pos: Vector3, transform: SDFTransform): Vector3 {
 		let result = pos.clone();
 
-		// Apply inverse translation
 		if (transform.position) {
 			result = result.subtract(transform.position);
 		}
 
-		// Apply inverse rotation
 		if (transform.rotation) {
 			result = this.rotatePoint(result, transform.rotation, true);
 		}
 
-		// Apply inverse scale
 		if (transform.scale) {
 			result = new Vector3(
 				result.x / transform.scale.x,
@@ -166,7 +161,6 @@ export class SDFSystem {
 	private rotatePoint(point: Vector3, rotation: Vector3, inverse: boolean = false): Vector3 {
 		const factor = inverse ? -1 : 1;
 
-		// Apply rotations in order: Y, X, Z (or reverse if inverse)
 		const rotX = Quaternion.RotationAxis(Vector3.Right(), rotation.x * factor);
 		const rotY = Quaternion.RotationAxis(Vector3.Up(), rotation.y * factor);
 		const rotZ = Quaternion.RotationAxis(Vector3.Forward(), rotation.z * factor);
@@ -184,7 +178,6 @@ export class SDFSystem {
 		return new Vector3(result.x, result.y, result.z);
 	}
 
-	// SDF Operations
 	private sdfUnion(distances: number[]): number {
 		return Math.min(...distances);
 	}
@@ -223,7 +216,6 @@ export class SDFSystem {
 		return result;
 	}
 
-	// Smooth operation helpers
 	private smoothMin(a: number, b: number, k: number): number {
 		const h = Math.max(k - Math.abs(a - b), 0.0) / k;
 		return Math.min(a, b) - h * h * h * k * (1.0 / 6.0);
@@ -233,7 +225,6 @@ export class SDFSystem {
 		return -this.smoothMin(-a, -b, k);
 	}
 
-	// Basic SDF shapes
 	private boxSDF(pos: Vector3, size: Vector3): number {
 		const d = new Vector3(
 			Math.abs(pos.x) - size.x * 0.5,
@@ -317,7 +308,6 @@ export class SDFSystem {
 		return Vector3.Dot(pos, normal.normalize()) - distance;
 	}
 
-	// Utility functions
 	public getEvaluationCount(): number {
 		return this.evaluationCount;
 	}
@@ -327,7 +317,6 @@ export class SDFSystem {
 	}
 }
 
-// Helper functions for building SDF trees
 export class SDFBuilder {
 	static shape(type: SDFShapeType, params: any, transform?: SDFTransform, id?: string): SDFNode {
 		return {
@@ -354,7 +343,6 @@ export class SDFBuilder {
 		};
 	}
 
-	// Convenience methods
 	static union(...children: SDFNode[]): SDFNode {
 		return SDFBuilder.operation('union', children);
 	}
@@ -379,7 +367,6 @@ export class SDFBuilder {
 		return SDFBuilder.operation('smoothIntersect', children, smoothness);
 	}
 
-	// Shape builders with common defaults
 	static box(size: Vector3, transform?: SDFTransform): SDFNode {
 		return SDFBuilder.shape('box', { size }, transform);
 	}

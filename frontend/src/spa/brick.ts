@@ -14,22 +14,22 @@ export default class brick {
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 		this.game = null;
-		//this.gameUI = new GameUI(this.div, {
-		//	enabledModules: ['score', 'timer', 'buttons'],
-		//	theme: 'pong',
-		//	modulePositions: {
-		//		score: { x: 'center', y: 'top', offset: { x: 100, y: 0 } },
-		//		timer: { x: 'center', y: 'top', offset: { x: -100, y: 0 } },
-		//		buttons: { x: 'center', y: 'bottom' }
-		//	}
-		//});
+		this.gameUI = new GameUI(this.div, {
+			enabledModules: ['score', 'timer', 'buttons'],
+			theme: 'pong',
+			modulePositions: {
+				score: { x: 'center', y: 'top', offset: { x: 100, y: 0 } },
+				timer: { x: 'center', y: 'top', offset: { x: -100, y: 0 } },
+				buttons: { x: 'center', y: 'bottom' }
+			}
+		});
 	}
 
 	public unload() {
 		App3D.enableHome();
 		//document.querySelector("canvas")?.blur();
 		this.game?.stop();
-		//this.gameUI.unload();
+		this.gameUI.unload();
 		//this.pongbr?.dispose();
 		//this.div.remove();
 	}
@@ -40,16 +40,16 @@ export default class brick {
 		//document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
 
-		//const gameUIDiv = this.div.querySelector("#game-ui-container") as HTMLDivElement;
+		const gameUIDiv = this.div.querySelector("#game-ui-container") as HTMLDivElement;
 
 
-		//this.gameUI.load();
-		//this.gameUI.showButton('restart', 'Restart', () => {
-		//	console.log('Game restarted');
-		//});
-		//this.gameUI.showButton('coucou', 'coucou', () => {
-		//	console.log('Game restarted');
-		//});
+		this.gameUI.load();
+		this.gameUI.showButton('restart', 'Restart', () => {
+			console.log('Game restarted');
+		});
+		this.gameUI.showButton('coucou', 'coucou', () => {
+			console.log('Game restarted');
+		});
 
 
 		if (!this.game)

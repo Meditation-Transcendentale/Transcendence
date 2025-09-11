@@ -148,6 +148,8 @@ export default class Lobby {
 
 			if (payload.update != null) {
 				this.mode = payload.update.mode as string;
+				this.map = payload.update.map as string;
+				console.log(this.map);
 				this.updatePlayers(payload.update.players as Array<{ uuid: string, ready: boolean }>);
 				console.log(`Update :${payload}`);
 			}
@@ -155,9 +157,8 @@ export default class Lobby {
 			if (payload.start != null) {
 				console.log("Everyone is ready");
 				const gameId = payload.start.gameId;
-				const map = "default"; //payload.start.map;
 				if (this.mode === 'br')
-					Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
+					Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
 				else
 					Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
 				this.ws?.close();

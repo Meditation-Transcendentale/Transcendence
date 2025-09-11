@@ -2391,6 +2391,9 @@ export namespace lobby {
 
         /** UpdateMessage mode */
         mode?: (string|null);
+
+        /** UpdateMessage map */
+        map?: (string|null);
     }
 
     /** Represents an UpdateMessage. */
@@ -2413,6 +2416,9 @@ export namespace lobby {
 
         /** UpdateMessage mode. */
         public mode: string;
+
+        /** UpdateMessage map. */
+        public map: string;
 
         /**
          * Creates a new UpdateMessage instance using the specified properties.

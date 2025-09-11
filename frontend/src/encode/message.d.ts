@@ -20,6 +20,9 @@ export namespace shared {
 
         /** Ball vy */
         vy?: (number|null);
+
+        /** Ball disabled */
+        disabled?: (boolean|null);
     }
 
     /** Represents a Ball. */
@@ -45,6 +48,9 @@ export namespace shared {
 
         /** Ball vy. */
         public vy: number;
+
+        /** Ball disabled. */
+        public disabled: boolean;
 
         /**
          * Creates a new Ball instance using the specified properties.
@@ -130,8 +136,14 @@ export namespace shared {
         /** Paddle id */
         id?: (number|null);
 
+        /** Paddle playerId */
+        playerId?: (number|null);
+
         /** Paddle move */
         move?: (number|null);
+
+        /** Paddle offset */
+        offset?: (number|null);
 
         /** Paddle dead */
         dead?: (boolean|null);
@@ -149,8 +161,14 @@ export namespace shared {
         /** Paddle id. */
         public id: number;
 
+        /** Paddle playerId. */
+        public playerId: number;
+
         /** Paddle move. */
         public move: number;
+
+        /** Paddle offset. */
+        public offset: number;
 
         /** Paddle dead. */
         public dead: boolean;
@@ -433,6 +451,272 @@ export namespace shared {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    /** Properties of a GameEvent. */
+    interface IGameEvent {
+
+        /** GameEvent type */
+        type?: (string|null);
+
+        /** GameEvent phase */
+        phase?: (string|null);
+
+        /** GameEvent remainingPlayers */
+        remainingPlayers?: (number|null);
+
+        /** GameEvent timestamp */
+        timestamp?: (number|Long|null);
+
+        /** GameEvent activePlayers */
+        activePlayers?: (number[]|null);
+
+        /** GameEvent playerMapping */
+        playerMapping?: ({ [k: string]: number }|null);
+    }
+
+    /** Represents a GameEvent. */
+    class GameEvent implements IGameEvent {
+
+        /**
+         * Constructs a new GameEvent.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: shared.IGameEvent);
+
+        /** GameEvent type. */
+        public type: string;
+
+        /** GameEvent phase. */
+        public phase: string;
+
+        /** GameEvent remainingPlayers. */
+        public remainingPlayers: number;
+
+        /** GameEvent timestamp. */
+        public timestamp: (number|Long);
+
+        /** GameEvent activePlayers. */
+        public activePlayers: number[];
+
+        /** GameEvent playerMapping. */
+        public playerMapping: { [k: string]: number };
+
+        /**
+         * Creates a new GameEvent instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GameEvent instance
+         */
+        public static create(properties?: shared.IGameEvent): shared.GameEvent;
+
+        /**
+         * Encodes the specified GameEvent message. Does not implicitly {@link shared.GameEvent.verify|verify} messages.
+         * @param message GameEvent message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: shared.IGameEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GameEvent message, length delimited. Does not implicitly {@link shared.GameEvent.verify|verify} messages.
+         * @param message GameEvent message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: shared.IGameEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GameEvent message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns GameEvent
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.GameEvent;
+
+        /**
+         * Decodes a GameEvent message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns GameEvent
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.GameEvent;
+
+        /**
+         * Verifies a GameEvent message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GameEvent message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GameEvent
+         */
+        public static fromObject(object: { [k: string]: any }): shared.GameEvent;
+
+        /**
+         * Creates a plain object from a GameEvent message. Also converts values to other types if specified.
+         * @param message GameEvent
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: shared.GameEvent, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GameEvent to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for GameEvent
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a GameStateInfo. */
+    interface IGameStateInfo {
+
+        /** GameStateInfo activePlayers */
+        activePlayers?: (number[]|null);
+
+        /** GameStateInfo eliminatedPlayers */
+        eliminatedPlayers?: (number[]|null);
+
+        /** GameStateInfo currentPhase */
+        currentPhase?: (string|null);
+
+        /** GameStateInfo isRebuilding */
+        isRebuilding?: (boolean|null);
+
+        /** GameStateInfo rebuildTimeRemaining */
+        rebuildTimeRemaining?: (number|Long|null);
+
+        /** GameStateInfo playerMapping */
+        playerMapping?: ({ [k: string]: number }|null);
+
+        /** GameStateInfo isGameOver */
+        isGameOver?: (boolean|null);
+
+        /** GameStateInfo winner */
+        winner?: (number|null);
+    }
+
+    /** Represents a GameStateInfo. */
+    class GameStateInfo implements IGameStateInfo {
+
+        /**
+         * Constructs a new GameStateInfo.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: shared.IGameStateInfo);
+
+        /** GameStateInfo activePlayers. */
+        public activePlayers: number[];
+
+        /** GameStateInfo eliminatedPlayers. */
+        public eliminatedPlayers: number[];
+
+        /** GameStateInfo currentPhase. */
+        public currentPhase: string;
+
+        /** GameStateInfo isRebuilding. */
+        public isRebuilding: boolean;
+
+        /** GameStateInfo rebuildTimeRemaining. */
+        public rebuildTimeRemaining: (number|Long);
+
+        /** GameStateInfo playerMapping. */
+        public playerMapping: { [k: string]: number };
+
+        /** GameStateInfo isGameOver. */
+        public isGameOver: boolean;
+
+        /** GameStateInfo winner. */
+        public winner: number;
+
+        /**
+         * Creates a new GameStateInfo instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GameStateInfo instance
+         */
+        public static create(properties?: shared.IGameStateInfo): shared.GameStateInfo;
+
+        /**
+         * Encodes the specified GameStateInfo message. Does not implicitly {@link shared.GameStateInfo.verify|verify} messages.
+         * @param message GameStateInfo message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: shared.IGameStateInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GameStateInfo message, length delimited. Does not implicitly {@link shared.GameStateInfo.verify|verify} messages.
+         * @param message GameStateInfo message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: shared.IGameStateInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GameStateInfo message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns GameStateInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.GameStateInfo;
+
+        /**
+         * Decodes a GameStateInfo message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns GameStateInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.GameStateInfo;
+
+        /**
+         * Verifies a GameStateInfo message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GameStateInfo message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GameStateInfo
+         */
+        public static fromObject(object: { [k: string]: any }): shared.GameStateInfo;
+
+        /**
+         * Creates a plain object from a GameStateInfo message. Also converts values to other types if specified.
+         * @param message GameStateInfo
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: shared.GameStateInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GameStateInfo to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for GameStateInfo
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     /** Properties of a MatchState. */
     interface IMatchState {
 
@@ -456,6 +740,12 @@ export namespace shared {
 
         /** MatchState stage */
         stage?: (number|null);
+
+        /** MatchState events */
+        events?: (shared.IGameEvent[]|null);
+
+        /** MatchState gameState */
+        gameState?: (shared.IGameStateInfo|null);
     }
 
     /** Represents a MatchState. */
@@ -487,6 +777,12 @@ export namespace shared {
 
         /** MatchState stage. */
         public stage: number;
+
+        /** MatchState events. */
+        public events: shared.IGameEvent[];
+
+        /** MatchState gameState. */
+        public gameState?: (shared.IGameStateInfo|null);
 
         /**
          * Creates a new MatchState instance using the specified properties.
@@ -1359,127 +1655,6 @@ export namespace shared {
          */
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
-
-    /** Properties of a PhysicsResponse. */
-    interface IPhysicsResponse {
-
-        /** PhysicsResponse gameId */
-        gameId?: (string|null);
-
-        /** PhysicsResponse tick */
-        tick?: (number|Long|null);
-
-        /** PhysicsResponse balls */
-        balls?: (shared.IBall[]|null);
-
-        /** PhysicsResponse paddles */
-        paddles?: (shared.IPaddle[]|null);
-
-        /** PhysicsResponse goal */
-        goal?: (shared.IGoal|null);
-    }
-
-    /** Represents a PhysicsResponse. */
-    class PhysicsResponse implements IPhysicsResponse {
-
-        /**
-         * Constructs a new PhysicsResponse.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: shared.IPhysicsResponse);
-
-        /** PhysicsResponse gameId. */
-        public gameId: string;
-
-        /** PhysicsResponse tick. */
-        public tick: (number|Long);
-
-        /** PhysicsResponse balls. */
-        public balls: shared.IBall[];
-
-        /** PhysicsResponse paddles. */
-        public paddles: shared.IPaddle[];
-
-        /** PhysicsResponse goal. */
-        public goal?: (shared.IGoal|null);
-
-        /**
-         * Creates a new PhysicsResponse instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PhysicsResponse instance
-         */
-        public static create(properties?: shared.IPhysicsResponse): shared.PhysicsResponse;
-
-        /**
-         * Encodes the specified PhysicsResponse message. Does not implicitly {@link shared.PhysicsResponse.verify|verify} messages.
-         * @param message PhysicsResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: shared.IPhysicsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PhysicsResponse message, length delimited. Does not implicitly {@link shared.PhysicsResponse.verify|verify} messages.
-         * @param message PhysicsResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: shared.IPhysicsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PhysicsResponse message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PhysicsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PhysicsResponse;
-
-        /**
-         * Decodes a PhysicsResponse message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PhysicsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PhysicsResponse;
-
-        /**
-         * Verifies a PhysicsResponse message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PhysicsResponse message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PhysicsResponse
-         */
-        public static fromObject(object: { [k: string]: any }): shared.PhysicsResponse;
-
-        /**
-         * Creates a plain object from a PhysicsResponse message. Also converts values to other types if specified.
-         * @param message PhysicsResponse
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: shared.PhysicsResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PhysicsResponse to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for PhysicsResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
 }
 
 /** Namespace google. */
@@ -2216,6 +2391,9 @@ export namespace lobby {
 
         /** UpdateMessage mode */
         mode?: (string|null);
+
+        /** UpdateMessage map */
+        map?: (string|null);
     }
 
     /** Represents an UpdateMessage. */
@@ -2238,6 +2416,9 @@ export namespace lobby {
 
         /** UpdateMessage mode. */
         public mode: string;
+
+        /** UpdateMessage map. */
+        public map: string;
 
         /**
          * Creates a new UpdateMessage instance using the specified properties.
@@ -2832,6 +3013,437 @@ export namespace lobby {
 
         /**
          * Gets the default type url for MatchCreateResponse
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+}
+
+/** Namespace notif. */
+export namespace notif {
+
+    /** Properties of a FriendUpdate. */
+    interface IFriendUpdate {
+
+        /** FriendUpdate sender */
+        sender?: (string|null);
+    }
+
+    /** Represents a FriendUpdate. */
+    class FriendUpdate implements IFriendUpdate {
+
+        /**
+         * Constructs a new FriendUpdate.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: notif.IFriendUpdate);
+
+        /** FriendUpdate sender. */
+        public sender: string;
+
+        /**
+         * Creates a new FriendUpdate instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns FriendUpdate instance
+         */
+        public static create(properties?: notif.IFriendUpdate): notif.FriendUpdate;
+
+        /**
+         * Encodes the specified FriendUpdate message. Does not implicitly {@link notif.FriendUpdate.verify|verify} messages.
+         * @param message FriendUpdate message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: notif.IFriendUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified FriendUpdate message, length delimited. Does not implicitly {@link notif.FriendUpdate.verify|verify} messages.
+         * @param message FriendUpdate message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: notif.IFriendUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a FriendUpdate message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns FriendUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): notif.FriendUpdate;
+
+        /**
+         * Decodes a FriendUpdate message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns FriendUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): notif.FriendUpdate;
+
+        /**
+         * Verifies a FriendUpdate message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a FriendUpdate message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns FriendUpdate
+         */
+        public static fromObject(object: { [k: string]: any }): notif.FriendUpdate;
+
+        /**
+         * Creates a plain object from a FriendUpdate message. Also converts values to other types if specified.
+         * @param message FriendUpdate
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: notif.FriendUpdate, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this FriendUpdate to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for FriendUpdate
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a GameInvite. */
+    interface IGameInvite {
+
+        /** GameInvite sender */
+        sender?: (string|null);
+
+        /** GameInvite lobbyid */
+        lobbyid?: (string|null);
+    }
+
+    /** Represents a GameInvite. */
+    class GameInvite implements IGameInvite {
+
+        /**
+         * Constructs a new GameInvite.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: notif.IGameInvite);
+
+        /** GameInvite sender. */
+        public sender: string;
+
+        /** GameInvite lobbyid. */
+        public lobbyid: string;
+
+        /**
+         * Creates a new GameInvite instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GameInvite instance
+         */
+        public static create(properties?: notif.IGameInvite): notif.GameInvite;
+
+        /**
+         * Encodes the specified GameInvite message. Does not implicitly {@link notif.GameInvite.verify|verify} messages.
+         * @param message GameInvite message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: notif.IGameInvite, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GameInvite message, length delimited. Does not implicitly {@link notif.GameInvite.verify|verify} messages.
+         * @param message GameInvite message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: notif.IGameInvite, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GameInvite message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns GameInvite
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): notif.GameInvite;
+
+        /**
+         * Decodes a GameInvite message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns GameInvite
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): notif.GameInvite;
+
+        /**
+         * Verifies a GameInvite message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GameInvite message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GameInvite
+         */
+        public static fromObject(object: { [k: string]: any }): notif.GameInvite;
+
+        /**
+         * Creates a plain object from a GameInvite message. Also converts values to other types if specified.
+         * @param message GameInvite
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: notif.GameInvite, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GameInvite to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for GameInvite
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a StatusUpdate. */
+    interface IStatusUpdate {
+
+        /** StatusUpdate sender */
+        sender?: (string|null);
+
+        /** StatusUpdate status */
+        status?: (string|null);
+
+        /** StatusUpdate option */
+        option?: (string|null);
+    }
+
+    /** Represents a StatusUpdate. */
+    class StatusUpdate implements IStatusUpdate {
+
+        /**
+         * Constructs a new StatusUpdate.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: notif.IStatusUpdate);
+
+        /** StatusUpdate sender. */
+        public sender: string;
+
+        /** StatusUpdate status. */
+        public status: string;
+
+        /** StatusUpdate option. */
+        public option: string;
+
+        /**
+         * Creates a new StatusUpdate instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns StatusUpdate instance
+         */
+        public static create(properties?: notif.IStatusUpdate): notif.StatusUpdate;
+
+        /**
+         * Encodes the specified StatusUpdate message. Does not implicitly {@link notif.StatusUpdate.verify|verify} messages.
+         * @param message StatusUpdate message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: notif.IStatusUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified StatusUpdate message, length delimited. Does not implicitly {@link notif.StatusUpdate.verify|verify} messages.
+         * @param message StatusUpdate message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: notif.IStatusUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a StatusUpdate message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns StatusUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): notif.StatusUpdate;
+
+        /**
+         * Decodes a StatusUpdate message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns StatusUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): notif.StatusUpdate;
+
+        /**
+         * Verifies a StatusUpdate message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a StatusUpdate message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns StatusUpdate
+         */
+        public static fromObject(object: { [k: string]: any }): notif.StatusUpdate;
+
+        /**
+         * Creates a plain object from a StatusUpdate message. Also converts values to other types if specified.
+         * @param message StatusUpdate
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: notif.StatusUpdate, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this StatusUpdate to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for StatusUpdate
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a NotificationMessage. */
+    interface INotificationMessage {
+
+        /** NotificationMessage friendRequest */
+        friendRequest?: (notif.IFriendUpdate|null);
+
+        /** NotificationMessage friendAccept */
+        friendAccept?: (notif.IFriendUpdate|null);
+
+        /** NotificationMessage gameInvite */
+        gameInvite?: (notif.IGameInvite|null);
+
+        /** NotificationMessage statusUpdate */
+        statusUpdate?: (notif.IStatusUpdate|null);
+    }
+
+    /** Represents a NotificationMessage. */
+    class NotificationMessage implements INotificationMessage {
+
+        /**
+         * Constructs a new NotificationMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: notif.INotificationMessage);
+
+        /** NotificationMessage friendRequest. */
+        public friendRequest?: (notif.IFriendUpdate|null);
+
+        /** NotificationMessage friendAccept. */
+        public friendAccept?: (notif.IFriendUpdate|null);
+
+        /** NotificationMessage gameInvite. */
+        public gameInvite?: (notif.IGameInvite|null);
+
+        /** NotificationMessage statusUpdate. */
+        public statusUpdate?: (notif.IStatusUpdate|null);
+
+        /** NotificationMessage payload. */
+        public payload?: ("friendRequest"|"friendAccept"|"gameInvite"|"statusUpdate");
+
+        /**
+         * Creates a new NotificationMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns NotificationMessage instance
+         */
+        public static create(properties?: notif.INotificationMessage): notif.NotificationMessage;
+
+        /**
+         * Encodes the specified NotificationMessage message. Does not implicitly {@link notif.NotificationMessage.verify|verify} messages.
+         * @param message NotificationMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: notif.INotificationMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified NotificationMessage message, length delimited. Does not implicitly {@link notif.NotificationMessage.verify|verify} messages.
+         * @param message NotificationMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: notif.INotificationMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a NotificationMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns NotificationMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): notif.NotificationMessage;
+
+        /**
+         * Decodes a NotificationMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns NotificationMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): notif.NotificationMessage;
+
+        /**
+         * Verifies a NotificationMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a NotificationMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns NotificationMessage
+         */
+        public static fromObject(object: { [k: string]: any }): notif.NotificationMessage;
+
+        /**
+         * Creates a plain object from a NotificationMessage message. Also converts values to other types if specified.
+         * @param message NotificationMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: notif.NotificationMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this NotificationMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for NotificationMessage
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */

@@ -54,6 +54,12 @@ export class Monolith {
 	private maxTrailLength = 10;
 	private text: TextRenderer | null = null;
 
+
+	private static readonly _tempVector = new Vector3();
+	private static readonly _tempVector2 = new Vector3();
+	private static readonly _tempVector3 = new Vector3();
+	private static readonly _tempMatrix = Matrix.Identity();
+
 	public depthMaterial: ShaderMaterial;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
@@ -215,47 +221,52 @@ export class Monolith {
 
 	private calculateOptimalBounds(): BoundingBox {
 		if (!this.sdfTree) {
-			const result = {
+			return {
 				min: Vector3.Zero(),
 				max: Vector3.One()
 			};
-			return result;
 		}
 
 		const testPoints = 20;
-		let minBounds = new Vector3(Infinity, Infinity, Infinity);
-		let maxBounds = new Vector3(-Infinity, -Infinity, -Infinity);
-		let sdfEvaluations = 0;
+		let minBounds = Monolith._tempVector.set(Infinity, Infinity, Infinity);
+		let maxBounds = Monolith._tempVector2.set(-Infinity, -Infinity, -Infinity);
 
 		const maxDim = Math.max(this.options.width, this.options.height, this.options.depth);
 		const searchRadius = maxDim * 1.2;
+		const tempTestPos = Monolith._tempVector3;
 
 		for (let i = 0; i < testPoints; i++) {
 			for (let j = 0; j < testPoints; j++) {
 				for (let k = 0; k < testPoints; k++) {
-					const testPos = new Vector3(
+					tempTestPos.set(
 						(i / (testPoints - 1) - 0.5) * searchRadius * 2,
 						(j / (testPoints - 1)) * searchRadius,
 						(k / (testPoints - 1) - 0.5) * searchRadius * 2
 					);
 
-					const distance = this.sdfSystem.evaluate(testPos, this.sdfTree);
-					sdfEvaluations++;
+					const distance = this.sdfSystem.evaluate(tempTestPos, this.sdfTree);
 
 					if (distance < this.options.sdfThreshold * 2) {
-						minBounds = Vector3.Minimize(minBounds, testPos);
-						maxBounds = Vector3.Maximize(maxBounds, testPos);
+						// Manual in-place min/max
+						if (tempTestPos.x < minBounds.x) minBounds.x = tempTestPos.x;
+						if (tempTestPos.y < minBounds.y) minBounds.y = tempTestPos.y;
+						if (tempTestPos.z < minBounds.z) minBounds.z = tempTestPos.z;
+
+						if (tempTestPos.x > maxBounds.x) maxBounds.x = tempTestPos.x;
+						if (tempTestPos.y > maxBounds.y) maxBounds.y = tempTestPos.y;
+						if (tempTestPos.z > maxBounds.z) maxBounds.z = tempTestPos.z;
 					}
 				}
 			}
 		}
 
 		const padding = this.options.voxelSize * 2;
-		const paddingVec = new Vector3(padding, padding, padding);
-		minBounds = minBounds.subtract(paddingVec);
-		maxBounds = maxBounds.add(paddingVec);
 
-		return { min: minBounds, max: maxBounds };
+		// Apply padding and return
+		return {
+			min: new Vector3(minBounds.x - padding, minBounds.y - padding, minBounds.z - padding),
+			max: new Vector3(maxBounds.x + padding, maxBounds.y + padding, maxBounds.z + padding)
+		};
 	}
 
 	private createVoxelGrid(bounds: BoundingBox): VoxelGrid {
@@ -297,7 +308,6 @@ export class Monolith {
 			grid.origin.z + z * grid.voxelSize
 		);
 	}
-
 	private isSurfaceVoxel(x: number, y: number, z: number, grid: VoxelGrid): boolean {
 		if (!this.options.surfaceOnly) return true;
 
@@ -311,7 +321,6 @@ export class Monolith {
 		for (const [dx, dy, dz] of neighbors) {
 			const neighborKey = this.voxelKey(x + dx, y + dy, z + dz);
 			if (!grid.data.has(neighborKey)) {
-				// Check if neighbor would be inside SDF
 				const neighborPos = new Vector3(
 					grid.origin.x + (x + dx) * grid.voxelSize,
 					grid.origin.y + (y + dy) * grid.voxelSize,
@@ -323,7 +332,7 @@ export class Monolith {
 				sdfEvaluations++;
 
 				if (distance >= this.options.sdfThreshold) {
-					return true; // surface voxel
+					return true;
 				}
 			}
 		}
