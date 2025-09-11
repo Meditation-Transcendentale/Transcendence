@@ -243,6 +243,7 @@ export class Field {
 			case 'play': {
 				this.camera.position.set(-13, 4, -7);
 				this.camera.setTarget(new Vector3(20, 11, -8));
+				this.monolith.setPicking(true);
 				//this.setEnable(true);
 				break;
 			}
@@ -250,6 +251,7 @@ export class Field {
 				this.camera.position.set(0, 5, 15);
 				this.camera.setTarget(new Vector3(0, 7, 0));
 				this.active = true;
+				this.monolith.setPicking(true);
 				this.setEnable(true);
 				//this.setEnable(true);
 				//Interpolator.addElem({
@@ -307,6 +309,7 @@ export class Field {
 				this.camera.position.set(0, 30, 0);
 				this.camera.setTarget(new Vector3(0, 0, 0));
 				this.setEnable(false);
+				this.monolith.setPicking(false);
 				break;
 			}
 			case 'exemple1': {

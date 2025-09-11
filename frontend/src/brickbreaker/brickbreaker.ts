@@ -67,7 +67,7 @@ export class BrickBreaker {
 			return;
 		}
 
-		if (this.bricks.length > 0){
+		if (this.bricks.length > 0) {
 			this.bricks.forEach(layer => {
 				layer.forEach(brick => {
 					brick.setEnabled(false);
@@ -93,15 +93,15 @@ export class BrickBreaker {
 	}
 
 
-	public stop(): void {
-		if (this.renderObserver) {
-			this.scene.onBeforeRenderObservable.remove(this.renderObserver);
-			this.renderObserver = null;
-			console.log("BrickBreaker removed from render loop");
-		}
-		this.player.disableInput();
-		this.reset();
-	}
+	//public stop(): void {
+	//	if (this.renderObserver) {
+	//		this.scene.onBeforeRenderObservable.remove(this.renderObserver);
+	//		this.renderObserver = null;
+	//		console.log("BrickBreaker removed from render loop");
+	//	}
+	//	this.player.disableInput();
+	//	this.reset();
+	//}
 
 	private update(): void {
 
@@ -128,6 +128,8 @@ export class BrickBreaker {
 		this.camera.parent = null;
 		this.start1 = false;
 		this.player.disableInput();
+		this.reset();
+
 	}
 
 	//private update(): void {

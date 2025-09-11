@@ -47,7 +47,7 @@ export class Monolith {
 	private isPickingEnabled: boolean = true;
 	private voxelPositions: Vector3[] = [];
 	private lastPickTime = 0;
-	private pickThrottleMs = 30;
+	private pickThrottleMs = 5;
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
 	private trailPositions: Vector3[] = [];
@@ -72,7 +72,7 @@ export class Monolith {
 			enableShaderAnimation: false,
 			animationSpeed: 1.0,
 			animationIntensity: 0.1,
-			qualityMode: 'low',
+			qualityMode: 'medium',
 			surfaceOnly: true,
 			mergeTolerance: 0.001,
 			...options
@@ -164,48 +164,38 @@ export class Monolith {
 
 		this.defaultCursorPosition = new Vector3(0, -10, 0);
 
-		try {
-			this.gpuPicker = new GPUPicker();
-			this.gpuPicker.setPickingList([this.voxelMesh]);
+		this.gpuPicker = new GPUPicker();
+		this.gpuPicker.setPickingList([this.voxelMesh]);
 
 
-			//this.scene.onPointerObservable.add((pointerInfo) => {
-			window.addEventListener("mousemove", (event) => {
-				if (!this.isPickingEnabled || !this.gpuPicker) return;
-				//if (.type !== PointerEventTypes.POINTERDOWN) return;
+		//this.scene.onPointerObservable.add((pointerInfo) => {
+		window.addEventListener("mousemove", (event) => {
+			if (!this.isPickingEnabled || !this.gpuPicker) return;
 
-				const now = performance.now();
-				if (now - this.lastPickTime < this.pickThrottleMs) return;
-				this.lastPickTime = now;
+			const now = performance.now();
+			if (now - this.lastPickTime < this.pickThrottleMs) return;
+			this.lastPickTime = now;
 
-				if (this.gpuPicker.pickingInProgress) return;
+			if (this.gpuPicker.pickingInProgress) return;
 
-				this.gpuPicker.pickAsync(event.clientX, event.clientY, false).then((pickInfo) => {
-					if (pickInfo && pickInfo.thinInstanceIndex != null) {
+			this.gpuPicker.pickAsync(event.clientX, event.clientY, false).then((pickInfo) => {
+				if (pickInfo && pickInfo.thinInstanceIndex != null) {
 
-						this.options.animationIntensity = 0.05;
-						if (this.voxelPositions && pickInfo.thinInstanceIndex < this.voxelPositions.length) {
-							const voxelPosition = this.voxelPositions[pickInfo.thinInstanceIndex];
+					this.options.animationIntensity = 0.05;
+					if (this.voxelPositions && pickInfo.thinInstanceIndex < this.voxelPositions.length) {
+						const voxelPosition = this.voxelPositions[pickInfo.thinInstanceIndex];
 
-							this.oldcursor.copyFrom(this.cursor);
-							this.cursor.copyFrom(voxelPosition);
-						} else {
-							console.warn("❌ Invalid instance index or missing voxel positions");
-						}
-					} else {
-						this.options.animationIntensity = 0;
 						this.oldcursor.copyFrom(this.cursor);
-						this.cursor.copyFrom(this.defaultCursorPosition);
+						this.cursor.copyFrom(voxelPosition);
 					}
-				}).catch((error) => {
-					console.warn("GPU picking failed:", error);
-				});
-			});
+				} else {
+					this.options.animationIntensity = 0;
+					this.oldcursor.copyFrom(this.cursor);
+					this.cursor.copyFrom(this.defaultCursorPosition);
+				}
+			})
+		});
 
-		} catch (error) {
-			console.error("❌ Failed to initialize GPU Picker:", error);
-			this.gpuPicker = null;
-		}
 	}
 	private buildDefaultSDF() {
 		const basePyramid = SDFBuilder.pyramid(1.0, {
@@ -750,6 +740,10 @@ export class Monolith {
 	}
 	public getTextZones(): string[] {
 		return this.text?.getZones() || [];
+	}
+
+	public setPicking(value: boolean) {
+		this.isPickingEnabled = value;
 	}
 }
 
