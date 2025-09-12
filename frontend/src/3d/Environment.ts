@@ -145,6 +145,7 @@ export class Environment {
 
 		// await this.gears.load();
 		//
+		await this.field.initialize();
 		await this.field.load();
 
 		this.scene.meshes.forEach((mesh) => {

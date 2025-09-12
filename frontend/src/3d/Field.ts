@@ -20,10 +20,10 @@ import { Pipeline } from "./Pipeline";
 import { Interpolator } from "./Interpolator";
 import { Water } from "./Water";
 import { Monolith } from "./Monolith";
-import { createFortressMonolith, createTempleMonolith } from "./Builder";
+import { createTempleMonolith } from "./Builder";
 import { DitherMaterial } from "./Shader/Shader.ts";
 
-
+let frameCount = 0;
 const playdiv = document.createElement("div");
 playdiv.className = "frame-new";
 playdiv.innerText = "PLAY";
@@ -137,7 +137,6 @@ export class Field {
 		this.scene.customRenderTargets = [];
 		//this.scene.customRenderTargets.push(this.rt);
 		let monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
-
 		monolith.enableShaderAnimation(true);
 		monolith.setAnimationSpeed(4.);
 		monolith.setAnimationIntensity(0.5);
@@ -147,6 +146,8 @@ export class Field {
 		monolith.setTextFace('create', 'left');
 		monolith.setTextFace('join', 'left');
 		monolith.setTextFace('play', 'front');
+
+
 		this.monolith = monolith;
 
 		this.water = new Water(this.scene, this.camera, this.cursor);
@@ -155,6 +156,10 @@ export class Field {
 		/////
 
 		this.grass.depth = this.fieldDepth;
+	}
+
+	public async initialize(): Promise<void> {
+		await this.monolith.init();
 	}
 
 	public async load() {
@@ -211,10 +216,11 @@ export class Field {
 	public update(time: number, deltaTime: number) {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
-		if (this.active)
+		if (this.active) {
 			this.monolith.update(time, this.camera);
-		this.pipeline.update(time);
-		this.water.update(time, 0.0041);
+			this.pipeline.update(time);
+			this.water.update(time, 0.0041);
+		}
 	}
 
 	public onHover(status: number) {
@@ -287,7 +293,9 @@ export class Field {
 			}
 			case 'pongBR': {
 				this.scene.activeCamera = this.scene.getCameraByName('br');
-				this.scene.activeCamera?.attachControl(); https://cyn-prod.com/stylized-paint-shader-breakdown
+				this.scene.activeCamera?.attachControl();
+				this.active = false;
+				this.setEnable(false);
 
 				break;
 			}
@@ -298,6 +306,7 @@ export class Field {
 				break;
 			}
 			case 'game': {
+				this.camera.detachControl();
 				this.camera.position.set(0, 50, 0);
 				this.camera.setTarget(new Vector3(0, 0, 0));
 				this.active = false;
@@ -326,3 +335,4 @@ export class Field {
 	}
 
 }
+

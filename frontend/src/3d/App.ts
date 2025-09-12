@@ -26,7 +26,7 @@ class app3d {
 	private cssRenderer!: CSSRenderer;
 
 	constructor() {
-		console.log("eeeeee");
+		//console.log("eeeeee");
 
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
 		this.canvas.focus();

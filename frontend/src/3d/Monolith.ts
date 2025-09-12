@@ -23,13 +23,17 @@ interface VoxelGrid {
 	origin: Vector3;
 	dimensions: Vector3;
 	voxelSize: number;
-	data: Map<string, boolean>;
+	data: Uint8Array;
+	width: number;
+	height: number;
+	depth: number;
 }
 
 interface BoundingBox {
 	min: Vector3;
 	max: Vector3;
 }
+
 
 export class Monolith {
 	public scene: Scene;
@@ -47,13 +51,19 @@ export class Monolith {
 	private isPickingEnabled: boolean = true;
 	private voxelPositions: Vector3[] = [];
 	private lastPickTime = 0;
-	private pickThrottleMs = 5;
+	private pickThrottleMs = 16; // Increased from 5ms to 16ms (60fps)
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
-	private trailPositions: Vector3[] = [];
-	private maxTrailLength = 10;
 	private text: TextRenderer | null = null;
+	private lastCursorPosition: Vector3 | null = null;
+	private lastOldCursorPosition: Vector3 | null = null;
 
+	private vector3Pool: Vector3[] = [];
+	private pooledVectors: Set<Vector3> = new Set();
+	private readonly POOL_INITIAL_SIZE = 1000;
+
+	private surfaceCache = new Map<number, boolean>();
+	private distanceCache = new Map<string, number>();
 
 	private static readonly _tempVector = new Vector3();
 	private static readonly _tempVector2 = new Vector3();
@@ -84,25 +94,77 @@ export class Monolith {
 			...options
 		};
 
-
-		console.log(`🔧 Monolith Configuration:
-   Size: ${size}
-   Voxel Size: ${this.options.voxelSize}
-   Quality: ${this.options.qualityMode}
-   Surface Only: ${this.options.surfaceOnly}
-   Max Voxels: ${this.options.maxVoxelCount}`);
+		this.initializeVector3Pool();
 
 		this.applyQualitySettings();
+
 		this.buildDefaultSDF();
 
 		this.text = new TextRenderer(this, this.scene);
-		//this.voxelMesh!.thinInstanceEnablePicking = true;
-		//
 
 		this.depthMaterial = new ShaderMaterial("monolithDepth", this.scene, "monolithDepth", {
 			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
 			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "worldCenter", "origin"]
-		})
+		});
+
+	}
+
+	// Vector3 Pool Methods
+	private initializeVector3Pool(): void {
+		for (let i = 0; i < this.POOL_INITIAL_SIZE; i++) {
+			this.vector3Pool.push(new Vector3());
+		}
+	}
+
+	private getPooledVector3(x: number = 0, y: number = 0, z: number = 0): Vector3 {
+		let vector = this.vector3Pool.pop();
+		if (!vector) {
+			vector = new Vector3();
+		}
+		vector.set(x, y, z);
+		this.pooledVectors.add(vector);
+		return vector;
+	}
+
+	private releaseVector3(vector: Vector3): void {
+		if (this.pooledVectors.has(vector)) {
+			this.pooledVectors.delete(vector);
+			this.vector3Pool.push(vector);
+		}
+	}
+
+	private releaseAllPooledVectors(): void {
+		for (const vector of this.pooledVectors) {
+			this.vector3Pool.push(vector);
+		}
+		this.pooledVectors.clear();
+	}
+
+	private getVoxelIndex(x: number, y: number, z: number, grid: VoxelGrid): number {
+		if (x < 0 || x >= grid.width || y < 0 || y >= grid.height || z < 0 || z >= grid.depth) {
+			return -1;
+		}
+		return x + y * grid.width + z * grid.width * grid.height;
+	}
+
+	private setVoxel(x: number, y: number, z: number, grid: VoxelGrid, value: boolean): void {
+		const index = this.getVoxelIndex(x, y, z, grid);
+		if (index >= 0) {
+			grid.data[index] = value ? 1 : 0;
+		}
+	}
+
+	private getVoxel(x: number, y: number, z: number, grid: VoxelGrid): boolean {
+		const index = this.getVoxelIndex(x, y, z, grid);
+		return index >= 0 ? grid.data[index] === 1 : false;
+	}
+
+	private indexToCoords(index: number, grid: VoxelGrid): [number, number, number] {
+		const z = Math.floor(index / (grid.width * grid.height));
+		const remainder = index % (grid.width * grid.height);
+		const y = Math.floor(remainder / grid.width);
+		const x = remainder % grid.width;
+		return [x, y, z];
 	}
 
 	private applyQualitySettings() {
@@ -134,10 +196,6 @@ export class Monolith {
 		this.options.maxVoxelCount = settings.maxVoxelCount;
 		this.options.surfaceOnly = settings.surfaceOnly;
 
-		console.log(`📊 Applied ${this.options.qualityMode} quality:
-   Voxel Size: ${this.options.voxelSize}
-   Max Voxels: ${this.options.maxVoxelCount}
-   Surface Only: ${this.options.surfaceOnly}`);
 	}
 
 	public async init() {
@@ -145,8 +203,6 @@ export class Monolith {
 	}
 
 	private createMaterial(): MonolithMaterial {
-
-		//const light = new PointLight("monolithLight", new Vector3(0, 5., 0), this.scene);
 		const shaderMaterial = new MonolithMaterial("monolithMaterial", this.scene);
 
 		shaderMaterial.setFloat("time", 0);
@@ -154,10 +210,9 @@ export class Monolith {
 		shaderMaterial.setFloat("animationIntensity", this.options.animationIntensity);
 		shaderMaterial.setVec3("worldCenter", Vector3.Zero());
 
-		shaderMaterial.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
-		shaderMaterial.setFloat("mouseInfluenceRadius", 1.)
+		shaderMaterial.setFloat("baseWaveIntensity", 0.02);
+		shaderMaterial.setFloat("mouseInfluenceRadius", 1.);
 		this.material = shaderMaterial;
-		//shaderMaterial.diffuseColor = new Color3(0);
 
 		return shaderMaterial;
 	}
@@ -173,8 +228,6 @@ export class Monolith {
 		this.gpuPicker = new GPUPicker();
 		this.gpuPicker.setPickingList([this.voxelMesh]);
 
-
-		//this.scene.onPointerObservable.add((pointerInfo) => {
 		window.addEventListener("mousemove", (event) => {
 			if (!this.isPickingEnabled || !this.gpuPicker) return;
 
@@ -186,7 +239,6 @@ export class Monolith {
 
 			this.gpuPicker.pickAsync(event.clientX, event.clientY, false).then((pickInfo) => {
 				if (pickInfo && pickInfo.thinInstanceIndex != null) {
-
 					this.options.animationIntensity = 0.05;
 					if (this.voxelPositions && pickInfo.thinInstanceIndex < this.voxelPositions.length) {
 						const voxelPosition = this.voxelPositions[pickInfo.thinInstanceIndex];
@@ -199,10 +251,10 @@ export class Monolith {
 					this.oldcursor.copyFrom(this.cursor);
 					this.cursor.copyFrom(this.defaultCursorPosition);
 				}
-			})
+			});
 		});
-
 	}
+
 	private buildDefaultSDF() {
 		const basePyramid = SDFBuilder.pyramid(1.0, {
 			scale: new Vector3(
@@ -216,7 +268,6 @@ export class Monolith {
 
 	public setSDFTree(sdfTree: SDFNode) {
 		this.sdfTree = sdfTree;
-		this.generateVoxelSystem();
 	}
 
 	private calculateOptimalBounds(): BoundingBox {
@@ -235,6 +286,8 @@ export class Monolith {
 		const searchRadius = maxDim * 1.2;
 		const tempTestPos = Monolith._tempVector3;
 
+		let sdfEvaluations = 0;
+
 		for (let i = 0; i < testPoints; i++) {
 			for (let j = 0; j < testPoints; j++) {
 				for (let k = 0; k < testPoints; k++) {
@@ -245,9 +298,9 @@ export class Monolith {
 					);
 
 					const distance = this.sdfSystem.evaluate(tempTestPos, this.sdfTree);
+					sdfEvaluations++;
 
 					if (distance < this.options.sdfThreshold * 2) {
-						// Manual in-place min/max
 						if (tempTestPos.x < minBounds.x) minBounds.x = tempTestPos.x;
 						if (tempTestPos.y < minBounds.y) minBounds.y = tempTestPos.y;
 						if (tempTestPos.z < minBounds.z) minBounds.z = tempTestPos.z;
@@ -260,9 +313,9 @@ export class Monolith {
 			}
 		}
 
+
 		const padding = this.options.voxelSize * 2;
 
-		// Apply padding and return
 		return {
 			min: new Vector3(minBounds.x - padding, minBounds.y - padding, minBounds.z - padding),
 			max: new Vector3(maxBounds.x + padding, maxBounds.y + padding, maxBounds.z + padding)
@@ -283,33 +336,34 @@ export class Monolith {
 		);
 
 		const size = alignedMax.subtract(alignedMin);
-		const dimensions = new Vector3(
-			size.x / this.options.voxelSize,
-			size.y / this.options.voxelSize,
-			size.z / this.options.voxelSize
-		);
+		const width = Math.ceil(size.x / this.options.voxelSize);
+		const height = Math.ceil(size.y / this.options.voxelSize);
+		const depth = Math.ceil(size.z / this.options.voxelSize);
+
+		const totalVoxels = width * height * depth;
+
+
 		return {
 			origin: alignedMin,
-			dimensions,
+			dimensions: new Vector3(width, height, depth),
 			voxelSize: this.options.voxelSize,
-			data: new Map<string, boolean>()
+			data: new Uint8Array(totalVoxels),
+			width,
+			height,
+			depth
 		};
 	}
 
-	private voxelKey(x: number, y: number, z: number): string {
-		return `${x},${y},${z}`;
-	}
-
-	private keyToPosition(key: string, grid: VoxelGrid): Vector3 {
-		const [x, y, z] = key.split(',').map(Number);
-		return new Vector3(
-			grid.origin.x + x * grid.voxelSize,
-			grid.origin.y + y * grid.voxelSize,
-			grid.origin.z + z * grid.voxelSize
-		);
-	}
 	private isSurfaceVoxel(x: number, y: number, z: number, grid: VoxelGrid): boolean {
 		if (!this.options.surfaceOnly) return true;
+
+		const index = this.getVoxelIndex(x, y, z, grid);
+		if (index < 0) return false;
+
+		if (this.surfaceCache.has(index)) {
+			return this.surfaceCache.get(index)!;
+		}
+
 
 		const neighbors = [
 			[-1, 0, 0], [1, 0, 0],
@@ -317,30 +371,62 @@ export class Monolith {
 			[0, 0, -1], [0, 0, 1]
 		];
 
+		let isSurface = false;
 		let sdfEvaluations = 0;
+
 		for (const [dx, dy, dz] of neighbors) {
-			const neighborKey = this.voxelKey(x + dx, y + dy, z + dz);
-			if (!grid.data.has(neighborKey)) {
-				const neighborPos = new Vector3(
-					grid.origin.x + (x + dx) * grid.voxelSize,
-					grid.origin.y + (y + dy) * grid.voxelSize,
-					grid.origin.z + (z + dz) * grid.voxelSize
+			const neighborX = x + dx;
+			const neighborY = y + dy;
+			const neighborZ = z + dz;
+
+			if (!this.getVoxel(neighborX, neighborY, neighborZ, grid)) {
+				const neighborPos = this.getPooledVector3(
+					grid.origin.x + neighborX * grid.voxelSize,
+					grid.origin.y + neighborY * grid.voxelSize,
+					grid.origin.z + neighborZ * grid.voxelSize
 				);
 
-				if (!this.sdfTree) return true;
-				const distance = this.sdfSystem.evaluate(neighborPos, this.sdfTree);
-				sdfEvaluations++;
+				if (this.sdfTree) {
+					const distance = this.sdfSystem.evaluate(neighborPos, this.sdfTree);
+					sdfEvaluations++;
+					if (distance >= this.options.sdfThreshold) {
+						isSurface = true;
+					}
+				}
 
-				if (distance >= this.options.sdfThreshold) {
-					return true;
+				this.releaseVector3(neighborPos);
+
+				if (isSurface) break;
+			}
+		}
+
+		this.surfaceCache.set(index, isSurface);
+		return isSurface;
+	}
+
+	private evaluateSDFBatch(positions: Vector3[], batchSize: number = 100): number[] {
+		const results: number[] = [];
+		let totalEvaluations = 0;
+
+		for (let i = 0; i < positions.length; i += batchSize) {
+			const batch = positions.slice(i, Math.min(i + batchSize, positions.length));
+
+			for (const pos of batch) {
+				if (this.sdfTree) {
+					results.push(this.sdfSystem.evaluate(pos, this.sdfTree));
+					totalEvaluations++;
+				} else {
+					results.push(Infinity);
 				}
 			}
 		}
-		return false;
+
+		return results;
 	}
 
 	private async generateVoxelSystem() {
 		if (!this.sdfTree) return;
+
 		this.sdfSystem.resetEvaluationCount();
 
 		if (this.voxelMesh) {
@@ -348,11 +434,13 @@ export class Monolith {
 			this.voxelMesh = null;
 		}
 
-		const bounds = this.calculateOptimalBounds();
+		this.surfaceCache.clear();
+		this.distanceCache.clear();
 
+		const bounds = this.calculateOptimalBounds();
 		this.voxelGrid = this.createVoxelGrid(bounds);
 
-		await this.fillVoxelGridWithOctree(this.voxelGrid);
+		await this.fillVoxelGridDirect(this.voxelGrid);
 
 		const surfaceVoxels = this.extractVoxels(this.voxelGrid);
 
@@ -361,29 +449,88 @@ export class Monolith {
 		if (finalVoxels.length > 0) {
 			this.voxelMesh = await this.createOptimizedVoxelMesh(finalVoxels);
 		}
-		this.setupGPUPicking();
 
+		this.setupGPUPicking();
+	}
+
+	private async fillVoxelGridDirect(grid: VoxelGrid) {
+		const totalVoxels = grid.width * grid.height * grid.depth;
+
+		let processed = 0;
+		let generated = 0;
+
+		for (let z = 0; z < grid.depth; z++) {
+			for (let y = 0; y < grid.height; y++) {
+				const positions: Vector3[] = [];
+				const coordinates: [number, number, number][] = [];
+
+				for (let x = 0; x < grid.width; x++) {
+					const worldPos = new Vector3(
+						grid.origin.x + x * grid.voxelSize,
+						grid.origin.y + y * grid.voxelSize,
+						grid.origin.z + z * grid.voxelSize
+					);
+
+					const distFromOrigin = Math.sqrt(worldPos.x * worldPos.x + worldPos.z * worldPos.z);
+					const maxRadius = Math.max(this.options.width, this.options.depth) * 1.1;
+
+					if (worldPos.y > this.options.height * 1.2 ||
+						worldPos.y < -this.options.height * 0.1 ||
+						distFromOrigin > maxRadius) {
+						processed++;
+						continue;
+					}
+
+					positions.push(worldPos);
+					coordinates.push([x, y, z]);
+					processed++;
+				}
+
+				if (positions.length > 0) {
+					const distances = this.evaluateSDFBatch(positions);
+
+					for (let j = 0; j < distances.length; j++) {
+						if (distances[j] < this.options.sdfThreshold) {
+							const [x, y, z] = coordinates[j];
+							this.setVoxel(x, y, z, grid, true);
+							generated++;
+						}
+					}
+				}
+
+				if ((y * grid.depth + z) % 1000 === 0) {
+					await new Promise(resolve => setTimeout(resolve, 1));
+				}
+			}
+		}
 	}
 
 	private extractVoxels(grid: VoxelGrid): Vector3[] {
 		const voxels: Vector3[] = [];
-		let surfaceCount = 0;
-		for (const [key] of grid.data) {
-			const [x, y, z] = key.split(',').map(Number);
+		const totalVoxels = grid.data.length;
 
-			if (this.isSurfaceVoxel(x, y, z, grid)) {
-				const worldPos = this.keyToPosition(key, grid);
-				voxels.push(worldPos);
-				surfaceCount++;
+		this.surfaceCache.clear();
+
+		for (let i = 0; i < totalVoxels; i++) {
+			if (grid.data[i] === 1) {
+				const [x, y, z] = this.indexToCoords(i, grid);
+
+				if (this.isSurfaceVoxel(x, y, z, grid)) {
+					const worldPos = this.getPooledVector3(
+						grid.origin.x + x * grid.voxelSize,
+						grid.origin.y + y * grid.voxelSize,
+						grid.origin.z + z * grid.voxelSize
+					);
+
+					voxels.push(new Vector3(worldPos.x, worldPos.y, worldPos.z));
+					this.releaseVector3(worldPos);
+				}
 			}
 		}
-
 		return voxels;
 	}
-
 	private limitVoxelCount(voxels: Vector3[]): Vector3[] {
 		if (voxels.length <= this.options.maxVoxelCount) {
-			console.log(`✅ No voxel limiting needed: ${voxels.length} <= ${this.options.maxVoxelCount}`);
 			return voxels;
 		}
 
@@ -395,8 +542,6 @@ export class Monolith {
 			sampled.push(voxels[index]);
 		}
 
-		const reductionRate = ((voxels.length - sampled.length) / voxels.length) * 100;
-
 		return sampled;
 	}
 
@@ -405,44 +550,37 @@ export class Monolith {
 			this.matrixBuffer = new Float32Array(positions.length * 16);
 			this.lastVoxelCount = positions.length;
 		}
+
 		const baseCube = MeshBuilder.CreateBox('voxel_base', {
 			size: this.options.voxelSize,
 			updatable: false
 		}, this.scene);
-		//baseCube.thinInstanceEnablePicking = true;
+
 		this.voxelPositions = [...positions];
 		const totalMatrices = positions.length;
 		const matrixBuffer = this.matrixBuffer;
 		const instanceIDBuffer = new Float32Array(totalMatrices);
 
-		console.log(`📊 Calculating center and building instance data...`);
-		let center = Vector3.Zero();
-		for (const pos of positions) {
-			center = center.add(pos);
-		}
-		center = center.scale(1.0 / positions.length);
 
-		// Build instance data in batches
+		const center = Monolith._tempVector.set(0, 0, 0);
+		for (const pos of positions) {
+			center.addInPlace(pos);
+		}
+		center.scaleInPlace(1.0 / positions.length);
+
 		const batchSize = 10000;
 		const totalBatches = Math.ceil(totalMatrices / batchSize);
-		console.log(`🔄 Processing ${totalBatches} batches of instance data...`);
 
 		for (let i = 0; i < totalMatrices; i += batchSize) {
 			const endIdx = Math.min(i + batchSize, totalMatrices);
-			const currentBatch = Math.floor(i / batchSize) + 1;
 
 			for (let j = i; j < endIdx; j++) {
 				const pos = positions[j];
-				const matrix = Matrix.Translation(pos.x, pos.y, pos.z);
-				matrix.copyToArray(matrixBuffer, j * 16);
+				Matrix.TranslationToRef(pos.x, pos.y, pos.z, Monolith._tempMatrix);
+				Monolith._tempMatrix.copyToArray(matrixBuffer, j * 16);
 				instanceIDBuffer[j] = j;
 			}
 
-			if (currentBatch % 5 === 0 || currentBatch === totalBatches) {
-				console.log(`   📦 Batch ${currentBatch}/${totalBatches} (${((currentBatch / totalBatches) * 100).toFixed(1)}%)`);
-			}
-
-			// Yield control
 			if (i % batchSize === 0) {
 				await new Promise(resolve => setTimeout(resolve, 1));
 			}
@@ -452,7 +590,6 @@ export class Monolith {
 		baseCube.thinInstanceCount = totalMatrices;
 
 		if (this.options.enableShaderAnimation) {
-			console.log(`🎬 Adding animation buffers...`);
 			baseCube.setVerticesBuffer(new VertexBuffer(
 				this.scene.getEngine(),
 				instanceIDBuffer,
@@ -470,137 +607,11 @@ export class Monolith {
 
 		baseCube.material = this.material;
 
-		try {
-			if (baseCube.freezeWorldMatrix) {
-				baseCube.freezeWorldMatrix(); // Optimize for static geometry
-				console.log(`🔒 World matrix frozen for optimization`);
-			}
-		} catch (e) {
-			console.log("❌ freezeWorldMatrix not available, skipping optimization");
+		if (baseCube.freezeWorldMatrix) {
+			baseCube.freezeWorldMatrix();
 		}
 
 		return baseCube;
-	}
-
-	private async fillVoxelGridWithOctree(grid: VoxelGrid) {
-		const rootBounds = {
-			min: grid.origin,
-			max: new Vector3(
-				grid.origin.x + grid.dimensions.x * grid.voxelSize,
-				grid.origin.y + grid.dimensions.y * grid.voxelSize,
-				grid.origin.z + grid.dimensions.z * grid.voxelSize
-			)
-		};
-
-		let processed = 0;
-		let generated = 0;
-
-		await this.subdivideAndFill(rootBounds, grid, 0, 6, (p, g) => { processed = p; generated = g; });
-	}
-
-	private async subdivideAndFill(bounds: BoundingBox, grid: VoxelGrid, level: number, maxLevel: number,
-		progressCallback: (processed: number, generated: number) => void) {
-
-		if (await this.isRegionEmpty(bounds)) {
-			return;
-		}
-
-		const size = bounds.max.subtract(bounds.min);
-		const minVoxelSize = this.options.voxelSize * 2;
-
-		if (level >= maxLevel || size.x <= minVoxelSize || size.y <= minVoxelSize || size.z <= minVoxelSize) {
-			await this.fillRegionDirectly(bounds, grid, progressCallback);
-			return;
-		}
-
-		const center = new Vector3(
-			(bounds.min.x + bounds.max.x) * 0.5,
-			(bounds.min.y + bounds.max.y) * 0.5,
-			(bounds.min.z + bounds.max.z) * 0.5
-		);
-
-		const octants = [
-			{ min: bounds.min, max: center },
-			{ min: new Vector3(center.x, bounds.min.y, bounds.min.z), max: new Vector3(bounds.max.x, center.y, center.z) },
-			{ min: new Vector3(bounds.min.x, center.y, bounds.min.z), max: new Vector3(center.x, bounds.max.y, center.z) },
-			{ min: new Vector3(center.x, center.y, bounds.min.z), max: new Vector3(bounds.max.x, bounds.max.y, center.z) },
-			{ min: new Vector3(bounds.min.x, bounds.min.y, center.z), max: new Vector3(center.x, center.y, bounds.max.z) },
-			{ min: new Vector3(center.x, bounds.min.y, center.z), max: new Vector3(bounds.max.x, center.y, bounds.max.z) },
-			{ min: new Vector3(bounds.min.x, center.y, center.z), max: new Vector3(center.x, bounds.max.y, bounds.max.z) },
-			{ min: center, max: bounds.max }
-		];
-
-		for (const octant of octants) {
-			await this.subdivideAndFill(octant, grid, level + 1, maxLevel, progressCallback);
-		}
-	}
-
-	private async isRegionEmpty(bounds: BoundingBox): Promise<boolean> {
-		if (!this.sdfTree) return true;
-
-		const testPoints = [
-			bounds.min,
-			bounds.max,
-			new Vector3(bounds.max.x, bounds.min.y, bounds.min.z),
-			new Vector3(bounds.min.x, bounds.max.y, bounds.min.z),
-			new Vector3(bounds.min.x, bounds.min.y, bounds.max.z),
-			new Vector3(bounds.max.x, bounds.max.y, bounds.min.z),
-			new Vector3(bounds.max.x, bounds.min.y, bounds.max.z),
-			new Vector3(bounds.min.x, bounds.max.y, bounds.max.z),
-			new Vector3( // center
-				(bounds.min.x + bounds.max.x) * 0.5,
-				(bounds.min.y + bounds.max.y) * 0.5,
-				(bounds.min.z + bounds.max.z) * 0.5
-			)
-		];
-
-		for (const point of testPoints) {
-			const distance = this.sdfSystem.evaluate(point, this.sdfTree);
-			if (distance < this.options.sdfThreshold * 2) { // Use larger threshold for region testing
-				return false; // Found something, region not empty
-			}
-		}
-
-		return true;
-	}
-
-	private async fillRegionDirectly(bounds: BoundingBox, grid: VoxelGrid,
-		progressCallback: (processed: number, generated: number) => void) {
-
-		const voxelSize = grid.voxelSize;
-		let localProcessed = 0;
-		let localGenerated = 0;
-
-		const startX = Math.max(0, Math.floor((bounds.min.x - grid.origin.x) / voxelSize));
-		const endX = Math.min(grid.dimensions.x, Math.ceil((bounds.max.x - grid.origin.x) / voxelSize));
-		const startY = Math.max(0, Math.floor((bounds.min.y - grid.origin.y) / voxelSize));
-		const endY = Math.min(grid.dimensions.y, Math.ceil((bounds.max.y - grid.origin.y) / voxelSize));
-		const startZ = Math.max(0, Math.floor((bounds.min.z - grid.origin.z) / voxelSize));
-		const endZ = Math.min(grid.dimensions.z, Math.ceil((bounds.max.z - grid.origin.z) / voxelSize));
-
-		for (let x = startX; x < endX; x++) {
-			for (let y = startY; y < endY; y++) {
-				for (let z = startZ; z < endZ; z++) {
-					const worldPos = new Vector3(
-						grid.origin.x + x * voxelSize,
-						grid.origin.y + y * voxelSize,
-						grid.origin.z + z * voxelSize
-					);
-
-					const distance = this.sdfSystem.evaluate(worldPos, this.sdfTree!);
-
-					if (distance < this.options.sdfThreshold) {
-						const key = this.voxelKey(x, y, z);
-						grid.data.set(key, true);
-						localGenerated++;
-					}
-
-					localProcessed++;
-				}
-			}
-		}
-
-		progressCallback(localProcessed, localGenerated);
 	}
 
 	public setRectangularDeadZone(center: Vector3, width: number, height: number, depth: number) {
@@ -612,7 +623,6 @@ export class Monolith {
 
 	public enableShaderAnimation(enabled: boolean) {
 		if (this.options.enableShaderAnimation !== enabled) {
-			console.log(`🎬 ${enabled ? 'Enabling' : 'Disabling'} shader animation...`);
 			this.options.enableShaderAnimation = enabled;
 			this.createMaterial();
 
@@ -632,7 +642,6 @@ export class Monolith {
 		if (this.material instanceof ShaderMaterial) {
 			this.material.setFloat("animationSpeed", speed);
 		}
-		console.log(`⚡ Animation speed: ${speed}`);
 	}
 
 	public setAnimationIntensity(intensity: number) {
@@ -640,7 +649,6 @@ export class Monolith {
 		if (this.material instanceof ShaderMaterial) {
 			this.material.setFloat("animationIntensity", intensity);
 		}
-		console.log(`💪 Animation intensity: ${intensity}`);
 	}
 
 	public setAnimationStyle(style: 'gentle' | 'active' | 'chaotic' | 'none') {
@@ -655,41 +663,57 @@ export class Monolith {
 		this.setAnimationSpeed(config.speed);
 		this.setAnimationIntensity(config.intensity);
 		this.enableShaderAnimation(config.enabled);
-		console.log(`🎭 Animation style: ${style}`);
 	}
 
 	public setQualityMode(mode: 'low' | 'medium' | 'high' | 'ultra') {
-		console.log(`🔧 Changing quality mode from ${this.options.qualityMode} to ${mode}`);
 		this.options.qualityMode = mode;
 		this.applyQualitySettings();
 		this.generateVoxelSystem();
 	}
 
+	// Optimized update method - only update uniforms when values change
+	private lastUpdateValues = {
+		time: -1,
+		animationSpeed: -1,
+		animationIntensity: -1,
+		cursorChanged: false,
+		oldCursorChanged: false
+	};
+
 	public update(time: number, camera: Camera) {
-		this.material.setVec3("cameraPosition", camera.globalPosition);
 		this.material.setFloat("time", time);
-		this.material.setVec3("origin", this.cursor);
-		this.material.setVec3("oldOrigin", this.oldcursor);
-		this.material.setFloat("animationSpeed", this.options.animationSpeed);
-		this.material.setFloat("animationIntensity", this.options.animationIntensity);
-		this.material.setVec3("worldCenter", Vector3.Zero());
-
-		this.material.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
-		this.material.setFloat("mouseInfluenceRadius", 0.8)
-		//this.setRectangularDeadZone(new Vector3(0, 7, 2), 1.5, 1.5, 1);
-
-
 		this.depthMaterial.setFloat("time", time);
+		this.lastUpdateValues.time = time;
+
+		const cursorChanged = !this.cursor.equals(this.lastCursorPosition || Vector3.Zero());
+		const oldCursorChanged = !this.oldcursor.equals(this.lastOldCursorPosition || Vector3.Zero());
+		this.material.setVec3("origin", this.cursor);
 		this.depthMaterial.setVector3("origin", this.cursor);
+		this.lastUpdateValues.cursorChanged = cursorChanged;
+
+		this.material.setVec3("oldOrigin", this.oldcursor);
+		this.lastUpdateValues.oldCursorChanged = oldCursorChanged;
+
+		this.material.setFloat("animationSpeed", this.options.animationSpeed);
 		this.depthMaterial.setFloat("animationSpeed", this.options.animationSpeed);
+		this.lastUpdateValues.animationSpeed = this.options.animationSpeed;
+
+		this.material.setFloat("animationIntensity", this.options.animationIntensity);
 		this.depthMaterial.setFloat("animationIntensity", this.options.animationIntensity);
+		this.lastUpdateValues.animationIntensity = this.options.animationIntensity;
+
+		this.material.setVec3("cameraPosition", camera.globalPosition);
+		this.material.setVec3("worldCenter", Vector3.Zero());
+		this.material.setFloat("baseWaveIntensity", 0.02);
+		this.material.setFloat("mouseInfluenceRadius", 0.8);
+
 		this.depthMaterial.setVector3("worldCenter", Vector3.Zero());
+		this.depthMaterial.setFloat("baseWaveIntensity", 0.02);
+		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.0);
 
-		this.depthMaterial.setFloat("baseWaveIntensity", 0.02); // Subtle base animation
-		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.)
-		if (this.text)
+		if (this.text) {
 			this.text.update();
-
+		}
 
 	}
 
@@ -702,8 +726,17 @@ export class Monolith {
 			this.voxelMesh.dispose();
 			this.voxelMesh = null;
 		}
+
+		this.surfaceCache.clear();
+		this.distanceCache.clear();
+		this.releaseAllPooledVectors();
+
 		this.voxelGrid = null;
-		console.log(`🗑️ Monolith disposed`);
+
+		if (this.gpuPicker) {
+			this.gpuPicker = null;
+		}
+
 	}
 
 	public addText(id: string, text: string, x: number = 0, y: number = 0, z: number = 3, size: number = 1.5) {
@@ -747,6 +780,7 @@ export class Monolith {
 			this.text.setTextFace(id, face);
 		}
 	}
+
 	public getTextZones(): string[] {
 		return this.text?.getZones() || [];
 	}
@@ -754,6 +788,10 @@ export class Monolith {
 	public setPicking(value: boolean) {
 		this.isPickingEnabled = value;
 	}
-}
 
+	public clearCaches() {
+		this.surfaceCache.clear();
+		this.distanceCache.clear();
+	}
+}
 
