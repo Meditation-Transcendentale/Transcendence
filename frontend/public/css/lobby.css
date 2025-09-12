@@ -1,16 +1,70 @@
 #players-window {
 	display: inline-block;
-	width: 100vh;
+	width: 60vh;
 	height: 100vh;
 	/*width: fit-content;*/
 	overflow: scroll;
 	pointer-events: auto;
 }
 
-#players-window>.window-bar {
-	font-size: 3vh;
+#info-window {
+	display:flex;
+	flex-direction: column;
+	/*display: inline-block;*/
+	width: 40vh;
+	height: 60vh;
+	overflow: scroll;
+	pointer-events: auto;
 }
 
+#invite-window {
+	display: inline-block;
+	width: 40vh;
+	height: 60vh;
+	overflow: scroll;
+	pointer-events: auto;
+}
+
+#invite-window>.window-bar {
+	font-size: 4vh;
+	user-select: none;
+}
+
+#info-window>.window-bar {
+	/*align-self: flex-end;*/
+	font-size: 4vh;
+	user-select: none;
+}
+
+#info-window>.window-content {
+	display:flex;
+	flex-direction: column;
+	flex-grow:1;
+	font-size: 4vh;
+	user-select: none;
+}
+
+#info-window>.window-footer {
+	display: flex;
+	flex-direction: row;
+	/*align-self: flex-start;*/
+	flex-grow:0;
+	font-size: 2vh;
+	user-select: none;
+}
+
+#info-window>.window-line {
+}
+
+#players-window>.window-bar {
+	font-size: 4vh;
+	user-select: none;
+}
+
+#info-window>.window {
+	display:flex;
+	flex-direction: row;
+}
 #players-window>table {
 	display: inline-block;
 	border-collapse: collapse;
@@ -42,7 +96,7 @@
 	text-align: left;
 }
 
-#players-windw thead>td>th {
+#players-window thead>td>th {
 	padding-right: 2vh;
 }
 
@@ -50,7 +104,7 @@
 	text-align: center;
 }
 
-#player-window thead th {
+#players-window thead th {
 	position: sticky;
 	top: 2.6vh;
 	background-color: black;

@@ -28,6 +28,7 @@ const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_
 const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
 const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getUserForFriendResearchStmt = database.prepare("SELECT username FROM users WHERE username = ?");
+const getAllUsersStmt = database.prepare("SELECT * FROM users");
 const getUserStatusStmt = database.prepare("SELECT status, lobby_gameId FROM active_user WHERE user_id = ?");
 const addUserStatusStmt = database.prepare("INSERT INTO active_user (user_id, status) VALUES (?, ?)");
 const updateStatusStmt = database.prepare("UPDATE active_user SET status = ?, lobby_gameId = ? WHERE user_id = ?");
@@ -213,15 +214,22 @@ const userService = {
 		// }
 		return status;
 	},
+	getAllUsers: () => {
+		const users = getAllUsersStmt.all();
+		if (users.length === 0) {
+			throw { status: statusCode.NOT_FOUND, message: returnMessages.NO_USERS_FOUND };
+		}
+		return users;
+	},
 	addUserStatus: (userId, status) => {
-		const validStatuses = ['registered', 'online', 'offline', 'in_lobby', 'in_game'];
+		const validStatuses = ['online', 'offline', 'in_lobby', 'in_game', 'in_tournament'];
 		if (!validStatuses.includes(status)) {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
 		}
 		addUserStatusStmt.run(userId, status);
 	},
 	updateStatus: (userId, status, lobby_gameId) => {
-		const validStatuses = ['registered', 'online', 'offline', 'in_lobby', 'in_game'];
+		const validStatuses = ['online', 'offline', 'in_lobby', 'in_game', 'in_tournament'];
 		if (status && !validStatuses.includes(status)) {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
 		}

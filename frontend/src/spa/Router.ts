@@ -81,7 +81,7 @@ class RouterC {
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 		this.routes.set("/brick", {
-			html: "/game",
+			html: "/game-ui",
 			ts: "./brick",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);

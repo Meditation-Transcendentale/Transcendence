@@ -14,6 +14,7 @@ interface TextZone {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	texture: Texture | null;
+	face: Vector3;
 }
 
 export class TextRenderer {
@@ -26,22 +27,15 @@ export class TextRenderer {
 		this.monolith = monolith;
 		this.scene = scene;
 		this.setupHoverDetection();
-
-		this.scene.registerBeforeRender(() => {
-			this.update();
-		});
 	}
 
 	addTextZone(id: string, text: string, x: number, y: number, z: number, size: number = 1.5) {
-		console.log(`🎨 Adding text zone "${id}": "${text}"`);
 
-		// Create canvas for this zone
 		const canvas = document.createElement('canvas');
 		canvas.width = 256;
 		canvas.height = 128;
 		const ctx = canvas.getContext('2d')!;
 
-		// Draw text on canvas
 		ctx.fillStyle = '#000000';
 		ctx.fillRect(0, 0, 256, 128);
 		ctx.fillStyle = '#ffffff';
@@ -50,20 +44,17 @@ export class TextRenderer {
 		ctx.textBaseline = 'middle';
 		ctx.fillText(text, 128, 64);
 
-		// Create texture
 		const texture = Texture.CreateFromBase64String(
 			canvas.toDataURL(),
 			`text_${id}`,
 			this.monolith.scene
 		);
 
-		// Calculate bounds
 		const bounds = {
 			min: new Vector3(x - size / 2, y - size / 2, z - 1),
 			max: new Vector3(x + size / 2, y + size / 2, z + 1)
 		};
 
-		// Create text zone
 		const zone: TextZone = {
 			id,
 			text,
@@ -74,12 +65,12 @@ export class TextRenderer {
 			glow: 0,
 			canvas,
 			ctx,
-			texture
+			texture,
+			face: new Vector3(0, 0, 1)
 		};
 
 		this.textZones.push(zone);
 
-		// If this is the first zone, make it active
 		if (!this.currentActiveZone) {
 			this.setActiveZone(id);
 		}
@@ -99,7 +90,6 @@ export class TextRenderer {
 				this.updateShaderUniforms();
 			}
 
-			console.log(`🗑️ Removed text zone "${id}"`);
 		}
 	}
 
@@ -109,7 +99,6 @@ export class TextRenderer {
 
 		zone.text = newText;
 
-		// Redraw canvas
 		zone.ctx.fillStyle = '#000000';
 		zone.ctx.fillRect(0, 0, 256, 128);
 		zone.ctx.fillStyle = '#ffffff';
@@ -118,7 +107,6 @@ export class TextRenderer {
 		zone.ctx.textBaseline = 'middle';
 		zone.ctx.fillText(newText, 128, 64);
 
-		// Update texture
 		if (zone.texture) {
 			zone.texture.dispose();
 		}
@@ -128,7 +116,6 @@ export class TextRenderer {
 			this.monolith.scene
 		);
 
-		// Update shader if this is the active zone
 		if (this.currentActiveZone === id) {
 			this.updateShaderUniforms();
 		}
@@ -139,7 +126,6 @@ export class TextRenderer {
 		if (zoneExists) {
 			this.currentActiveZone = id;
 			this.updateShaderUniforms();
-			console.log(`🎯 Active text zone: "${id}"`);
 		}
 	}
 
@@ -147,15 +133,14 @@ export class TextRenderer {
 		const material = this.monolith.material as MonolithMaterial;
 		if (!material) return;
 
-		this.scene.registerBeforeRender(() => {
-			material.setFloat('textCount', this.textZones.length);
+		material.setFloat('textCount', this.textZones.length);
 
-			this.textZones.forEach((zone, index) => {
-				material.setTexture(`textTexture${index}`, zone.texture);
-				material.setVec3(`textPosition${index}`, zone.position);
-				material.setFloat(`textSize${index}`, 5.0);
-				material.setFloat(`textGlow${index}`, zone.glow);
-			});
+		this.textZones.forEach((zone, index) => {
+			material.setTexture(`textTexture${index}`, zone.texture);
+			material.setVec3(`textPosition${index}`, zone.position);
+			material.setFloat(`textSize${index}`, 5.0);
+			material.setFloat(`textGlow${index}`, zone.glow);
+			material.setVec3(`textFace${index}`, zone.face);
 		});
 	}
 
@@ -165,7 +150,7 @@ export class TextRenderer {
 		});
 	}
 
-	private update() {
+	public update() {
 		for (const zone of this.textZones) {
 			if (zone.isHovering) {
 				zone.glow += 0.01;
@@ -180,6 +165,7 @@ export class TextRenderer {
 
 			}
 		}
+		this.updateShaderUniforms();
 
 	}
 
@@ -207,10 +193,6 @@ export class TextRenderer {
 
 			if (wasHovering !== zone.isHovering) {
 				anyHoverChanged = true;
-
-				if (zone.isHovering) {
-					console.log(`✨ Text hover detected on zone "${zone.id}"`);
-				}
 			}
 		}
 
@@ -273,6 +255,45 @@ export class TextRenderer {
 
 	public showZone(id: string) {
 		this.setActiveZone(id);
+	}
+	public setTextFace(id: string, face: 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom') {
+		const zoneIndex = this.getZoneIndex(id);
+		if (zoneIndex === -1) return;
+		const zone = this.textZones[zoneIndex];
+		if (!zone) return;
+		let faceVector: Vector3;
+
+		switch (face) {
+			case 'front':
+				faceVector = new Vector3(0, 0, 1);
+				break;
+			case 'back':
+				faceVector = new Vector3(0, 0, -1);
+				break;
+			case 'right':
+				faceVector = new Vector3(1, 0, 0);
+				break;
+			case 'left':
+				faceVector = new Vector3(-1, 0, 0);
+				break;
+			case 'top':
+				faceVector = new Vector3(0, 1, 0);
+				break;
+			case 'bottom':
+				faceVector = new Vector3(0, -1, 0);
+				break;
+			default:
+				faceVector = new Vector3(0, 0, 1);
+		}
+		zone.face = faceVector.clone();
+		const material = this.monolith.getMesh()?.material as MonolithMaterial;
+		if (material) {
+			material.setVec3(`textFace${zoneIndex}`, zone.face);
+		}
+	}
+
+	private getZoneIndex(id: string): number {
+		return this.textZones.findIndex(zone => zone.id === id);
 	}
 
 	public getZones(): string[] {

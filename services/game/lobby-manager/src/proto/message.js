@@ -6129,6 +6129,7 @@ export const lobby = $root.lobby = (() => {
          * @property {Array.<lobby.IPlayer>|null} [players] UpdateMessage players
          * @property {string|null} [status] UpdateMessage status
          * @property {string|null} [mode] UpdateMessage mode
+         * @property {string|null} [map] UpdateMessage map
          */
 
         /**
@@ -6180,6 +6181,14 @@ export const lobby = $root.lobby = (() => {
         UpdateMessage.prototype.mode = "";
 
         /**
+         * UpdateMessage map.
+         * @member {string} map
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.map = "";
+
+        /**
          * Creates a new UpdateMessage instance using the specified properties.
          * @function create
          * @memberof lobby.UpdateMessage
@@ -6212,6 +6221,8 @@ export const lobby = $root.lobby = (() => {
                 writer.uint32(/* id 3, wireType 2 =*/26).string(message.status);
             if (message.mode != null && Object.hasOwnProperty.call(message, "mode"))
                 writer.uint32(/* id 4, wireType 2 =*/34).string(message.mode);
+            if (message.map != null && Object.hasOwnProperty.call(message, "map"))
+                writer.uint32(/* id 5, wireType 2 =*/42).string(message.map);
             return writer;
         };
 
@@ -6264,6 +6275,10 @@ export const lobby = $root.lobby = (() => {
                     }
                 case 4: {
                         message.mode = reader.string();
+                        break;
+                    }
+                case 5: {
+                        message.map = reader.string();
                         break;
                     }
                 default:
@@ -6319,6 +6334,9 @@ export const lobby = $root.lobby = (() => {
             if (message.mode != null && message.hasOwnProperty("mode"))
                 if (!$util.isString(message.mode))
                     return "mode: string expected";
+            if (message.map != null && message.hasOwnProperty("map"))
+                if (!$util.isString(message.map))
+                    return "map: string expected";
             return null;
         };
 
@@ -6350,6 +6368,8 @@ export const lobby = $root.lobby = (() => {
                 message.status = String(object.status);
             if (object.mode != null)
                 message.mode = String(object.mode);
+            if (object.map != null)
+                message.map = String(object.map);
             return message;
         };
 
@@ -6372,6 +6392,7 @@ export const lobby = $root.lobby = (() => {
                 object.lobbyId = "";
                 object.status = "";
                 object.mode = "";
+                object.map = "";
             }
             if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
                 object.lobbyId = message.lobbyId;
@@ -6384,6 +6405,8 @@ export const lobby = $root.lobby = (() => {
                 object.status = message.status;
             if (message.mode != null && message.hasOwnProperty("mode"))
                 object.mode = message.mode;
+            if (message.map != null && message.hasOwnProperty("map"))
+                object.map = message.map;
             return object;
         };
 

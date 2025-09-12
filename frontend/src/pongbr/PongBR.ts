@@ -171,6 +171,7 @@ export class PongBR {
 		this.networkingSystem.forceIndexRebuild();
 
 		console.log("start");
+		this.inputManager.enable();
 		this.pongRoot.setEnabled(true);
 		this.stateManager.setter(true);
 		this.stateManager.update();
@@ -182,6 +183,7 @@ export class PongBR {
 	}
 	public stop(): void {
 
+		this.inputManager.disable();
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
 

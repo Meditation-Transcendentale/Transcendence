@@ -1,7 +1,8 @@
-import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4, Observer, TransformNode } from "@babylonImport";
+import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4, Observer, TransformNode, FreeCamera } from "@babylonImport";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
 import earcut from "earcut";
+import GameUI from "../spa/GameUI";
 
 let resizeTimeout: number;
 let engine: any;
@@ -9,7 +10,7 @@ let engine: any;
 export class BrickBreaker {
 	private engine: Engine;
 	private scene: Scene;
-	private camera: ArcRotateCamera;
+	private camera: FreeCamera;
 	private canvas: HTMLCanvasElement;
 	private bricks: Mesh[][];
 	private player: Player;
@@ -21,6 +22,10 @@ export class BrickBreaker {
 	private cols: number;
 	private layers: number;
 	public root: TransformNode;
+	private id: number = 0;
+	private start1: boolean = true;
+
+
 
 	constructor(canvas: HTMLCanvasElement, scene: Scene) {
 		this.canvas = canvas;
@@ -34,12 +39,11 @@ export class BrickBreaker {
 
 
 		//this.setupCamera();
-		this.setupLight();
+		//this.setupLight();
 		this.createArena();
 
-		this.camera = this.scene.getCameraByName("brick") as ArcRotateCamera;
-		this.camera.attachControl(this.canvas, true);
-		this.camera.parent = this.root
+		this.camera = this.scene.getCameraByName("fieldCamera") as FreeCamera;
+		//this.camera.attachControl(this.canvas, true);
 		this.layers = Math.ceil((Math.random() * 5) + 1);
 		// this.layers = 2;
 		this.cols = Math.ceil((Math.random() * 5) + 1);
@@ -47,6 +51,7 @@ export class BrickBreaker {
 
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
+		ballMaterial.specularColor.set(0, 0, 0);
 		this.ball = new Ball(this.scene, ballMaterial, this.root, this.layers * this.cols, this);
 		this.player = new Player(this.scene, new Vector3(0, 1, 0), this);
 
@@ -62,37 +67,87 @@ export class BrickBreaker {
 			return;
 		}
 
-		this.lastTime = performance.now();
+		if (this.bricks.length > 0) {
+			this.bricks.forEach(layer => {
+				layer.forEach(brick => {
+					brick.setEnabled(false);
+				});
+			});
+		}
+		this.layers = Math.ceil((Math.random() * 5) + 1);
+		this.cols = Math.ceil((Math.random() * 5) + 1);
+		this.ball.bricksLeft = this.layers * this.cols;
+		console.log("bricks :::: ", this.ball.bricksLeft);
+		this.bricks = this.generateBricks(10, this.layers, this.cols);
 
-		this.renderObserver = this.scene.onBeforeRenderObservable.add(() => {
-			this.update();
-		});
+		this.camera.parent = this.root
+		this.lastTime = performance.now();
+		this.start1 = true;
+		this.update();
+		//this.renderObserver = this.scene.onBeforeRenderObservable.add(() => {
+		//	this.update();
+		//});
+		this.player.enableInput();
 
 		console.log("BrickBreaker added to render loop");
 	}
 
-	public stop(): void {
-		if (this.renderObserver) {
-			this.scene.onBeforeRenderObservable.remove(this.renderObserver);
-			this.renderObserver = null;
-			console.log("BrickBreaker removed from render loop");
-		}
-	}
+
+	//public stop(): void {
+	//	if (this.renderObserver) {
+	//		this.scene.onBeforeRenderObservable.remove(this.renderObserver);
+	//		this.renderObserver = null;
+	//		console.log("BrickBreaker removed from render loop");
+	//	}
+	//	this.player.disableInput();
+	//	this.reset();
+	//}
 
 	private update(): void {
+
 		const currentTime = performance.now();
 		const delta = (currentTime - this.lastTime) / 1000;
 		this.lastTime = currentTime;
 
 		this.player.update();
 		this.ball.update(delta, this.player, this.cols, this.layers, this.bricks);
+
+		this.id = requestAnimationFrame(() => this.update());
+		if (!this.start1) {
+			cancelAnimationFrame(this.id);
+		}
 	}
 
-	public reset(): void {
-		this.ball.updatePosition(0, 1);
-		this.ball.setVelocity(new Vector3(0, 0, 0));
-		this.lastTime = performance.now();
 
+	public stop(): void {
+		//if (this.renderObserver) {
+		//	this.scene.onBeforeRenderObservable.remove(this.renderObserver);
+		//	this.renderObserver = null;
+		//	console.log("BrickBreaker removed from render loop");
+		//}
+		this.camera.parent = null;
+		this.start1 = false;
+		this.player.disableInput();
+		this.reset();
+
+	}
+
+	//private update(): void {
+	//	const currentTime = performance.now();
+	//	const delta = (currentTime - this.lastTime) / 1000;
+	//	this.lastTime = currentTime;
+	//
+	//	this.player.update();
+	//	this.ball.update(delta, this.player, this.cols, this.layers, this.bricks);
+	//}
+
+	public reset(): void {
+		console.log("reset BrickBreaker");
+		// this.ball.updatePosition(0, 1);
+		// this.ball.setVelocity(new Vector3(0, 0, 0));
+		this.ball.reset();
+		this.player.reset();
+		this.lastTime = performance.now();
 	}
 
 	private setupCamera() {
@@ -176,31 +231,31 @@ export class BrickBreaker {
 		return this.bricks;
 	}
 
-	public dispose() {
-		this.ball.ball.dispose();
-		this.player.goal.dispose();
-		this.player.shield.dispose();
-		this.player.pointerSurface.dispose();
-		this.arena.dispose();
+	// public dispose() {
+	// 	this.ball.ball.dispose();
+	// 	this.player.goal.dispose();
+	// 	this.player.shield.dispose();
+	// 	this.player.pointerSurface.dispose();
+	// 	this.arena.dispose();
 
-		this.bricks.forEach(brickCol => {
-			brickCol.forEach(brick => {
-				brick.dispose();
-			});
-		});
+	// 	this.bricks.forEach(brickCol => {
+	// 		brickCol.forEach(brick => {
+	// 			brick.dispose();
+	// 		});
+	// 	});
 
-		this.camera.dispose();
-		this.light.dispose();
-		this.engine.clear(new Color4(1, 1, 1, 1), true, true);
-		this.engine.stopRenderLoop();
+	// 	this.camera.dispose();
+	// 	this.light.dispose();
+	// 	this.engine.clear(new Color4(1, 1, 1, 1), true, true);
+	// 	this.engine.stopRenderLoop();
 
-		this.scene?.dispose();
-		this.engine?.dispose();
+	// 	this.scene?.dispose();
+	// 	this.engine?.dispose();
 
-		clearTimeout(resizeTimeout);
-		this.engine.dispose();
-		// Router.nav(`/play`, false, false);
-	}
+	// 	clearTimeout(resizeTimeout);
+	// 	this.engine.dispose();
+	// 	// Router.nav(`/play`, false, false);
+	// }
 
 	private resizeGame() {
 		window.addEventListener("resize", () => {

@@ -9,6 +9,8 @@ import { getRequest } from "./requests";
 
 interface lobbyHtmlReference {
 	playersWindow: { html: HTMLDivElement, id: number }
+	infoWindow: { html: HTMLDivElement, id: number }
+	inviteWindow: { html: HTMLDivElement, id: number }
 	playersList: HTMLDivElement
 }
 
@@ -32,6 +34,7 @@ export default class Lobby {
 	private ws: WebSocket | null;
 	private id: string | null;
 	private mode: string | null;
+	private map: string | null;
 	private state: lobbyState;
 
 	private players: Map<string, player>;
@@ -51,6 +54,8 @@ export default class Lobby {
 
 		this.ref = {
 			playersWindow: { html: div.querySelector("#players-window") as HTMLDivElement, id: -1 },
+			infoWindow: { html: div.querySelector("#info-window") as HTMLDivElement, id: -1 },
+			inviteWindow: { html: div.querySelector("#invite-window") as HTMLDivElement, id: -1 },
 			playersList: div.querySelector("#players-list") as HTMLDivElement
 		};
 
@@ -60,7 +65,22 @@ export default class Lobby {
 			height: 1,
 			world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 9, -40)),
 			enable: false
-		})
+		});
+		this.ref.infoWindow.id = App3D.addCSS3dObject({
+			html: this.ref.infoWindow.html,
+			width: 1,
+			height: 1,
+			world: Matrix.RotationY(5 * Math.PI / 4).multiply(Matrix.Translation(5, 10, -40)),
+			enable: false
+		});
+		this.ref.inviteWindow.id = App3D.addCSS3dObject({
+			html: this.ref.inviteWindow.html,
+			width: 1,
+			height: 1,
+			world: Matrix.RotationY(3 * Math.PI / 4).multiply(Matrix.Translation(-5, 8, -40)),
+			enable: false
+		});
+		console.log(` invite = ${this.ref.inviteWindow.id} info = ${this.ref.infoWindow.id} `);
 	}
 
 
@@ -74,18 +94,24 @@ export default class Lobby {
 			//return;
 		}
 		this.id = params.get("id") as string;
+		this.map = params.get("map") as string;
+		console.log(`LOBBY MAP = ${this.map}`);
 		this.setupWs(this.id);
 		this.ref.playersList.innerHTML = "";
 
 		this.createPlayerDiv(User.uuid as string, false, true);
-
 		document.body.appendChild(this.css);
+
 		App3D.setVue("lobby");
 		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, true);
+		App3D.setCSS3dObjectEnable(this.ref.infoWindow.id, true);
+		App3D.setCSS3dObjectEnable(this.ref.inviteWindow.id, true);
 	}
 
 	public async unload() {
 		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.infoWindow.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.inviteWindow.id, false);
 		this.ws?.send(encodeClientMessage({ quit: { lobbyId: this.id as string, uuid: User.uuid } }));
 		this.ws?.close();
 		this.css.remove();
@@ -122,6 +148,8 @@ export default class Lobby {
 
 			if (payload.update != null) {
 				this.mode = payload.update.mode as string;
+				this.map = payload.update.map as string;
+				console.log(this.map);
 				this.updatePlayers(payload.update.players as Array<{ uuid: string, ready: boolean }>);
 				console.log(`Update :${payload}`);
 			}
@@ -129,11 +157,10 @@ export default class Lobby {
 			if (payload.start != null) {
 				console.log("Everyone is ready");
 				const gameId = payload.start.gameId;
-				const map = "default"; //payload.start.map;
 				if (this.mode === 'br')
-					Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
+					Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
 				else
-					Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${map}`), false, true);
+					Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
 				this.ws?.close();
 			}
 

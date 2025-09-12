@@ -1,5 +1,5 @@
 
-import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, Inspector } from "@babylonImport";
+import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, Inspector, FreeCamera } from "@babylonImport";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -9,13 +9,16 @@ import { ThinInstanceSystem } from "./systems/ThinInstanceSystem.js";
 import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { getOrCreateUUID } from "./utils/getUUID.js";
-import { createGameTemplate, GameTemplateConfig } from "./templates/GameTemplate.js";
+import { createGameTemplate, GameTemplateConfig, createPlayer } from "./templates/GameTemplate.js";
 import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
 import { createCamera, createBaseMeshes, createInstanceManagers } from "./utils/initGame.js";
 import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
 import Router from "../spa/Router";
 import type { userinterface } from './utils/proto/message.js';
+import { BallComponent } from "./components/BallComponent.js";
+import { Entity } from "./ecs/Entity.js";
+import { Ball } from "../brickbreaker/Ball.js";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
@@ -25,7 +28,7 @@ let resizeTimeout: NodeJS.Timeout;
 export class Pong {
 	private engine!: Engine;
 	private scene: Scene;
-	private cam!: ArcRotateCamera;
+	private cam!: FreeCamera;
 
 	private ecs!: ECSManager;
 	public stateManager!: StateManager;
@@ -33,7 +36,7 @@ export class Pong {
 	private inputManager!: InputManager;
 
 	private visualEffectSystem!: VisualEffectSystem;
-	private uiSystem!: UISystem;
+	// private uiSystem!: UISystem;
 
 	private uuid!: string;
 	private baseMeshes: any;
@@ -48,29 +51,31 @@ export class Pong {
 	private networkingSystem!: NetworkingSystem;
 	private inputSystem!: InputSystem;
 
-	constructor(canvas: any, gameId: any, gameMode: any, scene: Scene) {
+	private config: any;
+
+	constructor(canvas: any, gameId: any, scene: Scene) {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.gameId = gameId;
-		this.gameMode = gameMode;
+		this.gameMode = "";
 		this.engine = this.scene.getEngine() as Engine;
 		this.inited = false;
-	}
 
-	public async init() {
-		const config = {
+		this.config = {
 			numberOfBalls: 1,
 			arenaSizeX: 30,
 			arenaSizeZ: 20,
 			wallWidth: 1
 		};
 
+	}
+
+	public async init() {
+
 		this.pongRoot = new TransformNode("pongRoot", this.scene);
 		this.pongRoot.position.set(2000, -3500, -3500);
-		this.cam = this.scene.getCameraByName('pong') as ArcRotateCamera;
-		this.cam.parent = this.pongRoot;
-		this.cam.minZ = 0.2;
-		this.baseMeshes = createBaseMeshes(this.scene, config, this.pongRoot);
+		this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
+		this.baseMeshes = createBaseMeshes(this.scene, this.config, this.pongRoot);
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
 		this.uuid = getOrCreateUUID();
 
@@ -80,17 +85,23 @@ export class Pong {
 
 		// localPaddleId = await this.waitForRegistration();
 		//this.camera = createCamera(this.scene, this.canvas, localPaddleId, this.gameMode);
-		this.initECS(config, this.instanceManagers, this.uuid);
+		this.initECS(this.config, this.instanceManagers, this.uuid);
 		this.stateManager = new StateManager(this.ecs);
 		this.inited = true;
 
-
 	}
-	public async start(gameId: string, uuid: string) {
+
+	public async start(gameId: string, uuid: string, gameMode: string, maps: string) {
+		// const maps = 0;
+		this.gameMode = gameMode;
 		if (this.wsManager) {
 			this.wsManager.socket.close();
 			this.ecs.removeSystem(this.inputSystem);
 			this.ecs.removeSystem(this.networkingSystem);
+			//delete player
+			// this.ecs.removeEntityById(7);
+			this.ecs.removeEntityById(6);
+			this.ecs.removeEntityById(5);
 		}
 		console.log("UU", uuid)
 		const wsUrl = `wss://${window.location.hostname}:7000/game?` +
@@ -98,15 +109,38 @@ export class Pong {
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 
-		localPaddleId = await this.waitForRegistration();
-
 		if (!this.inited) {
 			await this.init();
 		}
-		if (this.uiSystem) {
-			this.uiSystem.resetUI();
-			//this.uiSystem.enableUI();
+		this.cam.parent = this.pongRoot;
+		this.cam.minZ = 0.2;
+		if (maps == "monolith") {
+			this.pongRoot.position.set(0.1, 10, 0);
+			this.pongRoot.scalingDeterminant = 0.07;
+		} else if (maps == "grass") {
+			this.pongRoot.position.set(5, 0, 5);
+			this.pongRoot.scalingDeterminant = 0.25;
+		} else if (maps == "void") {
+			this.pongRoot.position.set(100, 0, 100);
+			this.pongRoot.scalingDeterminant = 0.25;
 		}
+		localPaddleId = await this.waitForRegistration();
+
+		//if (maps == "monolith") {
+		//	this.pongRoot.position.set(0.1, 10, 0);
+		//	this.pongRoot.scalingDeterminant = 0.07;
+		//} else if (maps == "grass") {
+		//	this.pongRoot.position.set(5, 0, 5);
+		//	this.pongRoot.scalingDeterminant = 0.25;
+		//} else if (maps == "void") {
+		//	this.pongRoot.position.set(100, 0, 100);
+		//	this.pongRoot.scalingDeterminant = 0.25;
+		//}
+
+		// if (this.uiSystem) {
+		// 	this.uiSystem.resetUI();
+		// 	//this.uiSystem.enableUI();
+		// }
 
 		// 4) Plug networking into ECS
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
@@ -116,9 +150,14 @@ export class Pong {
 			this.uuid
 		);
 		this.ecs.addSystem(this.networkingSystem);
+
+		//add player
+		createPlayer(this.ecs, this.config, localPaddleId, this.gameMode);
+
 		console.log("start");
 		//this.engine = new Engine(this.canvas, true);
 		//engine = this.engine;
+		this.inputManager.enable();
 		this.pongRoot.setEnabled(true);
 		// this.stateManager.set_ecs(this.ecs);
 		this.stateManager.setter(true);
@@ -135,18 +174,33 @@ export class Pong {
 
 	}
 	public stop(): void {
-		if (this.uiSystem) {
-			this.uiSystem.disableUI();
-		}
+		// if (this.uiSystem) {
+		// 	this.uiSystem.disableUI();
+		// }
+		const ballEntity = this.ecs.entitiesWith(BallComponent)[0] as Entity;
+		const ballComp = ballEntity.getComponent(BallComponent) as BallComponent;
+		ballComp.velocity.x = 0;
+		ballComp.velocity.z = 0;
+		ballComp.position.x = 0;
+		ballComp.position.z = 0;
+		this.inputManager.disable();
+		const payload: userinterface.IClientMessage = {
+			quit: {
+				uuid: this.uuid,
+				lobbyId: this.uuid
+			}
+		};
 
+		const buffer = encodeClientMessage(payload);
 
+		this.wsManager.socket.send(buffer);
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
+		this.cam.parent = null;
+
 
 		console.log("render loop stopped and game paused");
 	}
-
-
 
 	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
 		this.ecs = new ECSManager();
@@ -159,11 +213,11 @@ export class Pong {
 		this.ecs.addSystem(new MovementSystem());
 		this.visualEffectSystem = new VisualEffectSystem(this.scene);
 		this.ecs.addSystem(this.visualEffectSystem);
-		this.uiSystem = new UISystem(this);
-		this.scoreUI = this.uiSystem.scoreUI;
-		this.ecs.addSystem(this.uiSystem);
+		// this.uiSystem = new UISystem(this);
+		// this.scoreUI = this.uiSystem.scoreUI;
+		// this.ecs.addSystem(this.uiSystem);
 
-		createGameTemplate(this.ecs, config, localPaddleId, this.gameMode);
+		createGameTemplate(this.ecs, config);
 	}
 
 
