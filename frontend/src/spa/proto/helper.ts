@@ -216,7 +216,6 @@ export function encodeTournamentClientMessage(
         .finish();
 }
 
-=
 export function decodeTournamentClientMessage(
     buffer: Uint8Array
 ): tournament.TournamentClientMessage {

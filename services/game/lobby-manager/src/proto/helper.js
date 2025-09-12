@@ -122,3 +122,27 @@ export function encodeMatchStartTournament(payload) {
 export function decodeMatchStartTournament(buffer) {
 	return Proto.lobby.MatchStartTournament.decode(buffer);
 }
+
+export function encodeTournamentCreateRequest(payload) {
+	const err = Proto.lobby.TournamentCreateRequest.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.shared.MatchEnd
+		.encode(Proto.lobby.TournamentCreateRequest.create(payload))
+		.finish();
+}
+
+export function decodeTournamentCreateRequest(buffer) {
+	return Proto.lobby.TournamentCreateRequest.decode(buffer);
+}
+
+export function encodeTournamentCreateResponse(payload) {
+	const err = Proto.tournament.TournamentCreateResponse.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.shared.MatchEnd
+		.encode(Proto.lobby.TournamentCreateResponse.create(payload))
+		.finish();
+}
+
+export function decodeTournamentCreateResponse(buffer) {
+	return Proto.lobby.TournamentCreateResponse.decode(buffer);
+}

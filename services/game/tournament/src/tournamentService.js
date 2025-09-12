@@ -3,7 +3,7 @@ import {
     decodeMatchEnd,
     encodeTournamentServerMessage, 
     encodeMatchCreateRequest,
-    decodeMatchCreateResponse } from './proto/helper';
+    decodeMatchCreateResponse } from './proto/helper.js';
 import natsClient from './natsClient.js';
 
 class MatchNode {
@@ -205,7 +205,7 @@ export default class tournamentService {
         const player = tournament.player.get(userId);
         if (!player) return null;
         player.isConnected = false;
-        player.isEliminated = false;
+        player.isEliminated = true;
         tournament.sendUpdate();
         return tournament.getState();
     }

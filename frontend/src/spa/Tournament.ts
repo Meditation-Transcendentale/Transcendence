@@ -58,6 +58,10 @@ export default class Tournament {
 		// 	this.ws?.send(encodeClientMessage({ ready: { tournamentId: this.id as string } })); //encodeClientMessage to fix
 		// })
 
+		this.ref.leaveButton.addEventListener("click", () => {
+			this.ws?.send(encodeTournamentClientMessage({ quit: { uuid: User.uuid as string, tournamentId: this.id as string } }));
+			Router.nav("/play");
+		});
 	}
 
 
@@ -116,8 +120,8 @@ export default class Tournament {
 				//need to close the ws + switch to ingame so being able to reconnect to the tournament at the end of the game
 				if (gameId) {
 					const map = "default"; //payload.start.map;
-					Router.nav(encodeURI(`/game?id=${gameId}&mode=tournament&map=${map}`), false, false);
 					this.readyCheckEnabled = false;
+					Router.nav(encodeURI(`/game?id=${gameId}&mode=tournament&map=${map}`), false, false);
 				}
 				//can only leave through "leave" button on the tournament page, everyother thing make you come back to the tournament
 			}

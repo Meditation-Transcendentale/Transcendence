@@ -3,9 +3,12 @@ import fastifyCors from '@fastify/cors';
 import config from './config.js';
 import TournamentService from './tournamentService.js';
 import { decodeTournamentCreateRequest, encodeTournamentCreateResponse } from './proto/helper.js';
+import natsClient from './natsClient.js';
+import fs from 'fs';
+import { createUwsApp } from './uwsServer.js';
 
 async function start() {
-    await natsClient.connect(config.NATS_URL);
+    await natsClient.connect(process.env.NATS_URL);
 
     const tournamentService = new TournamentService();
 	const app = Fastify({

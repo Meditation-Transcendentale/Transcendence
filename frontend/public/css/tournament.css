@@ -1,0 +1,110 @@
+/* layout */
+#tournament {
+  box-sizing: border-box;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  font-family: system-ui, sans-serif;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.bracket {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  justify-content: center;   /* final in the center */
+  align-items: flex-start;
+  padding: 16px;
+}
+
+/* nodes */
+.match-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;                 /* space between match-info and its children */
+  min-width: 220px;          /* stable box width for readability */
+}
+
+.match-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #D0D5DD;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+}
+
+.match-info > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+/* children layout: one left, one right; spaced vertically */
+.match-children {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 96px;                 /* horizontal distance between branches */
+}
+
+.match-children > .match-node {
+  /* vertical breathing room to “fan out” the tree */
+  margin-block: 24px;
+}
+
+/* states */
+.match-info .winner,
+.winner {
+  background: #EDF7ED;
+  border: 1px solid #B7E1B7;
+  font-weight: 600;
+}
+
+.eliminated {
+  opacity: 0.55;
+}
+
+.disconnected {
+  background: #FFF4E5;
+  border-color: #F7C06A;
+}
+
+.disconnected-icon {
+  margin-right: 6px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.ready-checked {
+  font-size: 14px;
+  margin-left: 6px;
+}
+
+.notReady-checked {
+  font-size: 14px;
+  margin-left: 6px;
+  opacity: 0.7;
+}
+
+/* scoring cells appended to player rows */
+.match-info > div > div {
+  min-width: 2ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  margin-left: 8px;
+}
