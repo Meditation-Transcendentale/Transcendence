@@ -21,6 +21,11 @@ export class Player {
 
 	private keysPressed: Set<string> = new Set();
 	private pointer: Vector2;
+	private inputActive: boolean = false;
+
+	private keydownHandler: (e: KeyboardEvent) => void;
+	private keyupHandler: (e: KeyboardEvent) => void;
+	private pointerHandler: (e: PointerEvent) => void;
 
 	private scene: Scene;
 
@@ -34,7 +39,7 @@ export class Player {
 		this.goal = MeshBuilder.CreateCylinder("goal", { height: 0.5, diameter: 1, subdivisions: 16 }, this.scene);
 		this.goal.parent = game.root;
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
-		this.materialGoal.diffuseColor = new Color3(1, 0, 0);
+		this.materialGoal.diffuseColor = new Color3(1, 1, 1);
 		this.goal.material = this.materialGoal;
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
@@ -53,14 +58,27 @@ export class Player {
 
 		this.spawnShield();
 
-		window.addEventListener("keydown", (e) => {
+		this.keydownHandler = (e: KeyboardEvent) => {
 			this.keysPressed.add(e.code);
-		});
-		window.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
-		window.addEventListener("pointermove", (e) => {
+		}
+
+		this.keyupHandler = (e: KeyboardEvent) => {
+			this.keysPressed.delete(e.code);
+		}
+
+		this.pointerHandler = (e: PointerEvent) => {
 			this.pointer.x = e.clientX;
 			this.pointer.y = e.clientY;
-		});
+		}
+
+		// window.addEventListener("keydown", (e) => {
+		// 	this.keysPressed.add(e.code);
+		// });
+		// window.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
+		// window.addEventListener("pointermove", (e) => {
+		// 	this.pointer.x = e.clientX;
+		// 	this.pointer.y = e.clientY;
+		// });
 
 		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
 		this.pointerSurface.parent = game.root;
@@ -127,12 +145,37 @@ export class Player {
 		this.shield.material = this.shieldMat;
 	}
 
-	public die(): void {
+	enableInput() {
+		if (!this.inputActive) {
+			window.addEventListener("keydown", this.keydownHandler);
+			window.addEventListener("keyup", this.keyupHandler);
+			window.addEventListener("pointermove", this.pointerHandler);
+			this.inputActive = true;
+		}
+	}
+
+	disableInput() {
+		if (this.inputActive) {
+			window.removeEventListener("keydown", this.keydownHandler);
+			window.removeEventListener("keyup", this.keyupHandler);
+			window.removeEventListener("pointermove", this.pointerHandler);
+			this.inputActive = false;
+		}
+	}
+
+	die(): void {
 		this.goal.visibility = 0;
 		this.shield.visibility = 0;
 		this.isAlive = false;
 		//interface de fin de game
-		this.game.dispose();
+		// this.game.dispose();
+	}
+
+	reset(): void {
+		this.enableInput();
+		this.goal.visibility = 1;
+		this.shield.visibility = 1;
+		this.isAlive = true;
 	}
 
 	update(): void {
@@ -167,11 +210,11 @@ export class Player {
 	private spawnShield(): void {
 		if (!this.isAlive) return;
 
-		if (this.angleFactor != 1 && this.inputDown == true){
+		if (this.angleFactor != 1 && this.inputDown == true) {
 			this.isActive = 1.0;
 			this.alpha = 1.0;
 		}
-		else{
+		else {
 			this.isActive = 0.0;
 			this.alpha = 0.25;
 		}

@@ -1,4 +1,7 @@
 // ECSManager.ts
+import { BallComponent } from "../components/BallComponent.js";
+import { PaddleComponent } from "../components/PaddleComponent.js";
+import { WallComponent } from "../components/WallComponent.js";
 import { Entity } from "./Entity.js";
 import { System } from "./System.js";
 
@@ -22,6 +25,11 @@ export class ECSManager {
 	 */
 	removeEntity(entity: Entity): void {
 		this.entities = this.entities.filter(e => e.id !== entity.id);
+		Entity._idCounter--;
+		let count = 0;
+		this.entities.forEach(e => {
+			e.id = count++;
+		})
 	}
 
 	/**
@@ -29,6 +37,11 @@ export class ECSManager {
 	 */
 	removeEntityById(id: number): void {
 		this.entities = this.entities.filter(e => e.id !== id);
+		Entity._idCounter--;
+		let count = 0;
+		this.entities.forEach(e => {
+			e.id = count++;
+		})
 	}
 
 	/**

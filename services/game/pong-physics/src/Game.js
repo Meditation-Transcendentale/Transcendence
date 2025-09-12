@@ -22,9 +22,13 @@ export class Game {
 		this.wallEntities = {};
 		this.options = {};
 		this.players = this.options.players || [];
+		this.now = Date.now();
+		this.delay = 3000;
+		this.launch = false;
+		this.start = false;
 
 		this.init();
-		this.launchBall();
+		// this.launchBall();
 	}
 
 	/** Initialize entities: one ball, two paddles, and four walls */
@@ -32,7 +36,7 @@ export class Game {
 		const ballEntity = this.entityManager.createEntity();
 		ballEntity
 			.addComponent('position', Position(0, 0))
-			.addComponent('velocity', Velocity(5, 2))
+			.addComponent('velocity', Velocity(0, 0))
 			.addComponent('ball', { id: 0, radius: config.BALL_RADIUS })
 			.addComponent('collider', CircleCollider(config.BALL_RADIUS));
 
@@ -258,20 +262,25 @@ export class Game {
 			? Math.random() * angleRange - angleRange / 2           // -22.5° … +22.5°
 			: Math.PI + (Math.random() * angleRange - angleRange / 2); // 157.5° … 202.5°
 
-		vel.x = Math.cos(baseAngle) * speed;
+		vel.x = 0;
+		vel.y = 0;
+		this.launch = false;
+		// vel.x = Math.cos(baseAngle) * speed;
 		// vel.y = 0;
-		vel.y = Math.sin(baseAngle) * speed;
+		// vel.y = Math.sin(baseAngle) * speed;
+		this.now = Date.now();
 	}
 	launchBall() {
 		const ball = this.entityManager.getEntitiesWithComponents(['ball'])[0];
 		const pos = ball.getComponent('position');
 		pos.x = 0; pos.y = 0;
 		const vel = ball.getComponent('velocity');
-		const speed = this.options.initialBallSpeed || 20;
+		const speed = config.ballSpeed || 10;
 		const angle = (Math.random() * Math.PI / 2) - (Math.PI / 4);
 		const dir = Math.random() < 0.5 ? -1 : 1;
 		vel.x = Math.cos(angle) * speed * dir;
 		vel.y = Math.sin(angle) * speed;
+		this.launch = true;
 	}
 
 }

@@ -20,10 +20,10 @@ import { Pipeline } from "./Pipeline";
 import { Interpolator } from "./Interpolator";
 import { Water } from "./Water";
 import { Monolith } from "./Monolith";
-import { createFortressMonolith, createTempleMonolith } from "./Builder";
+import { createTempleMonolith } from "./Builder";
 import { DitherMaterial } from "./Shader/Shader.ts";
 
-
+let frameCount = 0;
 const playdiv = document.createElement("div");
 playdiv.className = "frame-new";
 playdiv.innerText = "PLAY";
@@ -63,6 +63,7 @@ export class Field {
 	private rtRatio = 1;
 
 	public fieldDepth = 0;
+	private active: Boolean;
 
 	private depthRender: DepthRenderer;
 
@@ -72,6 +73,7 @@ export class Field {
 		this.cursorMonolith = new Vector3();
 		this.cursorButterfly = new Vector3();
 		this.cursorWater = new Vector3();
+		this.active = true;
 
 		this.sun = new Sun(this.scene);
 		this.grass = new Grass(this.scene, 20, this.cursor);
@@ -135,33 +137,18 @@ export class Field {
 		this.scene.customRenderTargets = [];
 		//this.scene.customRenderTargets.push(this.rt);
 		let monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
-
-		//<<<<<<< HEAD
-		//		this.monolith.enableShaderAnimation(true);
-		//		this.monolith.setAnimationSpeed(4.);
-		//		this.monolith.setAnimationIntensity(0.05);
-		//		//monolith.getPerformanceReport();
-		//
-		//		// In render loop - minimal CPU work!
-		//		// scene.registerBeforeRender(() => {
-		//		// 	this.monolith.update(performance.now(), this.camera);
-		//		// });
-		//=======
 		monolith.enableShaderAnimation(true);
 		monolith.setAnimationSpeed(4.);
 		monolith.setAnimationIntensity(0.5);
 		monolith.addText('play', "PLAY", 0, 7.1, 1.7, 2.0);
-		monolith.addText('stats', "STATS", 0, 9, 1.7, 2.0);
-		//monolith.showText("STATS", 0, 9, 1.7);
-		monolith.addText('about', "ABOUT", 0, 5.5, 1.7, 2.0);
+		monolith.addText('create', "CREATE", 2., 7.5, 0., 2.0);
+		monolith.addText('join', "JOIN", -1.9, 5.5, 0., 2.0);
+		monolith.setTextFace('create', 'left');
+		monolith.setTextFace('join', 'left');
+		monolith.setTextFace('play', 'front');
+
+
 		this.monolith = monolith;
-		//monolith.showText("TEST");
-		//monolith.material.debugUniforms();
-
-		//scene.registerBeforeRender(() => {
-		//	monolith.update(performance.now(), this.camera);
-		//});
-
 
 		this.water = new Water(this.scene, this.camera, this.cursor);
 		this.pipeline = new Pipeline(this.scene, this.camera, this.depthRender.getDepthMap(), this.water.rtB, this.water.rtC);
@@ -169,6 +156,10 @@ export class Field {
 		/////
 
 		this.grass.depth = this.fieldDepth;
+	}
+
+	public async initialize(): Promise<void> {
+		await this.monolith.init();
 	}
 
 	public async load() {
@@ -225,9 +216,11 @@ export class Field {
 	public update(time: number, deltaTime: number) {
 		this.grass.update(time, this.scene.activeCamera as Camera);
 		this.butterfly.update(time, deltaTime);
-		this.monolith.update(time, this.camera);
-		this.pipeline.update(time);
-		this.water.update(time, 0.0041);
+		if (this.active) {
+			this.monolith.update(time, this.camera);
+			this.pipeline.update(time);
+			this.water.update(time, 0.0041);
+		}
 	}
 
 	public onHover(status: number) {
@@ -236,11 +229,11 @@ export class Field {
 	}
 
 	public setEnable(status: boolean) {
-		if (status) {
-			this.camera.attachControl();
-		} else {
-			this.camera.detachControl();
-		}
+		//if (status) {
+		//	this.camera.attachControl();
+		//} else {
+		//	this.camera.detachControl();
+		//}
 
 		this.pipeline.setEnable(status);
 	}
@@ -254,13 +247,19 @@ export class Field {
 		//const final = new Vue();
 		switch (vue) {
 			case 'play': {
-				this.camera.position.set(-20, 1, 30);
-				this.camera.setTarget(new Vector3(-20, 4, 20));
+				this.camera.position.set(-13, 4, -7);
+				this.camera.setTarget(new Vector3(20, 11, -8));
+				this.monolith.setPicking(true);
+				//this.setEnable(true);
 				break;
 			}
 			case 'home': {
 				this.camera.position.set(0, 5, 15);
 				this.camera.setTarget(new Vector3(0, 7, 0));
+				this.active = true;
+				this.monolith.setPicking(true);
+				this.setEnable(true);
+				//this.setEnable(true);
 				//Interpolator.addElem({
 				//	start: this.camera.position,
 				//	end: new Vector3(0, 2, 10),
@@ -284,6 +283,7 @@ export class Field {
 			case 'login': {
 				this.camera.position.set(0, 4, 40);
 				this.camera.setTarget(new Vector3(0, 6, 30));
+				this.setEnable(true);
 				break;
 			}
 			case 'register': {
@@ -293,7 +293,9 @@ export class Field {
 			}
 			case 'pongBR': {
 				this.scene.activeCamera = this.scene.getCameraByName('br');
-				this.scene.activeCamera?.attachControl(); https://cyn-prod.com/stylized-paint-shader-breakdown
+				this.scene.activeCamera?.attachControl();
+				this.active = false;
+				this.setEnable(false);
 
 				break;
 			}
@@ -304,11 +306,19 @@ export class Field {
 				break;
 			}
 			case 'game': {
-				this.scene.activeCamera = this.scene.getCameraByName("pong");
+				this.camera.detachControl();
+				this.camera.position.set(0, 50, 0);
+				this.camera.setTarget(new Vector3(0, 0, 0));
+				this.active = false;
+				this.setEnable(false);
 				break;
 			}
 			case 'brick': {
-				this.scene.activeCamera = this.scene.getCameraByName("brick");
+				//this.scene.activeCamera = this.scene.getCameraByName("brick");
+				this.camera.position.set(0, 30, 0);
+				this.camera.setTarget(new Vector3(0, 0, 0));
+				this.setEnable(false);
+				this.monolith.setPicking(false);
 				break;
 			}
 			case 'exemple1': {
@@ -325,3 +335,4 @@ export class Field {
 	}
 
 }
+

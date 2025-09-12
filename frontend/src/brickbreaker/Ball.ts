@@ -15,10 +15,10 @@ export class Ball {
 	private game: BrickBreaker;
 	private delta: number;
 	private newposition: Vector3 = new Vector3(0, 0.25, 0);
-	private bricksLeft: number;
 	private isDirty: boolean = false;
+	public bricksLeft: number = 0;
 
-	constructor(scene: Scene, material: StandardMaterial, root: TransformNode, bricksNumber: number, game: BrickBreaker) {
+	constructor(scene: Scene, material: StandardMaterial, root: TransformNode, game: BrickBreaker) {
 		this.ball = MeshBuilder.CreateSphere("ball", { diameter: 0.5 }, scene);
 		this.ball.parent = root;
 		this.ball.position = new Vector3(0, 0.25, 0);
@@ -28,9 +28,10 @@ export class Ball {
 
 		this.matTouched = new StandardMaterial("touchedMat", this.scene);
 		this.matTouched.diffuseColor.set(0, 0, 1);
+		this.matTouched.specularColor.set(0, 0, 0);
 		this.matUntouched = new StandardMaterial("untouchedMat", this.scene);
 		this.matUntouched.diffuseColor.set(1, 0, 0);
-		this.bricksLeft = bricksNumber;
+		this.matUntouched.specularColor.set(0, 0, 0);
 	}
 
 	public updatePosition(x: number, z: number): void {
@@ -45,7 +46,7 @@ export class Ball {
 
 			if (player.getAlive()) {
 				const playerGoalPos = player.getPlayerGoal().position;
-				const collideGoal = Math.sqrt((playerGoalPos.x - this.newposition.x)*(playerGoalPos.x - this.newposition.x)+(playerGoalPos.z - this.newposition.z)*(playerGoalPos.z - this.newposition.z)) - 0.25 < 0.35;
+				const collideGoal = Math.sqrt((playerGoalPos.x - this.newposition.x) * (playerGoalPos.x - this.newposition.x) + (playerGoalPos.z - this.newposition.z) * (playerGoalPos.z - this.newposition.z)) - 0.25 < 0.35;
 				const collideShield = this.detectCollisionShield(player);
 
 				if (collideShield) {
@@ -160,9 +161,19 @@ export class Ball {
 		return distance <= ballRadius;
 	}
 
-	private endGame(){
+	private endGame() {
 		// end screen UI
 		this.game.dispose();
+	}
+
+	reset(): void {
+		this.touched = false;
+		this.isDirty = false;
+		this.ball.material = this.matUntouched;
+		this.velocity.x = 0;
+		this.velocity.z = 0;
+		this.updatePosition(0, 0);
+		this.speedScale = 1;
 	}
 
 	public getMesh(): Mesh {

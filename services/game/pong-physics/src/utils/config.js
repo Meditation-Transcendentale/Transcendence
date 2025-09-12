@@ -13,7 +13,7 @@ export const config = {
 	arenaWidth: 30,
 	wallHeight: 1,
 	paddleSpeed: 1,
-	ballSpeed: 1,
+	ballSpeed: 10,
 	paddleOffsetRatio: 0.9
 
 };

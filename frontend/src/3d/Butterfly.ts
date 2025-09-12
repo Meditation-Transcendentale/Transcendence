@@ -341,7 +341,7 @@ class Grid2D {
 		this.cellCount = this.widthCount * Math.ceil(this.depth / this.cellSize);
 
 		this.cells = new Array<Cell>(this.cellCount)
-		console.log(this.cellCount);
+		//console.log(this.cellCount);
 		for (let i = 0; i < this.cellCount; i++) {
 			this.cells[i] = {
 				indexes: new Int16Array(this.minPerCell),

@@ -53,6 +53,7 @@ export function startWsServer({ port, handlers }) {
 		},
 
 		close: ws => {
+			console.log(`user disconnect = ${ws.uuid}`);
 			ws.isAlive = false;
 			//status -> online /!\ MIGHT CONFLICT WITH NOTIF WS WHICH SET OFFLINE
 			natsClient.publish(`notification.${ws.uuid}.status`, encodeStatusUpdate({ sender: ws.uuid, status: "online" }));

@@ -8,6 +8,7 @@ DOCKER_COMPOSE_METRICS = -f ./metrics/docker-compose-metrics.yml
 
 TARGET ?= all
 METRICS ?= false
+TEST ?= false
 
 ifeq ($(TARGET),user)
 	DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER)
@@ -28,6 +29,10 @@ endif
 
 ifeq ($(METRICS),true)
 	DOCKER_COMPOSE_FILE += $(DOCKER_COMPOSE_METRICS)
+endif
+
+ifeq ($(TEST),true)
+	DOCKER_COMPOSE_FILE += -f docker-compose_test.yml
 endif
 
 .PHONY: all build down stop up re cleanVolumes clean cleanShared reCleanData update-hostname-env

@@ -145,6 +145,7 @@ export class Environment {
 
 		// await this.gears.load();
 		//
+		await this.field.initialize();
 		await this.field.load();
 
 		this.scene.meshes.forEach((mesh) => {
@@ -200,17 +201,17 @@ export class Environment {
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
 		}
-		this.fieldCamera.setEnabled(true);
+		//this.fieldCamera.setEnabled(true);
 
 	}
 
 	public disableHome() {
-		this.updateHome = false;
+		//this.updateHome = false;
 		this.scene.fogMode = Scene.FOGMODE_NONE;
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(true);
 		}
-		this.fieldCamera.setEnabled(false);
+		//this.fieldCamera.setEnabled(false);
 
 	}
 
