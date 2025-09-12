@@ -13,12 +13,39 @@
 	display: flex;
 }
 
-.score-container {
+/* .score-container {
 	position: fixed;
 	align-self: center;
+} */
+
+#score-module {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0px 500px;
+	box-sizing: border-box;
+	z-index: 1000;
+	pointer-events: none;
+	background: transparent;
 }
 
-#score-module,
+#score-module .score-container{
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+
+#score-module .score-value{
+	font-size: 15vh;
+	font-weight: bold;
+	color: white;
+}
+
+#ending-module,
 #timer-module,
 #button-module {
     position: absolute;
@@ -76,21 +103,39 @@
 
 .game-ui-container.pong #score-module,
 .game-ui-container.pong #timer-module {
-    background: linear-gradient(45deg, #00ff00, #008000);
+    /* background: linear-gradient(45deg, #00ff00, #008000);
     color: black;
     border: 2px solid #00ff00;
-    text-shadow: 0 0 5px #00ff00;
+    text-shadow: 0 0 5px #00ff00; */
 }
 
 .game-ui-container.br #score-module,
 .game-ui-container.br #timer-module {
-    background: linear-gradient(45deg, #ff4500, #ff6600);
+    /* background: linear-gradient(45deg, #ff4500, #ff6600);
     border: 2px solid #ff4500;
-    box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+    box-shadow: 0 0 10px rgba(255, 69, 0, 0.5); */
 }
 
 .game-ui-container.brick #score-module,
 .game-ui-container.brick #timer-module {
-    background: linear-gradient(45deg, #4169e1, #6495ed);
-    border: 2px solid #4169e1;
+    /* background: linear-gradient(45deg, #4169e1, #6495ed);
+    border: 2px solid #4169e1; */
+}
+
+.game-ui-countdown{
+	color: white;
+	font-family: 'de-valancia', monospace;
+	font-size: 30vh;
+}
+
+#ending-module .score-value{
+	font-size: 30vh;
+	font-weight: bold;
+	color: white;
+}
+
+#ending-module .result-label{
+	font-size: 30vh;
+	font-weight: bold;
+	color: white;
 }

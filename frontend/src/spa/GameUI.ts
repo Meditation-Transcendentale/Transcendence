@@ -4,6 +4,8 @@ interface GameUIModules {
 	score?: ScoreModule;
 	timer?: TimerModule;
 	buttons?: ButtonModule;
+	countdown?: CountdownModule;
+	ending?: EndingModule;
 }
 
 interface ModulePosition {
@@ -24,6 +26,8 @@ interface GameUIConfig {
 		score?: ModulePosition;
 		timer?: ModulePosition;
 		buttons?: ModulePosition;
+		countdown?: ModulePosition;
+		ending?: ModulePosition;
 	};
 }
 
@@ -32,6 +36,8 @@ interface GameUIHtmlReference {
 	scoreModule: HTMLDivElement;
 	timerModule: HTMLDivElement;
 	buttonModule: HTMLDivElement;
+	countdownModule: HTMLDivElement;
+	endingModule: HTMLDivElement;
 }
 
 class GameUI {
@@ -51,7 +57,9 @@ class GameUI {
 			container: this.div,
 			scoreModule: div.querySelector("#score-module") as HTMLDivElement,
 			timerModule: div.querySelector("#timer-module") as HTMLDivElement,
-			buttonModule: div.querySelector("#button-module") as HTMLDivElement
+			buttonModule: div.querySelector("#button-module") as HTMLDivElement,
+			countdownModule: div.querySelector("#countdown-module") as HTMLDivElement,
+			endingModule: div.querySelector("#ending-module") as HTMLDivElement
 		};
 
 		this.initializeModules();
@@ -68,6 +76,12 @@ class GameUI {
 					break;
 				case 'buttons':
 					this.modules.buttons = new ButtonModule(this.ref.buttonModule);
+					break;
+				case 'countdown':
+					this.modules.countdown = new CountdownModule(this.ref.countdownModule);
+					break;
+				case 'ending':
+					this.modules.ending = new EndingModule(this.ref.endingModule);
 					break;
 			}
 		});
@@ -289,12 +303,18 @@ class GameUI {
 			case 'score': return this.ref.scoreModule;
 			case 'timer': return this.ref.timerModule;
 			case 'buttons': return this.ref.buttonModule;
+			case 'countdown': return this.ref.countdownModule;
+			case 'ending': return this.ref.endingModule;
 			default: return null;
 		}
 	}
 
-	public updateScore(score: number) {
-		this.modules.score?.updateScore(score);
+	public updateScore(score1: number, score2: number) {
+		this.modules.score?.updateScore(score1, score2);
+	}
+
+	public startCountdown(initialValue: number) {
+		this.modules.countdown?.start(initialValue);
 	}
 
 	public startTimer(duration?: number, onEnd?: () => void) {
@@ -305,6 +325,10 @@ class GameUI {
 		this.modules.timer?.stop();
 	}
 
+	public showEnd(score1: number, score2: number, result: boolean) {
+		this.modules.ending?.setResult(score1, score2, result);
+	}
+
 	public showButton(id: string, text: string, callback: () => void, style?: string) {
 		this.modules.buttons?.addButton(id, text, callback, style);
 	}
@@ -312,6 +336,7 @@ class GameUI {
 	public hideButton(id: string) {
 		this.modules.buttons?.removeButton(id);
 	}
+
 }
 
 interface GameUIModule {
@@ -321,19 +346,83 @@ interface GameUIModule {
 
 interface ScoreHtmlReference {
 	scoreLabel: HTMLSpanElement;
-	scoreValue: HTMLSpanElement;
+	score1Value: HTMLSpanElement;
+	score2Value: HTMLSpanElement;
+}
+
+interface CountdownHtmlReference {
+	countdownLabel: HTMLSpanElement;
+	countdownValue: HTMLSpanElement;
+}
+
+class CountdownModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: CountdownHtmlReference;
+	private delay = 1000;
+	private countdownNumber = 3;
+	private countdownInterval?: NodeJS.Timeout;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			countdownLabel: div.querySelector("#countdown-label") as HTMLSpanElement,
+			countdownValue: div.querySelector("#countdown-value") as HTMLSpanElement
+		};
+	}
+
+	load(){
+		this.div.style.display = 'flex';
+	}
+
+	unload(){
+		this.div.style.display = 'none';
+		this.stop();
+	}
+
+	start(initialValue: number = 3){
+		this.countdownNumber = initialValue;
+
+		this.updateDisplay();
+
+		this.countdownInterval = setInterval(() => {
+			this.countdownNumber--;
+			this.updateDisplay();
+
+			if (this.countdownNumber <= 0){
+				this.unload();
+			}
+		}, this.delay);
+	}
+
+	updateDisplay(){
+		if (this.ref.countdownValue){
+			this.ref.countdownValue.textContent = this.countdownNumber.toString();
+			this.ref.countdownValue.className = 'countdown-number';
+		}
+	}
+
+	stop(){
+		if (this.countdownInterval){
+			clearInterval(this.countdownInterval);
+			this.countdownInterval = undefined;
+		}
+	}
 }
 
 class ScoreModule implements GameUIModule {
 	private div: HTMLDivElement;
 	private ref: ScoreHtmlReference;
 	private scoreValue = 0;
+	private score1 = 0;
+	private score2 = 0;
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
+
 		this.ref = {
 			scoreLabel: div.querySelector("#score-label") as HTMLSpanElement,
-			scoreValue: div.querySelector("#score-value") as HTMLSpanElement
+			score1Value: div.querySelector("#score1-value") as HTMLSpanElement,
+			score2Value: div.querySelector("#score2-value") as HTMLSpanElement
 		};
 	}
 
@@ -345,10 +434,14 @@ class ScoreModule implements GameUIModule {
 		this.div.style.display = 'none';
 	}
 
-	updateScore(score: number) {
-		this.scoreValue = score;
-		if (this.ref.scoreValue) {
-			this.ref.scoreValue.textContent = score.toString();
+	updateScore(score1: number, score2: number) {
+		if (score1 == 5 || score2 == 5)
+			this.unload();
+		this.score1 = score1;
+		this.score2 = score2;
+		if (this.ref.score1Value && this.ref.score2Value) {
+			this.ref.score1Value.textContent = score1.toString();
+			this.ref.score2Value.textContent = score2.toString();
 		}
 	}
 }
@@ -463,5 +556,51 @@ class ButtonModule implements GameUIModule {
 		}
 	}
 }
+
+interface EndingHtmlReference{
+	score1Value: HTMLSpanElement;
+	score2Value: HTMLSpanElement;
+	result: HTMLSpanElement;
+}
+
+class EndingModule implements GameUIModule{
+	private div: HTMLDivElement;
+	private ref: EndingHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			score1Value: div.querySelector("#score1-value") as HTMLSpanElement,
+			score2Value: div.querySelector("#score2-value") as HTMLSpanElement,
+			result: div.querySelector("#result-label") as HTMLSpanElement
+		};
+	}
+
+	load() {
+		this.div.style.display = 'none';
+	}
+
+	unload() {
+		this.div.style.display = 'none';
+	}
+
+	setResult(score1: number, score2: number, result: boolean) {
+		if (this.ref.score1Value && this.ref.score2Value) {
+			this.ref.score1Value.textContent = score1.toString();
+			this.ref.score2Value.textContent = score2.toString();
+		}
+		if (result)
+			this.ref.result.textContent = 'You WIN!';
+		else
+			this.ref.result.textContent = 'You LOSE!';
+
+		this.div.style.display = 'flex';
+	}
+}
+
+//SpectateModule
+//BRDeathCounterModule
+//BRNotifDeathModule
+
 
 export default GameUI;

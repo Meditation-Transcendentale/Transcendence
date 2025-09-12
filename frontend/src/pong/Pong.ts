@@ -19,6 +19,7 @@ import type { userinterface } from './utils/proto/message.js';
 import { BallComponent } from "./components/BallComponent.js";
 import { Entity } from "./ecs/Entity.js";
 import { Ball } from "../brickbreaker/Ball.js";
+import GameUI from "../spa/GameUI.js";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
@@ -41,7 +42,7 @@ export class Pong {
 	private uuid!: string;
 	private baseMeshes: any;
 	private instanceManagers: any;
-	private scoreUI: any;
+	public gameUI: GameUI;
 
 	private canvas;
 	private gameId;
@@ -53,11 +54,12 @@ export class Pong {
 
 	private config: any;
 
-	constructor(canvas: any, gameId: any, scene: Scene) {
+	constructor(canvas: any, gameId: any, scene: Scene, gameUI: GameUI) {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.gameId = gameId;
 		this.gameMode = "";
+		this.gameUI = gameUI;
 		this.engine = this.scene.getEngine() as Engine;
 		this.inited = false;
 
@@ -75,6 +77,10 @@ export class Pong {
 		this.pongRoot = new TransformNode("pongRoot", this.scene);
 		this.pongRoot.position.set(2000, -3500, -3500);
 		this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
+		this.cam.position.x = 0;
+		this.cam.position.y = 40;
+		this.cam.position.z = -2;
+		this.cam.detachControl();
 		this.baseMeshes = createBaseMeshes(this.scene, this.config, this.pongRoot);
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
 		this.uuid = getOrCreateUUID();
@@ -99,7 +105,7 @@ export class Pong {
 			this.ecs.removeSystem(this.inputSystem);
 			this.ecs.removeSystem(this.networkingSystem);
 			//delete player
-			// this.ecs.removeEntityById(7);
+			//this.ecs.removeEntityById(7);
 			this.ecs.removeEntityById(6);
 			this.ecs.removeEntityById(5);
 		}
@@ -152,7 +158,7 @@ export class Pong {
 		this.ecs.addSystem(this.networkingSystem);
 
 		//add player
-		createPlayer(this.ecs, this.config, localPaddleId, this.gameMode);
+		createPlayer(this.ecs, this.config, localPaddleId, this.gameMode, this.gameUI);
 
 		console.log("start");
 		//this.engine = new Engine(this.canvas, true);
@@ -161,6 +167,8 @@ export class Pong {
 		this.pongRoot.setEnabled(true);
 		// this.stateManager.set_ecs(this.ecs);
 		this.stateManager.setter(true);
+		this.gameUI.startCountdown(3);
+		this.gameUI.updateScore(0, 0);
 		this.stateManager.update();
 
 		//this.engine.runRenderLoop(() => {

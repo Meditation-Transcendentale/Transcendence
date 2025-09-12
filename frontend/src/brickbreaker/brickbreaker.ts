@@ -32,7 +32,7 @@ export class BrickBreaker {
 		this.scene = scene;
 		this.engine = scene.getEngine() as Engine;
 		this.root = new TransformNode("pongbrRoot", this.scene);
-		this.root.position.set(2200, -3500, 3500);
+		this.root.position.set(200, 500, 500);
 		//this.root.rotation.z -= 30.9000;
 		this.root.scaling.set(1, 1, 1);
 
@@ -44,16 +44,16 @@ export class BrickBreaker {
 
 		this.camera = this.scene.getCameraByName("fieldCamera") as FreeCamera;
 		//this.camera.attachControl(this.canvas, true);
-		this.layers = Math.ceil((Math.random() * 5) + 1);
+		// this.layers = Math.ceil((Math.random() * 5) + 1);
 		// this.layers = 2;
-		this.cols = Math.ceil((Math.random() * 5) + 1);
-		this.bricks = this.generateBricks(10, this.layers, this.cols);
+		// this.cols = Math.ceil((Math.random() * 5) + 1);
+		// this.bricks = this.generateBricks(10, this.layers, this.cols);
 
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
 		ballMaterial.specularColor.set(0, 0, 0);
-		this.ball = new Ball(this.scene, ballMaterial, this.root, this.layers * this.cols, this);
-		this.player = new Player(this.scene, new Vector3(0, 1, 0), this);
+		this.ball = new Ball(this.scene, ballMaterial, this.root, this);
+		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
 
 		this.ball.updatePosition(0, 1);
 		this.ball.setVelocity(new Vector3(0, 0, 0));
@@ -67,17 +67,10 @@ export class BrickBreaker {
 			return;
 		}
 
-		if (this.bricks.length > 0){
-			this.bricks.forEach(layer => {
-				layer.forEach(brick => {
-					brick.setEnabled(false);
-				});
-			});
-		}
+		this.reset();
 		this.layers = Math.ceil((Math.random() * 5) + 1);
 		this.cols = Math.ceil((Math.random() * 5) + 1);
 		this.ball.bricksLeft = this.layers * this.cols;
-		console.log("bricks :::: ", this.ball.bricksLeft);
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
 
 		this.camera.parent = this.root
@@ -93,15 +86,15 @@ export class BrickBreaker {
 	}
 
 
-	public stop(): void {
-		if (this.renderObserver) {
-			this.scene.onBeforeRenderObservable.remove(this.renderObserver);
-			this.renderObserver = null;
-			console.log("BrickBreaker removed from render loop");
-		}
-		this.player.disableInput();
-		this.reset();
-	}
+	// public stop(): void {
+	// 	if (this.renderObserver) {
+	// 		this.scene.onBeforeRenderObservable.remove(this.renderObserver);
+	// 		this.renderObserver = null;
+	// 		console.log("BrickBreaker removed from render loop");
+	// 	}
+	// 	this.player.disableInput();
+	// 	this.reset();
+	// }
 
 	private update(): void {
 
@@ -128,6 +121,7 @@ export class BrickBreaker {
 		this.camera.parent = null;
 		this.start1 = false;
 		this.player.disableInput();
+		// this.reset();
 	}
 
 	//private update(): void {
@@ -140,9 +134,13 @@ export class BrickBreaker {
 	//}
 
 	public reset(): void {
-		console.log("reset BrickBreaker");
-		// this.ball.updatePosition(0, 1);
-		// this.ball.setVelocity(new Vector3(0, 0, 0));
+		if (this.bricks && this.bricks.length > 0){
+			this.bricks.forEach(layer => {
+				layer.forEach(brick => {
+					brick.setEnabled(false);
+				});
+			});
+		}
 		this.ball.reset();
 		this.player.reset();
 		this.lastTime = performance.now();
@@ -158,7 +156,7 @@ export class BrickBreaker {
 		// this.camera.orthoBottom = -9;
 		//this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 30, Vector3.Zero(), this.scene);
 		this.camera = this.scene.getCameraByName("brick") as ArcRotateCamera;
-		this.camera.attachControl(this.canvas, true);
+		// this.camera.attachControl(this.canvas, true);
 		this.camera.parent = this.root;
 	}
 

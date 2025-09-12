@@ -113,14 +113,24 @@ export class NetworkingSystem extends System {
 						.find(i => i !== localPaddleId)!;
 					const theirScore = score[otherId] ?? 0;
 					if (ui) {
-						ui.score.x = myScore;
-						ui.score.y = theirScore;
+						ui.gameUI.updateScore(myScore, theirScore);
+					}
+					if (ui && (myScore == 5 || theirScore == 5)){
+						ui.gameUI.showEnd(myScore, theirScore, myScore == 5);
 					}
 				}
 			}
 
 			// === Game End ===
 			if (serverMsg.end) {
+				
+				const e = entities.find(e => e.hasComponent(UIComponent));
+				let ui = e?.getComponent(UIComponent);
+				// const scores = serverMsg.end.score as number[];
+				// const myScore = scores[localPaddleId] ?? 0;
+				// const other = scores.find((_, i) => i !== localPaddleId) ?? 0;
+				
+				ui?.gameUI.showEnd(5, 5, true);
 				console.log("Received GameEndMessage");
 				// const scores = serverMsg.end.score as number[];
 				// const myScore = scores[localPaddleId] ?? 0;
