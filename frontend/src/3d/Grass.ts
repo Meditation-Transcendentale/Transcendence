@@ -134,7 +134,7 @@ export class Grass {
 		//this.setThinInstances(this.meshD1, this._size, this._size, optionsD);
 		//this.setThinInstances(this.meshE, this._size * 4, this._size * 4, optionsE);
 
-		console.log("NB GRASS:", this.meshA.thinInstanceCount * 2 + this.meshB.thinInstanceCount * 4 + this.meshC.thinInstanceCount * 6 + this.meshD.thinInstanceCount * 4 + this.meshD1.thinInstanceCount * 4 + this.meshE.thinInstanceCount * 4)
+		//console.log("NB GRASS:", this.meshA.thinInstanceCount * 2 + this.meshB.thinInstanceCount * 4 + this.meshC.thinInstanceCount * 6 + this.meshD.thinInstanceCount * 4 + this.meshD1.thinInstanceCount * 4 + this.meshE.thinInstanceCount * 4)
 
 
 		// this._grassShader = new ShaderMaterial(
@@ -259,12 +259,12 @@ export class Grass {
 		const loaded = await LoadAssetContainerAsync("/assets/grassLOD.glb", scene);
 		this.meshA = loaded.meshes[2] as Mesh;
 		this.meshA.setEnabled(false);
-		console.log(this.meshA);
+		//console.log(this.meshA);
 		this.meshA.name = 'nearGrass';
 		this.meshA.doNotSyncBoundingInfo = true;
 		this.meshA.alwaysSelectAsActiveMesh = true;
 
-		console.log("VERT:", this.meshA.getTotalIndices());
+		//console.log("VERT:", this.meshA.getTotalIndices());
 		// loaded.meshes[0].setEnabled(false);
 		//
 		loaded.meshes[1].setEnabled(false);
@@ -310,7 +310,7 @@ export class Grass {
 		const bufferColor = new Float32Array(4 * NUM_X * NUM_Z);
 
 		//const c = Color3.Random();
-		console.log(NUM_X, NUM_Z, CLUSTER_Z, CLUSTER_X);
+		//console.log(NUM_X, NUM_Z, CLUSTER_Z, CLUSTER_X);
 
 		for (let i = 0; i < NUM_X * NUM_Z; i++) {
 			const offsetX = (Math.random() - 0.5) * CLUSTER_X;
@@ -366,7 +366,7 @@ export class Grass {
 		const bufferColor = new Float32Array(4 * NUM_X * NUM_Z);
 
 		//const c = Color3.Random();
-		console.log(NUM_X, NUM_Z, CLUSTER_Z, CLUSTER_X);
+		//console.log(NUM_X, NUM_Z, CLUSTER_Z, CLUSTER_X);
 
 		for (let i = 0; i < NUM_X * NUM_Z; i++) {
 			const offsetX = (Math.random() - 0.5) * CLUSTER_X;

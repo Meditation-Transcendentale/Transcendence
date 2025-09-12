@@ -43,7 +43,7 @@ export function createUwsApp(path, lobbyService) {
 
 			try {
 				const state = lobbyService.join(lobbyId, ws.userId);
-				const buf = encodeServerMessage({ update: { lobbyId: state.lobbyId, players: state.players, status: state.status, mode: state.mode } });
+				const buf = encodeServerMessage({ update: { lobbyId: state.lobbyId, players: state.players, status: state.status, mode: state.mode, map: state.map } });
 				ws.subscribe(lobbyId);
 				app.publish(lobbyId, buf, true);
 			} catch (err) {
