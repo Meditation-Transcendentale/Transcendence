@@ -12,6 +12,10 @@ interface lobbyHtmlReference {
 	infoWindow: { html: HTMLDivElement, id: number }
 	inviteWindow: { html: HTMLDivElement, id: number }
 	playersList: HTMLDivElement
+	lobbyMode: HTMLSpanElement
+	lobbyMap: HTMLSpanElement
+	lobbyId: HTMLSpanElement
+	lobbyIdCopy: HTMLButtonElement
 }
 
 enum lobbyState {
@@ -46,6 +50,7 @@ export default class Lobby {
 		this.ws = null;
 		this.id = null;
 		this.mode = null;
+		this.map = null;
 		this.state = lobbyState.none;
 
 		this.players = new Map<string, player>;
@@ -56,7 +61,11 @@ export default class Lobby {
 			playersWindow: { html: div.querySelector("#players-window") as HTMLDivElement, id: -1 },
 			infoWindow: { html: div.querySelector("#info-window") as HTMLDivElement, id: -1 },
 			inviteWindow: { html: div.querySelector("#invite-window") as HTMLDivElement, id: -1 },
-			playersList: div.querySelector("#players-list") as HTMLDivElement
+			playersList: div.querySelector("#players-list") as HTMLDivElement,
+			lobbyMode: div.querySelector("#lobby-mode") as HTMLSpanElement,
+			lobbyMap: div.querySelector("#lobby-map") as HTMLSpanElement,
+			lobbyId: div.querySelector("#lobby-id-text") as HTMLSpanElement,
+			lobbyIdCopy: div.querySelector("#lobby-id-copy") as HTMLButtonElement
 		};
 
 		this.ref.playersWindow.id = App3D.addCSS3dObject({
@@ -98,6 +107,7 @@ export default class Lobby {
 		console.log(`LOBBY MAP = ${this.map}`);
 		this.setupWs(this.id);
 		this.ref.playersList.innerHTML = "";
+		this.ref.lobbyId.innerHTML = `${this.id}`;
 
 		this.createPlayerDiv(User.uuid as string, false, true);
 		document.body.appendChild(this.css);
@@ -106,6 +116,11 @@ export default class Lobby {
 		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.infoWindow.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.inviteWindow.id, true);
+
+		this.ref.lobbyIdCopy.addEventListener("click", () => {
+			navigator.clipboard.writeText(this.id);
+		})
+
 	}
 
 	public async unload() {
@@ -148,7 +163,9 @@ export default class Lobby {
 
 			if (payload.update != null) {
 				this.mode = payload.update.mode as string;
+				this.ref.lobbyMode.innerHTML = `MODE : ${this.mode}`;
 				this.map = payload.update.map as string;
+				this.ref.lobbyMap.innerHTML = `MAP : ${this.map}`;
 				console.log(this.map);
 				this.updatePlayers(payload.update.players as Array<{ uuid: string, ready: boolean }>);
 				console.log(`Update :${payload}`);
