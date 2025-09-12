@@ -7,6 +7,26 @@
 	pointer-events: auto;
 }
 
+/*#info-window>.window-footer>.button {*/
+/*	background-color: var(--window-color);*/
+/*	color: var(--window-background);*/
+/*}*/
+
+#lobby-id-copy.button {
+    background-color: var(--window-color) !important;
+    color: var(--window-background) !important;
+}
+
+#lobby-id-copy.button:hover {
+    color: var(--window-color) !important;
+    background-color: var(--window-background) !important;
+}
+
+#lobby-id-text {
+    background-color: var(--window-color) !important;
+    color: var(--window-background) !important;
+}
+
 #info-window {
 	display:flex;
 	flex-direction: column;
