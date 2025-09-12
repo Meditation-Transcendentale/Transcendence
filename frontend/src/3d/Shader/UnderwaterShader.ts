@@ -11,6 +11,7 @@ Effect.ShadersStore["OLDunderwaterFragmentShader"] = `
 	uniform sampler2D	surfaceTexture;
 	uniform sampler2D	causticTexture;
 
+
 	uniform mat4	projection;
 	uniform mat4	iprojection;
 	uniform mat4	iview;

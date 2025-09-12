@@ -1,3 +1,4 @@
+import { gFreindList } from "./Friendlist";
 import { NotificationManager } from "./NotificationManager";
 import { Popup } from "./Popup";
 import { cdnRequest, meRequest, patchRequest, postRequest } from "./requests";
@@ -8,6 +9,7 @@ interface athHtmlReference {
 	menu: HTMLDivElement,
 	setting: HTMLInputElement,
 	quit: HTMLInputElement,
+	friendlist: HTMLInputElement,
 }
 
 class Ath {
@@ -25,7 +27,8 @@ class Ath {
 		this.ref = {
 			menu: div.querySelector("#menu") as HTMLDivElement,
 			setting: div.querySelector("#setting-btn") as HTMLInputElement,
-			quit: div.querySelector("#quit-btn") as HTMLInputElement
+			quit: div.querySelector("#quit-btn") as HTMLInputElement,
+			friendlist: div.querySelector("#friend-btn") as HTMLInputElement
 		}
 		this.css = div.querySelector("link") as HTMLElement;
 
@@ -41,6 +44,12 @@ class Ath {
 		this.ref.quit.addEventListener("click", () => {
 			this.quit.load();
 		})
+
+		this.ref.friendlist.addEventListener("click", () => {
+			gFreindList.load();
+		})
+
+		gFreindList.init(div.querySelector("#friendlist-window") as HTMLDivElement);
 
 
 
@@ -230,26 +239,26 @@ class AthSetting {
 	//}
 
 	private avatarUpdate() {
-			const body = new FormData();
-			body.append('avatar', this.ref.avatarChange.files[0]);
-			patchRequest("update-info/avatar", body, false)
-				.then((json)=>{
-					// const url = URL.createObjectURL(json.data.cdnPath)
-					const url = new URL(json.data.cdnPath);
-					console.log(json.data.cdnPath);
-					this.ref.avatarImg.src = `https://${window.location.hostname}:7000${encodeURI(url.pathname)}`;
-				})
-				// .then(() => {
-				// 	meRequest()
-				// 		.then(() => { console.log(User) })
-				// 		.catch((err) => { console.log(err) })
-				// 	cdnRequest(User.avatar as string)
-				// 		.then((json) => { console.log(json) })
-				// 		.catch((err) => { console.log(err) })
-				// })
-				// .catch(() => {
-				// 	console.error("Error changing avatar");
-				// })
+		const body = new FormData();
+		body.append('avatar', this.ref.avatarChange.files[0]);
+		patchRequest("update-info/avatar", body, false)
+			.then((json) => {
+				// const url = URL.createObjectURL(json.data.cdnPath)
+				const url = new URL(json.data.cdnPath);
+				console.log(json.data.cdnPath);
+				this.ref.avatarImg.src = `https://${window.location.hostname}:7000${encodeURI(url.pathname)}`;
+			})
+		// .then(() => {
+		// 	meRequest()
+		// 		.then(() => { console.log(User) })
+		// 		.catch((err) => { console.log(err) })
+		// 	cdnRequest(User.avatar as string)
+		// 		.then((json) => { console.log(json) })
+		// 		.catch((err) => { console.log(err) })
+		// })
+		// .catch(() => {
+		// 	console.error("Error changing avatar");
+		// })
 	}
 
 
