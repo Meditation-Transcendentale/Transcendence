@@ -14,7 +14,7 @@ interface playHtmlReference {
 	create: { html: HTMLDivElement, id: number },
 	createOption: { html: HTMLDivElement, id: number },
 	//brMod: HTMLInputElement;
-	//tournamentMod: HTMLInputElement;
+	tournamentMod: HTMLInputElement;
 	//defaultMap: HTMLInputElement;
 	//localMod: HTMLInputElement;
 	//onlineMod: HTMLInputElement;
@@ -86,7 +86,7 @@ export default class Play {
 			createOption: { html: div.querySelector("#play-create-option") as HTMLDivElement, id: -1 },
 			join: { html: div.querySelector("#play-join") as HTMLDivElement, id: -1 },
 			//brMod: div.querySelector("#br-mod") as HTMLInputElement,
-			//tournamentMod: div.querySelector("#tournament-mod") as HTMLInputElement,
+			tournamentMod: div.querySelector("#tournament-mode") as HTMLInputElement,
 			//defaultMap: div.querySelector("#default-map") as HTMLInputElement,
 			//localMod: div.querySelector("#local-mod") as HTMLInputElement,
 			//onlineMod: div.querySelector("#online-mod") as HTMLInputElement,
@@ -235,9 +235,21 @@ export default class Play {
 			//this.create();
 		})
 
-
 		this.ref.brMode.addEventListener("click", () => {
 			this.createState.mod = "br";
+			this.ref.pongonline.removeAttribute("on");
+			this.ref.ponglocal.removeAttribute("on");
+			this.ref.pongai.removeAttribute("on");
+			this.ref.tournamentMode.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.returnButton();
+			//this.createOption(true);
+			this.create();
+		})
+
+		this.ref.tournamentMod.addEventListener("click", () => {
+			this.createState.mod = "tournament";
 			this.ref.pongonline.removeAttribute("on");
 			this.ref.ponglocal.removeAttribute("on");
 			this.ref.pongai.removeAttribute("on");

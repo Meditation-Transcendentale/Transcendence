@@ -124,25 +124,25 @@ export function decodeMatchStartTournament(buffer) {
 }
 
 export function encodeTournamentCreateRequest(payload) {
-	const err = Proto.lobby.TournamentCreateRequest.verify(payload);
+	const err = Proto.tournament.TournamentCreateRequest.verify(payload);
 	if (err) throw new Error(err);
 	return Proto.shared.MatchEnd
-		.encode(Proto.lobby.TournamentCreateRequest.create(payload))
+		.encode(Proto.tournament.TournamentCreateRequest.create(payload))
 		.finish();
 }
 
 export function decodeTournamentCreateRequest(buffer) {
-	return Proto.lobby.TournamentCreateRequest.decode(buffer);
+	return Proto.tournament.TournamentCreateRequest.decode(buffer);
 }
 
 export function encodeTournamentCreateResponse(payload) {
 	const err = Proto.tournament.TournamentCreateResponse.verify(payload);
 	if (err) throw new Error(err);
 	return Proto.shared.MatchEnd
-		.encode(Proto.lobby.TournamentCreateResponse.create(payload))
+		.encode(Proto.tournament.TournamentCreateResponse.create(payload))
 		.finish();
 }
 
 export function decodeTournamentCreateResponse(buffer) {
-	return Proto.lobby.TournamentCreateResponse.decode(buffer);
+	return Proto.tournament.TournamentCreateResponse.decode(buffer);
 }

@@ -6,18 +6,19 @@ import { decodeTournamentCreateRequest, encodeTournamentCreateResponse } from '.
 import natsClient from './natsClient.js';
 import fs from 'fs';
 import { createUwsApp } from './uwsServer.js';
+import { tournament } from './proto/message.js';
 
 async function start() {
-    await natsClient.connect(process.env.NATS_URL);
+    const nc = await natsClient.connect(process.env.NATS_URL);
 
     const tournamentService = new TournamentService();
-	const app = Fastify({
-		logger: true,
-		https: {
-			key: fs.readFileSync(process.env.SSL_KEY),
-			cert: fs.readFileSync(process.env.SSL_CERT)
-		}
-	});
+    const app = Fastify({
+        logger: true,
+        https: {
+            key: fs.readFileSync(process.env.SSL_KEY),
+            cert: fs.readFileSync(process.env.SSL_CERT)
+        }
+    });
     await app.register(fastifyCors, { origin: '*' });
     app.decorate('tournamentService', tournamentService);
     app.decorate('natsClient', natsClient);
@@ -35,18 +36,31 @@ async function start() {
         else console.log(`uWS WebSocket listening on ${config.WS_PORT}`);
     });
 
-    const subNewTournament = natsClient.subscribe('games.tournament.create');
+    const subCreate = nc.subscribe('games.tournament.create');
     (async () => {
-        for await (const msg of subNewTournament) {
-            const playersList = decodeTournamentCreateRequest(msg.data);
-            const tournamentId = tournamentService.create(playersList, uwsApp);
+        for await (const msg of subCreate) {
+            const req = decodeTournamentCreateRequest(msg.data);
+            console.log(`${req}|${req.players}|${req.players[0]}|${req.players[1]}|${req.players[2]}|${req.players[3]}|`)
+            const tournamentId = tournamentService.create(req.players, uwsApp);
             const respTournamentCreate = encodeTournamentCreateResponse({
                 tournamentId: tournamentId,
             });
+            console.log(tournamentId);
             msg.respond(respTournamentCreate);
         }
-        //send tournament id to the players uuid
-    })
+    })();
 }
+//     async (data, msg) => {
+//             const req = decodeTournamentCreateRequest(data);
+//             console.log(`${req}|${req.players}|${req.players[0]}|${req.players[1]}|${req.players[2]}|${req.players[3]}|`)
+//             const tournamentId = tournamentService.create(req.players, uwsApp);
+//             const respTournamentCreate = encodeTournamentCreateResponse({
+//                 tournamentId: tournamentId,
+//             });
+//             console.log(tournamentId);
+//             msg.respond(respTournamentCreate);
+//             //send tournament id to the players uuid
+//         });
+// }
 
 start().catch(console.error);

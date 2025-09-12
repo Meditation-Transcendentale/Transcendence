@@ -40,8 +40,9 @@ export function createUwsApp(path, lobbyService) {
 			const { lobbyId } = ws;
 			sockets.set(lobbyId, sockets.get(lobbyId) || new Set());
 			sockets.get(lobbyId).add(ws);
-
+			console.log (`1:${lobbyId}`);
 			try {
+				console.log (`JOIN: ${lobbyId}|${ws.userId}`);
 				const state = lobbyService.join(lobbyId, ws.userId);
 				const buf = encodeServerMessage({ update: { lobbyId: state.lobbyId, players: state.players, status: state.status, mode: state.mode, map: state.map } });
 				ws.subscribe(lobbyId);

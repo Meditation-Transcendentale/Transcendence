@@ -138,6 +138,7 @@ for svc in "${SERVICES[@]}"; do
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/ui.proto"
         "$SHARED_PROTO_DIR/tournament.proto"
+        "$SHARED_PROTO_DIR/lobby.proto"
       )
       ;;
     "friends-service")

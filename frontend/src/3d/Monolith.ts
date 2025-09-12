@@ -88,7 +88,7 @@ export class Monolith {
 			enableShaderAnimation: false,
 			animationSpeed: 1.0,
 			animationIntensity: 0.1,
-			qualityMode: 'medium',
+			qualityMode: 'low',
 			surfaceOnly: true,
 			mergeTolerance: 0.001,
 			...options
@@ -170,8 +170,8 @@ export class Monolith {
 	private applyQualitySettings() {
 		const qualitySettings = {
 			low: {
-				voxelSize: this.options.voxelSize * 2,
-				maxVoxelCount: 25000,
+				voxelSize: this.options.voxelSize * 4,
+				maxVoxelCount: 2500,
 				surfaceOnly: true
 			},
 			medium: {

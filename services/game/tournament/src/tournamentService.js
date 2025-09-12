@@ -1,10 +1,21 @@
-    import config from './config.js';
+import config from './config.js';
 import {
     decodeMatchEnd,
-    encodeTournamentServerMessage, 
+    encodeTournamentServerMessage,
     encodeMatchCreateRequest,
-    decodeMatchCreateResponse } from './proto/helper.js';
+    decodeMatchCreateResponse
+} from './proto/helper.js';
 import natsClient from './natsClient.js';
+
+
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
 
 class MatchNode {
     constructor() {
@@ -55,23 +66,26 @@ class Tournament {
     constructor(id, players, uwsApp) {
         this.uwsApp = uwsApp;
         this.id = id;
-        this.players = new Map(shuffle(players).map(p => [p, { isReady: false, isConnected: false, isEliminated: false, isInGame: false }]));
+        this.players = new Map(
+            players.map(p => [
+                p,
+                { isReady: false, isConnected: false, isEliminated: false, isInGame: false }
+            ])
+        );
         this.root = this.buildTournamentTree(this.players);
         this.current_round = 0;
 
-        const subTournamentEndGame = natsClient.subscribe('games.tournament.*.match.end');
-        (async () => {
-            for await (const msg of subTournamentEndGame) {
+        natsClient.subscribe('games.tournament.*.match.end',
+            (data, msg) => {
                 const [, , gameId] = msg.subject.split(".");
                 match = this.findMatchByGameId(this.root, gameId);
                 if (!match) { return; }
-                const data = decodeMatchEnd(msg.data);
-                match.setResult(data);
-                if (match == this.root) continue;
+                const decodedData = decodeMatchEnd(data);
+                match.setResult(decodedData);
+                if (match == this.root) return;
                 if (areAllMatchesFinished()) sendReadyCheck();
                 sendUpdate();
-            }
-        })
+            });
     }
 
     sendReadyCheck() {
@@ -89,6 +103,9 @@ class Tournament {
     }
 
     buildTournamentTree(players) {
+        console.log(`${players}`)
+        for (const i = 0; players[i]; i++)
+            console.log(players[i]);
         if (players.length === 0 || players.length % 2 !== 0) {
             throw new Error("Empty or odd playerlist");
         }
@@ -169,11 +186,15 @@ class Tournament {
     }
 
     addPlayer(userId) {
-        if (this.players.has(userId)) {
-            throw new Error(`Player already in tournament`)
+        if (!this.players.has(userId)) {
+            throw new Error(`Player ${userId} not in this tournament`);
         }
-        natsClient.publish(`notification.${userId}.status`, encodeStatusUpdate({ sender: userId, status: "in tournament", option: this.id }));
-        this.players.set(userId, { isReady: false, isConnected: true, isEliminated: false })
+        const state = this.players.get(userId);
+        state.isConnected = true;
+        natsClient.publish(
+            `notification.${userId}.status`,
+            encodeStatusUpdate({ sender: userId, status: "in tournament", option: this.id })
+        );
     }
 }
 
@@ -187,16 +208,17 @@ export default class tournamentService {
 
     create(players, uwsApp) {
         const id = Date.now().toString();
-        const tournament = new Tournament(id, players, uwsApp);
+        const shuffled = shuffle(players);
+        const tournament = new Tournament(id, shuffled, uwsApp);
         this.tournaments.set(id, tournament);
-        return (id);
+        return id;
     }
 
     join(tournamentId, userId) {
-        const tournament = this.tournaments.get(tournamentId)
-        if (!tournamentId) throw new Error('Lobby not found')
-        tournament.addPlayer(userId)
-        return tournament.getState()
+        const tournament = this.tournaments.get(tournamentId);
+        if (!tournament) throw new Error("Tournament not found");
+        tournament.addPlayer(userId);
+        return tournament.getState();
     }
 
     quit(tournamentId, userId) {
@@ -272,10 +294,3 @@ export default class tournamentService {
     }
 }
 
-const shuffle = (players) => {
-    for (let i = players.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [players[i], players[j]] = [players[j], players[i]];
-    }
-    return players;
-}; 

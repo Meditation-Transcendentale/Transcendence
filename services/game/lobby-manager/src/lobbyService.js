@@ -115,17 +115,21 @@ export default class LobbyService {
 
 		if (lobby.allReady()) {
 			if (lobby.mode == `tournament`) {
+				console.log(lobby.players.keys());
 				const reqBufTournament = encodeTournamentCreateRequest({
 					players: [...lobby.players.keys()],
 				});
-				const replyBufTournament = await natsClientClient.request(
-					`games.tournament.create`,
-					reqBufTournament, {}
-				);
-
-				const respTournament = decodeTournamentCreateResponse(replyBufTournament);
-				lobby.tournamentId = respTournament.tournamentId;
-				state.tournamentId = respTournament.tournamentId;
+				try {
+					const replyBufTournament = await natsClient.request(
+						`games.tournament.create`,
+						reqBufTournament, {}
+					);
+					const respTournament = decodeTournamentCreateResponse(replyBufTournament);
+					lobby.tournamentId = respTournament.tournamentId;
+					state.tournamentId = respTournament.tournamentId;
+				} catch (err) {
+					console.error(`Failed to create tournament:`, err);
+				}
 			}
 			else {
 				const reqBuf = encodeMatchCreateRequest({
