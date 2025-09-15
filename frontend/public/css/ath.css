@@ -1,3 +1,5 @@
+@import url("friendlist.css");
+
 #menu {
 	position: absolute;
 	background-color: black;
@@ -71,121 +73,126 @@
 	background-color: white;
 }
 
-#setting-window {
+
+
+/*########################*/
+/*	  PROFILE         */
+/*########################*/
+
+#profile-div {
 	position: absolute;
-	top: 30%;
+	width: 80%;
+	height: 80%;
+	top: 50%;
 	left: 50%;
-	transform: translateX(-50%);
-	width: 31vh;
-	height: 30vh;
+	pointer-events: auto;
+	transform: translate(-50%, -50%);
+	background-color: black;
 }
 
-#setting-window>.window-bar {
-	font-size: 2.5vh;
-}
-
-#setting-window>.window-content {
-	font-size: 3vh;
-}
-
-#avatar-img {
+#avatar-image {
 	width: 10vh;
 	height: 10vh;
-	background-color: grey;
-	cursor: pointer;
-	border-radius: 10%;
+}
+
+#stats-details>summary {
+	background: black;
+	color: white;
+}
+
+#stats-div {
+	display: grid;
+	width: 100%;
+	background-color: yellow;
+	height: 100%;
+
+}
+
+#stats-switch {
+	top: 0%;
+	left: 0%;
+	grid-column: 0 / 1;
+	grid-row: 1/ 2;
+}
+
+#stats-table {
+	color: white;
+	background-color: black;
+	grid-column: 0 / 5;
+	grid-row: 2/ 3;
+	width: 100%;
+
+}
+
+#stats-history {
+	color: white;
+	background-color: black;
+	grid-column: 5 / 10;
+	grid-row: 2/ 3;
+	width: 50%;
+
+}
+
+#stats-table>.window-content {
+	width: 100%;
+}
+
+.player-stat {
+	width: 100%;
 	border-color: white;
 	border-style: solid;
-	border-width: 0.2vh;
-	object-fit: cover;
-
-	transition: opacity 0.2s ease;
+	border-width: 0;
+	border-bottom-width: 0.4vh;
 }
 
-#avatar-change {
-	display: none;
-}
-
-#avatar-img:hover {
-	opacity: 0.8;
+.player-stat>div {
+	display: inline-block;
+	/*width: fit-content;*/
 }
 
 
-#username-change {
-	font-size: 3vh;
-	text-align: left;
-	color: white;
-	border-bottom: 0.1em white solid;
-	overflow: hidden;
-}
 
-#password-change,
-#username-edit,
-#avatar-edit,
-#twofa-change {
-	height: fit-content;
+.player-stat>div:last-child {
+	position: relative;
+	/*position: absolute;*/
+	right: 0;
+	/*width: 10vh;*/
 	text-align: center;
-	border: 0.1em white solid;
+	border-color: white;
+	border-style: solid;
+	border-width: 0;
+	border-left-width: 0.2vh;
+
 }
 
-#password-change:hover,
-#username-edit:hover,
-#avatar-edit:hover,
-#twofa-change:hover {
+.match-history {
+	width: 100%;
+	overflow: scroll;
+}
+
+.match-history>tbody>tr[win] {
+	background-color: green;
+}
+
+.match-history>tbody>tr[lose] {
+	background-color: red;
+}
+
+.match-history tr>th {
+	text-align: left;
+}
+
+.match-history,
+tr>td {
+	text-align: center;
+}
+
+.match-history,
+tr>td:last-child {
+	text-align: right;
+}
+
+#username-text {
 	color: black;
 	background-color: white;
-	animation: none;
-}
-
-#avatar-img {
-	position: absolute;
-	top: 1.2em;
-	left: 0.3em;
-}
-
-#username-change {
-	position: absolute;
-	width: 15vh;
-	top: 1.2em;
-	left: 12vh;
-}
-
-#avatar-edit {
-	position: absolute;
-	font-size: 2.2vh;
-	padding-right: 0.2em;
-	top: 3.5em;
-	left: 12vh;
-}
-
-#avatar-edit[off] {
-	pointer-events: none;
-}
-
-#username-edit {
-	position: absolute;
-	font-size: 2.2vh;
-	padding-right: 0.2em;
-	top: 5em;
-	left: 12vh;
-}
-
-#username-edit[off] {
-	pointer-events: none;
-}
-
-#password-change {
-	position: absolute;
-	bottom: 1%;
-	left: 1%;
-	width: 48%;
-
-}
-
-#twofa-change {
-	position: absolute;
-	bottom: 1%;
-	right: 1%;
-	width: 48%;
-
 }

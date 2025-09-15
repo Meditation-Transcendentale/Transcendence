@@ -1,51 +1,59 @@
+import { gFriendList } from "./Friendlist";
 import { NotificationManager } from "./NotificationManager";
 import { Popup } from "./Popup";
 import { cdnRequest, meRequest, patchRequest, postRequest } from "./requests";
+import Stats from "./Stats";
 import { User } from "./User";
 
 interface athHtmlReference {
 	menu: HTMLDivElement,
 	setting: HTMLInputElement,
 	quit: HTMLInputElement,
+	friendlist: HTMLInputElement,
 }
 
 class Ath {
-	private div: HTMLDivElement;
-	private ref: athHtmlReference;
-	private css: HTMLElement;
+	private div!: HTMLDivElement;
+	private ref!: athHtmlReference;
+	private css!: HTMLElement;
 
-	private quit: AthQuit;
-	private setting: AthSetting;
+	private quit!: AthQuit;
+	private profile!: Profile;
 
 	private loaded = false;
 
-	constructor(div: HTMLDivElement) {
+	constructor() {
+
+	}
+
+	public init(div: HTMLDivElement) {
 		this.div = div;
 		this.ref = {
 			menu: div.querySelector("#menu") as HTMLDivElement,
 			setting: div.querySelector("#setting-btn") as HTMLInputElement,
-			quit: div.querySelector("#quit-btn") as HTMLInputElement
+			quit: div.querySelector("#quit-btn") as HTMLInputElement,
+			friendlist: div.querySelector("#friend-btn") as HTMLInputElement
 		}
 		this.css = div.querySelector("link") as HTMLElement;
 
 		this.quit = new AthQuit(div);
-		this.setting = new AthSetting(div);
+		this.profile = new Profile(div.querySelector("#profile-div") as HTMLDivElement);
+		//this.setting = new AthSetting(div);
 		// this.notif = new AthNotif(div);
 
 		this.ref.setting.addEventListener('click', () => {
-			this.setting.load();
+			this.profile.load(User.username as string, true);
 		})
 
 		this.ref.quit.addEventListener("click", () => {
 			this.quit.load();
 		})
 
+		this.ref.friendlist.addEventListener("click", () => {
+			gFriendList.load();
+		})
 
-
-
-
-		// this.ref.settingEdit.addEventListener("click", () => { //FOR Username
-		// })
+		gFriendList.init(div.querySelector("#friendlist-container") as HTMLDivElement);
 
 		NotificationManager.setupWs();
 
@@ -59,31 +67,14 @@ class Ath {
 		this.loaded = true;
 	}
 
+	public loadProfile(username: string) {
+		this.profile.load(username);
+	}
+
 	public async unload() {
 		this.ref.menu.remove();
 		this.loaded = false;
 	}
-
-	// private settingUpdate() {
-	// 	if (this.avatarChange) {
-	// 		const body = new FormData();
-	// 		body.append('avatar', this.ref.avatarChange.files[0]);
-	// 		patchRequest("update-info/avatar", body, false)
-	// 			.then(() => {
-	// 				this.ref.settingEdit.toggleAttribute("off", true);
-	// 				this.avatarChange = false;
-	// 				meRequest()
-	// 					.then(() => { console.log(User) })
-	// 					.catch((err) => { console.log(err) })
-	// 				cdnRequest(User.avatar as string)
-	// 					.then((json) => { console.log(json) })
-	// 					.catch((err) => { console.log(err) })
-	// 			})
-	// 			.catch(() => {
-	// 				console.error("Error changing avatar");
-	// 			})
-	// 	}
-	// }
 }
 
 interface quitHtmlReference {
@@ -202,7 +193,7 @@ class AthSetting {
 
 	}
 
-	public load() {
+	public load(player: string) {
 		this.ref.username.value = User.username as string;
 		this.ref.twofa.value = (User.twofa as number > 0 ? "2FA Enabled" : "2FA Disabled");
 		this.ref.editUsername.toggleAttribute("off", true);
@@ -228,30 +219,111 @@ class AthSetting {
 	//}
 
 	private avatarUpdate() {
-			const body = new FormData();
-			body.append('avatar', this.ref.avatarChange.files[0]);
-			patchRequest("update-info/avatar", body, false)
-				.then((json)=>{
-					// const url = URL.createObjectURL(json.data.cdnPath)
-					const url = new URL(json.data.cdnPath);
-					console.log(json.data.cdnPath);
-					this.ref.avatarImg.src = `https://${window.location.hostname}:7000${encodeURI(url.pathname)}`;
-				})
-				// .then(() => {
-				// 	meRequest()
-				// 		.then(() => { console.log(User) })
-				// 		.catch((err) => { console.log(err) })
-				// 	cdnRequest(User.avatar as string)
-				// 		.then((json) => { console.log(json) })
-				// 		.catch((err) => { console.log(err) })
-				// })
-				// .catch(() => {
-				// 	console.error("Error changing avatar");
-				// })
+		const body = new FormData();
+		body.append('avatar', this.ref.avatarChange.files[0]);
+		patchRequest("update-info/avatar", body, false)
+			.then((json) => {
+				// const url = URL.createObjectURL(json.data.cdnPath)
+				const url = new URL(json.data.cdnPath);
+				console.log(json.data.cdnPath);
+				this.ref.avatarImg.src = `https://${window.location.hostname}:7000${encodeURI(url.pathname)}`;
+			})
+		// .then(() => {
+		// 	meRequest()
+		// 		.then(() => { console.log(User) })
+		// 		.catch((err) => { console.log(err) })
+		// 	cdnRequest(User.avatar as string)
+		// 		.then((json) => { console.log(json) })
+		// 		.catch((err) => { console.log(err) })
+		// })
+		// .catch(() => {
+		// 	console.error("Error changing avatar");
+		// })
 	}
 
 
 }
 
 
-export default Ath;
+interface profilHtmlReference {
+	usernameContainer: HTMLDivElement,
+	username: HTMLSpanElement,
+	usernameInput: HTMLInputElement,
+	avatar: HTMLImageElement,
+	avatarFile: HTMLInputElement,
+	security: HTMLInputElement,
+	edit: HTMLInputElement
+}
+
+class Profile {
+	private div: HTMLDivElement;
+	private ref: profilHtmlReference;
+
+	private stats: Stats;
+	private edit: boolean;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+
+		this.ref = {
+			usernameContainer: div.querySelector("#profile-username") as HTMLDivElement,
+			username: div.querySelector("#username-text") as HTMLSpanElement,
+			usernameInput: div.querySelector("#username-input") as HTMLInputElement,
+			avatar: div.querySelector("#avatar-image") as HTMLImageElement,
+			avatarFile: div.querySelector("#avatar-file") as HTMLInputElement,
+			security: div.querySelector("#security-input") as HTMLInputElement,
+			edit: div.querySelector("#edit-input") as HTMLInputElement
+		}
+
+		this.ref.avatarFile.addEventListener('change', () => {
+			const body = new FormData();
+			body.append('avatar', this.ref.avatarFile.files[0]);
+			patchRequest("update-info/avatar", body, false)
+				.then((json: any) => {
+					this.ref.avatar.src = `/cdn${json.data.cdnPath}`;
+				})
+				.catch((err) => {
+					NotificationManager.addText(err);
+				})
+		})
+
+
+		console.log(User.username)
+		this.ref.usernameInput.addEventListener("keyup", () => {
+			this.ref.edit.disabled = this.ref.usernameInput.value.length <= 0 || this.ref.usernameInput.value == User.username;
+		})
+
+
+		this.stats = new Stats(div.querySelector("#stats-div") as HTMLDivElement)
+
+	}
+
+	public load(username: string, self = false) {
+		Popup.removePopup();
+		this.stats.load(username);
+		this.setup(username, self);
+		Popup.addPopup(this.div);
+	}
+
+	private setup(username: string, self: boolean) {
+		this.ref.username.remove();
+		this.ref.usernameInput.remove();
+		this.ref.edit.remove();
+		if (self) {
+			this.ref.avatarFile.disabled = false;
+			this.ref.usernameInput.value = username;
+			this.ref.edit.disabled = true;
+			this.ref.avatar.src = `/cdn${User.avatar}`;
+			this.ref.usernameContainer.appendChild(this.ref.usernameInput);
+			this.ref.usernameContainer.appendChild(this.ref.edit);
+		} else {
+			this.ref.avatarFile.disabled = true;
+			this.ref.username.innerText = username;
+			this.ref.usernameContainer.appendChild(this.ref.username);
+		}
+	}
+
+}
+
+// export default Ath;
+export const gAth = new Ath();
