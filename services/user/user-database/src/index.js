@@ -68,6 +68,11 @@ handleErrorsNats(async () => {
 			const user = userService.getUserFromUUID(uuid);
 			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
 		}),
+		handleNatsSubscription("user.getUserInfosFromUUID", async (msg) => {
+			const { uuid } = jc.decode(msg.data);
+			const user = userService.getUserInfosFromUUID(uuid);
+			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
+		}),
 		handleNatsSubscription("user.getUserFromHeader", async (msg) => {
 			const { headers }  = jc.decode(msg.data);
 			const user = userService.getUserFromHeader(headers);

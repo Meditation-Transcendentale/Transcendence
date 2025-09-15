@@ -111,7 +111,7 @@ app.post('/search', handleErrors(async (req, res) => {
 			responseData = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: identifier } );
 			break;
 		case 'uuid':
-			responseData = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: identifier } );
+			responseData = await natsRequest(nats, jc, 'user.getUserInfosFromUUID', { uuid: identifier } );
 			if (!responseData) {
 				throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 			}

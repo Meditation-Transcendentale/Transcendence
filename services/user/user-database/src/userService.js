@@ -32,12 +32,13 @@ const getAllUsersStmt = database.prepare("SELECT * FROM users");
 const getUserStatusStmt = database.prepare("SELECT status, lobby_gameId FROM active_user WHERE user_id = ?");
 const addUserStatusStmt = database.prepare("INSERT INTO active_user (user_id, status) VALUES (?, ?)");
 const updateStatusStmt = database.prepare("UPDATE active_user SET status = ?, lobby_gameId = ? WHERE user_id = ?");
+const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getUserForFriendResearchStmt  = database.prepare(`
 	SELECT u.uuid, u.username, u.avatar_path, au.status 
 	FROM users u
 	JOIN active_user au ON u.id = au.user_id
 	WHERE u.username = ?`);
-const getUserFromUUIDStmt = database.prepare(`
+const getUserInfosFromUUIDStmt = database.prepare(`
 	SELECT u.uuid, u.username, u.avatar_path, au.status 
 	FROM users u
 	JOIN active_user au ON u.id = au.user_id
@@ -65,12 +66,18 @@ const getFriendlistStmt = database.prepare(`
 		CASE
 			WHEN f.user_id_1 = ? THEN u2.uuid
 			ELSE u1.uuid
-		END AS friend_uuid
+		END AS friend_uuid,
+		CASE
+			WHEN f.user_id_1 = ? THEN au2.status
+			ELSE au1.status
+		END AS friend_status
 	FROM friendslist f
 	JOIN users u1 ON f.user_id_1 = u1.id
 	JOIN users u2 ON f.user_id_2 = u2.id
+	LEFT JOIN active_user au1 ON f.user_id_1 = au1.user_id
+	LEFT JOIN active_user au2 ON f.user_id_2 = au2.user_id
 	WHERE (f.user_id_1 = ? OR f.user_id_2 = ?) 
-		AND status = 'accepted'`
+		AND f.status = 'accepted'`
 );
 
 
@@ -103,6 +110,13 @@ const userService = {
 	},
 	getUserFromId: (id) => {
 		const user = getUserByIdStmt.get(id);
+		if (!user) {
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
+		}
+		return user;
+	},
+	getUserInfosFromUUID: (uuid) => {
+		const user = getUserInfosFromUUIDStmt.get(uuid);
 		if (!user) {
 			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
@@ -204,7 +218,7 @@ const userService = {
 		return userInfo;
 	},
 	getFriendlist: (userId) => {
-		const friendlist = getFriendlistStmt.all(userId, userId, userId, userId);
+		const friendlist = getFriendlistStmt.all(userId, userId, userId, userId, userId);
 		if (friendlist.length === 0) {
 			throw { status: friendshipReturn.FRIEND_020.http, code: friendshipReturn.FRIEND_020.code, message: friendshipReturn.FRIEND_020.message };
 		}
