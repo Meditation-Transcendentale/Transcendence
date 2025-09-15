@@ -75,7 +75,7 @@ const returnMessages = {
 	STATUS_UPDATED: 'Status updated successfully',
 	STATUS_NOT_FOUND: 'Status not found for this user',
 	BAD_GAME_ID: 'Invalid game or lobby ID',
-	IDENTIFIER_TYPE_RESPONSE_REQUIRED: 'Identifier, type and response are required',
+	IDENTIFIER_TYPE_REQUIRED: 'Identifier and type are required',
 };
 
 const statusReturn = { 
@@ -124,7 +124,7 @@ const userReturn = {
 	USER_033: { http: 201, code: 2013, message: returnMessages.USER_CREATED },
 	USER_034: { http: 200, code: 20012, message: returnMessages.INTRA42_LOGGED_IN },
 	USER_035: { http: 200, code: 20013, message: returnMessages.LOGGED_IN },
-	USER_036: { http: 400, code: 40031, message: returnMessages.IDENTIFIER_TYPE_RESPONSE_REQUIRED },
+	USER_036: { http: 400, code: 40031, message: returnMessages.IDENTIFIER_TYPE_REQUIRED },
 	USER_037: { http: 400, code: 40032, message: returnMessages.INVALID_SEARCH_TYPE },
 };
 

@@ -26,14 +26,22 @@ const updateAvatarStmt = database.prepare("UPDATE users SET avatar_path = ? WHER
 const updatePasswordStmt = database.prepare("UPDATE users SET password = ? WHERE id = ?");
 const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_fa_enabled = ? WHERE id = ?");
 const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
-const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getAvatarFromUsernameStmt = database.prepare("SELECT avatar_path FROM users WHERE username = ?");
 const getAvatarFromUUIDStmt = database.prepare("SELECT avatar_path FROM users WHERE uuid = ?");
-const getUserForFriendResearchStmt = database.prepare("SELECT * FROM users WHERE username = ?");
 const getAllUsersStmt = database.prepare("SELECT * FROM users");
 const getUserStatusStmt = database.prepare("SELECT status, lobby_gameId FROM active_user WHERE user_id = ?");
 const addUserStatusStmt = database.prepare("INSERT INTO active_user (user_id, status) VALUES (?, ?)");
 const updateStatusStmt = database.prepare("UPDATE active_user SET status = ?, lobby_gameId = ? WHERE user_id = ?");
+const getUserForFriendResearchStmt  = database.prepare(`
+	SELECT u.uuid, u.username, u.avatar_path, au.status 
+	FROM users u
+	JOIN active_user au ON u.id = au.user_id
+	WHERE u.username = ?`);
+const getUserFromUUIDStmt = database.prepare(`
+	SELECT u.uuid, u.username, u.avatar_path, au.status 
+	FROM users u
+	JOIN active_user au ON u.id = au.user_id
+	WHERE u.uuid = ?`);
 const getBlockedUsersStmt = database.prepare(`
 	SELECT bu.id, u1.username AS blocker_username, u2.username AS blocked_username 
 	FROM blocked_users bu
