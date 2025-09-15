@@ -3,5 +3,5 @@ export default {
 	WS_PORT: 5019,
 	HEARTBEAT_INTERVAL: 30_000,
 	NATS_URL: 'nats://nats:4222',
-	WS_PATH: '/tournament',
+	WS_PATH: '/sacrifice',
 };

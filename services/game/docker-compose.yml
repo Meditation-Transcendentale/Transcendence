@@ -137,6 +137,6 @@ services:
     environment:
       - SERVICE_NAME=tournament
       - NATS_URL=nats://nats:4222
-      - PORT=5009
+      - PORT=5019
     ports:
-      - "5009:5009"
+      - "5019:5019"

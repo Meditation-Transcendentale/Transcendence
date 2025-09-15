@@ -126,7 +126,7 @@ export function decodeMatchStartTournament(buffer) {
 export function encodeTournamentCreateRequest(payload) {
 	const err = Proto.tournament.TournamentCreateRequest.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.shared.MatchEnd
+	return Proto.tournament.TournamentCreateRequest
 		.encode(Proto.tournament.TournamentCreateRequest.create(payload))
 		.finish();
 }
@@ -138,7 +138,7 @@ export function decodeTournamentCreateRequest(buffer) {
 export function encodeTournamentCreateResponse(payload) {
 	const err = Proto.tournament.TournamentCreateResponse.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.shared.MatchEnd
+	return Proto.tournament.TournamentCreateResponse
 		.encode(Proto.tournament.TournamentCreateResponse.create(payload))
 		.finish();
 }

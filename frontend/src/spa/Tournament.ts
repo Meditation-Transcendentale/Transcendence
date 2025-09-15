@@ -71,7 +71,7 @@ export default class Tournament {
 		} else if (this.id && this.id == params.get("id")) {
 			//nav to past tournament
 		}
-		document.querySelector('#home-container')?.appendChild(this.div);
+		document.body.appendChild(this.ref.tree);
 	}
 
 	public async unload() {
@@ -80,7 +80,7 @@ export default class Tournament {
 	}
 
 	private setupWs(id: string) {
-		const url = `wss://${window.location.hostname}:7000/tournament?uuid=${encodeURIComponent(User.uuid as string)}&tournamentId=${encodeURIComponent(id as string)}`;
+		const url = `wss://${window.location.hostname}:7000/sacrifice?uuid=${encodeURIComponent(User.uuid as string)}&tournamentId=${encodeURIComponent(id as string)}`;
 		console.log("URL", url);
 		this.ws = new WebSocket(url);
 

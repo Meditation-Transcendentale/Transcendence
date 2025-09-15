@@ -98,7 +98,7 @@ export function decodeMatchEnd(buffer) {
 export function encodeTournamentCreateRequest(payload) {
 	const err = Proto.tournament.TournamentCreateRequest.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.shared.MatchEnd
+	return Proto.tournament.TournamentCreateRequest
 		.encode(Proto.tournament.TournamentCreateRequest.create(payload))
 		.finish();
 }
@@ -110,7 +110,7 @@ export function decodeTournamentCreateRequest(buffer) {
 export function encodeTournamentCreateResponse(payload) {
 	const err = Proto.tournament.TournamentCreateResponse.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.shared.MatchEnd
+	return Proto.tournament.TournamentCreateResponse
 		.encode(Proto.tournament.TournamentCreateResponse.create(payload))
 		.finish();
 }
@@ -122,11 +122,23 @@ export function decodeTournamentCreateResponse(buffer) {
 export function encodeTournamentServerMessage(payload) {
 	const err = Proto.tournament.TournamentServerMessage.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.shared.MatchEnd
+	return Proto.tournament.TournamentServerMessage
 		.encode(Proto.tournament.TournamentServerMessage.create(payload))
 		.finish();
 }
 
 export function decodeTournamentServerMessage(buffer) {
 	return Proto.tournament.TournamentServerMessage.decode(buffer);
+}
+
+export function encodeServerMessage(payload) {
+	const err = Proto.lobby.ServerMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.lobby.ServerMessage
+		.encode(Proto.lobby.ServerMessage.create(payload))
+		.finish();
+}
+
+export function decodeServerMessage(buffer) {
+	return Proto.lobby.ServerMessage.decode(buffer);
 }

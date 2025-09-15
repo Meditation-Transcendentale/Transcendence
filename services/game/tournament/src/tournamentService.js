@@ -73,6 +73,7 @@ class Tournament {
             ])
         );
         this.root = this.buildTournamentTree(this.players);
+        this.createdAt = Date.now()
         this.current_round = 0;
 
         natsClient.subscribe('games.tournament.*.match.end',
@@ -102,19 +103,16 @@ class Tournament {
         this.uwsApp.publish(this.id, updateBuf, true);
     }
 
-    buildTournamentTree(players) {
-        console.log(`${players}`)
-        for (const i = 0; players[i]; i++)
-            console.log(players[i]);
-        if (players.length === 0 || players.length % 2 !== 0) {
+    buildTournamentTree() {
+        if (this.players.size === 0) {
             throw new Error("Empty or odd playerlist");
         }
 
         const leaves = [];
-        for (let i = 0; i < players.length; i += 2) {
+        for (let i = 0; i < this.players.size; i += 2) {
             const node = new MatchNode();
-            node.player1 = players[i];
-            node.player2 = players[i + 1];
+            node.player1 = this.players[i];
+            node.player2 = this.players[i + 1];
             leaves.push(node);
         }
         function pairMatches(nodes) {
@@ -274,10 +272,10 @@ export default class tournamentService {
 
     cleanup() {
         const now = Date.now();
-        for (const [id, lobby] of this.tournaments) {
+        for (const [id, tournament] of this.tournaments) {
             if (
-                this.tournaments.players.size === 0 ||
-                now - lobby.createdAt > config.HEARTBEAT_INTERVAL * 2
+                tournament.players.size === 0 ||
+                now - tournament.createdAt > config.HEARTBEAT_INTERVAL * 2
             ) {
                 this.tournaments.delete(id);
             }

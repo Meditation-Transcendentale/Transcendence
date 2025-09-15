@@ -97,7 +97,7 @@ class RouterC {
 		} as routePage);
 		this.routes.set("/tournament", { //TO USE FOR TEMPORARY ROUTE EX: BR / IO
 			html: "/tournament",
-			ts: "./tournament",
+			ts: "./Tournament",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
 

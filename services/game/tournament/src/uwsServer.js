@@ -1,9 +1,16 @@
 import uWS from 'uWebSockets.js';
+import { readFileSync } from 'fs';
+import { encodeServerMessage } from './proto/helper.js';
 
 export const tournamentSockets = new Map();
 
 export function createUwsApp(path, tournamentService) {
-    const app = uWS.App();
+    const key = readFileSync(process.env.SSL_KEY || './ssl/key.pem', 'utf8');
+    const cert = readFileSync(process.env.SSL_CERT || './ssl/cert.pem', 'utf8');
+    const app = uWS.SSLApp({
+        key_file_name: process.env.SSL_KEY,
+        cert_file_name: process.env.SSL_CERT
+    });
 
     app.ws(path, {
         idleTimeout: 60,
@@ -45,7 +52,7 @@ export function createUwsApp(path, tournamentService) {
             const buf = new Uint8Array(message);
             const payload = decodeClientMessage(buf);
 
-			if (payload.quit) lobbyService.quit(payload.quit.tournamentId, payload.quit.uuid);
+            if (payload.quit) lobbyService.quit(payload.quit.tournamentId, payload.quit.uuid);
             if (payload.ready) await tournamentService.ready(ws, ws.tournamentId, ws.userId);
         },
 
