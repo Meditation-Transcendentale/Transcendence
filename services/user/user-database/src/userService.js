@@ -26,12 +26,23 @@ const updateAvatarStmt = database.prepare("UPDATE users SET avatar_path = ? WHER
 const updatePasswordStmt = database.prepare("UPDATE users SET password = ? WHERE id = ?");
 const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_fa_enabled = ? WHERE id = ?");
 const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
-const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
-const getUserForFriendResearchStmt = database.prepare("SELECT username FROM users WHERE username = ?");
+const getAvatarFromUsernameStmt = database.prepare("SELECT avatar_path FROM users WHERE username = ?");
+const getAvatarFromUUIDStmt = database.prepare("SELECT avatar_path FROM users WHERE uuid = ?");
 const getAllUsersStmt = database.prepare("SELECT * FROM users");
 const getUserStatusStmt = database.prepare("SELECT status, lobby_gameId FROM active_user WHERE user_id = ?");
 const addUserStatusStmt = database.prepare("INSERT INTO active_user (user_id, status) VALUES (?, ?)");
 const updateStatusStmt = database.prepare("UPDATE active_user SET status = ?, lobby_gameId = ? WHERE user_id = ?");
+const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
+const getUserForFriendResearchStmt  = database.prepare(`
+	SELECT u.uuid, u.username, u.avatar_path, au.status 
+	FROM users u
+	JOIN active_user au ON u.id = au.user_id
+	WHERE u.username = ?`);
+const getUserInfosFromUUIDStmt = database.prepare(`
+	SELECT u.uuid, u.username, u.avatar_path, au.status 
+	FROM users u
+	JOIN active_user au ON u.id = au.user_id
+	WHERE u.uuid = ?`);
 const getBlockedUsersStmt = database.prepare(`
 	SELECT bu.id, u1.username AS blocker_username, u2.username AS blocked_username 
 	FROM blocked_users bu
@@ -39,7 +50,7 @@ const getBlockedUsersStmt = database.prepare(`
 	JOIN users u2 ON bu.blocked_id = u2.id
 	WHERE bu.blocker_id = ?`);
 const getFriendsRequestsStmt = database.prepare(`
-	SELECT f.id, u1.username AS sender_username, u2.username AS receiver_username
+	SELECT f.id, u1.username AS sender_username, u2.username AS receiver_username, u1.uuid AS sender_uuid, u2.uuid AS receiver_uuid
 	FROM friendslist f
 	JOIN users u1 ON f.user_id_1 = u1.id
 	JOIN users u2 ON f.user_id_2 = u2.id
@@ -55,12 +66,18 @@ const getFriendlistStmt = database.prepare(`
 		CASE
 			WHEN f.user_id_1 = ? THEN u2.uuid
 			ELSE u1.uuid
-		END AS friend_uuid
+		END AS friend_uuid,
+		CASE
+			WHEN f.user_id_1 = ? THEN au2.status
+			ELSE au1.status
+		END AS friend_status
 	FROM friendslist f
 	JOIN users u1 ON f.user_id_1 = u1.id
 	JOIN users u2 ON f.user_id_2 = u2.id
+	LEFT JOIN active_user au1 ON f.user_id_1 = au1.user_id
+	LEFT JOIN active_user au2 ON f.user_id_2 = au2.user_id
 	WHERE (f.user_id_1 = ? OR f.user_id_2 = ?) 
-		AND status = 'accepted'`
+		AND f.status = 'accepted'`
 );
 
 
@@ -93,6 +110,13 @@ const userService = {
 	},
 	getUserFromId: (id) => {
 		const user = getUserByIdStmt.get(id);
+		if (!user) {
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
+		}
+		return user;
+	},
+	getUserInfosFromUUID: (uuid) => {
+		const user = getUserInfosFromUUIDStmt.get(uuid);
 		if (!user) {
 			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
@@ -194,7 +218,7 @@ const userService = {
 		return userInfo;
 	},
 	getFriendlist: (userId) => {
-		const friendlist = getFriendlistStmt.all(userId, userId, userId, userId);
+		const friendlist = getFriendlistStmt.all(userId, userId, userId, userId, userId);
 		if (friendlist.length === 0) {
 			throw { status: friendshipReturn.FRIEND_020.http, code: friendshipReturn.FRIEND_020.code, message: friendshipReturn.FRIEND_020.message };
 		}
@@ -234,6 +258,20 @@ const userService = {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
 		}
 		updateStatusStmt.run(status, lobby_gameId, userId);
+	},
+	getAvatarFromUsername: (username) => {
+		const avatar = getAvatarFromUsernameStmt.get(username);
+		if (!avatar) {
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
+		}
+		return avatar;
+	},
+	getAvatarFromUUID: (uuid) => {
+		const avatar = getAvatarFromUUIDStmt.get(uuid);
+		if (!avatar) {
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
+		}
+		return avatar;
 	}
 
 };
