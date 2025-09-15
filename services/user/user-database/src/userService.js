@@ -27,6 +27,8 @@ const updatePasswordStmt = database.prepare("UPDATE users SET password = ? WHERE
 const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_fa_enabled = ? WHERE id = ?");
 const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
 const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
+const getAvatarFromUsernameStmt = database.prepare("SELECT avatar_path FROM users WHERE username = ?");
+const getAvatarFromUUIDStmt = database.prepare("SELECT avatar_path FROM users WHERE uuid = ?");
 const getUserForFriendResearchStmt = database.prepare("SELECT username FROM users WHERE username = ?");
 const getAllUsersStmt = database.prepare("SELECT * FROM users");
 const getUserStatusStmt = database.prepare("SELECT status, lobby_gameId FROM active_user WHERE user_id = ?");
@@ -234,6 +236,20 @@ const userService = {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
 		}
 		updateStatusStmt.run(status, lobby_gameId, userId);
+	},
+	getAvatarFromUsername: (username) => {
+		const avatar = getAvatarFromUsernameStmt.get(username);
+		if (!avatar) {
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
+		}
+		return avatar;
+	},
+	getAvatarFromUUID: (uuid) => {
+		const avatar = getAvatarFromUUIDStmt.get(uuid);
+		if (!avatar) {
+			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
+		}
+		return avatar;
 	}
 
 };

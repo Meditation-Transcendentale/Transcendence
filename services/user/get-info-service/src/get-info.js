@@ -142,7 +142,27 @@ app.post(`/users`, handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ users: users });
 }));
 
+app.get('/avatar/username/:username', handleErrors(async (req, res) => {
 
+	if (!req.params.username) {
+		throw { status: userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
+	}
+
+	const avatar = await natsRequest(nats, jc, 'user.getAvatarFromUsername', { username: req.params.username } );
+
+	res.code(statusCode.SUCCESS).send({ avatar: avatar.avatar_path });
+}));
+
+app.get('/avatar/uuid/:uuid', handleErrors(async (req, res) => {
+
+	if (!req.params.uuid) {
+		throw { status: userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
+	}
+
+	const avatar = await natsRequest(nats, jc, 'user.getAvatarFromUUID', { uuid: req.params.uuid } );
+
+	res.code(statusCode.SUCCESS).send({ avatar: avatar.avatar_path });
+}));
 
 app.get('/health', (req, res) => {
 	res.status(200).send('OK');

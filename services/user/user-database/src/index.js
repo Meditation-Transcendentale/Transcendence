@@ -194,5 +194,15 @@ handleErrorsNats(async () => {
 			userService.updateStatus(userId, status, lobby_gameId);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
+		handleNatsSubscription("user.getAvatarFromUsername", async (msg) => {
+			const { username } = jc.decode(msg.data);
+			const avatar = userService.getAvatarFromUsername(username);
+			nats.publish(msg.reply, jc.encode({ success: true, data: avatar }));
+		}),
+		handleNatsSubscription("user.getAvatarFromUUID", async (msg) => {
+			const { uuid } = jc.decode(msg.data);
+			const avatar = userService.getAvatarFromUUID(uuid);
+			nats.publish(msg.reply, jc.encode({ success: true, data: avatar }));
+		}),
 	]);
 })();
