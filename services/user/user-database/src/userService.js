@@ -39,7 +39,7 @@ const getUserForFriendResearchStmt  = database.prepare(`
 	JOIN active_user au ON u.id = au.user_id
 	WHERE u.username = ?`);
 const getUserInfosFromUUIDStmt = database.prepare(`
-	SELECT u.uuid, u.username, u.avatar_path, au.status 
+	SELECT u.uuid, u.username, u.avatar_path, au.status
 	FROM users u
 	JOIN active_user au ON u.id = au.user_id
 	WHERE u.uuid = ?`);
@@ -117,9 +117,6 @@ const userService = {
 	},
 	getUserInfosFromUUID: (uuid) => {
 		const user = getUserInfosFromUUIDStmt.get(uuid);
-		if (!user) {
-			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
-		}
 		return user;
 	},
 	getUserFromUUID: (uuid) => {
