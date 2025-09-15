@@ -26,11 +26,13 @@ class FriendlistC {
 	private ref!: friendlistHtmlReference;
 
 	// private friends: Array<friend>;
-	private friends: Map<string, friend>;
+	private friendsOnline: Map<string, friend>;
+	private friendsAway: Map<string, friend>;
 
 
 	constructor() {
-		this.friends = new Map<string, friend>;
+		this.friendsOnline = new Map<string, friend>;
+		this.friendsAway = new Map<string, friend>;
 	}
 
 	public init(div: HTMLDivElement) {
@@ -46,7 +48,7 @@ class FriendlistC {
 		this.ref.search.addEventListener("keypress", (e) => {
 			if (e.key == "Enter" && this.ref.search.value.length > 0) {
 				this.ref.result.innerHTML = "";
-				getRequest(`info/username/${encodeURIComponent(this.ref.search.value)}`)
+				postRequest("info/search", { identifier: this.ref.search.value, type: "username" })
 					.then((json) => { this.searchResolve(json) })
 					.catch((resp) => { console.log(resp) })
 			}
@@ -65,35 +67,31 @@ class FriendlistC {
 	}
 
 	private searchResolve(json: any) {
-		this.ref.result.appendChild(this.createResult(json.user.username));
+		this.ref.result.appendChild(this.createResult(json.data.username, json.data.uuid));
 	}
 
 	private friendlistResolve(json: any) {
-
 		for (let i of json.friendlist) {
-			const f = this.createFriend(i.friend_username, i.friend_uuid);
-			this.friends.set(i.friend_uuid, f);
-			this.ref.away.appendChild(f.div);
+			this.addToFriend(i.friend_username, i.friend_uuid, i.friend_status)
 		}
 	}
 
 	private friendlistInviteResolve(json: any) {
 		for (let i of json.friendsRequests) {
-			getRequest(`info/username/${i.sender_username}`)
-				.then((json: any) => { this.addToInvite(i.sender_username, i.sender_username) })
-				.catch((err) => { console.log(err) });
+			this.addToInvite(i.sender_username, i.sender_uuid)
 		}
 	}
 
-	private createFriend(name: string, id: string): friend {
+	public addToFriend(username: string, uuid: string, status: string) {
+		postRequest("info/search", { identifier: uuid, type: "uuid" });
 		const div = document.createElement("div");
 		const n = document.createElement("input");
 		const s = document.createElement("input");
 		const e = document.createElement("input");
 		n.type = "button";
-		n.value = name;
+		n.value = username;
 		s.type = "button"
-		s.value = "away";
+		s.value = status;
 		e.type = "button";
 		e.value = "remove";
 
@@ -101,40 +99,35 @@ class FriendlistC {
 			gAth.loadProfile(n.value);
 		})
 
-		s.addEventListener('click', () => {
-			if (s.value == 'away') {
-				div.remove();
-				s.value = "connected";
-				this.ref.connected.appendChild(div);
-			} else {
-				div.remove();
-				s.value = 'away';
-				this.ref.away.appendChild(div)
-			}
-		})
-
 		e.addEventListener('click', () => {
-			getRequest(`info/uuid/${id}`)
-				.then((json: any) => {
-					deleteRequest("friends/delete", { inputUsername: json.username })
-						.catch((err) => { console.log(err) });
-				})
-			this.friends.get(id)?.div.remove();
-			this.friends.delete(id)
+			deleteRequest("friends/delete", { inputUuid: uuid })
+				.catch((err) => { console.log(err) });
+			this.friendsOnline.get(uuid)?.div.remove();
+			this.friendsOnline.delete(uuid)
+			this.friendsAway.get(uuid)?.div.remove();
+			this.friendsAway.delete(uuid)
 		})
 		div.appendChild(n);
 		div.appendChild(s);
 		div.appendChild(e);
-		return {
+
+		const f = {
 			div: div,
 			name: n,
 			status: s,
 			edit: e
 		};
+		if (status == "offline") {
+			this.friendsAway.set(uuid, f);
+			this.ref.away.appendChild(f.div);
+		} else {
+			this.friendsOnline.set(uuid, f);
+			this.ref.connected.appendChild(f.div);
+		}
 	}
 
 
-	private createResult(username: string): HTMLDivElement {
+	private createResult(username: string, uuid: string): HTMLDivElement {
 		const div = document.createElement("div");
 		const n = document.createElement("input");
 		const a = document.createElement("input");
@@ -149,7 +142,7 @@ class FriendlistC {
 		})
 
 		a.addEventListener("click", () => {
-			postRequest(`friends/add`, { inputUsername: username });
+			postRequest(`friends/add`, { inputUuid: uuid });
 		})
 		div.appendChild(n);
 		div.appendChild(a);
@@ -173,25 +166,13 @@ class FriendlistC {
 			gAth.loadProfile(username);
 		})
 		a.addEventListener("click", () => {
-			// getRequest(`info/uuid/${uuid}`)
-			// 	.then((json: any) => {
-			// 		postRequest("friends/accept", { inputUsername: json.username })
-			// 			.then(() => { div.remove(); this.addFriend(json.username, uuid) })
-			// 			.catch((err) => { console.log(err) });
-			// 	})
-			postRequest("friends/accept", { inputUsername: username })
-				.then(() => { div.remove(); this.addFriend(username, uuid) })
+			postRequest("friends/accept", { inputUuid: uuid })
+				.then(() => { div.remove(); this.addToFriend(username, uuid, "offline") })
 				.catch((err) => { console.log(err) });
 
 		})
 		r.addEventListener("click", () => {
-			// getRequest(`info/uuid/${uuid}`)
-			// 	.then((json: any) => {
-			// 		postRequest("friends/decline", { inputUsername: json.username })
-			// 			.then(() => { div.remove(); })
-			// 			.catch((err) => { console.log(err) });
-			// 	})
-			deleteRequest("friends/decline", { inputUsername: username })
+			deleteRequest("friends/decline", { inputUuid: uuid })
 				.then(() => { div.remove(); })
 				.catch((err) => { console.log(err) });
 		})
@@ -202,10 +183,30 @@ class FriendlistC {
 		return div;
 	}
 
-	public addFriend(username: string, uuid: string) {
-		const f = this.createFriend(username, uuid);
-		this.friends.set(uuid, f);
-		this.ref.away.appendChild(f.div);
+	public updateStatus(uuid: string, status: string) {
+		if (status == "offline") {
+			if (this.friendsOnline.has(uuid)) {
+				const f = this.friendsOnline.get(uuid) as friend;
+				f.div.remove();
+				this.friendsAway.set(uuid, f);
+				this.friendsOnline.delete(uuid);
+				f.status.value = status;
+				this.ref.away.appendChild(f.div);
+			}
+		} else {
+			if (this.friendsAway.has(uuid)) {
+				const f = this.friendsAway.get(uuid) as friend;
+				f.div.remove();
+				this.friendsOnline.set(uuid, f);
+				this.friendsAway.delete(uuid);
+				f.status.value = status;
+				this.ref.connected.appendChild(f.div);
+			} else {
+				this.friendsOnline.get(uuid)!.status.value = status;
+			}
+
+
+		}
 	}
 }
 

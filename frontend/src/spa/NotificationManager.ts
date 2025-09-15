@@ -130,9 +130,9 @@ class NotificationManagerC {
 					const n = this.defaultDiv.cloneNode(true) as HTMLDivElement;
 					const p = this.defaultFriendPopup.cloneNode(true) as HTMLDivElement;
 					const popSpan = document.createElement('span');
-					getRequest(`info/uuid/${newNotification.friendRequest.sender}`)
-						.then((json) => {
-							const senderUsername = (json as any).username;
+					postRequest("info/search", { identifier: newNotification.friendRequest.sender, type: "uuid" }) //data.username
+						.then((json: any) => {
+							const senderUsername = json.data.username;
 							n.innerText = `Friend Request: ${senderUsername}`;
 							popSpan.innerText = `${senderUsername} wants to be friends.`;
 
@@ -142,7 +142,7 @@ class NotificationManagerC {
 								postRequest(`friends/accept`, { inputUsername: senderUsername })
 									.then(() => {
 										Popup.removePopup();
-										gFriendList.addFriend(senderUsername, newNotification.friendRequest!.sender as string);
+										gFriendList.addToFriend(senderUsername, json.data.uuid, json.data.status);
 										d.remove();
 									})
 							});
@@ -162,11 +162,11 @@ class NotificationManagerC {
 				}
 				if (newNotification.friendAccept != null) {
 					const n = this.defaultDiv.cloneNode(true) as HTMLDivElement;
-					getRequest(`info/uuid/${newNotification.friendAccept.sender}`)
-						.then((json) => {
-							const senderUsername = (json as any).username;
+					postRequest("info/search", { identifier: newNotification.friendAccept.sender, type: "uuid" }) //data.username
+						.then((json: any) => {
+							const senderUsername = json.data.username;
 							n.innerText = `${senderUsername} accepted to be friends.`;
-							gFriendList.addFriend(senderUsername, newNotification.friendAccept!.sender as string);
+							gFriendList.addToFriend(senderUsername, json.data.uuid, json.data.status);
 						});
 					NotificationManager.addDiv(n);
 				}
@@ -175,9 +175,9 @@ class NotificationManagerC {
 					const n = this.defaultDiv.cloneNode(true) as HTMLDivElement;
 					const p = this.defaultFriendPopup.cloneNode(true) as HTMLDivElement;
 					const popSpan = document.createElement('span');
-					getRequest(`info/uuid/${newNotification.gameInvite.sender}`)
-						.then((json) => {
-							const senderUsername = (json as any).username;
+					postRequest("info/search", { identifier: newNotification.gameInvite.sender, type: "uuid" }) //data.username
+						.then((json: any) => {
+							const senderUsername = json.data.username;
 							n.innerText = `Game invite: ${senderUsername}.`;
 							popSpan.innerText = `${senderUsername} invited you to a game.`;
 							p.querySelector("#game-invite-yes")?.addEventListener('click', () => {
