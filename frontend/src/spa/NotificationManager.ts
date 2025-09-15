@@ -192,7 +192,7 @@ class NotificationManagerC {
 					NotificationManager.addDiv(n);
 				}
 				if (newNotification.statusUpdate != null) {
-					console.log(`NEW STATUS: ${newNotification.statusUpdate.sender}|${newNotification.statusUpdate.status}|${newNotification.statusUpdate?.option}`);
+					gFriendList.updateStatus(newNotification.statusUpdate.sender as string, newNotification.statusUpdate.status as string)
 				}
 				console.log("Notif: ", newNotification);
 
