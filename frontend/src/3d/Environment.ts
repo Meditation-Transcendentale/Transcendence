@@ -19,6 +19,7 @@ import {
 	Mesh
 } from "@babylonImport";
 import { Field } from "./Field";
+import { DynamicTexture, Material, PBRMaterial } from "@babylonjs/core";
 
 
 export class Environment {
@@ -105,24 +106,83 @@ export class Environment {
 		this.pongRoot.position.set(-2200, -3500, -3500);
 		this.pongRoot.rotation.z -= 30.9000;
 		this.pongRoot.scaling.set(1, 1, 1);
-		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 1, tessellation: 128 }, this.scene);
+		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 5, tessellation: 128 }, this.scene);
 		arenaMesh.parent = this.pongRoot;
 		//arenaMesh.position = new Vector3(-2200, -3500, -3500);
 		////arenaMesh.rotation.x += Math.PI / 2;
 		//arenaMesh.rotation.z -= 30.9000;
-		const material = new StandardMaterial("arenaMaterial", this.scene);
-		material.diffuseColor.set(0, 0, 0);
-		material.specularColor.set(0, 0, 0);
-		material.emissiveColor.set(1, 1, 1);
-		material.disableLighting = true;
-		const fresnel = new FresnelParameters();
-		fresnel.isEnabled = true;
-		fresnel.leftColor = new Color3(1, 1, 1);
-		fresnel.rightColor = new Color3(0, 0, 0);
-		fresnel.power = 15;
-		material.emissiveFresnelParameters = fresnel;
-		arenaMesh.material = material;
+		const arenaMaterial = new PBRMaterial("gameplayArena", this.scene);
+		arenaMaterial.albedoColor = new Color3(0.08, 0.10, 0.12); // Very dark blue-gray
+		arenaMaterial.emissiveColor = new Color3(0.01, 0.03, 0.05); // Minimal glow
+		arenaMaterial.roughness = 0.95; // No distracting reflections
+		arenaMaterial.metallic = 0.02;
 
+		// Create gameplay-focused texture
+		const gameTexture = new DynamicTexture("gameTexture", { width: 1024, height: 1024 }, this.scene);
+		const ctx = gameTexture.getContext();
+
+		// Very dark base
+		ctx.fillStyle = "#0d1115";
+		ctx.fillRect(0, 0, 1024, 1024);
+
+		// Subtle grid for spatial reference (important for gameplay)
+		ctx.strokeStyle = "#1a2025"; // Barely visible but helpful
+		ctx.lineWidth = 1;
+		const gridSize = 64;
+
+		for (let i = 0; i <= 1024; i += gridSize) {
+			ctx.beginPath();
+			ctx.moveTo(i, 0);
+			ctx.lineTo(i, 1024);
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.moveTo(0, i);
+			ctx.lineTo(1024, i);
+			ctx.stroke();
+		}
+
+		// Add VERY subtle cosmic patterns (won't interfere with balls)
+		function drawMinimalPattern(centerX: number, centerY: number, radius: number) {
+			ctx.strokeStyle = "#151a20"; // Almost invisible
+			ctx.lineWidth = 1;
+
+			// Simple concentric circles
+			for (let i = 1; i <= 3; i++) {
+				ctx.beginPath();
+				ctx.arc(centerX, centerY, radius * i * 0.3, 0, 2 * Math.PI);
+				ctx.stroke();
+			}
+		}
+
+		// Place patterns sparingly
+		drawMinimalPattern(512, 512, 150); // Center only
+
+		// Add goal zone indicators (crucial for gameplay)
+		ctx.strokeStyle = "#25303a"; // Slightly more visible for goals
+		ctx.lineWidth = 2;
+
+		// Draw goal zone boundaries (adjust based on your 100-player setup)
+		const goalCount = 100;
+		const angleStep = (Math.PI * 2) / goalCount;
+		const arenaRadius = 450;
+
+		for (let i = 0; i < goalCount; i++) {
+			const angle = i * angleStep;
+			const x1 = 512 + Math.cos(angle) * arenaRadius;
+			const y1 = 512 + Math.sin(angle) * arenaRadius;
+			const x2 = 512 + Math.cos(angle) * (arenaRadius + 30);
+			const y2 = 512 + Math.sin(angle) * (arenaRadius + 30);
+
+			ctx.beginPath();
+			ctx.moveTo(x1, y1);
+			ctx.lineTo(x2, y2);
+			ctx.stroke();
+		}
+
+		gameTexture.update();
+		arenaMaterial.albedoTexture = gameTexture;
+		arenaMesh.material = arenaMaterial;
 		this.gameMeshes.push(arenaMesh);
 
 	}
@@ -135,13 +195,50 @@ export class Environment {
 		//this.camera_br.attachControl(this.canvas, true);
 		this.camera_pong = new ArcRotateCamera('pong', Math.PI / 2., 0, 50, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
-
+		// console.log("=== All Imported Meshes ===");
+		// loaded.meshes.forEach((mesh, index) => {
+		// 	console.log(`Mesh ${index}: "${mesh.name}" (ID: ${mesh.id})`);
+		// 	console.log(`  - Type: ${mesh.getClassName()}`);
+		// 	console.log(`  - Vertices: ${mesh.getTotalVertices()}`);
+		// 	console.log(`  - Material: ${mesh.material ? mesh.material.name : "None"}`);
+		// 	console.log("---");
+		// });
 		loaded.addAllToScene();
-		loaded.meshes[1].parent = this.pongRoot;
-		this.gameMeshes.push(loaded.meshes[1] as Mesh);
+		loaded.meshes[0].parent = this.pongRoot;
+		this.gameMeshes.push(loaded.meshes[0] as Mesh);
 
+		const headMesh = this.scene.getMeshByName('Head.001') as Mesh;
+		const headmat = new StandardMaterial('headmat', this.scene);
+		headmat.diffuseColor = new Color3(0.1, 0.1, 0.1);
+		headmat.emissiveColor = new Color3(0.1, 0.1, 0.1);
+		headMesh.material = headmat;
+		const mouthMesh = this.scene.getMeshByName('Mouth.001') as Mesh;
+		const mouthmat = new StandardMaterial('mouthmat', this.scene);
+		mouthmat.diffuseColor = new Color3(1., 1, 1);
+		mouthmat.emissiveColor = new Color3(0.1, 0.1, 0.1);
+		mouthMesh.material = headmat;
+		const eyeMesh = this.scene.getMeshByName('Eyes.001') as Mesh;
+		const eyemat = new StandardMaterial('eyemat', this.scene);
+		eyemat.diffuseColor = new Color3(1., 0, 0);
+		// eyemat.emissiveColor = new Color3(0.1, 0.1, 0.1);
+		eyeMesh.material = eyemat;
 
-		//this.scene.debugLayer.show();
+		if (mouthMesh && mouthMesh.morphTargetManager) {
+			const smileTarget = mouthMesh.morphTargetManager.getTarget(0);
+
+			smileTarget.influence = 0.;
+
+			console.log("Statue is now smiling!");
+		}
+
+		if (headMesh && headMesh.morphTargetManager) {
+			const smileTarget = headMesh.morphTargetManager.getTarget(0);
+
+			smileTarget.influence = 0.;
+
+			console.log("Statue is now smiling!");
+		}
+		// this.scene.debugLayer.show();
 
 		// await this.gears.load();
 		//

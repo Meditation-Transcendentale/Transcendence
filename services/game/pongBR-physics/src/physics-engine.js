@@ -73,7 +73,7 @@ export class PhysicsEngine {
 		const angleStep = (2 * Math.PI) / numPlayers;
 		const paddleArc = angleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
-		const pillarArc = angleStep * 0.1;
+		const pillarArc = angleStep * 0.025;
 		const usableArc = angleStep - pillarArc;
 		const halfUsableArc = usableArc / 2;
 		const maxOffsets = halfUsableArc - halfArc;
@@ -304,7 +304,7 @@ export class PhysicsEngine {
 		const newAngleStep = (2 * Math.PI) / numActivePlayers;
 		const paddleArc = newAngleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
-		const pillarArc = newAngleStep * 0.1;
+		const pillarArc = newAngleStep * 0.025;
 		const usableArc = newAngleStep - pillarArc;
 		const halfUsableArc = usableArc / 2;
 		const maxOffsets = halfUsableArc - halfArc;
@@ -354,6 +354,7 @@ export class PhysicsEngine {
 			// const pillarAngle = sliceStart + newAngleStep - pillarArc / 2;
 			const pillarAngle = sliceStart + pillarArc / 2;
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
+			// const pillarSize = pillarArc;
 
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
 			pd.posY[pillarEnt] = Math.sin(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);

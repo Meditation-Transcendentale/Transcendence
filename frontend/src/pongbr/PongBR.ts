@@ -21,6 +21,8 @@ import { TransformComponent } from "./components/TransformComponent.js";
 import { WallComponent } from "./components/WallComponent.js";
 import { Entity } from "./ecs/Entity.js";
 import earcut from "earcut";
+import { MotionBlurPostProcess } from "@babylonjs/core";
+import { createBlackHoleBackdrop, createSkybox } from "./skybox.js";
 
 
 export let localPaddleId: any = null;
@@ -78,7 +80,19 @@ export class PongBR {
 		//pipeline.sharpenEnabled = true;
 		this.baseMeshes = createBaseMeshes(this.scene, this.rotatingContainer);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
-
+		// const defaultPipeline = new DefaultRenderingPipeline("gameplayPipeline", true, this.scene, [this.camera]);
+		//
+		// // Bloom optimized for ball visibility
+		// defaultPipeline.bloomEnabled = true;
+		// defaultPipeline.bloomThreshold = 0.8; // Only very bright objects (balls)
+		// defaultPipeline.bloomWeight = 0.25; // Subtle - won't overwhelm
+		// defaultPipeline.bloomKernel = 32; // Tight glow, not spreading
+		// defaultPipeline.bloomScale = 0.5;
+		//
+		// // Minimal post-processing to maintain performance
+		// defaultPipeline.imageProcessingEnabled = true;
+		// defaultPipeline.imageProcessing.contrast = 1.05; // Very slight contrast boost
+		// defaultPipeline.imageProcessing.exposure = 0.9;
 
 		// const radian = 2 * Math.PI;
 		//
@@ -95,18 +109,22 @@ export class PongBR {
 		// const mesh = builder.build(true, 1.);
 		// mesh.parent = this.rotatingContainer;
 		// mesh.position.y += 0.45;
-		const statue = this.scene.getMeshByName('Version NoSmile.006') as Mesh;
+		const statue = this.scene.getMeshByName('__root__') as Mesh;
+		console.log("Statue type:", statue?.getClassName());
 		statue.parent = this.pongRoot;
-		statue.position.set(-750, -350, 0);
-		statue.rotation.set(0, Math.PI, 0);
+		statue.rotationQuaternion = null;
+		statue.position.set(-650, 400, 0);
+		statue.rotation.set(0, 0, 0);
 		statue.scaling.setAll(70);
+		// createSkybox(this.scene);
+		createBlackHoleBackdrop(this.scene, statue.position, this.pongRoot);
 
 		this.inputManager = new InputManager();
 		localPaddleId = 0;
 		this.initECS(this.instanceManagers, this.rotatingContainer);
 
 		this.stateManager = new StateManager(this.ecs);
-		this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
+		// this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
 		this.inited = true;
 
 
@@ -176,9 +194,9 @@ export class PongBR {
 		this.stateManager.setter(true);
 		this.stateManager.update();
 
-		this.scene.onBeforeRenderObservable.add(() => {
-			this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
-		});
+		// this.scene.onBeforeRenderObservable.add(() => {
+		// 	this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
+		// });
 
 	}
 	public stop(): void {
@@ -195,7 +213,7 @@ export class PongBR {
 			ball: new ThinInstanceManager(baseMeshes.ball, 200, 50, 100),
 			paddle: new ThinInstanceManager(baseMeshes.paddle, 100, 50, 100),
 			wall: new ThinInstanceManager(baseMeshes.wall, 100, 50, 100),
-			portal: new ThinInstanceManager(baseMeshes.portal, 4, 50, 100),
+			// portal: new ThinInstanceManager(baseMeshes.portal, 4, 50, 100),
 			pillar: new ThinInstanceManager(baseMeshes.pillar, 200, 50, 100),
 			goal: new ThinInstanceManager(baseMeshes.goal, 100, 50, 100),
 		}
@@ -209,7 +227,7 @@ export class PongBR {
 			instanceManagers.ball,
 			instanceManagers.paddle,
 			instanceManagers.wall,
-			instanceManagers.portal,
+			// instanceManagers.portal,
 			instanceManagers.goal,
 			instanceManagers.pillar,
 			this.camera
