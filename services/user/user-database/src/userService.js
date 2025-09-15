@@ -29,7 +29,7 @@ const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, tw
 const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getAvatarFromUsernameStmt = database.prepare("SELECT avatar_path FROM users WHERE username = ?");
 const getAvatarFromUUIDStmt = database.prepare("SELECT avatar_path FROM users WHERE uuid = ?");
-const getUserForFriendResearchStmt = database.prepare("SELECT username FROM users WHERE username = ?");
+const getUserForFriendResearchStmt = database.prepare("SELECT * FROM users WHERE username = ?");
 const getAllUsersStmt = database.prepare("SELECT * FROM users");
 const getUserStatusStmt = database.prepare("SELECT status, lobby_gameId FROM active_user WHERE user_id = ?");
 const addUserStatusStmt = database.prepare("INSERT INTO active_user (user_id, status) VALUES (?, ?)");

@@ -92,45 +92,71 @@ app.get('/me', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send( {userInfo: userInfo});
 }));
 
-app.get('/username/:username', handleErrors(async (req, res) => {
 
-	const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
-
-	if (asker.username === req.params.username) {
-		throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
-	}
+app.post('/search', handleErrors(async (req, res) => {
 	
-	const user = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: req.params.username } );
+	const { identifier, type, response } = req.body;
+	
+	if (!identifier || !type || !response) {
+		throw { status: userReturn.USER_036.http, code: userReturn.USER_036.code, message: userReturn.USER_036.message };
+	}
 
-	res.code(statusCode.SUCCESS).send({ user });
+	let responseData; 
+	switch (response) {
+		case 'user':
+			switch (type) {
+				case 'username':
+					const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
+					if (asker.username === identifier) {
+						throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
+					}
+					responseData = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: identifier } );
+					break;
+				case 'uuid':
+					responseData = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: identifier } );
+					if (!responseData) {
+						throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
+					}
+					break;
+				default:
+					throw { status: userReturn.USER_037.http, code: userReturn.USER_037.code, message: userReturn.USER_037.message };
+			}
+			break;
+		case 'avatar':
+			switch (type) {
+				case 'username':
+					responseData = await natsRequest(nats, jc, 'user.getAvatarFromUsername', { username: identifier } );
+					break;
+				case 'uuid':
+					responseData = await natsRequest(nats, jc, 'user.getAvatarFromUUID', { uuid: identifier } );
+					break;
+				default:
+					throw { status: userReturn.USER_037.http, code: userReturn.USER_037.code, message: userReturn.USER_037.message };
+			}
+			break;
+		default:
+			throw { status: userReturn.USER_037.http, code: userReturn.USER_037.code, message: userReturn.USER_037.message };
+		}
+
+		res.code(statusCode.SUCCESS).send({ data: responseData });
 }));
+
 
 app.get('/status', handleErrors(async (req, res) => {
-
+	
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
-
+	
 	const status = await natsRequest(nats, jc, 'user.getUserStatus', { userId: user.id } );
-
+	
 	res.code(statusCode.SUCCESS).send({ statusInfos: status });
-
+	
 }));
 
-app.get('/uuid/:uuid', handleErrors(async (req, res) => {
-
-	if (!req.params.uuid) {
-		throw { status: userReturn.USER_008.http, code: userReturn.USER_008.code, message: userReturn.USER_008.message };
-	}
-	const user = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: req.params.uuid });
-	if (!user) {
-		throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
-	}
-	res.code(statusCode.SUCCESS).send({ username: user.username });
-}));
 
 app.post(`/users`, handleErrors(async (req, res) => {
-
+	
 	const pw = req.body.pw;
-``
+	``
 	if (!pw || !pw.length) {
 		return res.code(statusCode.UNAUTHORIZED).send({ message: returnMessages.UNAUTHORIZED });
 	}
@@ -142,27 +168,52 @@ app.post(`/users`, handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ users: users });
 }));
 
-app.get('/avatar/username/:username', handleErrors(async (req, res) => {
+// app.get('/avatar/username/:username', handleErrors(async (req, res) => {
+	
+// 	if (!req.params.username) {
+// 		throw { status: userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
+// 	}
 
-	if (!req.params.username) {
-		throw { status: userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
-	}
+// 	const avatar = await natsRequest(nats, jc, 'user.getAvatarFromUsername', { username: req.params.username } );
 
-	const avatar = await natsRequest(nats, jc, 'user.getAvatarFromUsername', { username: req.params.username } );
+// 	res.code(statusCode.SUCCESS).send({ avatar: avatar.avatar_path });
+// }));
 
-	res.code(statusCode.SUCCESS).send({ avatar: avatar.avatar_path });
-}));
+// app.get('/avatar/uuid/:uuid', handleErrors(async (req, res) => {
+	
+// 	if (!req.params.uuid) {
+// 		throw { status: userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
+// 	}
 
-app.get('/avatar/uuid/:uuid', handleErrors(async (req, res) => {
+// 	const avatar = await natsRequest(nats, jc, 'user.getAvatarFromUUID', { uuid: req.params.uuid } );
 
-	if (!req.params.uuid) {
-		throw { status: userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
-	}
+// 	res.code(statusCode.SUCCESS).send({ avatar: avatar.avatar_path });
+// }));
 
-	const avatar = await natsRequest(nats, jc, 'user.getAvatarFromUUID', { uuid: req.params.uuid } );
+// app.get('/username/:username', handleErrors(async (req, res) => {
+			
+// 	const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
 
-	res.code(statusCode.SUCCESS).send({ avatar: avatar.avatar_path });
-}));
+// 	if (asker.username === req.params.username) {
+// 		throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
+// 	}
+	
+// 	const user = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: req.params.username } );
+
+// 	res.code(statusCode.SUCCESS).send({ user });
+// }));
+
+// app.get('/uuid/:uuid', handleErrors(async (req, res) => {
+
+// 	if (!req.params.uuid) {
+// 		throw { status: userReturn.USER_008.http, code: userReturn.USER_008.code, message: userReturn.USER_008.message };
+// 	}
+// 	const user = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: req.params.uuid });
+// 	if (!user) {
+// 		throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
+// 	}
+// 	res.code(statusCode.SUCCESS).send({ username: user.username });
+// }));
 
 app.get('/health', (req, res) => {
 	res.status(200).send('OK');
