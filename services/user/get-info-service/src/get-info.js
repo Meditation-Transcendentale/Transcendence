@@ -94,9 +94,9 @@ app.get('/me', handleErrors(async (req, res) => {
 
 
 app.post('/search', handleErrors(async (req, res) => {
-	
+
 	const { identifier, type } = req.body;
-	
+
 	if (!identifier || !type ) {
 		throw { status: userReturn.USER_036.http, code: userReturn.USER_036.code, message: userReturn.USER_036.message };
 	}
@@ -119,10 +119,9 @@ app.post('/search', handleErrors(async (req, res) => {
 		default:
 			throw { status: userReturn.USER_037.http, code: userReturn.USER_037.code, message: userReturn.USER_037.message };
 	}
-
+	res.header('Cache-Control', 'no-store');
 	res.code(statusCode.SUCCESS).send({ data: responseData });
 }));
-
 
 app.get('/status', handleErrors(async (req, res) => {
 	
@@ -133,7 +132,6 @@ app.get('/status', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ statusInfos: status });
 	
 }));
-
 
 app.post(`/users`, handleErrors(async (req, res) => {
 	
