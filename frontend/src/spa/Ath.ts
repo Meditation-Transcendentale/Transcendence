@@ -1,7 +1,7 @@
 import { gFriendList } from "./Friendlist";
 import { NotificationManager } from "./NotificationManager";
 import { Popup } from "./Popup";
-import { cdnRequest, meRequest, patchRequest, postRequest } from "./requests";
+import { cdnRequest, getRequest, meRequest, patchRequest, postRequest } from "./requests";
 import Stats from "./Stats";
 import { User } from "./User";
 
@@ -293,6 +293,16 @@ class Profile {
 			this.ref.edit.disabled = this.ref.usernameInput.value.length <= 0 || this.ref.usernameInput.value == User.username;
 		})
 
+		this.ref.edit.addEventListener("click", () => {
+			Popup.addValidation(true, User.twofa != 0, (p: string, t: string) => {
+				let ret = false;
+				patchRequest("update-info/username", { username: this.ref.usernameInput.value, password: p, token: t })
+					.then((json) => { ret = true; meRequest("no-cache"); })
+					.catch((err) => { NotificationManager.addText(err) })
+				return ret;
+			})
+		})
+
 
 		this.stats = new Stats(div.querySelector("#stats-div") as HTMLDivElement)
 
@@ -322,7 +332,6 @@ class Profile {
 			this.ref.usernameContainer.appendChild(this.ref.username);
 		}
 	}
-
 }
 
 // export default Ath;
