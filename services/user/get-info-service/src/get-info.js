@@ -76,7 +76,7 @@ app.get('/metrics', async (req, res) => {
 
 app.addHook('onRequest', verifyApiKey);
 
-const nats = await connect({ 
+const nats = await connect({
 	servers: process.env.NATS_URL,
 	token: process.env.NATS_TOKEN,
 	tls: { rejectUnauthorized: false }
@@ -85,33 +85,33 @@ const jc = JSONCodec();
 
 app.get('/me', handleErrors(async (req, res) => {
 
-	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const userInfo = await natsRequest(nats, jc, 'user.getUserInfo', { userId: user.id } );
+	const userInfo = await natsRequest(nats, jc, 'user.getUserInfo', { userId: user.id });
 
-	res.code(statusCode.SUCCESS).send( {userInfo: userInfo});
+	res.code(statusCode.SUCCESS).send({ userInfo: userInfo });
 }));
 
 
 app.post('/search', handleErrors(async (req, res) => {
-	
+
 	const { identifier, type } = req.body;
-	
-	if (!identifier || !type ) {
+
+	if (!identifier || !type) {
 		throw { status: userReturn.USER_036.http, code: userReturn.USER_036.code, message: userReturn.USER_036.message };
 	}
 
-	let responseData; 
+	let responseData;
 	switch (type) {
 		case 'username':
-			const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
+			const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 			if (asker.username === identifier) {
 				throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
 			}
-			responseData = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: identifier } );
+			responseData = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: identifier });
 			break;
 		case 'uuid':
-			responseData = await natsRequest(nats, jc, 'user.getUserInfosFromUUID', { uuid: identifier } );
+			responseData = await natsRequest(nats, jc, 'user.getUserInfosFromUUID', { uuid: identifier });
 			if (!responseData) {
 				throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 			}
@@ -125,18 +125,18 @@ app.post('/search', handleErrors(async (req, res) => {
 
 
 app.get('/status', handleErrors(async (req, res) => {
-	
-	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
-	
-	const status = await natsRequest(nats, jc, 'user.getUserStatus', { userId: user.id } );
-	
+
+	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
+
+	const status = await natsRequest(nats, jc, 'user.getUserStatus', { userId: user.id });
+
 	res.code(statusCode.SUCCESS).send({ statusInfos: status });
-	
+
 }));
 
 
 app.post(`/users`, handleErrors(async (req, res) => {
-	
+
 	const pw = req.body.pw;
 	``
 	if (!pw || !pw.length) {
@@ -151,7 +151,7 @@ app.post(`/users`, handleErrors(async (req, res) => {
 }));
 
 // app.get('/avatar/username/:username', handleErrors(async (req, res) => {
-	
+
 // 	if (!req.params.username) {
 // 		throw { status: userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
 // 	}
@@ -162,7 +162,7 @@ app.post(`/users`, handleErrors(async (req, res) => {
 // }));
 
 // app.get('/avatar/uuid/:uuid', handleErrors(async (req, res) => {
-	
+
 // 	if (!req.params.uuid) {
 // 		throw { status: userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
 // 	}
@@ -173,13 +173,13 @@ app.post(`/users`, handleErrors(async (req, res) => {
 // }));
 
 // app.get('/username/:username', handleErrors(async (req, res) => {
-			
+
 // 	const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
 
 // 	if (asker.username === req.params.username) {
 // 		throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
 // 	}
-	
+
 // 	const user = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: req.params.username } );
 
 // 	res.code(statusCode.SUCCESS).send({ user });
