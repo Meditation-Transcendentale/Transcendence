@@ -191,3 +191,8 @@ tr>td {
 tr>td:last-child {
 	text-align: right;
 }
+
+#username-text {
+	color: black;
+	background-color: white;
+}

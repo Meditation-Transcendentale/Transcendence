@@ -5,13 +5,14 @@ import { notif } from "./proto/message.js";
 import { User } from "./User";
 import { getRequest, postRequest, deleteRequest } from "./requests";
 import { Popup } from "./Popup";
+import { gFriendList } from "./Friendlist";
 
 
 class NotificationManagerC {
 	private container: HTMLDivElement;
 	private defaultDiv: HTMLDivElement;
 
-	private defaultDuration = 5000; //in millisecond
+	private defaultDuration = 10000; //in millisecond
 
 	private canceled!: Array<HTMLElement>;
 	private state = false;
@@ -134,13 +135,23 @@ class NotificationManagerC {
 							const senderUsername = (json as any).username;
 							n.innerText = `Friend Request: ${senderUsername}`;
 							popSpan.innerText = `${senderUsername} wants to be friends.`;
+
+							const d = gFriendList.addToInvite(senderUsername, newNotification.friendRequest!.sender as string);
+
 							p.querySelector("#friend-request-yes")?.addEventListener('click', () => {
 								postRequest(`friends/accept`, { inputUsername: senderUsername })
-									.then(() => { Popup.removePopup() })
+									.then(() => {
+										Popup.removePopup();
+										gFriendList.addFriend(senderUsername, newNotification.friendRequest!.sender as string);
+										d.remove();
+									})
 							});
 							p.querySelector("#friend-request-no")?.addEventListener('click', () => {
 								deleteRequest(`friends/decline`, { inputUsername: senderUsername })
-									.then(() => { Popup.removePopup() })
+									.then(() => {
+										Popup.removePopup();
+										d.remove();
+									})
 							});
 						});
 					p.appendChild(popSpan);
@@ -155,6 +166,7 @@ class NotificationManagerC {
 						.then((json) => {
 							const senderUsername = (json as any).username;
 							n.innerText = `${senderUsername} accepted to be friends.`;
+							gFriendList.addFriend(senderUsername, newNotification.friendAccept!.sender as string);
 						});
 					NotificationManager.addDiv(n);
 				}
@@ -182,6 +194,8 @@ class NotificationManagerC {
 				if (newNotification.statusUpdate != null) {
 					console.log(`NEW STATUS: ${newNotification.statusUpdate.sender}|${newNotification.statusUpdate.status}|${newNotification.statusUpdate?.option}`);
 				}
+				console.log("Notif: ", newNotification);
+
 			}
 
 			this.ws.onerror = (err) => {

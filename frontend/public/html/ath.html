@@ -10,8 +10,11 @@
 			<img id="avatar-image" width="200" />
 			<input id="avatar-file" type="file" />
 		</label>
-		<input id="username-input" type="text">
-		<input id="edit-input" type="button" value="Edit">
+		<div id="profile-username">
+			<input id="username-input" type="text">
+			<span id="username-text"></span>
+			<input id="edit-input" type="button" value="Edit">
+		</div>
 		<details id="stats-details">
 			<summary >Stats</summary>
 		<div id="stats-div">
@@ -42,14 +45,34 @@
 			<input id="quit-no" type="button" value="NO" />
 		</div>
 	</div>
-	<div id="friendlist-window" class="window">
-		<div class="window-bar">FRIENDLIST</div>
-		<div class="window-content">
-			<div id="friendlist-search-container">
-				<input id="friendlist-search" type="search" placeholder="Search...">
+
+	<div id="friendlist-container">
+		<div id="friendlist-window" class="window">
+			<div class="window-bar">FRIENDLIST</div>
+			<div class="window-content">
+				<div id="friendlist">
+					<span>Friends</span>
+					<div id="friendlist-connected">
+					</div>
+					<div id="friendlist-away">
+					</div>
+				</div>
+				<div id="friends-invite">
+					<span>Friend requests</span>
+					<div id="friendlist-invite">
+					</div>
+				</div>
 			</div>
-			<div id="friendlist">
+		</div>
+		<div id="friendlist-search-window" class="window">
+			<div class="window-bar">SEARCH FRIEND</div>
+			<div class="window-content">
+				<input id="friendlist-search" type="search" placeholder="Search...">
+				<div id="friendlist-search-result">
+				</div>
 			</div>
 		</div>
 	</div>
+
+	<div id="password-token-validation"></div>
 </div>
