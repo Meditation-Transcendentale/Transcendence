@@ -79,7 +79,7 @@ async function start() {
       if (!wasReconnected)
         userSockets.set(ws.uuid, ws);
 
-      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: { sender: ws.uuid, status: "online" } }), nc, jc);
+      sendStatus(ws.uuid, {sender: ws.uuid, status: "online" }, nc, jc);
       console.log(
         `[${SERVICE_NAME}] ${ws.uuid} ${wasReconnected ? 'reconnected' : 'connected'}`
       )
@@ -89,7 +89,7 @@ async function start() {
     },
 
     close: (ws, code, message) => {
-      sendStatus(ws.uuid, encodeNotificationMessage({ statusUpdate: { sender: ws.uuid, status: "offline" } }), nc, jc);
+      sendStatus(ws.uuid, { sender: ws.uuid, status: "offline" }, nc, jc);
       userSockets.delete(ws.uuid)
       console.log(`[${SERVICE_NAME}] ${ws.uuid} disconnected`)
     }
@@ -119,7 +119,7 @@ async function start() {
         switch (eventType) {
           case 'status':
             data = decodeStatusUpdate(msg.data);
-            sendStatus(uuid, data, nc, jc);
+            sendStatus(uuid, { sender: data.sender, status: data.status, option: data.option }, nc, jc);
             break;
           case 'friendRequest':
             data = decodeFriendUpdate(msg.data);
@@ -147,6 +147,11 @@ async function start() {
 
 async function sendStatus(senderId, data, nc, jc) {
   try {
+    await nc.request('status.updateUserStatus', jc.encode({ userId: senderId, status: data.status, option: data.option}));
+  } catch (err) {
+    console.error(`[${SERVICE_NAME}] Failed to update status:`, err);
+  }
+  try {
     const resp = await friendlist_Request(senderId, nc, jc);
 
     if (!resp.ok || !resp.message) {
@@ -154,13 +159,12 @@ async function sendStatus(senderId, data, nc, jc) {
       return;
     }
 
-    const sendingData = encodeNotificationMessage({ statusUpdate: data });
     for (const friend of resp.message) {
       const sockets = userSockets.get(friend.friend_uuid);
       if (!sockets) continue;
 
       try {
-        sockets.send(sendingData, true);
+        sockets.send(encodeNotificationMessage({statusUpdate: {sender: senderId, status: data.status, option: data.option} }), true);
       } catch (e) {
         console.warn(`[${SERVICE_NAME}] Failed to send to ${friend.friend_uuid}:`, e);
       }

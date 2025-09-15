@@ -196,3 +196,40 @@ tr>td:last-child {
 	color: black;
 	background-color: white;
 }
+
+#friendlist-window {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 40vh;
+	height: 70vh;
+	transform: translate(-50%, -50%);
+	z-index: inherit;
+}
+
+#friendlist-window>.window-content {
+	height: 100%;
+}
+
+#friendlist-window>.window-content span {
+	display: block;
+	width: 100%;
+	border-bottom: 2px solid white;
+}
+
+#friendlist {
+	height: 50%;
+}
+
+#friends-invite {
+	height: 50%;
+}
+
+#friendlist-search-window {
+	position: absolute;
+	top: 70%;
+	right: 10%;
+	height: 40vh;
+	transform: translate(-50%, -50%);
+	z-index: inherit;
+}
