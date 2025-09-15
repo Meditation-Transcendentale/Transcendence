@@ -26,6 +26,8 @@ const app = Fastify({
 	}
 });
 
+await app.register(import('@fastify/formbody'));
+
 app.register(fastifyMultipart, {
 	limits: {
 		fileSize: 5 * 1024 * 1024
@@ -118,6 +120,7 @@ async function checkPassword2FA(user, password, token) {
 			throw { status: statusCode.UNAUTHORIZED, code: error.response.data.code, message: error.response.data.message };
 		}
 	} else {
+		console.log("password: ", password, " user.password: ", user.password);
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 		if (!isPasswordValid) {
 			throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
@@ -155,14 +158,13 @@ async function getAvatarCdnUrl(avatar, uuid) {
 
 
 app.patch('/username', handleErrors(async (req, res) => {
-
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 		
 	if (!req.body) {
 		throw { status: userReturn.USER_021.http, code: userReturn.USER_021.code, message: userReturn.USER_021.message };
 	}
 
-	const { username, password, token } = req.body;
+	const { password, token, username } = JSON.parse(req.body);
 
 	if (username && USERNAME_REGEX.test(username) === false) {
 		throw { status: userReturn.USER_010.http, code: userReturn.USER_010.code, message: userReturn.USER_010.message };
