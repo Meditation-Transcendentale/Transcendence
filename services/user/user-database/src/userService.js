@@ -41,7 +41,7 @@ const getBlockedUsersStmt = database.prepare(`
 	JOIN users u2 ON bu.blocked_id = u2.id
 	WHERE bu.blocker_id = ?`);
 const getFriendsRequestsStmt = database.prepare(`
-	SELECT f.id, u1.username AS sender_username, u2.username AS receiver_username
+	SELECT f.id, u1.username AS sender_username, u2.username AS receiver_username, u1.uuid AS sender_uuid, u2.uuid AS receiver_uuid
 	FROM friendslist f
 	JOIN users u1 ON f.user_id_1 = u1.id
 	JOIN users u2 ON f.user_id_2 = u2.id
