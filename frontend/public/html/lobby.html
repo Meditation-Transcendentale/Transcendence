@@ -12,11 +12,14 @@
 				<span >LOBBY INFO</span>
 			</div>
 			<div class="window-content">
-				<span class="window-line">MODE: PONG</span>
-				<span class="window-line">MAP: GRASS</span>
+				<span id="lobby-mode" class="window-line">MODE: PONG</span>
+				<span id="lobby-map" class="window-line">MAP: GRASS</span>
 			</div>
 			<div class="window-footer">
-				<span class="window-line">LOBBYID: XXXXXXXXXXXXX</span>
+				<span id="lobby-id" class="window-line">
+					LOBBYID: <span id="lobby-id-text" ></span>
+					<button id="lobby-id-copy" class="button">COPY</button>
+				</span>
 			</div>
 	</div>
 	<div id="invite-window" class="window">
