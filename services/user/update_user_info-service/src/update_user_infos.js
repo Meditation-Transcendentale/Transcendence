@@ -128,7 +128,7 @@ async function checkPassword2FA(user, password, token) {
 async function removeOldAvatars(uuid) {
 	const files = fs.readdirSync('/app/cdn_data');
 	for (const file of files) {
-		if (file.startsWith(uuid + '.')) {
+		if (file.startsWith(uuid + '_')) {
 			fs.unlinkSync(`/app/cdn_data/${file}`);
 		}
 	}
@@ -143,8 +143,10 @@ async function getAvatarCdnUrl(avatar, uuid) {
 		throw { status: userReturn.USER_012.http, code: userReturn.USER_012.code, message: userReturn.USER_012.message };
 	}
 	await removeOldAvatars(uuid);
+	const randomAddition = Math.random().toString(36).substring(2, 8);
+	console.log(`Avatar upload: ${uuid}, type: ${fileType.ext}, random: ${randomAddition}`);
 
-	const filename = `${uuid}.${fileType.ext}`;
+	const filename = `${uuid}_${randomAddition}.${fileType.ext}`;
 	const fullPath = `/app/cdn_data/${filename}`;
 	fs.writeFileSync(fullPath, buffer);
 
@@ -186,6 +188,7 @@ app.patch('/avatar', handleErrors(async (req, res) => {
 
 	await natsRequest(nats, jc, 'user.updateAvatar', { avatar: cdnPath, userId: user.id });
 
+	res.header('Cache-Control', 'no-store');
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.AVATAR_UPDATED, data: { cdnPath }});
 
 }));
