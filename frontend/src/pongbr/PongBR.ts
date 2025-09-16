@@ -22,8 +22,8 @@ import { WallComponent } from "./components/WallComponent.js";
 import { Entity } from "./ecs/Entity.js";
 import earcut from "earcut";
 import { MotionBlurPostProcess } from "@babylonjs/core";
-import { createBlackHoleBackdrop, createHighQualityProceduralSkybox, createSimpleTextureSkybox, createSkybox } from "./skybox.js";
-import { createCustomizableSpaceSkybox } from "./skybox2.js";
+import { createBlackHoleBackdrop } from "./blackhole.js";
+import { SpaceSkybox } from "./skybox.js";
 
 
 export let localPaddleId: any = null;
@@ -46,7 +46,9 @@ export class PongBR {
 	private networkingSystem!: NetworkingSystem;
 	private inputSystem!: InputSystem;
 	private thinInstanceSystem!: ThinInstanceSystem;
+	private spaceSkybox!: SpaceSkybox;
 	public currentBallScale: Vector3 = new Vector3(1, 1, 1);
+
 
 	constructor(canvas: any, scene: Scene) {
 		this.canvas = canvas;
@@ -83,14 +85,12 @@ export class PongBR {
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 		// const defaultPipeline = new DefaultRenderingPipeline("gameplayPipeline", true, this.scene, [this.camera]);
 		//
-		// // Bloom optimized for ball visibility
 		// defaultPipeline.bloomEnabled = true;
 		// defaultPipeline.bloomThreshold = 0.8; // Only very bright objects (balls)
 		// defaultPipeline.bloomWeight = 0.25; // Subtle - won't overwhelm
 		// defaultPipeline.bloomKernel = 32; // Tight glow, not spreading
 		// defaultPipeline.bloomScale = 0.5;
 		//
-		// // Minimal post-processing to maintain performance
 		// defaultPipeline.imageProcessingEnabled = true;
 		// defaultPipeline.imageProcessing.contrast = 1.05; // Very slight contrast boost
 		// defaultPipeline.imageProcessing.exposure = 0.9;
@@ -119,13 +119,15 @@ export class PongBR {
 		statue.scaling.setAll(70);
 		// createSkybox(this.scene);
 		// createSimpleTextureSkybox(this.scene, "/assets/galaxy.jpg");
-		const spaceSkybox = createCustomizableSpaceSkybox(this.scene, {
-			brightness: 0.003,
-			speed: 0.001,
-			rotationSpeed: 0.0000001
-		});
+		// const spaceSkybox = createCustomizableSpaceSkybox(this.scene, {
+		// 	brightness: 0.003,
+		// 	speed: 0.001,
+		// 	rotationSpeed: 0.0000001
+		// });
 		// createHighQualityProceduralSkybox(this.scene);
 		createBlackHoleBackdrop(this.scene, statue.position, this.pongRoot);
+		this.spaceSkybox = new SpaceSkybox(this.scene);
+		this.spaceSkybox.applyPreset('Horror');
 
 		this.inputManager = new InputManager();
 		localPaddleId = 0;
@@ -189,6 +191,7 @@ export class PongBR {
 			}
 		});
 
+		this.spaceSkybox.onGameLoad();
 		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot);
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
 
@@ -209,6 +212,7 @@ export class PongBR {
 	}
 	public stop(): void {
 
+		this.spaceSkybox.onGameUnload();
 		this.inputManager.disable();
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
