@@ -1,11 +1,10 @@
 
-import { Color3, Engine, Matrix, Vector3 } from "@babylonImport";
+import { Engine } from "@babylonImport";
 
 import { Environment } from "./Environment";
 import { Vue } from "../Vue";
 import { css3dObject, CSSRenderer } from "./CSSRenderer";
 import { Interpolator } from "./Interpolator";
-import { UIaddColor, UIaddNumber, UIaddToggle, UIaddVec3 } from "./UtilsUI";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -26,20 +25,17 @@ class app3d {
 	private cssRenderer!: CSSRenderer;
 
 	constructor() {
-		//console.log("eeeeee");
 
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
 		this.canvas.focus();
-		//
+
 		this.engine = new Engine(this.canvas, true, {
 			useHighPrecisionFloats: true,
 			useHighPrecisionMatrix: true
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
 		this.engine.setHardwareScalingLevel(1.0);
-		//this.engine.useReverseDepthBuffee = true;
-		//console.log(this.engine.getRenderWidth(), this.engine.getRenderHeight());
-		//
+
 		window.addEventListener('resize', () => {
 			this.engine.resize(true);
 			this.environment.resize();
@@ -47,7 +43,6 @@ class app3d {
 		})
 
 		this.environment = new Environment(this.engine, this.canvas);
-		//
 		this.fps = document.getElementById('fps') as HTMLElement;
 
 		this.vues = new Map<string, Vue>;
@@ -107,9 +102,6 @@ class app3d {
 	public setVue(vue: string) {
 		this.cssRenderer.dirty = true;
 		this.environment.setVue(vue);
-		//if (!this.vues.has(vue)) {
-		//	this.vues.set(vue, this.environment.setVue(vue));
-		//}
 	}
 
 	public getVue(vue: string): Vue | undefined {

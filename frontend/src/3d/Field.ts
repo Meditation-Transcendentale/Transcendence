@@ -21,7 +21,6 @@ import { Interpolator } from "./Interpolator";
 import { Water } from "./Water";
 import { Monolith } from "./Monolith";
 import { createTempleMonolith } from "./Builder";
-import { DitherMaterial } from "./Shader/Shader.ts";
 
 let frameCount = 0;
 const playdiv = document.createElement("div");
@@ -55,9 +54,6 @@ export class Field {
 
 	private pipeline: Pipeline;
 	//////
-	private test: Mesh;
-	private test2: Mesh;
-	private test22: Mesh;
 
 	private rt: RenderTargetTexture;
 	private rtRatio = 1;
@@ -152,6 +148,7 @@ export class Field {
 
 		this.water = new Water(this.scene, this.camera, this.cursor);
 		this.pipeline = new Pipeline(this.scene, this.camera, this.depthRender.getDepthMap(), this.water.rtB, this.water.rtC);
+
 
 		/////
 
@@ -257,27 +254,8 @@ export class Field {
 				this.active = true;
 				this.monolith.setPicking(true);
 				this.setEnable(true);
-				//this.setEnable(true);
-				//Interpolator.addElem({
-				//	start: this.camera.position,
-				//	end: new Vector3(0, 2, 10),
-				//	duration: 0.5,
-				//	callback: () => { }
-				//})
-				//Interpolator.addElem({
-				//	start: this.camera.target,
-				//	end: new Vector3(0, 3, -10),
-				//	duration: 0.4,
-				//	callback: () => { this.camera.setTarget(this.camera.target) }
-				//})
 				break;
 			}
-			// case 'stats': {
-			// 	final.init(this.scene.getCameraByName('fieldCam') as Camera);
-			// 	final.addWindow('pong', this.cube0, this.vueBounding, Matrix.Identity());
-			// 	final.addWindow('br', this.cube1, this.vueBounding, Matrix.Identity());
-			// 	break;
-			// }
 			case 'login': {
 				this.camera.position.set(0, 4, 40);
 				this.camera.setTarget(new Vector3(0, 6, 30));
@@ -294,7 +272,6 @@ export class Field {
 				this.scene.activeCamera?.attachControl();
 				this.active = false;
 				this.setEnable(false);
-
 				break;
 			}
 			case 'lobby': {
@@ -312,7 +289,6 @@ export class Field {
 				break;
 			}
 			case 'brick': {
-				//this.scene.activeCamera = this.scene.getCameraByName("brick");
 				this.camera.position.set(0, 30, 0);
 				this.camera.setTarget(new Vector3(0, 0, 0));
 				this.setEnable(false);
