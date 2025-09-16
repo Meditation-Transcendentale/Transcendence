@@ -553,8 +553,8 @@ map: ${state.map}`;
 		players.innerHTML = "";
 		let html = "";
 		for (let i = 0; i < state.players.length; i++) {
-			const name = await getRequest(`info/uuid/${state.players[i].uuid}`).catch((err) => { console.log(err) }) as any;
-			html += `<li>${name.username}</li>`;
+			const name = await postRequest("info/search", { identifier: state.players[i].uuid, type: "uuid" }).catch((err) => { console.log(err) }) as any;
+			html += `<li>${name.data.username}</li>`;
 		}
 		players.innerHTML = html;
 		const join = this.ref.lobbyInfo.querySelector("#lobby-join") as HTMLDivElement;
