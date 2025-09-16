@@ -1,6 +1,6 @@
 import uWS from 'uWebSockets.js';
 import { readFileSync } from 'fs';
-import { encodeServerMessage } from './proto/helper.js';
+import { encodeServerMessage, decodeClientMessage } from './proto/helper.js';
 
 export const tournamentSockets = new Map();
 
@@ -52,7 +52,7 @@ export function createUwsApp(path, tournamentService) {
             const buf = new Uint8Array(message);
             const payload = decodeClientMessage(buf);
 
-            if (payload.quit) lobbyService.quit(payload.quit.tournamentId, payload.quit.uuid);
+            if (payload.quit) tournamentService.quit(payload.quit.tournamentId, payload.quit.uuid);
             if (payload.ready) await tournamentService.ready(ws, ws.tournamentId, ws.userId);
         },
 

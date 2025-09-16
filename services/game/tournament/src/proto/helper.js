@@ -142,3 +142,11 @@ export function encodeServerMessage(payload) {
 export function decodeServerMessage(buffer) {
 	return Proto.lobby.ServerMessage.decode(buffer);
 }
+
+export function encodeStatusUpdate(payload) {
+	const err = Proto.notif.StatusUpdate.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.notif.StatusUpdate
+		.encode(Proto.notif.StatusUpdate.create(payload))
+		.finish();
+}
