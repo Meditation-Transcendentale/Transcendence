@@ -1,65 +1,75 @@
 import uWS from 'uWebSockets.js';
-import { readFileSync } from 'fs';
-import { encodeServerMessage, decodeClientMessage } from './proto/helper.js';
+import { encodeTournamentServerMessage, decodeTournamentServerMessage } from './proto/helper.js';
 
 export const tournamentSockets = new Map();
 
 export function createUwsApp(path, tournamentService) {
-    const key = readFileSync(process.env.SSL_KEY || './ssl/key.pem', 'utf8');
-    const cert = readFileSync(process.env.SSL_CERT || './ssl/cert.pem', 'utf8');
     const app = uWS.SSLApp({
-        key_file_name: process.env.SSL_KEY,
-        cert_file_name: process.env.SSL_CERT
+        key_file_name: process.env.SSL_KEY || './ssl/key.pem',
+        cert_file_name: process.env.SSL_CERT || './ssl/cert.pem'
     });
 
     app.ws(path, {
-        idleTimeout: 60,
+        idleTimeout: 120,
+        maxBackpressure: 1024 * 1024,
+        maxPayloadLength: 1024 * 1024,
 
         upgrade: (res, req, context) => {
-            const fullQuery = req.getQuery();
-            const params = new URLSearchParams(fullQuery);
-            const session = {
-                userId: params.get('uuid'),
-                tournamentId: params.get('tournamentId')
-            };
-            res.upgrade(
-                session,
-                req.getHeader('sec-websocket-key'),
-                req.getHeader('sec-websocket-protocol'),
-                req.getHeader('sec-websocket-extensions'),
-                context
-            );
+            try {
+                const tournamentId = req.getQuery('tournamentId');
+                const userId = req.getQuery('uuid');
+                if (!tournamentId || !userId) {
+                    res.writeStatus('400 Bad Request').end();
+                    return;
+                }
+                res.upgrade(
+                    { tournamentId, userId },
+                    req.getHeader('sec-websocket-key'),
+                    req.getHeader('sec-websocket-protocol'),
+                    req.getHeader('sec-websocket-extensions'),
+                    context
+                );
+            } catch {
+                res.writeStatus('500 Internal Server Error').end();
+            }
         },
 
         open: (ws) => {
-            ws.isAlive = true;
-            const { tournamentId } = ws;
-            tournamentSockets.set(tournamentId, tournamentSockets.get(tournamentId) || new Set());
-            tournamentSockets.get(tournamentId).add(ws);
+            let set = tournamentSockets.get(ws.tournamentId);
+            if (!set) {
+                set = new Set();
+                tournamentSockets.set(ws.tournamentId, set);
+            }
+            set.add(ws);
+            console.log(`new connection: ${ws}`);
+            tournamentService.join(ws.tournamentId, ws.userId);
+            ws.subscribe(ws.tournamentId);
+        },
 
+        message: async (ws, message, isBinary) => {
             try {
-                const state = tournamentService.join(tournamentId, ws.userId);
-                const buf = encodeServerMessage({ update: { tournamentId: state.id, players: state.players, tournamentRoot: state.root } });
-                ws.subscribe(tournamentId);
-                app.publish(tournamentId, buf, true);
+                const payload = decodeTournamentServerMessage(new Uint8Array(message));
+
+                if (payload?.ready) {
+                    await tournamentService.ready(ws, ws.tournamentId, ws.userId);
+                    return;
+                }
+
+                if (payload?.quit) {
+                    tournamentService.quit(ws.tournamentId, ws.userId);
+                    return;
+                }
             } catch (err) {
-                const buf = encodeServerMessage({ error: { message: err.message } });
+                const buf = encodeTournamentServerMessage({ error: { message: err.message } });
                 ws.send(buf, true);
             }
         },
 
-        message: async (ws, message, isBinary) => {
-            const buf = new Uint8Array(message);
-            const payload = decodeClientMessage(buf);
-
-            if (payload.quit) tournamentService.quit(payload.quit.tournamentId, payload.quit.uuid);
-            if (payload.ready) await tournamentService.ready(ws, ws.tournamentId, ws.userId);
-        },
-
         close: (ws) => {
-
+            const set = tournamentSockets.get(ws.tournamentId);
+            if (set) set.delete(ws);
         }
-    })
+    });
 
     return app;
 }

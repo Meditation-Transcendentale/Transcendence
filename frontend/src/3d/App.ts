@@ -59,6 +59,7 @@ class app3d {
 
 	public async init() {
 		await this.environment.init();
+		document.querySelector("#utils-details")?.remove();
 	}
 
 

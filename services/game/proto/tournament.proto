@@ -2,76 +2,70 @@ syntax = "proto3";
 
 package tournament;
 
-import "google/protobuf/empty.proto";
-import "shared.proto";
-
-
 message Player {
-  string uuid  = 1;
+  string uuid = 1;
   bool ready = 2;
   bool connected = 3;
   bool eliminated = 4;
-  bool inGame = 5;
+}
+
+message Score {
+  repeated int32 values = 1;
+  bool forfeit = 2;
 }
 
 message MatchNode {
-    Player player1 = 1;
-    Player player2 = 2;
-    repeated int32 score = 3;
-    string gameId = 4;
-    optional MatchNode parent = 5;
-    optional MatchNode left_child = 6;
-    optional MatchNode right_child = 7;
-    Player winner = 8;
+  string player1Id = 1;
+  string player2Id = 2;
+  Score score      = 3;
+  string gameId    = 4;
+  MatchNode left   = 5;
+  MatchNode right  = 6;
+  string winnerId  = 7;
 }
 
 message TournamentUpdateMessage {
-    MatchNode tournamentRoot = 1;
+  MatchNode tournamentRoot = 1;
+  repeated Player players  = 2;
 }
 
-message TournamentClientReadyMessage {
-}
+message TournamentClientReadyMessage {}
 
 message TournamentReadyCheckMessage {
+  int64 deadlineMs = 1;
 }
 
-message TournamentFinishedMessage {
-    
-}
+message TournamentFinishedMessage {}
 
-message TournamentQuitMessage {
-    string uuid = 1;
-    string tournamentId = 2;
-}
+message TournamentQuitMessage {}
 
 message TournamentErrorMessage {
-    string message = 1;
+  string message = 1;
 }
 
 message TournamentCreateRequest {
-    repeated string players = 1;
+  repeated string players = 1;
 }
-
 message TournamentCreateResponse {
-    string tournamentId = 1;
+  string tournamentId = 1;
 }
 
 message TournamentClientMessage {
-    oneof payload {
-        TournamentQuitMessage quit = 1;
-        TournamentClientReadyMessage ready = 2;
-    }
+  oneof payload {
+    TournamentQuitMessage quit = 1;
+    TournamentClientReadyMessage ready = 2;
+  }
 }
 
 message TournamentStartGameMessage {
-    string gameId = 1;
+  string gameId = 1;
 }
 
 message TournamentServerMessage {
-    oneof payload {
-        TournamentUpdateMessage update = 1;
-        TournamentErrorMessage error = 2;
-        TournamentReadyCheckMessage readyCheck = 3;
-        TournamentStartGameMessage startGame = 4;
-    }
+  oneof payload {
+    TournamentUpdateMessage update   = 1;
+    TournamentErrorMessage error     = 2;
+    TournamentReadyCheckMessage readyCheck = 3;
+    TournamentStartGameMessage startGame   = 4;
+  }
 }

@@ -1,243 +1,322 @@
-import { decodeTournamentServerMessage, encodeClientMessage, encodeTournamentClientMessage } from "./proto/helper";
-import { tournament } from "./proto/message.js";
-import Router from "./Router";
-import { User } from "./User";
-import { getRequest } from "./requests";
-import { createButton } from "./utils";
+import {
+	encodeTournamentClientMessage,
+	decodeTournamentServerMessage,
+} from './proto/helper';
+import { User } from './User';
+import { getRequest } from './requests';
+import { App3D } from '../3d/App';
 
+type PlayerState = {
+	uuid: string;
+	ready: boolean;
+	connected: boolean;
+	eliminated: boolean;
+};
 
-interface tournamentHtmlReference {
-	tree: HTMLDivElement;
-	leaveButton: HTMLInputElement;
-}
+type Score = {
+	values?: number[];
+	forfeit?: boolean;
+};
 
-// interface Player {
-// 	uuid: string | null;
-// 	username: string | null;
-// 	isReady: boolean;
-// 	isConnected: boolean;
-// 	isInGame: boolean;
-// 	isEliminated: boolean;
-// }
+type MatchNode = {
+	player1Id?: string | null;
+	player2Id?: string | null;
+	left?: MatchNode | null;
+	right?: MatchNode | null;
+	winnerId?: string | null;
+	score?: Score | null;
+	gameId?: string | null;
+};
 
-// interface MatchNode {
-// 	player1: Player | null;
-// 	player2: Player | null;
-// 	left: MatchNode | null;
-// 	right: MatchNode | null;
-// 	parent: MatchNode | null;
-// 	winner: Player | null;
-// 	gameId: string | null;
-// 	score: Array<number>;
-// }
+type ServerMsg = {
+	update?: { tournamentRoot?: MatchNode | null; players?: PlayerState[] };
+	readyCheck?: { deadlineMs: number };
+	startGame?: { gameId: string };
+	error?: { message: string };
+};
 
+export default class TournamentPage {
+	private div: HTMLElement;
+	private ws: WebSocket | null = null;
 
-export default class Tournament {
-	private div: HTMLDivElement;
-	private ref: tournamentHtmlReference;
-	private ws: WebSocket | null;
-	private id: string | null;
-	private players: Map<string, tournament.IPlayer> | null; //key:uuid value:Player
-	// private tree: MatchNode | null;
-	private readyCheckEnabled: boolean;
-	private root: tournament.IMatchNode | null | undefined;
+	private tournamentId: string | null;
 
-	constructor(div: HTMLDivElement) {
+	private tree: MatchNode | null = null;
+	private players = new Map<string, PlayerState>();
+
+	private readyActive = false;
+	private readyDeadline = 0;
+	private countdownTimer: number | null = null;
+
+	private css: HTMLLinkElement;
+
+	private rootEl!: HTMLDivElement;
+	private toolbarEl!: HTMLDivElement;
+	private treeEl!: HTMLDivElement;
+
+	constructor(div: HTMLElement) {
 		this.div = div;
-		this.ws = null;
-		this.id = null;
-		this.root = null;
-		this.players = null;
-		this.readyCheckEnabled = false;
-		this.ref = {
-			tree: div.querySelector("#tournament-tree") as HTMLDivElement,
-			leaveButton: div.querySelector("#leave-btn") as HTMLInputElement
-		};
-
-		// this.ref.ready.addEventListener("click", () => {
-		// 	this.ws?.send(encodeClientMessage({ ready: { tournamentId: this.id as string } })); //encodeClientMessage to fix
-		// })
-
-		this.ref.leaveButton.addEventListener("click", () => {
-			this.ws?.send(encodeTournamentClientMessage({ quit: { uuid: User.uuid as string, tournamentId: this.id as string } }));
-			Router.nav("/play");
-		});
+		this.tournamentId = null;
+		this.css = div.querySelector("link") as HTMLLinkElement;
+		document.body.appendChild(this.css);
+		this.initDOM();
 	}
-
 
 	public load(params: URLSearchParams) {
-		if (!this.ws) {
-			this.setupWs(params.get("id") as string);
-		} else if (this.id && this.id == params.get("id")) {
-			//nav to past tournament
-		}
-		document.body.appendChild(this.ref.tree);
-	}
+		this.tournamentId = params.get("id") as string;
 
-	public async unload() {
-		this.div.remove();
-		this.ws?.close();
-	}
+		const url = `wss://${window.location.hostname}:7000/sacrifice?uuid=${encodeURIComponent(
+			User.uuid as string
+		)}&tournamentId=${encodeURIComponent(this.tournamentId as string)}`;
 
-	private setupWs(id: string) {
-		const url = `wss://${window.location.hostname}:7000/sacrifice?uuid=${encodeURIComponent(User.uuid as string)}&tournamentId=${encodeURIComponent(id as string)}`;
-		console.log("URL", url);
 		this.ws = new WebSocket(url);
+		this.ws.binaryType = 'arraybuffer';
 
-		this.ws.onopen = (e) => {
-			console.log(e);
-			User.status = { tournament: id };
-		}
-
-		this.ws.onmessage = (msg) => {
+		this.ws.onmessage = async (msg) => {
+			console.log(`MESSAGE RECEIVED`);
 			const buf = new Uint8Array(msg.data as ArrayBuffer);
-			let payload;
-			try {
-				payload = decodeTournamentServerMessage(buf);
-			} catch (err) {
-				console.error("Failed to decode Tournament Server Messager", err);
-				return;
-			}
-			if (payload.error) {
-				this.id = null;
-				this.ws?.close();
-				this.ws = null;
-				Router.nav("/play");
-				return;
-			}
+			if (!buf) return;
+			const payload = decodeTournamentServerMessage(new Uint8Array(buf)) as ServerMsg;
 
 			if (payload.update) {
-				this.root = payload.update.tournamentRoot;
-				if (this.root) this.treeResolve();
+				console.log(`UPDATE RECEIVED: ${payload.update.tournamentRoot}`);
+				if (payload.update.tournamentRoot !== undefined) this.tree = payload.update.tournamentRoot ?? null;
+				if (Array.isArray(payload.update.players)) this.players = new Map(payload.update.players.map((p) => [p.uuid, p]));
 			}
-
 			if (payload.readyCheck) {
-				this.readyCheckEnabled = true;
+				console.log(`READY CHECK RECEIVED: ${payload.readyCheck.deadlineMs}`);
+				this.readyActive = true;
+				this.readyDeadline = payload.readyCheck.deadlineMs;
+				this.startReadyCountdown();
 			}
-
 			if (payload.startGame) {
-				const gameId = payload.startGame?.gameId;
-				//need to close the ws + switch to ingame so being able to reconnect to the tournament at the end of the game
-				if (gameId) {
-					const map = "default"; //payload.start.map;
-					this.readyCheckEnabled = false;
-					Router.nav(encodeURI(`/game?id=${gameId}&mode=tournament&map=${map}`), false, false);
-				}
-				//can only leave through "leave" button on the tournament page, everyother thing make you come back to the tournament
+				console.log(`START GAME RECEIVED`);
 			}
-		}
+			this.render();
+		};
 
 		this.ws.onclose = () => {
-			this.id = null;
 			this.ws = null;
-			User.status = null;
-		}
+			this.stopReadyCountdown();
+		};
 
-		this.ws.onerror = (err) => {
-			console.warn(err);
+		App3D.setVue("tournament");
+
+		if (!document.body.contains(this.div)) {
+			document.body.appendChild(this.div);
 		}
 	}
 
-	private renderMatchNode(node: tournament.IMatchNode | null | undefined): HTMLDivElement {
-		const container = document.createElement('div');
-		container.classList.add('match-node');
-
-		const matchInfo = document.createElement('div');
-		matchInfo.classList.add('match-info');
-
-		const p1 = this.fillPlayer(node?.player1, node?.winner);
-		const p2 = this.fillPlayer(node?.player2, node?.winner);
-
-		if (node?.score) {
-			const score1 = document.createElement('div');
-			score1.textContent = node.score[0].toString();
-			p1.appendChild(score1);
-
-			const score2 = document.createElement('div');
-			score2.textContent = node.score[1].toString();
-			p2.appendChild(score2);
+	unload() {
+		this.stopReadyCountdown();
+		if (this.ws) {
+			try { this.ws.close(); } catch { }
+			this.ws = null;
 		}
-
-		matchInfo.appendChild(p1);
-		matchInfo.appendChild(p2);
-
-		container.appendChild(matchInfo);
-
-		if (node?.leftChild || node?.rightChild) {
-			const childrenContainer = document.createElement('div');
-			childrenContainer.classList.add('match-children');
-
-			if (node?.leftChild) {
-				const leftNode = this.renderMatchNode(node?.leftChild);
-				childrenContainer.appendChild(leftNode);
-			}
-
-			if (node?.rightChild) {
-				const rightNode = this.renderMatchNode(node?.rightChild);
-				childrenContainer.appendChild(rightNode);
-			}
-
-			container.appendChild(childrenContainer);
-		}
-
-		return container;
 	}
 
-	private fillPlayer(player: tournament.IPlayer | null | undefined, winner: tournament.IPlayer | null | undefined): HTMLDivElement {
-		const playerDiv = document.createElement('div');
-		let exposedName;
-		if (player !== null && player !== undefined) {
-			exposedName = getRequest(`/info/uuid/${player.uuid}`)
-				.then((json: any) => { return (json.username) });
-			if (!player.connected) {
-				const disconnectedIcon = document.createElement("span");
-				disconnectedIcon.textContent = "⚠";
-				disconnectedIcon.className = "disconnected-icon";
-				playerDiv.appendChild(disconnectedIcon);
-				playerDiv.classList.add("disconnected"); //ADD CSS 
-			}
-			else if (player.eliminated) {
-				playerDiv.classList.add("eliminated");
-			}
-			else if (this.readyCheckEnabled && (winner === null || winner === undefined)) {
-				if (!player.ready) {
-					if (player.uuid === User.uuid) {
-						const readyButton = createButton("Ready", (btn: HTMLInputElement) => {
-							this.ws?.send(encodeTournamentClientMessage({ ready: { tournamentId: this.id as string } }));
-							const check = document.createElement("span");
-							check.textContent = "✔";
-							check.className = "ready-checked";
-							btn.replaceWith(check);
-						});
-						playerDiv.appendChild(readyButton);
-					} else {
-						const notReady = document.createElement("span");
-						notReady.textContent = "✖";
-						notReady.className = "notReady-checked";
-						playerDiv.appendChild(notReady);
-					}
-				}
-				else {
-					const check = document.createElement("span");
-					check.textContent = "✔";
-					check.className = "ready-checked";
-					playerDiv.appendChild(check);
-				}
-			}
-			if (player.uuid == winner?.uuid)
-				playerDiv.classList.add("winner");
-		}
-		else {
-			exposedName = `TBD`;
-		}
-		playerDiv.textContent = `${exposedName}`;
-		return (playerDiv);
+	private initDOM() {
+		this.div.innerHTML = '';
+
+		this.rootEl = document.createElement('div');
+		this.rootEl.id = 'tournament';
+		this.rootEl.className = 'tournament-root';
+
+		this.toolbarEl = document.createElement('div');
+		this.toolbarEl.className = 'toolbar';
+
+		const countdown = document.createElement('span');
+		countdown.className = 'ready-countdown';
+		countdown.style.marginRight = 'auto';
+		countdown.style.fontVariantNumeric = 'tabular-nums';
+
+		const leaveBtn = document.createElement('button');
+		leaveBtn.id = 'leave-btn';
+		leaveBtn.textContent = 'Leave';
+		leaveBtn.addEventListener('click', () => this.sendQuit());
+
+		this.toolbarEl.append(countdown, leaveBtn);
+
+		this.treeEl = document.createElement('div');
+		this.treeEl.id = 'tournament-tree';
+
+		this.rootEl.append(this.toolbarEl, this.treeEl);
+		this.div.appendChild(this.rootEl);
+
+		this.render();
 	}
 
+	private render() {
+		this.treeEl.innerHTML = '';
+		if (!this.tree) return;
 
-	private treeResolve(): void {
-		this.ref.tree.innerHTML = '';
-		const treeRoot = this.renderMatchNode(this.root);
-		this.ref.tree.appendChild(treeRoot);
+		const root = this.renderNode(this.tree, 'root', 0);
+		this.treeEl.appendChild(root);
+	}
+
+	private sendReady() {
+		if (!this.ws) return;
+		const buf = encodeTournamentClientMessage({ ready: {} });
+		this.ws.send(buf);
+		if (User.uuid) {
+			const me = this.players.get(User.uuid);
+			if (me) {
+				me.ready = true;
+				this.players.set(User.uuid, me);
+				this.render();
+			}
+		}
+	}
+
+	private sendQuit() {
+		if (!this.ws) return;
+		const buf = encodeTournamentClientMessage({ quit: {} });
+		this.ws.send(buf);
+	}
+
+	private startReadyCountdown() {
+		const badge = this.toolbarEl.querySelector('.ready-countdown') as HTMLSpanElement | null;
+		const tick = () => {
+			if (!badge) return;
+			const ms = Math.max(0, this.readyDeadline - Date.now());
+			const s = Math.ceil(ms / 1000);
+			badge.textContent = `Ready check: ${s}s`;
+			if (ms <= 0) {
+				this.stopReadyCountdown();
+				this.readyActive = false;
+				badge.textContent = '';
+				this.render();
+			}
+		};
+		tick();
+		this.stopReadyCountdown();
+		this.countdownTimer = window.setInterval(tick, 200);
+	}
+
+	private stopReadyCountdown() {
+		if (this.countdownTimer) {
+			clearInterval(this.countdownTimer);
+			this.countdownTimer = null;
+		}
+	}
+
+	private renderNode(node: MatchNode, side: 'root' | 'left' | 'right', depth: number): HTMLElement {
+		const wrap = document.createElement('div');
+		wrap.className = `match-node side-${side}`;
+		wrap.dataset.depth = String(depth);
+
+		const box = document.createElement('div');
+		box.className = 'match-info';
+
+		const top = this.renderRow(node, node.player1Id ?? null, side);
+		const bot = this.renderRow(node, node.player2Id ?? null, side);
+
+		if (node.winnerId && node.player1Id && node.winnerId === node.player1Id) top.classList.add('winner');
+		if (node.winnerId && node.player2Id && node.winnerId === node.player2Id) bot.classList.add('winner');
+
+		box.appendChild(top);
+		box.appendChild(bot);
+		wrap.appendChild(box);
+
+		if (node.left || node.right) {
+			const kids = document.createElement('div');
+			kids.className = 'match-children';
+			kids.appendChild(node.left ? this.renderNode(node.left, 'left', depth + 1) : this.spacer());
+			kids.appendChild(node.right ? this.renderNode(node.right, 'right', depth + 1) : this.spacer());
+			wrap.appendChild(kids);
+		}
+
+		return wrap;
+	}
+
+	private spacer(): HTMLElement {
+		const s = document.createElement('div');
+		s.className = 'match-node';
+		s.style.minWidth = '220px';
+		s.style.visibility = 'hidden';
+		return s;
+	}
+
+	private isActive(node: MatchNode): boolean {
+		return !!node.player1Id && !!node.player2Id && !node.gameId && !node.winnerId;
+	}
+
+	private rowScore(node: MatchNode, pid: string | null): string | null {
+		if (!node.winnerId && !node.score) return null;
+		if (node.score?.forfeit) return pid && node.winnerId === pid ? 'W/O' : 'DQ';
+		if (node.winnerId) return pid && node.winnerId === pid ? 'WIN' : '—';
+		if (node.score?.values?.length) return node.score.values.join('–');
+		return null;
+	}
+
+	private renderRow(node: MatchNode, pid: string | null, side: 'root' | 'left' | 'right'): HTMLDivElement {
+		const row = document.createElement('div');
+
+		const name = document.createElement('span');
+		name.style.whiteSpace = 'nowrap';
+		name.style.maxWidth = '160px';
+		name.style.overflow = 'hidden';
+		name.style.textOverflow = 'ellipsis';
+		if (pid) {
+			getRequest(`/info/uuid/${pid}`)
+				.then((json: any) => { name.textContent = json?.username ? String(json.username) : pid; })
+				.catch(() => { /* keep id fallback */ });
+		}
+
+		const inner = document.createElement('div');
+		const score = this.rowScore(node, pid);
+		if (score) {
+			inner.textContent = score;
+		} else {
+			const ps = pid ? this.players.get(pid) ?? null : null;
+			const active = this.isActive(node);
+			const selfUuid = User.uuid || null;
+			if (this.readyActive && active && pid === selfUuid && !(ps && ps.ready) && !(ps && ps.eliminated) && (ps ? ps.connected : true)) {
+				inner.replaceChildren(this.makeReadyButton());
+			} else {
+				const badge = this.statusBadge(ps);
+				if (badge) inner.replaceChildren(badge);
+			}
+		}
+
+		if (side === 'right') {
+			row.append(inner, name);
+			name.style.textAlign = 'right';
+			row.style.flexDirection = 'row';
+		} else {
+			row.append(name, inner);
+			name.style.textAlign = 'left';
+			row.style.flexDirection = 'row';
+		}
+
+		const ps = pid ? this.players.get(pid) ?? null : null;
+		if (ps?.eliminated) row.classList.add('eliminated');
+
+		return row;
+	}
+
+	private makeReadyButton(): HTMLButtonElement {
+		const b = document.createElement('button');
+		b.textContent = 'Ready';
+		b.addEventListener('click', () => this.sendReady());
+		return b;
+	}
+
+	private statusBadge(p: PlayerState | null): HTMLElement | null {
+		if (!p) return null;
+		const s = document.createElement('span');
+		s.className = 'ready-checked';
+		if (p.eliminated) {
+			s.textContent = 'DQ';
+			return s;
+		}
+		if (!p.connected) {
+			s.textContent = 'Disconnected';
+			s.classList.add('disconnected');
+			return s;
+		}
+		s.textContent = p.ready ? 'Ready' : 'Not ready';
+		if (!p.ready) s.classList.add('notReady-checked');
+		return s;
 	}
 }
