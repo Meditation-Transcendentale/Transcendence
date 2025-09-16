@@ -21,6 +21,7 @@ import { Interpolator } from "./Interpolator";
 import { Water } from "./Water";
 import { Monolith } from "./Monolith";
 import { createTempleMonolith } from "./Builder";
+import { Fog } from "./Fog";
 
 let frameCount = 0;
 const playdiv = document.createElement("div");
@@ -281,3 +282,19 @@ export class Field {
 
 }
 
+
+// class nField {
+// 	private scene: Scene;
+//
+// 	private camera: Camera;
+//
+// 	private grass: Grass;
+// 	private fog: Fog;
+//
+// 	constructor(scene: Scene, camera: Camera) {
+// 		this.scene = scene;
+// 		this.camera = camera;
+//
+//
+// 	}
+// }
