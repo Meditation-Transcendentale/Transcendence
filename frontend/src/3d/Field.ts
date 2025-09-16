@@ -86,35 +86,6 @@ export class Field {
 		this.glowLayer.intensity = 0.5;
 		this.depthRender = this.scene.enableDepthRenderer();
 
-
-
-		//////
-		//this.test = MeshBuilder.CreatePlane("test", { size: 2 }, this.scene);
-		//this.test.material = new StandardMaterial("test", this.scene);
-		//this.test.material.backFaceCulling = false;
-		//this.test.position.set(0, 4, 0);
-		//this.test.rotation.y = 1 * Math.PI;
-		//this.test.setEnabled(false);
-
-		//
-		//this.test2 = MeshBuilder.CreateBox("test2", { width: 50, depth: 10, height: 10 }, this.scene);
-		//this.test2.material = new DitherMaterial("test2", this.scene);
-		//this.test2.material.backFaceCulling = false;
-		//this.test2.position.set(10, -this.fieldDepth, -20);
-		//this.test2.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
-		//this.test2.layerMask = 0x01000001;
-
-		//this.test22 = MeshBuilder.CreateBox("test22", { width: 50, depth: 10, height: 10 }, this.scene);
-		//this.test22.material = new StandardMaterial("test22", this.scene);
-		//this.test22.material.backFaceCulling = false;
-		//this.test22.position.set(10, 0, -20);
-		//this.test22.rotation.set(0.1 * Math.PI, 0.3 * Math.PI, 0.4 * Math.PI);
-		//this.test22.material.disableColorWrite = true;
-		//this.test22.material.forceDepthWrite = true;
-		//this.test22.layerMask = 0x10000000;
-
-
-
 		this.ground = MeshBuilder.CreateGround("ground", { size: 40. }, this.scene);
 		const m = new StandardMaterial("ground", this.scene);
 		m.diffuseColor = Color3.Black();
