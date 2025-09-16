@@ -294,12 +294,10 @@ class Profile {
 		})
 
 		this.ref.edit.addEventListener("click", () => {
-			Popup.addValidation(true, User.twofa != 0, (p: string, t: string) => {
-				let ret = false;
+			Popup.addValidation(true, User.twofa != 0, (p: string, t: string, success: any) => {
 				patchRequest("update-info/username", { username: this.ref.usernameInput.value, password: p, token: t })
-					.then((json) => { ret = true; meRequest("no-cache"); })
-					.catch((err) => { NotificationManager.addText(err) })
-				return ret;
+					.then((json) => { meRequest("no-cache"); success(); })
+					.catch((err) => { NotificationManager.addText(err); })
 			})
 		})
 
@@ -308,28 +306,33 @@ class Profile {
 
 	}
 
-	public load(username: string, self = false) {
+	public load(uuid: string, self = false) {
 		Popup.removePopup();
-		this.stats.load(username);
-		this.setup(username, self);
-		Popup.addPopup(this.div);
+		this.stats.load(uuid);
+		this.setup(uuid, self);
 	}
 
-	private setup(username: string, self: boolean) {
+	private setup(uuid: string, self: boolean) {
 		this.ref.username.remove();
 		this.ref.usernameInput.remove();
 		this.ref.edit.remove();
 		if (self) {
 			this.ref.avatarFile.disabled = false;
-			this.ref.usernameInput.value = username;
+			this.ref.usernameInput.value = User.username as string;
 			this.ref.edit.disabled = true;
 			this.ref.avatar.src = `/cdn${User.avatar}`;
 			this.ref.usernameContainer.appendChild(this.ref.usernameInput);
 			this.ref.usernameContainer.appendChild(this.ref.edit);
+			Popup.addPopup(this.div);
 		} else {
-			this.ref.avatarFile.disabled = true;
-			this.ref.username.innerText = username;
-			this.ref.usernameContainer.appendChild(this.ref.username);
+			postRequest("/info/search", { identifier: uuid, type: "uuid" })
+				.then((json: any) => {
+					this.ref.avatarFile.disabled = true;
+					this.ref.username.innerText = json.data.username;
+					this.ref.avatar.src = `/cdn${json.data.avatar_path}`;
+					this.ref.usernameContainer.appendChild(this.ref.username);
+					Popup.addPopup(this.div);
+				})
 		}
 	}
 }

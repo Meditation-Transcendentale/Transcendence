@@ -96,7 +96,11 @@ class FriendlistC {
 		e.value = "remove";
 
 		n.addEventListener('click', () => {
-			gAth.loadProfile(n.value);
+			gAth.loadProfile(uuid);
+		})
+
+		s.addEventListener("click", () => {
+			this.updateStatus(uuid, s.value == "offline" ? "online" : "offline")
 		})
 
 		e.addEventListener('click', () => {
@@ -138,7 +142,7 @@ class FriendlistC {
 		a.value = "add";
 
 		n.addEventListener('click', () => {
-			gAth.loadProfile(n.value);
+			gAth.loadProfile(uuid);
 		})
 
 		a.addEventListener("click", () => {
@@ -163,7 +167,7 @@ class FriendlistC {
 		r.value = "refuse";
 
 		n.addEventListener('click', () => {
-			gAth.loadProfile(username);
+			gAth.loadProfile(uuid);
 		})
 		a.addEventListener("click", () => {
 			postRequest("friends/accept", { inputUuid: uuid })
@@ -204,9 +208,11 @@ class FriendlistC {
 			} else {
 				this.friendsOnline.get(uuid)!.status.value = status;
 			}
-
-
 		}
+	}
+
+	public get onlineFriends(): Map<string, friend> {
+		return this.friendsOnline;
 	}
 }
 

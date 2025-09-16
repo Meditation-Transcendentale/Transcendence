@@ -110,9 +110,7 @@ class CPopup {
 		this.validationRef.exit.className = "validation-exit";
 
 		this.validationRef.submit.addEventListener("click", () => {
-			if (this.validationCallback(this.validationRef.password.value, this.validationRef.token.value)) {
-				this.removeValidation();
-			}
+			this.validationCallback(this.validationRef.password.value, this.validationRef.token.value, () => { this.removeValidation() })
 		})
 
 		this.validationRef.exit.addEventListener('click', () => {
