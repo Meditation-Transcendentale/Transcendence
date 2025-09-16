@@ -3,7 +3,7 @@ import {
 	decodeTournamentServerMessage,
 } from './proto/helper';
 import { User } from './User';
-import { getRequest } from './requests';
+import { postRequest } from './requests';
 import { App3D } from '../3d/App';
 
 type PlayerState = {
@@ -258,9 +258,10 @@ export default class TournamentPage {
 		name.style.overflow = 'hidden';
 		name.style.textOverflow = 'ellipsis';
 		if (pid) {
-			getRequest(`/info/uuid/${pid}`)
-				.then((json: any) => { name.textContent = json?.username ? String(json.username) : pid; })
-				.catch(() => { /* keep id fallback */ });
+			postRequest("info/search", {identifier: pid, type: "uuid"})
+			.then((json: any) => {
+				name.textContent = json.data.username;
+			});
 		}
 
 		const inner = document.createElement('div');
