@@ -11,6 +11,7 @@ Effect.ShadersStore["OLDunderwaterFragmentShader"] = `
 	uniform sampler2D	surfaceTexture;
 	uniform sampler2D	causticTexture;
 
+
 	uniform mat4	projection;
 	uniform mat4	iprojection;
 	uniform mat4	iview;
@@ -258,8 +259,10 @@ void main(void) {
 	vec2 uv;
 
 	float surfaceTransmittance = 1.;
-	float rayTransmittance = 1.;
+	//float rayTransmittance = 1.;
+	float rayTransmittance = 0.;
 	float surfaceLuminance = 0.;
+	vec3	fog = vec3(0.);
 	while (travel < maxDist) {
 		h = texture(waveTexture, p.xz * (1. / worldSize) + 0.5).r  * waveMaxDisplacement + waterHeight;
 		s = waterSdf(p, p.y > 0. ? h : waterHeight);
@@ -270,21 +273,30 @@ void main(void) {
 		uv = (p.xz + (h - p.y) * 0.2)* (1. / worldSize) + 0.5;
 
 		//surfaceLuminance += texture(causticTexture, uv).r;
-		rayTransmittance *= exp(-d * r);
-		surfaceTransmittance  *=  exp(-d * 0.01 * (h - p.y));// * float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
-		surfaceLuminance += ambientMultiplier * r * texture(causticTexture, uv).r * exp(-d * (h - p.y)) * float(s < 0.) * \
+		//rayTransmittance *= exp(-d * r);
+		rayTransmittance += d * r;
+		//surfaceTransmittance  *=  exp(-d * 0.01 * (h - p.y));// * float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
+		//surfaceLuminance += ambientMultiplier * r * texture(causticTexture, uv).r * exp(-d * (h - p.y)) * float(s < 0.) * \
+			//heyney_greenstein(dot(ray, vec3(0., 1, 0.)), lightScattering) *  float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
+		surfaceLuminance += ambientMultiplier * r * texture(causticTexture, uv).r  * float(s < 0.) * \
 			heyney_greenstein(dot(ray, vec3(0., 1, 0.)), lightScattering) *  float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
+		surfaceTransmittance *= exp(-d * (h - p.y));
 //* heyney_greenstein(dot(ray, vec3(0., -1, 0.)), lightScattering) 
+		
+		fog += ambientMultiplier * r * texture(causticTexture, uv).r * exp(d * (h - p.y) * -waterAbsorption) * float(s < 0.) * \
+			heyney_greenstein(dot(ray, vec3(0., 1, 0.)), lightScattering) *  float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
+
 
 		r = stepSize;
 		p += ray * r;
 
 		travel += r;
 	}
-	gl_FragColor.r = min(rayTransmittance, 1.);
+	gl_FragColor.r = min(rayTransmittance * 0.01, 1.);
 	gl_FragColor.g = min(surfaceLuminance , 1.);
-	gl_FragColor.b = 0.;
+	gl_FragColor.b = min(surfaceTransmittance, 1.);
 	gl_FragColor.a = 1.;
+	gl_FragColor.gba = fog;
 }
 `;
 
@@ -303,6 +315,8 @@ void main(void) {
 	vec4	color = texture(sceneTexture, vUV);
 	//gl_FragColor.rgb = (color.rgb * transmittances.r + transmittances.g) ;//* exp(-waterAbsorption);
 	gl_FragColor.rgb = (color.rgb * transmittances.r + transmittances.g) * exp(-waterAbsorption);
+	//gl_FragColor.rgb = color.rgb * exp(-waterAbsorption * transmittances.r);// + exp(-waterAbsorption * transmittances.g);
+	gl_FragColor.rgb = color.rgb * pow(exp(-waterAbsorption), vec3(transmittances.r * 100.)) + transmittances.gba;//+ transmittances.g * pow(vec3(transmittances.b), -waterAbsorption);
 	gl_FragColor.a = 1.;
 }
 `;

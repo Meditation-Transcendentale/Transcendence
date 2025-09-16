@@ -1,3 +1,4 @@
+import { gAth } from "./Ath";
 import { meReject, meRequest } from "./requests";
 
 type routePage = {
@@ -75,7 +76,7 @@ class RouterC {
 			ts: "./Friendlist",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
-		this.routes.set("/game", {
+		this.routes.set("/cajoue", {
 			html: "/game",
 			ts: "./Game",
 			callback: (url: URL) => { this.loadInMain(url) }
@@ -141,7 +142,7 @@ class RouterC {
 			//this.oldURL = url.href;
 			await meRequest("no-cache")
 				.then(() => {
-					if (url.pathname == "/login" || url.pathname == "/register") {
+					if (url.pathname == "/login" || url.pathname == "/register" || (this.first && url.pathname == "/cajoue")) {
 						url.pathname = "/home";
 						url.search = "";
 					}
@@ -199,8 +200,8 @@ class RouterC {
 	private async loadAth() {
 		if (!this.ath.instance) {
 			const html = await this.getHTML(this.ath!.html);
-			const ts = await this.getTS(this.ath!.ts);
-			this.ath!.instance = new ts.default(html);
+			this.ath.instance = gAth;
+			gAth.init(html);
 		}
 		this.ath.instance?.load();
 	}

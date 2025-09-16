@@ -7,8 +7,28 @@
 	pointer-events: auto;
 }
 
+/*#info-window>.window-footer>.button {*/
+/*	background-color: var(--window-color);*/
+/*	color: var(--window-background);*/
+/*}*/
+
+#lobby-id-copy.button {
+	background-color: var(--window-color) !important;
+	color: var(--window-background) !important;
+}
+
+#lobby-id-copy.button:hover {
+	color: var(--window-color) !important;
+	background-color: var(--window-background) !important;
+}
+
+#lobby-id-text {
+	background-color: var(--window-color) !important;
+	color: var(--window-background) !important;
+}
+
 #info-window {
-	display:flex;
+	display: flex;
 	flex-direction: column;
 	/*display: inline-block;*/
 	width: 40vh;
@@ -37,9 +57,9 @@
 }
 
 #info-window>.window-content {
-	display:flex;
+	display: flex;
 	flex-direction: column;
-	flex-grow:1;
+	flex-grow: 1;
 	font-size: 4vh;
 	user-select: none;
 }
@@ -48,13 +68,12 @@
 	display: flex;
 	flex-direction: row;
 	/*align-self: flex-start;*/
-	flex-grow:0;
+	flex-grow: 0;
 	font-size: 2vh;
 	user-select: none;
 }
 
-#info-window>.window-line {
-}
+#info-window>.window-line {}
 
 #players-window>.window-bar {
 	font-size: 4vh;
@@ -62,9 +81,10 @@
 }
 
 #info-window>.window {
-	display:flex;
+	display: flex;
 	flex-direction: row;
 }
+
 #players-window>table {
 	display: inline-block;
 	border-collapse: collapse;
@@ -149,4 +169,20 @@
 .list-body td[click]:hover {
 	color: black;
 	background-color: white;
+}
+
+#invite-list input {
+	color: white;
+	background-color: black;
+	border: none;
+	border-top: 2px solid white;
+	border-bottom: 2px solid white;
+	font-size: 4vh;
+	width: 50%;
+}
+
+#invite-list input:hover {
+	color: black;
+	background-color: white;
+	border-color: black;
 }

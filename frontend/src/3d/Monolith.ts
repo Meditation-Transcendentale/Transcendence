@@ -109,7 +109,6 @@ export class Monolith {
 
 	}
 
-	// Vector3 Pool Methods
 	private initializeVector3Pool(): void {
 		for (let i = 0; i < this.POOL_INITIAL_SIZE; i++) {
 			this.vector3Pool.push(new Vector3());
@@ -709,7 +708,7 @@ export class Monolith {
 
 		this.depthMaterial.setVector3("worldCenter", Vector3.Zero());
 		this.depthMaterial.setFloat("baseWaveIntensity", 0.02);
-		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.0);
+		this.depthMaterial.setFloat("mouseInfluenceRadius", 0.8);
 
 		if (this.text) {
 			this.text.update();

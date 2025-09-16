@@ -1,0 +1,19 @@
+.image-edit>img {
+	background-color: grey;
+	cursor: pointer;
+	border-radius: 10%;
+	border-color: white;
+	border-style: solid;
+	border-width: 0.2vh;
+	object-fit: cover;
+
+	transition: opacity 0.2s ease;
+}
+
+.image-edit>img:hover {
+	opacity: 0.8;
+}
+
+.image-edit>input[type="file"] {
+	display: none;
+}

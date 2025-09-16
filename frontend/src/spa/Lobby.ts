@@ -4,7 +4,9 @@ import { decodeServerMessage, encodeClientMessage } from "./proto/helper";
 // import { lobbyVue } from "../Vue";
 import Router from "./Router";
 import { User } from "./User";
-import { getRequest } from "./requests";
+import { getRequest, postRequest } from "./requests";
+import { gFriendList } from "./Friendlist";
+import { gAth } from "./Ath";
 
 
 interface lobbyHtmlReference {
@@ -12,6 +14,11 @@ interface lobbyHtmlReference {
 	infoWindow: { html: HTMLDivElement, id: number }
 	inviteWindow: { html: HTMLDivElement, id: number }
 	playersList: HTMLDivElement
+	lobbyMode: HTMLSpanElement
+	lobbyMap: HTMLSpanElement
+	lobbyId: HTMLSpanElement
+	lobbyIdCopy: HTMLButtonElement
+	inviteList: HTMLDivElement
 }
 
 enum lobbyState {
@@ -46,6 +53,7 @@ export default class Lobby {
 		this.ws = null;
 		this.id = null;
 		this.mode = null;
+		this.map = null;
 		this.state = lobbyState.none;
 
 		this.players = new Map<string, player>;
@@ -56,7 +64,12 @@ export default class Lobby {
 			playersWindow: { html: div.querySelector("#players-window") as HTMLDivElement, id: -1 },
 			infoWindow: { html: div.querySelector("#info-window") as HTMLDivElement, id: -1 },
 			inviteWindow: { html: div.querySelector("#invite-window") as HTMLDivElement, id: -1 },
-			playersList: div.querySelector("#players-list") as HTMLDivElement
+			playersList: div.querySelector("#players-list") as HTMLDivElement,
+			lobbyMode: div.querySelector("#lobby-mode") as HTMLSpanElement,
+			lobbyMap: div.querySelector("#lobby-map") as HTMLSpanElement,
+			lobbyId: div.querySelector("#lobby-id-text") as HTMLSpanElement,
+			lobbyIdCopy: div.querySelector("#lobby-id-copy") as HTMLButtonElement,
+			inviteList: div.querySelector("#invite-list") as HTMLDivElement
 		};
 
 		this.ref.playersWindow.id = App3D.addCSS3dObject({
@@ -98,14 +111,21 @@ export default class Lobby {
 		console.log(`LOBBY MAP = ${this.map}`);
 		this.setupWs(this.id);
 		this.ref.playersList.innerHTML = "";
+		this.ref.lobbyId.innerHTML = `${this.id}`;
 
 		this.createPlayerDiv(User.uuid as string, false, true);
 		document.body.appendChild(this.css);
+
 
 		App3D.setVue("lobby");
 		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.infoWindow.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.inviteWindow.id, true);
+
+		this.ref.lobbyIdCopy.addEventListener("click", () => {
+			navigator.clipboard.writeText(this.id);
+		})
+
 	}
 
 	public async unload() {
@@ -148,7 +168,12 @@ export default class Lobby {
 
 			if (payload.update != null) {
 				this.mode = payload.update.mode as string;
+				if (this.mode != "ai" && this.mode != "local") {
+					this.initInviteList();
+				}
+				this.ref.lobbyMode.innerHTML = `MODE : ${this.mode}`;
 				this.map = payload.update.map as string;
+				this.ref.lobbyMap.innerHTML = `MAP : ${this.map}`;
 				console.log(this.map);
 				this.updatePlayers(payload.update.players as Array<{ uuid: string, ready: boolean }>);
 				console.log(`Update :${payload}`);
@@ -160,7 +185,7 @@ export default class Lobby {
 				if (this.mode === 'br')
 					Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
 				else
-					Router.nav(encodeURI(`/game?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
+					Router.nav(encodeURI(`/cajoue?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
 				this.ws?.close();
 			}
 
@@ -213,8 +238,9 @@ export default class Lobby {
 		name.className = "username";
 		status.className = "status";
 
-		const rep = await getRequest(`info/uuid/${uuid}`).catch((err) => console.log(err)) as any;
-		name.innerText = rep.username; //NEED TO IMPLEMENT A ROUTE GET /userinfo/:uuid to get Username from uuid
+		// const rep = await getRequest(`info/uuid/${uuid}`).catch((err) => console.log(err)) as any;
+		const rep = await postRequest("info/search", { identifier: uuid, type: "uuid" }).catch((err) => console.log(err)) as any;
+		name.innerText = rep.data.username; //NEED TO IMPLEMENT A ROUTE GET /userinfo/:uuid to get Username from uuid
 		status.innerText = (ready ? "yes" : "no");
 		if (self) {
 			status.addEventListener("click", () => {
@@ -235,5 +261,33 @@ export default class Lobby {
 		if (this.ws) { this.ws?.send(msg); }
 	}
 
+	private initInviteList() {
+		this.ref.inviteList.innerHTML = "";
+		const uuids = gFriendList.onlineFriends;
+		for (let i of uuids) {
+			this.createPlayerInvite(i[0]);
+		}
+	}
 
+	private createPlayerInvite(uuid: string) {
+		postRequest("info/search", { identifier: uuid, type: "uuid" })
+			.then((json: any) => {
+				const d = document.createElement("div");
+				const u = document.createElement("input");
+				const i = document.createElement("input");
+				u.type = "button";
+				u.value = json.data.username;
+				i.type = "button";
+				i.value = "invite";
+				u.addEventListener("click", () => {
+					gAth.loadProfile(uuid);
+				})
+				i.addEventListener("click", () => {
+					alert("need a way to invite");
+				})
+				d.appendChild(u);
+				d.appendChild(i);
+				this.ref.inviteList.appendChild(d);
+			})
+	}
 }

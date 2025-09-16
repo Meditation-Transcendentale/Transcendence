@@ -158,13 +158,11 @@ export class Field {
 		this.grass.depth = this.fieldDepth;
 	}
 
-	public async initialize(): Promise<void> {
-		await this.monolith.init();
-	}
 
 	public async load() {
 		await this.butterfly.init();
 		await this.grass.init();
+		await this.monolith.init();
 
 		//this.glowLayer.addIncludedOnlyMesh(this.butterfly.mesh);
 		//this.glowLayer.setMaterialForRendering(this.butterfly.mesh, this.butterfly.glowMat);
@@ -207,7 +205,7 @@ export class Field {
 			this.depthRender.setMaterialForRendering(this.grass._tiles[i]._mesh, this.grass.grassDepthMaterial);
 		}
 		//this.depthRender.enabled = false;
-		//this.depthRender.setMaterialForRendering(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial)
+		this.depthRender.setMaterialForRendering(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial)
 		this.glowLayer.dispose();
 
 		//this.water.setMaterial();

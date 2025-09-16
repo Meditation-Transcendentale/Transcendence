@@ -95,7 +95,7 @@ export class Pipeline {
 		UIaddSlider("noiseOffset", noiseOffsetDefault, (n: number) => { this.dataUBO.updateFloat("noiseOffset", n) }, 0.1, 0, 2);
 		UIaddSlider("stepSize", stepSizeDefault, (n: number) => { this.dataUBO.updateFloat("stepSize", n) }, 0.05, 0.01, 2);
 		UIaddSlider("maxDistance", maxDistanceDefault, (n: number) => { this.dataUBO.updateFloat("maxDistance", n) }, 1, 0, 100);
-		UIaddSlider("worldSize", worldSizeDefault, (n: number) => { this.dataUBO.updateFloat("worldSize", n) }, 1, 0, 100);
+		UIaddSlider("worldSize", worldSizeDefault, (n: number) => { this.dataUBO.updateFloat("worldSize", n) }, 1, 0, 300);
 		UIaddSlider("waterHeight", waterHeightDefault, (n: number) => { this.dataUBO.updateFloat("waterHeight", n) }, 1, 0, 100);
 		UIaddSlider("waveMaxDisplacement", waveMaxDisplacementDefault, (n: number) => { this.dataUBO.updateFloat("waveMaxDisplacement", n) }, 0.5, 0, 20);
 		UIaddSlider("density", densityDefault, (n: number) => { this.dataUBO.updateFloat("density", n) }, 0.05, 0, 2);

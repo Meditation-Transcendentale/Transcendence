@@ -1,138 +1,219 @@
+import { gAth } from "./Ath";
 import { meReject, meRequest } from "./checkMe";
+import { Popup } from "./Popup";
 import { deleteRequest, getRequest, postRequest } from "./requests";
 import Router from "./Router";
 import { createButton, setDraggable } from "./utils";
 
 
-interface Friend {
-	id: number;
-	friend_username: string;
-}
-
 interface friendlistHtmlReference {
-	friendsBtn: HTMLInputElement;
-	friends: HTMLDivElement;
-	pendingBtn: HTMLInputElement;
-	pending: HTMLDivElement;
 	search: HTMLInputElement;
-	searchResult: HTMLDivElement;
+	result: HTMLDivElement;
+	connected: HTMLDivElement;
+	away: HTMLDivElement;
+	invite: HTMLDivElement;
 }
 
-export default class Friendlist {
-	private div: HTMLDivElement;
-	private ref: friendlistHtmlReference;
+interface friend {
+	div: HTMLDivElement;
+	name: HTMLInputElement;
+	status: HTMLInputElement;
+	edit: HTMLInputElement;
+}
 
-	constructor(div: HTMLDivElement) {
+class FriendlistC {
+	private div!: HTMLDivElement;
+	private ref!: friendlistHtmlReference;
+
+	// private friends: Array<friend>;
+	private friendsOnline: Map<string, friend>;
+	private friendsAway: Map<string, friend>;
+
+
+	constructor() {
+		this.friendsOnline = new Map<string, friend>;
+		this.friendsAway = new Map<string, friend>;
+	}
+
+	public init(div: HTMLDivElement) {
 		this.div = div;
-
 		this.ref = {
-			friendsBtn: div.querySelector("#fl-friends-btn") as HTMLInputElement,
-			friends: div.querySelector("#fl-friends") as HTMLDivElement,
-			pendingBtn: div.querySelector("#fl-pending-btn") as HTMLInputElement,
-			pending: div.querySelector("#fl-pending") as HTMLDivElement,
-			search: div.querySelector("#fl-search-input") as HTMLInputElement,
-			searchResult: div.querySelector("#fl-search-result") as HTMLDivElement,
+			search: div.querySelector("#friendlist-search") as HTMLInputElement,
+			result: div.querySelector("#friendlist-search-result") as HTMLDivElement,
+			connected: div.querySelector("#friendlist-connected") as HTMLDivElement,
+			away: div.querySelector("#friendlist-away") as HTMLDivElement,
+			invite: div.querySelector("#friendlist-invite") as HTMLDivElement
 		}
-
-
-
-		this.ref.friends.style.display = "block";
-		this.ref.pending.style.display = "none";
-
-		this.ref.friendsBtn.addEventListener("click", () => {
-			this.ref.friends.style.display = (this.ref.friends.style.display == "none" ? "block" : "none");
-		})
-
-		this.ref.pendingBtn.addEventListener("click", () => {
-			this.ref.pending.style.display = (this.ref.pending.style.display == "none" ? "block" : "none");
-		})
 
 		this.ref.search.addEventListener("keypress", (e) => {
 			if (e.key == "Enter" && this.ref.search.value.length > 0) {
-				getRequest(`info/${encodeURIComponent(this.ref.search.value)}`)
+				this.ref.result.innerHTML = "";
+				postRequest("info/search", { identifier: this.ref.search.value, type: "username" })
 					.then((json) => { this.searchResolve(json) })
-					.catch((resp) => { this.searchReject(resp) })
+					.catch((resp) => { console.log(resp) })
 			}
 		})
 
-		setDraggable(this.div.querySelector(".window") as HTMLDivElement);
-	}
-
-
-	public load(params: URLSearchParams) {
-		document.querySelector("#home-container")?.appendChild(this.div);
 		getRequest("friends/get/friendlist")
-			.then((json) => { this.friendlistResolve(json) });
+			.then((json) => { this.friendlistResolve(json) })
+			.catch((err) => { console.log(err.json()) })
 		getRequest("friends/get/requests")
-			.then((json) => { this.pendingResolve(json) });
+			.then((json) => { this.friendlistInviteResolve(json) })
+			.catch((err) => { console.log(err.json()) })
 	}
 
-	public async unload() {
-		this.div.remove();
-	}
-
-	private friendlistResolve(json: any) {
-		const frienlist = json.friendlist as Array<Object>;
-		const div = document.createElement("div");
-
-		frienlist.forEach((friend: any) => {
-			let user = document.createElement("div");
-			user.innerText = friend.friend_username;
-			user.className = "list-element";
-			user.appendChild(createButton("Stats", () => { Router.nav(`/stats?u=${friend.friend_username}`) }));
-			user.appendChild(createButton("Remove", (btn: HTMLInputElement) => {
-				deleteRequest(`friends/delete`, { inputUsername: friend.friend_username })
-					.then(() => { btn.parentElement?.remove() })
-			}))
-			div.appendChild(user);
-		})
-		this.ref.friends.innerHTML = "";
-		this.ref.friends.appendChild(div);
-
-
+	public load() {
+		Popup.addPopup(this.div);
 	}
 
 	private searchResolve(json: any) {
-		const search = json.user as any;
-		const div = document.createElement("div");
-
-		let user = document.createElement("div");
-		user.innerText = search.username;
-		user.appendChild(createButton("Stats", () => { Router.nav(`/stats?u=${search.username}`) }));
-		user.appendChild(createButton("Add", (btn: HTMLInputElement) => {
-			postRequest("friends/add", { inputUsername: search.username })
-				.then(() => { div.remove(); });
-		}));
-		div.appendChild(user);
-
-		this.ref.searchResult.appendChild(div);
+		this.ref.result.appendChild(this.createResult(json.data.username, json.data.uuid));
 	}
 
-	private searchReject(resp: Response) {
-		if (resp.status) {
-			resp.json().then((json) => console.log(json));
+	private friendlistResolve(json: any) {
+		for (let i of json.friendlist) {
+			this.addToFriend(i.friend_username, i.friend_uuid, i.friend_status)
 		}
 	}
 
-	private pendingResolve(json: any) {
-		console.log(json);
-		const pendinglist = json.friendsRequests as Array<Object>;
-		const div = document.createElement("div");
+	private friendlistInviteResolve(json: any) {
+		for (let i of json.friendsRequests) {
+			this.addToInvite(i.sender_username, i.sender_uuid)
+		}
+	}
 
-		pendinglist.forEach((pending: any) => {
-			let user = document.createElement("div");
-			user.innerText = pending.sender_username;
-			user.appendChild(createButton("Accept", (btn: HTMLInputElement) => {
-				postRequest(`friends/accept`, { inputUsername: pending.sender_username })
-					.then(() => { btn.parentElement?.remove() })
-			}))
-			div.appendChild(user);
+	public addToFriend(username: string, uuid: string, status: string) {
+		postRequest("info/search", { identifier: uuid, type: "uuid" });
+		const div = document.createElement("div");
+		const n = document.createElement("input");
+		const s = document.createElement("input");
+		const e = document.createElement("input");
+		n.type = "button";
+		n.value = username;
+		s.type = "button"
+		s.value = status;
+		e.type = "button";
+		e.value = "remove";
+
+		n.addEventListener('click', () => {
+			gAth.loadProfile(uuid);
 		})
-		this.ref.pending.innerHTML = "";
-		this.ref.pending.appendChild(div);
+
+		s.addEventListener("click", () => {
+			this.updateStatus(uuid, s.value == "offline" ? "online" : "offline")
+		})
+
+		e.addEventListener('click', () => {
+			deleteRequest("friends/delete", { inputUuid: uuid })
+				.catch((err) => { console.log(err) });
+			this.friendsOnline.get(uuid)?.div.remove();
+			this.friendsOnline.delete(uuid)
+			this.friendsAway.get(uuid)?.div.remove();
+			this.friendsAway.delete(uuid)
+		})
+		div.appendChild(n);
+		div.appendChild(s);
+		div.appendChild(e);
+
+		const f = {
+			div: div,
+			name: n,
+			status: s,
+			edit: e
+		};
+		if (status == "offline") {
+			this.friendsAway.set(uuid, f);
+			this.ref.away.appendChild(f.div);
+		} else {
+			this.friendsOnline.set(uuid, f);
+			this.ref.connected.appendChild(f.div);
+		}
 	}
 
 
+	private createResult(username: string, uuid: string): HTMLDivElement {
+		const div = document.createElement("div");
+		const n = document.createElement("input");
+		const a = document.createElement("input");
 
+		n.type = "button";
+		n.value = username;
+		a.type = "button";
+		a.value = "add";
 
+		n.addEventListener('click', () => {
+			gAth.loadProfile(uuid);
+		})
+
+		a.addEventListener("click", () => {
+			postRequest(`friends/add`, { inputUuid: uuid });
+		})
+		div.appendChild(n);
+		div.appendChild(a);
+		return div;
+	}
+
+	public addToInvite(username: string, uuid: string): HTMLDivElement {
+		const div = document.createElement("div");
+		const n = document.createElement("input");
+		const a = document.createElement("input");
+		const r = document.createElement("input");
+
+		n.type = "button";
+		n.value = username;
+		a.type = "button";
+		a.value = "accept";
+		r.type = "button";
+		r.value = "refuse";
+
+		n.addEventListener('click', () => {
+			gAth.loadProfile(uuid);
+		})
+		a.addEventListener("click", () => {
+			postRequest("friends/accept", { inputUuid: uuid })
+				.then(() => { div.remove(); this.addToFriend(username, uuid, "offline") })
+				.catch((err) => { console.log(err) });
+
+		})
+		r.addEventListener("click", () => {
+			deleteRequest("friends/decline", { inputUuid: uuid })
+				.then(() => { div.remove(); })
+				.catch((err) => { console.log(err) });
+		})
+		div.appendChild(n);
+		div.appendChild(a);
+		div.appendChild(r);
+		this.ref.invite.appendChild(div);
+		return div;
+	}
+
+	public updateStatus(uuid: string, status: string) {
+		if (status == "offline") {
+			if (this.friendsOnline.has(uuid)) {
+				const f = this.friendsOnline.get(uuid) as friend;
+				f.div.remove();
+				this.friendsAway.set(uuid, f);
+				this.friendsOnline.delete(uuid);
+				f.status.value = status;
+				this.ref.away.appendChild(f.div);
+			}
+		} else {
+			if (this.friendsAway.has(uuid)) {
+				const f = this.friendsAway.get(uuid) as friend;
+				f.div.remove();
+				this.friendsOnline.set(uuid, f);
+				this.friendsAway.delete(uuid);
+				f.status.value = status;
+				this.ref.connected.appendChild(f.div);
+			} else {
+				this.friendsOnline.get(uuid)!.status.value = status;
+			}
+		}
+	}
+
+	public get onlineFriends(): Map<string, friend> {
+		return this.friendsOnline;
+	}
 }
+
+export const gFriendList = new FriendlistC();
