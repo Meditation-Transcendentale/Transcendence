@@ -139,6 +139,7 @@ export default class TournamentPage {
 
 		this.treeEl = document.createElement('div');
 		this.treeEl.id = 'tournament-tree';
+		this.treeEl.className = 'bracket';
 
 		this.rootEl.append(this.toolbarEl, this.treeEl);
 		this.div.appendChild(this.rootEl);
@@ -258,10 +259,11 @@ export default class TournamentPage {
 		name.style.overflow = 'hidden';
 		name.style.textOverflow = 'ellipsis';
 		if (pid) {
-			postRequest("info/search", {identifier: pid, type: "uuid"})
-			.then((json: any) => {
-				name.textContent = json.data.username;
-			});
+			console.log(`PID NOT NULL`);
+			postRequest("info/search", { identifier: pid, type: "uuid" })
+				.then((json: any) => {
+					name.textContent = json.data.username;
+				});
 		}
 
 		const inner = document.createElement('div');
