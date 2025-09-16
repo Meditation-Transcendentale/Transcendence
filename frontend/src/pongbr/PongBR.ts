@@ -22,7 +22,8 @@ import { WallComponent } from "./components/WallComponent.js";
 import { Entity } from "./ecs/Entity.js";
 import earcut from "earcut";
 import { MotionBlurPostProcess } from "@babylonjs/core";
-import { createBlackHoleBackdrop, createSkybox } from "./skybox.js";
+import { createBlackHoleBackdrop, createHighQualityProceduralSkybox, createSimpleTextureSkybox, createSkybox } from "./skybox.js";
+import { createCustomizableSpaceSkybox } from "./skybox2.js";
 
 
 export let localPaddleId: any = null;
@@ -117,6 +118,13 @@ export class PongBR {
 		statue.rotation.set(0, 0, 0);
 		statue.scaling.setAll(70);
 		// createSkybox(this.scene);
+		// createSimpleTextureSkybox(this.scene, "/assets/galaxy.jpg");
+		const spaceSkybox = createCustomizableSpaceSkybox(this.scene, {
+			brightness: 0.003,
+			speed: 0.001,
+			rotationSpeed: 0.0000001
+		});
+		// createHighQualityProceduralSkybox(this.scene);
 		createBlackHoleBackdrop(this.scene, statue.position, this.pongRoot);
 
 		this.inputManager = new InputManager();

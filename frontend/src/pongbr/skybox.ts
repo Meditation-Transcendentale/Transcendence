@@ -1,4 +1,5 @@
-import { Effect, Material, MeshBuilder, Scene, ShaderMaterial, TransformNode, Vector3 } from "@babylonImport";
+import { Effect, Material, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, Texture, TransformNode, Vector3 } from "@babylonImport";
+import { Color3, DynamicTexture } from "@babylonjs/core";
 
 // Create fractal black hole shader
 Effect.ShadersStore["blackholeVertexShader"] = `
@@ -171,7 +172,7 @@ Effect.ShadersStore["blackholeFragmentShader"] = `
         finalColor = mix(finalColor, bloodRed, smoothstep(0.3, 0.6, c));
         finalColor = mix(finalColor, fireOrange, smoothstep(0.7, 0.9, c));
         
-        float alpha = smoothstep(0.05, 0.2, c); 
+        float alpha = 1.0 - smoothstep(0.7, 0.9, c); 
         
         // alpha *= smoothstep(0.7, 0.9, c);	
 
@@ -242,4 +243,88 @@ export function createSkybox(scene: Scene) {
 	});
 
 	return blackholeSkybox;
+}
+
+export function createSimpleTextureSkybox(scene: Scene, texturePath: string) {
+	const skybox = MeshBuilder.CreateSphere("skybox", { diameter: 10000, segments: 64 }, scene);
+	const skyboxMaterial = new StandardMaterial("skyboxMaterial", scene);
+
+	// Try loading as a dynamic texture instead
+	const img = new Image();
+	img.onload = () => {
+		const dynamicTexture = new DynamicTexture("skyboxTexture", { width: img.width, height: img.height }, scene);
+		const ctx = dynamicTexture.getContext();
+		ctx.drawImage(img, 0, 0);
+		dynamicTexture.update();
+
+		skyboxMaterial.emissiveTexture = dynamicTexture;
+		console.log("Skybox texture applied successfully!");
+	};
+
+	img.onerror = () => {
+		console.error("Failed to load image:", texturePath);
+		// Fallback to solid color
+		skyboxMaterial.emissiveColor = new Color3(0.1, 0.1, 0.2);
+	};
+
+	img.src = texturePath;
+
+	skyboxMaterial.disableLighting = true;
+	skyboxMaterial.backFaceCulling = false;
+
+	skybox.material = skyboxMaterial;
+	skybox.infiniteDistance = true;
+
+	return skybox;
+}
+
+export function createHighQualityProceduralSkybox(scene: Scene) {
+	// Create high-resolution texture
+	const skyTexture = new DynamicTexture("highQualitySky", { width: 4096, height: 2048 }, scene);
+	const ctx = skyTexture.getContext();
+
+	// High-quality gradient
+	const gradient = ctx.createLinearGradient(0, 2048, 0, 0);
+	gradient.addColorStop(0, "#0a0a15");
+	gradient.addColorStop(0.3, "#1a1530");
+	gradient.addColorStop(0.7, "#2a2040");
+	gradient.addColorStop(1, "#3a3050");
+
+	ctx.fillStyle = gradient;
+	ctx.fillRect(0, 0, 4096, 2048);
+
+	// High-density stars
+	ctx.fillStyle = "white";
+	for (let i = 0; i < 8000; i++) { // Much more stars
+		const x = Math.random() * 4096;
+		const y = Math.random() * 1024; // Upper half
+		const size = Math.random() * 2 + 0.2;
+		const brightness = Math.random();
+
+		ctx.globalAlpha = brightness;
+		ctx.beginPath();
+		ctx.arc(x, y, size, 0, 2 * Math.PI);
+		ctx.fill();
+	}
+
+	skyTexture.update();
+
+	const skybox = MeshBuilder.CreateSphere("highQualitySkybox", {
+		diameter: 10000,
+		segments: 64
+	}, scene);
+
+	const skyboxMaterial = new StandardMaterial("skyboxMaterial", scene);
+
+	// Apply quality settings
+	skyTexture.anisotropicFilteringLevel = 16;
+
+	skyboxMaterial.emissiveTexture = skyTexture;
+	skyboxMaterial.disableLighting = true;
+	skyboxMaterial.backFaceCulling = false;
+
+	skybox.material = skyboxMaterial;
+	skybox.infiniteDistance = true;
+
+	return skybox;
 }
