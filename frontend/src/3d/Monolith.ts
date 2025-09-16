@@ -51,7 +51,7 @@ export class Monolith {
 	private isPickingEnabled: boolean = true;
 	private voxelPositions: Vector3[] = [];
 	private lastPickTime = 0;
-	private pickThrottleMs = 16; // Increased from 5ms to 16ms (60fps)
+	private pickThrottleMs = 16;
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
 	private text: TextRenderer | null = null;
@@ -670,7 +670,6 @@ export class Monolith {
 		this.generateVoxelSystem();
 	}
 
-	// Optimized update method - only update uniforms when values change
 	private lastUpdateValues = {
 		time: -1,
 		animationSpeed: -1,
