@@ -1,5 +1,5 @@
 import uWS from 'uWebSockets.js';
-import { encodeTournamentServerMessage, decodeTournamentServerMessage } from './proto/helper.js';
+import { encodeTournamentServerMessage, decodeTournamentServerMessage, decodeTournamentClientMessage } from './proto/helper.js';
 
 export const tournamentSockets = new Map();
 
@@ -35,27 +35,34 @@ export function createUwsApp(path, tournamentService) {
         },
 
         open: (ws) => {
-            let set = tournamentSockets.get(ws.tournamentId);
-            if (!set) {
-                set = new Set();
-                tournamentSockets.set(ws.tournamentId, set);
+            try {
+                let set = tournamentSockets.get(ws.tournamentId);
+                if (!set) {
+                    set = new Set();
+                    tournamentSockets.set(ws.tournamentId, set);
+                }
+                set.add(ws);
+                ws.subscribe(ws.tournamentId);
+                console.log(`new connection: ${ws}`);
+                tournamentService.join(ws.tournamentId, ws.userId);
+            } catch (err) {
+                const buf = encodeTournamentServerMessage({ error: { message: err.message }});
+                ws.send(buf, true);
             }
-            set.add(ws);
-            console.log(`new connection: ${ws}`);
-            tournamentService.join(ws.tournamentId, ws.userId);
-            ws.subscribe(ws.tournamentId);
         },
 
         message: async (ws, message, isBinary) => {
             try {
-                const payload = decodeTournamentServerMessage(new Uint8Array(message));
+                const payload = decodeTournamentClientMessage(new Uint8Array(message));
 
                 if (payload?.ready) {
+                    console.log("READY RECEIVED");
                     await tournamentService.ready(ws, ws.tournamentId, ws.userId);
                     return;
                 }
 
                 if (payload?.quit) {
+                    console.log("QUIT RECEIVED");
                     tournamentService.quit(ws.tournamentId, ws.userId);
                     return;
                 }

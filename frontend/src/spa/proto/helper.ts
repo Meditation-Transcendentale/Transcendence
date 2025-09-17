@@ -221,3 +221,19 @@ export function decodeTournamentClientMessage(
 ): tournament.TournamentClientMessage {
     return Proto.tournament.TournamentClientMessage.decode(buffer);
 }
+
+export function encodeTournamentQuitMessage(
+    payload: tournament.ITournamentQuitMessage
+): Uint8Array {
+    const err = Proto.tournament.TournamentQuitMessage.verify(payload);
+    if (err) throw new Error(err);
+    return Proto.tournament.TournamentQuitMessage
+        .encode(Proto.tournament.TournamentQuitMessage.create(payload))
+        .finish();
+}
+
+export function decodeTournamentQuitMessage(
+    buffer: Uint8Array
+): tournament.TournamentQuitMessage {
+    return Proto.tournament.TournamentQuitMessage.decode(buffer);
+}

@@ -113,7 +113,15 @@ class Tournament {
 
     sendUpdate() {
         const buf = encodeTournamentServerMessage({
-            update: { tournamentRoot: this.root }
+            update: {
+                tournamentRoot: this.root,
+                players: this.players.map(p => ({
+                    uuid: p.id,
+                    ready: p.isReady,
+                    connected: p.isConnected,
+                    eliminated: p.isEliminated
+                }))
+            }
         });
         this.uwsApp.publish(this.id, buf, true);
     }
@@ -187,14 +195,18 @@ class Tournament {
         return alive.length > 0 && alive.every((p) => p.isReady);
     }
 
+    allConnected() {
+        return this.players.every(p => p.isConnected || p.isEliminated);
+    }
+    hasAnyActiveMatch() {
+        const it = this.root.getActiveMatches();
+        return !it.next().done;
+    }
 
     maybeStartReadyCheck() {
         if (this.readyActive) return;
-        const anyActive = (() => {
-            const it = this.root.getActiveMatches();
-            return !it.next().done;
-        })();
-        if (anyActive) this.sendReadyCheck();
+        if (!this.allConnected()) return;
+        if (this.hasAnyActiveMatch()) this.sendReadyCheck();
     }
 
     async handleReadyTimeout() {
@@ -300,14 +312,28 @@ class Tournament {
         const p = this.getPlayerByUuid(userId);
         if (!p) throw new Error(`Player ${userId} not in this tournament`);
         p.isConnected = true;
+        this.sendUpdate();
+        this.maybeStartReadyCheck();
     }
 
     quit(userId) {
         const p = this.getPlayerByUuid(userId);
-        if (!p) return;
+        if (!p || p.isEliminated) return;
+
         p.isConnected = false;
         p.isEliminated = true;
+
+        const m = this.findMatchByPlayer(this.root, userId);
+        if (m && !m.winnerId && m.player1Id && m.player2Id) {
+            const winnerSide = (m.player1Id === userId) ? 1 : 0;
+            m.setResult({ winnerId: winnerSide, score: { forfeit: true } });
+        }
+
+        this.autoAdvanceWalkovers();
+        this.sendUpdate();
+        this.maybeStartReadyCheck();
     }
+
 }
 
 export default class tournamentService {

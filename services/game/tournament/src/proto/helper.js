@@ -150,3 +150,15 @@ export function encodeStatusUpdate(payload) {
 		.encode(Proto.notif.StatusUpdate.create(payload))
 		.finish();
 }
+
+export function encodeTournamentClientMessage(payload) {
+	const err = Proto.tournament.TournamentClientMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.tournament.TournamentClientMessage
+		.encode(Proto.tournament.TournamentClientMessage.create(payload))
+		.finish();
+}
+
+export function decodeTournamentClientMessage(buffer) {
+	return Proto.tournament.TournamentClientMessage.decode(buffer);
+}

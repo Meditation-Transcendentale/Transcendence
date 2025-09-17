@@ -5,6 +5,7 @@ import {
 import { User } from './User';
 import { postRequest } from './requests';
 import { App3D } from '../3d/App';
+import Router from './Router';
 
 type PlayerState = {
 	uuid: string;
@@ -91,6 +92,8 @@ export default class TournamentPage {
 			}
 			if (payload.startGame) {
 				console.log(`START GAME RECEIVED`);
+				Router.nav(encodeURI(`/cajoue?id=${payload.startGame.gameId}&mod=tournament&map=default`), false, true);
+				this.ws?.close();
 			}
 			this.render();
 		};
