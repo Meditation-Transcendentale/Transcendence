@@ -8,7 +8,7 @@ import {
 	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
-	//Inspector,
+	// Inspector,
 	MeshBuilder,
 	Scene,
 	StandardMaterial,
@@ -20,6 +20,11 @@ import {
 } from "@babylonImport";
 import { Field } from "./Field";
 import { DynamicTexture, Material, PBRMaterial, Texture } from "@babylonjs/core";
+// import { Inspector } from '@babylonjs/inspector';
+// import "@babylonjs/core/Debug/debugLayer";
+// import "@babylonjs/inspector";
+import * as BABYLON from 'babylonjs';
+import 'babylonjs-inspector';
 
 
 export class Environment {
@@ -139,20 +144,26 @@ export class Environment {
 		//this.camera_br = new UniversalCamera('br', Vector3.Zero(), this.scene);
 		this.camera_brick = new ArcRotateCamera("brick", Math.PI / 2, 0, 30, Vector3.Zero(), this.scene);
 		this.camera_pong = new ArcRotateCamera('pong', Math.PI / 2., 0, 50, Vector3.Zero(), this.scene);
-		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
+		const loaded = await LoadAssetContainerAsync("/assets/PongStatutTextured.glb", this.scene);
 		loaded.addAllToScene();
 		loaded.meshes[0].parent = this.pongRoot;
 		this.gameMeshes.push(loaded.meshes[0] as Mesh);
 
 		const headMesh = this.scene.getMeshByName('Head.001') as Mesh;
-		// const headmat = new StandardMaterial('headmat', this.scene);
-		// headmat.diffuseColor = new Color3(1., 1, 1);
+		const headmat = new StandardMaterial('headmat', this.scene);
+		headmat.diffuseColor = new Color3(1., 1, 1);
 		// headMesh.material = headmat;
+
+		headMesh.material.usePhysicalLightFalloff = false;
+		headMesh.material.invertNormalMapX = true;
+		headMesh.material.invertNormalMapY = true;
+
+
 		const mouthMesh = this.scene.getMeshByName('Mouth.001') as Mesh;
 		const eyeMesh = this.scene.getMeshByName('Eyes.001') as Mesh;
-		// const eyemat = new StandardMaterial('eyemat', this.scene);
-		// eyemat.diffuseColor = new Color3(1., 0, 0);
-		// eyeMesh.material = eyemat;
+		const eyemat = new StandardMaterial('eyemat', this.scene);
+		eyemat.diffuseColor = new Color3(1., 0, 0);
+		eyeMesh.material = eyemat;
 
 		if (mouthMesh && mouthMesh.morphTargetManager) {
 			const smileTarget = mouthMesh.morphTargetManager.getTarget(0);
@@ -189,6 +200,7 @@ export class Environment {
 		// pp.bloomKernel = 16;
 		// pp.bloomScale = 0.25;
 
+		this.scene.debugLayer.show();
 		// Inspector.Show(this.scene, {});
 		//this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
 		//document.body.style.perspective = `${this.perspective}px`;

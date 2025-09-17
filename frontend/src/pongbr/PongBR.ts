@@ -127,7 +127,7 @@ export class PongBR {
 		// createHighQualityProceduralSkybox(this.scene);
 		createBlackHoleBackdrop(this.scene, statue.position, this.pongRoot);
 		this.spaceSkybox = new SpaceSkybox(this.scene);
-		this.spaceSkybox.applyPreset('Horror');
+		this.spaceSkybox.applyPreset('Monochrome');
 
 		this.inputManager = new InputManager();
 		localPaddleId = 0;
