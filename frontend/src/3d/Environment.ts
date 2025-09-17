@@ -19,6 +19,7 @@ import {
 	Mesh
 } from "@babylonImport";
 import { Field } from "./Field";
+import { DynamicTexture, Material, PBRMaterial, Texture } from "@babylonjs/core";
 
 
 export class Environment {
@@ -100,28 +101,33 @@ export class Environment {
 		this.gameMeshes = new Array<Mesh>;
 	}
 
+	private creatMaterial() {
+		// const concreteMaterial = new BABYLON.PBRMaterial("concreteMaterial", scene);
+		//
+		// concreteMaterial.baseTexture = new Texture("textures/brushed_concrete_diff_1k.jpg", this.scene);
+		// concreteMaterial.normalTexture = new Texture("textures/brushed_concrete_nor_gl_1k.jpg", this.scene);
+		// concreteMaterial.metallicRoughnessTexture = new Texture("textures/brushed_concrete_rough_1k.jpg", this.scene);
+		// concreteMaterial.ambientTexture = new Texture("textures/brushed_concrete_ao_1k.jpg", this.scene);
+		//
+		// concreteMaterial.metallicFactor = 0.0; 
+		// concreteMaterial.roughnessFactor = 1.0; 
+		// concreteMaterial.baseColor = new Color3(1, 1, 1); 
+		//
+		// concreteMaterial.ambientTextureStrength = 1.0;
+	}
+
 	private createMesh() {
 		this.pongRoot = new TransformNode("pongbrRoot", this.scene);
 		this.pongRoot.position.set(-2200, -3500, -3500);
 		this.pongRoot.rotation.z -= 30.9000;
 		this.pongRoot.scaling.set(1, 1, 1);
-		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 1, tessellation: 128 }, this.scene);
+		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 5, tessellation: 128 }, this.scene);
 		arenaMesh.parent = this.pongRoot;
-		//arenaMesh.position = new Vector3(-2200, -3500, -3500);
-		////arenaMesh.rotation.x += Math.PI / 2;
-		//arenaMesh.rotation.z -= 30.9000;
-		const material = new StandardMaterial("arenaMaterial", this.scene);
-		material.diffuseColor.set(0, 0, 0);
-		material.specularColor.set(0, 0, 0);
-		material.emissiveColor.set(1, 1, 1);
-		material.disableLighting = true;
-		const fresnel = new FresnelParameters();
-		fresnel.isEnabled = true;
-		fresnel.leftColor = new Color3(1, 1, 1);
-		fresnel.rightColor = new Color3(0, 0, 0);
-		fresnel.power = 15;
-		material.emissiveFresnelParameters = fresnel;
-		arenaMesh.material = material;
+		const arenaMaterial = new PBRMaterial("gameplayArena", this.scene);
+		arenaMaterial.albedoColor = new Color3(0.08, 0.10, 0.12);
+		arenaMaterial.emissiveColor = new Color3(0.01, 0.03, 0.05);
+		arenaMaterial.roughness = 0.95;
+		arenaMaterial.metallic = 0.02;
 
 		this.gameMeshes.push(arenaMesh);
 
@@ -132,19 +138,38 @@ export class Environment {
 		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		//this.camera_br = new UniversalCamera('br', Vector3.Zero(), this.scene);
 		this.camera_brick = new ArcRotateCamera("brick", Math.PI / 2, 0, 30, Vector3.Zero(), this.scene);
-		//this.camera_br.attachControl(this.canvas, true);
 		this.camera_pong = new ArcRotateCamera('pong', Math.PI / 2., 0, 50, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
-
 		loaded.addAllToScene();
-		loaded.meshes[1].parent = this.pongRoot;
-		this.gameMeshes.push(loaded.meshes[1] as Mesh);
+		loaded.meshes[0].parent = this.pongRoot;
+		this.gameMeshes.push(loaded.meshes[0] as Mesh);
 
+		const headMesh = this.scene.getMeshByName('Head.001') as Mesh;
+		// const headmat = new StandardMaterial('headmat', this.scene);
+		// headmat.diffuseColor = new Color3(1., 1, 1);
+		// headMesh.material = headmat;
+		const mouthMesh = this.scene.getMeshByName('Mouth.001') as Mesh;
+		const eyeMesh = this.scene.getMeshByName('Eyes.001') as Mesh;
+		// const eyemat = new StandardMaterial('eyemat', this.scene);
+		// eyemat.diffuseColor = new Color3(1., 0, 0);
+		// eyeMesh.material = eyemat;
 
-		//this.scene.debugLayer.show();
+		if (mouthMesh && mouthMesh.morphTargetManager) {
+			const smileTarget = mouthMesh.morphTargetManager.getTarget(0);
 
-		// await this.gears.load();
-		//
+			smileTarget.influence = 0.;
+
+			console.log("Statue is now smiling!");
+		}
+
+		if (headMesh && headMesh.morphTargetManager) {
+			const smileTarget = headMesh.morphTargetManager.getTarget(0);
+
+			smileTarget.influence = 0.;
+
+			console.log("Statue is now smiling!");
+		}
+
 		await this.field.load();
 
 		this.scene.meshes.forEach((mesh) => {

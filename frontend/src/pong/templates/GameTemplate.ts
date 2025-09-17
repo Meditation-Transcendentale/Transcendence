@@ -30,7 +30,7 @@ export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localP
 		const x = i % 2 ? -posX : posX;
 		const rotation_y = i % 2 ? -90 * Math.PI / 180 : 90 * Math.PI / 180;
 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.25, 0), 0));
-		if (i === localPaddleId || gameMode == "local"){
+		if (i === localPaddleId || gameMode == "local") {
 			paddleEntity.addComponent(new InputComponent(true, gameMode));
 		}
 		else
