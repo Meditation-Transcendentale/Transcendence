@@ -43,9 +43,9 @@ async function init() {
 		if (e.key == "p") {
 			NotificationManager.addText(`${performance.now()}`)
 		}
-		if (e.key == "t") {
-			postRequest("friends/add", { inputUsername: "Erwan"});
-		}
+		//if (e.key == "") {
+		//	postRequest("friends/add", { inputUsername: "Erwan"});
+		//}
 	})
 }
 window.addEventListener("DOMContentLoaded", () => { init() })

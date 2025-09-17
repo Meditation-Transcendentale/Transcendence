@@ -68,6 +68,7 @@ export class BrickBreaker {
 		}
 
 		this.reset();
+
 		this.layers = Math.ceil((Math.random() * 5) + 1);
 		this.cols = Math.ceil((Math.random() * 5) + 1);
 		this.ball.bricksLeft = this.layers * this.cols;

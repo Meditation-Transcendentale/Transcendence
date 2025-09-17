@@ -81,15 +81,19 @@ export default class UIService {
 					const [, , gameId] = m.subject.split('.');
 					const { winner } = decodeMatchEnd(m.data);
 					const buf = encodeServerMessage({ end: [winner] });
+
 					for (const sid of this.games.get(gameId) || []) {
 						const s = this.sessions.get(sid);
-						if (s.ws.isAlive) {
+						if (s && s.gameId === gameId && s.ws.isAlive) {
 							s.ws.send(buf, /* isBinary= */ true);
 							s.ws.close();
 						}
+						this.sessions.delete(sid);
+
 					}
 					this.allowedByGame.delete(gameId);
 					this.games.delete(gameId);
+					this.readyPlayers.delete(gameId);
 					console.log(`Game ${gameId} ended, winner paddleId=${winner}`);
 				}
 			})();
@@ -149,9 +153,26 @@ export default class UIService {
 
 	handleQuit(ws) {
 		const sess = this.sessions.get(ws.uuid);
-		const topic = `games.${sess.mode}.${sess.gameId}.match.quit`;
-		natsClient.publish(topic, encodeMatchQuit({ uuid: ws.uuid }));
-		// ws.close();
+		if (!sess) return;
+
+		const { uuid, mode, gameId } = sess;
+
+		const topic = `games.${mode}.${gameId}.match.quit`;
+		natsClient.publish(topic, encodeMatchQuit({ uuid }));
+
+		this.sessions.delete(uuid);
+
+		const gameSessionSet = this.games.get(gameId);
+		if (gameSessionSet) {
+			gameSessionSet.delete(uuid);
+		}
+
+		const readySet = this.readyPlayers.get(gameId);
+		if (readySet) {
+			readySet.delete(uuid);
+		}
+
+		//ws.close();
 	}
 
 	handleReady(ws) {

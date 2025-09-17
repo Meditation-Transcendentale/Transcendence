@@ -1,4 +1,6 @@
 @import url("font.css");
+@import url("inputs.css");
+@import url("popup.css");
 
 ::selection {
 	color: black !important;
@@ -509,7 +511,7 @@ input[on] {
 
 }
 
-details {
+#utils-details {
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -527,7 +529,7 @@ input[type="number"] {
 }
 
 
-details>div::before {
+#utils-details>div::before {
 	display: inline-block;
 	content: attr(name)": ";
 	width: 20vh;

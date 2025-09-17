@@ -5,13 +5,14 @@ import { notif } from "./proto/message.js";
 import { User } from "./User";
 import { getRequest, postRequest, deleteRequest } from "./requests";
 import { Popup } from "./Popup";
+import { gFriendList } from "./Friendlist";
 
 
 class NotificationManagerC {
 	private container: HTMLDivElement;
 	private defaultDiv: HTMLDivElement;
 
-	private defaultDuration = 5000; //in millisecond
+	private defaultDuration = 10000; //in millisecond
 
 	private canceled!: Array<HTMLElement>;
 	private state = false;
@@ -129,18 +130,28 @@ class NotificationManagerC {
 					const n = this.defaultDiv.cloneNode(true) as HTMLDivElement;
 					const p = this.defaultFriendPopup.cloneNode(true) as HTMLDivElement;
 					const popSpan = document.createElement('span');
-					getRequest(`info/uuid/${newNotification.friendRequest.sender}`)
-						.then((json) => {
-							const senderUsername = (json as any).username;
+					postRequest("info/search", { identifier: newNotification.friendRequest.sender, type: "uuid" }) //data.username
+						.then((json: any) => {
+							const senderUsername = json.data.username;
 							n.innerText = `Friend Request: ${senderUsername}`;
 							popSpan.innerText = `${senderUsername} wants to be friends.`;
+
+							const d = gFriendList.addToInvite(senderUsername, newNotification.friendRequest!.sender as string);
+
 							p.querySelector("#friend-request-yes")?.addEventListener('click', () => {
 								postRequest(`friends/accept`, { inputUsername: senderUsername })
-									.then(() => { Popup.removePopup() })
+									.then(() => {
+										Popup.removePopup();
+										gFriendList.addToFriend(senderUsername, json.data.uuid, json.data.status);
+										d.remove();
+									})
 							});
 							p.querySelector("#friend-request-no")?.addEventListener('click', () => {
 								deleteRequest(`friends/decline`, { inputUsername: senderUsername })
-									.then(() => { Popup.removePopup() })
+									.then(() => {
+										Popup.removePopup();
+										d.remove();
+									})
 							});
 						});
 					p.appendChild(popSpan);
@@ -151,10 +162,11 @@ class NotificationManagerC {
 				}
 				if (newNotification.friendAccept != null) {
 					const n = this.defaultDiv.cloneNode(true) as HTMLDivElement;
-					getRequest(`info/uuid/${newNotification.friendAccept.sender}`)
-						.then((json) => {
-							const senderUsername = (json as any).username;
+					postRequest("info/search", { identifier: newNotification.friendAccept.sender, type: "uuid" }) //data.username
+						.then((json: any) => {
+							const senderUsername = json.data.username;
 							n.innerText = `${senderUsername} accepted to be friends.`;
+							gFriendList.addToFriend(senderUsername, json.data.uuid, json.data.status);
 						});
 					NotificationManager.addDiv(n);
 				}
@@ -163,9 +175,9 @@ class NotificationManagerC {
 					const n = this.defaultDiv.cloneNode(true) as HTMLDivElement;
 					const p = this.defaultFriendPopup.cloneNode(true) as HTMLDivElement;
 					const popSpan = document.createElement('span');
-					getRequest(`info/uuid/${newNotification.gameInvite.sender}`)
-						.then((json) => {
-							const senderUsername = (json as any).username;
+					postRequest("info/search", { identifier: newNotification.gameInvite.sender, type: "uuid" }) //data.username
+						.then((json: any) => {
+							const senderUsername = json.data.username;
 							n.innerText = `Game invite: ${senderUsername}.`;
 							popSpan.innerText = `${senderUsername} invited you to a game.`;
 							p.querySelector("#game-invite-yes")?.addEventListener('click', () => {
@@ -180,8 +192,10 @@ class NotificationManagerC {
 					NotificationManager.addDiv(n);
 				}
 				if (newNotification.statusUpdate != null) {
-					console.log(`NEW STATUS: ${newNotification.statusUpdate.sender}|${newNotification.statusUpdate.status}|${newNotification.statusUpdate?.option}`);
+					gFriendList.updateStatus(newNotification.statusUpdate.sender as string, newNotification.statusUpdate.status as string)
 				}
+				console.log("Notif: ", newNotification);
+
 			}
 
 			this.ws.onerror = (err) => {

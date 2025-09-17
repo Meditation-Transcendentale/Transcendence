@@ -27,6 +27,7 @@ export const shared = $root.shared = (() => {
          * @property {number|null} [y] Ball y
          * @property {number|null} [vx] Ball vx
          * @property {number|null} [vy] Ball vy
+         * @property {boolean|null} [disabled] Ball disabled
          */
 
         /**
@@ -85,6 +86,14 @@ export const shared = $root.shared = (() => {
         Ball.prototype.vy = 0;
 
         /**
+         * Ball disabled.
+         * @member {boolean} disabled
+         * @memberof shared.Ball
+         * @instance
+         */
+        Ball.prototype.disabled = false;
+
+        /**
          * Creates a new Ball instance using the specified properties.
          * @function create
          * @memberof shared.Ball
@@ -111,13 +120,15 @@ export const shared = $root.shared = (() => {
             if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
             if (message.x != null && Object.hasOwnProperty.call(message, "x"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.x);
+                writer.uint32(/* id 2, wireType 5 =*/21).float(message.x);
             if (message.y != null && Object.hasOwnProperty.call(message, "y"))
-                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.y);
+                writer.uint32(/* id 3, wireType 5 =*/29).float(message.y);
             if (message.vx != null && Object.hasOwnProperty.call(message, "vx"))
-                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.vx);
+                writer.uint32(/* id 4, wireType 5 =*/37).float(message.vx);
             if (message.vy != null && Object.hasOwnProperty.call(message, "vy"))
-                writer.uint32(/* id 5, wireType 0 =*/40).int32(message.vy);
+                writer.uint32(/* id 5, wireType 5 =*/45).float(message.vy);
+            if (message.disabled != null && Object.hasOwnProperty.call(message, "disabled"))
+                writer.uint32(/* id 6, wireType 0 =*/48).bool(message.disabled);
             return writer;
         };
 
@@ -159,19 +170,23 @@ export const shared = $root.shared = (() => {
                         break;
                     }
                 case 2: {
-                        message.x = reader.int32();
+                        message.x = reader.float();
                         break;
                     }
                 case 3: {
-                        message.y = reader.int32();
+                        message.y = reader.float();
                         break;
                     }
                 case 4: {
-                        message.vx = reader.int32();
+                        message.vx = reader.float();
                         break;
                     }
                 case 5: {
-                        message.vy = reader.int32();
+                        message.vy = reader.float();
+                        break;
+                    }
+                case 6: {
+                        message.disabled = reader.bool();
                         break;
                     }
                 default:
@@ -213,17 +228,20 @@ export const shared = $root.shared = (() => {
                 if (!$util.isInteger(message.id))
                     return "id: integer expected";
             if (message.x != null && message.hasOwnProperty("x"))
-                if (!$util.isInteger(message.x))
-                    return "x: integer expected";
+                if (typeof message.x !== "number")
+                    return "x: number expected";
             if (message.y != null && message.hasOwnProperty("y"))
-                if (!$util.isInteger(message.y))
-                    return "y: integer expected";
+                if (typeof message.y !== "number")
+                    return "y: number expected";
             if (message.vx != null && message.hasOwnProperty("vx"))
-                if (!$util.isInteger(message.vx))
-                    return "vx: integer expected";
+                if (typeof message.vx !== "number")
+                    return "vx: number expected";
             if (message.vy != null && message.hasOwnProperty("vy"))
-                if (!$util.isInteger(message.vy))
-                    return "vy: integer expected";
+                if (typeof message.vy !== "number")
+                    return "vy: number expected";
+            if (message.disabled != null && message.hasOwnProperty("disabled"))
+                if (typeof message.disabled !== "boolean")
+                    return "disabled: boolean expected";
             return null;
         };
 
@@ -242,13 +260,15 @@ export const shared = $root.shared = (() => {
             if (object.id != null)
                 message.id = object.id | 0;
             if (object.x != null)
-                message.x = object.x | 0;
+                message.x = Number(object.x);
             if (object.y != null)
-                message.y = object.y | 0;
+                message.y = Number(object.y);
             if (object.vx != null)
-                message.vx = object.vx | 0;
+                message.vx = Number(object.vx);
             if (object.vy != null)
-                message.vy = object.vy | 0;
+                message.vy = Number(object.vy);
+            if (object.disabled != null)
+                message.disabled = Boolean(object.disabled);
             return message;
         };
 
@@ -271,17 +291,20 @@ export const shared = $root.shared = (() => {
                 object.y = 0;
                 object.vx = 0;
                 object.vy = 0;
+                object.disabled = false;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
             if (message.x != null && message.hasOwnProperty("x"))
-                object.x = message.x;
+                object.x = options.json && !isFinite(message.x) ? String(message.x) : message.x;
             if (message.y != null && message.hasOwnProperty("y"))
-                object.y = message.y;
+                object.y = options.json && !isFinite(message.y) ? String(message.y) : message.y;
             if (message.vx != null && message.hasOwnProperty("vx"))
-                object.vx = message.vx;
+                object.vx = options.json && !isFinite(message.vx) ? String(message.vx) : message.vx;
             if (message.vy != null && message.hasOwnProperty("vy"))
-                object.vy = message.vy;
+                object.vy = options.json && !isFinite(message.vy) ? String(message.vy) : message.vy;
+            if (message.disabled != null && message.hasOwnProperty("disabled"))
+                object.disabled = message.disabled;
             return object;
         };
 
@@ -321,7 +344,9 @@ export const shared = $root.shared = (() => {
          * @memberof shared
          * @interface IPaddle
          * @property {number|null} [id] Paddle id
+         * @property {number|null} [playerId] Paddle playerId
          * @property {number|null} [move] Paddle move
+         * @property {number|null} [offset] Paddle offset
          * @property {boolean|null} [dead] Paddle dead
          */
 
@@ -349,12 +374,28 @@ export const shared = $root.shared = (() => {
         Paddle.prototype.id = 0;
 
         /**
+         * Paddle playerId.
+         * @member {number} playerId
+         * @memberof shared.Paddle
+         * @instance
+         */
+        Paddle.prototype.playerId = 0;
+
+        /**
          * Paddle move.
          * @member {number} move
          * @memberof shared.Paddle
          * @instance
          */
         Paddle.prototype.move = 0;
+
+        /**
+         * Paddle offset.
+         * @member {number} offset
+         * @memberof shared.Paddle
+         * @instance
+         */
+        Paddle.prototype.offset = 0;
 
         /**
          * Paddle dead.
@@ -390,10 +431,14 @@ export const shared = $root.shared = (() => {
                 writer = $Writer.create();
             if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
+            if (message.playerId != null && Object.hasOwnProperty.call(message, "playerId"))
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.playerId);
             if (message.move != null && Object.hasOwnProperty.call(message, "move"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.move);
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.move);
+            if (message.offset != null && Object.hasOwnProperty.call(message, "offset"))
+                writer.uint32(/* id 4, wireType 5 =*/37).float(message.offset);
             if (message.dead != null && Object.hasOwnProperty.call(message, "dead"))
-                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.dead);
+                writer.uint32(/* id 5, wireType 0 =*/40).bool(message.dead);
             return writer;
         };
 
@@ -435,10 +480,18 @@ export const shared = $root.shared = (() => {
                         break;
                     }
                 case 2: {
-                        message.move = reader.int32();
+                        message.playerId = reader.int32();
                         break;
                     }
                 case 3: {
+                        message.move = reader.int32();
+                        break;
+                    }
+                case 4: {
+                        message.offset = reader.float();
+                        break;
+                    }
+                case 5: {
                         message.dead = reader.bool();
                         break;
                     }
@@ -480,9 +533,15 @@ export const shared = $root.shared = (() => {
             if (message.id != null && message.hasOwnProperty("id"))
                 if (!$util.isInteger(message.id))
                     return "id: integer expected";
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                if (!$util.isInteger(message.playerId))
+                    return "playerId: integer expected";
             if (message.move != null && message.hasOwnProperty("move"))
                 if (!$util.isInteger(message.move))
                     return "move: integer expected";
+            if (message.offset != null && message.hasOwnProperty("offset"))
+                if (typeof message.offset !== "number")
+                    return "offset: number expected";
             if (message.dead != null && message.hasOwnProperty("dead"))
                 if (typeof message.dead !== "boolean")
                     return "dead: boolean expected";
@@ -503,8 +562,12 @@ export const shared = $root.shared = (() => {
             let message = new $root.shared.Paddle();
             if (object.id != null)
                 message.id = object.id | 0;
+            if (object.playerId != null)
+                message.playerId = object.playerId | 0;
             if (object.move != null)
                 message.move = object.move | 0;
+            if (object.offset != null)
+                message.offset = Number(object.offset);
             if (object.dead != null)
                 message.dead = Boolean(object.dead);
             return message;
@@ -525,13 +588,19 @@ export const shared = $root.shared = (() => {
             let object = {};
             if (options.defaults) {
                 object.id = 0;
+                object.playerId = 0;
                 object.move = 0;
+                object.offset = 0;
                 object.dead = false;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                object.playerId = message.playerId;
             if (message.move != null && message.hasOwnProperty("move"))
                 object.move = message.move;
+            if (message.offset != null && message.hasOwnProperty("offset"))
+                object.offset = options.json && !isFinite(message.offset) ? String(message.offset) : message.offset;
             if (message.dead != null && message.hasOwnProperty("dead"))
                 object.dead = message.dead;
             return object;
@@ -1000,6 +1069,875 @@ export const shared = $root.shared = (() => {
         return Goal;
     })();
 
+    shared.GameEvent = (function() {
+
+        /**
+         * Properties of a GameEvent.
+         * @memberof shared
+         * @interface IGameEvent
+         * @property {string|null} [type] GameEvent type
+         * @property {string|null} [phase] GameEvent phase
+         * @property {number|null} [remainingPlayers] GameEvent remainingPlayers
+         * @property {number|Long|null} [timestamp] GameEvent timestamp
+         * @property {Array.<number>|null} [activePlayers] GameEvent activePlayers
+         * @property {Object.<string,number>|null} [playerMapping] GameEvent playerMapping
+         */
+
+        /**
+         * Constructs a new GameEvent.
+         * @memberof shared
+         * @classdesc Represents a GameEvent.
+         * @implements IGameEvent
+         * @constructor
+         * @param {shared.IGameEvent=} [properties] Properties to set
+         */
+        function GameEvent(properties) {
+            this.activePlayers = [];
+            this.playerMapping = {};
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GameEvent type.
+         * @member {string} type
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.type = "";
+
+        /**
+         * GameEvent phase.
+         * @member {string} phase
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.phase = "";
+
+        /**
+         * GameEvent remainingPlayers.
+         * @member {number} remainingPlayers
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.remainingPlayers = 0;
+
+        /**
+         * GameEvent timestamp.
+         * @member {number|Long} timestamp
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.timestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * GameEvent activePlayers.
+         * @member {Array.<number>} activePlayers
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.activePlayers = $util.emptyArray;
+
+        /**
+         * GameEvent playerMapping.
+         * @member {Object.<string,number>} playerMapping
+         * @memberof shared.GameEvent
+         * @instance
+         */
+        GameEvent.prototype.playerMapping = $util.emptyObject;
+
+        /**
+         * Creates a new GameEvent instance using the specified properties.
+         * @function create
+         * @memberof shared.GameEvent
+         * @static
+         * @param {shared.IGameEvent=} [properties] Properties to set
+         * @returns {shared.GameEvent} GameEvent instance
+         */
+        GameEvent.create = function create(properties) {
+            return new GameEvent(properties);
+        };
+
+        /**
+         * Encodes the specified GameEvent message. Does not implicitly {@link shared.GameEvent.verify|verify} messages.
+         * @function encode
+         * @memberof shared.GameEvent
+         * @static
+         * @param {shared.IGameEvent} message GameEvent message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameEvent.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.type != null && Object.hasOwnProperty.call(message, "type"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.type);
+            if (message.phase != null && Object.hasOwnProperty.call(message, "phase"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.phase);
+            if (message.remainingPlayers != null && Object.hasOwnProperty.call(message, "remainingPlayers"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.remainingPlayers);
+            if (message.timestamp != null && Object.hasOwnProperty.call(message, "timestamp"))
+                writer.uint32(/* id 4, wireType 0 =*/32).int64(message.timestamp);
+            if (message.activePlayers != null && message.activePlayers.length) {
+                writer.uint32(/* id 5, wireType 2 =*/42).fork();
+                for (let i = 0; i < message.activePlayers.length; ++i)
+                    writer.int32(message.activePlayers[i]);
+                writer.ldelim();
+            }
+            if (message.playerMapping != null && Object.hasOwnProperty.call(message, "playerMapping"))
+                for (let keys = Object.keys(message.playerMapping), i = 0; i < keys.length; ++i)
+                    writer.uint32(/* id 6, wireType 2 =*/50).fork().uint32(/* id 1, wireType 0 =*/8).int32(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.playerMapping[keys[i]]).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GameEvent message, length delimited. Does not implicitly {@link shared.GameEvent.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.GameEvent
+         * @static
+         * @param {shared.IGameEvent} message GameEvent message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameEvent.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GameEvent message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.GameEvent
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.GameEvent} GameEvent
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameEvent.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.GameEvent(), key, value;
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.type = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.phase = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.remainingPlayers = reader.int32();
+                        break;
+                    }
+                case 4: {
+                        message.timestamp = reader.int64();
+                        break;
+                    }
+                case 5: {
+                        if (!(message.activePlayers && message.activePlayers.length))
+                            message.activePlayers = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.activePlayers.push(reader.int32());
+                        } else
+                            message.activePlayers.push(reader.int32());
+                        break;
+                    }
+                case 6: {
+                        if (message.playerMapping === $util.emptyObject)
+                            message.playerMapping = {};
+                        let end2 = reader.uint32() + reader.pos;
+                        key = 0;
+                        value = 0;
+                        while (reader.pos < end2) {
+                            let tag2 = reader.uint32();
+                            switch (tag2 >>> 3) {
+                            case 1:
+                                key = reader.int32();
+                                break;
+                            case 2:
+                                value = reader.int32();
+                                break;
+                            default:
+                                reader.skipType(tag2 & 7);
+                                break;
+                            }
+                        }
+                        message.playerMapping[key] = value;
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GameEvent message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.GameEvent
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.GameEvent} GameEvent
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameEvent.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GameEvent message.
+         * @function verify
+         * @memberof shared.GameEvent
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GameEvent.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.type != null && message.hasOwnProperty("type"))
+                if (!$util.isString(message.type))
+                    return "type: string expected";
+            if (message.phase != null && message.hasOwnProperty("phase"))
+                if (!$util.isString(message.phase))
+                    return "phase: string expected";
+            if (message.remainingPlayers != null && message.hasOwnProperty("remainingPlayers"))
+                if (!$util.isInteger(message.remainingPlayers))
+                    return "remainingPlayers: integer expected";
+            if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                if (!$util.isInteger(message.timestamp) && !(message.timestamp && $util.isInteger(message.timestamp.low) && $util.isInteger(message.timestamp.high)))
+                    return "timestamp: integer|Long expected";
+            if (message.activePlayers != null && message.hasOwnProperty("activePlayers")) {
+                if (!Array.isArray(message.activePlayers))
+                    return "activePlayers: array expected";
+                for (let i = 0; i < message.activePlayers.length; ++i)
+                    if (!$util.isInteger(message.activePlayers[i]))
+                        return "activePlayers: integer[] expected";
+            }
+            if (message.playerMapping != null && message.hasOwnProperty("playerMapping")) {
+                if (!$util.isObject(message.playerMapping))
+                    return "playerMapping: object expected";
+                let key = Object.keys(message.playerMapping);
+                for (let i = 0; i < key.length; ++i) {
+                    if (!$util.key32Re.test(key[i]))
+                        return "playerMapping: integer key{k:int32} expected";
+                    if (!$util.isInteger(message.playerMapping[key[i]]))
+                        return "playerMapping: integer{k:int32} expected";
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GameEvent message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.GameEvent
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.GameEvent} GameEvent
+         */
+        GameEvent.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.GameEvent)
+                return object;
+            let message = new $root.shared.GameEvent();
+            if (object.type != null)
+                message.type = String(object.type);
+            if (object.phase != null)
+                message.phase = String(object.phase);
+            if (object.remainingPlayers != null)
+                message.remainingPlayers = object.remainingPlayers | 0;
+            if (object.timestamp != null)
+                if ($util.Long)
+                    (message.timestamp = $util.Long.fromValue(object.timestamp)).unsigned = false;
+                else if (typeof object.timestamp === "string")
+                    message.timestamp = parseInt(object.timestamp, 10);
+                else if (typeof object.timestamp === "number")
+                    message.timestamp = object.timestamp;
+                else if (typeof object.timestamp === "object")
+                    message.timestamp = new $util.LongBits(object.timestamp.low >>> 0, object.timestamp.high >>> 0).toNumber();
+            if (object.activePlayers) {
+                if (!Array.isArray(object.activePlayers))
+                    throw TypeError(".shared.GameEvent.activePlayers: array expected");
+                message.activePlayers = [];
+                for (let i = 0; i < object.activePlayers.length; ++i)
+                    message.activePlayers[i] = object.activePlayers[i] | 0;
+            }
+            if (object.playerMapping) {
+                if (typeof object.playerMapping !== "object")
+                    throw TypeError(".shared.GameEvent.playerMapping: object expected");
+                message.playerMapping = {};
+                for (let keys = Object.keys(object.playerMapping), i = 0; i < keys.length; ++i)
+                    message.playerMapping[keys[i]] = object.playerMapping[keys[i]] | 0;
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GameEvent message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.GameEvent
+         * @static
+         * @param {shared.GameEvent} message GameEvent
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GameEvent.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults)
+                object.activePlayers = [];
+            if (options.objects || options.defaults)
+                object.playerMapping = {};
+            if (options.defaults) {
+                object.type = "";
+                object.phase = "";
+                object.remainingPlayers = 0;
+                if ($util.Long) {
+                    let long = new $util.Long(0, 0, false);
+                    object.timestamp = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.timestamp = options.longs === String ? "0" : 0;
+            }
+            if (message.type != null && message.hasOwnProperty("type"))
+                object.type = message.type;
+            if (message.phase != null && message.hasOwnProperty("phase"))
+                object.phase = message.phase;
+            if (message.remainingPlayers != null && message.hasOwnProperty("remainingPlayers"))
+                object.remainingPlayers = message.remainingPlayers;
+            if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                if (typeof message.timestamp === "number")
+                    object.timestamp = options.longs === String ? String(message.timestamp) : message.timestamp;
+                else
+                    object.timestamp = options.longs === String ? $util.Long.prototype.toString.call(message.timestamp) : options.longs === Number ? new $util.LongBits(message.timestamp.low >>> 0, message.timestamp.high >>> 0).toNumber() : message.timestamp;
+            if (message.activePlayers && message.activePlayers.length) {
+                object.activePlayers = [];
+                for (let j = 0; j < message.activePlayers.length; ++j)
+                    object.activePlayers[j] = message.activePlayers[j];
+            }
+            let keys2;
+            if (message.playerMapping && (keys2 = Object.keys(message.playerMapping)).length) {
+                object.playerMapping = {};
+                for (let j = 0; j < keys2.length; ++j)
+                    object.playerMapping[keys2[j]] = message.playerMapping[keys2[j]];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this GameEvent to JSON.
+         * @function toJSON
+         * @memberof shared.GameEvent
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GameEvent.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GameEvent
+         * @function getTypeUrl
+         * @memberof shared.GameEvent
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GameEvent.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.GameEvent";
+        };
+
+        return GameEvent;
+    })();
+
+    shared.GameStateInfo = (function() {
+
+        /**
+         * Properties of a GameStateInfo.
+         * @memberof shared
+         * @interface IGameStateInfo
+         * @property {Array.<number>|null} [activePlayers] GameStateInfo activePlayers
+         * @property {Array.<number>|null} [eliminatedPlayers] GameStateInfo eliminatedPlayers
+         * @property {string|null} [currentPhase] GameStateInfo currentPhase
+         * @property {boolean|null} [isRebuilding] GameStateInfo isRebuilding
+         * @property {number|Long|null} [rebuildTimeRemaining] GameStateInfo rebuildTimeRemaining
+         * @property {Object.<string,number>|null} [playerMapping] GameStateInfo playerMapping
+         * @property {boolean|null} [isGameOver] GameStateInfo isGameOver
+         * @property {number|null} [winner] GameStateInfo winner
+         */
+
+        /**
+         * Constructs a new GameStateInfo.
+         * @memberof shared
+         * @classdesc Represents a GameStateInfo.
+         * @implements IGameStateInfo
+         * @constructor
+         * @param {shared.IGameStateInfo=} [properties] Properties to set
+         */
+        function GameStateInfo(properties) {
+            this.activePlayers = [];
+            this.eliminatedPlayers = [];
+            this.playerMapping = {};
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GameStateInfo activePlayers.
+         * @member {Array.<number>} activePlayers
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.activePlayers = $util.emptyArray;
+
+        /**
+         * GameStateInfo eliminatedPlayers.
+         * @member {Array.<number>} eliminatedPlayers
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.eliminatedPlayers = $util.emptyArray;
+
+        /**
+         * GameStateInfo currentPhase.
+         * @member {string} currentPhase
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.currentPhase = "";
+
+        /**
+         * GameStateInfo isRebuilding.
+         * @member {boolean} isRebuilding
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.isRebuilding = false;
+
+        /**
+         * GameStateInfo rebuildTimeRemaining.
+         * @member {number|Long} rebuildTimeRemaining
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.rebuildTimeRemaining = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * GameStateInfo playerMapping.
+         * @member {Object.<string,number>} playerMapping
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.playerMapping = $util.emptyObject;
+
+        /**
+         * GameStateInfo isGameOver.
+         * @member {boolean} isGameOver
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.isGameOver = false;
+
+        /**
+         * GameStateInfo winner.
+         * @member {number} winner
+         * @memberof shared.GameStateInfo
+         * @instance
+         */
+        GameStateInfo.prototype.winner = 0;
+
+        /**
+         * Creates a new GameStateInfo instance using the specified properties.
+         * @function create
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {shared.IGameStateInfo=} [properties] Properties to set
+         * @returns {shared.GameStateInfo} GameStateInfo instance
+         */
+        GameStateInfo.create = function create(properties) {
+            return new GameStateInfo(properties);
+        };
+
+        /**
+         * Encodes the specified GameStateInfo message. Does not implicitly {@link shared.GameStateInfo.verify|verify} messages.
+         * @function encode
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {shared.IGameStateInfo} message GameStateInfo message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameStateInfo.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.activePlayers != null && message.activePlayers.length) {
+                writer.uint32(/* id 1, wireType 2 =*/10).fork();
+                for (let i = 0; i < message.activePlayers.length; ++i)
+                    writer.int32(message.activePlayers[i]);
+                writer.ldelim();
+            }
+            if (message.eliminatedPlayers != null && message.eliminatedPlayers.length) {
+                writer.uint32(/* id 2, wireType 2 =*/18).fork();
+                for (let i = 0; i < message.eliminatedPlayers.length; ++i)
+                    writer.int32(message.eliminatedPlayers[i]);
+                writer.ldelim();
+            }
+            if (message.currentPhase != null && Object.hasOwnProperty.call(message, "currentPhase"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.currentPhase);
+            if (message.isRebuilding != null && Object.hasOwnProperty.call(message, "isRebuilding"))
+                writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isRebuilding);
+            if (message.rebuildTimeRemaining != null && Object.hasOwnProperty.call(message, "rebuildTimeRemaining"))
+                writer.uint32(/* id 5, wireType 0 =*/40).int64(message.rebuildTimeRemaining);
+            if (message.playerMapping != null && Object.hasOwnProperty.call(message, "playerMapping"))
+                for (let keys = Object.keys(message.playerMapping), i = 0; i < keys.length; ++i)
+                    writer.uint32(/* id 6, wireType 2 =*/50).fork().uint32(/* id 1, wireType 0 =*/8).int32(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.playerMapping[keys[i]]).ldelim();
+            if (message.isGameOver != null && Object.hasOwnProperty.call(message, "isGameOver"))
+                writer.uint32(/* id 7, wireType 0 =*/56).bool(message.isGameOver);
+            if (message.winner != null && Object.hasOwnProperty.call(message, "winner"))
+                writer.uint32(/* id 8, wireType 0 =*/64).int32(message.winner);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GameStateInfo message, length delimited. Does not implicitly {@link shared.GameStateInfo.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {shared.IGameStateInfo} message GameStateInfo message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameStateInfo.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GameStateInfo message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.GameStateInfo} GameStateInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameStateInfo.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.GameStateInfo(), key, value;
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.activePlayers && message.activePlayers.length))
+                            message.activePlayers = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.activePlayers.push(reader.int32());
+                        } else
+                            message.activePlayers.push(reader.int32());
+                        break;
+                    }
+                case 2: {
+                        if (!(message.eliminatedPlayers && message.eliminatedPlayers.length))
+                            message.eliminatedPlayers = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.eliminatedPlayers.push(reader.int32());
+                        } else
+                            message.eliminatedPlayers.push(reader.int32());
+                        break;
+                    }
+                case 3: {
+                        message.currentPhase = reader.string();
+                        break;
+                    }
+                case 4: {
+                        message.isRebuilding = reader.bool();
+                        break;
+                    }
+                case 5: {
+                        message.rebuildTimeRemaining = reader.int64();
+                        break;
+                    }
+                case 6: {
+                        if (message.playerMapping === $util.emptyObject)
+                            message.playerMapping = {};
+                        let end2 = reader.uint32() + reader.pos;
+                        key = 0;
+                        value = 0;
+                        while (reader.pos < end2) {
+                            let tag2 = reader.uint32();
+                            switch (tag2 >>> 3) {
+                            case 1:
+                                key = reader.int32();
+                                break;
+                            case 2:
+                                value = reader.int32();
+                                break;
+                            default:
+                                reader.skipType(tag2 & 7);
+                                break;
+                            }
+                        }
+                        message.playerMapping[key] = value;
+                        break;
+                    }
+                case 7: {
+                        message.isGameOver = reader.bool();
+                        break;
+                    }
+                case 8: {
+                        message.winner = reader.int32();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GameStateInfo message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.GameStateInfo} GameStateInfo
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameStateInfo.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GameStateInfo message.
+         * @function verify
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GameStateInfo.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.activePlayers != null && message.hasOwnProperty("activePlayers")) {
+                if (!Array.isArray(message.activePlayers))
+                    return "activePlayers: array expected";
+                for (let i = 0; i < message.activePlayers.length; ++i)
+                    if (!$util.isInteger(message.activePlayers[i]))
+                        return "activePlayers: integer[] expected";
+            }
+            if (message.eliminatedPlayers != null && message.hasOwnProperty("eliminatedPlayers")) {
+                if (!Array.isArray(message.eliminatedPlayers))
+                    return "eliminatedPlayers: array expected";
+                for (let i = 0; i < message.eliminatedPlayers.length; ++i)
+                    if (!$util.isInteger(message.eliminatedPlayers[i]))
+                        return "eliminatedPlayers: integer[] expected";
+            }
+            if (message.currentPhase != null && message.hasOwnProperty("currentPhase"))
+                if (!$util.isString(message.currentPhase))
+                    return "currentPhase: string expected";
+            if (message.isRebuilding != null && message.hasOwnProperty("isRebuilding"))
+                if (typeof message.isRebuilding !== "boolean")
+                    return "isRebuilding: boolean expected";
+            if (message.rebuildTimeRemaining != null && message.hasOwnProperty("rebuildTimeRemaining"))
+                if (!$util.isInteger(message.rebuildTimeRemaining) && !(message.rebuildTimeRemaining && $util.isInteger(message.rebuildTimeRemaining.low) && $util.isInteger(message.rebuildTimeRemaining.high)))
+                    return "rebuildTimeRemaining: integer|Long expected";
+            if (message.playerMapping != null && message.hasOwnProperty("playerMapping")) {
+                if (!$util.isObject(message.playerMapping))
+                    return "playerMapping: object expected";
+                let key = Object.keys(message.playerMapping);
+                for (let i = 0; i < key.length; ++i) {
+                    if (!$util.key32Re.test(key[i]))
+                        return "playerMapping: integer key{k:int32} expected";
+                    if (!$util.isInteger(message.playerMapping[key[i]]))
+                        return "playerMapping: integer{k:int32} expected";
+                }
+            }
+            if (message.isGameOver != null && message.hasOwnProperty("isGameOver"))
+                if (typeof message.isGameOver !== "boolean")
+                    return "isGameOver: boolean expected";
+            if (message.winner != null && message.hasOwnProperty("winner"))
+                if (!$util.isInteger(message.winner))
+                    return "winner: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a GameStateInfo message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.GameStateInfo} GameStateInfo
+         */
+        GameStateInfo.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.GameStateInfo)
+                return object;
+            let message = new $root.shared.GameStateInfo();
+            if (object.activePlayers) {
+                if (!Array.isArray(object.activePlayers))
+                    throw TypeError(".shared.GameStateInfo.activePlayers: array expected");
+                message.activePlayers = [];
+                for (let i = 0; i < object.activePlayers.length; ++i)
+                    message.activePlayers[i] = object.activePlayers[i] | 0;
+            }
+            if (object.eliminatedPlayers) {
+                if (!Array.isArray(object.eliminatedPlayers))
+                    throw TypeError(".shared.GameStateInfo.eliminatedPlayers: array expected");
+                message.eliminatedPlayers = [];
+                for (let i = 0; i < object.eliminatedPlayers.length; ++i)
+                    message.eliminatedPlayers[i] = object.eliminatedPlayers[i] | 0;
+            }
+            if (object.currentPhase != null)
+                message.currentPhase = String(object.currentPhase);
+            if (object.isRebuilding != null)
+                message.isRebuilding = Boolean(object.isRebuilding);
+            if (object.rebuildTimeRemaining != null)
+                if ($util.Long)
+                    (message.rebuildTimeRemaining = $util.Long.fromValue(object.rebuildTimeRemaining)).unsigned = false;
+                else if (typeof object.rebuildTimeRemaining === "string")
+                    message.rebuildTimeRemaining = parseInt(object.rebuildTimeRemaining, 10);
+                else if (typeof object.rebuildTimeRemaining === "number")
+                    message.rebuildTimeRemaining = object.rebuildTimeRemaining;
+                else if (typeof object.rebuildTimeRemaining === "object")
+                    message.rebuildTimeRemaining = new $util.LongBits(object.rebuildTimeRemaining.low >>> 0, object.rebuildTimeRemaining.high >>> 0).toNumber();
+            if (object.playerMapping) {
+                if (typeof object.playerMapping !== "object")
+                    throw TypeError(".shared.GameStateInfo.playerMapping: object expected");
+                message.playerMapping = {};
+                for (let keys = Object.keys(object.playerMapping), i = 0; i < keys.length; ++i)
+                    message.playerMapping[keys[i]] = object.playerMapping[keys[i]] | 0;
+            }
+            if (object.isGameOver != null)
+                message.isGameOver = Boolean(object.isGameOver);
+            if (object.winner != null)
+                message.winner = object.winner | 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GameStateInfo message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {shared.GameStateInfo} message GameStateInfo
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GameStateInfo.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults) {
+                object.activePlayers = [];
+                object.eliminatedPlayers = [];
+            }
+            if (options.objects || options.defaults)
+                object.playerMapping = {};
+            if (options.defaults) {
+                object.currentPhase = "";
+                object.isRebuilding = false;
+                if ($util.Long) {
+                    let long = new $util.Long(0, 0, false);
+                    object.rebuildTimeRemaining = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.rebuildTimeRemaining = options.longs === String ? "0" : 0;
+                object.isGameOver = false;
+                object.winner = 0;
+            }
+            if (message.activePlayers && message.activePlayers.length) {
+                object.activePlayers = [];
+                for (let j = 0; j < message.activePlayers.length; ++j)
+                    object.activePlayers[j] = message.activePlayers[j];
+            }
+            if (message.eliminatedPlayers && message.eliminatedPlayers.length) {
+                object.eliminatedPlayers = [];
+                for (let j = 0; j < message.eliminatedPlayers.length; ++j)
+                    object.eliminatedPlayers[j] = message.eliminatedPlayers[j];
+            }
+            if (message.currentPhase != null && message.hasOwnProperty("currentPhase"))
+                object.currentPhase = message.currentPhase;
+            if (message.isRebuilding != null && message.hasOwnProperty("isRebuilding"))
+                object.isRebuilding = message.isRebuilding;
+            if (message.rebuildTimeRemaining != null && message.hasOwnProperty("rebuildTimeRemaining"))
+                if (typeof message.rebuildTimeRemaining === "number")
+                    object.rebuildTimeRemaining = options.longs === String ? String(message.rebuildTimeRemaining) : message.rebuildTimeRemaining;
+                else
+                    object.rebuildTimeRemaining = options.longs === String ? $util.Long.prototype.toString.call(message.rebuildTimeRemaining) : options.longs === Number ? new $util.LongBits(message.rebuildTimeRemaining.low >>> 0, message.rebuildTimeRemaining.high >>> 0).toNumber() : message.rebuildTimeRemaining;
+            let keys2;
+            if (message.playerMapping && (keys2 = Object.keys(message.playerMapping)).length) {
+                object.playerMapping = {};
+                for (let j = 0; j < keys2.length; ++j)
+                    object.playerMapping[keys2[j]] = message.playerMapping[keys2[j]];
+            }
+            if (message.isGameOver != null && message.hasOwnProperty("isGameOver"))
+                object.isGameOver = message.isGameOver;
+            if (message.winner != null && message.hasOwnProperty("winner"))
+                object.winner = message.winner;
+            return object;
+        };
+
+        /**
+         * Converts this GameStateInfo to JSON.
+         * @function toJSON
+         * @memberof shared.GameStateInfo
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GameStateInfo.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GameStateInfo
+         * @function getTypeUrl
+         * @memberof shared.GameStateInfo
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GameStateInfo.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.GameStateInfo";
+        };
+
+        return GameStateInfo;
+    })();
+
     shared.MatchState = (function() {
 
         /**
@@ -1013,6 +1951,8 @@ export const shared = $root.shared = (() => {
          * @property {Array.<number>|null} [score] MatchState score
          * @property {Array.<number>|null} [ranks] MatchState ranks
          * @property {number|null} [stage] MatchState stage
+         * @property {Array.<shared.IGameEvent>|null} [events] MatchState events
+         * @property {shared.IGameStateInfo|null} [gameState] MatchState gameState
          */
 
         /**
@@ -1028,6 +1968,7 @@ export const shared = $root.shared = (() => {
             this.paddles = [];
             this.score = [];
             this.ranks = [];
+            this.events = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -1091,6 +2032,22 @@ export const shared = $root.shared = (() => {
         MatchState.prototype.stage = 0;
 
         /**
+         * MatchState events.
+         * @member {Array.<shared.IGameEvent>} events
+         * @memberof shared.MatchState
+         * @instance
+         */
+        MatchState.prototype.events = $util.emptyArray;
+
+        /**
+         * MatchState gameState.
+         * @member {shared.IGameStateInfo|null|undefined} gameState
+         * @memberof shared.MatchState
+         * @instance
+         */
+        MatchState.prototype.gameState = null;
+
+        /**
          * Creates a new MatchState instance using the specified properties.
          * @function create
          * @memberof shared.MatchState
@@ -1138,6 +2095,11 @@ export const shared = $root.shared = (() => {
             }
             if (message.stage != null && Object.hasOwnProperty.call(message, "stage"))
                 writer.uint32(/* id 7, wireType 0 =*/56).int32(message.stage);
+            if (message.events != null && message.events.length)
+                for (let i = 0; i < message.events.length; ++i)
+                    $root.shared.GameEvent.encode(message.events[i], writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+            if (message.gameState != null && Object.hasOwnProperty.call(message, "gameState"))
+                $root.shared.GameStateInfo.encode(message.gameState, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
             return writer;
         };
 
@@ -1220,6 +2182,16 @@ export const shared = $root.shared = (() => {
                         message.stage = reader.int32();
                         break;
                     }
+                case 8: {
+                        if (!(message.events && message.events.length))
+                            message.events = [];
+                        message.events.push($root.shared.GameEvent.decode(reader, reader.uint32()));
+                        break;
+                    }
+                case 9: {
+                        message.gameState = $root.shared.GameStateInfo.decode(reader, reader.uint32());
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -1296,6 +2268,20 @@ export const shared = $root.shared = (() => {
             if (message.stage != null && message.hasOwnProperty("stage"))
                 if (!$util.isInteger(message.stage))
                     return "stage: integer expected";
+            if (message.events != null && message.hasOwnProperty("events")) {
+                if (!Array.isArray(message.events))
+                    return "events: array expected";
+                for (let i = 0; i < message.events.length; ++i) {
+                    let error = $root.shared.GameEvent.verify(message.events[i]);
+                    if (error)
+                        return "events." + error;
+                }
+            }
+            if (message.gameState != null && message.hasOwnProperty("gameState")) {
+                let error = $root.shared.GameStateInfo.verify(message.gameState);
+                if (error)
+                    return "gameState." + error;
+            }
             return null;
         };
 
@@ -1358,6 +2344,21 @@ export const shared = $root.shared = (() => {
             }
             if (object.stage != null)
                 message.stage = object.stage | 0;
+            if (object.events) {
+                if (!Array.isArray(object.events))
+                    throw TypeError(".shared.MatchState.events: array expected");
+                message.events = [];
+                for (let i = 0; i < object.events.length; ++i) {
+                    if (typeof object.events[i] !== "object")
+                        throw TypeError(".shared.MatchState.events: object expected");
+                    message.events[i] = $root.shared.GameEvent.fromObject(object.events[i]);
+                }
+            }
+            if (object.gameState != null) {
+                if (typeof object.gameState !== "object")
+                    throw TypeError(".shared.MatchState.gameState: object expected");
+                message.gameState = $root.shared.GameStateInfo.fromObject(object.gameState);
+            }
             return message;
         };
 
@@ -1379,6 +2380,7 @@ export const shared = $root.shared = (() => {
                 object.paddles = [];
                 object.score = [];
                 object.ranks = [];
+                object.events = [];
             }
             if (options.defaults) {
                 object.gameId = "";
@@ -1388,6 +2390,7 @@ export const shared = $root.shared = (() => {
                 } else
                     object.tick = options.longs === String ? "0" : 0;
                 object.stage = 0;
+                object.gameState = null;
             }
             if (message.gameId != null && message.hasOwnProperty("gameId"))
                 object.gameId = message.gameId;
@@ -1418,6 +2421,13 @@ export const shared = $root.shared = (() => {
             }
             if (message.stage != null && message.hasOwnProperty("stage"))
                 object.stage = message.stage;
+            if (message.events && message.events.length) {
+                object.events = [];
+                for (let j = 0; j < message.events.length; ++j)
+                    object.events[j] = $root.shared.GameEvent.toObject(message.events[j], options);
+            }
+            if (message.gameState != null && message.hasOwnProperty("gameState"))
+                object.gameState = $root.shared.GameStateInfo.toObject(message.gameState, options);
             return object;
         };
 
@@ -3224,367 +4234,6 @@ export const shared = $root.shared = (() => {
         return PhysicsRequest;
     })();
 
-    shared.PhysicsResponse = (function() {
-
-        /**
-         * Properties of a PhysicsResponse.
-         * @memberof shared
-         * @interface IPhysicsResponse
-         * @property {string|null} [gameId] PhysicsResponse gameId
-         * @property {number|Long|null} [tick] PhysicsResponse tick
-         * @property {Array.<shared.IBall>|null} [balls] PhysicsResponse balls
-         * @property {Array.<shared.IPaddle>|null} [paddles] PhysicsResponse paddles
-         * @property {shared.IGoal|null} [goal] PhysicsResponse goal
-         */
-
-        /**
-         * Constructs a new PhysicsResponse.
-         * @memberof shared
-         * @classdesc Represents a PhysicsResponse.
-         * @implements IPhysicsResponse
-         * @constructor
-         * @param {shared.IPhysicsResponse=} [properties] Properties to set
-         */
-        function PhysicsResponse(properties) {
-            this.balls = [];
-            this.paddles = [];
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PhysicsResponse gameId.
-         * @member {string} gameId
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.gameId = "";
-
-        /**
-         * PhysicsResponse tick.
-         * @member {number|Long} tick
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.tick = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-        /**
-         * PhysicsResponse balls.
-         * @member {Array.<shared.IBall>} balls
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.balls = $util.emptyArray;
-
-        /**
-         * PhysicsResponse paddles.
-         * @member {Array.<shared.IPaddle>} paddles
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.paddles = $util.emptyArray;
-
-        /**
-         * PhysicsResponse goal.
-         * @member {shared.IGoal|null|undefined} goal
-         * @memberof shared.PhysicsResponse
-         * @instance
-         */
-        PhysicsResponse.prototype.goal = null;
-
-        /**
-         * Creates a new PhysicsResponse instance using the specified properties.
-         * @function create
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {shared.IPhysicsResponse=} [properties] Properties to set
-         * @returns {shared.PhysicsResponse} PhysicsResponse instance
-         */
-        PhysicsResponse.create = function create(properties) {
-            return new PhysicsResponse(properties);
-        };
-
-        /**
-         * Encodes the specified PhysicsResponse message. Does not implicitly {@link shared.PhysicsResponse.verify|verify} messages.
-         * @function encode
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {shared.IPhysicsResponse} message PhysicsResponse message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        PhysicsResponse.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.gameId != null && Object.hasOwnProperty.call(message, "gameId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.gameId);
-            if (message.tick != null && Object.hasOwnProperty.call(message, "tick"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int64(message.tick);
-            if (message.balls != null && message.balls.length)
-                for (let i = 0; i < message.balls.length; ++i)
-                    $root.shared.Ball.encode(message.balls[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            if (message.paddles != null && message.paddles.length)
-                for (let i = 0; i < message.paddles.length; ++i)
-                    $root.shared.Paddle.encode(message.paddles[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-            if (message.goal != null && Object.hasOwnProperty.call(message, "goal"))
-                $root.shared.Goal.encode(message.goal, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PhysicsResponse message, length delimited. Does not implicitly {@link shared.PhysicsResponse.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {shared.IPhysicsResponse} message PhysicsResponse message or plain object to encode
-         * @param {$protobuf.default.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.default.Writer} Writer
-         */
-        PhysicsResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PhysicsResponse message from the specified reader or buffer.
-         * @function decode
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {shared.PhysicsResponse} PhysicsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        PhysicsResponse.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.PhysicsResponse();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.gameId = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.tick = reader.int64();
-                        break;
-                    }
-                case 3: {
-                        if (!(message.balls && message.balls.length))
-                            message.balls = [];
-                        message.balls.push($root.shared.Ball.decode(reader, reader.uint32()));
-                        break;
-                    }
-                case 4: {
-                        if (!(message.paddles && message.paddles.length))
-                            message.paddles = [];
-                        message.paddles.push($root.shared.Paddle.decode(reader, reader.uint32()));
-                        break;
-                    }
-                case 5: {
-                        message.goal = $root.shared.Goal.decode(reader, reader.uint32());
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PhysicsResponse message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {shared.PhysicsResponse} PhysicsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
-         */
-        PhysicsResponse.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PhysicsResponse message.
-         * @function verify
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PhysicsResponse.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.gameId != null && message.hasOwnProperty("gameId"))
-                if (!$util.isString(message.gameId))
-                    return "gameId: string expected";
-            if (message.tick != null && message.hasOwnProperty("tick"))
-                if (!$util.isInteger(message.tick) && !(message.tick && $util.isInteger(message.tick.low) && $util.isInteger(message.tick.high)))
-                    return "tick: integer|Long expected";
-            if (message.balls != null && message.hasOwnProperty("balls")) {
-                if (!Array.isArray(message.balls))
-                    return "balls: array expected";
-                for (let i = 0; i < message.balls.length; ++i) {
-                    let error = $root.shared.Ball.verify(message.balls[i]);
-                    if (error)
-                        return "balls." + error;
-                }
-            }
-            if (message.paddles != null && message.hasOwnProperty("paddles")) {
-                if (!Array.isArray(message.paddles))
-                    return "paddles: array expected";
-                for (let i = 0; i < message.paddles.length; ++i) {
-                    let error = $root.shared.Paddle.verify(message.paddles[i]);
-                    if (error)
-                        return "paddles." + error;
-                }
-            }
-            if (message.goal != null && message.hasOwnProperty("goal")) {
-                let error = $root.shared.Goal.verify(message.goal);
-                if (error)
-                    return "goal." + error;
-            }
-            return null;
-        };
-
-        /**
-         * Creates a PhysicsResponse message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {shared.PhysicsResponse} PhysicsResponse
-         */
-        PhysicsResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.shared.PhysicsResponse)
-                return object;
-            let message = new $root.shared.PhysicsResponse();
-            if (object.gameId != null)
-                message.gameId = String(object.gameId);
-            if (object.tick != null)
-                if ($util.Long)
-                    (message.tick = $util.Long.fromValue(object.tick)).unsigned = false;
-                else if (typeof object.tick === "string")
-                    message.tick = parseInt(object.tick, 10);
-                else if (typeof object.tick === "number")
-                    message.tick = object.tick;
-                else if (typeof object.tick === "object")
-                    message.tick = new $util.LongBits(object.tick.low >>> 0, object.tick.high >>> 0).toNumber();
-            if (object.balls) {
-                if (!Array.isArray(object.balls))
-                    throw TypeError(".shared.PhysicsResponse.balls: array expected");
-                message.balls = [];
-                for (let i = 0; i < object.balls.length; ++i) {
-                    if (typeof object.balls[i] !== "object")
-                        throw TypeError(".shared.PhysicsResponse.balls: object expected");
-                    message.balls[i] = $root.shared.Ball.fromObject(object.balls[i]);
-                }
-            }
-            if (object.paddles) {
-                if (!Array.isArray(object.paddles))
-                    throw TypeError(".shared.PhysicsResponse.paddles: array expected");
-                message.paddles = [];
-                for (let i = 0; i < object.paddles.length; ++i) {
-                    if (typeof object.paddles[i] !== "object")
-                        throw TypeError(".shared.PhysicsResponse.paddles: object expected");
-                    message.paddles[i] = $root.shared.Paddle.fromObject(object.paddles[i]);
-                }
-            }
-            if (object.goal != null) {
-                if (typeof object.goal !== "object")
-                    throw TypeError(".shared.PhysicsResponse.goal: object expected");
-                message.goal = $root.shared.Goal.fromObject(object.goal);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PhysicsResponse message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {shared.PhysicsResponse} message PhysicsResponse
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PhysicsResponse.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (options.arrays || options.defaults) {
-                object.balls = [];
-                object.paddles = [];
-            }
-            if (options.defaults) {
-                object.gameId = "";
-                if ($util.Long) {
-                    let long = new $util.Long(0, 0, false);
-                    object.tick = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                } else
-                    object.tick = options.longs === String ? "0" : 0;
-                object.goal = null;
-            }
-            if (message.gameId != null && message.hasOwnProperty("gameId"))
-                object.gameId = message.gameId;
-            if (message.tick != null && message.hasOwnProperty("tick"))
-                if (typeof message.tick === "number")
-                    object.tick = options.longs === String ? String(message.tick) : message.tick;
-                else
-                    object.tick = options.longs === String ? $util.Long.prototype.toString.call(message.tick) : options.longs === Number ? new $util.LongBits(message.tick.low >>> 0, message.tick.high >>> 0).toNumber() : message.tick;
-            if (message.balls && message.balls.length) {
-                object.balls = [];
-                for (let j = 0; j < message.balls.length; ++j)
-                    object.balls[j] = $root.shared.Ball.toObject(message.balls[j], options);
-            }
-            if (message.paddles && message.paddles.length) {
-                object.paddles = [];
-                for (let j = 0; j < message.paddles.length; ++j)
-                    object.paddles[j] = $root.shared.Paddle.toObject(message.paddles[j], options);
-            }
-            if (message.goal != null && message.hasOwnProperty("goal"))
-                object.goal = $root.shared.Goal.toObject(message.goal, options);
-            return object;
-        };
-
-        /**
-         * Converts this PhysicsResponse to JSON.
-         * @function toJSON
-         * @memberof shared.PhysicsResponse
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PhysicsResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for PhysicsResponse
-         * @function getTypeUrl
-         * @memberof shared.PhysicsResponse
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        PhysicsResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/shared.PhysicsResponse";
-        };
-
-        return PhysicsResponse;
-    })();
-
     return shared;
 })();
 
@@ -5180,6 +5829,7 @@ export const lobby = $root.lobby = (() => {
          * @property {Array.<lobby.IPlayer>|null} [players] UpdateMessage players
          * @property {string|null} [status] UpdateMessage status
          * @property {string|null} [mode] UpdateMessage mode
+         * @property {string|null} [map] UpdateMessage map
          */
 
         /**
@@ -5231,6 +5881,14 @@ export const lobby = $root.lobby = (() => {
         UpdateMessage.prototype.mode = "";
 
         /**
+         * UpdateMessage map.
+         * @member {string} map
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.map = "";
+
+        /**
          * Creates a new UpdateMessage instance using the specified properties.
          * @function create
          * @memberof lobby.UpdateMessage
@@ -5263,6 +5921,8 @@ export const lobby = $root.lobby = (() => {
                 writer.uint32(/* id 3, wireType 2 =*/26).string(message.status);
             if (message.mode != null && Object.hasOwnProperty.call(message, "mode"))
                 writer.uint32(/* id 4, wireType 2 =*/34).string(message.mode);
+            if (message.map != null && Object.hasOwnProperty.call(message, "map"))
+                writer.uint32(/* id 5, wireType 2 =*/42).string(message.map);
             return writer;
         };
 
@@ -5315,6 +5975,10 @@ export const lobby = $root.lobby = (() => {
                     }
                 case 4: {
                         message.mode = reader.string();
+                        break;
+                    }
+                case 5: {
+                        message.map = reader.string();
                         break;
                     }
                 default:
@@ -5370,6 +6034,9 @@ export const lobby = $root.lobby = (() => {
             if (message.mode != null && message.hasOwnProperty("mode"))
                 if (!$util.isString(message.mode))
                     return "mode: string expected";
+            if (message.map != null && message.hasOwnProperty("map"))
+                if (!$util.isString(message.map))
+                    return "map: string expected";
             return null;
         };
 
@@ -5401,6 +6068,8 @@ export const lobby = $root.lobby = (() => {
                 message.status = String(object.status);
             if (object.mode != null)
                 message.mode = String(object.mode);
+            if (object.map != null)
+                message.map = String(object.map);
             return message;
         };
 
@@ -5423,6 +6092,7 @@ export const lobby = $root.lobby = (() => {
                 object.lobbyId = "";
                 object.status = "";
                 object.mode = "";
+                object.map = "";
             }
             if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
                 object.lobbyId = message.lobbyId;
@@ -5435,6 +6105,8 @@ export const lobby = $root.lobby = (() => {
                 object.status = message.status;
             if (message.mode != null && message.hasOwnProperty("mode"))
                 object.mode = message.mode;
+            if (message.map != null && message.hasOwnProperty("map"))
+                object.map = message.map;
             return object;
         };
 
@@ -6709,6 +7381,1038 @@ export const lobby = $root.lobby = (() => {
     })();
 
     return lobby;
+})();
+
+export const notif = $root.notif = (() => {
+
+    /**
+     * Namespace notif.
+     * @exports notif
+     * @namespace
+     */
+    const notif = {};
+
+    notif.FriendUpdate = (function() {
+
+        /**
+         * Properties of a FriendUpdate.
+         * @memberof notif
+         * @interface IFriendUpdate
+         * @property {string|null} [sender] FriendUpdate sender
+         */
+
+        /**
+         * Constructs a new FriendUpdate.
+         * @memberof notif
+         * @classdesc Represents a FriendUpdate.
+         * @implements IFriendUpdate
+         * @constructor
+         * @param {notif.IFriendUpdate=} [properties] Properties to set
+         */
+        function FriendUpdate(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * FriendUpdate sender.
+         * @member {string} sender
+         * @memberof notif.FriendUpdate
+         * @instance
+         */
+        FriendUpdate.prototype.sender = "";
+
+        /**
+         * Creates a new FriendUpdate instance using the specified properties.
+         * @function create
+         * @memberof notif.FriendUpdate
+         * @static
+         * @param {notif.IFriendUpdate=} [properties] Properties to set
+         * @returns {notif.FriendUpdate} FriendUpdate instance
+         */
+        FriendUpdate.create = function create(properties) {
+            return new FriendUpdate(properties);
+        };
+
+        /**
+         * Encodes the specified FriendUpdate message. Does not implicitly {@link notif.FriendUpdate.verify|verify} messages.
+         * @function encode
+         * @memberof notif.FriendUpdate
+         * @static
+         * @param {notif.IFriendUpdate} message FriendUpdate message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        FriendUpdate.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.sender != null && Object.hasOwnProperty.call(message, "sender"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.sender);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified FriendUpdate message, length delimited. Does not implicitly {@link notif.FriendUpdate.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof notif.FriendUpdate
+         * @static
+         * @param {notif.IFriendUpdate} message FriendUpdate message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        FriendUpdate.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a FriendUpdate message from the specified reader or buffer.
+         * @function decode
+         * @memberof notif.FriendUpdate
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {notif.FriendUpdate} FriendUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        FriendUpdate.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.notif.FriendUpdate();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.sender = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a FriendUpdate message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof notif.FriendUpdate
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {notif.FriendUpdate} FriendUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        FriendUpdate.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a FriendUpdate message.
+         * @function verify
+         * @memberof notif.FriendUpdate
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        FriendUpdate.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.sender != null && message.hasOwnProperty("sender"))
+                if (!$util.isString(message.sender))
+                    return "sender: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a FriendUpdate message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof notif.FriendUpdate
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {notif.FriendUpdate} FriendUpdate
+         */
+        FriendUpdate.fromObject = function fromObject(object) {
+            if (object instanceof $root.notif.FriendUpdate)
+                return object;
+            let message = new $root.notif.FriendUpdate();
+            if (object.sender != null)
+                message.sender = String(object.sender);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a FriendUpdate message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof notif.FriendUpdate
+         * @static
+         * @param {notif.FriendUpdate} message FriendUpdate
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        FriendUpdate.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults)
+                object.sender = "";
+            if (message.sender != null && message.hasOwnProperty("sender"))
+                object.sender = message.sender;
+            return object;
+        };
+
+        /**
+         * Converts this FriendUpdate to JSON.
+         * @function toJSON
+         * @memberof notif.FriendUpdate
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        FriendUpdate.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for FriendUpdate
+         * @function getTypeUrl
+         * @memberof notif.FriendUpdate
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        FriendUpdate.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/notif.FriendUpdate";
+        };
+
+        return FriendUpdate;
+    })();
+
+    notif.GameInvite = (function() {
+
+        /**
+         * Properties of a GameInvite.
+         * @memberof notif
+         * @interface IGameInvite
+         * @property {string|null} [sender] GameInvite sender
+         * @property {string|null} [lobbyid] GameInvite lobbyid
+         */
+
+        /**
+         * Constructs a new GameInvite.
+         * @memberof notif
+         * @classdesc Represents a GameInvite.
+         * @implements IGameInvite
+         * @constructor
+         * @param {notif.IGameInvite=} [properties] Properties to set
+         */
+        function GameInvite(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GameInvite sender.
+         * @member {string} sender
+         * @memberof notif.GameInvite
+         * @instance
+         */
+        GameInvite.prototype.sender = "";
+
+        /**
+         * GameInvite lobbyid.
+         * @member {string} lobbyid
+         * @memberof notif.GameInvite
+         * @instance
+         */
+        GameInvite.prototype.lobbyid = "";
+
+        /**
+         * Creates a new GameInvite instance using the specified properties.
+         * @function create
+         * @memberof notif.GameInvite
+         * @static
+         * @param {notif.IGameInvite=} [properties] Properties to set
+         * @returns {notif.GameInvite} GameInvite instance
+         */
+        GameInvite.create = function create(properties) {
+            return new GameInvite(properties);
+        };
+
+        /**
+         * Encodes the specified GameInvite message. Does not implicitly {@link notif.GameInvite.verify|verify} messages.
+         * @function encode
+         * @memberof notif.GameInvite
+         * @static
+         * @param {notif.IGameInvite} message GameInvite message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameInvite.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.sender != null && Object.hasOwnProperty.call(message, "sender"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.sender);
+            if (message.lobbyid != null && Object.hasOwnProperty.call(message, "lobbyid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.lobbyid);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GameInvite message, length delimited. Does not implicitly {@link notif.GameInvite.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof notif.GameInvite
+         * @static
+         * @param {notif.IGameInvite} message GameInvite message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        GameInvite.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GameInvite message from the specified reader or buffer.
+         * @function decode
+         * @memberof notif.GameInvite
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {notif.GameInvite} GameInvite
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameInvite.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.notif.GameInvite();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.sender = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.lobbyid = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GameInvite message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof notif.GameInvite
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {notif.GameInvite} GameInvite
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        GameInvite.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GameInvite message.
+         * @function verify
+         * @memberof notif.GameInvite
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GameInvite.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.sender != null && message.hasOwnProperty("sender"))
+                if (!$util.isString(message.sender))
+                    return "sender: string expected";
+            if (message.lobbyid != null && message.hasOwnProperty("lobbyid"))
+                if (!$util.isString(message.lobbyid))
+                    return "lobbyid: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a GameInvite message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof notif.GameInvite
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {notif.GameInvite} GameInvite
+         */
+        GameInvite.fromObject = function fromObject(object) {
+            if (object instanceof $root.notif.GameInvite)
+                return object;
+            let message = new $root.notif.GameInvite();
+            if (object.sender != null)
+                message.sender = String(object.sender);
+            if (object.lobbyid != null)
+                message.lobbyid = String(object.lobbyid);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GameInvite message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof notif.GameInvite
+         * @static
+         * @param {notif.GameInvite} message GameInvite
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GameInvite.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.sender = "";
+                object.lobbyid = "";
+            }
+            if (message.sender != null && message.hasOwnProperty("sender"))
+                object.sender = message.sender;
+            if (message.lobbyid != null && message.hasOwnProperty("lobbyid"))
+                object.lobbyid = message.lobbyid;
+            return object;
+        };
+
+        /**
+         * Converts this GameInvite to JSON.
+         * @function toJSON
+         * @memberof notif.GameInvite
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GameInvite.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GameInvite
+         * @function getTypeUrl
+         * @memberof notif.GameInvite
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GameInvite.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/notif.GameInvite";
+        };
+
+        return GameInvite;
+    })();
+
+    notif.StatusUpdate = (function() {
+
+        /**
+         * Properties of a StatusUpdate.
+         * @memberof notif
+         * @interface IStatusUpdate
+         * @property {string|null} [sender] StatusUpdate sender
+         * @property {string|null} [status] StatusUpdate status
+         * @property {string|null} [option] StatusUpdate option
+         */
+
+        /**
+         * Constructs a new StatusUpdate.
+         * @memberof notif
+         * @classdesc Represents a StatusUpdate.
+         * @implements IStatusUpdate
+         * @constructor
+         * @param {notif.IStatusUpdate=} [properties] Properties to set
+         */
+        function StatusUpdate(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * StatusUpdate sender.
+         * @member {string} sender
+         * @memberof notif.StatusUpdate
+         * @instance
+         */
+        StatusUpdate.prototype.sender = "";
+
+        /**
+         * StatusUpdate status.
+         * @member {string} status
+         * @memberof notif.StatusUpdate
+         * @instance
+         */
+        StatusUpdate.prototype.status = "";
+
+        /**
+         * StatusUpdate option.
+         * @member {string} option
+         * @memberof notif.StatusUpdate
+         * @instance
+         */
+        StatusUpdate.prototype.option = "";
+
+        /**
+         * Creates a new StatusUpdate instance using the specified properties.
+         * @function create
+         * @memberof notif.StatusUpdate
+         * @static
+         * @param {notif.IStatusUpdate=} [properties] Properties to set
+         * @returns {notif.StatusUpdate} StatusUpdate instance
+         */
+        StatusUpdate.create = function create(properties) {
+            return new StatusUpdate(properties);
+        };
+
+        /**
+         * Encodes the specified StatusUpdate message. Does not implicitly {@link notif.StatusUpdate.verify|verify} messages.
+         * @function encode
+         * @memberof notif.StatusUpdate
+         * @static
+         * @param {notif.IStatusUpdate} message StatusUpdate message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        StatusUpdate.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.sender != null && Object.hasOwnProperty.call(message, "sender"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.sender);
+            if (message.status != null && Object.hasOwnProperty.call(message, "status"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.status);
+            if (message.option != null && Object.hasOwnProperty.call(message, "option"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.option);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified StatusUpdate message, length delimited. Does not implicitly {@link notif.StatusUpdate.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof notif.StatusUpdate
+         * @static
+         * @param {notif.IStatusUpdate} message StatusUpdate message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        StatusUpdate.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a StatusUpdate message from the specified reader or buffer.
+         * @function decode
+         * @memberof notif.StatusUpdate
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {notif.StatusUpdate} StatusUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        StatusUpdate.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.notif.StatusUpdate();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.sender = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.status = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.option = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a StatusUpdate message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof notif.StatusUpdate
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {notif.StatusUpdate} StatusUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        StatusUpdate.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a StatusUpdate message.
+         * @function verify
+         * @memberof notif.StatusUpdate
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        StatusUpdate.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.sender != null && message.hasOwnProperty("sender"))
+                if (!$util.isString(message.sender))
+                    return "sender: string expected";
+            if (message.status != null && message.hasOwnProperty("status"))
+                if (!$util.isString(message.status))
+                    return "status: string expected";
+            if (message.option != null && message.hasOwnProperty("option"))
+                if (!$util.isString(message.option))
+                    return "option: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a StatusUpdate message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof notif.StatusUpdate
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {notif.StatusUpdate} StatusUpdate
+         */
+        StatusUpdate.fromObject = function fromObject(object) {
+            if (object instanceof $root.notif.StatusUpdate)
+                return object;
+            let message = new $root.notif.StatusUpdate();
+            if (object.sender != null)
+                message.sender = String(object.sender);
+            if (object.status != null)
+                message.status = String(object.status);
+            if (object.option != null)
+                message.option = String(object.option);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a StatusUpdate message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof notif.StatusUpdate
+         * @static
+         * @param {notif.StatusUpdate} message StatusUpdate
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        StatusUpdate.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.sender = "";
+                object.status = "";
+                object.option = "";
+            }
+            if (message.sender != null && message.hasOwnProperty("sender"))
+                object.sender = message.sender;
+            if (message.status != null && message.hasOwnProperty("status"))
+                object.status = message.status;
+            if (message.option != null && message.hasOwnProperty("option"))
+                object.option = message.option;
+            return object;
+        };
+
+        /**
+         * Converts this StatusUpdate to JSON.
+         * @function toJSON
+         * @memberof notif.StatusUpdate
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        StatusUpdate.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for StatusUpdate
+         * @function getTypeUrl
+         * @memberof notif.StatusUpdate
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        StatusUpdate.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/notif.StatusUpdate";
+        };
+
+        return StatusUpdate;
+    })();
+
+    notif.NotificationMessage = (function() {
+
+        /**
+         * Properties of a NotificationMessage.
+         * @memberof notif
+         * @interface INotificationMessage
+         * @property {notif.IFriendUpdate|null} [friendRequest] NotificationMessage friendRequest
+         * @property {notif.IFriendUpdate|null} [friendAccept] NotificationMessage friendAccept
+         * @property {notif.IGameInvite|null} [gameInvite] NotificationMessage gameInvite
+         * @property {notif.IStatusUpdate|null} [statusUpdate] NotificationMessage statusUpdate
+         */
+
+        /**
+         * Constructs a new NotificationMessage.
+         * @memberof notif
+         * @classdesc Represents a NotificationMessage.
+         * @implements INotificationMessage
+         * @constructor
+         * @param {notif.INotificationMessage=} [properties] Properties to set
+         */
+        function NotificationMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * NotificationMessage friendRequest.
+         * @member {notif.IFriendUpdate|null|undefined} friendRequest
+         * @memberof notif.NotificationMessage
+         * @instance
+         */
+        NotificationMessage.prototype.friendRequest = null;
+
+        /**
+         * NotificationMessage friendAccept.
+         * @member {notif.IFriendUpdate|null|undefined} friendAccept
+         * @memberof notif.NotificationMessage
+         * @instance
+         */
+        NotificationMessage.prototype.friendAccept = null;
+
+        /**
+         * NotificationMessage gameInvite.
+         * @member {notif.IGameInvite|null|undefined} gameInvite
+         * @memberof notif.NotificationMessage
+         * @instance
+         */
+        NotificationMessage.prototype.gameInvite = null;
+
+        /**
+         * NotificationMessage statusUpdate.
+         * @member {notif.IStatusUpdate|null|undefined} statusUpdate
+         * @memberof notif.NotificationMessage
+         * @instance
+         */
+        NotificationMessage.prototype.statusUpdate = null;
+
+        // OneOf field names bound to virtual getters and setters
+        let $oneOfFields;
+
+        /**
+         * NotificationMessage payload.
+         * @member {"friendRequest"|"friendAccept"|"gameInvite"|"statusUpdate"|undefined} payload
+         * @memberof notif.NotificationMessage
+         * @instance
+         */
+        Object.defineProperty(NotificationMessage.prototype, "payload", {
+            get: $util.oneOfGetter($oneOfFields = ["friendRequest", "friendAccept", "gameInvite", "statusUpdate"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * Creates a new NotificationMessage instance using the specified properties.
+         * @function create
+         * @memberof notif.NotificationMessage
+         * @static
+         * @param {notif.INotificationMessage=} [properties] Properties to set
+         * @returns {notif.NotificationMessage} NotificationMessage instance
+         */
+        NotificationMessage.create = function create(properties) {
+            return new NotificationMessage(properties);
+        };
+
+        /**
+         * Encodes the specified NotificationMessage message. Does not implicitly {@link notif.NotificationMessage.verify|verify} messages.
+         * @function encode
+         * @memberof notif.NotificationMessage
+         * @static
+         * @param {notif.INotificationMessage} message NotificationMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        NotificationMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.friendRequest != null && Object.hasOwnProperty.call(message, "friendRequest"))
+                $root.notif.FriendUpdate.encode(message.friendRequest, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.friendAccept != null && Object.hasOwnProperty.call(message, "friendAccept"))
+                $root.notif.FriendUpdate.encode(message.friendAccept, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.gameInvite != null && Object.hasOwnProperty.call(message, "gameInvite"))
+                $root.notif.GameInvite.encode(message.gameInvite, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            if (message.statusUpdate != null && Object.hasOwnProperty.call(message, "statusUpdate"))
+                $root.notif.StatusUpdate.encode(message.statusUpdate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified NotificationMessage message, length delimited. Does not implicitly {@link notif.NotificationMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof notif.NotificationMessage
+         * @static
+         * @param {notif.INotificationMessage} message NotificationMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        NotificationMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a NotificationMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof notif.NotificationMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {notif.NotificationMessage} NotificationMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        NotificationMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.notif.NotificationMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.friendRequest = $root.notif.FriendUpdate.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
+                        message.friendAccept = $root.notif.FriendUpdate.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 3: {
+                        message.gameInvite = $root.notif.GameInvite.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 4: {
+                        message.statusUpdate = $root.notif.StatusUpdate.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a NotificationMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof notif.NotificationMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {notif.NotificationMessage} NotificationMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        NotificationMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a NotificationMessage message.
+         * @function verify
+         * @memberof notif.NotificationMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        NotificationMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            let properties = {};
+            if (message.friendRequest != null && message.hasOwnProperty("friendRequest")) {
+                properties.payload = 1;
+                {
+                    let error = $root.notif.FriendUpdate.verify(message.friendRequest);
+                    if (error)
+                        return "friendRequest." + error;
+                }
+            }
+            if (message.friendAccept != null && message.hasOwnProperty("friendAccept")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.notif.FriendUpdate.verify(message.friendAccept);
+                    if (error)
+                        return "friendAccept." + error;
+                }
+            }
+            if (message.gameInvite != null && message.hasOwnProperty("gameInvite")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.notif.GameInvite.verify(message.gameInvite);
+                    if (error)
+                        return "gameInvite." + error;
+                }
+            }
+            if (message.statusUpdate != null && message.hasOwnProperty("statusUpdate")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.notif.StatusUpdate.verify(message.statusUpdate);
+                    if (error)
+                        return "statusUpdate." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a NotificationMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof notif.NotificationMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {notif.NotificationMessage} NotificationMessage
+         */
+        NotificationMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.notif.NotificationMessage)
+                return object;
+            let message = new $root.notif.NotificationMessage();
+            if (object.friendRequest != null) {
+                if (typeof object.friendRequest !== "object")
+                    throw TypeError(".notif.NotificationMessage.friendRequest: object expected");
+                message.friendRequest = $root.notif.FriendUpdate.fromObject(object.friendRequest);
+            }
+            if (object.friendAccept != null) {
+                if (typeof object.friendAccept !== "object")
+                    throw TypeError(".notif.NotificationMessage.friendAccept: object expected");
+                message.friendAccept = $root.notif.FriendUpdate.fromObject(object.friendAccept);
+            }
+            if (object.gameInvite != null) {
+                if (typeof object.gameInvite !== "object")
+                    throw TypeError(".notif.NotificationMessage.gameInvite: object expected");
+                message.gameInvite = $root.notif.GameInvite.fromObject(object.gameInvite);
+            }
+            if (object.statusUpdate != null) {
+                if (typeof object.statusUpdate !== "object")
+                    throw TypeError(".notif.NotificationMessage.statusUpdate: object expected");
+                message.statusUpdate = $root.notif.StatusUpdate.fromObject(object.statusUpdate);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a NotificationMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof notif.NotificationMessage
+         * @static
+         * @param {notif.NotificationMessage} message NotificationMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        NotificationMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (message.friendRequest != null && message.hasOwnProperty("friendRequest")) {
+                object.friendRequest = $root.notif.FriendUpdate.toObject(message.friendRequest, options);
+                if (options.oneofs)
+                    object.payload = "friendRequest";
+            }
+            if (message.friendAccept != null && message.hasOwnProperty("friendAccept")) {
+                object.friendAccept = $root.notif.FriendUpdate.toObject(message.friendAccept, options);
+                if (options.oneofs)
+                    object.payload = "friendAccept";
+            }
+            if (message.gameInvite != null && message.hasOwnProperty("gameInvite")) {
+                object.gameInvite = $root.notif.GameInvite.toObject(message.gameInvite, options);
+                if (options.oneofs)
+                    object.payload = "gameInvite";
+            }
+            if (message.statusUpdate != null && message.hasOwnProperty("statusUpdate")) {
+                object.statusUpdate = $root.notif.StatusUpdate.toObject(message.statusUpdate, options);
+                if (options.oneofs)
+                    object.payload = "statusUpdate";
+            }
+            return object;
+        };
+
+        /**
+         * Converts this NotificationMessage to JSON.
+         * @function toJSON
+         * @memberof notif.NotificationMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        NotificationMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for NotificationMessage
+         * @function getTypeUrl
+         * @memberof notif.NotificationMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        NotificationMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/notif.NotificationMessage";
+        };
+
+        return NotificationMessage;
+    })();
+
+    return notif;
 })();
 
 export { $root as default };

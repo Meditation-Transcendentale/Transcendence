@@ -111,13 +111,13 @@ app.post('/add', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers } );
 
-	const addedPlayerUsername = req.body.inputUsername;
-	
-	if (!addedPlayerUsername) {
+	const addedPlayerUuid = req.body.inputUuid;
+
+	if (!addedPlayerUuid) {
 		throw { status : userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
 	}
 
-	const friend = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: addedPlayerUsername });
+	const friend = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: addedPlayerUuid });
 
 	if (user.id === friend.id) {
 		throw { status : friendshipReturn.FRIEND_006.http, code: friendshipReturn.FRIEND_006.code, message: friendshipReturn.FRIEND_006.message };
@@ -134,14 +134,14 @@ app.post('/accept', handleErrors(async (req, res) => {
 	
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const requestFrom = req.body.inputUsername;
+	const requestFrom = req.body.inputUuid;
 	if (!requestFrom) {
 		throw { status : userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
-	} else if (user.username === requestFrom) {
+	} else if (user.uuid === requestFrom) {
 		throw { status : friendshipReturn.FRIEND_006.http, code: friendshipReturn.FRIEND_006.code, message: friendshipReturn.FRIEND_006.message };
 	}
 
-	const friend = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: requestFrom });
+	const friend = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: requestFrom });
 	const friendship = await natsRequest(nats, jc, 'user.getFriendshipFromUser1Username', { userId: user.id, friendId: friend.id });
 	if (friendship.status !== 'pending') {
 		throw { status : friendshipReturn.FRIEND_002.http, code: friendshipReturn.FRIEND_002.code, message: friendshipReturn.FRIEND_002.message };
@@ -157,14 +157,14 @@ app.delete('/decline', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const requestFrom = req.body.inputUsername;
+	const requestFrom = req.body.inputUuid;
 	if (!requestFrom) {
 		throw { status : userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
-	} else if (user.username === requestFrom) {
+	} else if (user.uuid === requestFrom) {
 		throw { status : friendshipReturn.FRIEND_008.http, code: friendshipReturn.FRIEND_008.code, message: friendshipReturn.FRIEND_008.message };
 	}
 
-	const friend = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: requestFrom });
+	const friend = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: requestFrom });
 
 	const friendship = await natsRequest(nats, jc, 'user.getFriendshipFromUser1Username', { userId: user.id, friendId: friend.id });
 	if (friendship.status !== 'pending') {
@@ -200,14 +200,14 @@ app.delete('/delete', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const friendName = req.body.inputUsername;
+	const friendName = req.body.inputUuid;
 	if (!friendName) {
 		throw { status : userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
-	} else if (user.username === friendName) {
+	} else if (user.uuid === friendName) {
 		throw { status : friendshipReturn.FRIEND_007.http, code: friendshipReturn.FRIEND_007.code, message: friendshipReturn.FRIEND_007.message };
 	}
 
-	const friend = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: friendName });
+	const friend = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: friendName });
 
 	const friendship = await natsRequest(nats, jc, 'user.isFriendshipExisting', { userId1: user.id, userId2: friend.id });
 	if (!friendship || friendship.status !== 'accepted') {
@@ -223,12 +223,12 @@ app.post('/block', handleErrors(async (req, res) => {
 	
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const blockedUserName = req.body.inputUsername;
-	if (!blockedUserName) {
+	const blockedUuid = req.body.inputUuid;
+	if (!blockedUuid) {
 		throw { status : userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
 	}
 
-	const blockedUser = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: blockedUserName });
+	const blockedUser = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: blockedUuid });
 	if (user.id === blockedUser.id) {
 		throw { status : friendshipReturn.FRIEND_009.http, code: friendshipReturn.FRIEND_009.code, message: friendshipReturn.FRIEND_009.message };
 	}
@@ -248,12 +248,12 @@ app.delete('/unblock', handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
-	const blockedUserName = req.body.inputUsername;
-	if (!blockedUserName) {
+	const blockedUuid = req.body.inputUuid;
+	if (!blockedUuid) {
 		throw { status : userReturn.USER_004.http, code: userReturn.USER_004.code, message: userReturn.USER_004.message };
 	}
 
-	const blockedUser = await natsRequest(nats, jc, 'user.getUserFromUsername', { username: blockedUserName });
+	const blockedUser = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: blockedUuid });
 	if (user.id === blockedUser.id) {
 		throw { status : friendshipReturn.FRIEND_010.http, code: friendshipReturn.FRIEND_010.code, message: friendshipReturn.FRIEND_010.message };
 	}
