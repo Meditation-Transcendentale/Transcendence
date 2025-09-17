@@ -56,14 +56,9 @@ class MatchNode {
 }
 
 class Tournament {
-    /**
-     * @param {string} id
-     * @param {string[]} playerIds - already shuffled IDs
-     * @param {uWS.TemplatedApp} uwsApp
-     */
     constructor(id, playerIds, uwsApp) {
-        this.uwsApp = uwsApp;
         this.id = id;
+        this.uwsApp = uwsApp;
 
         this.players = playerIds.map((id) => ({
             id,
@@ -74,25 +69,29 @@ class Tournament {
 
         this.root = this.buildTournamentTree();
         this.createdAt = Date.now();
-        this.current_round = 0;
 
         this.readyActive = false;
         this.readyDeadlineMs = 0;
         this.readyTimer = null;
 
+        this.scheduling = false;
+
         natsClient.subscribe('games.tournament.*.match.end', (data, msg) => {
-            const [, , gameId] = msg.subject.split('.');
+            const parts = String(msg.subject || '').split('.');
+            const gameId = parts[2];
+            if (!gameId) return;
+
             const match = this.findMatchByGameId(this.root, gameId);
             if (!match) return;
-            const decodedData = decodeMatchEnd(data);
-            match.setResult(decodedData);
-            this.maybeStartReadyCheck();
+
+            const decoded = decodeMatchEnd(data);
+            match.setResult(decoded);
+
+            this.autoAdvanceWalkovers();
             this.sendUpdate();
+            this.maybeStartReadyCheck();
         });
-
-        this.maybeStartReadyCheck();
     }
-
 
     sendReadyCheck() {
         for (const p of this.players) {
@@ -100,7 +99,6 @@ class Tournament {
         }
         this.readyActive = true;
         this.readyDeadlineMs = Date.now() + 20_000;
-
         if (this.readyTimer) clearTimeout(this.readyTimer);
         this.readyTimer = setTimeout(() => this.handleReadyTimeout(), 20_000);
 
@@ -115,7 +113,7 @@ class Tournament {
         const buf = encodeTournamentServerMessage({
             update: {
                 tournamentRoot: this.root,
-                players: this.players.map(p => ({
+                players: this.players.map((p) => ({
                     uuid: p.id,
                     ready: p.isReady,
                     connected: p.isConnected,
@@ -139,8 +137,8 @@ class Tournament {
             leaves.push(node);
         }
 
-        function pairMatches(nodes) {
-            const nextRound = [];
+        function pair(nodes) {
+            const next = [];
             for (let i = 0; i < nodes.length; i += 2) {
                 const parent = new MatchNode();
                 const left = nodes[i];
@@ -149,12 +147,12 @@ class Tournament {
                 parent.right = right;
                 left.parent = parent;
                 right.parent = parent;
-                nextRound.push(parent);
+                next.push(parent);
             }
-            return nextRound.length === 1 ? nextRound[0] : pairMatches(nextRound);
+            return next.length === 1 ? next[0] : pair(next);
         }
 
-        return pairMatches(leaves);
+        return pair(leaves);
     }
 
     findMatchByPlayer(root, playerId) {
@@ -173,30 +171,15 @@ class Tournament {
         return this.findMatchByGameId(root.right, gameId);
     }
 
-    getState() {
-        return {
-            tournamentId: this.id,
-            players: this.players.map((p) => ({
-                uuid: p.id,
-                ready: p.isReady,
-                connected: p.isConnected,
-                eliminated: p.isEliminated
-            })),
-            tree: this.root
-        };
-    }
-
     getPlayerByUuid(uuid) {
         return this.players.find((p) => p.id === uuid) || null;
     }
-
+    allConnected() {
+        return this.players.every((p) => p.isConnected || p.isEliminated);
+    }
     allNonEliminatedPlayersReady() {
         const alive = this.players.filter((p) => !p.isEliminated);
         return alive.length > 0 && alive.every((p) => p.isReady);
-    }
-
-    allConnected() {
-        return this.players.every(p => p.isConnected || p.isEliminated);
     }
     hasAnyActiveMatch() {
         const it = this.root.getActiveMatches();
@@ -219,7 +202,6 @@ class Tournament {
             const r2 = !!p2 && !p2.isEliminated && p2.isReady;
 
             if (r1 && r2) {
-                continue;
             } else if (r1 && !r2) {
                 if (p2 && !p2.isEliminated) p2.isEliminated = true;
                 match.setResult({ winnerId: 0, score: { forfeit: true } });
@@ -233,12 +215,9 @@ class Tournament {
         }
 
         this.autoAdvanceWalkovers();
-
         await this.scheduleReadyMatches();
-
         this.readyActive = false;
         this.sendUpdate();
-
         this.maybeStartReadyCheck();
     }
 
@@ -283,28 +262,45 @@ class Tournament {
     }
 
     async scheduleReadyMatches() {
-        for (const match of this.root.getActiveMatches()) {
-            const p1 = this.getPlayerByUuid(match.player1Id);
-            const p2 = this.getPlayerByUuid(match.player2Id);
-            if (!p1 || !p2) continue;
-            if (p1.isEliminated || p2.isEliminated) continue;
-            if (!p1.isReady || !p2.isReady) continue;
-            if (match.creating || match.gameId) continue;
-
-            match.creating = true;
-            const reqBuf = encodeMatchCreateRequest({ players: [match.player1Id, match.player2Id] });
-            try {
-                const replyBuf = await natsClient.request('games.tournament.match.create', reqBuf, {});
-                const resp = decodeMatchCreateResponse(replyBuf);
-                match.gameId = resp.gameId;
-                const startBuf = encodeTournamentServerMessage({ startGame: { gameId: match.gameId } });
-                this.uwsApp.publish(this.id, startBuf, true);
-            } catch (err) {
-                const buf = encodeTournamentServerMessage({ error: { message: err.message } });
-                this.uwsApp.publish(this.id, buf, true);
-            } finally {
-                match.creating = false;
+        if (this.scheduling) return;
+        this.scheduling = true;
+        try {
+            const candidates = [];
+            for (const m of this.root.getActiveMatches()) {
+                candidates.push(m);
+                console.log("ADD CANDIDATE");
             }
+
+            for (const match of candidates) {
+                if (!match || match.creating || match.gameId) continue;
+
+                const p1 = this.getPlayerByUuid(match.player1Id);
+                const p2 = this.getPlayerByUuid(match.player2Id);
+                if (!p1 || !p2) continue;
+                if (p1.isEliminated || p2.isEliminated) continue;
+                if (!p1.isReady || !p2.isReady) continue;
+
+                match.creating = true;
+                const reqBuf = encodeMatchCreateRequest({ players: [match.player1Id, match.player2Id] });
+                try {
+                    const replyBuf = await natsClient.request('games.tournament.match.create', reqBuf, { timeout: 5000 });
+                    const resp = decodeMatchCreateResponse(replyBuf);
+                    if (!resp || !resp.gameId) throw new Error('Invalid match.create response');
+                    match.gameId = resp.gameId;
+                    console.log(`new game: ${match.gameId}|p1:${match.player1Id}|p2:${match.player2Id}`);
+                    const startBuf = encodeTournamentServerMessage({ startGame: { gameId: match.gameId } });
+                    this.uwsApp.publish(`user.${match.player1Id}`, startBuf, true);
+                    this.uwsApp.publish(`user.${match.player2Id}`, startBuf, true);
+                } catch (err) {
+                    const buf = encodeTournamentServerMessage({ error: { message: String(err?.message || err) } });
+                    this.uwsApp.publish(`user.${match.player1Id}`, buf, true);
+                    this.uwsApp.publish(`user.${match.player2Id}`, buf, true);
+                } finally {
+                    match.creating = false;
+                }
+            }
+        } finally {
+            this.scheduling = false;
         }
     }
 
@@ -333,7 +329,6 @@ class Tournament {
         this.sendUpdate();
         this.maybeStartReadyCheck();
     }
-
 }
 
 export default class tournamentService {
@@ -345,8 +340,8 @@ export default class tournamentService {
     create(players, uwsApp) {
         const id = Date.now().toString();
         const shuffled = shuffle(players);
-        const tournament = new Tournament(id, shuffled, uwsApp);
-        this.tournaments.set(id, tournament);
+        const t = new Tournament(id, shuffled, uwsApp);
+        this.tournaments.set(id, t);
         return id;
     }
 
@@ -354,14 +349,14 @@ export default class tournamentService {
         const t = this.tournaments.get(tournamentId);
         if (!t) throw new Error('Tournament not found');
         t.addPlayer(userId);
-        t.sendUpdate();
+        return t.getState?.() ?? { tournamentId, tree: t.root };
     }
 
     quit(tournamentId, userId) {
         const t = this.tournaments.get(tournamentId);
         if (!t) return null;
         t.quit(userId);
-        t.sendUpdate();
+        return t.getState?.() ?? { tournamentId, tree: t.root };
     }
 
     async ready(ws, tournamentId, playerId) {
@@ -382,7 +377,12 @@ export default class tournamentService {
             await t.scheduleReadyMatches();
             t.readyActive = false;
             t.sendUpdate();
+            t.maybeStartReadyCheck();
         }
+    }
+
+    getTournament(tournamentId) {
+        return this.tournaments.get(tournamentId);
     }
 
     cleanup() {
@@ -392,10 +392,6 @@ export default class tournamentService {
                 this.tournaments.delete(id);
             }
         }
-    }
-
-    getTournament(tournamentId) {
-        return this.tournaments.get(tournamentId);
     }
 
     shutdown() {

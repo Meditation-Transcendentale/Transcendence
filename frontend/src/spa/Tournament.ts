@@ -92,7 +92,7 @@ export default class TournamentPage {
 			}
 			if (payload.startGame) {
 				console.log(`START GAME RECEIVED`);
-				Router.nav(encodeURI(`/cajoue?id=${payload.startGame.gameId}&mod=tournament&map=default`), false, true);
+				Router.nav(encodeURI(`/cajoue?id=${payload.startGame.gameId}&mod=tournament&map=default&tournamentId=${this.tournamentId}`), false, true);
 				this.ws?.close();
 			}
 			this.render();
@@ -111,6 +111,7 @@ export default class TournamentPage {
 	}
 
 	unload() {
+		this.div.remove();
 		this.stopReadyCountdown();
 		if (this.ws) {
 			try { this.ws.close(); } catch { }

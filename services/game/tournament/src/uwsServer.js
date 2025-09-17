@@ -43,6 +43,7 @@ export function createUwsApp(path, tournamentService) {
                 }
                 set.add(ws);
                 ws.subscribe(ws.tournamentId);
+                ws.subscribe(`user.${ws.userId}`);
                 console.log(`new connection: ${ws}`);
                 tournamentService.join(ws.tournamentId, ws.userId);
             } catch (err) {

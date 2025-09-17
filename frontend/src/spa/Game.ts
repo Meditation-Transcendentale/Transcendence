@@ -12,6 +12,8 @@ export default class Game {
 	private map: string | null;
 	private id: string | null;
 
+	private tournamentId: string | null;
+
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 		this.pong = null;
@@ -19,6 +21,7 @@ export default class Game {
 		this.mod = null;
 		this.map = null;
 		this.id = null;
+		this.tournamentId = null;
 	}
 
 	public unload() {
@@ -26,6 +29,13 @@ export default class Game {
 		//App3D.unloadVue('game');
 		//document.querySelector("canvas")?.blur();
 		this.pong?.stop();
+
+		if (this.mod === "tournament")
+		{
+			this.mod = null;
+			Router.nav(encodeURI(`/tournament?id=${this.tournamentId}`), false, true);
+		}
+		this.mod = null;
 		//this.pongbr?.dispose();
 		//this.div.remove();
 		//(document.querySelector("#main-container") as HTMLDivElement).style.zIndex = "0";
@@ -43,6 +53,8 @@ export default class Game {
 		let gameId = params.get("id");
 		let uuid = User.uuid;
 		let gameMode = params.get("mod");
+		this.mod = gameMode;
+		this.tournamentId = params.get("tournamentId");
 		let map = params.get("map");
 		if (!gameId)
 			gameId = "";
