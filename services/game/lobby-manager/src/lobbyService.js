@@ -13,16 +13,16 @@ import {
 // Simple Lobby model
 class Lobby {
 	constructor({ id, mode, map }) {
-		this.id = id
-		this.mode = mode
+		this.id = id;
+		this.mode = mode;
 		this.map = map;
 		console.log(mode);
-		this.maxPlayers = config.MAX_PLAYERS[mode] ?? 2
+		this.maxPlayers = config.MAX_PLAYERS[mode] ?? 2;
 		// userId -> { isReady, lastSeen }
-		this.players = new Map()
-		this.createdAt = Date.now()
-		this.gameId = null
-		this.tournamentId = null;
+		this.players = new Map();
+		this.createdAt = Date.now();
+		this.lastActivity = Date.now();
+		this.gameId = null;
 	}
 
 	addPlayer(userId) {
@@ -32,18 +32,46 @@ class Lobby {
 		if (this.players.has(userId)) {
 			throw new Error(`Player already in lobby`)
 		}
-		natsClient.publish(`notification.${userId}.status`, encodeStatusUpdate({ sender: userId, status: "in lobby", option: this.id }));
+		this.updateActivity();
+		natsClient.publish(`notification.${userId}.status`, encodeStatusUpdate({
+			sender: userId,
+			status: "in lobby",
+			option: this.id
+		}));
+
 		this.players.set(userId, { isReady: false })
 	}
 
 	removePlayer(userId) {
-		this.players.delete(userId)
+		this.players.delete(userId);
+		this.updateActivity();
+		return this.isEmpty();
 	}
 
 	markReady(userId) {
 		const p = this.players.get(userId)
 		if (!p) throw new Error('Player not in lobby')
-		p.isReady = true
+		p.isReady = true;
+		this.updateActivity();
+	}
+
+	updateActivity() {
+		this.lastActivity = Date.now()
+	}
+
+	isEmpty() {
+		return this.players.size === 0
+	}
+
+	isStale() {
+		const now = Date.now()
+		const maxAge = config.LOBBY_MAX_AGE || (10 * 60 * 1000)
+		const inactivityTimeout = config.LOBBY_INACTIVITY_TIMEOUT || (5 * 60 * 1000)
+
+		return (
+			now - this.createdAt > maxAge ||
+			now - this.lastActivity > inactivityTimeout
+		)
 	}
 
 	allReady() {
@@ -97,7 +125,14 @@ export default class LobbyService {
 	quit(lobbyId, userId) {
 		const lobby = this.lobbies.get(lobbyId)
 		if (!lobby) return null
-		lobby.removePlayer(userId)
+		const isEmpty = lobby.removePlayer(userId)
+
+		if (isEmpty) {
+			console.log(`Lobby ${lobbyId} is empty, removing immediately`)
+			this.lobbies.delete(lobbyId)
+			return null
+		}
+
 		return lobby.getState()
 	}
 
@@ -165,14 +200,33 @@ export default class LobbyService {
 	}
 
 	cleanup() {
-		const now = Date.now()
+		const toDelete = []
+
 		for (const [id, lobby] of this.lobbies) {
-			if (
-				lobby.players.size === 0 ||
-				now - lobby.createdAt > config.HEARTBEAT_INTERVAL * 2
-			) {
-				this.lobbies.delete(id)
+			if (lobby.isEmpty()) {
+				console.log(`Cleaning up empty lobby: ${id}`)
+				toDelete.push(id)
+			} else if (lobby.isStale()) {
+				console.log(`Cleaning up stale lobby: ${id} (created: ${new Date(lobby.createdAt)}, last activity: ${new Date(lobby.lastActivity)})`)
+				this.notifyPlayersLobbyClosing(lobby)
+				toDelete.push(id)
 			}
+		}
+
+		toDelete.forEach(id => this.lobbies.delete(id))
+
+		if (toDelete.length > 0) {
+			console.log(`Cleaned up ${toDelete.length} lobbies`)
+		}
+	}
+
+	notifyPlayersLobbyClosing(lobby) {
+		for (const userId of lobby.players.keys()) {
+			natsClient.publish(`notification.${userId}.lobby`, encodeNotificationMessage({
+				type: 'lobby_closed',
+				message: 'Lobby closed due to inactivity',
+				lobbyId: lobby.id
+			}))
 		}
 	}
 
