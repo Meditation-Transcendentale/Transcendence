@@ -232,6 +232,7 @@ export default class Lobby {
 		name.className = "username";
 		status.className = "status";
 
+		console.log(`POST UUID = ${uuid}`);
 		// const rep = await getRequest(`info/uuid/${uuid}`).catch((err) => console.log(err)) as any;
 		const rep = await postRequest("info/search", { identifier: uuid, type: "uuid" }).catch((err) => console.log(err)) as any;
 		name.innerText = rep.data.username; //NEED TO IMPLEMENT A ROUTE GET /userinfo/:uuid to get Username from uuid
