@@ -145,8 +145,14 @@ export class Environment {
 		this.gameMeshes.push(loaded.meshes[0] as Mesh);
 
 		const headMesh = this.scene.getMeshByName('Head.001') as Mesh;
+		// const headmat = new StandardMaterial('headmat', this.scene);
+		// headmat.diffuseColor = new Color3(1., 1, 1);
+		// headMesh.material = headmat;
 		const mouthMesh = this.scene.getMeshByName('Mouth.001') as Mesh;
 		const eyeMesh = this.scene.getMeshByName('Eyes.001') as Mesh;
+		// const eyemat = new StandardMaterial('eyemat', this.scene);
+		// eyemat.diffuseColor = new Color3(1., 0, 0);
+		// eyeMesh.material = eyemat;
 
 		if (mouthMesh && mouthMesh.morphTargetManager) {
 			const smileTarget = mouthMesh.morphTargetManager.getTarget(0);
@@ -164,8 +170,6 @@ export class Environment {
 			console.log("Statue is now smiling!");
 		}
 
-		// await this.gears.load();
-		//
 		await this.field.load();
 
 		this.scene.meshes.forEach((mesh) => {

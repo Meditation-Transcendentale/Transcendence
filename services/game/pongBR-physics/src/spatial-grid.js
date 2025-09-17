@@ -1,5 +1,4 @@
 // spatial-grid.js
-// Spatial partitioning for collision detection optimization
 
 export class UniformGrid {
 	constructor(cellSize, maxItemsPerCell = 64) {

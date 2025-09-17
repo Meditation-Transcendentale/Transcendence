@@ -16,6 +16,11 @@ export const CFG = {
 	GRID_CELL_SIZE_MULTIPLIER: 4,
 	MAX_BROAD_PHASE_CHECKS: 64,
 	REBUILD_DURATION: 3000,
+	SPAWN_INITIAL_DELAY: 1000,
+	SPAWN_EXPONENTIAL_BASE: 0.8,
+	SPAWN_MIN_INTERVAL: 100,
+	SPAWN_MAX_INTERVAL: 3000,
+	SPAWN_SAFETY_MARGIN: 0.3,
 };
 
 export const ENTITY_MASKS = {
@@ -25,6 +30,15 @@ export const ENTITY_MASKS = {
 	PILLAR: 4,
 	STATIC: 8
 };
+
+export const PHASE_BALL_CONFIGS = {
+	'Phase 1': { initialBalls: 1, maxBalls: 200 },
+	'Phase 2': { initialBalls: 1, maxBalls: 100 },
+	'Phase 3': { initialBalls: 1, maxBalls: 50 },
+	'Phase 4': { initialBalls: 1, maxBalls: 25 },
+	'Final Phase': { initialBalls: 1, maxBalls: 6 }
+};
+
 
 export const PHASE_CONFIGS = {
 	'Phase 1': { playerCount: 100, minPlayers: 51 },
@@ -54,4 +68,8 @@ export function getPhasePaddleSize(phase = 'Phase 1', arenaRadius = CFG.ARENA_RA
 	const perim = 2 * Math.PI * arenaRadius;
 	const playerCount = getPhaseConfig(phase).playerCount;
 	return (perim / playerCount) * CFG.PADDLE_FILL;
+}
+
+export function getPhaseBallConfig(phase = 'Phase 1') {
+	return PHASE_BALL_CONFIGS[phase] || PHASE_BALL_CONFIGS['Phase 1'];
 }

@@ -15,26 +15,15 @@ export const Physics = {
 
 		const eng = this.games.get(gameId);
 
-		// Apply paddle inputs
 		if (Array.isArray(inputs)) {
 			for (const { id, move } of inputs) {
-				//console.log(`Handling input for player: ${id}`);
 				eng.updatePaddleInputState(id, move);
 			}
 		}
 
-		// Start measuring performance
-		//const startTime = performance.now();
-
 		try {
 			const { balls, paddles, stage, ranks, end, events } = eng.step();
-			// End measuring performance
-			//const endTime = performance.now();
-			//const duration = endTime - startTime;
-			//
-			//console.log(`Step execution time for game ${gameId} at tick ${tick}: ${duration} milliseconds`);
-
-			const gameState = eng.gameState.getGameState(); // Get current game state
+			const gameState = eng.gameState.getGameState();
 			return { gameId, tick, balls, paddles, stage, ranks, end, events, gameState };
 		} catch (err) {
 			console.error('Physics.step() failed at tick', tick, err);
