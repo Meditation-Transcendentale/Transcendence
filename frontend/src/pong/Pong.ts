@@ -132,22 +132,6 @@ export class Pong {
 		}
 		localPaddleId = await this.waitForRegistration();
 
-		//if (maps == "monolith") {
-		//	this.pongRoot.position.set(0.1, 10, 0);
-		//	this.pongRoot.scalingDeterminant = 0.07;
-		//} else if (maps == "grass") {
-		//	this.pongRoot.position.set(5, 0, 5);
-		//	this.pongRoot.scalingDeterminant = 0.25;
-		//} else if (maps == "void") {
-		//	this.pongRoot.position.set(100, 0, 100);
-		//	this.pongRoot.scalingDeterminant = 0.25;
-		//}
-
-		// if (this.uiSystem) {
-		// 	this.uiSystem.resetUI();
-		// 	//this.uiSystem.enableUI();
-		// }
-
 		// 4) Plug networking into ECS
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
 		this.ecs.addSystem(this.inputSystem);
@@ -169,6 +153,22 @@ export class Pong {
 		this.stateManager.setter(true);
 		this.gameUI.startCountdown(3);
 		this.gameUI.updateScore(0, 0);
+
+		if (this.gameMode == "local"){
+			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: 70,  y: -3} });
+			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: 70,  y: 15} });
+			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70,  y: -3} });
+			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70,  y: 15} });
+		} else if (this.gameMode == "ai") {
+			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70,  y: -3} });
+			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70,  y: 15} });
+		} else if (this.gameMode == "online") {
+			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: -80,  y: -3} });
+			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: -80,  y: 15} });
+			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70,  y: -3} });
+			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70,  y: 15} });
+		}
+
 		this.stateManager.update();
 
 		//this.engine.runRenderLoop(() => {

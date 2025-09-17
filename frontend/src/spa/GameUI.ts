@@ -6,6 +6,7 @@ interface GameUIModules {
 	buttons?: ButtonModule;
 	countdown?: CountdownModule;
 	ending?: EndingModule;
+	images?: ImageModule;
 }
 
 interface ModulePosition {
@@ -28,6 +29,7 @@ interface GameUIConfig {
 		buttons?: ModulePosition;
 		countdown?: ModulePosition;
 		ending?: ModulePosition;
+		images?: ModulePosition;
 	};
 }
 
@@ -38,6 +40,7 @@ interface GameUIHtmlReference {
 	buttonModule: HTMLDivElement;
 	countdownModule: HTMLDivElement;
 	endingModule: HTMLDivElement;
+	imageModule: HTMLDivElement;
 }
 
 class GameUI {
@@ -59,7 +62,8 @@ class GameUI {
 			timerModule: div.querySelector("#timer-module") as HTMLDivElement,
 			buttonModule: div.querySelector("#button-module") as HTMLDivElement,
 			countdownModule: div.querySelector("#countdown-module") as HTMLDivElement,
-			endingModule: div.querySelector("#ending-module") as HTMLDivElement
+			endingModule: div.querySelector("#ending-module") as HTMLDivElement,
+			imageModule: div.querySelector("#image-module") as HTMLDivElement
 		};
 
 		this.initializeModules();
@@ -83,6 +87,8 @@ class GameUI {
 				case 'ending':
 					this.modules.ending = new EndingModule(this.ref.endingModule);
 					break;
+				case 'images':
+					this.modules.images = new ImageModule(this.ref.imageModule);
 			}
 		});
 	}
@@ -305,6 +311,7 @@ class GameUI {
 			case 'buttons': return this.ref.buttonModule;
 			case 'countdown': return this.ref.countdownModule;
 			case 'ending': return this.ref.endingModule;
+			case 'images': return this.ref.imageModule;
 			default: return null;
 		}
 	}
@@ -335,6 +342,14 @@ class GameUI {
 
 	public hideButton(id: string) {
 		this.modules.buttons?.removeButton(id);
+	}
+
+	public showImage(id: string, src: string, style?: string, position?: ImagePosition) {
+		this.modules.images?.addImage(id, src, style, position);
+	}
+
+	public hideImage(id: string) {
+		this.modules.images?.removeImage(id);
 	}
 
 }
@@ -570,8 +585,8 @@ class EndingModule implements GameUIModule{
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 		this.ref = {
-			score1Value: div.querySelector("#score1-value") as HTMLSpanElement,
-			score2Value: div.querySelector("#score2-value") as HTMLSpanElement,
+			score1Value: div.querySelector("#end-score1-value") as HTMLSpanElement,
+			score2Value: div.querySelector("#end-score2-value") as HTMLSpanElement,
 			result: div.querySelector("#result-label") as HTMLSpanElement
 		};
 	}
@@ -590,11 +605,139 @@ class EndingModule implements GameUIModule{
 			this.ref.score2Value.textContent = score2.toString();
 		}
 		if (result)
-			this.ref.result.textContent = 'You WIN!';
+			this.ref.result.innerHTML = 'You <span class="win">Win</span>';
 		else
-			this.ref.result.textContent = 'You LOSE!';
+			this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
 
 		this.div.style.display = 'flex';
+	}
+}
+
+
+interface ImageHtmlReference{
+	imageContainer: HTMLDivElement;
+}
+
+interface ImagePosition {
+	x?: 'left' | 'center' | 'right' | number;
+	y?: 'top' | 'center' | 'bottom' | number;
+	anchor?: 'top-left' | 'top-center' | 'top-right' |
+					 'center-left' | 'center' | 'center-right' |
+					 'bottom-left' | 'bottom-center' | 'bottom-right';
+	offset?: { x: number; y: number };
+}
+
+class ImageModule implements GameUIModule{
+	private div: HTMLDivElement;
+	private ref: ImageHtmlReference;
+	private images: Map<string, HTMLImageElement> = new Map();
+	private positions: Map<string, ImagePosition> = new Map();
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			imageContainer: div.querySelector("#image-container") as HTMLDivElement
+		};
+	}
+
+	load() {
+		this.div.style.display = 'flex';
+		this.ref.imageContainer.style.position = 'relative';
+	}
+
+	unload() {
+		this.div.style.display = 'none';
+		this.images.clear();
+		this.positions.clear();
+		if (this.ref.imageContainer) {
+			this.ref.imageContainer.innerHTML = '';
+		}
+	}
+
+	addImage(id: string, src: string, style?: string, position?: ImagePosition) {
+		this.removeImage(id);
+
+		const img = document.createElement('img');
+		img.src = src;
+		img.className = `game-image ${style || ''}`;
+		img.id = `game-img-${id}`;
+
+		this.images.set(id, img);
+		this.ref.imageContainer.appendChild(img);
+
+		if (position)
+			this.setImagePosition(id, position);
+  	}
+
+	removeImage(id: string) {
+		const img = this.images.get(id);
+		if (img) {
+			img.remove();
+			this.images.delete(id);
+			this.positions.delete(id);
+		}
+	}
+
+	setImagePosition(id: string, position: ImagePosition){
+		const img = this.images.get(id);
+		if(!img) return;
+
+		this.positions.set(id, position);
+
+		img.style.position = 'absolute';
+		img.style.top = '50%';
+		img.style.left = '50%';
+		img.style.transform = 'translate(-50%, -50%)';
+
+		// img.style.top = '';
+		// img.style.left = '';
+		// img.style.right = '';
+		// img.style.bottom = '';
+		// img.style.transform = '';
+
+		// if (position.anchor) {
+		// 	switch (position.anchor) {
+		// 		case 'center-right':
+		// 			img.style.top = '50%';
+		// 			img.style.right = '20px';
+		// 			img.style.transform = 'translateY(-50%)';
+		// 			break;
+		// 		case 'center-left':
+		// 			img.style.top = '50%';
+		// 			img.style.left = '20px';
+		// 			img.style.transform = 'translateY(50%)';
+		// 			break;
+		// 		case 'top-right':
+		// 			img.style.top = '20px';
+		// 			img.style.right = '20px';
+		// 			break;
+		// 		case 'top-left':
+		// 			img.style.top = '20px';
+		// 			img.style.left = '20px';
+		// 			break;
+		// 		case 'bottom-right':
+		// 			img.style.bottom = '20px';
+		// 			img.style.right = '20px';
+		// 			break;
+		// 		case 'bottom-left':
+		// 			img.style.bottom = '20px';
+		// 			img.style.left = '20px';
+		// 			break;
+		// 	}
+		// } else {
+		// 	if (typeof position.x === 'number') {
+		// 		img.style.left = position.x + 'px';
+		// 	}
+		// 	if (typeof position.y === 'number') {
+		// 		img.style.top = position.y + 'px';
+		// 	}
+		// }
+
+		if (position.offset) {
+			// const t = img.style.transform || '';
+			// img.style.transform = `${t} translate(${position.offset.x}px, ${position.offset.y}px)`;
+			img.style.transform += ` translate(${position.offset.x}vh, ${position.offset.y}vh)`;
+		}
 	}
 }
 

@@ -23,13 +23,14 @@ export default class Game {
 		this.id = null;
 
 		this.gameUI = new GameUI(this.div, {
-			enabledModules: ['score', 'buttons', 'countdown', 'ending'],
+			enabledModules: ['score', 'buttons', 'countdown', 'ending', 'images'],
 			theme: 'pong',
 			modulePositions: {
 				score: { x: 'center', y: 'top'},
 				buttons: { x: 'center', y: 'bottom' },
 				countdown: {x: 'center', y: 'center'},
-				ending: {x:'center', y:'center'}
+				ending: {x:'center', y:'center'},
+				images: {x:'center', y:'center'}
 			}
 		});
 	}
