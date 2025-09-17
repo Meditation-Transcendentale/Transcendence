@@ -6,8 +6,9 @@ import { PaddleComponent } from "../components/PaddleComponent.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputComponent } from "../components/InputComponent.js";
-// import { UIComponent } from "../components/UIComponent.js";
+import { UIComponent } from "../components/UIComponent.js";
 import Game from "../../spa/Game.js";
+import GameUI from "../../spa/GameUI.js";
 
 export interface GameTemplateConfig {
 	numberOfBalls: number;
@@ -16,11 +17,11 @@ export interface GameTemplateConfig {
 	wallWidth: number;
 }
 
-export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string): void {
+export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string, gameUI: GameUI): void {
 
-	// const scoreUI = new Entity();
-	// scoreUI.addComponent(new UIComponent(gameMode));
-	// ecs.addEntity(scoreUI);
+	const scoreUI = new Entity();
+	scoreUI.addComponent(new UIComponent(gameMode, gameUI));
+	ecs.addEntity(scoreUI);
 
 	// console.log("create player === ", gameMode);
 	for (let i = 0; i < 2; i++) {

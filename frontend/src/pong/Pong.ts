@@ -19,6 +19,7 @@ import type { userinterface } from './utils/proto/message.js';
 import { BallComponent } from "./components/BallComponent.js";
 import { Entity } from "./ecs/Entity.js";
 import { Ball } from "../brickbreaker/Ball.js";
+import GameUI from "../spa/GameUI.js";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
@@ -41,7 +42,7 @@ export class Pong {
 	private uuid!: string;
 	private baseMeshes: any;
 	private instanceManagers: any;
-	private scoreUI: any;
+	public gameUI: GameUI;
 
 	private canvas;
 	private gameId;
@@ -53,11 +54,12 @@ export class Pong {
 
 	private config: any;
 
-	constructor(canvas: any, gameId: any, scene: Scene) {
+	constructor(canvas: any, gameId: any, scene: Scene, gameUI: GameUI) {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.gameId = gameId;
 		this.gameMode = "";
+		this.gameUI = gameUI;
 		this.engine = this.scene.getEngine() as Engine;
 		this.inited = false;
 
@@ -75,6 +77,10 @@ export class Pong {
 		this.pongRoot = new TransformNode("pongRoot", this.scene);
 		this.pongRoot.position.set(2000, -3500, -3500);
 		this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
+		this.cam.position.x = 0;
+		this.cam.position.y = 40;
+		this.cam.position.z = -2;
+		this.cam.detachControl();
 		this.baseMeshes = createBaseMeshes(this.scene, this.config, this.pongRoot);
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
 		this.uuid = getOrCreateUUID();
@@ -99,7 +105,7 @@ export class Pong {
 			this.ecs.removeSystem(this.inputSystem);
 			this.ecs.removeSystem(this.networkingSystem);
 			//delete player
-			// this.ecs.removeEntityById(7);
+			//this.ecs.removeEntityById(7);
 			this.ecs.removeEntityById(6);
 			this.ecs.removeEntityById(5);
 		}
@@ -126,22 +132,6 @@ export class Pong {
 		}
 		localPaddleId = await this.waitForRegistration();
 
-		//if (maps == "monolith") {
-		//	this.pongRoot.position.set(0.1, 10, 0);
-		//	this.pongRoot.scalingDeterminant = 0.07;
-		//} else if (maps == "grass") {
-		//	this.pongRoot.position.set(5, 0, 5);
-		//	this.pongRoot.scalingDeterminant = 0.25;
-		//} else if (maps == "void") {
-		//	this.pongRoot.position.set(100, 0, 100);
-		//	this.pongRoot.scalingDeterminant = 0.25;
-		//}
-
-		// if (this.uiSystem) {
-		// 	this.uiSystem.resetUI();
-		// 	//this.uiSystem.enableUI();
-		// }
-
 		// 4) Plug networking into ECS
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
 		this.ecs.addSystem(this.inputSystem);
@@ -152,7 +142,7 @@ export class Pong {
 		this.ecs.addSystem(this.networkingSystem);
 
 		//add player
-		createPlayer(this.ecs, this.config, localPaddleId, this.gameMode);
+		createPlayer(this.ecs, this.config, localPaddleId, this.gameMode, this.gameUI);
 
 		console.log("start");
 		//this.engine = new Engine(this.canvas, true);
@@ -161,6 +151,24 @@ export class Pong {
 		this.pongRoot.setEnabled(true);
 		// this.stateManager.set_ecs(this.ecs);
 		this.stateManager.setter(true);
+		this.gameUI.startCountdown(3);
+		this.gameUI.updateScore(0, 0);
+
+		if (this.gameMode == "local"){
+			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: 70,  y: -3} });
+			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: 70,  y: 15} });
+			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70,  y: -3} });
+			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70,  y: 15} });
+		} else if (this.gameMode == "ai") {
+			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70,  y: -3} });
+			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70,  y: 15} });
+		} else if (this.gameMode == "online") {
+			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: -80,  y: -3} });
+			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: -80,  y: 15} });
+			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70,  y: -3} });
+			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70,  y: 15} });
+		}
+
 		this.stateManager.update();
 
 		//this.engine.runRenderLoop(() => {
