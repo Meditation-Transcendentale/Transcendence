@@ -22,6 +22,7 @@ import { Ball } from "../brickbreaker/Ball.js";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
+export let tournamentId: any = null;
 let engine: any;
 let resizeTimeout: NodeJS.Timeout;
 
@@ -91,9 +92,10 @@ export class Pong {
 
 	}
 
-	public async start(gameId: string, uuid: string, gameMode: string, maps: string) {
+	public async start(gameId: string, uuid: string, gameMode: string, maps: string, tournament: string) {
 		// const maps = 0;
 		this.gameMode = gameMode;
+		tournamentId = tournament;
 		if (this.wsManager) {
 			this.wsManager.socket.close();
 			this.ecs.removeSystem(this.inputSystem);
@@ -197,6 +199,7 @@ export class Pong {
 		this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
 		this.cam.parent = null;
+		tournamentId = null;
 
 
 		console.log("render loop stopped and game paused");

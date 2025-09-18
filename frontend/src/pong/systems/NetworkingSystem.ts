@@ -14,6 +14,8 @@ import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
 import { localPaddleId } from "../Pong";
+import { tournamentId } from "../Pong";
+import Router from "../../spa/Router.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -121,6 +123,9 @@ export class NetworkingSystem extends System {
 
 			// === Game End ===
 			if (serverMsg.end) {
+				if (tournamentId)
+					Router.nav(encodeURI(`/tournament?id=${tournamentId}`), false, true);
+
 				console.log("Received GameEndMessage");
 				// const scores = serverMsg.end.score as number[];
 				// const myScore = scores[localPaddleId] ?? 0;

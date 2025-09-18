@@ -30,11 +30,10 @@ export default class Game {
 		//document.querySelector("canvas")?.blur();
 		this.pong?.stop();
 
-		if (this.mod === "tournament")
-		{
-			this.mod = null;
-			Router.nav(encodeURI(`/tournament?id=${this.tournamentId}`), false, true);
-		}
+		// if (this.mod === "tournament") {
+		// 	this.mod = null;
+		// 	Router.nav(encodeURI(`/tournament?id=${this.tournamentId}`), false, true);
+		// }
 		this.mod = null;
 		//this.pongbr?.dispose();
 		//this.div.remove();
@@ -64,7 +63,7 @@ export default class Game {
 			gameMode = "";
 		if (!map)
 			map = "";
-		this.pong.start(gameId, uuid, gameMode, map);
+		this.pong.start(gameId, uuid, gameMode, map, this.tournamentId);
 	}
 
 }
