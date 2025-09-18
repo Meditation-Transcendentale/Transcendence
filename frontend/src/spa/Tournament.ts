@@ -64,7 +64,7 @@ export default class TournamentPage {
 	}
 
 	public load(params: URLSearchParams) {
-		console.log ("AAAAAAAAAAAAAAAAAAAAA");
+		console.log("AAAAAAAAAAAAAAAAAAAAA")
 		if (!this.tournamentId)
 			this.tournamentId = params.get("id") as string;
 
@@ -117,7 +117,7 @@ export default class TournamentPage {
 		this.stopReadyCountdown();
 		if (this.ws) {
 			try { this.ws.close(); } catch { }
-			// this.ws = null;
+			this.ws = null;
 		}
 	}
 
@@ -147,18 +147,16 @@ export default class TournamentPage {
 		this.treeEl.id = 'tournament-tree';
 		this.treeEl.className = 'bracket';
 
+		this.treeEl.innerHTML = `
+			<div class="bracket-left"></div>
+			<div class="bracket-center"></div>
+			<div class="bracket-right"></div>
+			`;
+
 		this.rootEl.append(this.toolbarEl, this.treeEl);
 		this.div.appendChild(this.rootEl);
 
 		this.render();
-	}
-
-	private render() {
-		this.treeEl.innerHTML = '';
-		if (!this.tree) return;
-
-		const root = this.renderNode(this.tree, 'root', 0);
-		this.treeEl.appendChild(root);
 	}
 
 	private sendReady() {
@@ -208,43 +206,6 @@ export default class TournamentPage {
 		}
 	}
 
-	private renderNode(node: MatchNode, side: 'root' | 'left' | 'right', depth: number): HTMLElement {
-		const wrap = document.createElement('div');
-		wrap.className = `match-node side-${side}`;
-		wrap.dataset.depth = String(depth);
-
-		const box = document.createElement('div');
-		box.className = 'match-info';
-
-		const top = this.renderRow(node, node.player1Id ?? null, side);
-		const bot = this.renderRow(node, node.player2Id ?? null, side);
-
-		if (node.winnerId && node.player1Id && node.winnerId === node.player1Id) top.classList.add('winner');
-		if (node.winnerId && node.player2Id && node.winnerId === node.player2Id) bot.classList.add('winner');
-
-		box.appendChild(top);
-		box.appendChild(bot);
-		wrap.appendChild(box);
-
-		if (node.left || node.right) {
-			const kids = document.createElement('div');
-			kids.className = 'match-children';
-			kids.appendChild(node.left ? this.renderNode(node.left, 'left', depth + 1) : this.spacer());
-			kids.appendChild(node.right ? this.renderNode(node.right, 'right', depth + 1) : this.spacer());
-			wrap.appendChild(kids);
-		}
-
-		return wrap;
-	}
-
-	private spacer(): HTMLElement {
-		const s = document.createElement('div');
-		s.className = 'match-node';
-		s.style.minWidth = '220px';
-		s.style.visibility = 'hidden';
-		return s;
-	}
-
 	private isActive(node: MatchNode): boolean {
 		return !!node.player1Id && !!node.player2Id && !node.gameId && !node.winnerId;
 	}
@@ -265,12 +226,13 @@ export default class TournamentPage {
 		name.style.maxWidth = '160px';
 		name.style.overflow = 'hidden';
 		name.style.textOverflow = 'ellipsis';
+
 		if (pid) {
-			console.log(`PID NOT NULL`);
 			postRequest("info/search", { identifier: pid, type: "uuid" })
-				.then((json: any) => {
-					name.textContent = json.data.username;
-				});
+				.then((json: any) => { name.textContent = json.data.username; });
+		} else {
+			name.textContent = 'TBD';
+			name.classList.add('tbd');
 		}
 
 		const inner = document.createElement('div');
@@ -305,6 +267,7 @@ export default class TournamentPage {
 		return row;
 	}
 
+
 	private makeReadyButton(): HTMLButtonElement {
 		const b = document.createElement('button');
 		b.textContent = 'Ready';
@@ -329,4 +292,122 @@ export default class TournamentPage {
 		if (!p.ready) s.classList.add('notReady-checked');
 		return s;
 	}
+
+	private makeGameItem(node: MatchNode, side: 'left' | 'right' | 'root'): HTMLLIElement {
+		const li = document.createElement('li');
+		li.className = 'game';
+
+		const card = document.createElement('div');
+		card.className = 'match-info';
+
+		const top = this.renderRow(node, node.player1Id ?? null, side === 'root' ? 'left' : side);
+		const bot = this.renderRow(node, node.player2Id ?? null, side === 'root' ? 'right' : side);
+
+		if (node.winnerId && node.player1Id && node.winnerId === node.player1Id) top.classList.add('winner');
+		if (node.winnerId && node.player2Id && node.winnerId === node.player2Id) bot.classList.add('winner');
+
+		card.append(top, bot);
+		li.appendChild(card);
+		return li;
+	}
+
+	private collectLevels(root: MatchNode | null): MatchNode[][] {
+		const levels: MatchNode[][] = [];
+		if (!root) return levels;
+		let q: MatchNode[] = [root];
+		let depth = 1;
+		while (q.length) {
+			levels[depth] = q.slice();
+			const next: MatchNode[] = [];
+			for (const n of q) {
+				if (n.left) next.push(n.left);
+				if (n.right) next.push(n.right);
+			}
+			q = next;
+			depth++;
+		}
+		return levels;
+	}
+
+	private makeRoundColumn(
+		lane: 'left' | 'right' | 'center',
+		depthIndex: number,                      
+		nodes: MatchNode[] | undefined,
+		hasChildrenNextDepth: boolean            
+	): HTMLUListElement {
+		const ul = document.createElement('ul');
+		ul.className = `round ${lane}`;
+		if (hasChildrenNextDepth) ul.classList.add('has-children');
+
+		const spacer = () => { const li = document.createElement('li'); li.className = 'spacer'; return li; };
+
+		if (lane === 'center') {
+			ul.appendChild(spacer());
+			ul.appendChild(spacer());
+			return ul;
+		}
+
+		const items = (nodes ?? []).map(n => this.makeGameItem(n, lane));
+		ul.appendChild(spacer());
+
+		if (depthIndex === 1) {
+			for (let i = 0; i < items.length; i++) {
+				ul.appendChild(items[i]);
+				if (i !== items.length - 1) ul.appendChild(spacer());
+			}
+		} else {
+			for (let i = 0; i < items.length; i += 2) {
+				const topItem = items[i];
+				const botItem = items[i + 1] ?? items[i].cloneNode(true) as HTMLLIElement; 
+				topItem.classList.add('game-top');
+				botItem.classList.add('game-bottom');
+
+				const mid = document.createElement('li');
+				mid.className = 'game-spacer';
+
+				ul.append(topItem, mid, botItem);
+
+				if (i + 2 < items.length) ul.appendChild(spacer());
+			}
+		}
+
+		ul.appendChild(spacer());
+		return ul;
+	}
+
+	private render() {
+		const leftLane = this.treeEl.querySelector('.bracket-left') as HTMLElement;
+		const ctrLane = this.treeEl.querySelector('.bracket-center') as HTMLElement;
+		const rightLane = this.treeEl.querySelector('.bracket-right') as HTMLElement;
+
+		leftLane.innerHTML = '';
+		ctrLane.innerHTML = '';
+		rightLane.innerHTML = '';
+
+		if (!this.tree) return;
+
+		const leftLevels = this.collectLevels(this.tree.left ?? null);
+		const rightLevels = this.collectLevels(this.tree.right ?? null);
+
+		const leftDepths = Object.keys(leftLevels).map(Number).sort((a, b) => a - b);
+		for (const d of leftDepths) {
+			const col = this.makeRoundColumn('left', d, leftLevels[d], !!leftLevels[d + 1]);
+			leftLane.appendChild(col);
+		}
+
+		const finalCard = this.makeGameItem(this.tree, 'root');
+		finalCard.classList.add('final');
+		const centerCol = this.makeRoundColumn('center', 0, [], false);
+		centerCol.insertBefore(finalCard, centerCol.lastElementChild);
+		ctrLane.appendChild(centerCol);
+		
+		const rightDepths = Object.keys(rightLevels).map(Number).sort((a, b) => a - b);
+		for (const d of rightDepths) {
+			const col = this.makeRoundColumn('right', d, rightLevels[d], !!rightLevels[d + 1]);
+			rightLane.appendChild(col);
+		}
+	}
+
+
 }
+
