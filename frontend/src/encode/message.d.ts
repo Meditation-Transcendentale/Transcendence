@@ -2619,6 +2619,7 @@ export namespace lobby {
 
     /** Represents a ServerMessage. */
     class ServerMessage implements IServerMessage {
+		startTournament: null;
 
         /**
          * Constructs a new ServerMessage.

@@ -1,4 +1,4 @@
-import { Camera, Color3, Engine, FxaaPostProcess, Matrix, PostProcess, ProceduralTexture, RenderTargetTexture, Scene, Texture, UniformBuffer, Vector2, Vector3 } from "@babylonImport";
+import { BloomEffect, Camera, Color3, Engine, FxaaPostProcess, Matrix, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, ProceduralTexture, RenderTargetTexture, Scene, Texture, UniformBuffer, Vector2, Vector3 } from "@babylonImport";
 import { UIaddColor, UIaddDetails, UIaddNumber, UIaddSlider, UIaddSliderVec3, UIaddToggle, UIaddVec3 } from "./UtilsUI";
 
 
@@ -6,6 +6,7 @@ export class Pipeline {
 	private scene: Scene;
 	private camera: Camera;
 
+	private renderingPipeline: PostProcessRenderPipeline;
 	private enabled: boolean;
 
 	private fogPostProcess: PostProcess;
@@ -26,13 +27,17 @@ export class Pipeline {
 		this.fogTexture = fogRt;
 
 		this.enabled = true;
+
+		this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "pipeline");
+
 		this.fogPostProcess = new PostProcess("fogApply", "fogApply", {
 			uniforms: ["fogAbsorption"],
 			samplers: ["fogTexture"],
 			size: 1.,
 			camera: this.camera,
 			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
-			reusable: true
+			textureType: Engine.TEXTURETYPE_HALF_FLOAT,
+			reusable: false
 		});
 
 		this.fogAbsorption = new Vector3(0.1, 0.1, 0.1);
@@ -41,14 +46,15 @@ export class Pipeline {
 			effect.setTexture("fogTexture", this.fogTexture);
 		}
 
-		this.fxaaPostProcess = new FxaaPostProcess("fxaa", 1.0, this.camera);
+		// this.fxaaPostProcess = new FxaaPostProcess("fxaa", 1.0);
 
 		this.colorCorrectionPostProcess = new PostProcess("colorCorrection", "colorCorrection", {
 			uniforms: ["contrast", "brightness", "gamma"],
 			size: 1.,
 			camera: this.camera,
 			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
-			reusable: true
+			textureType: Engine.TEXTURETYPE_HALF_FLOAT,
+			reusable: false
 		})
 		this.contrast = 1.;
 		this.brightness = 0.;
@@ -60,19 +66,31 @@ export class Pipeline {
 			effect.setFloat("gamma", this.gamma);
 		}
 
+		this.camera.detachPostProcess(this.colorCorrectionPostProcess);
+		this.camera.detachPostProcess(this.fogPostProcess);
+
+
+		const bloom = new BloomEffect(this.scene.getEngine(), 0.25, 0.1, 32., Engine.TEXTURETYPE_HALF_FLOAT);
+
+
+		const d = new PostProcessRenderEffect(this.scene.getEngine(), "first", () => {
+			return [this.fogPostProcess, this.colorCorrectionPostProcess];
+		});
+		this.renderingPipeline.addEffect(d);
+		this.renderingPipeline.addEffect(bloom);
+
+		this.scene.postProcessRenderPipelineManager.addPipeline(this.renderingPipeline);
+		this.scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("pipeline", this.camera);
+
 		this.initUI();
 	}
 
 	public setEnable(status: boolean) {
 		if (status && !this.enabled) {
-			this.camera.attachPostProcess(this.fogPostProcess);
-			this.camera.attachPostProcess(this.fxaaPostProcess);
-			this.camera.attachPostProcess(this.colorCorrectionPostProcess);
+			this.scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("pipeline", this.camera);
 			this.enabled = true;
 		} else if (!status && this.enabled) {
-			this.camera.detachPostProcess(this.colorCorrectionPostProcess);
-			this.camera.detachPostProcess(this.fxaaPostProcess);
-			this.camera.detachPostProcess(this.fogPostProcess);
+			this.scene.postProcessRenderPipelineManager.detachCamerasFromRenderPipeline("pipeline", this.camera);
 			this.enabled = false;
 		}
 	}
@@ -106,18 +124,10 @@ export class Pipeline {
 		}, (n: number) => { this.gamma = n });
 	}
 
-	public setFogEnable(status: boolean) {
-		if (!status) {
-			this.camera.detachPostProcess(this.fogPostProcess)
-		} else {
-			this.camera.attachPostProcess(this.fogPostProcess, 0)
-		};
-	}
-
 	public dispose() {
 		this.setEnable(false);
 		this.fogPostProcess.dispose();
-		this.fxaaPostProcess.dispose();
+		// this.fxaaPostProcess.dispose();
 		this.colorCorrectionPostProcess.dispose();
 	}
 }

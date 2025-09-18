@@ -83,3 +83,18 @@ export function decodeMatchSetup(buffer) {
 	return Proto.shared.MatchSetup.decode(buffer);
 }
 
+/**
+ * MatchEnd (NATS lifecycle)
+ */
+export function encodeMatchEnd(payload) {
+	const err = Proto.shared.MatchEnd.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.shared.MatchEnd
+		.encode(Proto.shared.MatchEnd.create(payload))
+		.finish();
+}
+
+export function decodeMatchEnd(buffer) {
+	return Proto.shared.MatchEnd.decode(buffer);
+}
+

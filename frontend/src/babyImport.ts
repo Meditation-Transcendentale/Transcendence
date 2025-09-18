@@ -1,9 +1,12 @@
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import "@babylonjs/loaders/glTF/2.0/";
+import "@babylonjs/loaders/OBJ/objFileLoader"
 import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // load shaders
+
 // import * as POST from "@babylonjs/core/PostProcesses";
 
-// export { Inspector } from '@babylonjs/core';
+
+// export { Inspector } from '@babylonjs/inspector';
 // import {
 // 	VolumetricLightScatteringPostProcess
 // } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
@@ -68,6 +71,9 @@ export { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 export { EffectWrapper, EffectRenderer } from "@babylonjs/core/Materials/effectRenderer";
 export { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 export { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
+export { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
+export { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
+export { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 
 import "@babylonjs/core/Culling/ray";
 

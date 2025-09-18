@@ -10,7 +10,8 @@ import "./auroraShader.ts";
 import "./postShader.ts";
 import "./fogShader.ts";
 import "./gaussianBlurShader.ts";
-import "./pickerShader.ts"
+import "./pickerShader.ts";
+import "./stupidShader.ts";
 
 Effect.IncludesShadersStore["noises"] = `
 uint murmurHash12(uvec2 src) {

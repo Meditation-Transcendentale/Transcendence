@@ -1,6 +1,0 @@
-{
-    "senderId":{
-        "format": "uuid",
-        "type": "string"
-    }
-}

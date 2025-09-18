@@ -86,7 +86,10 @@ message MatchQuit { string uuid = 1; }
 
 message MatchStart {}
 
-message MatchEnd { int32 winner = 1; }
+message MatchEnd { 
+  int32 winnerId = 1;
+  repeated int32 score = 2;
+}
 
 message PhysicsRequest {
   string gameId = 1;

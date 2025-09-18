@@ -62,7 +62,7 @@ export function buildPaddles(
 	const halfArc = paddleArc / 2;
 	const y = paddleHeight / 2;
 	const goalRadius = arenaRadius + wallWidth / 2 + goalDepth / 2;
-	const pillarArc = angleStep * 0.1;
+	const pillarArc = angleStep * 0.025;
 	const pillarSize = arenaRadius * pillarArc;
 	const usableArc = angleStep - pillarArc;
 	const halfUsableArc = usableArc / 2;
@@ -125,7 +125,8 @@ export function buildPaddles(
 		ecs.addEntity(deathWall);
 
 		// ---- Pillars ----
-		const angle = midAngle - maxOffset - halfArc;
+		// const angle = midAngle - maxOffset - halfArc;
+		const angle = sliceStart + pillarArc / 2;
 		const baseX = Math.cos(angle) * (arenaRadius + pillarSize / 2);
 		const baseZ = Math.sin(angle) * (arenaRadius + pillarSize / 2);
 
@@ -140,9 +141,9 @@ export function buildPaddles(
 		pillar.addComponent(new PillarComponent(i));
 		pillar.addComponent(
 			new TransformComponent(
-				new Vector3(px, y, pz),
+				new Vector3(px, pillarSize * 1.5 / 2 + 2.5, pz),
 				new Vector3(0, yaw, 0),
-				new Vector3(pillarSize, paddleHeight * 2 * pillarSize, pillarSize),
+				new Vector3(pillarSize, pillarSize * 1.5, pillarSize),
 				pongRoot
 			)
 		);

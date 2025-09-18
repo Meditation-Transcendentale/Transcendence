@@ -115,7 +115,6 @@ export class Field {
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
 		this.fog.addMeshToDepth(this.picker.mesh, this.defaultDepthMaterial);
 
-		UIaddToggle("fog", true, {}, (n: boolean) => { this.fog.setEnabled(n); this.pipeline.setFogEnable(n) });
 	}
 
 	public update(time: number, deltaTime: number) {
@@ -199,6 +198,13 @@ export class Field {
 			case 'exemple2': {
 				this.camera.position.set(0, 6, 40);
 				this.camera.setTarget(new Vector3(0, 6, 30));
+				break;
+			}
+			case 'tournament': {
+				this.camera.position.set(-13, 4, -7);
+				this.camera.setTarget(new Vector3(20, 11, -8));
+				this.monolith.setPicking(true);
+				//this.setEnable(true);
 				break;
 			}
 		}

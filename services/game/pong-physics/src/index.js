@@ -65,17 +65,21 @@ async function start() {
 	const endLocal = nc.subscribe('games.local.*.match.end');
 	const endIa = nc.subscribe('games.ai.*.match.end');
 	const endOnline = nc.subscribe('games.online.*.match.end');
+	const endTournament = nc.subscribe('games.tournament.*.match.end');
 	handleEnd(endLocal);
 	handleEnd(endIa);
 	handleEnd(endOnline);
+	handleEnd(endTournament);
 
 	const subLocal = nc.subscribe("games.local.*.physics.request");
 	const subIA = nc.subscribe("games.ai.*.physics.request");
 	const subOnline = nc.subscribe("games.online.*.physics.request");
+	const subTournament = nc.subscribe("games.tournament.*.physics.request");
 
 	handlePhysicsRequest(subLocal);
 	handlePhysicsRequest(subIA);
 	handlePhysicsRequest(subOnline);
+	handlePhysicsRequest(subTournament);
 }
 
 start();

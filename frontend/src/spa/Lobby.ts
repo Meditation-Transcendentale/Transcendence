@@ -1,6 +1,6 @@
 import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
-import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
+import { decodeServerMessage, encodeClientMessage } from "./proto/helper";
 // import { lobbyVue } from "../Vue";
 import Router from "./Router";
 import { User } from "./User";
@@ -188,6 +188,12 @@ export default class Lobby {
 					Router.nav(encodeURI(`/cajoue?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
 				this.ws?.close();
 			}
+
+			if (payload.startTournament != null) {
+				const tournamentId = payload.startTournament.tournamentId;
+				Router.nav(encodeURI(`/tournament?id=${tournamentId}`), false, true);
+				this.ws?.close();
+			}
 		}
 
 		this.ws.onclose = () => {
@@ -232,6 +238,7 @@ export default class Lobby {
 		name.className = "username";
 		status.className = "status";
 
+		console.log(`POST UUID = ${uuid}`);
 		// const rep = await getRequest(`info/uuid/${uuid}`).catch((err) => console.log(err)) as any;
 		const rep = await postRequest("info/search", { identifier: uuid, type: "uuid" }).catch((err) => console.log(err)) as any;
 		name.innerText = rep.data.username; //NEED TO IMPLEMENT A ROUTE GET /userinfo/:uuid to get Username from uuid

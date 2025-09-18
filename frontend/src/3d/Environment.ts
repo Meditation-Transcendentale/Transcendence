@@ -15,6 +15,12 @@ import {
 	FreeCamera,
 } from "@babylonImport";
 import { Field } from "./Field";
+import { DefaultRenderingPipeline, DirectionalLight, DynamicTexture, Material, PBRMaterial, PointLight, ShadowGenerator, SpotLight, Texture } from "@babylonjs/core";
+// import { Inspector } from '@babylonjs/inspector';
+// import "@babylonjs/core/Debug/debugLayer";
+// import "@babylonjs/inspector";
+// import * as BABYLON from 'babylonjs';
+// import 'babylonjs-inspector';
 
 
 export class Environment {
@@ -30,7 +36,7 @@ export class Environment {
 	private pongRoot!: TransformNode;
 
 	private fCamera: FreeCamera;
-	private field: nField | Field;
+	private field: Field;
 
 	private updateHome: boolean = true;
 
@@ -68,26 +74,34 @@ export class Environment {
 
 	}
 
+	private creatMaterial() {
+		// const concreteMaterial = new BABYLON.PBRMaterial("concreteMaterial", scene);
+		//
+		// concreteMaterial.baseTexture = new Texture("textures/brushed_concrete_diff_1k.jpg", this.scene);
+		// concreteMaterial.normalTexture = new Texture("textures/brushed_concrete_nor_gl_1k.jpg", this.scene);
+		// concreteMaterial.metallicRoughnessTexture = new Texture("textures/brushed_concrete_rough_1k.jpg", this.scene);
+		// concreteMaterial.ambientTexture = new Texture("textures/brushed_concrete_ao_1k.jpg", this.scene);
+		//
+		// concreteMaterial.metallicFactor = 0.0; 
+		// concreteMaterial.roughnessFactor = 1.0; 
+		// concreteMaterial.baseColor = new Color3(1, 1, 1); 
+		//
+		// concreteMaterial.ambientTextureStrength = 1.0;
+	}
+
 	private createMesh() {
 		this.pongRoot = new TransformNode("pongbrRoot", this.scene);
-		this.pongRoot.position.set(-2200, -3500, -3500);
-		this.pongRoot.rotation.z -= 30.9000;
-		this.pongRoot.scaling.set(1, 1, 1);
-		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 1, tessellation: 128 }, this.scene);
-		arenaMesh.parent = this.pongRoot;
+		this.pongRoot.position.set(0, -100, 0);
 
-		const material = new StandardMaterial("arenaMaterial", this.scene);
-		material.diffuseColor.set(0, 0, 0);
-		material.specularColor.set(0, 0, 0);
-		material.emissiveColor.set(1, 1, 1);
-		material.disableLighting = true;
-		const fresnel = new FresnelParameters();
-		fresnel.isEnabled = true;
-		fresnel.leftColor = new Color3(1, 1, 1);
-		fresnel.rightColor = new Color3(0, 0, 0);
-		fresnel.power = 15;
-		material.emissiveFresnelParameters = fresnel;
-		arenaMesh.material = material;
+		// this.pongRoot.rotation.z -= 30.9000;
+		this.pongRoot.scaling.set(0.1, 0.1, 0.1);
+		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 5, tessellation: 128 }, this.scene);
+		arenaMesh.parent = this.pongRoot;
+		const arenaMaterial = new PBRMaterial("gameplayArena", this.scene);
+		arenaMaterial.albedoColor = new Color3(0.08, 0.10, 0.12);
+		arenaMaterial.emissiveColor = new Color3(0.01, 0.03, 0.05);
+		arenaMaterial.roughness = 0.95;
+		arenaMaterial.metallic = 0.02;
 
 		this.gameMeshes.push(arenaMesh);
 
@@ -96,14 +110,90 @@ export class Environment {
 
 		this.createMesh();
 		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
-		const loaded = await LoadAssetContainerAsync("/assets/PongStatut.glb", this.scene);
 
+		//this.camera_br = new UniversalCamera('br', Vector3.Zero(), this.scene);
+		const loaded = await LoadAssetContainerAsync("/assets/PongStatutTextured.glb", this.scene);
 		loaded.addAllToScene();
-		loaded.meshes[1].parent = this.pongRoot;
-		this.gameMeshes.push(loaded.meshes[1] as Mesh);
+		loaded.meshes[0].parent = this.pongRoot;
+		this.gameMeshes.push(loaded.meshes[0] as Mesh);
+
+		const headMesh = this.scene.getMeshByName('Head.001') as Mesh;
+		const headmat = new StandardMaterial('headmat', this.scene);
+		headmat.diffuseColor = new Color3(1., 1, 1);
+		// headMesh.material = headmat;
 
 
-		// this.scene.debugLayer.show();
+		const material = headMesh.material as PBRMaterial;
+		material.usePhysicalLightFalloff = false;
+		material.invertNormalMapX = true;
+		material.invertNormalMapY = true;
+
+		const mouthMesh = this.scene.getMeshByName('Mouth.001') as Mesh;
+		const eyeMesh = this.scene.getMeshByName('Eyes.001') as Mesh;
+		const eyemat = new StandardMaterial('eyemat', this.scene);
+		eyemat.diffuseColor = new Color3(1., 0, 0);
+		eyemat.emissiveColor = new Color3(1, 1, 1);
+		eyeMesh.material = eyemat;
+
+		if (mouthMesh && mouthMesh.morphTargetManager) {
+			const smileTarget = mouthMesh.morphTargetManager.getTarget(0);
+
+			smileTarget.influence = 0.;
+
+			console.log("Statue is now smiling!");
+		}
+
+		if (headMesh && headMesh.morphTargetManager) {
+			const smileTarget = headMesh.morphTargetManager.getTarget(0);
+
+			smileTarget.influence = 1.;
+
+			console.log("Statue is now smiling!");
+		}
+		const redlight = new SpotLight(
+			"redlight",
+			new Vector3(-1200, 200, 0),
+			new Vector3(1, -1, 0),
+			160.8,
+			2,
+			this.scene
+		);
+		redlight.diffuse = Color3.Red();
+		redlight.intensity = 100;
+		redlight.parent = this.pongRoot;
+		const whitelight = new SpotLight(
+			"whitelight",
+			new Vector3(-500, 220, 0),
+			new Vector3(-1, -1, 0),
+			2 * Math.PI,
+			2,
+			this.scene
+		);
+		const whitelight2 = new SpotLight(
+			"whitelight2",
+			new Vector3(0, 400, 0),
+			new Vector3(0, -1, 0),
+			Math.PI,
+			2,
+			this.scene
+		);
+
+		whitelight.parent = this.pongRoot;
+		whitelight2.parent = this.pongRoot;
+		whitelight.shadowMinZ = 1;
+		whitelight.intensity = 8;
+		whitelight2.intensity = 1;
+		whitelight.shadowMaxZ = 10;
+		redlight.shadowMinZ = 1;
+		redlight.shadowMaxZ = 80;
+		const shadowGenerator1 = new ShadowGenerator(2048, redlight);
+		const shadowGenerator2 = new ShadowGenerator(2048, whitelight);
+		shadowGenerator1.useBlurCloseExponentialShadowMap = true;
+		shadowGenerator2.useBlurCloseExponentialShadowMap = true;
+		shadowGenerator1.addShadowCaster(headMesh);
+		shadowGenerator2.addShadowCaster(headMesh);
+		// shadowGenerator1.addShadowCaster(rimHeadMesh);
+		// shadowGenerator2.addShadowCaster(rimHeadMesh);
 
 		await this.field.load();
 
@@ -111,14 +201,17 @@ export class Environment {
 			mesh.receiveShadows = true;
 		})
 
-		this.scene.fogMode = Scene.FOGMODE_NONE;
-		this.scene.fogDensity = 0.2;
-		this.scene.fogStart = 100;
-		this.scene.fogEnd = 120;
-		this.scene.fogColor = new Color3(0., 0., 0.);
+
 		this.scene.clearColor = new Color4(0., 0., 0., 0.);
 
 
+
+		// this.scene.debugLayer.show();
+
+		this.scene.imageProcessingConfiguration.toneMappingEnabled = false;
+		this.scene.imageProcessingConfiguration.applyByPostProcess = false;
+		this.scene.imageProcessingConfiguration.exposure = 1.;
+		this.scene.imageProcessingConfiguration.contrast = 1.;
 
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
@@ -133,10 +226,8 @@ export class Environment {
 	public render(time: number) {
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
-		//this.updateCameraDiv();
 	}
 
 	private update() {
@@ -147,22 +238,18 @@ export class Environment {
 
 	public enableHome() {
 		this.updateHome = true;
-		//this.scene.fogMode = Scene.FOGMODE_LINEAR;
 		this.scene.activeCamera = this.fieldCamera;
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
 		}
-		//this.fieldCamera.setEnabled(true);
 
 	}
 
 	public disableHome() {
-		//this.updateHome = false;
-		this.scene.fogMode = Scene.FOGMODE_NONE;
+		this.updateHome = false;
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(true);
 		}
-		//this.fieldCamera.setEnabled(false);
 
 	}
 
@@ -183,7 +270,6 @@ export class Environment {
 	}
 
 	public dispose() {
-		//this.gears?.dispose();
 		this.field?.dispose();
 		this.camera?.dispose();
 		this.scene?.dispose();

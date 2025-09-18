@@ -107,3 +107,42 @@ export function encodeNotificationMessage(payload) {
 export function decodeNotificationMessage(buffer) {
 	return Proto.notif.NotificationMessage.decode(buffer);
 }
+
+/**
+ * MatchStartTournament
+ */
+export function encodeMatchStartTournament(payload) {
+	const err = Proto.lobby.MatchStartTournament.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.lobby.MatchStartTournament
+		.encode(Proto.lobby.MatchStartTournament.create(payload))
+		.finish();
+}
+
+export function decodeMatchStartTournament(buffer) {
+	return Proto.lobby.MatchStartTournament.decode(buffer);
+}
+
+export function encodeTournamentCreateRequest(payload) {
+	const err = Proto.tournament.TournamentCreateRequest.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.tournament.TournamentCreateRequest
+		.encode(Proto.tournament.TournamentCreateRequest.create(payload))
+		.finish();
+}
+
+export function decodeTournamentCreateRequest(buffer) {
+	return Proto.tournament.TournamentCreateRequest.decode(buffer);
+}
+
+export function encodeTournamentCreateResponse(payload) {
+	const err = Proto.tournament.TournamentCreateResponse.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.tournament.TournamentCreateResponse
+		.encode(Proto.tournament.TournamentCreateResponse.create(payload))
+		.finish();
+}
+
+export function decodeTournamentCreateResponse(buffer) {
+	return Proto.tournament.TournamentCreateResponse.decode(buffer);
+}

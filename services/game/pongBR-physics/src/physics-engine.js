@@ -1,7 +1,6 @@
 // physics-engine.js
-// Main physics engine - coordinates all systems
 
-import { CFG, ENTITY_MASKS, getPhaseConfig, getPhasePaddleSize, getPhaseStage } from './physics-config.js';
+import { CFG, ENTITY_MASKS, getPhaseBallConfig, getPhaseConfig, getPhasePaddleSize, getPhaseStage } from './physics-config.js';
 import { PhysicsData } from './physics-data.js';
 import { UniformGrid } from './spatial-grid.js';
 import { PhysicsSystems } from './collision-systems.js';
@@ -11,27 +10,32 @@ export class PhysicsEngine {
 	constructor(cfg = {}) {
 		this.cfg = { ...CFG, ...cfg };
 
-		// Core systems
 		this.pd = new PhysicsData(this.cfg.MAX_PLAYERS + this.cfg.INITIAL_BALLS + this.cfg.MAX_PLAYERS + 16);
 		this.gameState = new GameStateManager(() => this.moveAllBallsAway());
 
-		// Physics timing
 		this.dt = 1 / this.cfg.TARGET_FPS / this.cfg.SUB_STEPS;
 
-		// Spatial partitioning
 		const gridCellSize = this.cfg.BALL_RADIUS * this.cfg.GRID_CELL_SIZE_MULTIPLIER;
 		this.ballGrid = new UniformGrid(gridCellSize);
 
-		// Entity collections
 		this.entities = { balls: [], paddles: [], pillars: [] };
 
-		// Paddle-specific data
 		this.paddleData = {
 			offsets: [],
 			maxOffsets: [],
 			centerAngles: [],
 			inputStates: [],
 			dead: []
+		};
+
+		this.spawnState = {
+			enabled: false,
+			startTime: 0,
+			lastSpawnTime: 0,
+			nextSpawnTime: 0,
+			currentSpawnInterval: cfg.SPAWN_MAX_INTERVAL,
+			targetBallCount: 0,
+			spawnedThisPhase: 0
 		};
 	}
 
@@ -41,7 +45,7 @@ export class PhysicsEngine {
 		this.reset();
 		this.gameState.initBattleRoyale(numPlayers);
 
-		const totalEntitiesNeeded = numPlayers * 2 + numBalls; // paddles + pillars + balls
+		const totalEntitiesNeeded = numPlayers * 2 + numBalls;
 		if (totalEntitiesNeeded > this.pd.maxEntities) {
 			throw new Error(`Cannot create game: need ${totalEntitiesNeeded} entities but max is ${this.pd.maxEntities}`);
 		}
@@ -52,17 +56,21 @@ export class PhysicsEngine {
 		this.paddleData.inputStates = new Int8Array(numPlayers);
 		this.paddleData.dead = new Uint8Array(numPlayers);
 
-		console.log(`Entity stats before creation:`, this.pd.getStats());
+		// console.log(`Entity stats before creation:`, this.pd.getStats());
 
 		this.createPaddles(numPlayers);
-		console.log(`Entity stats after paddles:`, this.pd.getStats());
+		// console.log(`Entity stats after paddles:`, this.pd.getStats());
 
-		this.createBalls(numBalls);
-		console.log(`Entity stats after balls:`, this.pd.getStats());
+		// this.createBalls(numBalls);
+		// console.log(`Entity stats after balls:`, this.pd.getStats());
 
 		for (let pid = 0; pid < numPlayers; pid++) {
 			this.paddleData.dead[pid] = 0;
 		}
+
+		setTimeout(() => {
+			this.gameState.triggerPhaseTransition('Phase 1');
+		}, 3000);
 
 		console.log(`Battle Royale initialization complete. Final entity stats:`, this.pd.getStats());
 	}
@@ -73,7 +81,7 @@ export class PhysicsEngine {
 		const angleStep = (2 * Math.PI) / numPlayers;
 		const paddleArc = angleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
-		const pillarArc = angleStep * 0.1;
+		const pillarArc = angleStep * 0.025;
 		const usableArc = angleStep - pillarArc;
 		const halfUsableArc = usableArc / 2;
 		const maxOffsets = halfUsableArc - halfArc;
@@ -84,9 +92,6 @@ export class PhysicsEngine {
 
 			const sliceStart = pid * angleStep;
 			const midAngle = sliceStart + pillarArc + halfUsableArc;
-			console.log(`paddle  id = ${pid} sliceStart = ${sliceStart}, paddleRotY = ${midAngle}`)
-			// const midAngle = sliceStart + halfUsableArc;
-			// const midAngle = sliceStart  halfUsableArc;
 
 			this.paddleData.centerAngles[pid] = midAngle;
 			this.paddleData.maxOffsets[pid] = maxOffsets;
@@ -96,7 +101,6 @@ export class PhysicsEngine {
 			pd.posY[paddleEnt] = Math.sin(midAngle) * cfg.ARENA_RADIUS;
 			pd.rot[paddleEnt] = midAngle - Math.PI / 2;
 
-			// console.log(`Physics paddle ${pid}: midAngle = ${midAngle}, centerAngle = ${this.paddleData.centerAngles[pid]}`);
 			const perim = 2 * Math.PI * cfg.ARENA_RADIUS;
 			const cellW = (perim / numPlayers) * cfg.PADDLE_FILL;
 			pd.halfW[paddleEnt] = cellW / 2;
@@ -106,9 +110,9 @@ export class PhysicsEngine {
 			const pillarEnt = pd.create(ENTITY_MASKS.PILLAR | ENTITY_MASKS.STATIC);
 			this.entities.pillars[pid] = pillarEnt;
 
-			// const pillarAngle = midAngle - maxOffsets - halfArc;
-			// const pillarAngle = sliceStart + angleStep - pillarArc / 2;
 			const pillarAngle = sliceStart + pillarArc / 2;
+
+			console.log(`Pillar angle = ${pillarAngle}`);
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
@@ -116,6 +120,93 @@ export class PhysicsEngine {
 			pd.rot[pillarEnt] = pillarAngle;
 			pd.halfW[pillarEnt] = pd.halfH[pillarEnt] = pd.radius[pillarEnt] = pillarSize / 2;
 		}
+	}
+
+	startPhaseSpawning(phase) {
+		const ballConfig = getPhaseBallConfig(phase);
+		const currentActiveBalls = this.entities.balls.filter(b =>
+			this.pd.isActive(b) && this.pd.isEliminated[b] !== 1
+		).length;
+
+		if (currentActiveBalls >= ballConfig.maxBalls) {
+			this.spawnState.enabled = false;
+			return;
+		}
+
+		const currentTime = performance.now();
+		this.spawnState.enabled = true;
+		this.spawnState.startTime = currentTime;
+		this.spawnState.lastSpawnTime = currentTime;
+		this.spawnState.nextSpawnTime = currentTime + this.cfg.SPAWN_INITIAL_DELAY;
+		this.spawnState.currentSpawnInterval = this.cfg.SPAWN_MAX_INTERVAL;
+		this.spawnState.targetBallCount = ballConfig.maxBalls;
+		this.spawnState.spawnedThisPhase = 0;
+
+		// console.log(`Started spawning for ${phase}: target ${ballConfig.maxBalls} balls`);
+	}
+
+	updateBallSpawning(currentTime) {
+		if (!this.spawnState.enabled || this.gameState.isRebuilding || this.gameState.gameOver) {
+			return;
+		}
+
+		const activeBalls = this.entities.balls.filter(b =>
+			this.pd.isActive(b) && this.pd.isEliminated[b] !== 1
+		).length;
+
+		if (activeBalls >= this.spawnState.targetBallCount) {
+			this.spawnState.enabled = false;
+			return;
+		}
+
+		if (currentTime >= this.spawnState.nextSpawnTime) {
+			this.spawnSingleBall();
+			this.spawnState.lastSpawnTime = currentTime;
+			this.spawnState.spawnedThisPhase++;
+
+			this.spawnState.currentSpawnInterval *= this.cfg.SPAWN_EXPONENTIAL_BASE;
+			this.spawnState.currentSpawnInterval = Math.max(
+				this.spawnState.currentSpawnInterval,
+				this.cfg.SPAWN_MIN_INTERVAL
+			);
+
+			this.spawnState.nextSpawnTime = currentTime + this.spawnState.currentSpawnInterval;
+
+			const jitter = (Math.random() - 0.5) * this.spawnState.currentSpawnInterval * 0.2;
+			this.spawnState.nextSpawnTime += jitter;
+		}
+	}
+
+	spawnSingleBall() {
+		const cfg = this.cfg;
+		const pd = this.pd;
+
+		const ballEnt = pd.create(ENTITY_MASKS.BALL);
+		this.entities.balls.push(ballEnt);
+
+		pd.radius[ballEnt] = cfg.BALL_RADIUS;
+
+		const safeRadius = cfg.ARENA_RADIUS * cfg.SPAWN_SAFETY_MARGIN;
+		const r = Math.sqrt(Math.random()) * safeRadius;
+		const theta = Math.random() * 2 * Math.PI;
+		// pd.posX[ballEnt] = r * Math.cos(theta);
+		// pd.posY[ballEnt] = r * Math.sin(theta);
+		pd.posX[ballEnt] = 0;
+		pd.posY[ballEnt] = 0;
+
+		// const dir = Math.random() * 2 * Math.PI;
+		const dir = 0.0007853981633974484;
+		const speedVariation = 0.8 + (Math.random() * 0.4);
+		const speed = cfg.INITIAL_SPEED * speedVariation;
+		pd.velX[ballEnt] = Math.cos(dir) * speed;
+		pd.velY[ballEnt] = Math.sin(dir) * speed;
+
+		// console.log(`Spawned ball ${this.spawnState.spawnedThisPhase + 1}, next in ${this.spawnState.currentSpawnInterval.toFixed(0)}ms`);
+	}
+
+	stopBallSpawning() {
+		this.spawnState.enabled = false;
+		// console.log(`Ball spawning stopped. Spawned ${this.spawnState.spawnedThisPhase} balls this phase.`);
 	}
 
 	createBalls(numBalls) {
@@ -280,8 +371,6 @@ export class PhysicsEngine {
 
 		if (numActivePlayers === 0) return;
 
-		// console.log(`Redistributing ${numActivePlayers} players. Entity stats before cleanup:`, pd.getStats());
-
 		let destroyedPaddles = 0;
 		let destroyedPillars = 0;
 
@@ -299,12 +388,10 @@ export class PhysicsEngine {
 			}
 		});
 
-		// console.log(`Destroyed ${destroyedPaddles} paddles and ${destroyedPillars} pillars. Entity stats after cleanup:`, pd.getStats());
-
 		const newAngleStep = (2 * Math.PI) / numActivePlayers;
 		const paddleArc = newAngleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
-		const pillarArc = newAngleStep * 0.1;
+		const pillarArc = newAngleStep * 0.025;
 		const usableArc = newAngleStep - pillarArc;
 		const halfUsableArc = usableArc / 2;
 		const maxOffsets = halfUsableArc - halfArc;
@@ -320,14 +407,12 @@ export class PhysicsEngine {
 			maxOffsets: new Float32Array(numActivePlayers),
 			centerAngles: new Float32Array(numActivePlayers),
 			inputStates: new Int8Array(numActivePlayers),
-			dead: new Uint8Array(this.gameState.originalPlayerCount) // Keep original size
+			dead: new Uint8Array(this.gameState.originalPlayerCount)
 		};
 
 		for (let i = 0; i < this.gameState.originalPlayerCount; i++) {
 			newPaddleData.dead[i] = this.paddleData.dead[i];
 		}
-
-		// console.log(`Creating ${numActivePlayers} new paddles and pillars...`);
 
 		activePlayers.forEach((fixedPlayerId, newPaddleIndex) => {
 			const sliceStart = newPaddleIndex * newAngleStep;
@@ -351,13 +436,13 @@ export class PhysicsEngine {
 			const pillarEnt = pd.create(ENTITY_MASKS.PILLAR | ENTITY_MASKS.STATIC);
 			newPillars[newPaddleIndex] = pillarEnt;
 
-			// const pillarAngle = sliceStart + newAngleStep - pillarArc / 2;
 			const pillarAngle = sliceStart + pillarArc / 2;
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
 			pd.posY[pillarEnt] = Math.sin(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
 			pd.rot[pillarEnt] = pillarAngle;
+			console.log(`Pillar angle = ${pillarAngle}`);
 			pd.halfW[pillarEnt] = pd.halfH[pillarEnt] = pd.radius[pillarEnt] = pillarSize / 2;
 		});
 
@@ -367,33 +452,47 @@ export class PhysicsEngine {
 
 		this.gameState.updatePlayerMapping(activePlayers);
 
-		// console.log(`Redistributed ${numActivePlayers} players. Final entity stats:`, pd.getStats());
 	}
 
 	resetBallsForNewPhase() {
 		const pd = this.pd;
 		const cfg = this.cfg;
-		const numActivePlayers = this.gameState.playerStates.activePlayers.size;
-
-		// console.log(`Resetting balls for new phase. Current balls: ${this.entities.balls.length}`);
 
 		this.entities.balls.forEach(ballEnt => {
 			if (ballEnt !== undefined && pd.isActive(ballEnt)) {
 				pd.destroy(ballEnt);
 			}
 		});
-
 		this.entities.balls.length = 0;
 
-		const ballsPerPlayer = Math.floor(cfg.INITIAL_BALLS / cfg.MAX_PLAYERS);
-		const newBallCount = Math.max(ballsPerPlayer * numActivePlayers / 2, 3);
+		const ballConfig = getPhaseBallConfig(this.gameState.currentPhase);
 
-		// console.log(`Creating ${newBallCount} new balls. Entity stats before:`, pd.getStats());
+		this.createBalls(ballConfig.initialBalls);
 
-		this.createBalls(newBallCount);
-
-		// console.log(`Ball reset complete. Entity stats after:`, pd.getStats());
+		this.startPhaseSpawning(this.gameState.currentPhase);
 	}
+
+	// resetBallsForNewPhase() {
+	// 	const pd = this.pd;
+	// 	const cfg = this.cfg;
+	// 	const numActivePlayers = this.gameState.playerStates.activePlayers.size;
+	//
+	//
+	// 	this.entities.balls.forEach(ballEnt => {
+	// 		if (ballEnt !== undefined && pd.isActive(ballEnt)) {
+	// 			pd.destroy(ballEnt);
+	// 		}
+	// 	});
+	//
+	// 	this.entities.balls.length = 0;
+	//
+	// 	const ballsPerPlayer = Math.floor(cfg.INITIAL_BALLS / cfg.MAX_PLAYERS);
+	// 	const newBallCount = Math.max(ballsPerPlayer * numActivePlayers / 2, 3);
+	//
+	//
+	// 	this.createBalls(newBallCount);
+	//
+	// }
 
 	updatePaddleInputState(fixedPlayerId, moveInput) {
 		if (this.gameState.isRebuilding) return;
@@ -436,6 +535,8 @@ export class PhysicsEngine {
 	step() {
 		if (this.gameState.gameOver) return this.getState();
 
+		const currentTime = performance.now();
+
 		if (this.gameState.checkRebuildComplete()) {
 			this.completeArenaRebuild();
 		}
@@ -444,6 +545,7 @@ export class PhysicsEngine {
 			return this.getState();
 		}
 
+		this.updateBallSpawning(currentTime);
 		const pd = this.pd;
 		const cfg = this.cfg;
 
@@ -538,6 +640,12 @@ export class PhysicsEngine {
 				activeBalls: balls.filter(ball => !ball.disabled).length,
 				activePaddles: paddles.length,
 				totalPlayers: this.entities.paddles.length,
+				// Add spawn info
+				spawning: this.spawnState.enabled,
+				spawnedThisPhase: this.spawnState.spawnedThisPhase,
+				targetBalls: this.spawnState.targetBallCount,
+				nextSpawnIn: this.spawnState.enabled ?
+					Math.max(0, this.spawnState.nextSpawnTime - performance.now()) : 0,
 				...this.pd.getStats(),
 				...this.ballGrid.getStats()
 			}
@@ -563,14 +671,6 @@ export class PhysicsEngine {
 		const expectedBalls = this.entities.balls.filter(b => b !== undefined && pd.isActive(b)).length;
 		const expectedPaddles = this.entities.paddles.filter(p => p !== undefined && pd.isActive(p)).length;
 		const expectedPillars = this.entities.pillars.filter(p => p !== undefined && pd.isActive(p)).length;
-
-		// console.log(`Entity integrity check:`);
-		// console.log(`  Active entities: ${activeCount}/${pd.count} (max: ${pd.maxEntities})`);
-		// console.log(`  Balls: ${ballCount} (expected: ${expectedBalls})`);
-		// console.log(`  Paddles: ${paddleCount} (expected: ${expectedPaddles})`);
-		// console.log(`  Pillars: ${pillarCount} (expected: ${expectedPillars})`);
-		// console.log(`  Free list size: ${pd.freeList.length}`);
-
 		return {
 			activeCount,
 			ballCount,
@@ -584,17 +684,13 @@ export class PhysicsEngine {
 	}
 
 	completeArenaRebuild() {
-		// console.log(`Starting arena rebuild cleanup for ${this.gameState.currentPhase}`);
-		// console.log(`Pre-rebuild entity integrity:`);
 		this.verifyEntityIntegrity();
 
 		this.redistributeSurvivingPlayers();
 		this.resetBallsForNewPhase();
 		this.gameState.completeArenaRebuild();
 
-		// console.log(`Post-rebuild entity integrity:`);
 		this.verifyEntityIntegrity();
-		// console.log(`Arena rebuild complete!`);
 	}
 
 	disableBall(ballIndex) {

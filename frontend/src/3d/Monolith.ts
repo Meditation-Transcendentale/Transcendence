@@ -51,7 +51,7 @@ export class Monolith {
 	private isPickingEnabled: boolean = true;
 	private voxelPositions: Vector3[] = [];
 	private lastPickTime = 0;
-	private pickThrottleMs = 16; // Increased from 5ms to 16ms (60fps)
+	private pickThrottleMs = 16;
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
 	private text: TextRenderer | null = null;
@@ -88,7 +88,7 @@ export class Monolith {
 			enableShaderAnimation: false,
 			animationSpeed: 1.0,
 			animationIntensity: 0.1,
-			qualityMode: 'medium',
+			qualityMode: 'low',
 			surfaceOnly: true,
 			mergeTolerance: 0.001,
 			...options
@@ -171,8 +171,8 @@ export class Monolith {
 	private applyQualitySettings() {
 		const qualitySettings = {
 			low: {
-				voxelSize: this.options.voxelSize * 2,
-				maxVoxelCount: 25000,
+				voxelSize: this.options.voxelSize * 4,
+				maxVoxelCount: 2500,
 				surfaceOnly: true
 			},
 			medium: {
@@ -687,7 +687,6 @@ export class Monolith {
 		this.generateVoxelSystem();
 	}
 
-	// Optimized update method - only update uniforms when values change
 	private lastUpdateValues = {
 		time: -1,
 		animationSpeed: -1,

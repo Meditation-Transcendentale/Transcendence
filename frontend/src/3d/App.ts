@@ -35,10 +35,11 @@ class app3d {
 		this.engine = new Engine(this.canvas, true, {
 			useHighPrecisionFloats: true,
 			useHighPrecisionMatrix: true,
-			antialias: true
+			antialias: true,
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
 		this.engine.setHardwareScalingLevel(1.0);
+		this.engine.getCaps().textureFloatRender = true;
 
 		window.addEventListener('resize', () => {
 			this.engine.resize(true);
@@ -59,6 +60,7 @@ class app3d {
 	public async init() {
 		await this.environment.init();
 
+		// document.querySelector("#utils-details")?.remove();
 	}
 
 

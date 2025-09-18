@@ -5,6 +5,7 @@ import { connect, JSONCodec } from "nats";
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
+import { handleErrorsNats } from "../../shared/handleErrors.mjs";
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import handleGameFinished from "./natsHandler.js";
 import statsRoutes from "./statsRoutes.js";
@@ -76,20 +77,46 @@ app.get('/metrics', async (req, res) => {
 
 app.addHook('onRequest', verifyApiKey);
 
-const nc = await connect({ 
+const nats = await connect({ 
 	servers: process.env.NATS_URL,
 	token: process.env.NATS_TOKEN,
 	tls: { rejectUnauthorized: false }
 });
 const jc = JSONCodec();
 
-(async () => {
-
-	const sub = nc.subscribe("game.finished");
+async function handleNatsSubscription(subject, handler) {
+	const sub = nats.subscribe(subject);
 	for await (const msg of sub) {
-		const data = JSON.parse(jc.decode(msg.data));
-		handleGameFinished(data);
+		try {
+			await handler(msg);
+		} catch (error) {
+			const status = error.status || 500;
+			const message = error.message || "Internal Server Error";
+			const code = error.code || 500;
+			nats.publish(msg.reply, jc.encode({ success: false, status, message, code }));
+		}
 	}
+}
+
+
+
+handleErrorsNats(async () => {
+	await Promise.all([
+		handleNatsSubscription("test.stats", async (msg) => {
+
+			const decodedData = jc.decode(msg.data);
+
+			if (Array.isArray(decodedData)) {
+				nats.request('stats.addBRMatchStatsInfos', msg.data, { timeout: 1000 });
+			} else if (decodedData && typeof decodedData === 'object') {
+				nats.request('stats.addClassicMatchStatsInfos', msg.data, { timeout: 1000 });
+			} else {
+				console.log("Received data of unknown type:", decodedData);
+			}
+
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		})
+	]);
 })();
 
 app.register(statsRoutes);
@@ -105,4 +132,4 @@ const start = async () => {
 
 start();
 
-export { nc, jc };
+export { nats, jc };
