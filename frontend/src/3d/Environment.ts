@@ -23,8 +23,8 @@ import { DynamicTexture, Material, PBRMaterial, Texture } from "@babylonjs/core"
 // import { Inspector } from '@babylonjs/inspector';
 // import "@babylonjs/core/Debug/debugLayer";
 // import "@babylonjs/inspector";
-import * as BABYLON from 'babylonjs';
-import 'babylonjs-inspector';
+// import * as BABYLON from 'babylonjs';
+// import 'babylonjs-inspector';
 
 
 export class Environment {
@@ -200,7 +200,9 @@ export class Environment {
 		// pp.bloomKernel = 16;
 		// pp.bloomScale = 0.25;
 
-		this.scene.debugLayer.show();
+		// this.scene.debugLayer.show();
+
+
 		// Inspector.Show(this.scene, {});
 		//this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
 		//document.body.style.perspective = `${this.perspective}px`;
