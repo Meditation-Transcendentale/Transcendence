@@ -172,6 +172,43 @@ class Home {
 		resp.json()
 			.then((json) => raiseStatus(false, json.message));
 	}
+
+	private setNotificationManager(url: string){
+		const notificationSocket = new WebSocket(url);
+		notificationSocket.onopen = () => {
+			console.log('Connected to notificationSocket server');
+		  }
+		  
+		notificationSocket.onmessage = (event) => {
+			const message = JSON.parse(event.data);
+			console.log('Received message:', message);
+		  
+			switch (message.type) {
+			  case 'notification.friendRequest':
+				console.log('Friend request:', message.data);
+				break
+			  case 'notification.friendAccept':
+				console.log('Friend accepted:', message.data);
+				break
+			  case 'notification.gameInvite':
+				console.log('Game invite:', message.data);
+				break
+			  case 'notification.status':
+				console.log('Status update:', message.data);
+				break
+			  default:
+				console.warn('Unknown message type:', message.type);
+			}
+		}
+		  
+		notificationSocket.onerror = (err) => {
+			console.error('WebSocket error:', err);
+		}
+		  
+		notificationSocket.onclose = () => {
+			console.log('WebSocket connection closed');
+		}
+	}
 }
 
 export default Home;

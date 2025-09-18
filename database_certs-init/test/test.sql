@@ -25,11 +25,11 @@ INSERT INTO users (uuid, username, password) VALUES
 -- ('testpassword10', '$2b$10$gE77Xee6p0.8dSZtLxt4Pup7AfYYJhAOSHC6rkaV.Gu0a8GFGIOV6'),
 
 
-INSERT INTO match (game_mode, winner_id, total_players) VALUES 
-('classic', 1, 2), ('classic', 2, 2), ('classic', 3, 2),
-('br', 3, 5), ('br', 2, 5), ('br', 1, 5),
-('io', 1, 5), ('io', 2, 5), ('io', 3, 5),
-('classic', 1, 2), ('classic', 1, 2), ('classic', 1, 2);
+-- INSERT INTO match (game_mode, winner_id, total_players) VALUES 
+-- ('classic', 1, 2), ('classic', 2, 2), ('classic', 3, 2),
+-- ('br', 3, 5), ('br', 2, 5), ('br', 1, 5),
+-- ('io', 1, 5), ('io', 2, 5), ('io', 3, 5),
+-- ('classic', 1, 2), ('classic', 1, 2), ('classic', 1, 2);
 
 INSERT INTO match_stats (match_id, user_id, is_winner, goals_scored, goals_conceded, placement) VALUES 
 (1, 1, 1, 5, 2, NULL), 
@@ -75,47 +75,48 @@ INSERT INTO match_stats (match_id, user_id, is_winner, goals_scored, goals_conce
 (12, 1, 1, 5, 2, NULL), 
 (12, 2, 0, 2, 5, NULL);
 
-INSERT INTO friendslist (user_id_1, user_id_2, status) VALUES 
-(1, 2, 'accepted'), 
-(1, 3, 'pending'), 
-(1, 4, 'accepted'), 
-(1, 5, 'pending'), 
-(1, 6, 'accepted'), 
-(2, 3, 'accepted'),
-(2, 4, 'accepted'),
-(2, 5, 'pending'),
-(2, 7, 'pending'),
-(2, 8, 'pending'),
-(2, 9, 'accepted'),
-(2, 10, 'accepted'),
-(3, 4, 'pending'),
-(3, 5, 'pending'),
-(3, 6, 'accepted'),
-(3, 7, 'pending'),
-(3, 8, 'accepted'),
-(3, 9, 'pending'),
-(4, 5, 'accepted'),
-(4, 6, 'pending'),
-(4, 7, 'accepted'),
-(4, 8, 'pending'),
-(4, 9, 'accepted'),
-(4, 10, 'pending'),
-(5, 6, 'accepted'),
-(5, 7, 'pending'),
-(5, 8, 'accepted'),
-(5, 9, 'pending'),
-(5, 10, 'accepted'),
-(6, 7, 'pending'),
-(6, 8, 'accepted'),
-(7, 1, 'pending'),
-(8, 1, 'pending'),
-(9, 1, 'pending'),
-(10, 1, 'pending');
 
-INSERT INTO blocked_users (blocker_id, blocked_id) VALUES 
-(1, 9), 
-(6, 2),
-(3, 10);
+-- INSERT INTO friendslist (user_id_1, user_id_2, status) VALUES 
+-- (1, 2, 'accepted'), 
+-- (1, 3, 'pending'), 
+-- (1, 4, 'accepted'), 
+-- (1, 5, 'pending'), 
+-- (1, 6, 'accepted'), 
+-- (2, 3, 'accepted'),
+-- (2, 4, 'accepted'),
+-- (2, 5, 'pending'),
+-- (2, 7, 'pending'),
+-- (2, 8, 'pending'),
+-- (2, 9, 'accepted'),
+-- (2, 10, 'accepted'),
+-- (3, 4, 'pending'),
+-- (3, 5, 'pending'),
+-- (3, 6, 'accepted'),
+-- (3, 7, 'pending'),
+-- (3, 8, 'accepted'),
+-- (3, 9, 'pending'),
+-- (4, 5, 'accepted'),
+-- (4, 6, 'pending'),
+-- (4, 7, 'accepted'),
+-- (4, 8, 'pending'),
+-- (4, 9, 'accepted'),
+-- (4, 10, 'pending'),
+-- (5, 6, 'accepted'),
+-- (5, 7, 'pending'),
+-- (5, 8, 'accepted'),
+-- (5, 9, 'pending'),
+-- (5, 10, 'accepted'),
+-- (6, 7, 'pending'),
+-- (6, 8, 'accepted'),
+-- (7, 1, 'pending'),
+-- (8, 1, 'pending'),
+-- (9, 1, 'pending'),
+-- (10, 1, 'pending');
+
+-- INSERT INTO blocked_users (blocker_id, blocked_id) VALUES 
+-- (1, 9), 
+-- (6, 2),
+-- (3, 10);
 
 INSERT INTO active_user (user_id, status) VALUES 
 (1, 'online'), 

@@ -1,0 +1,51 @@
+{
+    "type": "update",
+    "players": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "uuid": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Player’s unique identifier"
+            },
+            "ready": {
+                "type": "boolean",
+                "description": "Whether this player is ready"
+            }
+        }
+    },
+    "tree": {
+        "player1_uuid": "string|null",
+        "player2_uuid": "string|null",
+        "left": {
+            "player1_uuid": "string|null",
+            "player2_uuid": "string|null",
+            "left": {
+                "$ref": "#/tree"
+            } | null,
+            "right": {
+                "$ref": "#/tree"
+            } | null,
+            "parent": null,
+            "winner_uuid": "string|null",
+            "gameId": "string|null",
+            "score": {
+                "player1_uuid": "number",
+                "player2_uuid": "number"
+            } | null,
+            "depth": "number|null"
+        } | null,
+        "right": {
+            "$ref": "#/tree"
+        } | null,
+        "parent": null,
+        "winner_uuid": "string|null",
+        "gameId": "string|null",
+        "score": {
+            "player1_uuid": "number",
+            "player2_uuid": "number"
+        } | null,
+        "depth": "number|null"
+    }
+}

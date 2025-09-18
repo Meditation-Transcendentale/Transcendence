@@ -250,12 +250,12 @@ export function createBallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 0.5 }, scene);
 	ballMesh.parent = pongRoot;
 	const ballMaterial = new StandardMaterial("ballMaterial", scene);
-	ballMaterial.emissiveColor = Color3.Black();
-	ballMaterial.diffuseColor.set(1, 0, 1);
-	ballMaterial.emissiveColor.set(1, 0, 1);
+	ballMaterial.diffuseColor.set(1, 0, 0);
+	ballMaterial.emissiveColor.set(0.3, 0.3, 0.3);
+	ballMaterial.specularColor.set(0.5, 0.5, 0.5);
 	ballMesh.setEnabled(true);
 	ballMesh.setPivotPoint(Vector3.Zero());
-	ballMesh.position.y = 0.5;
+	ballMesh.position.y = 2.5;
 	ballMesh.material = ballMaterial;
 
 	return ballMesh;
@@ -343,7 +343,7 @@ export function createBaseMeshes(scene: Scene, pongRoot: TransformNode) {
 		ball: createBallMesh(scene, pongRoot),
 		paddle: createPaddleMesh(scene, pongRoot),
 		wall: createWallMesh(scene, pongRoot),
-		portal: createPortalMesh(scene, pongRoot),
+		// portal: createPortalMesh(scene, pongRoot),
 		pillar: createPillarMesh(scene, pongRoot),
 		goal: createGoalMesh(scene, pongRoot),
 	}

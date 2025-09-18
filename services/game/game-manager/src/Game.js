@@ -21,6 +21,9 @@ export class Game {
 			case "pongIO":
 				this.state = this.initializeStatePongIO();
 				break;
+			case "tournament":
+				this.state = this.initializeStatePong();
+				break;
 			default:
 				console.log(`Game init can't find game mode: ${this.mode}`);
 		}

@@ -1,9 +1,11 @@
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import "@babylonjs/loaders/glTF/2.0/";
+import "@babylonjs/loaders/OBJ/objFileLoader"
 import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // load shaders
+
 // import * as POST from "@babylonjs/core/PostProcesses";
 
-//export { Inspector } from '@babylonjs/inspector';
+export { Inspector } from '@babylonjs/inspector';
 // import {
 // 	VolumetricLightScatteringPostProcess
 // } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";

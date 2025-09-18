@@ -40,7 +40,7 @@ export default class brick {
 		//document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
 
-		const gameUIDiv = this.div.querySelector("#game-ui-container") as HTMLDivElement;
+		// const gameUIDiv = this.div.querySelector("#game-ui-container") as HTMLDivElement;
 
 
 		this.gameUI.load();

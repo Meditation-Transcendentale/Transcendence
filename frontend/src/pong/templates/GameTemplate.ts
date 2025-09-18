@@ -6,8 +6,9 @@ import { PaddleComponent } from "../components/PaddleComponent.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputComponent } from "../components/InputComponent.js";
-// import { UIComponent } from "../components/UIComponent.js";
+import { UIComponent } from "../components/UIComponent.js";
 import Game from "../../spa/Game.js";
+import GameUI from "../../spa/GameUI.js";
 
 export interface GameTemplateConfig {
 	numberOfBalls: number;
@@ -16,11 +17,11 @@ export interface GameTemplateConfig {
 	wallWidth: number;
 }
 
-export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string): void {
+export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameMode: string, gameUI: GameUI): void {
 
-	// const scoreUI = new Entity();
-	// scoreUI.addComponent(new UIComponent(gameMode));
-	// ecs.addEntity(scoreUI);
+	const scoreUI = new Entity();
+	scoreUI.addComponent(new UIComponent(gameMode, gameUI));
+	ecs.addEntity(scoreUI);
 
 	// console.log("create player === ", gameMode);
 	for (let i = 0; i < 2; i++) {
@@ -29,7 +30,7 @@ export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localP
 		const x = i % 2 ? -posX : posX;
 		const rotation_y = i % 2 ? -90 * Math.PI / 180 : 90 * Math.PI / 180;
 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.25, 0), 0));
-		if (i === localPaddleId || gameMode == "local"){
+		if (i === localPaddleId || gameMode == "local") {
 			paddleEntity.addComponent(new InputComponent(true, gameMode));
 		}
 		else

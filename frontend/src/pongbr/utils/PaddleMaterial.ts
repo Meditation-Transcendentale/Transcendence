@@ -35,7 +35,7 @@ export class PaddleMaterial extends CustomMaterial {
 		  float radiusOffset = position.z;
 		  float r = arenaRadius + (width * RATIO) / 2.;
 		  positionUpdated.x = cos(localA) * r - (position.z) * (width * RATIO);
-		  positionUpdated.y = (position.y+ 0.5) * width * RATIO + 0.5;
+		  positionUpdated.y = (position.y+ 0.5) * width * RATIO + 2.5;
 		  positionUpdated.z = sin(localA) * r; 
 
 

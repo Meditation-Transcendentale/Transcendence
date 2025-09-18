@@ -1,0 +1,76 @@
+{
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "enum": [
+          "notification.friendRequest",
+          "notification.friendAccept",
+          "notification.gameInvite",
+          "notification.status"
+        ]
+      },
+      "data": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "Friend request data",
+            "properties": {
+              "fromUserId": { "type": "string" }
+            },
+            "required": ["fromUserId"]
+          },
+          {
+            "type": "object",
+            "description": "Friend accept data",
+            "properties": {
+              "userId": { "type": "string" }
+            },
+            "required": ["userId"]
+          },
+          {
+            "type": "object",
+            "description": "Game invite data",
+            "properties": {
+              "gameId": { "type": "string" },
+              "fromUserId": { "type": "string" }
+            },
+            "required": ["gameId", "fromUserId"]
+          },
+          {
+            "type": "object",
+            "description": "Status update data",
+            "oneOf": [
+              {
+                "properties": {
+                  "type": { "const": "online" }
+                },
+                "required": ["type"]
+              },
+              {
+                "properties": {
+                  "type": { "const": "offline" }
+                },
+                "required": ["type"]
+              },
+              {
+                "properties": {
+                  "type": { "const": "in-lobby" },
+                  "lobbyId": { "type": "string" }
+                },
+                "required": ["type", "lobbyId"]
+              },
+              {
+                "properties": {
+                  "type": { "const": "in-game" },
+                  "gameId": { "type": "string" }
+                },
+                "required": ["type", "gameId"]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "required": ["type", "data"]
+  }

@@ -4,6 +4,9 @@ interface GameUIModules {
 	score?: ScoreModule;
 	timer?: TimerModule;
 	buttons?: ButtonModule;
+	countdown?: CountdownModule;
+	ending?: EndingModule;
+	images?: ImageModule;
 }
 
 interface ModulePosition {
@@ -24,6 +27,9 @@ interface GameUIConfig {
 		score?: ModulePosition;
 		timer?: ModulePosition;
 		buttons?: ModulePosition;
+		countdown?: ModulePosition;
+		ending?: ModulePosition;
+		images?: ModulePosition;
 	};
 }
 
@@ -32,6 +38,9 @@ interface GameUIHtmlReference {
 	scoreModule: HTMLDivElement;
 	timerModule: HTMLDivElement;
 	buttonModule: HTMLDivElement;
+	countdownModule: HTMLDivElement;
+	endingModule: HTMLDivElement;
+	imageModule: HTMLDivElement;
 }
 
 class GameUI {
@@ -51,7 +60,10 @@ class GameUI {
 			container: this.div,
 			scoreModule: div.querySelector("#score-module") as HTMLDivElement,
 			timerModule: div.querySelector("#timer-module") as HTMLDivElement,
-			buttonModule: div.querySelector("#button-module") as HTMLDivElement
+			buttonModule: div.querySelector("#button-module") as HTMLDivElement,
+			countdownModule: div.querySelector("#countdown-module") as HTMLDivElement,
+			endingModule: div.querySelector("#ending-module") as HTMLDivElement,
+			imageModule: div.querySelector("#image-module") as HTMLDivElement
 		};
 
 		this.initializeModules();
@@ -69,6 +81,14 @@ class GameUI {
 				case 'buttons':
 					this.modules.buttons = new ButtonModule(this.ref.buttonModule);
 					break;
+				case 'countdown':
+					this.modules.countdown = new CountdownModule(this.ref.countdownModule);
+					break;
+				case 'ending':
+					this.modules.ending = new EndingModule(this.ref.endingModule);
+					break;
+				case 'images':
+					this.modules.images = new ImageModule(this.ref.imageModule);
 			}
 		});
 	}
@@ -289,12 +309,19 @@ class GameUI {
 			case 'score': return this.ref.scoreModule;
 			case 'timer': return this.ref.timerModule;
 			case 'buttons': return this.ref.buttonModule;
+			case 'countdown': return this.ref.countdownModule;
+			case 'ending': return this.ref.endingModule;
+			case 'images': return this.ref.imageModule;
 			default: return null;
 		}
 	}
 
-	public updateScore(score: number) {
-		this.modules.score?.updateScore(score);
+	public updateScore(score1: number, score2: number) {
+		this.modules.score?.updateScore(score1, score2);
+	}
+
+	public startCountdown(initialValue: number) {
+		this.modules.countdown?.start(initialValue);
 	}
 
 	public startTimer(duration?: number, onEnd?: () => void) {
@@ -305,6 +332,10 @@ class GameUI {
 		this.modules.timer?.stop();
 	}
 
+	public showEnd(score1: number, score2: number, result: boolean) {
+		this.modules.ending?.setResult(score1, score2, result);
+	}
+
 	public showButton(id: string, text: string, callback: () => void, style?: string) {
 		this.modules.buttons?.addButton(id, text, callback, style);
 	}
@@ -312,6 +343,15 @@ class GameUI {
 	public hideButton(id: string) {
 		this.modules.buttons?.removeButton(id);
 	}
+
+	public showImage(id: string, src: string, style?: string, position?: ImagePosition) {
+		this.modules.images?.addImage(id, src, style, position);
+	}
+
+	public hideImage(id: string) {
+		this.modules.images?.removeImage(id);
+	}
+
 }
 
 interface GameUIModule {
@@ -321,19 +361,83 @@ interface GameUIModule {
 
 interface ScoreHtmlReference {
 	scoreLabel: HTMLSpanElement;
-	scoreValue: HTMLSpanElement;
+	score1Value: HTMLSpanElement;
+	score2Value: HTMLSpanElement;
+}
+
+interface CountdownHtmlReference {
+	countdownLabel: HTMLSpanElement;
+	countdownValue: HTMLSpanElement;
+}
+
+class CountdownModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: CountdownHtmlReference;
+	private delay = 1000;
+	private countdownNumber = 3;
+	private countdownInterval?: NodeJS.Timeout;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			countdownLabel: div.querySelector("#countdown-label") as HTMLSpanElement,
+			countdownValue: div.querySelector("#countdown-value") as HTMLSpanElement
+		};
+	}
+
+	load(){
+		this.div.style.display = 'flex';
+	}
+
+	unload(){
+		this.div.style.display = 'none';
+		this.stop();
+	}
+
+	start(initialValue: number = 3){
+		this.countdownNumber = initialValue;
+
+		this.updateDisplay();
+
+		this.countdownInterval = setInterval(() => {
+			this.countdownNumber--;
+			this.updateDisplay();
+
+			if (this.countdownNumber <= 0){
+				this.unload();
+			}
+		}, this.delay);
+	}
+
+	updateDisplay(){
+		if (this.ref.countdownValue){
+			this.ref.countdownValue.textContent = this.countdownNumber.toString();
+			this.ref.countdownValue.className = 'countdown-number';
+		}
+	}
+
+	stop(){
+		if (this.countdownInterval){
+			clearInterval(this.countdownInterval);
+			this.countdownInterval = undefined;
+		}
+	}
 }
 
 class ScoreModule implements GameUIModule {
 	private div: HTMLDivElement;
 	private ref: ScoreHtmlReference;
 	private scoreValue = 0;
+	private score1 = 0;
+	private score2 = 0;
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
+
 		this.ref = {
 			scoreLabel: div.querySelector("#score-label") as HTMLSpanElement,
-			scoreValue: div.querySelector("#score-value") as HTMLSpanElement
+			score1Value: div.querySelector("#score1-value") as HTMLSpanElement,
+			score2Value: div.querySelector("#score2-value") as HTMLSpanElement
 		};
 	}
 
@@ -345,10 +449,14 @@ class ScoreModule implements GameUIModule {
 		this.div.style.display = 'none';
 	}
 
-	updateScore(score: number) {
-		this.scoreValue = score;
-		if (this.ref.scoreValue) {
-			this.ref.scoreValue.textContent = score.toString();
+	updateScore(score1: number, score2: number) {
+		if (score1 == 5 || score2 == 5)
+			this.unload();
+		this.score1 = score1;
+		this.score2 = score2;
+		if (this.ref.score1Value && this.ref.score2Value) {
+			this.ref.score1Value.textContent = score1.toString();
+			this.ref.score2Value.textContent = score2.toString();
 		}
 	}
 }
@@ -463,5 +571,179 @@ class ButtonModule implements GameUIModule {
 		}
 	}
 }
+
+interface EndingHtmlReference{
+	score1Value: HTMLSpanElement;
+	score2Value: HTMLSpanElement;
+	result: HTMLSpanElement;
+}
+
+class EndingModule implements GameUIModule{
+	private div: HTMLDivElement;
+	private ref: EndingHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			score1Value: div.querySelector("#end-score1-value") as HTMLSpanElement,
+			score2Value: div.querySelector("#end-score2-value") as HTMLSpanElement,
+			result: div.querySelector("#result-label") as HTMLSpanElement
+		};
+	}
+
+	load() {
+		this.div.style.display = 'none';
+	}
+
+	unload() {
+		this.div.style.display = 'none';
+	}
+
+	setResult(score1: number, score2: number, result: boolean) {
+		if (this.ref.score1Value && this.ref.score2Value) {
+			this.ref.score1Value.textContent = score1.toString();
+			this.ref.score2Value.textContent = score2.toString();
+		}
+		if (result)
+			this.ref.result.innerHTML = 'You <span class="win">Win</span>';
+		else
+			this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
+
+		this.div.style.display = 'flex';
+	}
+}
+
+
+interface ImageHtmlReference{
+	imageContainer: HTMLDivElement;
+}
+
+interface ImagePosition {
+	x?: 'left' | 'center' | 'right' | number;
+	y?: 'top' | 'center' | 'bottom' | number;
+	anchor?: 'top-left' | 'top-center' | 'top-right' |
+					 'center-left' | 'center' | 'center-right' |
+					 'bottom-left' | 'bottom-center' | 'bottom-right';
+	offset?: { x: number; y: number };
+}
+
+class ImageModule implements GameUIModule{
+	private div: HTMLDivElement;
+	private ref: ImageHtmlReference;
+	private images: Map<string, HTMLImageElement> = new Map();
+	private positions: Map<string, ImagePosition> = new Map();
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			imageContainer: div.querySelector("#image-container") as HTMLDivElement
+		};
+	}
+
+	load() {
+		this.div.style.display = 'flex';
+		this.ref.imageContainer.style.position = 'relative';
+	}
+
+	unload() {
+		this.div.style.display = 'none';
+		this.images.clear();
+		this.positions.clear();
+		if (this.ref.imageContainer) {
+			this.ref.imageContainer.innerHTML = '';
+		}
+	}
+
+	addImage(id: string, src: string, style?: string, position?: ImagePosition) {
+		this.removeImage(id);
+
+		const img = document.createElement('img');
+		img.src = src;
+		img.className = `game-image ${style || ''}`;
+		img.id = `game-img-${id}`;
+
+		this.images.set(id, img);
+		this.ref.imageContainer.appendChild(img);
+
+		if (position)
+			this.setImagePosition(id, position);
+  	}
+
+	removeImage(id: string) {
+		const img = this.images.get(id);
+		if (img) {
+			img.remove();
+			this.images.delete(id);
+			this.positions.delete(id);
+		}
+	}
+
+	setImagePosition(id: string, position: ImagePosition){
+		const img = this.images.get(id);
+		if(!img) return;
+
+		this.positions.set(id, position);
+
+		img.style.position = 'absolute';
+		img.style.top = '50%';
+		img.style.left = '50%';
+		img.style.transform = 'translate(-50%, -50%)';
+
+		// img.style.top = '';
+		// img.style.left = '';
+		// img.style.right = '';
+		// img.style.bottom = '';
+		// img.style.transform = '';
+
+		// if (position.anchor) {
+		// 	switch (position.anchor) {
+		// 		case 'center-right':
+		// 			img.style.top = '50%';
+		// 			img.style.right = '20px';
+		// 			img.style.transform = 'translateY(-50%)';
+		// 			break;
+		// 		case 'center-left':
+		// 			img.style.top = '50%';
+		// 			img.style.left = '20px';
+		// 			img.style.transform = 'translateY(50%)';
+		// 			break;
+		// 		case 'top-right':
+		// 			img.style.top = '20px';
+		// 			img.style.right = '20px';
+		// 			break;
+		// 		case 'top-left':
+		// 			img.style.top = '20px';
+		// 			img.style.left = '20px';
+		// 			break;
+		// 		case 'bottom-right':
+		// 			img.style.bottom = '20px';
+		// 			img.style.right = '20px';
+		// 			break;
+		// 		case 'bottom-left':
+		// 			img.style.bottom = '20px';
+		// 			img.style.left = '20px';
+		// 			break;
+		// 	}
+		// } else {
+		// 	if (typeof position.x === 'number') {
+		// 		img.style.left = position.x + 'px';
+		// 	}
+		// 	if (typeof position.y === 'number') {
+		// 		img.style.top = position.y + 'px';
+		// 	}
+		// }
+
+		if (position.offset) {
+			// const t = img.style.transform || '';
+			// img.style.transform = `${t} translate(${position.offset.x}px, ${position.offset.y}px)`;
+			img.style.transform += ` translate(${position.offset.x}vh, ${position.offset.y}vh)`;
+		}
+	}
+}
+
+//SpectateModule
+//BRDeathCounterModule
+//BRNotifDeathModule
+
 
 export default GameUI;
