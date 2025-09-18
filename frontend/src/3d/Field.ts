@@ -13,6 +13,7 @@ import {
 	HemisphericLight,
 	Material,
 	ShaderMaterial,
+	EffectRenderer,
 } from "@babylonImport";
 import { Vue } from "../Vue";
 import "./Shader/Shader.ts";
@@ -26,6 +27,7 @@ import { Monolith } from "./Monolith";
 import { createTempleMonolith } from "./Builder";
 import { Fog } from "./Fog";
 import { Aurora } from "./Aurora";
+import { Picker } from "./Picker";
 
 let frameCount = 0;
 const playdiv = document.createElement("div");
@@ -294,10 +296,13 @@ export class nField {
 
 	private camera: FreeCamera;
 
+	private effectRenderer: EffectRenderer;
+
 	private grass: Grass;
 	private fog: Fog;
 	private monolith: Monolith;
 	private pipeline: nPipeline;
+	private picker: Picker;
 
 	private cursor: Vector3;
 	private cursorMonolith: Vector3;
@@ -314,12 +319,15 @@ export class nField {
 		this.scene = scene;
 		this.camera = camera;
 
+		this.effectRenderer = new EffectRenderer(this.scene.getEngine());
+
 		this.cursor = new Vector3();
 		this.cursorMonolith = new Vector3();
 
 
 		this.grass = new Grass(this.scene, 20, this.cursor);
-		this.fog = new Fog(this.scene, this.camera, 0.5);
+		this.fog = new Fog(this.scene, this.camera, this.effectRenderer, 0.5);
+		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 0, 0), new Vector3(40, 0, 40));
 
 		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
@@ -357,6 +365,14 @@ export class nField {
 			attributes: ['position'],
 			uniforms: ["world", "viewProjection", "depthValues"]
 		})
+
+		const t = MeshBuilder.CreateGround("he", { width: 40, height: 40 }, this.scene);
+		t.position.y = 3;
+		const n = new StandardMaterial("he", this.scene);
+		n.emissiveTexture = this.picker.texture;
+		n.diffuseColor = Color3.Black();
+		n.specularColor = Color3.Black();
+		t.material = n;
 	}
 
 	public async load() {
@@ -382,6 +398,7 @@ export class nField {
 
 		this.scene.onBeforeRenderObservable.add(() => {
 			if (this.active) {
+				this.picker.render();
 				this.fog.render();
 			}
 		})

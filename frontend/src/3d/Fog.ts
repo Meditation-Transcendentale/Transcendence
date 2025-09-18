@@ -31,15 +31,14 @@ export class Fog {
 	private delta: Vector2;
 	private blur: boolean;
 
-	constructor(scene: Scene, camera: Camera, ratio: number) {
+	constructor(scene: Scene, camera: Camera, effectRenderer: EffectRenderer, ratio: number) {
 		this.scene = scene;
 		this.camera = camera;
 		this.ratio = ratio;
 
 		this.blur = false;
 
-		this.effectRenderer = new EffectRenderer(scene.getEngine());
-
+		this.effectRenderer = effectRenderer;
 
 		this.depthTexture = new RenderTargetTexture("depth", { width: this.scene.getEngine().getRenderWidth() * this.ratio, height: this.scene.getEngine().getRenderHeight() * this.ratio }, scene, {
 			type: Engine.TEXTURETYPE_FLOAT,
