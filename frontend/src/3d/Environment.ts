@@ -247,6 +247,7 @@ export class Environment {
 		pp.bloomKernel = 16;
 		pp.bloomScale = 0.25;
 
+		this.pongRoot.isEnabled(false);
 		// this.scene.debugLayer.show();
 
 		// Inspector.Show(this.scene, {});
@@ -276,6 +277,10 @@ export class Environment {
 		const r = world!.getRotationMatrix().transpose().m;
 		const m = world!.m;
 		this.cameraDiv.style.transform = `translateZ(${this.perspective}px) matrix3d(${m[0]},${-r[1]},${-r[2]},${m[3]},${-r[4]},${-m[5]},${-r[6]},${m[7]},${-r[8]},${r[9]},${m[10]},${m[11]},${m[12]},${-m[13]},${m[14]},${m[15]}) translate(${this.width * 0.5}px, ${this.height * 0.5}px)`;
+	}
+
+	public enableBr(value: boolean) {
+		this.pongRoot.isEnabled(value);
 	}
 
 	public enableHome() {

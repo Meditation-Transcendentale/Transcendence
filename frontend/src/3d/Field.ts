@@ -295,6 +295,7 @@ export class Field {
 				this.active = false;
 				this.setEnable(false);
 
+
 				break;
 			}
 			case 'lobby': {
