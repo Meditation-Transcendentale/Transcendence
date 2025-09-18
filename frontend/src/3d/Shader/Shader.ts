@@ -1,4 +1,4 @@
-import { Color3, CustomMaterial, Effect, Scene, Texture, Vector3 } from "@babylonImport"
+import { Color3, CustomMaterial, Effect, RenderTargetTexture, Scene, Texture, Vector3 } from "@babylonImport"
 import "./GeometryShader.ts";
 import "./UnderwaterShader.ts";
 import "./depthShaders.ts";
@@ -771,12 +771,12 @@ void main() {
 
 
 export class GrassShader extends CustomMaterial {
-	constructor(name: string, scene: Scene, texture: Texture) {
+	constructor(name: string, scene: Scene) {
 		super(name, scene);
 		this.AddUniform('time', 'float', 0.0);
 		this.AddUniform('oldTime', 'float', 0.0);
 		this.AddUniform("origin", 'vec3', null);
-		this.AddUniform('tNoise', 'sampler2D', texture);
+		this.AddUniform('textureSampler', 'sampler2D', null);
 
 		this.AddAttribute('baseColor');
 		this.AddAttribute('uv');
@@ -832,6 +832,14 @@ export class GrassShader extends CustomMaterial {
 			float simplexOctave(vec2 v) {
 				return (simplexNoise(v) + 0.5 * simplexNoise(v * 2.) + 0.25 * simplexNoise(v * 4.)) * (1. / 1.75);
 			}
+
+			vec3	sampleWave(vec2 pos) {
+				vec2 uv = (pos / 80.) + 0.5;
+				vec3 wave = texture(textureSampler, uv).rgb;
+				wave.xy = wave.xy * 2. - 1.;
+				wave.z *= (uv.x < 1. && uv.x > 0. && uv.y > 0. && uv.y < 1. ? 1. : 0.);
+				return wave;
+			}
 		`
 		);
 
@@ -841,7 +849,7 @@ export class GrassShader extends CustomMaterial {
 				vec2 windDir = vec2(-1., 0.);
 
 				// vec4 noiseA = texture2D(tNoise, pos * 0.02 - time * windDir * 0.3);
-				vec4 noiseB = texture2D(tNoise, pos * 0.04);
+				// vec4 noiseB = texture2D(tNoise, pos * 0.04);
 			
 				// vec2 curl = curlSimplex(pos * 0.1 - vec2(time * 0.2, 0.), 1.);
 				// float strengh = length(curl);
@@ -858,11 +866,11 @@ export class GrassShader extends CustomMaterial {
 				strengh *= baseColor.a; //apply blade stiffness
 				// strengh *= M_PI * 0.5;
 				
-				vec3 totalWave = vec3(0.);
-				//for (int i = 0; i < 1; i++) {
-					vec3 wave = computeWave(origin, pos);
-					totalWave = mix(totalWave, wave, step(totalWave.z, wave.z));
-				//}
+				vec3 totalWave = sampleWave(pos);
+				// //for (int i = 0; i < 1; i++) {
+				// 	vec3 wave = computeWave(origin, pos);
+				// 	totalWave = mix(totalWave, wave, step(totalWave.z, wave.z));
+				// //}
 
 				positionUpdated = rotationY(positionUpdated, baseColor.r);
 
@@ -1124,6 +1132,13 @@ export class GrassShader extends CustomMaterial {
 	setFloatArray3(name: string, values: number[]) {
 		this.onBindObservable.addOnce(() => {
 			this.getEffect().setFloatArray3(name, values);
+		});
+	}
+
+	setTexture(name: string, texture: RenderTargetTexture) {
+
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setTexture(name, texture);
 		});
 	}
 

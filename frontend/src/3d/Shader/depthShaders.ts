@@ -12,6 +12,8 @@ attribute vec4	world2;
 attribute vec4	world3;
 attribute vec4	baseColor;
 
+uniform sampler2D   textureSampler;
+
 uniform mat4	world;
 uniform mat4	viewProjection;
 uniform vec2	depthValues;
@@ -45,6 +47,15 @@ float simplexOctave(vec2 v) {
 	return (simplexNoise(v) + 0.5 * simplexNoise(v * 2.) + 0.25 * simplexNoise(v * 4.)) * (1. / 1.75);
 }
 
+vec3	sampleWave(vec2 pos) {
+	vec2 uv = (pos / 80.) + 0.5;
+	vec3 wave = texture(textureSampler, uv).rgb;
+	wave.xy = wave.xy * 2. - 1.;
+	wave.z *= (uv.x < 1. && uv.x > 0. && uv.y > 0. && uv.y < 1. ? 1. : 0.);
+	return wave;
+}
+
+
 
 void	main(void) {
 	vec3 positionUpdated = position;
@@ -63,9 +74,9 @@ void	main(void) {
 
 	strengh *= baseColor.a; //apply blade stiffness
 	
-	vec3 totalWave = vec3(0.);
-	vec3 wave = computeWave(origin, pos);
-	totalWave = mix(totalWave, wave, step(totalWave.z, wave.z));
+	vec3 totalWave = sampleWave(pos);
+	// vec3 wave = computeWave(origin, pos);
+	// totalWave = mix(totalWave, wave, step(totalWave.z, wave.z));
 
 
 	positionUpdated = rotationY(positionUpdated, baseColor.r);

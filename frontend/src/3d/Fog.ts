@@ -31,6 +31,8 @@ export class Fog {
 	private delta: Vector2;
 	private blur: boolean;
 
+	private enabled: boolean;
+
 	constructor(scene: Scene, camera: Camera, effectRenderer: EffectRenderer, ratio: number) {
 		this.scene = scene;
 		this.camera = camera;
@@ -120,6 +122,8 @@ export class Fog {
 		this.cameraUBO = new UniformBuffer(scene.getEngine());
 		this.dataUBO = new UniformBuffer(scene.getEngine());
 
+		this.enabled = true;
+
 		this.initUBO();
 		this.initUI();
 
@@ -128,6 +132,7 @@ export class Fog {
 	}
 
 	public render() {
+		if (!this.enabled) { return }
 		this.depthTexture.render();
 		this.effectRenderer.render(this.heightEffect, this.heightTexture);
 		this.effectRenderer.render(this.surfaceEffect, this.surfaceTexture);
@@ -344,6 +349,27 @@ export class Fog {
 
 	public get texture() {
 		return this.fogTexture;
+	}
+
+	public setEnabled(status: boolean) {
+		this.enabled = status;
+	}
+
+	public dispose() {
+		this.fogTexture.dispose();
+		this.blurTexture.dispose();
+		this.surfaceTexture.dispose();
+		this.depthTexture.dispose();
+		this.heightTexture.dispose();
+
+		this.fogEffect.dispose();
+		this.surfaceEffect.dispose();
+		this.heightEffect.dispose();
+		this.gaussBlurHEffect.dispose();
+		this.gaussBlurVEffect.dispose();
+
+		this.dataUBO.dispose();
+		this.cameraUBO.dispose();
 	}
 
 

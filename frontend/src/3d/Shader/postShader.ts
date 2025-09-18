@@ -31,7 +31,7 @@ void main(void) {
 	vec4	color = texture(textureSampler, vUV);
 	vec4	fog = texture(fogTexture, vUV);
 	
-	gl_FragColor.rgb = color.rgb * pow(exp(-fogAbsorption), vec3(fog.r * 100.)) + fog.gba;
+	gl_FragColor.rgb = color.rgb * pow(exp(-fogAbsorption), vec3(fog.r * 100.) * color.a) + fog.gba;
 	// gl_FragColor.rgb = color.rgb + fog.gba;
 	gl_FragColor.a = 1.;
 	// gl_FragColor.rgb = fog.rgb;

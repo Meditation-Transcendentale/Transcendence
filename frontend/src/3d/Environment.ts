@@ -14,7 +14,7 @@ import {
 	Mesh,
 	FreeCamera,
 } from "@babylonImport";
-import { Field, nField } from "./Field";
+import { Field } from "./Field";
 
 
 export class Environment {
@@ -52,27 +52,19 @@ export class Environment {
 
 		this.scene.setRenderingAutoClearDepthStencil(0, true);
 
-		// window.addEventListener("keydown", (ev) => {
-		// 	if (ev.key == ' ') {
-		// 		this.scene.setActiveCameraByName('menu');
-		// 	}
-		// });
-
-
-
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
 		this.frame = 0;
 
 		this.fCamera = new FreeCamera("fieldCamera", new Vector3(0, 6, 40), this.scene, true);
 
-		this.field = new nField(this.scene, this.fCamera);
-		// this.field = new Field(this.scene);
+		this.field = new Field(this.scene, this.fCamera);
 
 		this.width = engine.getRenderWidth();
 		this.height = engine.getRenderHeight();
 
 		this.gameMeshes = new Array<Mesh>;
+
 
 	}
 
@@ -131,18 +123,26 @@ export class Environment {
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
 		}
+
+
+		this.scene.onBeforeRenderObservable.add(() => {
+			this.update();
+		})
 	}
 
 	public render(time: number) {
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		if (this.updateHome) {
-			this.field.update(time, this.deltaTime);
-		}
 		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
 		//this.updateCameraDiv();
+	}
+
+	private update() {
+		if (this.updateHome) {
+			this.field.update(this.lastTime, this.deltaTime);
+		}
 	}
 
 	public enableHome() {
@@ -184,6 +184,7 @@ export class Environment {
 
 	public dispose() {
 		//this.gears?.dispose();
+		this.field?.dispose();
 		this.camera?.dispose();
 		this.scene?.dispose();
 	}

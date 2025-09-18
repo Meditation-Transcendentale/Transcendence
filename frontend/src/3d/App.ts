@@ -5,6 +5,7 @@ import { Environment } from "./Environment";
 import { Vue } from "../Vue";
 import { css3dObject, CSSRenderer } from "./CSSRenderer";
 import { Interpolator } from "./Interpolator";
+
 import { UIaddDetails, UIaddVec3 } from "./UtilsUI";
 
 const handleSubmit = function(e: Event) {
@@ -30,9 +31,11 @@ class app3d {
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
 		this.canvas.focus();
 
+
 		this.engine = new Engine(this.canvas, true, {
 			useHighPrecisionFloats: true,
-			useHighPrecisionMatrix: true
+			useHighPrecisionMatrix: true,
+			antialias: true
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
 		this.engine.setHardwareScalingLevel(1.0);
