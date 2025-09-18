@@ -1,4 +1,4 @@
-import { Camera, Color3, EffectRenderer, EffectWrapper, Engine, Mesh, MeshBuilder, PBRMaterial, RenderTargetTexture, Scene, ShaderMaterial, StandardMaterial, Vector2, Vector3, Vector4 } from "@babylonImport";
+import { Camera, EffectRenderer, EffectWrapper, Engine, Matrix, Mesh, MeshBuilder, RenderTargetTexture, Scene, ShaderMaterial, Vector2, Vector3, Vector4 } from "@babylonImport";
 import { UIaddDetails, UIaddSlider } from "./UtilsUI";
 
 export class Picker {
@@ -88,12 +88,7 @@ export class Picker {
 				this.ballHit = false;
 				return;
 			}
-			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
-			let delta = Math.abs(this.camera.position.y - this.groundPosition.y) / ray.y;
-
-			let x = (this.camera.position.x - ray.x * delta) - this.meshBall.position.x;
-			let y = (this.camera.position.z - ray.z * delta) - this.meshBall.position.z;
-			this.ballHit = (Math.sqrt(x * x + y * y) < this.ballDiameter * 0.5); // NEED to be better, MAYBE USE tec from VUe: BOUNDING BOX
+			this.ballHit = this.pickBall(ev.clientX, ev.clientY);
 		})
 		window.addEventListener("mousemove", (ev) => {
 			if (!this.ballHit) {
@@ -117,21 +112,6 @@ export class Picker {
 		this.meshBall = MeshBuilder.CreateSphere("picker ball", {
 			diameter: this.ballDiameter
 		}, this.scene)
-		// this.material = new StandardMaterial("picker ball", this.scene);
-		// this.material.emissiveColor = new Color3(1000., 0., 0.);
-		// this.material.disableLighting = true;
-		// this.material.diffuseColor = Color3.Black();
-		// this.material.specularColor = Color3.Black();
-		// this.meshBall.visibility = 0.2;
-		// this.material.alphaMode = Engine.ALPHA_DISABLE;
-		// this.meshBall.position.set(0, this.groundPosition.y, 4);
-		//
-		// const mat = new PBRMaterial("pbr", this.scene);
-		// mat.emissiveColor = new Color3(1, 0, 0);
-		// mat.emissiveIntensity = 1000;
-		// mat.disableLighting = true;
-		// mat.alphaMode = Engine.ALPHA_DISABLE;
-		//
 		this.material = new ShaderMaterial("picker ball", this.scene, "oneColor", {
 			attributes: ["position"],
 			uniforms: ["world", "viewProjection", "color"]
@@ -170,6 +150,22 @@ export class Picker {
 		let a = this.rtA;
 		this.rtA = this.rtB;
 		this.rtB = a;
+	}
+
+	private pickBall(x: number, y: number): boolean {
+		const v = this.camera.viewport;
+		const p = Vector3.Project(
+			this.meshBall.position,
+			Matrix.Identity(),
+			this.scene.getTransformMatrix(),
+			v
+		)
+		const px = (this.ballDiameter / Vector3.Distance(this.camera.position, this.meshBall.position)) * (this.scene.getEngine().getRenderHeight() / (2 * Math.tan(this.camera.fov * 0.5)))
+
+		const xx = p.x * this.scene.getEngine().getRenderWidth() - x;
+		const yy = p.y * this.scene.getEngine().getRenderHeight() - y;
+
+		return Math.sqrt(xx * xx + yy * yy) < px * 0.5;
 	}
 
 	public get texture(): RenderTargetTexture {
