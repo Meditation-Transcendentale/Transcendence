@@ -107,10 +107,8 @@ handleErrorsNats(async () => {
 			const decodedData = jc.decode(msg.data);
 
 			if (Array.isArray(decodedData)) {
-				console.log("Received an array:", decodedData);
 				nats.request('stats.addBRMatchStatsInfos', msg.data, { timeout: 1000 });
 			} else if (decodedData && typeof decodedData === 'object') {
-				console.log("Received an object:", decodedData);
 				nats.request('stats.addClassicMatchStatsInfos', msg.data, { timeout: 1000 });
 			} else {
 				console.log("Received data of unknown type:", decodedData);

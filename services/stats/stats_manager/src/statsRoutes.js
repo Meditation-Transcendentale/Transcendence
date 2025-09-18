@@ -85,31 +85,31 @@ export default async function statsRoutes(app) {
 
 	app.post('/test', handleErrors(async (req, res) => {
 		const testTab = [
-			{ placement: 1, uuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890" },
-			{ placement: 2, uuid: "b2c3d4e5-f6g7-8901-bcde-f23456789012" },
-			{ placement: 3, uuid: "c3d4e5f6-g7h8-9012-cdef-345678901234" },
-			{ placement: 4, uuid: "d4e5f6g7-h8i9-0123-defg-456789012345" },
-			{ placement: 5, uuid: "e5f6g7h8-i9j0-1234-efgh-567890123456" },
-			{ placement: 6, uuid: "f6g7h8i9-j0k1-2345-fghi-678901234567" },
-			{ placement: 7, uuid: "g7h8i9j0-k1l2-3456-ghij-789012345678" },
-			{ placement: 8, uuid: "h8i9j0k1-l2m3-4567-hijk-890123456789" },
-			{ placement: 9, uuid: "i9j0k1l2-m3n4-5678-ijkl-901234567890" },
-			{ placement: 10, uuid: "j0k1l2m3-n4o5-6789-jklm-012345678901" },
-			{ placement: 11, uuid: "k1l2m3n4-o5p6-7890-klmn-123456789012" },
-			{ placement: 12, uuid: "l2m3n4o5-p6q7-8901-lmno-234567890123" },
-			{ placement: 13, uuid: "m3n4o5p6-q7r8-9012-mnop-345678901234" },
-			{ placement: 14, uuid: "n4o5p6q7-r8s9-0123-nopq-456789012345" },
-			{ placement: 15, uuid: "o5p6q7r8-s9t0-1234-opqr-567890123456" },
-			{ placement: 16, uuid: "p6q7r8s9-t0u1-2345-pqrs-678901234567" },
-			{ placement: 17, uuid: "q7r8s9t0-u1v2-3456-qrst-789012345678" },
-			{ placement: 18, uuid: "r8s9t0u1-v2w3-4567-rstu-890123456789" },
-			{ placement: 19, uuid: "s9t0u1v2-w3x4-5678-stuv-901234567890" },
-			{ placement: 20, uuid: "t0u1v2w3-x4y5-6789-tuvw-012345678901" }
+			{ placement: 1, uuid: "00c9948a-36be-4dd4-9034-9fa2bd5ff793" },
+			{ placement: 2, uuid: "bd9480ce-cc9b-43b5-82f2-eba931d8f64c" },
+			{ placement: 3, uuid: "201a4d31-1b90-4bb7-95e0-46c706c07d91" },
+			{ placement: 4, uuid: "e48147c4-b5f9-42a6-8e60-815166133be7" },
+			{ placement: 5, uuid: "20ea6ec7-116b-4a63-a586-697772482679" },
+			{ placement: 6, uuid: "4f6a4dde-384a-4ad7-8027-89125aa43a78" },
+			{ placement: 7, uuid: "f1ca5043-4ca7-4728-8163-d92ab9fb087d" },
+			{ placement: 8, uuid: "7cacc128-5f2e-4e4f-a306-88921110fa01" },
+			{ placement: 9, uuid: "ca477d3b-4649-41cc-9b7f-44085a17467e" },
+			{ placement: 10, uuid: "a41448b4-5842-4bb2-bc80-9478cc6265c4" },
+			{ placement: 11, uuid: "b28ee785-c6e2-4a07-91e9-107fedbe62f6" },
+			{ placement: 12, uuid: "3e6107ec-31f8-469a-a314-f3970eb68d9b" },
+			{ placement: 13, uuid: "bb6946ca-b2a0-497a-a58f-e5b8f5ed7d0b" },
+			{ placement: 14, uuid: "ce642bfa-da42-4531-ad0b-e90ef72e2bfe" },
+			{ placement: 15, uuid: "7140c40a-7587-4280-8019-fc573163ecd3" },
+			{ placement: 16, uuid: "7271d8fc-6bfd-4dd1-bfca-0c2686b5b19f" },
+			{ placement: 17, uuid: "6809fd4f-998a-43c1-bd23-c201c05f7c83" },
+			{ placement: 18, uuid: "b1737db5-fc23-4f44-887e-d1443cfd5af1" },
+			{ placement: 19, uuid: "469304e8-5335-4d0c-a811-06331f24a86e" },
+			{ placement: 20, uuid: "fe5f5394-11ac-4def-8696-d6d72bca10cb" }
 		];
 
 		const testClassic = { 
-			winner: "a1b2c3d4-e5f6-7890-abcd-ef1234567890", 
-			looser: "b2c3d4e5-f6g7-8901-bcde-f23456789012", 
+			winner: "00c9948a-36be-4dd4-9034-9fa2bd5ff793", 
+			looser: "ce642bfa-da42-4531-ad0b-e90ef72e2bfe", 
 			score: "5-3", 
 			forfait: false 
 		};

@@ -43,31 +43,73 @@ handleErrorsNats(async () => {
 		handleNatsSubscription("stats.addBRMatchStatsInfos", async (msg) => {
 			const matchInfos = jc.decode(msg.data);
 			
-			console.log("test1");
-
 			const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos[0].uuid }), { timeout: 1000 });
 			const winnerDecoded = jc.decode(winner.data);
 
-			console.log("winner:", winnerDecoded);
-
 			matchInfos.winner_id = winnerDecoded.data.id;
 
-			console.log("matchInfos", matchInfos.winner_id, matchInfos.length);
+			const matchId = statService.addMatchInfos('br', matchInfos.winner_id, matchInfos.length);
 
-			statService.addMatchInfos('br', matchInfos.winner_id, matchInfos.length);
-
-			for (i = 0; i < matchInfos.length; i++) {
+			for (let i = 0; i < matchInfos.length; i++) {
 				const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos[i].uuid }), { timeout: 1000 });
 				const userDecoded = jc.decode(user.data);
 				matchInfos[i].user_id = userDecoded.data.id;
+				matchInfos[i].match_id = matchId;
+				if (matchInfos[i].placement == 1) {
+					matchInfos[i].is_winner = true;
+				} else {
+					matchInfos[i].is_winner = false;
+				}
 			}
-			console.log("matchInfos after", matchInfos);
 
 			statService.addBRMatchStatsInfos(matchInfos);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("stats.addClassicMatchStatsInfos", async (msg) => {
 			const matchInfos = jc.decode(msg.data);
+
+			const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos.winner }), { timeout: 1000 });
+			const winnerDecoded = jc.decode(winner.data);
+
+
+			const matchId = statService.addMatchInfos('classic', winnerDecoded.data.id, 2);
+
+			const [score1, score2] = matchInfos.score.split('-').map(Number);
+			let score;
+
+			if (matchInfos.forfait == false || (matchInfos.forfait == true && score1 != score2)) {
+				score = { 
+					winner_goals: Math.max(score1, score2),
+					loser_goals: Math.min(score1, score2)
+				}
+			} else if (matchInfos.forfait == true && score1 == score2) {
+				score = { 
+					winner_goals: score1,
+					loser_goals: score2
+				}
+			}
+
+			const winnerUser = {
+				match_id: matchId,
+				user_id: winnerDecoded.data.id,
+				is_winner: true,
+				goals_scored: score.winner_goals,
+				goals_conceded: score.loser_goals
+			}
+			const looser = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos.looser }), { timeout: 1000 });
+			const looserDecoded = jc.decode(looser.data);
+			
+			const looserUser = { 
+				match_id: matchId,
+				user_id: looserDecoded.data.id,
+				is_winner: false,
+				goals_scored: score.loser_goals,
+				goals_conceded: score.winner_goals
+			}
+
+			statService.addClassicMatchStatsInfos(winnerUser);
+			statService.addClassicMatchStatsInfos(looserUser);
+
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("test.statsDatabase", async (msg) => {
@@ -76,28 +118,3 @@ handleErrorsNats(async () => {
 		})
 	]);
 })();
-
-
-
-
-
-// (handleErrorsNats(async () => {
-
-// 	const sub = nats.subscribe("stats.getPlayerStats");
-// 	for await (const msg of sub) {
-// 		try {
-// 			const playerId = jc.decode(msg.data);
-// 			statService.isUserIdExisting(playerId);
-// 			const playerStats = {
-// 				classic: statService.getPlayerStatsClassicMode(playerId),
-// 				br: statService.getPlayerStatsBRMode(playerId),
-// 				io: statService.getPlayerStatsIOMode(playerId)
-// 			};
-// 			nats.publish(msg.reply, jc.encode({ success: true, data: playerStats }));
-// 		} catch (error) {
-// 			const status = error.status || 500;
-// 			const message = error.message || "Internal Server Error";
-// 			nats.publish(msg.reply, jc.encode({ success: false, status, message }));
-// 		}
-// 	}
-// }))();

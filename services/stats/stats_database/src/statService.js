@@ -42,27 +42,32 @@ const statService = {
 		}
 	},
 	addMatchInfos: (game_mode, winner_id, total_players) => {
-		addMatchInfosStmt.run(game_mode, winner_id, total_players);
+		const matchInfo = addMatchInfosStmt.run(game_mode, winner_id, total_players);
+		return matchInfo.lastInsertRowid;
 	},
 	addBRMatchStatsInfos: (matchResults) => {
-		console.log("service");
-		const transaction = database.transaction((results) => {
-			for (const result of results) {
-				if (result.placement == 1) {
-					result.is_winner = true;
-				} else {
-					result.is_winner = false;
-				}
+		const transaction = database.transaction(() => {
+			for (const [index, result] of matchResults.entries()) {
 				addMatchStatsInfosStmt.run(
 					result.match_id, 
 					result.user_id, 
-					result.is_winner, 
+					result.is_winner ? 1 : 0, 
 					null, 
 					null, 
 					result.placement);
 			}
 		});
 		transaction(matchResults);
+	},
+	addClassicMatchStatsInfos: (result) => {
+		addMatchStatsInfosStmt.run(
+			result.match_id,
+			result.user_id,
+			result.is_winner ? 1 : 0,
+			result.goals_scored,
+			result.goals_conceded,
+			null
+		);
 	},
 	testAll: () => {
 		const allMatch = testAllMatch.all();

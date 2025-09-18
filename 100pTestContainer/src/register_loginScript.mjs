@@ -20,7 +20,7 @@ async function main()
 {
 	const agent = new https.Agent({ rejectUnauthorized: false });
 	let lobbyId = null;
-	for (let i = 1; i <= 100; i++) {
+	for (let i = 1; i <= 20; i++) {
 
 		let username = `user${i}`;
 		let password = `Password${i}`;
