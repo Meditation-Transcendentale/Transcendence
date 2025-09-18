@@ -27,12 +27,16 @@ export class Picker {
 	private ballDiameter = 1.5;
 	private ballHit!: boolean;
 
+	private enabled: boolean;
+
 	constructor(scene: Scene, camera: Camera, effectRenderer: EffectRenderer, position: Vector3, size: Vector2) {
 		this.scene = scene;
 		this.camera = camera;
 		this.groundPosition = position;
 		this.groundSize = size;
 		this.effectRenderer = effectRenderer;
+
+		this.enabled = true;
 
 
 		this.rtA = new RenderTargetTexture("picker", { width: 256, height: 256 }, scene, {
@@ -78,20 +82,22 @@ export class Picker {
 	}
 
 	public render() {
+		if (!this.enabled) { return; }
 		this.swapRT();
 		this.effectRenderer.render(this.pickerEffect, this.rtB);
 	}
 
 	private setEvent() {
 		window.addEventListener("click", (ev) => {
-			if (this.ballHit) {
+
+			if (this.ballHit || !this.enabled) {
 				this.ballHit = false;
 				return;
 			}
 			this.ballHit = this.pickBall(ev.clientX, ev.clientY);
 		})
 		window.addEventListener("mousemove", (ev) => {
-			if (!this.ballHit) {
+			if (!this.ballHit || !this.enabled) {
 				return;
 			}
 			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
@@ -174,6 +180,11 @@ export class Picker {
 
 	public get mesh(): Mesh {
 		return this.meshBall;
+	}
+
+	public setEnable(status: boolean) {
+		this.enabled = status;
+		this.mesh.setEnabled(status);
 	}
 
 	public dispose() {

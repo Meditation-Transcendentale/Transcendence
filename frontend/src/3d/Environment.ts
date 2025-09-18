@@ -217,6 +217,13 @@ export class Environment {
 			this.gameMeshes[i].setEnabled(false);
 		}
 
+		////////////////////////////////////////
+		//
+		//COMMENT IF YOU WANT TO HAVE FULL GRASS AND FOG ON LOAD
+		//
+		////////////////////////////////////////
+		this.field.setLowPerf();
+
 
 		this.scene.onBeforeRenderObservable.add(() => {
 			this.update();
@@ -231,9 +238,7 @@ export class Environment {
 	}
 
 	private update() {
-		if (this.updateHome) {
-			this.field.update(this.lastTime, this.deltaTime);
-		}
+		this.field.update(this.lastTime, this.deltaTime);
 	}
 
 	public enableHome() {

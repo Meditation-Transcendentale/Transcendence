@@ -40,17 +40,23 @@ export class Field {
 
 	private defaultDepthMaterial: ShaderMaterial;
 
+	private toogleFog!: HTMLElement;
+	private toogleGrass!: HTMLElement;
+
+	private lowPerf: boolean;
+
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
 		this.camera = camera;
 
+		this.lowPerf = true;
 		this.effectRenderer = new EffectRenderer(this.scene.getEngine());
 
 		this.cursor = new Vector3();
 		this.cursorMonolith = new Vector3();
 
 
-		this.grass = new Grass(this.scene, 20, this.cursor);
+		this.grass = new Grass(this.scene, 20);
 		this.fog = new Fog(this.scene, this.camera, this.effectRenderer, 0.5);
 		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 1, 0), new Vector2(80, 80));
 
@@ -97,15 +103,6 @@ export class Field {
 		await this.grass.init();
 		await this.monolith.init();
 
-		window.addEventListener("mousemove", (ev) => {
-			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
-			let delta = Math.abs(this.camera.position.y + this.fieldDepth - 1) / ray.y;
-
-			this.cursor.x = this.camera.position.x - ray.x * delta;
-			this.cursor.y = this.camera.position.z - ray.z * delta;
-			this.cursor.z = performance.now() * 0.001;
-		})
-
 		for (let i = 0; i < this.grass._tiles.length; i++) {
 			this.fog.addMeshToDepth(this.grass._tiles[i]._mesh, this.grass.grassDepthMaterial);
 		}
@@ -115,11 +112,11 @@ export class Field {
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
 		this.fog.addMeshToDepth(this.picker.mesh, this.defaultDepthMaterial);
 
-		UIaddToggle("fog", true, {}, (n: boolean) => {
+		this.toogleFog = UIaddToggle("fog", true, {}, (n: boolean) => {
 			this.fog.setEnabled(n);
 			this.pipeline.setFogEnable(n);
 		})
-		UIaddToggle("reduce grass", false, {}, (n: boolean) => {
+		this.toogleGrass = UIaddToggle("reduce grass", false, {}, (n: boolean) => {
 			this.grass.reduceGrass(n);
 		})
 	}
@@ -134,7 +131,7 @@ export class Field {
 	}
 
 	public setEnable(status: boolean) {
-		this.active = status;
+		//this.active = status;
 	}
 
 	public resize() {
@@ -146,34 +143,31 @@ export class Field {
 			case 'play': {
 				this.camera.position.set(-13, 4, -7);
 				this.camera.setTarget(new Vector3(20, 11, -8));
-				this.monolith.setPicking(true);
-				this.setEnable(true);
+				this.setAllEnable(true);
 				break;
 			}
 			case 'home': {
 				this.camera.position.set(0, 5, 15);
 				this.camera.setTarget(new Vector3(0, 7, 0));
-				this.active = true;
-				this.monolith.setPicking(true);
-				this.setEnable(true);
+				this.setAllEnable(true);
 				break;
 			}
 			case 'login': {
 				this.camera.position.set(0, 4, 40);
 				this.camera.setTarget(new Vector3(0, 6, 30));
-				this.setEnable(true);
+				this.setAllEnable(true);
 				break;
 			}
 			case 'register': {
 				this.camera.position.set(0, 4, 40);
 				this.camera.setTarget(new Vector3(0, 4, 30))
+				this.setAllEnable(true);
 				break;
 			}
 			case 'pongBR': {
 				this.scene.activeCamera = this.scene.getCameraByName('br');
 				this.scene.activeCamera?.attachControl();
-				this.active = false;
-				this.setEnable(false);
+				this.setAllEnable(false);
 				break;
 			}
 			case 'lobby': {
@@ -193,8 +187,7 @@ export class Field {
 			case 'brick': {
 				this.camera.position.set(0, 30, 0);
 				this.camera.setTarget(new Vector3(0, 0, 0));
-				this.setEnable(false);
-				this.monolith.setPicking(false);
+				this.setAllEnable(false);
 				break;
 			}
 			case 'exemple1': {
@@ -214,15 +207,54 @@ export class Field {
 				//this.setEnable(true);
 				break;
 			}
+			case 'monolith': {
+				this.camera.detachControl();
+				this.camera.position.set(0, 50, 0);
+				this.camera.setTarget(new Vector3(0, 0, 0));
+				this.grass.setEnable(false);
+				this.setFogEnable(false);
+				break;
+			}
+			case 'grass': {
+				this.camera.detachControl();
+				this.camera.position.set(0, 50, 0);
+				this.camera.setTarget(new Vector3(0, 0, 0));
+				this.monolith.setPicking(false);
+				this.picker.setEnable(false);
+				break;
+			}
+			case 'void': {
+				this.camera.detachControl();
+				this.camera.position.set(0, 50, 0);
+				this.camera.setTarget(new Vector3(0, 0, 0));
+				this.setAllEnable(false);
+				break;
+			}
+
 		}
 	}
 
-	public lowPerf() {
+	public setLowPerf() {
+		this.toogleGrass.querySelector("input")!.checked = true;
+		this.toogleFog.querySelector("input")!.checked = false;
 		this.fog.setEnabled(false);
 		this.pipeline.setFogEnable(false);
 		this.grass.reduceGrass(true);
 	}
 
+	public setFogEnable(status: boolean) {
+		this.fog.setEnabled(status);
+		this.pipeline.setFogEnable(status);
+	}
+
+	public setAllEnable(status: boolean) {
+		this.camera.attachControl();
+		this.setFogEnable(status && this.toogleFog.querySelector("input")!.checked);
+		this.picker.setEnable(status);
+		this.monolith.setPicking(status);
+		this.grass.setEnable(status);
+		this.active = status;
+	}
 
 	public dispose() {
 		this.effectRenderer.dispose();
