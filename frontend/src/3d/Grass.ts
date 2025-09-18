@@ -53,16 +53,20 @@ export class Grass {
 	public cursor!: Vector3;
 
 	public depth = 50.;
+	private enabled: boolean;
+	private reduced: boolean;
 
-	constructor(scene: Scene, size: number, cursor: Vector3) {
+	constructor(scene: Scene, size: number) {
 		this._size = size;
 		this._tiles = [];
 		this.scene = scene;
-		this.cursor = cursor;
+
+		this.enabled = true;
+		this.reduced = false;
 
 		this.grassDepthMaterial = new ShaderMaterial("grassDepth", scene, "grassDepth", {
 			attributes: ["position", "world0", "world1", "world2", "world3", "baseColor"],
-			uniforms: ["world", "viewProjection", "depthValues", "time", "origin"],
+			uniforms: ["world", "viewProjection", "depthValues", "time"],
 			samplers: ["textureSampler"]
 		})
 		this.grassDepthMaterial.backFaceCulling = false;
@@ -99,15 +103,14 @@ export class Grass {
 	}
 
 	public update(time: number, camera: Camera, texture: RenderTargetTexture) {
+		if (!this.enabled) { return; }
 		this._grassShader.setFloat("time", time);
 		this._grassShader.setFloat("oldTime", this._pastTime);
-		this._grassShader.setVec3("origin", this.cursor);
 		this._grassShader.setTexture("textureSampler", texture);
 
 		this._pastTime = time;
 
 		this.grassDepthMaterial.setFloat("time", time);
-		this.grassDepthMaterial.setVector3("origin", this.cursor);
 		this.grassDepthMaterial.setTexture("textureSampler", texture);
 
 
@@ -191,8 +194,17 @@ export class Grass {
 	}
 
 	public reduceGrass(status: boolean) {
+		this.reduced = status;
 		for (let i = 4; i < this._tiles.length; i++) {
 			this._tiles[i]._mesh.setEnabled(!status);
+		}
+	}
+
+	public setEnable(status: boolean) {
+		this.enabled = status;
+		const n = this.reduced ? 4 : this._tiles.length;
+		for (let i = 0; i < n; i++) {
+			this._tiles[i]._mesh.setEnabled(status);
 		}
 	}
 
