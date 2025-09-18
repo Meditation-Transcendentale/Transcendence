@@ -76,8 +76,8 @@ class RouterC {
 			ts: "./Friendlist",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
-		this.routes.set("/cajoue", {
-			html: "/game",
+		this.routes.set("/game", {
+			html: "/game-ui",
 			ts: "./Game",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);

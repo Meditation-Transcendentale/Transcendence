@@ -16,7 +16,7 @@ export class Sun {
 		//this.light.intensity = 0.5;
 
 		this.hemish = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
-		this.hemish.intensity = 2.5;
+		this.hemish.intensity = 0.1;
 		UIaddNumber("hemis intensity", this.hemish.intensity, (value: number) => {
 			this.hemish.intensity = value;
 		})

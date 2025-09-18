@@ -14,7 +14,7 @@ export class ThinInstanceSystem extends System {
 	private ballManager: ThinInstanceManager;
 	private paddleManager: ThinInstanceManager;
 	private wallManager: ThinInstanceManager;
-	private portalManager: ThinInstanceManager;
+	// private portalManager: ThinInstanceManager;
 	private goalManager: ThinInstanceManager;
 	private pillarManager: ThinInstanceManager;
 	private camera: Camera;
@@ -24,7 +24,7 @@ export class ThinInstanceSystem extends System {
 		ballManager: ThinInstanceManager,
 		paddleManager: ThinInstanceManager,
 		wallManager: ThinInstanceManager,
-		portalManager: ThinInstanceManager,
+		// portalManager: ThinInstanceManager,
 		goalManager: ThinInstanceManager,
 		pillarManager: ThinInstanceManager,
 		camera: Camera
@@ -33,7 +33,7 @@ export class ThinInstanceSystem extends System {
 		this.ballManager = ballManager;
 		this.paddleManager = paddleManager;
 		this.wallManager = wallManager;
-		this.portalManager = portalManager;
+		// this.portalManager = portalManager;
 		this.goalManager = goalManager;
 		this.pillarManager = pillarManager;
 		this.camera = camera;
@@ -44,7 +44,7 @@ export class ThinInstanceSystem extends System {
 		this.ballManager.update(entities, BallComponent, this.camera, this.frameCount);
 		this.paddleManager.update(entities, PaddleComponent, this.camera, this.frameCount);
 		this.wallManager.update(entities, WallComponent, this.camera, this.frameCount);
-		this.portalManager.update(entities, PortalComponent, this.camera, this.frameCount);
+		// this.portalManager.update(entities, PortalComponent, this.camera, this.frameCount);
 		this.goalManager.update(entities, GoalComponent, this.camera, this.frameCount);
 		this.pillarManager.update(entities, PillarComponent, this.camera, this.frameCount);
 	}

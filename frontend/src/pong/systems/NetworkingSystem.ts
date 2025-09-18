@@ -20,9 +20,6 @@ export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
 	private oldVelX: number;
 	private oldVelY: number;
-	private uuid: string;
-	private scoreUI: any;
-	private endUI: any;
 	private myScore: number;
 	private opponentScore: number;
 	private mode: string;
@@ -110,15 +107,17 @@ export class NetworkingSystem extends System {
 				if (score) {
 					const e = entities.find(e => e.hasComponent(UIComponent));
 					let ui = e?.getComponent(UIComponent);
-					const myScore = score[localPaddleId] ?? 0;
+					this.myScore = score[localPaddleId] ?? 0;
 					const otherId = score
 						.map((_, i) => i)
 						.find(i => i !== localPaddleId)!;
-					const theirScore = score[otherId] ?? 0;
+					this.opponentScore = score[otherId] ?? 0;
 					if (ui) {
-						ui.score.x = myScore;
-						ui.score.y = theirScore;
+						ui.gameUI.updateScore(this.myScore, this.opponentScore);
 					}
+					// if (ui && (myScore == 5 || theirScore == 5)){
+					// 	ui.gameUI.showEnd(myScore, theirScore, myScore == 5);
+					// }
 				}
 			}
 
@@ -126,6 +125,15 @@ export class NetworkingSystem extends System {
 			if (serverMsg.end) {
 				if (this.mode = "tournament")
 					Router.nav(`/tournament`, false, true);
+				
+				const e = entities.find(e => e.hasComponent(UIComponent));
+				let ui = e?.getComponent(UIComponent);
+
+				let win = false;
+				if (this.myScore == 5)
+					win = true;
+
+				ui?.gameUI.showEnd(this.myScore, this.opponentScore, win);
 				console.log("Received GameEndMessage");
 				// const scores = serverMsg.end.score as number[];
 				// const myScore = scores[localPaddleId] ?? 0;
