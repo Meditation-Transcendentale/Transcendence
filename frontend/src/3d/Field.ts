@@ -14,7 +14,7 @@ import { Monolith } from "./Monolith";
 import { createTempleMonolith } from "./Builder";
 import { Fog } from "./Fog";
 import { Picker } from "./Picker";
-import { UIaddToggle } from "./UtilsUI.js";
+import { UIaddDetails, UIaddToggle } from "./UtilsUI.js";
 
 export class Field {
 	private scene: Scene;
@@ -55,6 +55,7 @@ export class Field {
 		this.cursor = new Vector3();
 		this.cursorMonolith = new Vector3();
 
+		this.initUI();
 
 		this.grass = new Grass(this.scene, 20);
 		this.fog = new Fog(this.scene, this.camera, this.effectRenderer, 0.5);
@@ -112,13 +113,6 @@ export class Field {
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
 		this.fog.addMeshToDepth(this.picker.mesh, this.defaultDepthMaterial);
 
-		this.toogleFog = UIaddToggle("fog", true, {}, (n: boolean) => {
-			this.fog.setEnabled(n);
-			this.pipeline.setFogEnable(n);
-		})
-		this.toogleGrass = UIaddToggle("reduce grass", false, {}, (n: boolean) => {
-			this.grass.reduceGrass(n);
-		})
 	}
 
 	public update(time: number, deltaTime: number) {
@@ -236,9 +230,8 @@ export class Field {
 
 	public setLowPerf() {
 		this.toogleGrass.querySelector("input")!.checked = true;
-		this.toogleFog.querySelector("input")!.checked = false;
-		this.fog.setEnabled(false);
-		this.pipeline.setFogEnable(false);
+		// this.toogleFog.querySelector("input")!.checked = false;
+		// this.setFogEnable(false);
 		this.grass.reduceGrass(true);
 	}
 
@@ -262,5 +255,17 @@ export class Field {
 		this.pipeline.dispose();
 		this.grass.dispose();
 		this.picker.dispose();
+	}
+
+	private initUI() {
+		// const details = UIaddDetails("--GENERAL");
+		this.toogleFog = UIaddToggle("fog", true, {}, (n: boolean) => {
+			this.fog.setEnabled(n);
+			this.pipeline.setFogEnable(n);
+		})
+		this.toogleGrass = UIaddToggle("reduce grass", false, {}, (n: boolean) => {
+			this.grass.reduceGrass(n);
+		})
+
 	}
 }

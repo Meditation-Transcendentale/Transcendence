@@ -104,7 +104,22 @@ export class Pipeline {
 	}
 
 	public initUI() {
-		const details = UIaddDetails("PIPELINE");
+		const details = UIaddDetails("--PIPELINE");
+		UIaddToggle("color correction", true, { div: details }, (n: boolean) => {
+			if (n) {
+				this.scene.postProcessRenderPipelineManager.enableEffectInPipeline("pipeline", "colorCorrectionEffect", this.camera);
+			} else {
+				this.scene.postProcessRenderPipelineManager.disableEffectInPipeline("pipeline", "colorCorrectionEffect", this.camera);
+			}
+		})
+		UIaddToggle("bloom", true, { div: details }, (n: boolean) => {
+			if (n) {
+				this.scene.postProcessRenderPipelineManager.enableEffectInPipeline("pipeline", this.bloomEffect._name, this.camera);
+			} else {
+				this.scene.postProcessRenderPipelineManager.disableEffectInPipeline("pipeline", this.bloomEffect._name, this.camera);
+			}
+		})
+
 		UIaddSliderVec3("fog asborption", this.fogAbsorption, {
 			step: 0.05,
 			min: 0,
@@ -130,21 +145,24 @@ export class Pipeline {
 			max: 3,
 			div: details
 		}, (n: number) => { this.gamma = n });
-
-		UIaddToggle("color correction", true, { div: details }, (n: boolean) => {
-			if (n) {
-				this.scene.postProcessRenderPipelineManager.enableEffectInPipeline("pipeline", "colorCorrectionEffect", this.camera);
-			} else {
-				this.scene.postProcessRenderPipelineManager.disableEffectInPipeline("pipeline", "colorCorrectionEffect", this.camera);
-			}
-		})
-		UIaddToggle("bloom correction", true, { div: details }, (n: boolean) => {
-			if (n) {
-				this.scene.postProcessRenderPipelineManager.enableEffectInPipeline("pipeline", this.bloomEffect._name, this.camera);
-			} else {
-				this.scene.postProcessRenderPipelineManager.disableEffectInPipeline("pipeline", this.bloomEffect._name, this.camera);
-			}
-		})
+		UIaddSlider("bloom weight", this.bloomEffect.weight, {
+			step: 0.1,
+			min: 0,
+			max: 10,
+			div: details
+		}, (n: number) => { this.bloomEffect.weight = n });
+		UIaddSlider("bloom kernel", this.bloomEffect.kernel, {
+			step: 2,
+			min: 0,
+			max: 128,
+			div: details
+		}, (n: number) => { this.bloomEffect.kernel = n });
+		UIaddSlider("bloom threshold", this.bloomEffect.threshold, {
+			step: 0.01,
+			min: 0,
+			max: 1,
+			div: details
+		}, (n: number) => { this.bloomEffect.threshold = n });
 	}
 
 	public setFogEnable(status: boolean) {

@@ -219,7 +219,7 @@ export class Environment {
 
 		////////////////////////////////////////
 		//
-		//COMMENT IF YOU WANT TO HAVE FULL GRASS AND FOG ON LOAD
+		//COMMENT IF YOU WANT TO HAVE FULL GRASS ON LOAD
 		//
 		////////////////////////////////////////
 		this.field.setLowPerf();

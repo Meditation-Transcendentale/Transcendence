@@ -193,7 +193,7 @@ export class Fog {
 	}
 
 	private initUI() {
-		const details = UIaddDetails("--FOG--");
+		const details = UIaddDetails("--FOG");
 
 		UIaddSlider("wave initial speed", this.noiseInitialSpeed, {
 			step: 0.05,
@@ -247,12 +247,12 @@ export class Fog {
 			div: details,
 
 		}, (n: number) => { this.dataUBO.updateFloat("waterHeight", n) });
-		UIaddSlider("waveMaxDisplacement", waveMaxDisplacementDefault, {
-			step: 0.5,
-			min: 0,
-			max: 20,
-			div: details
-		}, (n: number) => { this.dataUBO.updateFloat("waveMaxDisplacement", n) });
+		// UIaddSlider("waveMaxDisplacement", waveMaxDisplacementDefault, {
+		// 	step: 0.5,
+		// 	min: 0,
+		// 	max: 20,
+		// 	div: details
+		// }, (n: number) => { this.dataUBO.updateFloat("waveMaxDisplacement", n) });
 		UIaddSlider("density", densityDefault, {
 			step: 0.05,
 			min: 0,

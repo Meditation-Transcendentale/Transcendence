@@ -135,7 +135,7 @@ export class Picker {
 	}
 
 	private initUI() {
-		const details = UIaddDetails('PICKER');
+		const details = UIaddDetails('--PICKER');
 
 		UIaddSlider("attenuation", this.attenuation, {
 			step: 0.01,
