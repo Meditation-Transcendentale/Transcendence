@@ -23,6 +23,9 @@ const addMatchInfosStmt = database.prepare(`INSERT INTO match (game_mode, winner
 const addMatchStatsInfosStmt = database.prepare(`INSERT INTO match_stats (match_id, user_id, is_winner, goals_scored, goals_conceded, placement) VALUES (?, ?, ?, ?, ?, ?)`);
 
 
+const testAllMatch = database.prepare(`SELECT * FROM match`);
+const testAllMatchStats = database.prepare(`SELECT * FROM match_stats`);
+
 const statService = {
 	getPlayerStatsClassicMode: (playerId) => {
 		const playerStatsClassic = getPlayerStatsClassicModeStmt.all(playerId);
@@ -41,8 +44,30 @@ const statService = {
 	addMatchInfos: (game_mode, winner_id, total_players) => {
 		addMatchInfosStmt.run(game_mode, winner_id, total_players);
 	},
-	addMatchStatsInfos: (match_id, user_id, is_winner, goals_scored, goals_conceded, placement) => {
-		addMatchStatsInfosStmt.run(match_id, user_id, is_winner, goals_scored, goals_conceded, placement);
+	addBRMatchStatsInfos: (matchResults) => {
+		console.log("service");
+		const transaction = database.transaction((results) => {
+			for (const result of results) {
+				if (result.placement == 1) {
+					result.is_winner = true;
+				} else {
+					result.is_winner = false;
+				}
+				addMatchStatsInfosStmt.run(
+					result.match_id, 
+					result.user_id, 
+					result.is_winner, 
+					null, 
+					null, 
+					result.placement);
+			}
+		});
+		transaction(matchResults);
+	},
+	testAll: () => {
+		const allMatch = testAllMatch.all();
+		const allMatchStats = testAllMatchStats.all();
+		return { allMatch, allMatchStats };
 	}
 
 

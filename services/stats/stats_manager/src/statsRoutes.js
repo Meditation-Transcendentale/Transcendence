@@ -106,9 +106,36 @@ export default async function statsRoutes(app) {
 			{ placement: 19, uuid: "s9t0u1v2-w3x4-5678-stuv-901234567890" },
 			{ placement: 20, uuid: "t0u1v2w3-x4y5-6789-tuvw-012345678901" }
 		];
-		const test = await nats.request('test.stats', jc.encode({ testTab }), { timeout: 1000 });
+
+		const testClassic = { 
+			winner: "a1b2c3d4-e5f6-7890-abcd-ef1234567890", 
+			looser: "b2c3d4e5-f6g7-8901-bcde-f23456789012", 
+			score: "5-3", 
+			forfait: false 
+		};
+
+		let finalData;
+
+		if (Math.random() < 0.5) {
+			finalData = testTab ;
+		} else {
+			finalData = testClassic;
+		}
+
+
+		const test = await nats.request('test.stats', jc.encode(finalData), { timeout: 1000 });
 		const result = jc.decode(test.data);
 
+		res.code(statusCode.SUCCESS).send({ message: 'success' });
+	}));
+
+	app.get('/get/test', handleErrors(async (req, res) => {
+
+		const result = await nats.request('test.statsDatabase', jc.encode({}), { timeout: 1000 });
+		const decodedResult = jc.decode(result.data);
+		console.log("All Match:", decodedResult.data.allMatch);
+		console.log("All Match Stats:", decodedResult.data.allMatchStats);
+		res.header('Cache-Control', 'no-store');
 		res.code(statusCode.SUCCESS).send({ message: 'success' });
 	}));
 
