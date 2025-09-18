@@ -190,6 +190,11 @@ export class Grass {
 		mesh.thinInstanceSetBuffer('baseColor', bufferColor, 4, true);
 	}
 
+	public reduceGrass(status: boolean) {
+		for (let i = 4; i < this._tiles.length; i++) {
+			this._tiles[i]._mesh.setEnabled(!status);
+		}
+	}
 
 	public dispose() {
 		this._tiles.forEach((tile) => {

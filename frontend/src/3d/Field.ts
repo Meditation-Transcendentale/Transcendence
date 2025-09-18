@@ -115,6 +115,13 @@ export class Field {
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
 		this.fog.addMeshToDepth(this.picker.mesh, this.defaultDepthMaterial);
 
+		UIaddToggle("fog", true, {}, (n: boolean) => {
+			this.fog.setEnabled(n);
+			this.pipeline.setFogEnable(n);
+		})
+		UIaddToggle("reduce grass", false, {}, (n: boolean) => {
+			this.grass.reduceGrass(n);
+		})
 	}
 
 	public update(time: number, deltaTime: number) {
@@ -208,6 +215,12 @@ export class Field {
 				break;
 			}
 		}
+	}
+
+	public lowPerf() {
+		this.fog.setEnabled(false);
+		this.pipeline.setFogEnable(false);
+		this.grass.reduceGrass(true);
 	}
 
 
