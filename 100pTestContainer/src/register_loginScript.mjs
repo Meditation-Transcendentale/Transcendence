@@ -24,7 +24,7 @@ async function main()
 
 		let username = `user${i}`;
 		let password = `Password${i}`;
-		console.log("lobbyId:", lobbyId);
+		// console.log("lobbyId:", lobbyId);
 
 
 		try {
@@ -33,7 +33,7 @@ async function main()
 				password: password
 			}, { headers: { 'x-api-key': process.env.API_GATEWAY_KEY }, httpsAgent: agent });
 
-			console.log(`Registered: ${username}`);
+			// console.log(`Registered: ${username}`);
 
 			const response = await axios.post(`${API_URL}/auth/login`, {
 				username: username,
@@ -46,7 +46,7 @@ async function main()
 
 			const cookies = response.headers['set-cookie'];
 
-			console.log(`Logged in: ${username}`);
+			// console.log(`Logged in: ${username}`);
 			
 			if (i == 1) {
 				const state = await axios.post(`${API_URL}/lobby/create`,{
@@ -61,7 +61,7 @@ async function main()
 				});
 
 				lobbyId = state.data.lobbyId;
-				console.log('Created a battle royale lobby:', lobbyId);
+				// console.log('Created a battle royale lobby:', lobbyId);
 			}
 
 			const user = await axios.get(`${API_URL}/info/me`, { 
@@ -75,56 +75,56 @@ async function main()
 			const uuid = user.data.userInfo.uuid;
 			console.log(username, 'uuid:', uuid);
 
-			const url = `wss://172.17.0.1:7000/lobbies?uuid=${encodeURIComponent(uuid)}&lobbyId=${encodeURIComponent(lobbyId)}`;
-			const ws = new WebSocket(url, {
-				rejectUnauthorized: false,
-				headers: {
-					'Cookie': cookies ? cookies.join('; ') : ''
-				}
-			});
+			// const url = `wss://172.17.0.1:7000/lobbies?uuid=${encodeURIComponent(uuid)}&lobbyId=${encodeURIComponent(lobbyId)}`;
+			// const ws = new WebSocket(url, {
+			// 	rejectUnauthorized: false,
+			// 	headers: {
+			// 		'Cookie': cookies ? cookies.join('; ') : ''
+			// 	}
+			// });
 
-			ws.onmessage = (msg) => {
-				const buf = new Uint8Array(msg.data);
-				const payload = decodeServerMessage(buf);
-				console.log('Decoded payload:', payload);
-			};
+			// ws.onmessage = (msg) => {
+			// 	const buf = new Uint8Array(msg.data);
+			// 	const payload = decodeServerMessage(buf);
+			// 	console.log('Decoded payload:', payload);
+			// };
 
-			ws.onopen = () => {
-				console.log(`✅ WebSocket connected for ${username}`);
-			};
+			// ws.onopen = () => {
+			// 	console.log(`✅ WebSocket connected for ${username}`);
+			// };
 
-			ws.onerror = (error) => {
-				console.error(`❌ WebSocket error for ${username}:`, error);
-			};
+			// ws.onerror = (error) => {
+			// 	console.error(`❌ WebSocket error for ${username}:`, error);
+			// };
 
-			ws.onclose = () => {
-				console.log(`🔌 WebSocket closed for ${username}`);
-			};
+			// ws.onclose = () => {
+			// 	console.log(`🔌 WebSocket closed for ${username}`);
+			// };
 
-			if (i > 1) {
-				const searchResponse = await axios.post(`${API_URL}/info/search`, {
-					identifier: `user${i - 1}`,
-					type: 'username'
-				}, { 
-					headers: { 
-						'x-api-key': process.env.API_GATEWAY_KEY, 
-						'Cookie': cookies ? cookies.join('; ') : ''
-					}, 
-					httpsAgent: agent });
+			// if (i > 1) {
+			// 	const searchResponse = await axios.post(`${API_URL}/info/search`, {
+			// 		identifier: `user${i - 1}`,
+			// 		type: 'username'
+			// 	}, { 
+			// 		headers: { 
+			// 			'x-api-key': process.env.API_GATEWAY_KEY, 
+			// 			'Cookie': cookies ? cookies.join('; ') : ''
+			// 		}, 
+			// 		httpsAgent: agent });
 
-				console.log('Searched:', `user${i - 1}`, 'UUID:', searchResponse.data.data.uuid);
+			// 	console.log('Searched:', `user${i - 1}`, 'UUID:', searchResponse.data.data.uuid);
 
-				await axios.post(`${API_URL}/friends/add`, {
-					inputUuid: searchResponse.data.data.uuid
-				}, { 
-					headers: { 
-						'x-api-key': process.env.API_GATEWAY_KEY, 
-						'Cookie': cookies ? cookies.join('; ') : ''
-					}, 
-					httpsAgent: agent });
+				// await axios.post(`${API_URL}/friends/add`, {
+				// 	inputUuid: searchResponse.data.data.uuid
+				// }, { 
+				// 	headers: { 
+				// 		'x-api-key': process.env.API_GATEWAY_KEY, 
+				// 		'Cookie': cookies ? cookies.join('; ') : ''
+				// 	}, 
+				// 	httpsAgent: agent });
 
-				console.log('Friend request sent to:', `user${i - 1}`);
-			}
+				// console.log('Friend request sent to:', `user${i - 1}`);
+			// }
 
 		}
 		catch (error) {

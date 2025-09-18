@@ -42,8 +42,16 @@ handleErrorsNats(async () => {
 		}),
 		handleNatsSubscription("stats.addBRMatchStatsInfos", async (msg) => {
 			const matchInfos = jc.decode(msg.data);
-			
-			const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos[0].uuid }), { timeout: 1000 });
+
+			let winner_uuid;
+			for (const info of matchInfos) {
+				if (info.placement == 1) {
+					winner_uuid = info.uuid;
+					break;
+				}
+			}
+
+			const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: winner_uuid }), { timeout: 1000 });
 			const winnerDecoded = jc.decode(winner.data);
 
 			matchInfos.winner_id = winnerDecoded.data.id;
