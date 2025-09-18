@@ -3,7 +3,7 @@ import "@babylonjs/loaders/glTF/2.0/";
 import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // load shaders
 // import * as POST from "@babylonjs/core/PostProcesses";
 
-//export { Inspector } from '@babylonjs/inspector';
+// export { Inspector } from '@babylonjs/core';
 // import {
 // 	VolumetricLightScatteringPostProcess
 // } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
@@ -67,6 +67,7 @@ export { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
 export { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 export { EffectWrapper, EffectRenderer } from "@babylonjs/core/Materials/effectRenderer";
 export { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
+export { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 
 import "@babylonjs/core/Culling/ray";
 

@@ -103,47 +103,67 @@ void main(void) {
 }`;
 
 Effect.ShadersStore["grassFragmentShader"] = `
+
+layout(std140) uniform data {
+	float	noiseOffset;
+	float	stepSize;
+	float	maxDistance;
+	float	worldSize;
+	float	waterHeight;
+	float	waveMaxDisplacement;
+	float	density;
+	float	lightScattering;
+	float	ambientMultiplier;
+	vec3	waterAbsorption;
+};
+
+struct lightingInfo {
+    vec3 diffuse;
+    vec3 specular;
+};
+
+lightingInfo	blinnPhong(vec3 normal, vec3 viewDir, vec3 lightIntensity, vec3 specularIntensity) {
+    lightingInfo    info;
+
+    float NdotL = clamp(dot(normal, lightDir), 0., 1.);
+    info.diffuse = NdotL * lightDiffuseColor * lightIntensity;
+
+    vec3 h = normalize(lightDir + viewDir);
+    float NdotH = clamp(dot(normal, h), 0., 1.);
+    info.specular = pow(NdotH, glossiness) * specularColor * specularIntensity;
+}
+
+float waterSdf(vec3 p, float h) {
+	p.y -= waterHeight * 0.5;
+	vec3 q = abs(p) - vec3(worldSize * 0.5, h * 0.5, worldSize * 0.5);
+	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+}
+
+vec3 computeSunIntensity(vec3 position) {
+    float h = texture(surfaceTexture, p.xz * (1. / worldSize) + 0.5).r  * waveMaxDisplacement + waterHeight;
+    float s = waterSdf(p, p.y > 0. ? h : waterHeight);
+    float d = density * float(s < 0.);
+
+    uv = (p.xz + (h - p.y) * 0.2)* (1. / worldSize) + 0.5;
+
+    vec3 sun = ambientMultiplier * texture(surfaceTexture, uv).r * exp(d * (h - p.y) * -waterAbsorption) * float(s < 0.) * \
+		float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
+
+    return clamp(sun, vec3(0.), vec3(1.));
+}
+
 void main(void) {
     vec3 viewDirectionW = normalize(vEyePosition.xyz-vPositionW);
-    vec4 baseColor = vec4(1., 1., 1., 1.);
-    vec3 diffuseColor = vDiffuseColor.rgb;
-    float alpha = vDiffuseColor.a;
     vec3 normalW = normalize(vNormalW);
-    vec2 uvOffset = vec2(0.0, 0.0);
-    vec3 baseAmbientColor = vec3(1., 1., 1.);
-    
-    float glossiness = vSpecularColor.a;
-    vec3 specularColor = vSpecularColor.rgb;
-    vec3 diffuseBase = vec3(0., 0., 0.);
-    lightingInfo info;
-    vec3 specularBase = vec3(0., 0., 0.);
-    float shadow = 1.;
-    float aggShadow = 0.;
-    float numLights = 0.;
-    vec4 diffuse0 = light0.vLightDiffuse;
-    #define CUSTOM_LIGHT0_COLOR 
-    info = computeHemisphericLighting(viewDirectionW, normalW, light0.vLightData, diffuse0.rgb, light0.vLightSpecular.rgb, light0.vLightGround, glossiness);
-    shadow = 1.;
-    aggShadow += shadow;
-    numLights += 1.0;
-    diffuseBase += info.diffuse*shadow;
-    specularBase += info.specular*shadow;
-    aggShadow = aggShadow/numLights;
-    vec4 refractionColor = vec4(0., 0., 0., 1.);
-    vec4 reflectionColor = vec4(0., 0., 0., 1.);
-    vec3 emissiveColor = vEmissiveColor;
-    vec3 finalDiffuse = clamp(diffuseBase*diffuseColor+emissiveColor+vAmbientColor, 0.0, 1.0)*baseColor.rgb;
-    vec3 finalSpecular = specularBase*specularColor;
-    vec4 color = vec4(finalDiffuse*baseAmbientColor+finalSpecular+reflectionColor.rgb+refractionColor.rgb, alpha);
+
+    vec3 sunIntensity = computeSunIntensity(vPositionW);
+    lightInfo light = blinnPhong(normalW, viewDirectionW, sunIntensity, sunIntensity);
+
+    vec3    color = diffuseColor * light.diffuse + specularColor * light.info;
     color.rgb *= vPositionM.y * 1. * baseColor.g;
-
-    color.rgb = max(color.rgb, 0.);
-    color.a *= visibility;
-
-    glFragColor = color;
     
-    float distToCamera = length(vPositionW.xyz - vEyePosition.xyz);
-    float distToSurface = max(-vPositionW.y, 0.);
-    glFragColor.rgb = clamp(glFragColor.rgb, 0., 1.);
+    gl_FragColor.rgb = color;
+    gl_FragColor.a = 1.;
+    
 }
-`
+`;

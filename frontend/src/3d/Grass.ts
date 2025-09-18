@@ -21,31 +21,31 @@ const optionsA: _thinInstancesOptions = {
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.5,
-	scale: new Vector3(1.5, 1.5, 1.5)
+	scale: new Vector3(1.5, 2.5, 1.5)
 };
 
 const optionsB: _thinInstancesOptions = {
-	density: optionsA.density * 1,
+	density: optionsA.density * 0.8,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 1,
-	scale: new Vector3(1, .8, 1)
+	scale: new Vector3(2., 2.2, 2.)
 };
 
 const optionsC: _thinInstancesOptions = {
 	density: optionsA.density * 1,
 	stiffness: 0.4,
 	rotation: 0.2,
-	size: 1,
-	scale: new Vector3(1, .8, 1)
+	size: 0.5,
+	scale: new Vector3(1.5, 2.5, 1.5)
 };
 
 const optionsD: _thinInstancesOptions = {
 	density: optionsA.density * 1,
 	stiffness: 0.4,
 	rotation: 0.2,
-	size: 1,
-	scale: new Vector3(1.4, 0.9, 1.4)
+	size: 0.5,
+	scale: new Vector3(1.5, 2.5, 1.5)
 };
 
 const optionsE: _thinInstancesOptions = {
@@ -55,30 +55,6 @@ const optionsE: _thinInstancesOptions = {
 	size: 1,
 	scale: new Vector3(1.5, 0.9, 1.5)
 };
-
-// const _midOptions: _thinInstancesOptions = {
-// 	density: 10,
-// 	stiffness: 0.4,
-// 	rotation: 0.2,
-// 	size: 0.7,
-// 	scale: new Vector3(0.5, 1.0, 0.5)
-// }
-//
-// const _farOptions: _thinInstancesOptions = {
-// 	density: 4,
-// 	stiffness: 1.0,
-// 	rotation: 0.1,
-// 	size: 1.0,
-// 	scale: new Vector3(1.5, 1.0, 1.5)
-// }
-
-// const _far2Options: _thinInstancesOptions = {
-// 	density: 1.5,
-// 	stiffness: 1.0,
-// 	rotation: 0.0,
-// 	size: 1.0,
-// 	scale: new Vector3(5.0, 1.0, 5.0)
-// }
 
 export class Grass {
 	public scene: Scene;
@@ -124,12 +100,12 @@ export class Grass {
 	public async init() {
 		await this.loadAssests(this.scene);
 
-		this.noiseTexture = new ProceduralTexture("noise", 1024, "WindHeight", this.scene);
-		this.noiseTexture.refreshRate = 0;
+		// this.noiseTexture = new ProceduralTexture("noise", 1024, "WindHeight", this.scene);
+		// this.noiseTexture.refreshRate = 0;
 
 		this.setThinInstances(this.meshA, this._size, this._size, optionsA);
-		//this.setThinInstances(this.meshB, this._size, this._size, optionsB);
-		//this.setThinInstances(this.meshC, this._size, this._size, optionsC);
+		this.setThinInstances(this.meshB, this._size * 2, this._size * 2, optionsB);
+		// this.setThinInstances(this.meshC, this._size, this._size, optionsC);
 		//this.setThinInstances(this.meshD, this._size * 2, this._size * 2, optionsD);
 		//this.setThinInstances(this.meshD1, this._size, this._size, optionsD);
 		//this.setThinInstances(this.meshE, this._size * 4, this._size * 4, optionsE);
@@ -161,75 +137,14 @@ export class Grass {
 		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, -this.depth, -size)), this._size, this._size));
 		this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, -this.depth, -size)), this._size, this._size));
 
-
-		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 3, 0, 0)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 3, 0, 0)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size, 0, -size * 2)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size, 0, -size * 2)), this._size, this._size));
-		////
-		////
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(size * 3, 0, -size * 2)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(-size * 3, 0, -size * 2)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(size * 5, 0, 0)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(-size * 5, 0, 0)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(size * 5, 0, -size * 2)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(-size * 5, 0, -size * 2)), this._size, this._size));
-		//
-		//this._tiles.push(new Tile(this.meshD1, this._grassShader, o.add(new Vector3(size * 7, 0, 0)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshD1, this._grassShader, o.add(new Vector3(-size * 7, 0, 0)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshD1, this._grassShader, o.add(new Vector3(size * 7, 0, -size * 2)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshD1, this._grassShader, o.add(new Vector3(-size * 7, 0, -size * 2)), this._size, this._size));
-		//
-		////
-		//this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(size * 2, 0, -size * 5)), this._size * 2, this._size * 2));
-		//this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(-size * 2, 0, -size * 5)), this._size * 2, this._size * 2));
-		//this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(size * 6, 0, -size * 5)), this._size * 2, this._size * 2));
-		//this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(-size * 6, 0, -size * 5)), this._size * 2, this._size * 2));
-		//
-		//
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 12, 0, -size * 3)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 4, 0, -size * 11)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 12, 0, -size * 11)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 12, 0, -size * 11)), this._size * 4, this._size * 4));
-		////
-		////
-		//this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(size, 0, 20)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshA, this._grassShader, o.add(new Vector3(-size, 0, 20)), this._size, this._size));
-		//
-		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 3, 0, 20)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 3, 0, 20)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size, 0, size * 2 + 20)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size, 0, size * 2 + 20)), this._size, this._size));
-		////
-		////
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(size * 3, 0, 20 + size * 2)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(-size * 3, 0, 20 + size * 2)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(size * 5, 0, 20)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(-size * 5, 0, 20)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(size * 5, 0, 20 + size * 2)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshC, this._grassShader, o.add(new Vector3(-size * 5, 0, 20 + size * 2)), this._size, this._size));
-		//
-		//this._tiles.push(new Tile(this.meshD1, this._grassShader, o.add(new Vector3(size * 7, 0, 20)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshD1, this._grassShader, o.add(new Vector3(-size * 7, 0, 20)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshD1, this._grassShader, o.add(new Vector3(size * 7, 0, 20 + size * 2)), this._size, this._size));
-		//this._tiles.push(new Tile(this.meshD1, this._grassShader, o.add(new Vector3(-size * 7, 0, 20 + size * 2)), this._size, this._size));
-		//
-		////
-		//this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(size * 2, 0, 20 + size * 5)), this._size * 2, this._size * 2));
-		//this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(-size * 2, 0, 20 + size * 5)), this._size * 2, this._size * 2));
-		//this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(size * 6, 0, 20 + size * 5)), this._size * 2, this._size * 2));
-		//this._tiles.push(new Tile(this.meshD, this._grassShader, o.add(new Vector3(-size * 6, 0, 20 + size * 5)), this._size * 2, this._size * 2));
-		//
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 12, 0, 20 + size * 3)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 12, 0, 20 + size * 3)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 4, 0, 20 + size * 11)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 4, 0, 20 + size * 11)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(size * 12, 0, 20 + size * 11)), this._size * 4, this._size * 4));
-		//this._tiles.push(new Tile(this.meshE, this._grassShader, o.add(new Vector3(-size * 12, 0, 20 + size * 11)), this._size * 4, this._size * 4));
-		//
-
+		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 4, -this.depth, 0)), this._size * 2, this._size * 2));
+		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 4, -this.depth, 0)), this._size * 2, this._size * 2));
+		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 4, -this.depth, -size * 4)), this._size * 2, this._size * 2));
+		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 4, -this.depth, -size * 4)), this._size * 2, this._size * 2));
+		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(0, -this.depth, -size * 4)), this._size * 2, this._size * 2));
+		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 4, -this.depth, -size * 8)), this._size * 2, this._size * 2));
+		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 4, -this.depth, -size * 8)), this._size * 2, this._size * 2));
+		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(0, -this.depth, -size * 8)), this._size * 2, this._size * 2));
 
 	}
 

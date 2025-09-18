@@ -187,3 +187,28 @@ void main(void) {
     glFragColor = vec4(vDepthMetric, 0.0, 0.0, 1.0);
 }
 `;
+
+Effect.ShadersStore["defaultDepthVertexShader"] = `
+precision highp float;
+
+attribute vec3	position;
+uniform mat4	world;
+uniform mat4	viewProjection;
+uniform vec2	depthValues;
+
+varying float vDepthMetric;
+void main() {
+	gl_Position = viewProjection * world * vec4(position, 1.);
+	vDepthMetric = ((gl_Position.z + depthValues.x)/depthValues.y);
+}
+`;
+
+Effect.ShadersStore["defaultDepthFragmentShader"] = `
+precision highp float;
+
+varying float vDepthMetric;
+
+void main(void) {
+    glFragColor = vec4(vDepthMetric, 0.0, 0.0, 1.0);
+}
+`;

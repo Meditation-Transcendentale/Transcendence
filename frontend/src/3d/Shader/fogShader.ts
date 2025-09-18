@@ -14,6 +14,7 @@ layout(std140) uniform camera {
 	mat4	iview;
 	mat4	world;
 };
+
 layout(std140) uniform data {
 	float	noiseOffset;
 	float	stepSize;
@@ -73,9 +74,28 @@ float waterSdf(vec3 p, float h) {
 	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
+//from inigo quilez
+//https://iquilezles.org/articles/intersectors/
+// axis aligned box centered at the origin, with size boxSize
+bool boxIntersection( vec3 ro, vec3 rd, vec3 boxSize, out float result) 
+{
+	vec3 m = 1.0/rd; // can precompute if traversing a set of aligned boxes
+	vec3 n = m*ro;   // can precompute if traversing a set of aligned boxes
+	vec3 k = abs(m)*boxSize;
+	vec3 t1 = -n - k;
+	vec3 t2 = -n + k;
+	float tN = max( max( t1.x, t1.y ), t1.z );
+	float tF = min( min( t2.x, t2.y ), t2.z );
+	result = tF;
+	// result.y = tF;
+	return (tN > tF || tF < 0.);
+}
+
 void main(void) {
 	vec3 position = cameraPosition;
 
+	// gl_FragColor.rgb = vec3(texture(depthTexture, vUV).r);
+	// return;
 	vec3 worldPos = worldPosFromDepth();
 
 
@@ -109,7 +129,7 @@ void main(void) {
 
 		rayTransmittance += d * r;
 		
-		fog += ambientMultiplier * r * texture(surfaceTexture, uv).r * exp(d * (h - p.y) * -waterAbsorption) * float(s < 0.) * \
+		fog += ambientMultiplier * r * texture(surfaceTexture, uv).g * exp(d * (h - p.y) * -waterAbsorption) * float(s < 0.) * \
 			heyney_greenstein(dot(ray, vec3(0., 1, 0.)), lightScattering) *  float(dot(step(uv, vec2(1.)),step(-uv, vec2(0.))) == 2.);
 
 
@@ -118,6 +138,10 @@ void main(void) {
 
 		travel += r;
 	}
+	// position += travel * ray;
+	// if (travel >= maxDistance && !boxIntersection(position , ray, vec3(worldSize * 0.5, waterHeight, worldSize * 0.5), d)) {
+	// 	rayTransmittance += density * max(d, length(worldPos - position));
+	// }
 	gl_FragColor.r = min(rayTransmittance * 0.01, 1.);
 	gl_FragColor.gba = fog;
 }

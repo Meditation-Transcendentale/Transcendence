@@ -5,6 +5,11 @@ import "./depthShaders.ts";
 import "./waterSurfaceShader.ts"
 import "./waterShader.ts";
 import "./copyShader.ts";
+import "./surfaceShader.ts";
+import "./auroraShader.ts";
+import "./postShader.ts";
+import "./fogShader.ts";
+import "./gaussianBlurShader.ts";
 
 Effect.IncludesShadersStore["noises"] = `
 uint murmurHash12(uvec2 src) {

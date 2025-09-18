@@ -11,9 +11,10 @@ import {
 	Vector3,
 	TransformNode,
 	LoadAssetContainerAsync,
-	Mesh
+	Mesh,
+	FreeCamera,
 } from "@babylonImport";
-import { Field } from "./Field";
+import { Field, nField } from "./Field";
 
 
 export class Environment {
@@ -28,8 +29,8 @@ export class Environment {
 	private frame: number;
 	private pongRoot!: TransformNode;
 
-
-	private field: Field;
+	private fCamera: FreeCamera;
+	private field: nField | Field;
 
 	private updateHome: boolean = true;
 
@@ -63,11 +64,16 @@ export class Environment {
 		this.deltaTime = 0;
 		this.frame = 0;
 
-		this.field = new Field(this.scene);
+		this.fCamera = new FreeCamera("fieldCamera", new Vector3(0, 6, 40), this.scene, true);
+
+		this.field = new nField(this.scene, this.fCamera);
+		// this.field = new Field(this.scene);
+
 		this.width = engine.getRenderWidth();
 		this.height = engine.getRenderHeight();
 
 		this.gameMeshes = new Array<Mesh>;
+
 	}
 
 	private createMesh() {
@@ -105,7 +111,7 @@ export class Environment {
 		this.gameMeshes.push(loaded.meshes[1] as Mesh);
 
 
-		//this.scene.debugLayer.show();
+		// this.scene.debugLayer.show();
 
 		await this.field.load();
 

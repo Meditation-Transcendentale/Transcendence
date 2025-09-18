@@ -1,6 +1,5 @@
 import { Effect } from "@babylonImport";
 
-
 Effect.ShadersStore["heightFragmentShader"] = `
 precision highp float;
 

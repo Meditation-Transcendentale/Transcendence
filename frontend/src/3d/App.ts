@@ -1,10 +1,11 @@
 
-import { Engine } from "@babylonImport";
+import { Engine, Vector3 } from "@babylonImport";
 
 import { Environment } from "./Environment";
 import { Vue } from "../Vue";
 import { css3dObject, CSSRenderer } from "./CSSRenderer";
 import { Interpolator } from "./Interpolator";
+import { UIaddDetails, UIaddVec3 } from "./UtilsUI";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -54,6 +55,7 @@ class app3d {
 
 	public async init() {
 		await this.environment.init();
+
 	}
 
 
