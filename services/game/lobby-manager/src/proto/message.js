@@ -3724,7 +3724,8 @@ export const shared = $root.shared = (() => {
          * Properties of a MatchEnd.
          * @memberof shared
          * @interface IMatchEnd
-         * @property {number|null} [winner] MatchEnd winner
+         * @property {number|null} [winnerId] MatchEnd winnerId
+         * @property {Array.<number>|null} [score] MatchEnd score
          */
 
         /**
@@ -3736,6 +3737,7 @@ export const shared = $root.shared = (() => {
          * @param {shared.IMatchEnd=} [properties] Properties to set
          */
         function MatchEnd(properties) {
+            this.score = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -3743,12 +3745,20 @@ export const shared = $root.shared = (() => {
         }
 
         /**
-         * MatchEnd winner.
-         * @member {number} winner
+         * MatchEnd winnerId.
+         * @member {number} winnerId
          * @memberof shared.MatchEnd
          * @instance
          */
-        MatchEnd.prototype.winner = 0;
+        MatchEnd.prototype.winnerId = 0;
+
+        /**
+         * MatchEnd score.
+         * @member {Array.<number>} score
+         * @memberof shared.MatchEnd
+         * @instance
+         */
+        MatchEnd.prototype.score = $util.emptyArray;
 
         /**
          * Creates a new MatchEnd instance using the specified properties.
@@ -3774,8 +3784,14 @@ export const shared = $root.shared = (() => {
         MatchEnd.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.winner != null && Object.hasOwnProperty.call(message, "winner"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.winner);
+            if (message.winnerId != null && Object.hasOwnProperty.call(message, "winnerId"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.winnerId);
+            if (message.score != null && message.score.length) {
+                writer.uint32(/* id 2, wireType 2 =*/18).fork();
+                for (let i = 0; i < message.score.length; ++i)
+                    writer.int32(message.score[i]);
+                writer.ldelim();
+            }
             return writer;
         };
 
@@ -3813,7 +3829,18 @@ export const shared = $root.shared = (() => {
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.winner = reader.int32();
+                        message.winnerId = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        if (!(message.score && message.score.length))
+                            message.score = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.score.push(reader.int32());
+                        } else
+                            message.score.push(reader.int32());
                         break;
                     }
                 default:
@@ -3851,9 +3878,16 @@ export const shared = $root.shared = (() => {
         MatchEnd.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.winner != null && message.hasOwnProperty("winner"))
-                if (!$util.isInteger(message.winner))
-                    return "winner: integer expected";
+            if (message.winnerId != null && message.hasOwnProperty("winnerId"))
+                if (!$util.isInteger(message.winnerId))
+                    return "winnerId: integer expected";
+            if (message.score != null && message.hasOwnProperty("score")) {
+                if (!Array.isArray(message.score))
+                    return "score: array expected";
+                for (let i = 0; i < message.score.length; ++i)
+                    if (!$util.isInteger(message.score[i]))
+                        return "score: integer[] expected";
+            }
             return null;
         };
 
@@ -3869,8 +3903,15 @@ export const shared = $root.shared = (() => {
             if (object instanceof $root.shared.MatchEnd)
                 return object;
             let message = new $root.shared.MatchEnd();
-            if (object.winner != null)
-                message.winner = object.winner | 0;
+            if (object.winnerId != null)
+                message.winnerId = object.winnerId | 0;
+            if (object.score) {
+                if (!Array.isArray(object.score))
+                    throw TypeError(".shared.MatchEnd.score: array expected");
+                message.score = [];
+                for (let i = 0; i < object.score.length; ++i)
+                    message.score[i] = object.score[i] | 0;
+            }
             return message;
         };
 
@@ -3887,10 +3928,17 @@ export const shared = $root.shared = (() => {
             if (!options)
                 options = {};
             let object = {};
+            if (options.arrays || options.defaults)
+                object.score = [];
             if (options.defaults)
-                object.winner = 0;
-            if (message.winner != null && message.hasOwnProperty("winner"))
-                object.winner = message.winner;
+                object.winnerId = 0;
+            if (message.winnerId != null && message.hasOwnProperty("winnerId"))
+                object.winnerId = message.winnerId;
+            if (message.score && message.score.length) {
+                object.score = [];
+                for (let j = 0; j < message.score.length; ++j)
+                    object.score[j] = message.score[j];
+            }
             return object;
         };
 
@@ -5590,6 +5638,258 @@ export const lobby = $root.lobby = (() => {
         return StartMessage;
     })();
 
+    lobby.StartTournamentMessage = (function() {
+
+        /**
+         * Properties of a StartTournamentMessage.
+         * @memberof lobby
+         * @interface IStartTournamentMessage
+         * @property {string|null} [lobbyId] StartTournamentMessage lobbyId
+         * @property {string|null} [tournamentId] StartTournamentMessage tournamentId
+         * @property {string|null} [map] StartTournamentMessage map
+         */
+
+        /**
+         * Constructs a new StartTournamentMessage.
+         * @memberof lobby
+         * @classdesc Represents a StartTournamentMessage.
+         * @implements IStartTournamentMessage
+         * @constructor
+         * @param {lobby.IStartTournamentMessage=} [properties] Properties to set
+         */
+        function StartTournamentMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * StartTournamentMessage lobbyId.
+         * @member {string} lobbyId
+         * @memberof lobby.StartTournamentMessage
+         * @instance
+         */
+        StartTournamentMessage.prototype.lobbyId = "";
+
+        /**
+         * StartTournamentMessage tournamentId.
+         * @member {string} tournamentId
+         * @memberof lobby.StartTournamentMessage
+         * @instance
+         */
+        StartTournamentMessage.prototype.tournamentId = "";
+
+        /**
+         * StartTournamentMessage map.
+         * @member {string} map
+         * @memberof lobby.StartTournamentMessage
+         * @instance
+         */
+        StartTournamentMessage.prototype.map = "";
+
+        /**
+         * Creates a new StartTournamentMessage instance using the specified properties.
+         * @function create
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {lobby.IStartTournamentMessage=} [properties] Properties to set
+         * @returns {lobby.StartTournamentMessage} StartTournamentMessage instance
+         */
+        StartTournamentMessage.create = function create(properties) {
+            return new StartTournamentMessage(properties);
+        };
+
+        /**
+         * Encodes the specified StartTournamentMessage message. Does not implicitly {@link lobby.StartTournamentMessage.verify|verify} messages.
+         * @function encode
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {lobby.IStartTournamentMessage} message StartTournamentMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        StartTournamentMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.lobbyId != null && Object.hasOwnProperty.call(message, "lobbyId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.lobbyId);
+            if (message.tournamentId != null && Object.hasOwnProperty.call(message, "tournamentId"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.tournamentId);
+            if (message.map != null && Object.hasOwnProperty.call(message, "map"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.map);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified StartTournamentMessage message, length delimited. Does not implicitly {@link lobby.StartTournamentMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {lobby.IStartTournamentMessage} message StartTournamentMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        StartTournamentMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a StartTournamentMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {lobby.StartTournamentMessage} StartTournamentMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        StartTournamentMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.lobby.StartTournamentMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.lobbyId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.tournamentId = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.map = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a StartTournamentMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {lobby.StartTournamentMessage} StartTournamentMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        StartTournamentMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a StartTournamentMessage message.
+         * @function verify
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        StartTournamentMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                if (!$util.isString(message.lobbyId))
+                    return "lobbyId: string expected";
+            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
+                if (!$util.isString(message.tournamentId))
+                    return "tournamentId: string expected";
+            if (message.map != null && message.hasOwnProperty("map"))
+                if (!$util.isString(message.map))
+                    return "map: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a StartTournamentMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {lobby.StartTournamentMessage} StartTournamentMessage
+         */
+        StartTournamentMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.lobby.StartTournamentMessage)
+                return object;
+            let message = new $root.lobby.StartTournamentMessage();
+            if (object.lobbyId != null)
+                message.lobbyId = String(object.lobbyId);
+            if (object.tournamentId != null)
+                message.tournamentId = String(object.tournamentId);
+            if (object.map != null)
+                message.map = String(object.map);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a StartTournamentMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {lobby.StartTournamentMessage} message StartTournamentMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        StartTournamentMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.lobbyId = "";
+                object.tournamentId = "";
+                object.map = "";
+            }
+            if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
+                object.lobbyId = message.lobbyId;
+            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
+                object.tournamentId = message.tournamentId;
+            if (message.map != null && message.hasOwnProperty("map"))
+                object.map = message.map;
+            return object;
+        };
+
+        /**
+         * Converts this StartTournamentMessage to JSON.
+         * @function toJSON
+         * @memberof lobby.StartTournamentMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        StartTournamentMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for StartTournamentMessage
+         * @function getTypeUrl
+         * @memberof lobby.StartTournamentMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        StartTournamentMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/lobby.StartTournamentMessage";
+        };
+
+        return StartTournamentMessage;
+    })();
+
     lobby.Player = (function() {
 
         /**
@@ -6412,6 +6712,7 @@ export const lobby = $root.lobby = (() => {
          * @property {lobby.IStartMessage|null} [start] ServerMessage start
          * @property {lobby.IUpdateMessage|null} [update] ServerMessage update
          * @property {lobby.IErrorMessage|null} [error] ServerMessage error
+         * @property {lobby.IStartTournamentMessage|null} [startTournament] ServerMessage startTournament
          */
 
         /**
@@ -6453,17 +6754,25 @@ export const lobby = $root.lobby = (() => {
          */
         ServerMessage.prototype.error = null;
 
+        /**
+         * ServerMessage startTournament.
+         * @member {lobby.IStartTournamentMessage|null|undefined} startTournament
+         * @memberof lobby.ServerMessage
+         * @instance
+         */
+        ServerMessage.prototype.startTournament = null;
+
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
 
         /**
          * ServerMessage payload.
-         * @member {"start"|"update"|"error"|undefined} payload
+         * @member {"start"|"update"|"error"|"startTournament"|undefined} payload
          * @memberof lobby.ServerMessage
          * @instance
          */
         Object.defineProperty(ServerMessage.prototype, "payload", {
-            get: $util.oneOfGetter($oneOfFields = ["start", "update", "error"]),
+            get: $util.oneOfGetter($oneOfFields = ["start", "update", "error", "startTournament"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
@@ -6497,6 +6806,8 @@ export const lobby = $root.lobby = (() => {
                 $root.lobby.UpdateMessage.encode(message.update, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             if (message.error != null && Object.hasOwnProperty.call(message, "error"))
                 $root.lobby.ErrorMessage.encode(message.error, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            if (message.startTournament != null && Object.hasOwnProperty.call(message, "startTournament"))
+                $root.lobby.StartTournamentMessage.encode(message.startTournament, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             return writer;
         };
 
@@ -6543,6 +6854,10 @@ export const lobby = $root.lobby = (() => {
                     }
                 case 3: {
                         message.error = $root.lobby.ErrorMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 4: {
+                        message.startTournament = $root.lobby.StartTournamentMessage.decode(reader, reader.uint32());
                         break;
                     }
                 default:
@@ -6609,6 +6924,16 @@ export const lobby = $root.lobby = (() => {
                         return "error." + error;
                 }
             }
+            if (message.startTournament != null && message.hasOwnProperty("startTournament")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.lobby.StartTournamentMessage.verify(message.startTournament);
+                    if (error)
+                        return "startTournament." + error;
+                }
+            }
             return null;
         };
 
@@ -6638,6 +6963,11 @@ export const lobby = $root.lobby = (() => {
                 if (typeof object.error !== "object")
                     throw TypeError(".lobby.ServerMessage.error: object expected");
                 message.error = $root.lobby.ErrorMessage.fromObject(object.error);
+            }
+            if (object.startTournament != null) {
+                if (typeof object.startTournament !== "object")
+                    throw TypeError(".lobby.ServerMessage.startTournament: object expected");
+                message.startTournament = $root.lobby.StartTournamentMessage.fromObject(object.startTournament);
             }
             return message;
         };
@@ -6669,6 +6999,11 @@ export const lobby = $root.lobby = (() => {
                 object.error = $root.lobby.ErrorMessage.toObject(message.error, options);
                 if (options.oneofs)
                     object.payload = "error";
+            }
+            if (message.startTournament != null && message.hasOwnProperty("startTournament")) {
+                object.startTournament = $root.lobby.StartTournamentMessage.toObject(message.startTournament, options);
+                if (options.oneofs)
+                    object.payload = "startTournament";
             }
             return object;
         };
@@ -8413,6 +8748,3344 @@ export const notif = $root.notif = (() => {
     })();
 
     return notif;
+})();
+
+export const tournament = $root.tournament = (() => {
+
+    /**
+     * Namespace tournament.
+     * @exports tournament
+     * @namespace
+     */
+    const tournament = {};
+
+    tournament.Player = (function() {
+
+        /**
+         * Properties of a Player.
+         * @memberof tournament
+         * @interface IPlayer
+         * @property {string|null} [uuid] Player uuid
+         * @property {boolean|null} [ready] Player ready
+         * @property {boolean|null} [connected] Player connected
+         * @property {boolean|null} [eliminated] Player eliminated
+         */
+
+        /**
+         * Constructs a new Player.
+         * @memberof tournament
+         * @classdesc Represents a Player.
+         * @implements IPlayer
+         * @constructor
+         * @param {tournament.IPlayer=} [properties] Properties to set
+         */
+        function Player(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Player uuid.
+         * @member {string} uuid
+         * @memberof tournament.Player
+         * @instance
+         */
+        Player.prototype.uuid = "";
+
+        /**
+         * Player ready.
+         * @member {boolean} ready
+         * @memberof tournament.Player
+         * @instance
+         */
+        Player.prototype.ready = false;
+
+        /**
+         * Player connected.
+         * @member {boolean} connected
+         * @memberof tournament.Player
+         * @instance
+         */
+        Player.prototype.connected = false;
+
+        /**
+         * Player eliminated.
+         * @member {boolean} eliminated
+         * @memberof tournament.Player
+         * @instance
+         */
+        Player.prototype.eliminated = false;
+
+        /**
+         * Creates a new Player instance using the specified properties.
+         * @function create
+         * @memberof tournament.Player
+         * @static
+         * @param {tournament.IPlayer=} [properties] Properties to set
+         * @returns {tournament.Player} Player instance
+         */
+        Player.create = function create(properties) {
+            return new Player(properties);
+        };
+
+        /**
+         * Encodes the specified Player message. Does not implicitly {@link tournament.Player.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.Player
+         * @static
+         * @param {tournament.IPlayer} message Player message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        Player.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.uuid != null && Object.hasOwnProperty.call(message, "uuid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uuid);
+            if (message.ready != null && Object.hasOwnProperty.call(message, "ready"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.ready);
+            if (message.connected != null && Object.hasOwnProperty.call(message, "connected"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.connected);
+            if (message.eliminated != null && Object.hasOwnProperty.call(message, "eliminated"))
+                writer.uint32(/* id 4, wireType 0 =*/32).bool(message.eliminated);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Player message, length delimited. Does not implicitly {@link tournament.Player.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.Player
+         * @static
+         * @param {tournament.IPlayer} message Player message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        Player.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Player message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.Player
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.Player} Player
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        Player.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.Player();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.uuid = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.ready = reader.bool();
+                        break;
+                    }
+                case 3: {
+                        message.connected = reader.bool();
+                        break;
+                    }
+                case 4: {
+                        message.eliminated = reader.bool();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Player message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.Player
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.Player} Player
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        Player.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Player message.
+         * @function verify
+         * @memberof tournament.Player
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Player.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                if (!$util.isString(message.uuid))
+                    return "uuid: string expected";
+            if (message.ready != null && message.hasOwnProperty("ready"))
+                if (typeof message.ready !== "boolean")
+                    return "ready: boolean expected";
+            if (message.connected != null && message.hasOwnProperty("connected"))
+                if (typeof message.connected !== "boolean")
+                    return "connected: boolean expected";
+            if (message.eliminated != null && message.hasOwnProperty("eliminated"))
+                if (typeof message.eliminated !== "boolean")
+                    return "eliminated: boolean expected";
+            return null;
+        };
+
+        /**
+         * Creates a Player message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.Player
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.Player} Player
+         */
+        Player.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.Player)
+                return object;
+            let message = new $root.tournament.Player();
+            if (object.uuid != null)
+                message.uuid = String(object.uuid);
+            if (object.ready != null)
+                message.ready = Boolean(object.ready);
+            if (object.connected != null)
+                message.connected = Boolean(object.connected);
+            if (object.eliminated != null)
+                message.eliminated = Boolean(object.eliminated);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Player message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.Player
+         * @static
+         * @param {tournament.Player} message Player
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Player.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.uuid = "";
+                object.ready = false;
+                object.connected = false;
+                object.eliminated = false;
+            }
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                object.uuid = message.uuid;
+            if (message.ready != null && message.hasOwnProperty("ready"))
+                object.ready = message.ready;
+            if (message.connected != null && message.hasOwnProperty("connected"))
+                object.connected = message.connected;
+            if (message.eliminated != null && message.hasOwnProperty("eliminated"))
+                object.eliminated = message.eliminated;
+            return object;
+        };
+
+        /**
+         * Converts this Player to JSON.
+         * @function toJSON
+         * @memberof tournament.Player
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Player.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for Player
+         * @function getTypeUrl
+         * @memberof tournament.Player
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        Player.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.Player";
+        };
+
+        return Player;
+    })();
+
+    tournament.Score = (function() {
+
+        /**
+         * Properties of a Score.
+         * @memberof tournament
+         * @interface IScore
+         * @property {Array.<number>|null} [values] Score values
+         * @property {boolean|null} [forfeit] Score forfeit
+         */
+
+        /**
+         * Constructs a new Score.
+         * @memberof tournament
+         * @classdesc Represents a Score.
+         * @implements IScore
+         * @constructor
+         * @param {tournament.IScore=} [properties] Properties to set
+         */
+        function Score(properties) {
+            this.values = [];
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Score values.
+         * @member {Array.<number>} values
+         * @memberof tournament.Score
+         * @instance
+         */
+        Score.prototype.values = $util.emptyArray;
+
+        /**
+         * Score forfeit.
+         * @member {boolean} forfeit
+         * @memberof tournament.Score
+         * @instance
+         */
+        Score.prototype.forfeit = false;
+
+        /**
+         * Creates a new Score instance using the specified properties.
+         * @function create
+         * @memberof tournament.Score
+         * @static
+         * @param {tournament.IScore=} [properties] Properties to set
+         * @returns {tournament.Score} Score instance
+         */
+        Score.create = function create(properties) {
+            return new Score(properties);
+        };
+
+        /**
+         * Encodes the specified Score message. Does not implicitly {@link tournament.Score.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.Score
+         * @static
+         * @param {tournament.IScore} message Score message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        Score.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.values != null && message.values.length) {
+                writer.uint32(/* id 1, wireType 2 =*/10).fork();
+                for (let i = 0; i < message.values.length; ++i)
+                    writer.int32(message.values[i]);
+                writer.ldelim();
+            }
+            if (message.forfeit != null && Object.hasOwnProperty.call(message, "forfeit"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.forfeit);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Score message, length delimited. Does not implicitly {@link tournament.Score.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.Score
+         * @static
+         * @param {tournament.IScore} message Score message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        Score.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Score message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.Score
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.Score} Score
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        Score.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.Score();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.values && message.values.length))
+                            message.values = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.values.push(reader.int32());
+                        } else
+                            message.values.push(reader.int32());
+                        break;
+                    }
+                case 2: {
+                        message.forfeit = reader.bool();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Score message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.Score
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.Score} Score
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        Score.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Score message.
+         * @function verify
+         * @memberof tournament.Score
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Score.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.values != null && message.hasOwnProperty("values")) {
+                if (!Array.isArray(message.values))
+                    return "values: array expected";
+                for (let i = 0; i < message.values.length; ++i)
+                    if (!$util.isInteger(message.values[i]))
+                        return "values: integer[] expected";
+            }
+            if (message.forfeit != null && message.hasOwnProperty("forfeit"))
+                if (typeof message.forfeit !== "boolean")
+                    return "forfeit: boolean expected";
+            return null;
+        };
+
+        /**
+         * Creates a Score message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.Score
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.Score} Score
+         */
+        Score.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.Score)
+                return object;
+            let message = new $root.tournament.Score();
+            if (object.values) {
+                if (!Array.isArray(object.values))
+                    throw TypeError(".tournament.Score.values: array expected");
+                message.values = [];
+                for (let i = 0; i < object.values.length; ++i)
+                    message.values[i] = object.values[i] | 0;
+            }
+            if (object.forfeit != null)
+                message.forfeit = Boolean(object.forfeit);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Score message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.Score
+         * @static
+         * @param {tournament.Score} message Score
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Score.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults)
+                object.values = [];
+            if (options.defaults)
+                object.forfeit = false;
+            if (message.values && message.values.length) {
+                object.values = [];
+                for (let j = 0; j < message.values.length; ++j)
+                    object.values[j] = message.values[j];
+            }
+            if (message.forfeit != null && message.hasOwnProperty("forfeit"))
+                object.forfeit = message.forfeit;
+            return object;
+        };
+
+        /**
+         * Converts this Score to JSON.
+         * @function toJSON
+         * @memberof tournament.Score
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Score.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for Score
+         * @function getTypeUrl
+         * @memberof tournament.Score
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        Score.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.Score";
+        };
+
+        return Score;
+    })();
+
+    tournament.MatchNode = (function() {
+
+        /**
+         * Properties of a MatchNode.
+         * @memberof tournament
+         * @interface IMatchNode
+         * @property {string|null} [player1Id] MatchNode player1Id
+         * @property {string|null} [player2Id] MatchNode player2Id
+         * @property {tournament.IScore|null} [score] MatchNode score
+         * @property {string|null} [gameId] MatchNode gameId
+         * @property {tournament.IMatchNode|null} [left] MatchNode left
+         * @property {tournament.IMatchNode|null} [right] MatchNode right
+         * @property {string|null} [winnerId] MatchNode winnerId
+         */
+
+        /**
+         * Constructs a new MatchNode.
+         * @memberof tournament
+         * @classdesc Represents a MatchNode.
+         * @implements IMatchNode
+         * @constructor
+         * @param {tournament.IMatchNode=} [properties] Properties to set
+         */
+        function MatchNode(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * MatchNode player1Id.
+         * @member {string} player1Id
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.player1Id = "";
+
+        /**
+         * MatchNode player2Id.
+         * @member {string} player2Id
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.player2Id = "";
+
+        /**
+         * MatchNode score.
+         * @member {tournament.IScore|null|undefined} score
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.score = null;
+
+        /**
+         * MatchNode gameId.
+         * @member {string} gameId
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.gameId = "";
+
+        /**
+         * MatchNode left.
+         * @member {tournament.IMatchNode|null|undefined} left
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.left = null;
+
+        /**
+         * MatchNode right.
+         * @member {tournament.IMatchNode|null|undefined} right
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.right = null;
+
+        /**
+         * MatchNode winnerId.
+         * @member {string} winnerId
+         * @memberof tournament.MatchNode
+         * @instance
+         */
+        MatchNode.prototype.winnerId = "";
+
+        /**
+         * Creates a new MatchNode instance using the specified properties.
+         * @function create
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {tournament.IMatchNode=} [properties] Properties to set
+         * @returns {tournament.MatchNode} MatchNode instance
+         */
+        MatchNode.create = function create(properties) {
+            return new MatchNode(properties);
+        };
+
+        /**
+         * Encodes the specified MatchNode message. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {tournament.IMatchNode} message MatchNode message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        MatchNode.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.player1Id != null && Object.hasOwnProperty.call(message, "player1Id"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.player1Id);
+            if (message.player2Id != null && Object.hasOwnProperty.call(message, "player2Id"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.player2Id);
+            if (message.score != null && Object.hasOwnProperty.call(message, "score"))
+                $root.tournament.Score.encode(message.score, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            if (message.gameId != null && Object.hasOwnProperty.call(message, "gameId"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.gameId);
+            if (message.left != null && Object.hasOwnProperty.call(message, "left"))
+                $root.tournament.MatchNode.encode(message.left, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+            if (message.right != null && Object.hasOwnProperty.call(message, "right"))
+                $root.tournament.MatchNode.encode(message.right, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+            if (message.winnerId != null && Object.hasOwnProperty.call(message, "winnerId"))
+                writer.uint32(/* id 7, wireType 2 =*/58).string(message.winnerId);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified MatchNode message, length delimited. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {tournament.IMatchNode} message MatchNode message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        MatchNode.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a MatchNode message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.MatchNode} MatchNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        MatchNode.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.MatchNode();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.player1Id = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.player2Id = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.score = $root.tournament.Score.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 4: {
+                        message.gameId = reader.string();
+                        break;
+                    }
+                case 5: {
+                        message.left = $root.tournament.MatchNode.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 6: {
+                        message.right = $root.tournament.MatchNode.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 7: {
+                        message.winnerId = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a MatchNode message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.MatchNode} MatchNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        MatchNode.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a MatchNode message.
+         * @function verify
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        MatchNode.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.player1Id != null && message.hasOwnProperty("player1Id"))
+                if (!$util.isString(message.player1Id))
+                    return "player1Id: string expected";
+            if (message.player2Id != null && message.hasOwnProperty("player2Id"))
+                if (!$util.isString(message.player2Id))
+                    return "player2Id: string expected";
+            if (message.score != null && message.hasOwnProperty("score")) {
+                let error = $root.tournament.Score.verify(message.score);
+                if (error)
+                    return "score." + error;
+            }
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                if (!$util.isString(message.gameId))
+                    return "gameId: string expected";
+            if (message.left != null && message.hasOwnProperty("left")) {
+                let error = $root.tournament.MatchNode.verify(message.left);
+                if (error)
+                    return "left." + error;
+            }
+            if (message.right != null && message.hasOwnProperty("right")) {
+                let error = $root.tournament.MatchNode.verify(message.right);
+                if (error)
+                    return "right." + error;
+            }
+            if (message.winnerId != null && message.hasOwnProperty("winnerId"))
+                if (!$util.isString(message.winnerId))
+                    return "winnerId: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a MatchNode message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.MatchNode} MatchNode
+         */
+        MatchNode.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.MatchNode)
+                return object;
+            let message = new $root.tournament.MatchNode();
+            if (object.player1Id != null)
+                message.player1Id = String(object.player1Id);
+            if (object.player2Id != null)
+                message.player2Id = String(object.player2Id);
+            if (object.score != null) {
+                if (typeof object.score !== "object")
+                    throw TypeError(".tournament.MatchNode.score: object expected");
+                message.score = $root.tournament.Score.fromObject(object.score);
+            }
+            if (object.gameId != null)
+                message.gameId = String(object.gameId);
+            if (object.left != null) {
+                if (typeof object.left !== "object")
+                    throw TypeError(".tournament.MatchNode.left: object expected");
+                message.left = $root.tournament.MatchNode.fromObject(object.left);
+            }
+            if (object.right != null) {
+                if (typeof object.right !== "object")
+                    throw TypeError(".tournament.MatchNode.right: object expected");
+                message.right = $root.tournament.MatchNode.fromObject(object.right);
+            }
+            if (object.winnerId != null)
+                message.winnerId = String(object.winnerId);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a MatchNode message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {tournament.MatchNode} message MatchNode
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        MatchNode.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.player1Id = "";
+                object.player2Id = "";
+                object.score = null;
+                object.gameId = "";
+                object.left = null;
+                object.right = null;
+                object.winnerId = "";
+            }
+            if (message.player1Id != null && message.hasOwnProperty("player1Id"))
+                object.player1Id = message.player1Id;
+            if (message.player2Id != null && message.hasOwnProperty("player2Id"))
+                object.player2Id = message.player2Id;
+            if (message.score != null && message.hasOwnProperty("score"))
+                object.score = $root.tournament.Score.toObject(message.score, options);
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                object.gameId = message.gameId;
+            if (message.left != null && message.hasOwnProperty("left"))
+                object.left = $root.tournament.MatchNode.toObject(message.left, options);
+            if (message.right != null && message.hasOwnProperty("right"))
+                object.right = $root.tournament.MatchNode.toObject(message.right, options);
+            if (message.winnerId != null && message.hasOwnProperty("winnerId"))
+                object.winnerId = message.winnerId;
+            return object;
+        };
+
+        /**
+         * Converts this MatchNode to JSON.
+         * @function toJSON
+         * @memberof tournament.MatchNode
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        MatchNode.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for MatchNode
+         * @function getTypeUrl
+         * @memberof tournament.MatchNode
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        MatchNode.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.MatchNode";
+        };
+
+        return MatchNode;
+    })();
+
+    tournament.TournamentUpdateMessage = (function() {
+
+        /**
+         * Properties of a TournamentUpdateMessage.
+         * @memberof tournament
+         * @interface ITournamentUpdateMessage
+         * @property {tournament.IMatchNode|null} [tournamentRoot] TournamentUpdateMessage tournamentRoot
+         * @property {Array.<tournament.IPlayer>|null} [players] TournamentUpdateMessage players
+         */
+
+        /**
+         * Constructs a new TournamentUpdateMessage.
+         * @memberof tournament
+         * @classdesc Represents a TournamentUpdateMessage.
+         * @implements ITournamentUpdateMessage
+         * @constructor
+         * @param {tournament.ITournamentUpdateMessage=} [properties] Properties to set
+         */
+        function TournamentUpdateMessage(properties) {
+            this.players = [];
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * TournamentUpdateMessage tournamentRoot.
+         * @member {tournament.IMatchNode|null|undefined} tournamentRoot
+         * @memberof tournament.TournamentUpdateMessage
+         * @instance
+         */
+        TournamentUpdateMessage.prototype.tournamentRoot = null;
+
+        /**
+         * TournamentUpdateMessage players.
+         * @member {Array.<tournament.IPlayer>} players
+         * @memberof tournament.TournamentUpdateMessage
+         * @instance
+         */
+        TournamentUpdateMessage.prototype.players = $util.emptyArray;
+
+        /**
+         * Creates a new TournamentUpdateMessage instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentUpdateMessage
+         * @static
+         * @param {tournament.ITournamentUpdateMessage=} [properties] Properties to set
+         * @returns {tournament.TournamentUpdateMessage} TournamentUpdateMessage instance
+         */
+        TournamentUpdateMessage.create = function create(properties) {
+            return new TournamentUpdateMessage(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentUpdateMessage message. Does not implicitly {@link tournament.TournamentUpdateMessage.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentUpdateMessage
+         * @static
+         * @param {tournament.ITournamentUpdateMessage} message TournamentUpdateMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentUpdateMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.tournamentRoot != null && Object.hasOwnProperty.call(message, "tournamentRoot"))
+                $root.tournament.MatchNode.encode(message.tournamentRoot, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.players != null && message.players.length)
+                for (let i = 0; i < message.players.length; ++i)
+                    $root.tournament.Player.encode(message.players[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentUpdateMessage message, length delimited. Does not implicitly {@link tournament.TournamentUpdateMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentUpdateMessage
+         * @static
+         * @param {tournament.ITournamentUpdateMessage} message TournamentUpdateMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentUpdateMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentUpdateMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentUpdateMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentUpdateMessage} TournamentUpdateMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentUpdateMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentUpdateMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.tournamentRoot = $root.tournament.MatchNode.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
+                        if (!(message.players && message.players.length))
+                            message.players = [];
+                        message.players.push($root.tournament.Player.decode(reader, reader.uint32()));
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentUpdateMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentUpdateMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentUpdateMessage} TournamentUpdateMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentUpdateMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentUpdateMessage message.
+         * @function verify
+         * @memberof tournament.TournamentUpdateMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentUpdateMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.tournamentRoot != null && message.hasOwnProperty("tournamentRoot")) {
+                let error = $root.tournament.MatchNode.verify(message.tournamentRoot);
+                if (error)
+                    return "tournamentRoot." + error;
+            }
+            if (message.players != null && message.hasOwnProperty("players")) {
+                if (!Array.isArray(message.players))
+                    return "players: array expected";
+                for (let i = 0; i < message.players.length; ++i) {
+                    let error = $root.tournament.Player.verify(message.players[i]);
+                    if (error)
+                        return "players." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a TournamentUpdateMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentUpdateMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentUpdateMessage} TournamentUpdateMessage
+         */
+        TournamentUpdateMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentUpdateMessage)
+                return object;
+            let message = new $root.tournament.TournamentUpdateMessage();
+            if (object.tournamentRoot != null) {
+                if (typeof object.tournamentRoot !== "object")
+                    throw TypeError(".tournament.TournamentUpdateMessage.tournamentRoot: object expected");
+                message.tournamentRoot = $root.tournament.MatchNode.fromObject(object.tournamentRoot);
+            }
+            if (object.players) {
+                if (!Array.isArray(object.players))
+                    throw TypeError(".tournament.TournamentUpdateMessage.players: array expected");
+                message.players = [];
+                for (let i = 0; i < object.players.length; ++i) {
+                    if (typeof object.players[i] !== "object")
+                        throw TypeError(".tournament.TournamentUpdateMessage.players: object expected");
+                    message.players[i] = $root.tournament.Player.fromObject(object.players[i]);
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a TournamentUpdateMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentUpdateMessage
+         * @static
+         * @param {tournament.TournamentUpdateMessage} message TournamentUpdateMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentUpdateMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults)
+                object.players = [];
+            if (options.defaults)
+                object.tournamentRoot = null;
+            if (message.tournamentRoot != null && message.hasOwnProperty("tournamentRoot"))
+                object.tournamentRoot = $root.tournament.MatchNode.toObject(message.tournamentRoot, options);
+            if (message.players && message.players.length) {
+                object.players = [];
+                for (let j = 0; j < message.players.length; ++j)
+                    object.players[j] = $root.tournament.Player.toObject(message.players[j], options);
+            }
+            return object;
+        };
+
+        /**
+         * Converts this TournamentUpdateMessage to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentUpdateMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentUpdateMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentUpdateMessage
+         * @function getTypeUrl
+         * @memberof tournament.TournamentUpdateMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentUpdateMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentUpdateMessage";
+        };
+
+        return TournamentUpdateMessage;
+    })();
+
+    tournament.TournamentClientReadyMessage = (function() {
+
+        /**
+         * Properties of a TournamentClientReadyMessage.
+         * @memberof tournament
+         * @interface ITournamentClientReadyMessage
+         */
+
+        /**
+         * Constructs a new TournamentClientReadyMessage.
+         * @memberof tournament
+         * @classdesc Represents a TournamentClientReadyMessage.
+         * @implements ITournamentClientReadyMessage
+         * @constructor
+         * @param {tournament.ITournamentClientReadyMessage=} [properties] Properties to set
+         */
+        function TournamentClientReadyMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new TournamentClientReadyMessage instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentClientReadyMessage
+         * @static
+         * @param {tournament.ITournamentClientReadyMessage=} [properties] Properties to set
+         * @returns {tournament.TournamentClientReadyMessage} TournamentClientReadyMessage instance
+         */
+        TournamentClientReadyMessage.create = function create(properties) {
+            return new TournamentClientReadyMessage(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentClientReadyMessage message. Does not implicitly {@link tournament.TournamentClientReadyMessage.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentClientReadyMessage
+         * @static
+         * @param {tournament.ITournamentClientReadyMessage} message TournamentClientReadyMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentClientReadyMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentClientReadyMessage message, length delimited. Does not implicitly {@link tournament.TournamentClientReadyMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentClientReadyMessage
+         * @static
+         * @param {tournament.ITournamentClientReadyMessage} message TournamentClientReadyMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentClientReadyMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentClientReadyMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentClientReadyMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentClientReadyMessage} TournamentClientReadyMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentClientReadyMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentClientReadyMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentClientReadyMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentClientReadyMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentClientReadyMessage} TournamentClientReadyMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentClientReadyMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentClientReadyMessage message.
+         * @function verify
+         * @memberof tournament.TournamentClientReadyMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentClientReadyMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a TournamentClientReadyMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentClientReadyMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentClientReadyMessage} TournamentClientReadyMessage
+         */
+        TournamentClientReadyMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentClientReadyMessage)
+                return object;
+            return new $root.tournament.TournamentClientReadyMessage();
+        };
+
+        /**
+         * Creates a plain object from a TournamentClientReadyMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentClientReadyMessage
+         * @static
+         * @param {tournament.TournamentClientReadyMessage} message TournamentClientReadyMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentClientReadyMessage.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this TournamentClientReadyMessage to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentClientReadyMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentClientReadyMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentClientReadyMessage
+         * @function getTypeUrl
+         * @memberof tournament.TournamentClientReadyMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentClientReadyMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentClientReadyMessage";
+        };
+
+        return TournamentClientReadyMessage;
+    })();
+
+    tournament.TournamentReadyCheckMessage = (function() {
+
+        /**
+         * Properties of a TournamentReadyCheckMessage.
+         * @memberof tournament
+         * @interface ITournamentReadyCheckMessage
+         * @property {number|Long|null} [deadlineMs] TournamentReadyCheckMessage deadlineMs
+         */
+
+        /**
+         * Constructs a new TournamentReadyCheckMessage.
+         * @memberof tournament
+         * @classdesc Represents a TournamentReadyCheckMessage.
+         * @implements ITournamentReadyCheckMessage
+         * @constructor
+         * @param {tournament.ITournamentReadyCheckMessage=} [properties] Properties to set
+         */
+        function TournamentReadyCheckMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * TournamentReadyCheckMessage deadlineMs.
+         * @member {number|Long} deadlineMs
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @instance
+         */
+        TournamentReadyCheckMessage.prototype.deadlineMs = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * Creates a new TournamentReadyCheckMessage instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @static
+         * @param {tournament.ITournamentReadyCheckMessage=} [properties] Properties to set
+         * @returns {tournament.TournamentReadyCheckMessage} TournamentReadyCheckMessage instance
+         */
+        TournamentReadyCheckMessage.create = function create(properties) {
+            return new TournamentReadyCheckMessage(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentReadyCheckMessage message. Does not implicitly {@link tournament.TournamentReadyCheckMessage.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @static
+         * @param {tournament.ITournamentReadyCheckMessage} message TournamentReadyCheckMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentReadyCheckMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.deadlineMs != null && Object.hasOwnProperty.call(message, "deadlineMs"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int64(message.deadlineMs);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentReadyCheckMessage message, length delimited. Does not implicitly {@link tournament.TournamentReadyCheckMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @static
+         * @param {tournament.ITournamentReadyCheckMessage} message TournamentReadyCheckMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentReadyCheckMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentReadyCheckMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentReadyCheckMessage} TournamentReadyCheckMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentReadyCheckMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentReadyCheckMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.deadlineMs = reader.int64();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentReadyCheckMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentReadyCheckMessage} TournamentReadyCheckMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentReadyCheckMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentReadyCheckMessage message.
+         * @function verify
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentReadyCheckMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.deadlineMs != null && message.hasOwnProperty("deadlineMs"))
+                if (!$util.isInteger(message.deadlineMs) && !(message.deadlineMs && $util.isInteger(message.deadlineMs.low) && $util.isInteger(message.deadlineMs.high)))
+                    return "deadlineMs: integer|Long expected";
+            return null;
+        };
+
+        /**
+         * Creates a TournamentReadyCheckMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentReadyCheckMessage} TournamentReadyCheckMessage
+         */
+        TournamentReadyCheckMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentReadyCheckMessage)
+                return object;
+            let message = new $root.tournament.TournamentReadyCheckMessage();
+            if (object.deadlineMs != null)
+                if ($util.Long)
+                    (message.deadlineMs = $util.Long.fromValue(object.deadlineMs)).unsigned = false;
+                else if (typeof object.deadlineMs === "string")
+                    message.deadlineMs = parseInt(object.deadlineMs, 10);
+                else if (typeof object.deadlineMs === "number")
+                    message.deadlineMs = object.deadlineMs;
+                else if (typeof object.deadlineMs === "object")
+                    message.deadlineMs = new $util.LongBits(object.deadlineMs.low >>> 0, object.deadlineMs.high >>> 0).toNumber();
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a TournamentReadyCheckMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @static
+         * @param {tournament.TournamentReadyCheckMessage} message TournamentReadyCheckMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentReadyCheckMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults)
+                if ($util.Long) {
+                    let long = new $util.Long(0, 0, false);
+                    object.deadlineMs = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.deadlineMs = options.longs === String ? "0" : 0;
+            if (message.deadlineMs != null && message.hasOwnProperty("deadlineMs"))
+                if (typeof message.deadlineMs === "number")
+                    object.deadlineMs = options.longs === String ? String(message.deadlineMs) : message.deadlineMs;
+                else
+                    object.deadlineMs = options.longs === String ? $util.Long.prototype.toString.call(message.deadlineMs) : options.longs === Number ? new $util.LongBits(message.deadlineMs.low >>> 0, message.deadlineMs.high >>> 0).toNumber() : message.deadlineMs;
+            return object;
+        };
+
+        /**
+         * Converts this TournamentReadyCheckMessage to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentReadyCheckMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentReadyCheckMessage
+         * @function getTypeUrl
+         * @memberof tournament.TournamentReadyCheckMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentReadyCheckMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentReadyCheckMessage";
+        };
+
+        return TournamentReadyCheckMessage;
+    })();
+
+    tournament.TournamentFinishedMessage = (function() {
+
+        /**
+         * Properties of a TournamentFinishedMessage.
+         * @memberof tournament
+         * @interface ITournamentFinishedMessage
+         */
+
+        /**
+         * Constructs a new TournamentFinishedMessage.
+         * @memberof tournament
+         * @classdesc Represents a TournamentFinishedMessage.
+         * @implements ITournamentFinishedMessage
+         * @constructor
+         * @param {tournament.ITournamentFinishedMessage=} [properties] Properties to set
+         */
+        function TournamentFinishedMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new TournamentFinishedMessage instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentFinishedMessage
+         * @static
+         * @param {tournament.ITournamentFinishedMessage=} [properties] Properties to set
+         * @returns {tournament.TournamentFinishedMessage} TournamentFinishedMessage instance
+         */
+        TournamentFinishedMessage.create = function create(properties) {
+            return new TournamentFinishedMessage(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentFinishedMessage message. Does not implicitly {@link tournament.TournamentFinishedMessage.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentFinishedMessage
+         * @static
+         * @param {tournament.ITournamentFinishedMessage} message TournamentFinishedMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentFinishedMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentFinishedMessage message, length delimited. Does not implicitly {@link tournament.TournamentFinishedMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentFinishedMessage
+         * @static
+         * @param {tournament.ITournamentFinishedMessage} message TournamentFinishedMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentFinishedMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentFinishedMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentFinishedMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentFinishedMessage} TournamentFinishedMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentFinishedMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentFinishedMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentFinishedMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentFinishedMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentFinishedMessage} TournamentFinishedMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentFinishedMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentFinishedMessage message.
+         * @function verify
+         * @memberof tournament.TournamentFinishedMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentFinishedMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a TournamentFinishedMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentFinishedMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentFinishedMessage} TournamentFinishedMessage
+         */
+        TournamentFinishedMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentFinishedMessage)
+                return object;
+            return new $root.tournament.TournamentFinishedMessage();
+        };
+
+        /**
+         * Creates a plain object from a TournamentFinishedMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentFinishedMessage
+         * @static
+         * @param {tournament.TournamentFinishedMessage} message TournamentFinishedMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentFinishedMessage.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this TournamentFinishedMessage to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentFinishedMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentFinishedMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentFinishedMessage
+         * @function getTypeUrl
+         * @memberof tournament.TournamentFinishedMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentFinishedMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentFinishedMessage";
+        };
+
+        return TournamentFinishedMessage;
+    })();
+
+    tournament.TournamentQuitMessage = (function() {
+
+        /**
+         * Properties of a TournamentQuitMessage.
+         * @memberof tournament
+         * @interface ITournamentQuitMessage
+         */
+
+        /**
+         * Constructs a new TournamentQuitMessage.
+         * @memberof tournament
+         * @classdesc Represents a TournamentQuitMessage.
+         * @implements ITournamentQuitMessage
+         * @constructor
+         * @param {tournament.ITournamentQuitMessage=} [properties] Properties to set
+         */
+        function TournamentQuitMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new TournamentQuitMessage instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentQuitMessage
+         * @static
+         * @param {tournament.ITournamentQuitMessage=} [properties] Properties to set
+         * @returns {tournament.TournamentQuitMessage} TournamentQuitMessage instance
+         */
+        TournamentQuitMessage.create = function create(properties) {
+            return new TournamentQuitMessage(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentQuitMessage message. Does not implicitly {@link tournament.TournamentQuitMessage.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentQuitMessage
+         * @static
+         * @param {tournament.ITournamentQuitMessage} message TournamentQuitMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentQuitMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentQuitMessage message, length delimited. Does not implicitly {@link tournament.TournamentQuitMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentQuitMessage
+         * @static
+         * @param {tournament.ITournamentQuitMessage} message TournamentQuitMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentQuitMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentQuitMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentQuitMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentQuitMessage} TournamentQuitMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentQuitMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentQuitMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentQuitMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentQuitMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentQuitMessage} TournamentQuitMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentQuitMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentQuitMessage message.
+         * @function verify
+         * @memberof tournament.TournamentQuitMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentQuitMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a TournamentQuitMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentQuitMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentQuitMessage} TournamentQuitMessage
+         */
+        TournamentQuitMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentQuitMessage)
+                return object;
+            return new $root.tournament.TournamentQuitMessage();
+        };
+
+        /**
+         * Creates a plain object from a TournamentQuitMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentQuitMessage
+         * @static
+         * @param {tournament.TournamentQuitMessage} message TournamentQuitMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentQuitMessage.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this TournamentQuitMessage to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentQuitMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentQuitMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentQuitMessage
+         * @function getTypeUrl
+         * @memberof tournament.TournamentQuitMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentQuitMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentQuitMessage";
+        };
+
+        return TournamentQuitMessage;
+    })();
+
+    tournament.TournamentErrorMessage = (function() {
+
+        /**
+         * Properties of a TournamentErrorMessage.
+         * @memberof tournament
+         * @interface ITournamentErrorMessage
+         * @property {string|null} [message] TournamentErrorMessage message
+         */
+
+        /**
+         * Constructs a new TournamentErrorMessage.
+         * @memberof tournament
+         * @classdesc Represents a TournamentErrorMessage.
+         * @implements ITournamentErrorMessage
+         * @constructor
+         * @param {tournament.ITournamentErrorMessage=} [properties] Properties to set
+         */
+        function TournamentErrorMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * TournamentErrorMessage message.
+         * @member {string} message
+         * @memberof tournament.TournamentErrorMessage
+         * @instance
+         */
+        TournamentErrorMessage.prototype.message = "";
+
+        /**
+         * Creates a new TournamentErrorMessage instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentErrorMessage
+         * @static
+         * @param {tournament.ITournamentErrorMessage=} [properties] Properties to set
+         * @returns {tournament.TournamentErrorMessage} TournamentErrorMessage instance
+         */
+        TournamentErrorMessage.create = function create(properties) {
+            return new TournamentErrorMessage(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentErrorMessage message. Does not implicitly {@link tournament.TournamentErrorMessage.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentErrorMessage
+         * @static
+         * @param {tournament.ITournamentErrorMessage} message TournamentErrorMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentErrorMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.message != null && Object.hasOwnProperty.call(message, "message"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.message);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentErrorMessage message, length delimited. Does not implicitly {@link tournament.TournamentErrorMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentErrorMessage
+         * @static
+         * @param {tournament.ITournamentErrorMessage} message TournamentErrorMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentErrorMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentErrorMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentErrorMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentErrorMessage} TournamentErrorMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentErrorMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentErrorMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.message = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentErrorMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentErrorMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentErrorMessage} TournamentErrorMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentErrorMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentErrorMessage message.
+         * @function verify
+         * @memberof tournament.TournamentErrorMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentErrorMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.message != null && message.hasOwnProperty("message"))
+                if (!$util.isString(message.message))
+                    return "message: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a TournamentErrorMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentErrorMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentErrorMessage} TournamentErrorMessage
+         */
+        TournamentErrorMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentErrorMessage)
+                return object;
+            let message = new $root.tournament.TournamentErrorMessage();
+            if (object.message != null)
+                message.message = String(object.message);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a TournamentErrorMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentErrorMessage
+         * @static
+         * @param {tournament.TournamentErrorMessage} message TournamentErrorMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentErrorMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults)
+                object.message = "";
+            if (message.message != null && message.hasOwnProperty("message"))
+                object.message = message.message;
+            return object;
+        };
+
+        /**
+         * Converts this TournamentErrorMessage to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentErrorMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentErrorMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentErrorMessage
+         * @function getTypeUrl
+         * @memberof tournament.TournamentErrorMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentErrorMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentErrorMessage";
+        };
+
+        return TournamentErrorMessage;
+    })();
+
+    tournament.TournamentCreateRequest = (function() {
+
+        /**
+         * Properties of a TournamentCreateRequest.
+         * @memberof tournament
+         * @interface ITournamentCreateRequest
+         * @property {Array.<string>|null} [players] TournamentCreateRequest players
+         */
+
+        /**
+         * Constructs a new TournamentCreateRequest.
+         * @memberof tournament
+         * @classdesc Represents a TournamentCreateRequest.
+         * @implements ITournamentCreateRequest
+         * @constructor
+         * @param {tournament.ITournamentCreateRequest=} [properties] Properties to set
+         */
+        function TournamentCreateRequest(properties) {
+            this.players = [];
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * TournamentCreateRequest players.
+         * @member {Array.<string>} players
+         * @memberof tournament.TournamentCreateRequest
+         * @instance
+         */
+        TournamentCreateRequest.prototype.players = $util.emptyArray;
+
+        /**
+         * Creates a new TournamentCreateRequest instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentCreateRequest
+         * @static
+         * @param {tournament.ITournamentCreateRequest=} [properties] Properties to set
+         * @returns {tournament.TournamentCreateRequest} TournamentCreateRequest instance
+         */
+        TournamentCreateRequest.create = function create(properties) {
+            return new TournamentCreateRequest(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentCreateRequest message. Does not implicitly {@link tournament.TournamentCreateRequest.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentCreateRequest
+         * @static
+         * @param {tournament.ITournamentCreateRequest} message TournamentCreateRequest message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentCreateRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.players != null && message.players.length)
+                for (let i = 0; i < message.players.length; ++i)
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.players[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentCreateRequest message, length delimited. Does not implicitly {@link tournament.TournamentCreateRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentCreateRequest
+         * @static
+         * @param {tournament.ITournamentCreateRequest} message TournamentCreateRequest message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentCreateRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentCreateRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentCreateRequest
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentCreateRequest} TournamentCreateRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentCreateRequest.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentCreateRequest();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.players && message.players.length))
+                            message.players = [];
+                        message.players.push(reader.string());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentCreateRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentCreateRequest
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentCreateRequest} TournamentCreateRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentCreateRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentCreateRequest message.
+         * @function verify
+         * @memberof tournament.TournamentCreateRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentCreateRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.players != null && message.hasOwnProperty("players")) {
+                if (!Array.isArray(message.players))
+                    return "players: array expected";
+                for (let i = 0; i < message.players.length; ++i)
+                    if (!$util.isString(message.players[i]))
+                        return "players: string[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a TournamentCreateRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentCreateRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentCreateRequest} TournamentCreateRequest
+         */
+        TournamentCreateRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentCreateRequest)
+                return object;
+            let message = new $root.tournament.TournamentCreateRequest();
+            if (object.players) {
+                if (!Array.isArray(object.players))
+                    throw TypeError(".tournament.TournamentCreateRequest.players: array expected");
+                message.players = [];
+                for (let i = 0; i < object.players.length; ++i)
+                    message.players[i] = String(object.players[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a TournamentCreateRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentCreateRequest
+         * @static
+         * @param {tournament.TournamentCreateRequest} message TournamentCreateRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentCreateRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults)
+                object.players = [];
+            if (message.players && message.players.length) {
+                object.players = [];
+                for (let j = 0; j < message.players.length; ++j)
+                    object.players[j] = message.players[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this TournamentCreateRequest to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentCreateRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentCreateRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentCreateRequest
+         * @function getTypeUrl
+         * @memberof tournament.TournamentCreateRequest
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentCreateRequest.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentCreateRequest";
+        };
+
+        return TournamentCreateRequest;
+    })();
+
+    tournament.TournamentCreateResponse = (function() {
+
+        /**
+         * Properties of a TournamentCreateResponse.
+         * @memberof tournament
+         * @interface ITournamentCreateResponse
+         * @property {string|null} [tournamentId] TournamentCreateResponse tournamentId
+         */
+
+        /**
+         * Constructs a new TournamentCreateResponse.
+         * @memberof tournament
+         * @classdesc Represents a TournamentCreateResponse.
+         * @implements ITournamentCreateResponse
+         * @constructor
+         * @param {tournament.ITournamentCreateResponse=} [properties] Properties to set
+         */
+        function TournamentCreateResponse(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * TournamentCreateResponse tournamentId.
+         * @member {string} tournamentId
+         * @memberof tournament.TournamentCreateResponse
+         * @instance
+         */
+        TournamentCreateResponse.prototype.tournamentId = "";
+
+        /**
+         * Creates a new TournamentCreateResponse instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentCreateResponse
+         * @static
+         * @param {tournament.ITournamentCreateResponse=} [properties] Properties to set
+         * @returns {tournament.TournamentCreateResponse} TournamentCreateResponse instance
+         */
+        TournamentCreateResponse.create = function create(properties) {
+            return new TournamentCreateResponse(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentCreateResponse message. Does not implicitly {@link tournament.TournamentCreateResponse.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentCreateResponse
+         * @static
+         * @param {tournament.ITournamentCreateResponse} message TournamentCreateResponse message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentCreateResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.tournamentId != null && Object.hasOwnProperty.call(message, "tournamentId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.tournamentId);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentCreateResponse message, length delimited. Does not implicitly {@link tournament.TournamentCreateResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentCreateResponse
+         * @static
+         * @param {tournament.ITournamentCreateResponse} message TournamentCreateResponse message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentCreateResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentCreateResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentCreateResponse
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentCreateResponse} TournamentCreateResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentCreateResponse.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentCreateResponse();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.tournamentId = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentCreateResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentCreateResponse
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentCreateResponse} TournamentCreateResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentCreateResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentCreateResponse message.
+         * @function verify
+         * @memberof tournament.TournamentCreateResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentCreateResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
+                if (!$util.isString(message.tournamentId))
+                    return "tournamentId: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a TournamentCreateResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentCreateResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentCreateResponse} TournamentCreateResponse
+         */
+        TournamentCreateResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentCreateResponse)
+                return object;
+            let message = new $root.tournament.TournamentCreateResponse();
+            if (object.tournamentId != null)
+                message.tournamentId = String(object.tournamentId);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a TournamentCreateResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentCreateResponse
+         * @static
+         * @param {tournament.TournamentCreateResponse} message TournamentCreateResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentCreateResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults)
+                object.tournamentId = "";
+            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
+                object.tournamentId = message.tournamentId;
+            return object;
+        };
+
+        /**
+         * Converts this TournamentCreateResponse to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentCreateResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentCreateResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentCreateResponse
+         * @function getTypeUrl
+         * @memberof tournament.TournamentCreateResponse
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentCreateResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentCreateResponse";
+        };
+
+        return TournamentCreateResponse;
+    })();
+
+    tournament.TournamentClientMessage = (function() {
+
+        /**
+         * Properties of a TournamentClientMessage.
+         * @memberof tournament
+         * @interface ITournamentClientMessage
+         * @property {tournament.ITournamentQuitMessage|null} [quit] TournamentClientMessage quit
+         * @property {tournament.ITournamentClientReadyMessage|null} [ready] TournamentClientMessage ready
+         */
+
+        /**
+         * Constructs a new TournamentClientMessage.
+         * @memberof tournament
+         * @classdesc Represents a TournamentClientMessage.
+         * @implements ITournamentClientMessage
+         * @constructor
+         * @param {tournament.ITournamentClientMessage=} [properties] Properties to set
+         */
+        function TournamentClientMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * TournamentClientMessage quit.
+         * @member {tournament.ITournamentQuitMessage|null|undefined} quit
+         * @memberof tournament.TournamentClientMessage
+         * @instance
+         */
+        TournamentClientMessage.prototype.quit = null;
+
+        /**
+         * TournamentClientMessage ready.
+         * @member {tournament.ITournamentClientReadyMessage|null|undefined} ready
+         * @memberof tournament.TournamentClientMessage
+         * @instance
+         */
+        TournamentClientMessage.prototype.ready = null;
+
+        // OneOf field names bound to virtual getters and setters
+        let $oneOfFields;
+
+        /**
+         * TournamentClientMessage payload.
+         * @member {"quit"|"ready"|undefined} payload
+         * @memberof tournament.TournamentClientMessage
+         * @instance
+         */
+        Object.defineProperty(TournamentClientMessage.prototype, "payload", {
+            get: $util.oneOfGetter($oneOfFields = ["quit", "ready"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * Creates a new TournamentClientMessage instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentClientMessage
+         * @static
+         * @param {tournament.ITournamentClientMessage=} [properties] Properties to set
+         * @returns {tournament.TournamentClientMessage} TournamentClientMessage instance
+         */
+        TournamentClientMessage.create = function create(properties) {
+            return new TournamentClientMessage(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentClientMessage message. Does not implicitly {@link tournament.TournamentClientMessage.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentClientMessage
+         * @static
+         * @param {tournament.ITournamentClientMessage} message TournamentClientMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentClientMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.quit != null && Object.hasOwnProperty.call(message, "quit"))
+                $root.tournament.TournamentQuitMessage.encode(message.quit, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.ready != null && Object.hasOwnProperty.call(message, "ready"))
+                $root.tournament.TournamentClientReadyMessage.encode(message.ready, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentClientMessage message, length delimited. Does not implicitly {@link tournament.TournamentClientMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentClientMessage
+         * @static
+         * @param {tournament.ITournamentClientMessage} message TournamentClientMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentClientMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentClientMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentClientMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentClientMessage} TournamentClientMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentClientMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentClientMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.quit = $root.tournament.TournamentQuitMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
+                        message.ready = $root.tournament.TournamentClientReadyMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentClientMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentClientMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentClientMessage} TournamentClientMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentClientMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentClientMessage message.
+         * @function verify
+         * @memberof tournament.TournamentClientMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentClientMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            let properties = {};
+            if (message.quit != null && message.hasOwnProperty("quit")) {
+                properties.payload = 1;
+                {
+                    let error = $root.tournament.TournamentQuitMessage.verify(message.quit);
+                    if (error)
+                        return "quit." + error;
+                }
+            }
+            if (message.ready != null && message.hasOwnProperty("ready")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.tournament.TournamentClientReadyMessage.verify(message.ready);
+                    if (error)
+                        return "ready." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a TournamentClientMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentClientMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentClientMessage} TournamentClientMessage
+         */
+        TournamentClientMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentClientMessage)
+                return object;
+            let message = new $root.tournament.TournamentClientMessage();
+            if (object.quit != null) {
+                if (typeof object.quit !== "object")
+                    throw TypeError(".tournament.TournamentClientMessage.quit: object expected");
+                message.quit = $root.tournament.TournamentQuitMessage.fromObject(object.quit);
+            }
+            if (object.ready != null) {
+                if (typeof object.ready !== "object")
+                    throw TypeError(".tournament.TournamentClientMessage.ready: object expected");
+                message.ready = $root.tournament.TournamentClientReadyMessage.fromObject(object.ready);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a TournamentClientMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentClientMessage
+         * @static
+         * @param {tournament.TournamentClientMessage} message TournamentClientMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentClientMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (message.quit != null && message.hasOwnProperty("quit")) {
+                object.quit = $root.tournament.TournamentQuitMessage.toObject(message.quit, options);
+                if (options.oneofs)
+                    object.payload = "quit";
+            }
+            if (message.ready != null && message.hasOwnProperty("ready")) {
+                object.ready = $root.tournament.TournamentClientReadyMessage.toObject(message.ready, options);
+                if (options.oneofs)
+                    object.payload = "ready";
+            }
+            return object;
+        };
+
+        /**
+         * Converts this TournamentClientMessage to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentClientMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentClientMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentClientMessage
+         * @function getTypeUrl
+         * @memberof tournament.TournamentClientMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentClientMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentClientMessage";
+        };
+
+        return TournamentClientMessage;
+    })();
+
+    tournament.TournamentStartGameMessage = (function() {
+
+        /**
+         * Properties of a TournamentStartGameMessage.
+         * @memberof tournament
+         * @interface ITournamentStartGameMessage
+         * @property {string|null} [gameId] TournamentStartGameMessage gameId
+         */
+
+        /**
+         * Constructs a new TournamentStartGameMessage.
+         * @memberof tournament
+         * @classdesc Represents a TournamentStartGameMessage.
+         * @implements ITournamentStartGameMessage
+         * @constructor
+         * @param {tournament.ITournamentStartGameMessage=} [properties] Properties to set
+         */
+        function TournamentStartGameMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * TournamentStartGameMessage gameId.
+         * @member {string} gameId
+         * @memberof tournament.TournamentStartGameMessage
+         * @instance
+         */
+        TournamentStartGameMessage.prototype.gameId = "";
+
+        /**
+         * Creates a new TournamentStartGameMessage instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentStartGameMessage
+         * @static
+         * @param {tournament.ITournamentStartGameMessage=} [properties] Properties to set
+         * @returns {tournament.TournamentStartGameMessage} TournamentStartGameMessage instance
+         */
+        TournamentStartGameMessage.create = function create(properties) {
+            return new TournamentStartGameMessage(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentStartGameMessage message. Does not implicitly {@link tournament.TournamentStartGameMessage.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentStartGameMessage
+         * @static
+         * @param {tournament.ITournamentStartGameMessage} message TournamentStartGameMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentStartGameMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.gameId != null && Object.hasOwnProperty.call(message, "gameId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.gameId);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentStartGameMessage message, length delimited. Does not implicitly {@link tournament.TournamentStartGameMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentStartGameMessage
+         * @static
+         * @param {tournament.ITournamentStartGameMessage} message TournamentStartGameMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentStartGameMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentStartGameMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentStartGameMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentStartGameMessage} TournamentStartGameMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentStartGameMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentStartGameMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.gameId = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentStartGameMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentStartGameMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentStartGameMessage} TournamentStartGameMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentStartGameMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentStartGameMessage message.
+         * @function verify
+         * @memberof tournament.TournamentStartGameMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentStartGameMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                if (!$util.isString(message.gameId))
+                    return "gameId: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a TournamentStartGameMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentStartGameMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentStartGameMessage} TournamentStartGameMessage
+         */
+        TournamentStartGameMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentStartGameMessage)
+                return object;
+            let message = new $root.tournament.TournamentStartGameMessage();
+            if (object.gameId != null)
+                message.gameId = String(object.gameId);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a TournamentStartGameMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentStartGameMessage
+         * @static
+         * @param {tournament.TournamentStartGameMessage} message TournamentStartGameMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentStartGameMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults)
+                object.gameId = "";
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                object.gameId = message.gameId;
+            return object;
+        };
+
+        /**
+         * Converts this TournamentStartGameMessage to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentStartGameMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentStartGameMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentStartGameMessage
+         * @function getTypeUrl
+         * @memberof tournament.TournamentStartGameMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentStartGameMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentStartGameMessage";
+        };
+
+        return TournamentStartGameMessage;
+    })();
+
+    tournament.TournamentServerMessage = (function() {
+
+        /**
+         * Properties of a TournamentServerMessage.
+         * @memberof tournament
+         * @interface ITournamentServerMessage
+         * @property {tournament.ITournamentUpdateMessage|null} [update] TournamentServerMessage update
+         * @property {tournament.ITournamentErrorMessage|null} [error] TournamentServerMessage error
+         * @property {tournament.ITournamentReadyCheckMessage|null} [readyCheck] TournamentServerMessage readyCheck
+         * @property {tournament.ITournamentStartGameMessage|null} [startGame] TournamentServerMessage startGame
+         */
+
+        /**
+         * Constructs a new TournamentServerMessage.
+         * @memberof tournament
+         * @classdesc Represents a TournamentServerMessage.
+         * @implements ITournamentServerMessage
+         * @constructor
+         * @param {tournament.ITournamentServerMessage=} [properties] Properties to set
+         */
+        function TournamentServerMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * TournamentServerMessage update.
+         * @member {tournament.ITournamentUpdateMessage|null|undefined} update
+         * @memberof tournament.TournamentServerMessage
+         * @instance
+         */
+        TournamentServerMessage.prototype.update = null;
+
+        /**
+         * TournamentServerMessage error.
+         * @member {tournament.ITournamentErrorMessage|null|undefined} error
+         * @memberof tournament.TournamentServerMessage
+         * @instance
+         */
+        TournamentServerMessage.prototype.error = null;
+
+        /**
+         * TournamentServerMessage readyCheck.
+         * @member {tournament.ITournamentReadyCheckMessage|null|undefined} readyCheck
+         * @memberof tournament.TournamentServerMessage
+         * @instance
+         */
+        TournamentServerMessage.prototype.readyCheck = null;
+
+        /**
+         * TournamentServerMessage startGame.
+         * @member {tournament.ITournamentStartGameMessage|null|undefined} startGame
+         * @memberof tournament.TournamentServerMessage
+         * @instance
+         */
+        TournamentServerMessage.prototype.startGame = null;
+
+        // OneOf field names bound to virtual getters and setters
+        let $oneOfFields;
+
+        /**
+         * TournamentServerMessage payload.
+         * @member {"update"|"error"|"readyCheck"|"startGame"|undefined} payload
+         * @memberof tournament.TournamentServerMessage
+         * @instance
+         */
+        Object.defineProperty(TournamentServerMessage.prototype, "payload", {
+            get: $util.oneOfGetter($oneOfFields = ["update", "error", "readyCheck", "startGame"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * Creates a new TournamentServerMessage instance using the specified properties.
+         * @function create
+         * @memberof tournament.TournamentServerMessage
+         * @static
+         * @param {tournament.ITournamentServerMessage=} [properties] Properties to set
+         * @returns {tournament.TournamentServerMessage} TournamentServerMessage instance
+         */
+        TournamentServerMessage.create = function create(properties) {
+            return new TournamentServerMessage(properties);
+        };
+
+        /**
+         * Encodes the specified TournamentServerMessage message. Does not implicitly {@link tournament.TournamentServerMessage.verify|verify} messages.
+         * @function encode
+         * @memberof tournament.TournamentServerMessage
+         * @static
+         * @param {tournament.ITournamentServerMessage} message TournamentServerMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentServerMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.update != null && Object.hasOwnProperty.call(message, "update"))
+                $root.tournament.TournamentUpdateMessage.encode(message.update, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.error != null && Object.hasOwnProperty.call(message, "error"))
+                $root.tournament.TournamentErrorMessage.encode(message.error, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.readyCheck != null && Object.hasOwnProperty.call(message, "readyCheck"))
+                $root.tournament.TournamentReadyCheckMessage.encode(message.readyCheck, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            if (message.startGame != null && Object.hasOwnProperty.call(message, "startGame"))
+                $root.tournament.TournamentStartGameMessage.encode(message.startGame, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified TournamentServerMessage message, length delimited. Does not implicitly {@link tournament.TournamentServerMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof tournament.TournamentServerMessage
+         * @static
+         * @param {tournament.ITournamentServerMessage} message TournamentServerMessage message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        TournamentServerMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a TournamentServerMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof tournament.TournamentServerMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {tournament.TournamentServerMessage} TournamentServerMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentServerMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.tournament.TournamentServerMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.update = $root.tournament.TournamentUpdateMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
+                        message.error = $root.tournament.TournamentErrorMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 3: {
+                        message.readyCheck = $root.tournament.TournamentReadyCheckMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 4: {
+                        message.startGame = $root.tournament.TournamentStartGameMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a TournamentServerMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof tournament.TournamentServerMessage
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {tournament.TournamentServerMessage} TournamentServerMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        TournamentServerMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a TournamentServerMessage message.
+         * @function verify
+         * @memberof tournament.TournamentServerMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        TournamentServerMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            let properties = {};
+            if (message.update != null && message.hasOwnProperty("update")) {
+                properties.payload = 1;
+                {
+                    let error = $root.tournament.TournamentUpdateMessage.verify(message.update);
+                    if (error)
+                        return "update." + error;
+                }
+            }
+            if (message.error != null && message.hasOwnProperty("error")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.tournament.TournamentErrorMessage.verify(message.error);
+                    if (error)
+                        return "error." + error;
+                }
+            }
+            if (message.readyCheck != null && message.hasOwnProperty("readyCheck")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.tournament.TournamentReadyCheckMessage.verify(message.readyCheck);
+                    if (error)
+                        return "readyCheck." + error;
+                }
+            }
+            if (message.startGame != null && message.hasOwnProperty("startGame")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.tournament.TournamentStartGameMessage.verify(message.startGame);
+                    if (error)
+                        return "startGame." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a TournamentServerMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof tournament.TournamentServerMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {tournament.TournamentServerMessage} TournamentServerMessage
+         */
+        TournamentServerMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.tournament.TournamentServerMessage)
+                return object;
+            let message = new $root.tournament.TournamentServerMessage();
+            if (object.update != null) {
+                if (typeof object.update !== "object")
+                    throw TypeError(".tournament.TournamentServerMessage.update: object expected");
+                message.update = $root.tournament.TournamentUpdateMessage.fromObject(object.update);
+            }
+            if (object.error != null) {
+                if (typeof object.error !== "object")
+                    throw TypeError(".tournament.TournamentServerMessage.error: object expected");
+                message.error = $root.tournament.TournamentErrorMessage.fromObject(object.error);
+            }
+            if (object.readyCheck != null) {
+                if (typeof object.readyCheck !== "object")
+                    throw TypeError(".tournament.TournamentServerMessage.readyCheck: object expected");
+                message.readyCheck = $root.tournament.TournamentReadyCheckMessage.fromObject(object.readyCheck);
+            }
+            if (object.startGame != null) {
+                if (typeof object.startGame !== "object")
+                    throw TypeError(".tournament.TournamentServerMessage.startGame: object expected");
+                message.startGame = $root.tournament.TournamentStartGameMessage.fromObject(object.startGame);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a TournamentServerMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof tournament.TournamentServerMessage
+         * @static
+         * @param {tournament.TournamentServerMessage} message TournamentServerMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TournamentServerMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (message.update != null && message.hasOwnProperty("update")) {
+                object.update = $root.tournament.TournamentUpdateMessage.toObject(message.update, options);
+                if (options.oneofs)
+                    object.payload = "update";
+            }
+            if (message.error != null && message.hasOwnProperty("error")) {
+                object.error = $root.tournament.TournamentErrorMessage.toObject(message.error, options);
+                if (options.oneofs)
+                    object.payload = "error";
+            }
+            if (message.readyCheck != null && message.hasOwnProperty("readyCheck")) {
+                object.readyCheck = $root.tournament.TournamentReadyCheckMessage.toObject(message.readyCheck, options);
+                if (options.oneofs)
+                    object.payload = "readyCheck";
+            }
+            if (message.startGame != null && message.hasOwnProperty("startGame")) {
+                object.startGame = $root.tournament.TournamentStartGameMessage.toObject(message.startGame, options);
+                if (options.oneofs)
+                    object.payload = "startGame";
+            }
+            return object;
+        };
+
+        /**
+         * Converts this TournamentServerMessage to JSON.
+         * @function toJSON
+         * @memberof tournament.TournamentServerMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TournamentServerMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for TournamentServerMessage
+         * @function getTypeUrl
+         * @memberof tournament.TournamentServerMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        TournamentServerMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/tournament.TournamentServerMessage";
+        };
+
+        return TournamentServerMessage;
+    })();
+
+    return tournament;
 })();
 
 export { $root as default };

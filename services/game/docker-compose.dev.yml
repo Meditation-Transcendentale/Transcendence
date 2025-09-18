@@ -183,6 +183,38 @@ services:
     networks:
       - game-network
 
+  tournament:
+    container_name: tournament
+    build:
+      context: ./services/game/tournament
+    volumes:
+      - ./services/game/tournament/src:/app/src
+      # - ./tournament/test:/app/test
+      - ./services/game/tournament/package.json:/app/package.json
+      - ./services/game/tournament/.env.example:/app/.env
+      - ./services/user/shared:/usr/src/app/shared
+      - ./shared/certs:/app/certs:ro
+
+    depends_on:
+      nats_game:
+        condition: service_started
+      database_certs-init:
+        condition: service_completed_successfully
+    command: npm run dev
+    environment:
+      - NATS_URL=${NATS_GAME_URL}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+      - API_GATEWAY_KEY=${API_GATEWAY_KEY}
+      - PORT=5009
+    ports:
+      - "5009:5009"
+      - "5019:5019"
+    networks:
+      - game-network
+      - transcendence-network
+
 
 networks:
   game-network:

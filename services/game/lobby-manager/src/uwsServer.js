@@ -40,8 +40,9 @@ export function createUwsApp(path, lobbyService) {
 			const { lobbyId } = ws;
 			sockets.set(lobbyId, sockets.get(lobbyId) || new Set());
 			sockets.get(lobbyId).add(ws);
-
+			console.log (`1:${lobbyId}`);
 			try {
+				console.log (`JOIN: ${lobbyId}|${ws.userId}`);
 				const state = lobbyService.join(lobbyId, ws.userId);
 				const buf = encodeServerMessage({ update: { lobbyId: state.lobbyId, players: state.players, status: state.status, mode: state.mode, map: state.map } });
 				ws.subscribe(lobbyId);
@@ -73,11 +74,17 @@ export function createUwsApp(path, lobbyService) {
 						}
 					});
 					app.publish(ws.lobbyId, startBuf, true);
-
-					// for (const peer of sockets.get(ws.lobbyId) || []) {
-					// 	peer.close(1000, 'Game starting');
-					// }
-					// sockets.delete(ws.lobbyId);
+					return;
+				}
+				if (newState.tournamentId) {
+					const startTournamentBuf = encodeServerMessage({
+						startTournament: {
+							lobbyId: newState.lobbyId,
+							tournamentId: newState.tournamentId,
+							map: newState.map
+						}
+					});
+					app.publish(ws.lobbyId, startTournamentBuf, true);
 					return;
 				}
 			}

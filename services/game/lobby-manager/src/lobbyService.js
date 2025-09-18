@@ -5,6 +5,8 @@ import {
 	encodeMatchCreateRequest,
 	decodeMatchCreateResponse,
 	encodeNotificationMessage,
+	encodeTournamentCreateRequest,
+	decodeTournamentCreateResponse,
 	encodeStatusUpdate
 } from './proto/helper.js'
 
@@ -90,7 +92,8 @@ class Lobby {
 			})),
 			status,
 			mode: this.mode,
-			gameId: this.gameId
+			gameId: this.gameId,
+			tournamentId: this.tournamentId,
 		}
 	}
 }
@@ -146,25 +149,43 @@ export default class LobbyService {
 		const state = lobby.getState()
 
 		if (lobby.allReady()) {
-			const reqBuf = encodeMatchCreateRequest({
-				players: [...lobby.players.keys()],
-			})
-			console.log("all ready");
-			try {
-				const replyBuf = await natsClient.request(
-					`games.${lobby.mode}.match.create`,
-					reqBuf, {}
-				)
-				console.log('raw reply hex:', Buffer.from(replyBuf).toString('hex'));
-				const resp = decodeMatchCreateResponse(replyBuf)
-				console.log('decoded resp:', resp);
-				lobby.gameId = resp.gameId
-				state.gameId = resp.gameId
-			} catch (err) {
-				console.error('Failed to create game:', err)
+			if (lobby.mode == `tournament`) {
+				console.log(lobby.players.keys());
+				const reqBufTournament = encodeTournamentCreateRequest({
+					players: [...lobby.players.keys()],
+				});
+				try {
+					const replyBufTournament = await natsClient.request(
+						`games.tournament.create`,
+						reqBufTournament, {}
+					);
+					const respTournament = decodeTournamentCreateResponse(replyBufTournament);
+					lobby.tournamentId = respTournament.tournamentId;
+					state.tournamentId = respTournament.tournamentId;
+				} catch (err) {
+					console.error(`Failed to create tournament:`, err);
+				}
+			}
+			else {
+				const reqBuf = encodeMatchCreateRequest({
+					players: [...lobby.players.keys()],
+				})
+				console.log("all ready");
+				try {
+					const replyBuf = await natsClient.request(
+						`games.${lobby.mode}.match.create`,
+						reqBuf, {}
+					)
+					console.log('raw reply hex:', Buffer.from(replyBuf).toString('hex'));
+					const resp = decodeMatchCreateResponse(replyBuf)
+					console.log('decoded resp:', resp);
+					lobby.gameId = resp.gameId
+					state.gameId = resp.gameId
+				} catch (err) {
+					console.error('Failed to create game:', err)
+				}
 			}
 		}
-
 		return state
 	}
 

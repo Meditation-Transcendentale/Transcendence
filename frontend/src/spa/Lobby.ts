@@ -1,6 +1,6 @@
 import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
-import { decodeServerMessage, encodeClientMessage } from "../encode/helper";
+import { decodeServerMessage, encodeClientMessage } from "./proto/helper";
 // import { lobbyVue } from "../Vue";
 import Router from "./Router";
 import { User } from "./User";
@@ -186,6 +186,12 @@ export default class Lobby {
 					Router.nav(encodeURI(`/test?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
 				else
 					Router.nav(encodeURI(`/cajoue?id=${gameId}&mod=${this.mode}&map=${this.map}`), false, true);
+				this.ws?.close();
+			}
+
+			if (payload.startTournament != null) {
+				const tournamentId = payload.startTournament.tournamentId;
+				Router.nav(encodeURI(`/tournament?id=${tournamentId}`), false, true);
 				this.ws?.close();
 			}
 		}

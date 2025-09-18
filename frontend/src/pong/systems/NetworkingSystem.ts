@@ -14,6 +14,7 @@ import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
 import { localPaddleId } from "../Pong";
+import Router from "../../spa/Router.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -21,10 +22,11 @@ export class NetworkingSystem extends System {
 	private oldVelY: number;
 	private myScore: number;
 	private opponentScore: number;
+	private mode: string;
 	// private endUI = globalEndUI;
 
 
-	constructor(wsManager: WebSocketManager, uuid: string) {
+	constructor(wsManager: WebSocketManager, uuid: string, mode: string) {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
@@ -32,6 +34,7 @@ export class NetworkingSystem extends System {
 		this.opponentScore = 0;
 		this.oldVelX = 0;
 		this.oldVelY = 0;
+		this.mode = mode;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -120,6 +123,8 @@ export class NetworkingSystem extends System {
 
 			// === Game End ===
 			if (serverMsg.end) {
+				if (this.mode = "tournament")
+					Router.nav(`/tournament`, false, true);
 				
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);

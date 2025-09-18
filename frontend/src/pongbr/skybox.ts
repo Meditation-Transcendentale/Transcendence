@@ -62,7 +62,7 @@ export class SpaceSkybox {
 			autoRotate: true,
 			rotationSpeed: 0.05,
 			sphereSegments: 128,
-			skyboxSize: 10000,
+			skyboxSize: 2000,
 			resolution: new Vector2(2048, 2048),
 			...options
 		};

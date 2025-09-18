@@ -8,7 +8,7 @@ import {
 	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
-	// Inspector,
+	Inspector,
 	MeshBuilder,
 	Scene,
 	StandardMaterial,
@@ -19,7 +19,7 @@ import {
 	Mesh
 } from "@babylonImport";
 import { Field } from "./Field";
-import { DynamicTexture, Material, PBRMaterial, Texture } from "@babylonjs/core";
+import { DirectionalLight, DynamicTexture, Material, PBRMaterial, PointLight, ShadowGenerator, SpotLight, Texture } from "@babylonjs/core";
 // import { Inspector } from '@babylonjs/inspector';
 // import "@babylonjs/core/Debug/debugLayer";
 // import "@babylonjs/inspector";
@@ -123,9 +123,10 @@ export class Environment {
 
 	private createMesh() {
 		this.pongRoot = new TransformNode("pongbrRoot", this.scene);
-		this.pongRoot.position.set(-2200, -3500, -3500);
-		this.pongRoot.rotation.z -= 30.9000;
-		this.pongRoot.scaling.set(1, 1, 1);
+		this.pongRoot.position.set(0, -100, 0);
+
+		// this.pongRoot.rotation.z -= 30.9000;
+		this.pongRoot.scaling.set(0.1, 0.1, 0.1);
 		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 5, tessellation: 128 }, this.scene);
 		arenaMesh.parent = this.pongRoot;
 		const arenaMaterial = new PBRMaterial("gameplayArena", this.scene);
@@ -154,15 +155,16 @@ export class Environment {
 		headmat.diffuseColor = new Color3(1., 1, 1);
 		// headMesh.material = headmat;
 
-		headMesh.material.usePhysicalLightFalloff = false;
-		headMesh.material.invertNormalMapX = true;
-		headMesh.material.invertNormalMapY = true;
-
+		const material = headMesh.material as PBRMaterial;
+		material.usePhysicalLightFalloff = false;
+		material.invertNormalMapX = true;
+		material.invertNormalMapY = true;
 
 		const mouthMesh = this.scene.getMeshByName('Mouth.001') as Mesh;
 		const eyeMesh = this.scene.getMeshByName('Eyes.001') as Mesh;
 		const eyemat = new StandardMaterial('eyemat', this.scene);
 		eyemat.diffuseColor = new Color3(1., 0, 0);
+		eyemat.emissiveColor = new Color3(1, 1, 1);
 		eyeMesh.material = eyemat;
 
 		if (mouthMesh && mouthMesh.morphTargetManager) {
@@ -176,16 +178,61 @@ export class Environment {
 		if (headMesh && headMesh.morphTargetManager) {
 			const smileTarget = headMesh.morphTargetManager.getTarget(0);
 
-			smileTarget.influence = 0.;
+			smileTarget.influence = 1.;
 
 			console.log("Statue is now smiling!");
 		}
+		const redlight = new SpotLight(
+			"redlight",
+			new Vector3(-1200, 200, 0),
+			new Vector3(1, -1, 0),
+			160.8,
+			2,
+			this.scene
+		);
+		redlight.diffuse = Color3.Red();
+		redlight.intensity = 100;
+		redlight.parent = this.pongRoot;
+		const whitelight = new SpotLight(
+			"whitelight",
+			new Vector3(-500, 220, 0),
+			new Vector3(-1, -1, 0),
+			2 * Math.PI,
+			2,
+			this.scene
+		);
+		const whitelight2 = new SpotLight(
+			"whitelight2",
+			new Vector3(0, 400, 0),
+			new Vector3(0, -1, 0),
+			Math.PI,
+			2,
+			this.scene
+		);
+
+		whitelight.parent = this.pongRoot;
+		whitelight2.parent = this.pongRoot;
+		whitelight.shadowMinZ = 1;
+		whitelight.intensity = 8;
+		whitelight2.intensity = 1;
+		whitelight.shadowMaxZ = 10;
+		redlight.shadowMinZ = 1;
+		redlight.shadowMaxZ = 80;
+		const shadowGenerator1 = new ShadowGenerator(2048, redlight);
+		const shadowGenerator2 = new ShadowGenerator(2048, whitelight);
+		shadowGenerator1.useBlurCloseExponentialShadowMap = true;
+		shadowGenerator2.useBlurCloseExponentialShadowMap = true;
+		shadowGenerator1.addShadowCaster(headMesh);
+		shadowGenerator2.addShadowCaster(headMesh);
+		// shadowGenerator1.addShadowCaster(rimHeadMesh);
+		// shadowGenerator2.addShadowCaster(rimHeadMesh);
 
 		await this.field.load();
 
 		this.scene.meshes.forEach((mesh) => {
 			mesh.receiveShadows = true;
 		})
+
 
 		this.scene.fogMode = Scene.FOGMODE_NONE;
 		this.scene.fogDensity = 0.2;
@@ -194,14 +241,13 @@ export class Environment {
 		this.scene.fogColor = new Color3(0., 0., 0.);
 		this.scene.clearColor = new Color4(0., 0., 0., 0.);
 
-		// const pp = new DefaultRenderingPipeline("default", true, this.scene, [this.scene.activeCamera as Camera]);
-		// pp.bloomEnabled = true;
-		// pp.bloomWeight = 0.5;
-		// pp.bloomKernel = 16;
-		// pp.bloomScale = 0.25;
+		const pp = new DefaultRenderingPipeline("default", true, this.scene, [this.scene.activeCamera as Camera]);
+		pp.bloomEnabled = true;
+		pp.bloomWeight = 0.5;
+		pp.bloomKernel = 16;
+		pp.bloomScale = 0.25;
 
 		// this.scene.debugLayer.show();
-
 
 		// Inspector.Show(this.scene, {});
 		//this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
