@@ -64,7 +64,9 @@ export default class TournamentPage {
 	}
 
 	public load(params: URLSearchParams) {
-		this.tournamentId = params.get("id") as string;
+		console.log ("AAAAAAAAAAAAAAAAAAAAA");
+		if (!this.tournamentId)
+			this.tournamentId = params.get("id") as string;
 
 		const url = `wss://${window.location.hostname}:7000/sacrifice?uuid=${encodeURIComponent(
 			User.uuid as string
@@ -111,11 +113,11 @@ export default class TournamentPage {
 	}
 
 	unload() {
-		this.div.remove();
+		// this.div.remove();
 		this.stopReadyCountdown();
 		if (this.ws) {
 			try { this.ws.close(); } catch { }
-			this.ws = null;
+			// this.ws = null;
 		}
 	}
 
@@ -175,6 +177,7 @@ export default class TournamentPage {
 
 	private sendQuit() {
 		if (!this.ws) return;
+		this.tournamentId = null;
 		const buf = encodeTournamentClientMessage({ quit: {} });
 		this.ws.send(buf);
 	}

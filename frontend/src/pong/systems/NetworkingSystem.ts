@@ -14,7 +14,6 @@ import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
 import { localPaddleId } from "../Pong";
-import { tournamentId } from "../Pong";
 import Router from "../../spa/Router.js";
 
 export class NetworkingSystem extends System {
@@ -26,10 +25,11 @@ export class NetworkingSystem extends System {
 	private endUI: any;
 	private myScore: number;
 	private opponentScore: number;
+	private mode: string;
 	// private endUI = globalEndUI;
 
 
-	constructor(wsManager: WebSocketManager, uuid: string) {
+	constructor(wsManager: WebSocketManager, uuid: string, mode: string) {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
@@ -37,6 +37,7 @@ export class NetworkingSystem extends System {
 		this.opponentScore = 0;
 		this.oldVelX = 0;
 		this.oldVelY = 0;
+		this.mode = mode;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -123,9 +124,8 @@ export class NetworkingSystem extends System {
 
 			// === Game End ===
 			if (serverMsg.end) {
-				if (tournamentId)
-					Router.nav(encodeURI(`/tournament?id=${tournamentId}`), false, true);
-
+				if (this.mode = "tournament")
+					Router.nav(`/tournament`, false, true);
 				console.log("Received GameEndMessage");
 				// const scores = serverMsg.end.score as number[];
 				// const myScore = scores[localPaddleId] ?? 0;
