@@ -36,6 +36,12 @@ message StartMessage {
   string map = 3; // which map to use
 }
 
+message StartTournamentMessage {
+  string lobbyId = 1;
+  string tournamentId = 2;
+  string map = 3;
+}
+
 message Player {
   string uuid = 1;
   bool ready = 2;
@@ -62,7 +68,8 @@ message ServerMessage {
   oneof payload {
     StartMessage start = 1;
     UpdateMessage update = 2;
-    ErrorMessage error = 3;
+    ErrorMessage  error  = 3;
+    StartTournamentMessage startTournament = 4;
   }
 }
 

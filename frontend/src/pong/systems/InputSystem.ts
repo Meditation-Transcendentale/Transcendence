@@ -46,7 +46,7 @@ export class InputSystem extends System {
 			let upKeys = [];
 			let downKeys = [];
 			console.log(input.gameMode);
-			if ((input.gameMode === "online" || input.gameMode === "ai") && paddle.id == localPaddleId) {
+			if ((input.gameMode === "online" || input.gameMode === "ai" || input.gameMode === "tournament") && paddle.id == localPaddleId) {
 				if (paddle.id == 0){
 					upKeys = ["KeyW", "ArrowUp"];
 					downKeys = ["KeyS", "ArrowDown"];

@@ -3275,6 +3275,2825 @@ export namespace userinterface {
     }
 }
 
+/** Namespace tournament. */
+export namespace tournament {
+
+    /** Properties of a Player. */
+    interface IPlayer {
+
+        /** Player uuid */
+        uuid?: (string|null);
+
+        /** Player ready */
+        ready?: (boolean|null);
+
+        /** Player connected */
+        connected?: (boolean|null);
+
+        /** Player eliminated */
+        eliminated?: (boolean|null);
+    }
+
+    /** Represents a Player. */
+    class Player implements IPlayer {
+
+        /**
+         * Constructs a new Player.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.IPlayer);
+
+        /** Player uuid. */
+        public uuid: string;
+
+        /** Player ready. */
+        public ready: boolean;
+
+        /** Player connected. */
+        public connected: boolean;
+
+        /** Player eliminated. */
+        public eliminated: boolean;
+
+        /**
+         * Creates a new Player instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Player instance
+         */
+        public static create(properties?: tournament.IPlayer): tournament.Player;
+
+        /**
+         * Encodes the specified Player message. Does not implicitly {@link tournament.Player.verify|verify} messages.
+         * @param message Player message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.IPlayer, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Player message, length delimited. Does not implicitly {@link tournament.Player.verify|verify} messages.
+         * @param message Player message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.IPlayer, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Player message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Player
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.Player;
+
+        /**
+         * Decodes a Player message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Player
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.Player;
+
+        /**
+         * Verifies a Player message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Player message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Player
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.Player;
+
+        /**
+         * Creates a plain object from a Player message. Also converts values to other types if specified.
+         * @param message Player
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.Player, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Player to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for Player
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a Score. */
+    interface IScore {
+
+        /** Score values */
+        values?: (number[]|null);
+
+        /** Score forfeit */
+        forfeit?: (boolean|null);
+    }
+
+    /** Represents a Score. */
+    class Score implements IScore {
+
+        /**
+         * Constructs a new Score.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.IScore);
+
+        /** Score values. */
+        public values: number[];
+
+        /** Score forfeit. */
+        public forfeit: boolean;
+
+        /**
+         * Creates a new Score instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Score instance
+         */
+        public static create(properties?: tournament.IScore): tournament.Score;
+
+        /**
+         * Encodes the specified Score message. Does not implicitly {@link tournament.Score.verify|verify} messages.
+         * @param message Score message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.IScore, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Score message, length delimited. Does not implicitly {@link tournament.Score.verify|verify} messages.
+         * @param message Score message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.IScore, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Score message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Score
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.Score;
+
+        /**
+         * Decodes a Score message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Score
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.Score;
+
+        /**
+         * Verifies a Score message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Score message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Score
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.Score;
+
+        /**
+         * Creates a plain object from a Score message. Also converts values to other types if specified.
+         * @param message Score
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.Score, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Score to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for Score
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a MatchNode. */
+    interface IMatchNode {
+
+        /** MatchNode player1Id */
+        player1Id?: (string|null);
+
+        /** MatchNode player2Id */
+        player2Id?: (string|null);
+
+        /** MatchNode score */
+        score?: (tournament.IScore|null);
+
+        /** MatchNode gameId */
+        gameId?: (string|null);
+
+        /** MatchNode left */
+        left?: (tournament.IMatchNode|null);
+
+        /** MatchNode right */
+        right?: (tournament.IMatchNode|null);
+
+        /** MatchNode winnerId */
+        winnerId?: (string|null);
+    }
+
+    /** Represents a MatchNode. */
+    class MatchNode implements IMatchNode {
+
+        /**
+         * Constructs a new MatchNode.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.IMatchNode);
+
+        /** MatchNode player1Id. */
+        public player1Id: string;
+
+        /** MatchNode player2Id. */
+        public player2Id: string;
+
+        /** MatchNode score. */
+        public score?: (tournament.IScore|null);
+
+        /** MatchNode gameId. */
+        public gameId: string;
+
+        /** MatchNode left. */
+        public left?: (tournament.IMatchNode|null);
+
+        /** MatchNode right. */
+        public right?: (tournament.IMatchNode|null);
+
+        /** MatchNode winnerId. */
+        public winnerId: string;
+
+        /**
+         * Creates a new MatchNode instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns MatchNode instance
+         */
+        public static create(properties?: tournament.IMatchNode): tournament.MatchNode;
+
+        /**
+         * Encodes the specified MatchNode message. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
+         * @param message MatchNode message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.IMatchNode, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified MatchNode message, length delimited. Does not implicitly {@link tournament.MatchNode.verify|verify} messages.
+         * @param message MatchNode message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.IMatchNode, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a MatchNode message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns MatchNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.MatchNode;
+
+        /**
+         * Decodes a MatchNode message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns MatchNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.MatchNode;
+
+        /**
+         * Verifies a MatchNode message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a MatchNode message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns MatchNode
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.MatchNode;
+
+        /**
+         * Creates a plain object from a MatchNode message. Also converts values to other types if specified.
+         * @param message MatchNode
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.MatchNode, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this MatchNode to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for MatchNode
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentUpdateMessage. */
+    interface ITournamentUpdateMessage {
+
+        /** TournamentUpdateMessage tournamentRoot */
+        tournamentRoot?: (tournament.IMatchNode|null);
+
+        /** TournamentUpdateMessage players */
+        players?: (tournament.IPlayer[]|null);
+    }
+
+    /** Represents a TournamentUpdateMessage. */
+    class TournamentUpdateMessage implements ITournamentUpdateMessage {
+
+        /**
+         * Constructs a new TournamentUpdateMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentUpdateMessage);
+
+        /** TournamentUpdateMessage tournamentRoot. */
+        public tournamentRoot?: (tournament.IMatchNode|null);
+
+        /** TournamentUpdateMessage players. */
+        public players: tournament.IPlayer[];
+
+        /**
+         * Creates a new TournamentUpdateMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentUpdateMessage instance
+         */
+        public static create(properties?: tournament.ITournamentUpdateMessage): tournament.TournamentUpdateMessage;
+
+        /**
+         * Encodes the specified TournamentUpdateMessage message. Does not implicitly {@link tournament.TournamentUpdateMessage.verify|verify} messages.
+         * @param message TournamentUpdateMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentUpdateMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentUpdateMessage message, length delimited. Does not implicitly {@link tournament.TournamentUpdateMessage.verify|verify} messages.
+         * @param message TournamentUpdateMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentUpdateMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentUpdateMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentUpdateMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentUpdateMessage;
+
+        /**
+         * Decodes a TournamentUpdateMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentUpdateMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentUpdateMessage;
+
+        /**
+         * Verifies a TournamentUpdateMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentUpdateMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentUpdateMessage
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentUpdateMessage;
+
+        /**
+         * Creates a plain object from a TournamentUpdateMessage message. Also converts values to other types if specified.
+         * @param message TournamentUpdateMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentUpdateMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentUpdateMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentUpdateMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentClientReadyMessage. */
+    interface ITournamentClientReadyMessage {
+    }
+
+    /** Represents a TournamentClientReadyMessage. */
+    class TournamentClientReadyMessage implements ITournamentClientReadyMessage {
+
+        /**
+         * Constructs a new TournamentClientReadyMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentClientReadyMessage);
+
+        /**
+         * Creates a new TournamentClientReadyMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentClientReadyMessage instance
+         */
+        public static create(properties?: tournament.ITournamentClientReadyMessage): tournament.TournamentClientReadyMessage;
+
+        /**
+         * Encodes the specified TournamentClientReadyMessage message. Does not implicitly {@link tournament.TournamentClientReadyMessage.verify|verify} messages.
+         * @param message TournamentClientReadyMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentClientReadyMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentClientReadyMessage message, length delimited. Does not implicitly {@link tournament.TournamentClientReadyMessage.verify|verify} messages.
+         * @param message TournamentClientReadyMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentClientReadyMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentClientReadyMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentClientReadyMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentClientReadyMessage;
+
+        /**
+         * Decodes a TournamentClientReadyMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentClientReadyMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentClientReadyMessage;
+
+        /**
+         * Verifies a TournamentClientReadyMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentClientReadyMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentClientReadyMessage
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentClientReadyMessage;
+
+        /**
+         * Creates a plain object from a TournamentClientReadyMessage message. Also converts values to other types if specified.
+         * @param message TournamentClientReadyMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentClientReadyMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentClientReadyMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentClientReadyMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentReadyCheckMessage. */
+    interface ITournamentReadyCheckMessage {
+
+        /** TournamentReadyCheckMessage deadlineMs */
+        deadlineMs?: (number|Long|null);
+    }
+
+    /** Represents a TournamentReadyCheckMessage. */
+    class TournamentReadyCheckMessage implements ITournamentReadyCheckMessage {
+
+        /**
+         * Constructs a new TournamentReadyCheckMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentReadyCheckMessage);
+
+        /** TournamentReadyCheckMessage deadlineMs. */
+        public deadlineMs: (number|Long);
+
+        /**
+         * Creates a new TournamentReadyCheckMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentReadyCheckMessage instance
+         */
+        public static create(properties?: tournament.ITournamentReadyCheckMessage): tournament.TournamentReadyCheckMessage;
+
+        /**
+         * Encodes the specified TournamentReadyCheckMessage message. Does not implicitly {@link tournament.TournamentReadyCheckMessage.verify|verify} messages.
+         * @param message TournamentReadyCheckMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentReadyCheckMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentReadyCheckMessage message, length delimited. Does not implicitly {@link tournament.TournamentReadyCheckMessage.verify|verify} messages.
+         * @param message TournamentReadyCheckMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentReadyCheckMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentReadyCheckMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentReadyCheckMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentReadyCheckMessage;
+
+        /**
+         * Decodes a TournamentReadyCheckMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentReadyCheckMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentReadyCheckMessage;
+
+        /**
+         * Verifies a TournamentReadyCheckMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentReadyCheckMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentReadyCheckMessage
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentReadyCheckMessage;
+
+        /**
+         * Creates a plain object from a TournamentReadyCheckMessage message. Also converts values to other types if specified.
+         * @param message TournamentReadyCheckMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentReadyCheckMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentReadyCheckMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentReadyCheckMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentFinishedMessage. */
+    interface ITournamentFinishedMessage {
+    }
+
+    /** Represents a TournamentFinishedMessage. */
+    class TournamentFinishedMessage implements ITournamentFinishedMessage {
+
+        /**
+         * Constructs a new TournamentFinishedMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentFinishedMessage);
+
+        /**
+         * Creates a new TournamentFinishedMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentFinishedMessage instance
+         */
+        public static create(properties?: tournament.ITournamentFinishedMessage): tournament.TournamentFinishedMessage;
+
+        /**
+         * Encodes the specified TournamentFinishedMessage message. Does not implicitly {@link tournament.TournamentFinishedMessage.verify|verify} messages.
+         * @param message TournamentFinishedMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentFinishedMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentFinishedMessage message, length delimited. Does not implicitly {@link tournament.TournamentFinishedMessage.verify|verify} messages.
+         * @param message TournamentFinishedMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentFinishedMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentFinishedMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentFinishedMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentFinishedMessage;
+
+        /**
+         * Decodes a TournamentFinishedMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentFinishedMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentFinishedMessage;
+
+        /**
+         * Verifies a TournamentFinishedMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentFinishedMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentFinishedMessage
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentFinishedMessage;
+
+        /**
+         * Creates a plain object from a TournamentFinishedMessage message. Also converts values to other types if specified.
+         * @param message TournamentFinishedMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentFinishedMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentFinishedMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentFinishedMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentQuitMessage. */
+    interface ITournamentQuitMessage {
+    }
+
+    /** Represents a TournamentQuitMessage. */
+    class TournamentQuitMessage implements ITournamentQuitMessage {
+
+        /**
+         * Constructs a new TournamentQuitMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentQuitMessage);
+
+        /**
+         * Creates a new TournamentQuitMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentQuitMessage instance
+         */
+        public static create(properties?: tournament.ITournamentQuitMessage): tournament.TournamentQuitMessage;
+
+        /**
+         * Encodes the specified TournamentQuitMessage message. Does not implicitly {@link tournament.TournamentQuitMessage.verify|verify} messages.
+         * @param message TournamentQuitMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentQuitMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentQuitMessage message, length delimited. Does not implicitly {@link tournament.TournamentQuitMessage.verify|verify} messages.
+         * @param message TournamentQuitMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentQuitMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentQuitMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentQuitMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentQuitMessage;
+
+        /**
+         * Decodes a TournamentQuitMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentQuitMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentQuitMessage;
+
+        /**
+         * Verifies a TournamentQuitMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentQuitMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentQuitMessage
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentQuitMessage;
+
+        /**
+         * Creates a plain object from a TournamentQuitMessage message. Also converts values to other types if specified.
+         * @param message TournamentQuitMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentQuitMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentQuitMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentQuitMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentErrorMessage. */
+    interface ITournamentErrorMessage {
+
+        /** TournamentErrorMessage message */
+        message?: (string|null);
+    }
+
+    /** Represents a TournamentErrorMessage. */
+    class TournamentErrorMessage implements ITournamentErrorMessage {
+
+        /**
+         * Constructs a new TournamentErrorMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentErrorMessage);
+
+        /** TournamentErrorMessage message. */
+        public message: string;
+
+        /**
+         * Creates a new TournamentErrorMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentErrorMessage instance
+         */
+        public static create(properties?: tournament.ITournamentErrorMessage): tournament.TournamentErrorMessage;
+
+        /**
+         * Encodes the specified TournamentErrorMessage message. Does not implicitly {@link tournament.TournamentErrorMessage.verify|verify} messages.
+         * @param message TournamentErrorMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentErrorMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentErrorMessage message, length delimited. Does not implicitly {@link tournament.TournamentErrorMessage.verify|verify} messages.
+         * @param message TournamentErrorMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentErrorMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentErrorMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentErrorMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentErrorMessage;
+
+        /**
+         * Decodes a TournamentErrorMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentErrorMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentErrorMessage;
+
+        /**
+         * Verifies a TournamentErrorMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentErrorMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentErrorMessage
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentErrorMessage;
+
+        /**
+         * Creates a plain object from a TournamentErrorMessage message. Also converts values to other types if specified.
+         * @param message TournamentErrorMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentErrorMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentErrorMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentErrorMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentCreateRequest. */
+    interface ITournamentCreateRequest {
+
+        /** TournamentCreateRequest players */
+        players?: (string[]|null);
+    }
+
+    /** Represents a TournamentCreateRequest. */
+    class TournamentCreateRequest implements ITournamentCreateRequest {
+
+        /**
+         * Constructs a new TournamentCreateRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentCreateRequest);
+
+        /** TournamentCreateRequest players. */
+        public players: string[];
+
+        /**
+         * Creates a new TournamentCreateRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentCreateRequest instance
+         */
+        public static create(properties?: tournament.ITournamentCreateRequest): tournament.TournamentCreateRequest;
+
+        /**
+         * Encodes the specified TournamentCreateRequest message. Does not implicitly {@link tournament.TournamentCreateRequest.verify|verify} messages.
+         * @param message TournamentCreateRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentCreateRequest message, length delimited. Does not implicitly {@link tournament.TournamentCreateRequest.verify|verify} messages.
+         * @param message TournamentCreateRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentCreateRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentCreateRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentCreateRequest;
+
+        /**
+         * Decodes a TournamentCreateRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentCreateRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentCreateRequest;
+
+        /**
+         * Verifies a TournamentCreateRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentCreateRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentCreateRequest
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentCreateRequest;
+
+        /**
+         * Creates a plain object from a TournamentCreateRequest message. Also converts values to other types if specified.
+         * @param message TournamentCreateRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentCreateRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentCreateRequest to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentCreateRequest
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentCreateResponse. */
+    interface ITournamentCreateResponse {
+
+        /** TournamentCreateResponse tournamentId */
+        tournamentId?: (string|null);
+    }
+
+    /** Represents a TournamentCreateResponse. */
+    class TournamentCreateResponse implements ITournamentCreateResponse {
+
+        /**
+         * Constructs a new TournamentCreateResponse.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentCreateResponse);
+
+        /** TournamentCreateResponse tournamentId. */
+        public tournamentId: string;
+
+        /**
+         * Creates a new TournamentCreateResponse instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentCreateResponse instance
+         */
+        public static create(properties?: tournament.ITournamentCreateResponse): tournament.TournamentCreateResponse;
+
+        /**
+         * Encodes the specified TournamentCreateResponse message. Does not implicitly {@link tournament.TournamentCreateResponse.verify|verify} messages.
+         * @param message TournamentCreateResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentCreateResponse message, length delimited. Does not implicitly {@link tournament.TournamentCreateResponse.verify|verify} messages.
+         * @param message TournamentCreateResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentCreateResponse message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentCreateResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentCreateResponse;
+
+        /**
+         * Decodes a TournamentCreateResponse message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentCreateResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentCreateResponse;
+
+        /**
+         * Verifies a TournamentCreateResponse message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentCreateResponse message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentCreateResponse
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentCreateResponse;
+
+        /**
+         * Creates a plain object from a TournamentCreateResponse message. Also converts values to other types if specified.
+         * @param message TournamentCreateResponse
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentCreateResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentCreateResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentCreateResponse
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentClientMessage. */
+    interface ITournamentClientMessage {
+
+        /** TournamentClientMessage quit */
+        quit?: (tournament.ITournamentQuitMessage|null);
+
+        /** TournamentClientMessage ready */
+        ready?: (tournament.ITournamentClientReadyMessage|null);
+    }
+
+    /** Represents a TournamentClientMessage. */
+    class TournamentClientMessage implements ITournamentClientMessage {
+
+        /**
+         * Constructs a new TournamentClientMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentClientMessage);
+
+        /** TournamentClientMessage quit. */
+        public quit?: (tournament.ITournamentQuitMessage|null);
+
+        /** TournamentClientMessage ready. */
+        public ready?: (tournament.ITournamentClientReadyMessage|null);
+
+        /** TournamentClientMessage payload. */
+        public payload?: ("quit"|"ready");
+
+        /**
+         * Creates a new TournamentClientMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentClientMessage instance
+         */
+        public static create(properties?: tournament.ITournamentClientMessage): tournament.TournamentClientMessage;
+
+        /**
+         * Encodes the specified TournamentClientMessage message. Does not implicitly {@link tournament.TournamentClientMessage.verify|verify} messages.
+         * @param message TournamentClientMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentClientMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentClientMessage message, length delimited. Does not implicitly {@link tournament.TournamentClientMessage.verify|verify} messages.
+         * @param message TournamentClientMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentClientMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentClientMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentClientMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentClientMessage;
+
+        /**
+         * Decodes a TournamentClientMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentClientMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentClientMessage;
+
+        /**
+         * Verifies a TournamentClientMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentClientMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentClientMessage
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentClientMessage;
+
+        /**
+         * Creates a plain object from a TournamentClientMessage message. Also converts values to other types if specified.
+         * @param message TournamentClientMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentClientMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentClientMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentClientMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentStartGameMessage. */
+    interface ITournamentStartGameMessage {
+
+        /** TournamentStartGameMessage gameId */
+        gameId?: (string|null);
+    }
+
+    /** Represents a TournamentStartGameMessage. */
+    class TournamentStartGameMessage implements ITournamentStartGameMessage {
+
+        /**
+         * Constructs a new TournamentStartGameMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentStartGameMessage);
+
+        /** TournamentStartGameMessage gameId. */
+        public gameId: string;
+
+        /**
+         * Creates a new TournamentStartGameMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentStartGameMessage instance
+         */
+        public static create(properties?: tournament.ITournamentStartGameMessage): tournament.TournamentStartGameMessage;
+
+        /**
+         * Encodes the specified TournamentStartGameMessage message. Does not implicitly {@link tournament.TournamentStartGameMessage.verify|verify} messages.
+         * @param message TournamentStartGameMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentStartGameMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentStartGameMessage message, length delimited. Does not implicitly {@link tournament.TournamentStartGameMessage.verify|verify} messages.
+         * @param message TournamentStartGameMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentStartGameMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentStartGameMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentStartGameMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentStartGameMessage;
+
+        /**
+         * Decodes a TournamentStartGameMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentStartGameMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentStartGameMessage;
+
+        /**
+         * Verifies a TournamentStartGameMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentStartGameMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentStartGameMessage
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentStartGameMessage;
+
+        /**
+         * Creates a plain object from a TournamentStartGameMessage message. Also converts values to other types if specified.
+         * @param message TournamentStartGameMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentStartGameMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentStartGameMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentStartGameMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a TournamentServerMessage. */
+    interface ITournamentServerMessage {
+
+        /** TournamentServerMessage update */
+        update?: (tournament.ITournamentUpdateMessage|null);
+
+        /** TournamentServerMessage error */
+        error?: (tournament.ITournamentErrorMessage|null);
+
+        /** TournamentServerMessage readyCheck */
+        readyCheck?: (tournament.ITournamentReadyCheckMessage|null);
+
+        /** TournamentServerMessage startGame */
+        startGame?: (tournament.ITournamentStartGameMessage|null);
+    }
+
+    /** Represents a TournamentServerMessage. */
+    class TournamentServerMessage implements ITournamentServerMessage {
+
+        /**
+         * Constructs a new TournamentServerMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: tournament.ITournamentServerMessage);
+
+        /** TournamentServerMessage update. */
+        public update?: (tournament.ITournamentUpdateMessage|null);
+
+        /** TournamentServerMessage error. */
+        public error?: (tournament.ITournamentErrorMessage|null);
+
+        /** TournamentServerMessage readyCheck. */
+        public readyCheck?: (tournament.ITournamentReadyCheckMessage|null);
+
+        /** TournamentServerMessage startGame. */
+        public startGame?: (tournament.ITournamentStartGameMessage|null);
+
+        /** TournamentServerMessage payload. */
+        public payload?: ("update"|"error"|"readyCheck"|"startGame");
+
+        /**
+         * Creates a new TournamentServerMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TournamentServerMessage instance
+         */
+        public static create(properties?: tournament.ITournamentServerMessage): tournament.TournamentServerMessage;
+
+        /**
+         * Encodes the specified TournamentServerMessage message. Does not implicitly {@link tournament.TournamentServerMessage.verify|verify} messages.
+         * @param message TournamentServerMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: tournament.ITournamentServerMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified TournamentServerMessage message, length delimited. Does not implicitly {@link tournament.TournamentServerMessage.verify|verify} messages.
+         * @param message TournamentServerMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: tournament.ITournamentServerMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TournamentServerMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TournamentServerMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.TournamentServerMessage;
+
+        /**
+         * Decodes a TournamentServerMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns TournamentServerMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.TournamentServerMessage;
+
+        /**
+         * Verifies a TournamentServerMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a TournamentServerMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TournamentServerMessage
+         */
+        public static fromObject(object: { [k: string]: any }): tournament.TournamentServerMessage;
+
+        /**
+         * Creates a plain object from a TournamentServerMessage message. Also converts values to other types if specified.
+         * @param message TournamentServerMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: tournament.TournamentServerMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TournamentServerMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for TournamentServerMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+}
+
+/** Namespace lobby. */
+export namespace lobby {
+
+    /** Properties of a UserStatus. */
+    interface IUserStatus {
+
+        /** UserStatus uuid */
+        uuid?: (string|null);
+
+        /** UserStatus lobbyId */
+        lobbyId?: (string|null);
+
+        /** UserStatus status */
+        status?: (string|null);
+    }
+
+    /** Represents a UserStatus. */
+    class UserStatus implements IUserStatus {
+
+        /**
+         * Constructs a new UserStatus.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IUserStatus);
+
+        /** UserStatus uuid. */
+        public uuid: string;
+
+        /** UserStatus lobbyId. */
+        public lobbyId: string;
+
+        /** UserStatus status. */
+        public status: string;
+
+        /**
+         * Creates a new UserStatus instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns UserStatus instance
+         */
+        public static create(properties?: lobby.IUserStatus): lobby.UserStatus;
+
+        /**
+         * Encodes the specified UserStatus message. Does not implicitly {@link lobby.UserStatus.verify|verify} messages.
+         * @param message UserStatus message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IUserStatus, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified UserStatus message, length delimited. Does not implicitly {@link lobby.UserStatus.verify|verify} messages.
+         * @param message UserStatus message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IUserStatus, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a UserStatus message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns UserStatus
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.UserStatus;
+
+        /**
+         * Decodes a UserStatus message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns UserStatus
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.UserStatus;
+
+        /**
+         * Verifies a UserStatus message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a UserStatus message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns UserStatus
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.UserStatus;
+
+        /**
+         * Creates a plain object from a UserStatus message. Also converts values to other types if specified.
+         * @param message UserStatus
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.UserStatus, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this UserStatus to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for UserStatus
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a QuitMessage. */
+    interface IQuitMessage {
+
+        /** QuitMessage uuid */
+        uuid?: (string|null);
+
+        /** QuitMessage lobbyId */
+        lobbyId?: (string|null);
+    }
+
+    /** Represents a QuitMessage. */
+    class QuitMessage implements IQuitMessage {
+
+        /**
+         * Constructs a new QuitMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IQuitMessage);
+
+        /** QuitMessage uuid. */
+        public uuid: string;
+
+        /** QuitMessage lobbyId. */
+        public lobbyId: string;
+
+        /**
+         * Creates a new QuitMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns QuitMessage instance
+         */
+        public static create(properties?: lobby.IQuitMessage): lobby.QuitMessage;
+
+        /**
+         * Encodes the specified QuitMessage message. Does not implicitly {@link lobby.QuitMessage.verify|verify} messages.
+         * @param message QuitMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IQuitMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified QuitMessage message, length delimited. Does not implicitly {@link lobby.QuitMessage.verify|verify} messages.
+         * @param message QuitMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IQuitMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a QuitMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns QuitMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.QuitMessage;
+
+        /**
+         * Decodes a QuitMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns QuitMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.QuitMessage;
+
+        /**
+         * Verifies a QuitMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a QuitMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns QuitMessage
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.QuitMessage;
+
+        /**
+         * Creates a plain object from a QuitMessage message. Also converts values to other types if specified.
+         * @param message QuitMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.QuitMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this QuitMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for QuitMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a ReadyMessage. */
+    interface IReadyMessage {
+
+        /** ReadyMessage lobbyId */
+        lobbyId?: (string|null);
+    }
+
+    /** Represents a ReadyMessage. */
+    class ReadyMessage implements IReadyMessage {
+
+        /**
+         * Constructs a new ReadyMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IReadyMessage);
+
+        /** ReadyMessage lobbyId. */
+        public lobbyId: string;
+
+        /**
+         * Creates a new ReadyMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns ReadyMessage instance
+         */
+        public static create(properties?: lobby.IReadyMessage): lobby.ReadyMessage;
+
+        /**
+         * Encodes the specified ReadyMessage message. Does not implicitly {@link lobby.ReadyMessage.verify|verify} messages.
+         * @param message ReadyMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IReadyMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified ReadyMessage message, length delimited. Does not implicitly {@link lobby.ReadyMessage.verify|verify} messages.
+         * @param message ReadyMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IReadyMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a ReadyMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns ReadyMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.ReadyMessage;
+
+        /**
+         * Decodes a ReadyMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns ReadyMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.ReadyMessage;
+
+        /**
+         * Verifies a ReadyMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a ReadyMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns ReadyMessage
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.ReadyMessage;
+
+        /**
+         * Creates a plain object from a ReadyMessage message. Also converts values to other types if specified.
+         * @param message ReadyMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.ReadyMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this ReadyMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for ReadyMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of an ErrorMessage. */
+    interface IErrorMessage {
+
+        /** ErrorMessage message */
+        message?: (string|null);
+    }
+
+    /** Represents an ErrorMessage. */
+    class ErrorMessage implements IErrorMessage {
+
+        /**
+         * Constructs a new ErrorMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IErrorMessage);
+
+        /** ErrorMessage message. */
+        public message: string;
+
+        /**
+         * Creates a new ErrorMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns ErrorMessage instance
+         */
+        public static create(properties?: lobby.IErrorMessage): lobby.ErrorMessage;
+
+        /**
+         * Encodes the specified ErrorMessage message. Does not implicitly {@link lobby.ErrorMessage.verify|verify} messages.
+         * @param message ErrorMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IErrorMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified ErrorMessage message, length delimited. Does not implicitly {@link lobby.ErrorMessage.verify|verify} messages.
+         * @param message ErrorMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IErrorMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes an ErrorMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns ErrorMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.ErrorMessage;
+
+        /**
+         * Decodes an ErrorMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns ErrorMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.ErrorMessage;
+
+        /**
+         * Verifies an ErrorMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates an ErrorMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns ErrorMessage
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.ErrorMessage;
+
+        /**
+         * Creates a plain object from an ErrorMessage message. Also converts values to other types if specified.
+         * @param message ErrorMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.ErrorMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this ErrorMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for ErrorMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a StartMessage. */
+    interface IStartMessage {
+
+        /** StartMessage lobbyId */
+        lobbyId?: (string|null);
+
+        /** StartMessage gameId */
+        gameId?: (string|null);
+
+        /** StartMessage map */
+        map?: (string|null);
+    }
+
+    /** Represents a StartMessage. */
+    class StartMessage implements IStartMessage {
+
+        /**
+         * Constructs a new StartMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IStartMessage);
+
+        /** StartMessage lobbyId. */
+        public lobbyId: string;
+
+        /** StartMessage gameId. */
+        public gameId: string;
+
+        /** StartMessage map. */
+        public map: string;
+
+        /**
+         * Creates a new StartMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns StartMessage instance
+         */
+        public static create(properties?: lobby.IStartMessage): lobby.StartMessage;
+
+        /**
+         * Encodes the specified StartMessage message. Does not implicitly {@link lobby.StartMessage.verify|verify} messages.
+         * @param message StartMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IStartMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified StartMessage message, length delimited. Does not implicitly {@link lobby.StartMessage.verify|verify} messages.
+         * @param message StartMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IStartMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a StartMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns StartMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.StartMessage;
+
+        /**
+         * Decodes a StartMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns StartMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.StartMessage;
+
+        /**
+         * Verifies a StartMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a StartMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns StartMessage
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.StartMessage;
+
+        /**
+         * Creates a plain object from a StartMessage message. Also converts values to other types if specified.
+         * @param message StartMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.StartMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this StartMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for StartMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a StartTournamentMessage. */
+    interface IStartTournamentMessage {
+
+        /** StartTournamentMessage lobbyId */
+        lobbyId?: (string|null);
+
+        /** StartTournamentMessage tournamentId */
+        tournamentId?: (string|null);
+
+        /** StartTournamentMessage map */
+        map?: (string|null);
+    }
+
+    /** Represents a StartTournamentMessage. */
+    class StartTournamentMessage implements IStartTournamentMessage {
+
+        /**
+         * Constructs a new StartTournamentMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IStartTournamentMessage);
+
+        /** StartTournamentMessage lobbyId. */
+        public lobbyId: string;
+
+        /** StartTournamentMessage tournamentId. */
+        public tournamentId: string;
+
+        /** StartTournamentMessage map. */
+        public map: string;
+
+        /**
+         * Creates a new StartTournamentMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns StartTournamentMessage instance
+         */
+        public static create(properties?: lobby.IStartTournamentMessage): lobby.StartTournamentMessage;
+
+        /**
+         * Encodes the specified StartTournamentMessage message. Does not implicitly {@link lobby.StartTournamentMessage.verify|verify} messages.
+         * @param message StartTournamentMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IStartTournamentMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified StartTournamentMessage message, length delimited. Does not implicitly {@link lobby.StartTournamentMessage.verify|verify} messages.
+         * @param message StartTournamentMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IStartTournamentMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a StartTournamentMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns StartTournamentMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.StartTournamentMessage;
+
+        /**
+         * Decodes a StartTournamentMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns StartTournamentMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.StartTournamentMessage;
+
+        /**
+         * Verifies a StartTournamentMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a StartTournamentMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns StartTournamentMessage
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.StartTournamentMessage;
+
+        /**
+         * Creates a plain object from a StartTournamentMessage message. Also converts values to other types if specified.
+         * @param message StartTournamentMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.StartTournamentMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this StartTournamentMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for StartTournamentMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a Player. */
+    interface IPlayer {
+
+        /** Player uuid */
+        uuid?: (string|null);
+
+        /** Player ready */
+        ready?: (boolean|null);
+    }
+
+    /** Represents a Player. */
+    class Player implements IPlayer {
+
+        /**
+         * Constructs a new Player.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IPlayer);
+
+        /** Player uuid. */
+        public uuid: string;
+
+        /** Player ready. */
+        public ready: boolean;
+
+        /**
+         * Creates a new Player instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Player instance
+         */
+        public static create(properties?: lobby.IPlayer): lobby.Player;
+
+        /**
+         * Encodes the specified Player message. Does not implicitly {@link lobby.Player.verify|verify} messages.
+         * @param message Player message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IPlayer, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Player message, length delimited. Does not implicitly {@link lobby.Player.verify|verify} messages.
+         * @param message Player message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IPlayer, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Player message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Player
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.Player;
+
+        /**
+         * Decodes a Player message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Player
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.Player;
+
+        /**
+         * Verifies a Player message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Player message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Player
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.Player;
+
+        /**
+         * Creates a plain object from a Player message. Also converts values to other types if specified.
+         * @param message Player
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.Player, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Player to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for Player
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of an UpdateMessage. */
+    interface IUpdateMessage {
+
+        /** UpdateMessage lobbyId */
+        lobbyId?: (string|null);
+
+        /** UpdateMessage players */
+        players?: (lobby.IPlayer[]|null);
+
+        /** UpdateMessage status */
+        status?: (string|null);
+
+        /** UpdateMessage mode */
+        mode?: (string|null);
+
+        /** UpdateMessage map */
+        map?: (string|null);
+    }
+
+    /** Represents an UpdateMessage. */
+    class UpdateMessage implements IUpdateMessage {
+
+        /**
+         * Constructs a new UpdateMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IUpdateMessage);
+
+        /** UpdateMessage lobbyId. */
+        public lobbyId: string;
+
+        /** UpdateMessage players. */
+        public players: lobby.IPlayer[];
+
+        /** UpdateMessage status. */
+        public status: string;
+
+        /** UpdateMessage mode. */
+        public mode: string;
+
+        /** UpdateMessage map. */
+        public map: string;
+
+        /**
+         * Creates a new UpdateMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns UpdateMessage instance
+         */
+        public static create(properties?: lobby.IUpdateMessage): lobby.UpdateMessage;
+
+        /**
+         * Encodes the specified UpdateMessage message. Does not implicitly {@link lobby.UpdateMessage.verify|verify} messages.
+         * @param message UpdateMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IUpdateMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified UpdateMessage message, length delimited. Does not implicitly {@link lobby.UpdateMessage.verify|verify} messages.
+         * @param message UpdateMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IUpdateMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes an UpdateMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns UpdateMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.UpdateMessage;
+
+        /**
+         * Decodes an UpdateMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns UpdateMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.UpdateMessage;
+
+        /**
+         * Verifies an UpdateMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates an UpdateMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns UpdateMessage
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.UpdateMessage;
+
+        /**
+         * Creates a plain object from an UpdateMessage message. Also converts values to other types if specified.
+         * @param message UpdateMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.UpdateMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this UpdateMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for UpdateMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a ClientMessage. */
+    interface IClientMessage {
+
+        /** ClientMessage quit */
+        quit?: (lobby.IQuitMessage|null);
+
+        /** ClientMessage ready */
+        ready?: (lobby.IReadyMessage|null);
+    }
+
+    /** Represents a ClientMessage. */
+    class ClientMessage implements IClientMessage {
+
+        /**
+         * Constructs a new ClientMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IClientMessage);
+
+        /** ClientMessage quit. */
+        public quit?: (lobby.IQuitMessage|null);
+
+        /** ClientMessage ready. */
+        public ready?: (lobby.IReadyMessage|null);
+
+        /** ClientMessage payload. */
+        public payload?: ("quit"|"ready");
+
+        /**
+         * Creates a new ClientMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns ClientMessage instance
+         */
+        public static create(properties?: lobby.IClientMessage): lobby.ClientMessage;
+
+        /**
+         * Encodes the specified ClientMessage message. Does not implicitly {@link lobby.ClientMessage.verify|verify} messages.
+         * @param message ClientMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IClientMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified ClientMessage message, length delimited. Does not implicitly {@link lobby.ClientMessage.verify|verify} messages.
+         * @param message ClientMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IClientMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a ClientMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns ClientMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.ClientMessage;
+
+        /**
+         * Decodes a ClientMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns ClientMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.ClientMessage;
+
+        /**
+         * Verifies a ClientMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a ClientMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns ClientMessage
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.ClientMessage;
+
+        /**
+         * Creates a plain object from a ClientMessage message. Also converts values to other types if specified.
+         * @param message ClientMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.ClientMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this ClientMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for ClientMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a ServerMessage. */
+    interface IServerMessage {
+
+        /** ServerMessage start */
+        start?: (lobby.IStartMessage|null);
+
+        /** ServerMessage update */
+        update?: (lobby.IUpdateMessage|null);
+
+        /** ServerMessage error */
+        error?: (lobby.IErrorMessage|null);
+
+        /** ServerMessage startTournament */
+        startTournament?: (lobby.IStartTournamentMessage|null);
+    }
+
+    /** Represents a ServerMessage. */
+    class ServerMessage implements IServerMessage {
+
+        /**
+         * Constructs a new ServerMessage.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IServerMessage);
+
+        /** ServerMessage start. */
+        public start?: (lobby.IStartMessage|null);
+
+        /** ServerMessage update. */
+        public update?: (lobby.IUpdateMessage|null);
+
+        /** ServerMessage error. */
+        public error?: (lobby.IErrorMessage|null);
+
+        /** ServerMessage startTournament. */
+        public startTournament?: (lobby.IStartTournamentMessage|null);
+
+        /** ServerMessage payload. */
+        public payload?: ("start"|"update"|"error"|"startTournament");
+
+        /**
+         * Creates a new ServerMessage instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns ServerMessage instance
+         */
+        public static create(properties?: lobby.IServerMessage): lobby.ServerMessage;
+
+        /**
+         * Encodes the specified ServerMessage message. Does not implicitly {@link lobby.ServerMessage.verify|verify} messages.
+         * @param message ServerMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IServerMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified ServerMessage message, length delimited. Does not implicitly {@link lobby.ServerMessage.verify|verify} messages.
+         * @param message ServerMessage message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IServerMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a ServerMessage message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns ServerMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.ServerMessage;
+
+        /**
+         * Decodes a ServerMessage message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns ServerMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.ServerMessage;
+
+        /**
+         * Verifies a ServerMessage message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a ServerMessage message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns ServerMessage
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.ServerMessage;
+
+        /**
+         * Creates a plain object from a ServerMessage message. Also converts values to other types if specified.
+         * @param message ServerMessage
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.ServerMessage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this ServerMessage to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for ServerMessage
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a UserStatusPublish. */
+    interface IUserStatusPublish {
+
+        /** UserStatusPublish uuid */
+        uuid?: (string|null);
+
+        /** UserStatusPublish lobbyId */
+        lobbyId?: (string|null);
+
+        /** UserStatusPublish status */
+        status?: (string|null);
+    }
+
+    /** Represents a UserStatusPublish. */
+    class UserStatusPublish implements IUserStatusPublish {
+
+        /**
+         * Constructs a new UserStatusPublish.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IUserStatusPublish);
+
+        /** UserStatusPublish uuid. */
+        public uuid: string;
+
+        /** UserStatusPublish lobbyId. */
+        public lobbyId: string;
+
+        /** UserStatusPublish status. */
+        public status: string;
+
+        /**
+         * Creates a new UserStatusPublish instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns UserStatusPublish instance
+         */
+        public static create(properties?: lobby.IUserStatusPublish): lobby.UserStatusPublish;
+
+        /**
+         * Encodes the specified UserStatusPublish message. Does not implicitly {@link lobby.UserStatusPublish.verify|verify} messages.
+         * @param message UserStatusPublish message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IUserStatusPublish, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified UserStatusPublish message, length delimited. Does not implicitly {@link lobby.UserStatusPublish.verify|verify} messages.
+         * @param message UserStatusPublish message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IUserStatusPublish, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a UserStatusPublish message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns UserStatusPublish
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.UserStatusPublish;
+
+        /**
+         * Decodes a UserStatusPublish message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns UserStatusPublish
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.UserStatusPublish;
+
+        /**
+         * Verifies a UserStatusPublish message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a UserStatusPublish message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns UserStatusPublish
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.UserStatusPublish;
+
+        /**
+         * Creates a plain object from a UserStatusPublish message. Also converts values to other types if specified.
+         * @param message UserStatusPublish
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.UserStatusPublish, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this UserStatusPublish to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for UserStatusPublish
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a MatchCreateRequest. */
+    interface IMatchCreateRequest {
+
+        /** MatchCreateRequest players */
+        players?: (string[]|null);
+    }
+
+    /** Represents a MatchCreateRequest. */
+    class MatchCreateRequest implements IMatchCreateRequest {
+
+        /**
+         * Constructs a new MatchCreateRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IMatchCreateRequest);
+
+        /** MatchCreateRequest players. */
+        public players: string[];
+
+        /**
+         * Creates a new MatchCreateRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns MatchCreateRequest instance
+         */
+        public static create(properties?: lobby.IMatchCreateRequest): lobby.MatchCreateRequest;
+
+        /**
+         * Encodes the specified MatchCreateRequest message. Does not implicitly {@link lobby.MatchCreateRequest.verify|verify} messages.
+         * @param message MatchCreateRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IMatchCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified MatchCreateRequest message, length delimited. Does not implicitly {@link lobby.MatchCreateRequest.verify|verify} messages.
+         * @param message MatchCreateRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IMatchCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a MatchCreateRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns MatchCreateRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.MatchCreateRequest;
+
+        /**
+         * Decodes a MatchCreateRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns MatchCreateRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.MatchCreateRequest;
+
+        /**
+         * Verifies a MatchCreateRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a MatchCreateRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns MatchCreateRequest
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.MatchCreateRequest;
+
+        /**
+         * Creates a plain object from a MatchCreateRequest message. Also converts values to other types if specified.
+         * @param message MatchCreateRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.MatchCreateRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this MatchCreateRequest to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for MatchCreateRequest
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a MatchCreateResponse. */
+    interface IMatchCreateResponse {
+
+        /** MatchCreateResponse gameId */
+        gameId?: (string|null);
+    }
+
+    /** Represents a MatchCreateResponse. */
+    class MatchCreateResponse implements IMatchCreateResponse {
+
+        /**
+         * Constructs a new MatchCreateResponse.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: lobby.IMatchCreateResponse);
+
+        /** MatchCreateResponse gameId. */
+        public gameId: string;
+
+        /**
+         * Creates a new MatchCreateResponse instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns MatchCreateResponse instance
+         */
+        public static create(properties?: lobby.IMatchCreateResponse): lobby.MatchCreateResponse;
+
+        /**
+         * Encodes the specified MatchCreateResponse message. Does not implicitly {@link lobby.MatchCreateResponse.verify|verify} messages.
+         * @param message MatchCreateResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: lobby.IMatchCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified MatchCreateResponse message, length delimited. Does not implicitly {@link lobby.MatchCreateResponse.verify|verify} messages.
+         * @param message MatchCreateResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: lobby.IMatchCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a MatchCreateResponse message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns MatchCreateResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): lobby.MatchCreateResponse;
+
+        /**
+         * Decodes a MatchCreateResponse message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns MatchCreateResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): lobby.MatchCreateResponse;
+
+        /**
+         * Verifies a MatchCreateResponse message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a MatchCreateResponse message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns MatchCreateResponse
+         */
+        public static fromObject(object: { [k: string]: any }): lobby.MatchCreateResponse;
+
+        /**
+         * Creates a plain object from a MatchCreateResponse message. Also converts values to other types if specified.
+         * @param message MatchCreateResponse
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: lobby.MatchCreateResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this MatchCreateResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for MatchCreateResponse
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+}
+
 /** Namespace notif. */
 export namespace notif {
 

@@ -137,7 +137,8 @@ export class Pong {
 		this.ecs.addSystem(this.inputSystem);
 		this.networkingSystem = new NetworkingSystem(
 			this.wsManager,
-			this.uuid
+			this.uuid,
+			this.gameMode
 		);
 		this.ecs.addSystem(this.networkingSystem);
 

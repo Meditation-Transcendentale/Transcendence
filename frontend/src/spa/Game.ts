@@ -14,6 +14,7 @@ export default class Game {
 	private map: string | null;
 	private id: string | null;
 
+
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 		this.pong = null;
@@ -69,6 +70,7 @@ export default class Game {
 		let gameId = params.get("id");
 		let uuid = User.uuid;
 		let gameMode = params.get("mod");
+		this.mod = gameMode;
 		let map = params.get("map");
 		if (!gameId)
 			gameId = "";

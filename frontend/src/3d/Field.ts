@@ -329,6 +329,13 @@ export class Field {
 				this.camera.setTarget(new Vector3(0, 6, 30));
 				break;
 			}
+			case 'tournament': {
+				this.camera.position.set(-13, 4, -7);
+				this.camera.setTarget(new Vector3(20, 11, -8));
+				this.monolith.setPicking(true);
+				//this.setEnable(true);
+				break;
+			}
 		}
 	}
 

@@ -96,6 +96,11 @@ class RouterC {
 			ts: "./Exemple",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
+		this.routes.set("/tournament", { //TO USE FOR TEMPORARY ROUTE EX: BR / IO
+			html: "/tournament",
+			ts: "./Tournament",
+			callback: (url: URL) => { this.loadInMain(url) }
+		} as routePage);
 
 
 
@@ -183,12 +188,17 @@ class RouterC {
 		const route = this.routes.get(url.pathname);
 		console.log(route);
 		if (!route?.instance) {
+			console.log("loading HTML");
 			const html = await this.getHTML(route!.html);
+			console.log("loading TS");
 			const ts = await this.getTS(route!.ts);
+			console.log("loaded TS");
 			route!.instance = new ts.default(html);
 		}
 		await this.currentPage?.unload();
+		console.log("UNLOADED");
 		this.currentPage = (route?.instance as IPage);
+		console.log("LOADING");
 		this.currentPage.load(url.searchParams);
 	}
 
