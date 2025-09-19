@@ -29,6 +29,8 @@ export class Picker {
 
 	private enabled: boolean;
 
+	private pointer: Vector2;
+
 	constructor(scene: Scene, camera: Camera, effectRenderer: EffectRenderer, position: Vector3, size: Vector2) {
 		this.scene = scene;
 		this.camera = camera;
@@ -37,6 +39,7 @@ export class Picker {
 		this.effectRenderer = effectRenderer;
 
 		this.enabled = true;
+		this.pointer = new Vector2();
 
 
 		this.rtA = new RenderTargetTexture("picker", { width: 256, height: 256 }, scene, {
@@ -83,6 +86,7 @@ export class Picker {
 
 	public render() {
 		if (!this.enabled) { return; }
+		this.moveBall();
 		this.swapRT();
 		this.effectRenderer.render(this.pickerEffect, this.rtB);
 	}
@@ -97,20 +101,7 @@ export class Picker {
 			this.ballHit = this.pickBall(ev.clientX, ev.clientY);
 		})
 		window.addEventListener("mousemove", (ev) => {
-			if (!this.ballHit || !this.enabled) {
-				return;
-			}
-			const ray = this.scene.createPickingRay(ev.clientX, ev.clientY).direction;
-			let delta = Math.abs(this.camera.position.y - this.groundPosition.y) / ray.y;
-
-			let x = this.camera.position.x - ray.x * delta;
-			let y = this.camera.position.z - ray.z * delta;
-			this.cursor.x = (x / (this.groundSize.x)) + 0.5;
-			this.cursor.y = (y / (this.groundSize.y)) + 0.5;
-			this.pick = ray.y < 0. && Math.abs(this.cursor.x) < 1. && Math.abs(this.cursor.y) < 1. ? 1 : 0;
-			this.meshBall.position.set(
-				x, this.groundPosition.y, y
-			)
+			this.pointer.set(ev.clientX, ev.clientY);
 		})
 	}
 
@@ -172,6 +163,27 @@ export class Picker {
 		const yy = p.y * this.scene.getEngine().getRenderHeight() - y;
 
 		return Math.sqrt(xx * xx + yy * yy) < px * 0.5;
+	}
+
+	private moveBall() {
+		if (!this.ballHit || !this.enabled) {
+			return;
+		}
+		const ray = this.scene.createPickingRay(this.pointer.x, this.pointer.y).direction;
+		let delta = Math.abs(this.camera.position.y - this.groundPosition.y) / ray.y;
+
+		let x = this.camera.position.x - ray.x * delta;
+		let y = this.camera.position.z - ray.z * delta;
+		this.cursor.x = (x / (this.groundSize.x)) + 0.5;
+		this.cursor.y = (y / (this.groundSize.y)) + 0.5;
+		this.pick = ray.y < 0. && Math.abs(this.cursor.x - 0.5) < 0.5 && Math.abs(this.cursor.y - 0.5) < .5 ? 1 : 0;
+		if (Math.abs(x) < this.groundSize.x * 0.6 && Math.abs(y) < this.groundSize.y * 0.6) {
+			this.meshBall.position.set(
+				x, this.groundPosition.y, y
+			)
+		} else {
+			this.ballHit = false;
+		}
 	}
 
 	public get texture(): RenderTargetTexture {

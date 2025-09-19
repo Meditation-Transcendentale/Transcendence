@@ -15,6 +15,8 @@ import { createTempleMonolith } from "./Builder";
 import { Fog } from "./Fog";
 import { Picker } from "./Picker";
 import { UIaddDetails, UIaddToggle } from "./UtilsUI.js";
+import { CameraUtils } from "./CameraUtils.js";
+import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } from "./TrackManager.js";
 
 export class Field {
 	private scene: Scene;
@@ -46,6 +48,9 @@ export class Field {
 
 	private lowPerf: boolean;
 
+	private trackTarget!: Track;
+	private trackCamera!: Track;
+
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
 		this.camera = camera;
@@ -60,7 +65,7 @@ export class Field {
 
 		this.grass = new Grass(this.scene, 20);
 		this.fog = new Fog(this.scene, this.camera, this.effectRenderer, 0.5);
-		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 1, 0), new Vector2(80, 80));
+		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 1, 0), new Vector2(40, 40));
 
 		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
@@ -114,6 +119,18 @@ export class Field {
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
 		this.fog.addMeshToDepth(this.picker.mesh, this.defaultDepthMaterial);
 
+
+		this.trackTarget = new Track();
+		this.trackTarget.addSection(new SectionStatic(1., new Vector3(0., 4, 0.)));
+
+
+		this.trackCamera = new Track();
+		this.trackCamera.addSection(new SectionBezier(1, {
+			origin: new Vector3(0, 2, 40),
+			destination: new Vector3(10, 7, 18),
+			control: new Vector3(-20, 0, 20),
+			segments: 1000
+		}))
 	}
 
 	public update(time: number, deltaTime: number) {
@@ -142,9 +159,13 @@ export class Field {
 				break;
 			}
 			case 'home': {
-				this.camera.position.set(0, 5, 15);
-				this.camera.setTarget(new Vector3(0, 7, 0));
+				// this.camera.position.set(0, 5, 15);
+				// this.camera.setTarget(new Vector3(0, 7, 0));
+				gTrackManager.addTrack(this.trackCamera, (point: Vector3) => { this.camera.position.copyFrom(point); });
+				gTrackManager.addTrack(this.trackTarget, (point: Vector3) => { this.camera.setTarget(point) });
+				// this.camera.update();
 				this.light.isEnabled(true);
+				// this.camera.getViewMatrix().fromArray(CameraUtils.LookAt(new Vector3(0, 5, 15), new Vector3(0, 7, 0), Vector3.Up()));
 				this.setAllEnable(true);
 				break;
 			}
