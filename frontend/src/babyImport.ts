@@ -74,6 +74,7 @@ export { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 export { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 export { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 export { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
+export { Curve3 } from "@babylonjs/core/Maths/math.path";
 
 import "@babylonjs/core/Culling/ray";
 

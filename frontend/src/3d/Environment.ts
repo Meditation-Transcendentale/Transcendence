@@ -16,6 +16,7 @@ import {
 } from "@babylonImport";
 import { Field } from "./Field";
 import { DefaultRenderingPipeline, DirectionalLight, DynamicTexture, Material, PBRMaterial, PointLight, ShadowGenerator, SpotLight, Texture } from "@babylonjs/core";
+import { gTrackManager } from "./TrackManager";
 // import { Inspector } from '@babylonjs/inspector';
 // import "@babylonjs/core/Debug/debugLayer";
 // import "@babylonjs/inspector";
@@ -63,6 +64,7 @@ export class Environment {
 		this.frame = 0;
 
 		this.fCamera = new FreeCamera("fieldCamera", new Vector3(0, 6, 40), this.scene, true);
+		this.fCamera.updateUpVectorFromRotation = true;
 
 		this.field = new Field(this.scene, this.fCamera);
 
@@ -237,6 +239,7 @@ export class Environment {
 	}
 
 	private update() {
+		gTrackManager.update(this.lastTime);
 		this.field.update(this.lastTime, this.deltaTime);
 	}
 

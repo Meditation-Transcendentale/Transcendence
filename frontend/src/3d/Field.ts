@@ -15,6 +15,8 @@ import { createTempleMonolith } from "./Builder";
 import { Fog } from "./Fog";
 import { Picker } from "./Picker";
 import { UIaddDetails, UIaddToggle } from "./UtilsUI.js";
+import { CameraUtils } from "./CameraUtils.js";
+import { gTrackManager, SectionBezier, SectionStatic, Track } from "./TrackManager.js";
 
 export class Field {
 	private scene: Scene;
@@ -45,6 +47,9 @@ export class Field {
 	private toogleGrass!: HTMLElement;
 
 	private lowPerf: boolean;
+
+	private trackTarget!: Track;
+	private trackCamera!: Track;
 
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
@@ -114,6 +119,23 @@ export class Field {
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
 		this.fog.addMeshToDepth(this.picker.mesh, this.defaultDepthMaterial);
 
+		this.trackTarget = new Track();
+		this.trackTarget.addSection(new SectionStatic(0.5, new Vector3(0., 5, 0.)));
+		this.trackTarget.addSection(new SectionBezier(0.5, {
+			origin: new Vector3(0, 5, 0),
+			destination: new Vector3(-5, 2, 3),
+			control: new Vector3(-2, 3, -2),
+			segments: 1000
+		}))
+
+
+		this.trackCamera = new Track();
+		this.trackCamera.addSection(new SectionBezier(1, {
+			origin: new Vector3(0, 4, 40),
+			destination: new Vector3(0, 12, 18),
+			control: new Vector3(10, 0, 20),
+			segments: 1000
+		}))
 	}
 
 	public update(time: number, deltaTime: number) {
@@ -142,9 +164,13 @@ export class Field {
 				break;
 			}
 			case 'home': {
-				this.camera.position.set(0, 5, 15);
-				this.camera.setTarget(new Vector3(0, 7, 0));
+				// this.camera.position.set(0, 5, 15);
+				// this.camera.setTarget(new Vector3(0, 7, 0));
+				gTrackManager.addTrack(this.trackCamera, (point: Vector3) => { this.camera.position.copyFrom(point); });
+				gTrackManager.addTrack(this.trackTarget, (point: Vector3) => { this.camera.setTarget(point) });
+				// this.camera.update();
 				this.light.isEnabled(true);
+				// this.camera.getViewMatrix().fromArray(CameraUtils.LookAt(new Vector3(0, 5, 15), new Vector3(0, 7, 0), Vector3.Up()));
 				this.setAllEnable(true);
 				break;
 			}
