@@ -22,6 +22,7 @@ export class Field {
 	private camera: FreeCamera;
 
 	private effectRenderer: EffectRenderer;
+	private light: HemisphericLight;
 
 	private grass: Grass;
 	private fog: Fog;
@@ -65,8 +66,8 @@ export class Field {
 		this.camera.rotation.y = Math.PI;
 		this.camera.attachControl();
 		this.camera.minZ = 0.01;
-		let hemish = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
-		hemish.intensity = 2.5;
+		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
+		this.light.intensity = 2.5;
 
 
 		this.monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
@@ -143,6 +144,7 @@ export class Field {
 			case 'home': {
 				this.camera.position.set(0, 5, 15);
 				this.camera.setTarget(new Vector3(0, 7, 0));
+				this.light.isEnabled(true);
 				this.setAllEnable(true);
 				break;
 			}
@@ -161,9 +163,6 @@ export class Field {
 			case 'pongBR': {
 				this.scene.activeCamera = this.scene.getCameraByName('br');
 				this.scene.activeCamera?.attachControl();
-
-
-
 				this.setAllEnable(false);
 
 				break;
@@ -178,7 +177,6 @@ export class Field {
 				this.camera.detachControl();
 				this.camera.position.set(0, 50, 0);
 				this.camera.setTarget(new Vector3(0, 0, 0));
-				this.active = false;
 				this.setEnable(false);
 				break;
 			}
@@ -244,12 +242,20 @@ export class Field {
 		this.pipeline.setFogEnable(status);
 	}
 
+	public setLight(status: boolean) {
+		if (status == true)
+			this.light.intensity = 2.5;
+		else
+			this.light.intensity = 0;
+	}
+
 	public setAllEnable(status: boolean) {
 		this.camera.attachControl();
 		this.setFogEnable(status && this.toogleFog.querySelector("input")!.checked);
 		this.picker.setEnable(status);
 		this.monolith.setPicking(status);
 		this.grass.setEnable(status);
+		this.setLight(status)
 		this.active = status;
 	}
 

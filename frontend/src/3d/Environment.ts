@@ -18,7 +18,7 @@ import { Field } from "./Field";
 import { DefaultRenderingPipeline, DirectionalLight, DynamicTexture, Material, PBRMaterial, PointLight, ShadowGenerator, SpotLight, Texture } from "@babylonjs/core";
 // import { Inspector } from '@babylonjs/inspector';
 // import "@babylonjs/core/Debug/debugLayer";
-// import "@babylonjs/inspector";
+import "@babylonjs/inspector";
 // import * as BABYLON from 'babylonjs';
 // import 'babylonjs-inspector';
 
@@ -192,8 +192,6 @@ export class Environment {
 		shadowGenerator2.useBlurCloseExponentialShadowMap = true;
 		shadowGenerator1.addShadowCaster(headMesh);
 		shadowGenerator2.addShadowCaster(headMesh);
-		// shadowGenerator1.addShadowCaster(rimHeadMesh);
-		// shadowGenerator2.addShadowCaster(rimHeadMesh);
 
 		await this.field.load();
 
