@@ -21,6 +21,7 @@ export default class br {
 	}
 
 	public unload() {
+		App3D.enableBr(false);
 		App3D.enableHome();
 		//document.querySelector("canvas")?.blur();
 		this.pongbr?.stop();
@@ -31,6 +32,7 @@ export default class br {
 	public load(params: URLSearchParams) {
 		App3D.setVue('pongBR');
 		App3D.disableHome();
+		App3D.enableBr(true);
 		document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
 		if (!this.pongbr)

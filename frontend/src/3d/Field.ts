@@ -161,7 +161,11 @@ export class Field {
 			case 'pongBR': {
 				this.scene.activeCamera = this.scene.getCameraByName('br');
 				this.scene.activeCamera?.attachControl();
+
+
+
 				this.setAllEnable(false);
+
 				break;
 			}
 			case 'lobby': {

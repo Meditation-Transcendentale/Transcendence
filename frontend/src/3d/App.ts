@@ -88,6 +88,9 @@ class app3d {
 		this.engine?.dispose();
 	}
 
+	public enableBr(value: boolean) {
+		this.environment.enableBr(value);
+	}
 	public enableHome() {
 		this.environment.enableHome();
 	}

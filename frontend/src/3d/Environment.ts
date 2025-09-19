@@ -206,6 +206,7 @@ export class Environment {
 
 
 
+		this.pongRoot.isEnabled(false);
 		// this.scene.debugLayer.show();
 
 		this.scene.imageProcessingConfiguration.toneMappingEnabled = false;
@@ -239,6 +240,10 @@ export class Environment {
 
 	private update() {
 		this.field.update(this.lastTime, this.deltaTime);
+	}
+
+	public enableBr(value: boolean) {
+		this.pongRoot.isEnabled(value);
 	}
 
 	public enableHome() {

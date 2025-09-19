@@ -43,6 +43,39 @@ export function collideCircleWithOBB(circleX, circleY, circleRadius, rectX, rect
 	return { collision: false };
 }
 
+export function collideCircleWithCircle(circle1X, circle1Y, circle1Radius, circle2X, circle2Y, circle2Radius) {
+	const dx = circle1X - circle2X;
+	const dy = circle1Y - circle2Y;
+	const totalRadius = circle1Radius + circle2Radius;
+	const distanceSquared = dx * dx + dy * dy;
+
+	if (distanceSquared <= totalRadius * totalRadius) {
+		const distance = Math.sqrt(distanceSquared);
+
+		if (distance < CFG.COLLISION_EPSILON) {
+			// Handle near-zero distance case
+			const angle = Math.random() * 2 * Math.PI;
+			return {
+				collision: true,
+				normalX: Math.cos(angle),
+				normalY: Math.sin(angle),
+				penetration: totalRadius
+			};
+		}
+
+		const invDistance = 1.0 / distance;
+		return {
+			collision: true,
+			normalX: dx * invDistance,
+			normalY: dy * invDistance,
+			penetration: totalRadius - distance
+		};
+	}
+
+	return { collision: false };
+}
+
+
 export class PhysicsSystems {
 	static movement(pd, dt, mask = ENTITY_MASKS.BALL) {
 		for (let i = 0; i < pd.count; i++) {
@@ -50,6 +83,32 @@ export class PhysicsSystems {
 			pd.posX[i] += pd.velX[i] * dt;
 			pd.posY[i] += pd.velY[i] * dt;
 		}
+	}
+
+	static ballPillarCollision(pd, ballId, pillarId, cfg) {
+		const collision = collideCircleWithCircle(
+			pd.posX[ballId], pd.posY[ballId], pd.radius[ballId],
+			pd.posX[pillarId], pd.posY[pillarId], pd.radius[pillarId]
+		);
+
+		if (collision.collision) {
+			const buffer = 2.0;
+			const separationDistance = collision.penetration + buffer;
+
+			pd.posX[ballId] += collision.normalX * separationDistance;
+			pd.posY[ballId] += collision.normalY * separationDistance;
+
+			const dot = pd.velX[ballId] * collision.normalX + pd.velY[ballId] * collision.normalY;
+			if (dot < 0) {
+				pd.velX[ballId] -= 2 * dot * collision.normalX;
+				pd.velY[ballId] -= 2 * dot * collision.normalY;
+				pd.velX[ballId] *= cfg.VELOCITY_DAMPING;
+				pd.velY[ballId] *= cfg.VELOCITY_DAMPING;
+			}
+
+			return true;
+		}
+		return false;
 	}
 
 	static ballBallCollision(pd, i, j) {
@@ -107,7 +166,7 @@ export class PhysicsSystems {
 			pd.posY[ballId] += collision.normalY * collision.penetration;
 
 			const dot = pd.velX[ballId] * collision.normalX + pd.velY[ballId] * collision.normalY;
-			if (dot > 0) {
+			if (dot < 0) {
 				pd.velX[ballId] -= 2 * dot * collision.normalX;
 				pd.velY[ballId] -= 2 * dot * collision.normalY;
 				pd.velX[ballId] *= cfg.VELOCITY_DAMPING;
