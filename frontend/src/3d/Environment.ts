@@ -1,25 +1,21 @@
-import { Gears } from "./Gears";
-import { Vue } from "../Vue";
 import {
 	ArcRotateCamera,
 	Camera,
 	Color3,
 	Color4,
-	DefaultRenderingPipeline,
 	Engine,
 	FresnelParameters,
-	Inspector,
 	MeshBuilder,
 	Scene,
 	StandardMaterial,
 	Vector3,
-	UniversalCamera,
 	TransformNode,
 	LoadAssetContainerAsync,
-	Mesh
+	Mesh,
+	FreeCamera,
 } from "@babylonImport";
 import { Field } from "./Field";
-import { DirectionalLight, DynamicTexture, Material, PBRMaterial, PointLight, ShadowGenerator, SpotLight, Texture } from "@babylonjs/core";
+import { DefaultRenderingPipeline, DirectionalLight, DynamicTexture, Material, PBRMaterial, PointLight, ShadowGenerator, SpotLight, Texture } from "@babylonjs/core";
 // import { Inspector } from '@babylonjs/inspector';
 // import "@babylonjs/core/Debug/debugLayer";
 // import "@babylonjs/inspector";
@@ -33,21 +29,17 @@ export class Environment {
 
 	private camera!: ArcRotateCamera;
 	private camera_br!: ArcRotateCamera;
-	private camera_brick!: ArcRotateCamera;
-	private camera_pong!: ArcRotateCamera;
 
 	private lastTime: number;
 	private deltaTime: number;
 	private frame: number;
-	private pongRoot: TransformNode;
+	private pongRoot!: TransformNode;
 
-	private gears!: Gears;
-
+	private fCamera: FreeCamera;
 	private field: Field;
 
 	private updateHome: boolean = true;
 
-	//private cameraDiv: HTMLDivElement;
 	private perspective!: number;
 
 	private width: number;
@@ -66,44 +58,20 @@ export class Environment {
 
 		this.scene.setRenderingAutoClearDepthStencil(0, true);
 
-		window.addEventListener("keydown", (ev) => {
-			// Alt+I
-			//if (ev.altKey && (ev.key === "I" || ev.key === "i")) {
-			//	if (this.scene.debugLayer.isVisible()) {
-			//		//this.scene.debugLayer.hide();
-			//	} else {
-			//		this.scene.debugLayer.show();
-			//	}
-			//}
-
-			//if (ev.key == 'Escape') {
-			//	this.scene.setActiveCameraByName('home');
-			//}
-			//
-			if (ev.key == ' ') {
-
-				this.scene.setActiveCameraByName('menu');
-			}
-		});
-
-		// this.scene.useRightHandedSystem = true;
-
-
 		this.lastTime = performance.now() * 0.001;
 		this.deltaTime = 0;
 		this.frame = 0;
 
-		// this.gears = new Gears(this.scene);
-		this.field = new Field(this.scene);
+		this.fCamera = new FreeCamera("fieldCamera", new Vector3(0, 6, 40), this.scene, true);
+
+		this.field = new Field(this.scene, this.fCamera);
+
 		this.width = engine.getRenderWidth();
 		this.height = engine.getRenderHeight();
 
-		//const perspec = this.scene.getEngine().getRenderHeight() * 0.5 * cam!.getProjectionMatrix().m[5];
-		//this.cameraDiv = document.querySelector("#camera") as HTMLDivElement;
-		//this.cameraDiv.style.width = `${this.width}px`;
-		//this.cameraDiv.style.height = `${this.height}px`;
-		//
 		this.gameMeshes = new Array<Mesh>;
+
+
 	}
 
 	private creatMaterial() {
@@ -142,9 +110,8 @@ export class Environment {
 
 		this.createMesh();
 		this.camera_br = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
+
 		//this.camera_br = new UniversalCamera('br', Vector3.Zero(), this.scene);
-		this.camera_brick = new ArcRotateCamera("brick", Math.PI / 2, 0, 30, Vector3.Zero(), this.scene);
-		this.camera_pong = new ArcRotateCamera('pong', Math.PI / 2., 0, 50, Vector3.Zero(), this.scene);
 		const loaded = await LoadAssetContainerAsync("/assets/PongStatutTextured.glb", this.scene);
 		loaded.addAllToScene();
 		loaded.meshes[0].parent = this.pongRoot;
@@ -154,6 +121,7 @@ export class Environment {
 		const headmat = new StandardMaterial('headmat', this.scene);
 		headmat.diffuseColor = new Color3(1., 1, 1);
 		// headMesh.material = headmat;
+
 
 		const material = headMesh.material as PBRMaterial;
 		material.usePhysicalLightFalloff = false;
@@ -234,49 +202,44 @@ export class Environment {
 		})
 
 
-		this.scene.fogMode = Scene.FOGMODE_NONE;
-		this.scene.fogDensity = 0.2;
-		this.scene.fogStart = 100;
-		this.scene.fogEnd = 120;
-		this.scene.fogColor = new Color3(0., 0., 0.);
 		this.scene.clearColor = new Color4(0., 0., 0., 0.);
 
-		const pp = new DefaultRenderingPipeline("default", true, this.scene, [this.scene.activeCamera as Camera]);
-		pp.bloomEnabled = true;
-		pp.bloomWeight = 0.5;
-		pp.bloomKernel = 16;
-		pp.bloomScale = 0.25;
+
 
 		this.pongRoot.isEnabled(false);
 		// this.scene.debugLayer.show();
 
-		// Inspector.Show(this.scene, {});
-		//this.perspective = this.scene.getEngine().getRenderHeight() * 0.5 * this.scene.activeCamera!.getProjectionMatrix().m[5];
-		//document.body.style.perspective = `${this.perspective}px`;
-		//
+		this.scene.imageProcessingConfiguration.toneMappingEnabled = false;
+		this.scene.imageProcessingConfiguration.applyByPostProcess = false;
+		this.scene.imageProcessingConfiguration.exposure = 1.;
+		this.scene.imageProcessingConfiguration.contrast = 1.;
 
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
 		}
+
+		////////////////////////////////////////
+		//
+		//COMMENT IF YOU WANT TO HAVE FULL GRASS ON LOAD
+		//
+		////////////////////////////////////////
+		this.field.setLowPerf();
+
+
+		this.scene.onBeforeRenderObservable.add(() => {
+			this.update();
+		})
 	}
 
 	public render(time: number) {
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;
-		if (this.updateHome) {
-			this.field.update(time, this.deltaTime);
-		}
-		// this.gears.update(this.deltaTime);
 		this.scene.render();
 		this.frame += 1;
-		//this.updateCameraDiv();
 	}
 
-	private updateCameraDiv() {
-		const world = this.scene.activeCamera?.getWorldMatrix();
-		const r = world!.getRotationMatrix().transpose().m;
-		const m = world!.m;
-		this.cameraDiv.style.transform = `translateZ(${this.perspective}px) matrix3d(${m[0]},${-r[1]},${-r[2]},${m[3]},${-r[4]},${-m[5]},${-r[6]},${m[7]},${-r[8]},${r[9]},${m[10]},${m[11]},${m[12]},${-m[13]},${m[14]},${m[15]}) translate(${this.width * 0.5}px, ${this.height * 0.5}px)`;
+	private update() {
+		this.field.update(this.lastTime, this.deltaTime);
 	}
 
 	public enableBr(value: boolean) {
@@ -285,22 +248,18 @@ export class Environment {
 
 	public enableHome() {
 		this.updateHome = true;
-		//this.scene.fogMode = Scene.FOGMODE_LINEAR;
 		this.scene.activeCamera = this.fieldCamera;
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
 		}
-		//this.fieldCamera.setEnabled(true);
 
 	}
 
 	public disableHome() {
-		//this.updateHome = false;
-		this.scene.fogMode = Scene.FOGMODE_NONE;
+		this.updateHome = false;
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(true);
 		}
-		//this.fieldCamera.setEnabled(false);
 
 	}
 
@@ -321,7 +280,7 @@ export class Environment {
 	}
 
 	public dispose() {
-		//this.gears?.dispose();
+		this.field?.dispose();
 		this.camera?.dispose();
 		this.scene?.dispose();
 	}

@@ -1,28 +1,59 @@
 import { Color3, Vector2, Vector3, Vector4 } from "@babylonImport";
 
+interface iUIOption {
+	step?: number;
+	min?: number;
+	max?: number;
+	div?: HTMLElement | null;
+}
 
-export function UIaddVec3(name: string, vec: Vector3, eventListener?: any, step = 1, min = -100, max = 100): HTMLElement {
+interface iUIOptionSet {
+	step: number;
+	min: number;
+	max: number;
+	div: HTMLElement | null;
+}
+
+const defaultUIOption: iUIOption = {
+	step: 1,
+	min: -100,
+	max: 100,
+	div: null
+}
+
+export function UIaddDetails(name: string): HTMLElement {
+	const d = document.createElement("details");
+	const s = document.createElement("summary");
+	s.innerText = name;
+	d.appendChild(s);
+	d.className = "utils-details";
+	document.querySelector("#utils-details")?.appendChild(d);
+	return d;
+}
+
+export function UIaddVec3(name: string, vec: Vector3, Xoption: iUIOption, eventListener?: any): HTMLElement {
+	const option = { ...defaultUIOption, ...Xoption } as iUIOptionSet;
 	const div = document.createElement('div');
 	div.className = "vector";
 	const x = document.createElement("input");
 	x.type = "number";
 	x.value = vec.x.toString();
-	x.step = step.toString();
-	x.max = max.toString();
-	x.min = min.toString();
+	x.step = option.step.toString();
+	x.max = option.max.toString();
+	x.min = option.min.toString();
 
 	const y = document.createElement("input");
 	y.type = "number";
 	y.value = vec.y.toString();
-	y.step = step.toString();
-	y.max = max.toString();
-	y.min = min.toString();
+	y.step = option.step.toString();
+	y.max = option.max.toString();
+	y.min = option.min.toString();
 	const z = document.createElement("input");
 	z.type = "number";
 	z.value = vec.z.toString();
-	z.step = step.toString();
-	z.max = max.toString();
-	z.min = min.toString();
+	z.step = option.step.toString();
+	z.max = option.max.toString();
+	z.min = option.min.toString();
 
 	div.appendChild(x);
 	div.appendChild(y);
@@ -39,40 +70,45 @@ export function UIaddVec3(name: string, vec: Vector3, eventListener?: any, step 
 		vec.z = Number(z.value);
 		eventListener();
 	})
-	document.querySelector("#utils-details")?.appendChild(div);
+	if (option.div == null) {
+		document.querySelector("#utils-details")?.appendChild(div);
+	} else {
+		option.div!.appendChild(div)
+	}
 	div.setAttribute("name", name);
 	return div;
 }
 
-export function UIaddVec4(name: string, vec: Vector4, eventListener?: any, step = 1, min = -100, max = 100): HTMLElement {
+export function UIaddVec4(name: string, vec: Vector4, Xoption: iUIOption, eventListener?: any): HTMLElement {
+	const option = { ...defaultUIOption, ...Xoption } as iUIOptionSet;
 	const div = document.createElement('div');
 	div.className = "vector";
 	const x = document.createElement("input");
 	x.type = "number";
 	x.value = vec.x.toString();
-	x.step = step.toString();
-	x.max = max.toString();
-	x.min = min.toString();
+	x.step = option.step.toString();
+	x.max = option.max.toString();
+	x.min = option.min.toString();
 	const y = document.createElement("input");
 	y.type = "number";
 	y.value = vec.y.toString();
-	y.step = step.toString();
-	y.max = max.toString();
-	y.min = min.toString();
+	y.step = option.step.toString();
+	y.max = option.max.toString();
+	y.min = option.min.toString();
 
 	const z = document.createElement("input");
 	z.type = "number";
 	z.value = vec.z.toString();
-	z.step = step.toString();
-	z.max = max.toString();
-	z.min = min.toString();
+	z.step = option.step.toString();
+	z.max = option.max.toString();
+	z.min = option.min.toString();
 
 	const w = document.createElement("input");
 	w.type = "number";
 	w.value = vec.w.toString();
-	w.step = step.toString();
-	w.max = max.toString();
-	w.min = min.toString();
+	w.step = option.step.toString();
+	w.max = option.max.toString();
+	w.min = option.min.toString();
 
 
 	div.appendChild(x);
@@ -95,28 +131,34 @@ export function UIaddVec4(name: string, vec: Vector4, eventListener?: any, step 
 		vec.w = Number(w.value);
 		eventListener();
 	})
-	document.querySelector("#utils-details")?.appendChild(div);
+	if (option.div == null) {
+		document.querySelector("#utils-details")?.appendChild(div);
+	} else {
+		option.div!.appendChild(div)
+	}
+
 	div.setAttribute("name", name);
 	return div;
 }
 
-export function UIaddVec2(name: string, vec: Vector2, eventListener?: any, step = 1, min = -100, max = 100): HTMLElement {
+export function UIaddVec2(name: string, vec: Vector2, Xoption: iUIOption, eventListener?: any): HTMLElement {
+	const option = { ...defaultUIOption, ...Xoption } as iUIOptionSet;
 	const div = document.createElement('div');
 	div.className = "vector";
 	const x = document.createElement("input");
 	x.type = "number";
 	x.value = vec.x.toString();
-	x.step = step.toString();
-	x.max = max.toString();
-	x.min = min.toString();
+	x.step = option.step.toString();
+	x.max = option.max.toString();
+	x.min = option.min.toString();
 
 
 	const y = document.createElement("input");
 	y.type = "number";
 	y.value = vec.y.toString();
-	y.step = step.toString();
-	y.max = max.toString();
-	y.min = min.toString();
+	y.step = option.step.toString();
+	y.max = option.max.toString();
+	y.min = option.min.toString();
 
 	div.appendChild(x);
 	div.appendChild(y);
@@ -128,12 +170,18 @@ export function UIaddVec2(name: string, vec: Vector2, eventListener?: any, step 
 		vec.y = Number(y.value);
 		eventListener();
 	})
-	document.querySelector("#utils-details")?.appendChild(div);
 	div.setAttribute("name", name);
+	if (option.div == null) {
+		document.querySelector("#utils-details")?.appendChild(div);
+	} else {
+		option.div!.appendChild(div)
+	}
+
 	return div;
 }
 
-export function UIaddColor(name: string, col: Color3, eventListener: any): HTMLElement {
+export function UIaddColor(name: string, col: Color3, Xoption: iUIOption, eventListener?: any): HTMLElement {
+	const option = { ...defaultUIOption, ...Xoption } as iUIOptionSet;
 	const div = document.createElement("div");
 	div.className = "color-picker";
 	const color = document.createElement("input");
@@ -145,27 +193,39 @@ export function UIaddColor(name: string, col: Color3, eventListener: any): HTMLE
 	});
 	div.appendChild(color);
 	div.setAttribute("name", name);
-	document.querySelector("#utils-details")?.appendChild(div);
+	if (option.div == null) {
+		document.querySelector("#utils-details")?.appendChild(div);
+	} else {
+		option.div!.appendChild(div)
+	}
+
 	return div;
 }
 
-export function UIaddNumber(name: string, value: number, eventListener?: any, step = 1, min = -100, max = 100): HTMLElement {
+export function UIaddNumber(name: string, value: number, Xoption: iUIOption, eventListener?: any): HTMLElement {
+	const option = { ...defaultUIOption, ...Xoption } as iUIOptionSet;
 	const div = document.createElement('div');
 	div.className = "float";
 	const f = document.createElement("input");
 	f.type = "number";
-	f.step = step.toString();
-	f.max = max.toString();
-	f.min = min.toString();
+	f.step = option.step.toString();
+	f.max = option.max.toString();
+	f.min = option.min.toString();
 	f.value = value.toString();
 	f.addEventListener("input", () => { eventListener(Number(f.value)) });
 	div.appendChild(f);
 	div.setAttribute("name", name);
-	document.querySelector("#utils-details")?.appendChild(div);
+
+	if (option.div == null) {
+		document.querySelector("#utils-details")?.appendChild(div);
+	} else {
+		option.div!.appendChild(div)
+	}
 	return div;
 }
 
-export function UIaddToggle(name: string, value: boolean, eventListener: any): HTMLElement {
+export function UIaddToggle(name: string, value: boolean, Xoption: iUIOption, eventListener?: any): HTMLElement {
+	const option = { ...defaultUIOption, ...Xoption } as iUIOptionSet;
 	const div = document.createElement('div');
 	div.className = "toogle";
 	const t = document.createElement("input");
@@ -174,11 +234,17 @@ export function UIaddToggle(name: string, value: boolean, eventListener: any): H
 	t.addEventListener("change", () => { eventListener(t.checked) });
 	div.appendChild(t);
 	div.setAttribute("name", name);
-	document.querySelector("#utils-details")?.appendChild(div);
+	if (option.div == null) {
+		document.querySelector("#utils-details")?.appendChild(div);
+	} else {
+		option.div!.appendChild(div)
+	}
+
 	return div;
 }
 
-export function UIaddSlider(name: string, value: number, eventListener?: any, step = 1, min = -100, max = 100) {
+export function UIaddSlider(name: string, value: number, Xoption: iUIOption, eventListener?: any) {
+	const option = { ...defaultUIOption, ...Xoption } as iUIOptionSet;
 	const div = document.createElement("div");
 	div.className = "toggle";
 	const r = document.createElement("input");
@@ -191,9 +257,9 @@ export function UIaddSlider(name: string, value: number, eventListener?: any, st
 			eventListener(Number(r.value));
 		}
 	});
-	r.step = step.toString();
-	r.max = max.toString();
-	r.min = min.toString();
+	r.step = option.step.toString();
+	r.max = option.max.toString();
+	r.min = option.min.toString();
 
 	n.type = "number";
 	n.value = value.toString();
@@ -204,32 +270,43 @@ export function UIaddSlider(name: string, value: number, eventListener?: any, st
 			eventListener(Number(n.value))
 		}
 	});
-	n.step = step.toString();
-	n.max = max.toString();
-	n.min = min.toString();
+	n.step = option.step.toString();
+	n.max = option.max.toString();
+	n.min = option.min.toString();
 
 	div.appendChild(r);
 	div.appendChild(n);
 	div.setAttribute("name", name);
-	document.querySelector("#utils-details")?.appendChild(div);
+
+	if (option.div == null) {
+		document.querySelector("#utils-details")?.appendChild(div);
+	} else {
+		option.div!.appendChild(div)
+	}
 	return div;
 }
 
 
-export function UIaddSliderVec3(name: string, vec: Vector3, eventListener?: any, step = 1, min = -100, max = 100) {
+export function UIaddSliderVec3(name: string, vec: Vector3, Xoption: iUIOption, eventListener?: any) {
+	const option = { ...defaultUIOption, ...Xoption } as iUIOptionSet;
 	const div = document.createElement("div");
 	div.setAttribute("name", name);
-	document.querySelector("#utils-details")?.appendChild(div);
-	UIaddSlider("		-x", vec.x, (n: number) => {
+
+	if (option.div == null) {
+		document.querySelector("#utils-details")?.appendChild(div);
+	} else {
+		option.div!.appendChild(div)
+	}
+	UIaddSlider("  -x", vec.x, option, (n: number) => {
 		vec.x = n;
 		if (eventListener !== undefined) { eventListener() }
-	}, step, min, max);
-	UIaddSlider("		-y", vec.y, (n: number) => {
+	});
+	UIaddSlider("  -y", vec.y, option, (n: number) => {
 		vec.y = n;
 		if (eventListener !== undefined) { eventListener() }
-	}, step, min, max);
-	UIaddSlider("		-z", vec.z, (n: number) => {
+	});
+	UIaddSlider("  -z", vec.z, option, (n: number) => {
 		vec.z = n;
 		if (eventListener !== undefined) { eventListener() }
-	}, step, min, max);
+	});
 }

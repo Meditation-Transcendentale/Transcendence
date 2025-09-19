@@ -1,4 +1,4 @@
-import { AbstractMesh, Vector3, Material, Mesh, BoundingBox, StandardMaterial, Color3, CustomMaterial, Plane } from "@babylonImport";
+import { AbstractMesh, Vector3, Mesh, BoundingBox, CustomMaterial, Plane } from "@babylonImport";
 
 export class Tile {
 	public _mesh!: Mesh;
@@ -14,15 +14,6 @@ export class Tile {
 
 		this._mesh.position.copyFrom(position);
 		this._mesh.material = material;
-		// this._mesh.makeGeometryUnique();
-		// this._mesh.simplify([{ quality: 1, distance: 0, optimizeMesh: true }], true);
-
-		// this._mesh.rotation.y = Math.PI;
-
-		// const m = new StandardMaterial("gr", mesh._scene);
-		// m.backFaceCulling = false;
-		// m.emissiveColor = Color3.Red();
-		// this._mesh.material = m;
 
 
 		this._mesh.freezeWorldMatrix();
@@ -33,7 +24,6 @@ export class Tile {
 			this._mesh.getWorldMatrix()
 		);
 
-		//this._mesh.markVerticesDataAsUpdatable(VertexBuffer.PositionKind, false);
 
 		this._boundingBox = this._mesh.getBoundingInfo().boundingBox;
 
