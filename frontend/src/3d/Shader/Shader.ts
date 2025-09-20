@@ -835,7 +835,7 @@ export class GrassShader extends CustomMaterial {
 			}
 
 			vec3	sampleWave(vec2 pos) {
-				vec2 uv = (pos / 80.) + 0.5;
+				vec2 uv = (pos / 40.) + 0.5;
 				vec3 wave = texture(textureSampler, uv).rgb;
 				wave.xy = wave.xy * 2. - 1.;
 				wave.z *= (uv.x < 1. && uv.x > 0. && uv.y > 0. && uv.y < 1. ? 1. : 0.);

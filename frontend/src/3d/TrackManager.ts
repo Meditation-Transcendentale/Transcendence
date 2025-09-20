@@ -3,13 +3,19 @@ import { Curve3, Vector3 } from "@babylonImport";
 
 class TrackManager {
 	private tracks: Array<{ track: Track, callback: any }>;
+	private tracksId: Set<number>;
 
 	constructor() {
 		this.tracks = new Array<{ track: Track, callback: any }>;
+		this.tracksId = new Set<number>;
 	}
 
 	public addTrack(track: Track, callback: any) {
-		this.tracks.push({ track, callback });
+		if (this.tracksId.has(track.id)) {
+			this.tracks.splice(this.getTrackIndex(track.id), 1);
+		}
+		this.tracksId.add(track.id);
+		this.tracks.push({ track: track, callback: callback });
 		track.reset();
 	}
 
@@ -21,11 +27,21 @@ class TrackManager {
 				this.tracks[i].callback(point);
 			}
 			if (this.tracks[i].track.dead) {
+				this.tracksId.delete(this.tracks[i].track.id)
 				this.tracks.splice(i, 1);
 			} else {
 				i++;
 			}
 		}
+	}
+
+	private getTrackIndex(id: number): number {
+		for (let i = 0; i < this.tracks.length; i++) {
+			if (this.tracks[i].track.id == id) {
+				return i;
+			}
+		}
+		return 0;
 	}
 }
 
@@ -65,8 +81,7 @@ export class SectionBezier implements ISection {
 	}
 
 	public getPoint(timestamp: number): Vector3 {
-		let t = Math.floor((timestamp / this.duration) * this.points.length);
-		return this.points[t];
+		return this.points[Math.floor((timestamp / this.duration) * this.points.length)];
 	}
 }
 
@@ -84,6 +99,24 @@ export class SectionStatic implements ISection {
 	}
 }
 
+export class SectionManual implements ISection {
+	public readonly duration: number;
+	public readonly destination: Vector3;
+
+	private points: Array<Vector3>;
+
+	constructor(duration: number, points: Array<Vector3>) {
+		this.duration = duration;
+		this.destination = points[points.length - 1];
+		this.points = points;
+	}
+
+	public getPoint(timestamp: number): Vector3 {
+		return this.points[Math.floor((timestamp / this.duration) * this.points.length)];
+	}
+
+}
+
 export class Track {
 	private sections: Array<ISection>;
 	private startTime: number;
@@ -91,11 +124,17 @@ export class Track {
 	private _loop: boolean;
 	private _dead: boolean;
 
+	public readonly id: number;
+
+	private static ID: number = 0;
+
 	constructor(loop: boolean = false) {
 		this._loop = loop;
 		this.sections = new Array<ISection>;
 		this.startTime = 0;
 		this._dead = false;
+		this.id = Track.ID;
+		Track.ID++;
 	}
 
 	public addSection(section: ISection) {

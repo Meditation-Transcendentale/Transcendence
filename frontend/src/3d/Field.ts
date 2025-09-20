@@ -16,7 +16,7 @@ import { Fog } from "./Fog";
 import { Picker } from "./Picker";
 import { UIaddDetails, UIaddToggle } from "./UtilsUI.js";
 import { CameraUtils } from "./CameraUtils.js";
-import { gTrackManager, SectionBezier, SectionStatic, Track } from "./TrackManager.js";
+import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } from "./TrackManager.js";
 
 export class Field {
 	private scene: Scene;
@@ -65,7 +65,7 @@ export class Field {
 
 		this.grass = new Grass(this.scene, 20);
 		this.fog = new Fog(this.scene, this.camera, this.effectRenderer, 0.5);
-		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 1, 0), new Vector2(80, 80));
+		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 1, 0), new Vector2(40, 40));
 
 		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
@@ -119,21 +119,16 @@ export class Field {
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
 		this.fog.addMeshToDepth(this.picker.mesh, this.defaultDepthMaterial);
 
+
 		this.trackTarget = new Track();
-		this.trackTarget.addSection(new SectionStatic(0.5, new Vector3(0., 5, 0.)));
-		this.trackTarget.addSection(new SectionBezier(0.5, {
-			origin: new Vector3(0, 5, 0),
-			destination: new Vector3(-5, 2, 3),
-			control: new Vector3(-2, 3, -2),
-			segments: 1000
-		}))
+		this.trackTarget.addSection(new SectionStatic(1., new Vector3(0., 4, 0.)));
 
 
 		this.trackCamera = new Track();
 		this.trackCamera.addSection(new SectionBezier(1, {
-			origin: new Vector3(0, 4, 40),
-			destination: new Vector3(0, 12, 18),
-			control: new Vector3(10, 0, 20),
+			origin: new Vector3(0, 2, 40),
+			destination: new Vector3(10, 7, 18),
+			control: new Vector3(-20, 0, 20),
 			segments: 1000
 		}))
 	}
