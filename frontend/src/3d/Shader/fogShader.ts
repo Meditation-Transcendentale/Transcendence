@@ -125,7 +125,8 @@ void main(void) {
 		d = density * float(s < 0.);
 		r = min(stepSize, abs(s));
 
-		uv = (p.xz + (h - p.y) * 0.2)* (1. / worldSize) + 0.5;
+		// uv = (p.xz + (h - p.y) * 0.2)* (1. / worldSize) + 0.5;
+		uv = (p.xz )* (1. / worldSize) + 0.5;
 
 		rayTransmittance += d * r;
 		

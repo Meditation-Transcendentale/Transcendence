@@ -114,7 +114,7 @@ export class Picker {
 			uniforms: ["world", "viewProjection", "color"]
 		})
 
-		this.material.setVector4("color", new Vector4(8., 0., 0., 0.2));
+		this.material.setVector4("color", new Vector4(12., 0., 0., 0.2));
 		this.material.alphaMode = Engine.ALPHA_DISABLE;
 
 		this.material.onBindObservable.add
