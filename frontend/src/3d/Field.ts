@@ -65,7 +65,9 @@ export class Field {
 
 		this.grass = new Grass(this.scene, 20);
 		this.fog = new Fog(this.scene, this.camera, this.effectRenderer, 0.5);
-		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 1, 0), new Vector2(40, 40));
+		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 0.5, 0), new Vector2(40, 40));
+
+		this.grass.ballPosition = this.picker.position;
 
 		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
@@ -73,6 +75,7 @@ export class Field {
 		this.camera.minZ = 0.01;
 		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
 		this.light.intensity = 2.5;
+		// this.light.specular = Color3.Black();
 
 
 		this.monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
@@ -136,7 +139,7 @@ export class Field {
 	public update(time: number, deltaTime: number) {
 		if (this.active) {
 			this.picker.render();
-			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture);
+			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
 			this.fog.render();
 			this.monolith.update(time, this.camera);
 		}

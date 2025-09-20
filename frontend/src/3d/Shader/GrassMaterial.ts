@@ -7,6 +7,8 @@ export class GrassShader extends CustomMaterial {
 		this.AddUniform('oldTime', 'float', 0.0);
 		this.AddUniform("origin", 'vec3', null);
 		this.AddUniform('textureSampler', 'sampler2D', null);
+		this.AddUniform("ballPosition", "vec3", null);
+		this.AddUniform("ballRadius", "float", 0.);
 
 		this.AddAttribute('baseColor');
 		this.AddAttribute('uv');
@@ -94,23 +96,16 @@ export class GrassShader extends CustomMaterial {
 
 				// strengh *= abs(dot(rotationY(normal, baseColor.r).xz, windDir)) * 0.5 + 0.5; // grass parallel to wind are less bend
 				strengh *= baseColor.a; //apply blade stiffness
-				// strengh *= M_PI * 0.5;
 				
 				vec3 totalWave = sampleWave(pos);
-				// //for (int i = 0; i < 1; i++) {
-				// 	vec3 wave = computeWave(origin, pos);
-				// 	totalWave = mix(totalWave, wave, step(totalWave.z, wave.z));
-				// //}
-
+			
 				positionUpdated = rotationY(positionUpdated, baseColor.r);
+				strengh *= max(1. - totalWave.z * 1.5, 1.);
 
-				// float waveHeightFactor = ((1. - uv.y) * 0.5 + 0.5) * float(uv.y > 0.01);
-				// positionUpdated.y *= max(1. - totalWave.z, 0.) * baseColor.a;
-				// positionUpdated.xz += vec2(-totalWave.x, totalWave.y) * totalWave.z * uv.y * baseColor.a;
-				positionUpdated = rotationAxis(positionUpdated,  totalWave.z * baseColor.a * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
+				positionUpdated = rotationAxis(positionUpdated,  totalWave.z  * M_PI * 0.3 , vec3(-totalWave.y, 0., -totalWave.x));
 				positionUpdated = (position.y > 0.1 ? rotationAxis(positionUpdated, strengh, vec3(windDir.y, 0., windDir.x)) : positionUpdated);
 
-
+			
 
 				vPositionM = position;
 
@@ -122,20 +117,23 @@ export class GrassShader extends CustomMaterial {
 
 		this.Vertex_Before_NormalUpdated(
 			`
-				vec3 viewDir = vEyePosition.xyz - vec3(pos.x, 0., pos.y) ;
-				normalUpdated = normalize(vec3(viewDir.x, 0., viewDir.z));
+				// vec3 viewDir = vEyePosition.xyz - vec3(pos.x, 0., pos.y) ;
+				// normalUpdated = normalize(vec3(viewDir.x, 0., viewDir.z));
 				// normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
 				// normalUpdated = rotationAxis(normalUpdated, totalWave.z * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
-				// normalUpdated = rotationAxis(normalUpdated, totalWave.z * baseColor.a * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
+				normalUpdated = vec3(0.,0.,1.);
+				normalUpdated = rotationY(normalUpdated, baseColor.r);
+				normalUpdated = rotationAxis(normalUpdated, totalWave.z * M_PI* 0.3 , vec3(-totalWave.y, 0., -totalWave.x));
 				normalUpdated = rotationAxis(normalUpdated, strengh, vec3(windDir.y, 0., windDir.x));
 				normalUpdated.y = abs(normalUpdated.y);
-		`
+
+			`
 		)
 
 
 		//NORMAL IN FRAGMENT
 		this.Fragment_Before_Lights(`
-			// normalW = normalize(cross(dFdx(vPositionW), dFdy(vPositionW)));
+			normalW = normalize(cross(dFdx(vPositionW), dFdy(vPositionW)));
 			// normalW.y = abs(normalW.y);
 			// vec3 nor = rotationY(normalW, M_PI * 0.5 * (vMainUV1.x * 2. - 1.)); //Rounded Normal
 			// normalW = rotationAxis(vPositionM,M_PI * 0.1 * (vMainUV1.x * 2. - 1.), normalW );
@@ -315,10 +313,12 @@ export class GrassShader extends CustomMaterial {
 			// gl_FragColor.rgb = vec3(normalW * 0.5 + 0.5);
 			// gl_FragColor.rgb = vec3(ddt);
 			// gl_FragColor.rgb = vec3(vPositionM.rg, 0.);
-			float distToCamera = length(vPositionW.xyz - vEyePosition.xyz);
-			float distToSurface = max(-vPositionW.y,0.);
-			gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0., 1.);
-			//gl_FragColor.rgb *= exp(-waterAbsortion * (distToCamera + distToSurface));
+			// gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0., 1.);
+			// gl_FragColor.rgb += ballStrengh * vec3(1., 0., 0.);
+			// gl_FragColor.rgb = vec3(normalW * 0.5 + 0.5);
+			// gl_FragColor.rgb = vec3(normalW.y);
+
+			gl_FragColor.rgb += max((ballRadius - length(ballPosition - vPositionW)) / ballRadius, 0.) * vec3(2., 0., 0.);
 		`)
 
 		this.Fragment_Before_Fog(`
@@ -327,7 +327,7 @@ export class GrassShader extends CustomMaterial {
 
 		//console.log(this.FragmentShader);
 
-		//this.twoSidedLighting = true;
+		this.twoSidedLighting = true;
 		// this.specularPower = 1000;
 		this.backFaceCulling = false;
 		// this.twoSidedLighting = true;

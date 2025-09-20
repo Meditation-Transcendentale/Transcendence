@@ -75,13 +75,12 @@ void	main(void) {
 	strengh *= baseColor.a; //apply blade stiffness
 	
 	vec3 totalWave = sampleWave(pos);
-	// vec3 wave = computeWave(origin, pos);
-	// totalWave = mix(totalWave, wave, step(totalWave.z, wave.z));
+	strengh *= max(1. - totalWave.z * 1.5, 1.);
 
 
 	positionUpdated = rotationY(positionUpdated, baseColor.r);
 
-	positionUpdated = rotationAxis(positionUpdated,  totalWave.z * baseColor.a * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
+	positionUpdated = rotationAxis(positionUpdated,  totalWave.z  * M_PI* 0.3 , vec3(-totalWave.y, 0., -totalWave.x));
 	positionUpdated = (position.y > 0.1 ? rotationAxis(positionUpdated, strengh, vec3(windDir.y, 0., windDir.x)) : positionUpdated);
 
 	vec4 worldPos = finalWorld * vec4(positionUpdated, 1.);

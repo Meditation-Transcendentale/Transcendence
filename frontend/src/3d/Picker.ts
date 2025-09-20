@@ -1,4 +1,4 @@
-import { Camera, EffectRenderer, EffectWrapper, Engine, Matrix, Mesh, MeshBuilder, RenderTargetTexture, Scene, ShaderMaterial, Vector2, Vector3, Vector4 } from "@babylonImport";
+import { Camera, Color3, EffectRenderer, EffectWrapper, Engine, Matrix, Mesh, MeshBuilder, PointLight, RenderTargetTexture, Scene, ShaderMaterial, Vector2, Vector3, Vector4 } from "@babylonImport";
 import { UIaddDetails, UIaddSlider } from "./UtilsUI";
 
 export class Picker {
@@ -26,6 +26,7 @@ export class Picker {
 
 	private ballDiameter = 1.5;
 	private ballHit!: boolean;
+	private ballLight: PointLight;
 
 	private enabled: boolean;
 
@@ -59,8 +60,8 @@ export class Picker {
 
 		this.cursor = new Vector2();
 		this.pick = 0;
-		this.attenuation = 0.5;
-		this.radius = 1.6 / this.groundSize.x;
+		this.attenuation = 0.3;
+		this.radius = 1.1 / this.groundSize.x;
 		this.oldTime = 0.;
 
 		this.pickerEffect.onApplyObservable.add(() => {
@@ -121,6 +122,13 @@ export class Picker {
 
 		this.meshBall.material = this.material;
 		this.meshBall.position.set(0, this.groundPosition.y, 4);
+
+		this.ballLight = new PointLight("ball light", this.meshBall.position, this.scene);
+		this.ballLight.diffuse = new Color3(8., 0., 0.);
+		this.ballLight.specular = this.ballLight.diffuse;
+		this.ballLight.range = 3;
+		// p.setEnabled(false);
+
 
 		this.ballHit = false;
 	}
@@ -192,6 +200,14 @@ export class Picker {
 
 	public get mesh(): Mesh {
 		return this.meshBall;
+	}
+
+	public get position(): Vector3 {
+		return this.mesh.position;
+	}
+
+	public get ballRadius(): number {
+		return this.ballLight.range;
 	}
 
 	public setEnable(status: boolean) {

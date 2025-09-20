@@ -195,6 +195,10 @@ export class Environment {
 		shadowGenerator1.addShadowCaster(headMesh);
 		shadowGenerator2.addShadowCaster(headMesh);
 
+		whitelight.setEnabled(false);
+		whitelight2.setEnabled(false);
+		redlight.setEnabled(false);
+
 		await this.field.load();
 
 		this.scene.meshes.forEach((mesh) => {

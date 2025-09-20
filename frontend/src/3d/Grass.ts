@@ -56,6 +56,8 @@ export class Grass {
 	private enabled: boolean;
 	private reduced: boolean;
 
+	public ballPosition!: Vector3;
+
 	constructor(scene: Scene, size: number) {
 		this._size = size;
 		this._tiles = [];
@@ -102,11 +104,13 @@ export class Grass {
 
 	}
 
-	public update(time: number, camera: Camera, texture: RenderTargetTexture) {
+	public update(time: number, camera: Camera, texture: RenderTargetTexture, radius: number) {
 		if (!this.enabled) { return; }
 		this._grassShader.setFloat("time", time);
 		this._grassShader.setFloat("oldTime", this._pastTime);
 		this._grassShader.setTexture("textureSampler", texture);
+		this._grassShader.setVec3("ballPosition", this.ballPosition);
+		this._grassShader.setFloat("ballRadius", radius);
 
 		this._pastTime = time;
 
