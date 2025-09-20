@@ -195,10 +195,6 @@ export class Environment {
 		shadowGenerator1.addShadowCaster(headMesh);
 		shadowGenerator2.addShadowCaster(headMesh);
 
-		whitelight.setEnabled(false);
-		whitelight2.setEnabled(false);
-		redlight.setEnabled(false);
-
 		await this.field.load();
 
 		this.scene.meshes.forEach((mesh) => {
@@ -273,11 +269,7 @@ export class Environment {
 	}
 
 	public get fieldCamera(): Camera {
-		return this.field.camera;
-	}
-
-	public onHover(status: number) {
-		this.field.onHover(status);
+		return this.fieldCamera;
 	}
 
 	public resize() {
