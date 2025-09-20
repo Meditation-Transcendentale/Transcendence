@@ -51,7 +51,10 @@ export const gTrackManager = new TrackManager();
 interface ISection {
 	readonly duration: number;
 	readonly destination: Vector3;
+	speed: number;
 	getPoint(timestamp: number): Vector3;
+	inRange(timestamp: number, deltaTime: number, speed: number): boolean;
+	reset(): void;
 
 }
 
@@ -59,35 +62,70 @@ export interface sectionBezierOption {
 	origin: Vector3,
 	control: Vector3,
 	destination: Vector3,
-	segments: number
+	segments: number,
 }
 
 export class SectionBezier implements ISection {
-	public readonly duration: number;
+	public duration: number;
 	private origin: Vector3;
 	public readonly destination: Vector3;
 	private points: Array<Vector3>;
 	private length: number;
 
+	private acceleration: number;
 
-	constructor(duration: number, option: sectionBezierOption) {
-		this.duration = duration;
+	public speed!: number;
+	private travel: number;
+
+
+	constructor(acceleration: number, option: sectionBezierOption) {
+		// this.duration = duration;
+		this.duration = 0;
 		this.origin = option.origin;
 		this.destination = option.destination;
 
 		const curve = Curve3.CreateQuadraticBezier(this.origin, option.control, this.destination, option.segments);
 		this.points = curve.getPoints();
 		this.length = curve.length();
+		console.log("curve length", curve.length());
+
+		this.acceleration = acceleration;
+		this.speed = 0;
+		this.travel = 0;
 	}
 
 	public getPoint(timestamp: number): Vector3 {
-		return this.points[Math.floor((timestamp / this.duration) * this.points.length)];
+		return this.points[Math.floor((this.travel / this.length) * this.points.length)];
+	}
+
+	public inRange(timestamp: number, deltaTime: number, speed: number): boolean {
+		this.speed = speed + this.acceleration * deltaTime;
+		this.speed = Math.max(this.speed, 0.);
+		this.travel += this.speed * deltaTime;
+		this.duration = timestamp;
+		return this.travel <= this.length;
+	}
+
+	public reset(): void {
+		this.travel = 0;
+	}
+
+	public getDurationFromSpeed(speed: number): { duration: number, finalSpeed: number } | null {
+		const delta = speed * speed + 4 * this.acceleration * this.length;
+		if (delta < 0) {
+			return null;
+		}
+		const t = (-speed + Math.sqrt(delta)) / (2 * this.acceleration);
+		const s = speed + this.acceleration * t;
+		return { duration: t, finalSpeed: s };
 	}
 }
 
 export class SectionStatic implements ISection {
 	public readonly duration: number;
 	public readonly destination: Vector3;
+
+	public speed = 0;
 
 	constructor(duration: number, point: Vector3) {
 		this.duration = duration;
@@ -97,6 +135,13 @@ export class SectionStatic implements ISection {
 	public getPoint(timestamp: number): Vector3 {
 		return this.destination;
 	}
+
+	public inRange(timestamp: number, deltaTime: number, speed: number) {
+		this.speed = speed;
+		return timestamp <= this.duration;
+	}
+
+	public reset(): void { }
 }
 
 export class SectionManual implements ISection {
@@ -104,6 +149,7 @@ export class SectionManual implements ISection {
 	public readonly destination: Vector3;
 
 	private points: Array<Vector3>;
+	public speed = 0;
 
 	constructor(duration: number, points: Array<Vector3>) {
 		this.duration = duration;
@@ -115,6 +161,12 @@ export class SectionManual implements ISection {
 		return this.points[Math.floor((timestamp / this.duration) * this.points.length)];
 	}
 
+	public inRange(timestamp: number, deltaTime: number, speed: number) {
+		this.speed = speed;
+		return timestamp <= this.duration;
+	}
+
+	public reset(): void { }
 }
 
 export class Track {
@@ -128,13 +180,22 @@ export class Track {
 
 	private static ID: number = 0;
 
-	constructor(loop: boolean = false) {
+	private initialSpeed: number;
+	private speed: number;
+
+	private pastTime: number;
+
+	constructor(initialSpeed: number, loop: boolean = false) {
 		this._loop = loop;
 		this.sections = new Array<ISection>;
 		this.startTime = 0;
 		this._dead = false;
 		this.id = Track.ID;
 		Track.ID++;
+
+		this.initialSpeed = initialSpeed;
+		this.speed = this.initialSpeed;
+		this.pastTime = 0;
 	}
 
 	public addSection(section: ISection) {
@@ -143,15 +204,24 @@ export class Track {
 
 	public reset(loop: boolean = this._loop) {
 		this.startTime = performance.now() * 0.001;
+		this.speed = this.initialSpeed;
+		this.pastTime = this.startTime;
 		this._loop = loop;
 		this._dead = false;
+		for (let i = 0; i < this.sections.length; i++) {
+			this.sections[i].reset();
+		}
 	}
 
 	public getPoint(time: number): Vector3 | null {
 		let timestamp = time - this.startTime;
+		let deltaTime = time - this.pastTime;
+		this.pastTime = time;
 		for (let i = 0; i < this.sections.length; i++) {
-			if (timestamp < this.sections[i].duration) {
-				return this.sections[i].getPoint(timestamp);
+			if (this.sections[i].inRange(timestamp, deltaTime, this.speed)) {
+				let v = this.sections[i].getPoint(timestamp);
+				this.speed = this.sections[i].speed;
+				return v;
 			}
 			timestamp -= this.sections[i].duration;
 		}
