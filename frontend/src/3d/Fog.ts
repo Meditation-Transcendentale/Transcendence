@@ -87,7 +87,7 @@ export class Fog {
 			engine: scene.getEngine(),
 			useShaderStore: true,
 			fragmentShader: "surface",
-			uniforms: ["delta"],
+			uniforms: ["delta", "time"],
 			samplers: ["heightTexture"]
 		});
 
@@ -134,7 +134,7 @@ export class Fog {
 	public render() {
 		if (!this.enabled) { return }
 		this.depthTexture.render();
-		this.effectRenderer.render(this.heightEffect, this.heightTexture);
+		// this.effectRenderer.render(this.heightEffect, this.heightTexture);
 		this.effectRenderer.render(this.surfaceEffect, this.surfaceTexture);
 		this.effectRenderer.render(this.fogEffect, this.fogTexture);
 		if (this.blur) {
@@ -171,11 +171,11 @@ export class Fog {
 		const stepSizeDefault = 0.5;
 		const maxDistanceDefault = 50.;
 		const worldSizeDefault = 100.;
-		const waterHeightDefault = 20;
+		const waterHeightDefault = 40;
 		const waveMaxDisplacementDefault = 1;
 		const densityDefault = 1.;
 		const lightScatteringDefault = 0.2;
-		const ambientMultiplierDefault = 1;
+		const ambientMultiplierDefault = 0.3;
 		const waterAbsorptionDefault = new Vector3(0.35, 0.07, 0.03);
 		this.dataUBO.updateFloat("noiseOffset", noiseOffsetDefault);
 		this.dataUBO.updateFloat("stepSize", stepSizeDefault);
@@ -212,11 +212,11 @@ export class Fog {
 		const stepSizeDefault = 0.5;
 		const maxDistanceDefault = 50.;
 		const worldSizeDefault = 100.;
-		const waterHeightDefault = 20;
+		const waterHeightDefault = 40;
 		const waveMaxDisplacementDefault = 1;
 		const densityDefault = 1;
 		const lightScatteringDefault = 0.2;
-		const ambientMultiplierDefault = 1;
+		const ambientMultiplierDefault = 0.3;
 		const waterAbsorptionDefault = new Vector3(0.35, 0.07, 0.03);
 		UIaddSlider("noiseOffset", noiseOffsetDefault, {
 			step: 0.1,
@@ -293,6 +293,7 @@ export class Fog {
 
 		this.surfaceEffect.onApplyObservable.add(() => {
 			this.surfaceEffect.effect.setFloat("delta", 1. / 256.);
+			this.surfaceEffect.effect.setFloat("time", performance.now() * 0.001);
 			this.surfaceEffect.effect.setTexture("heightTexture", this.heightTexture);
 		})
 
