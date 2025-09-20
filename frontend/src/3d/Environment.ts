@@ -269,7 +269,7 @@ export class Environment {
 	}
 
 	public get fieldCamera(): Camera {
-		return this.fieldCamera;
+		return this.fCamera;
 	}
 
 	public resize() {
