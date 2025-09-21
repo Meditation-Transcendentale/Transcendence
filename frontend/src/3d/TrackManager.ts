@@ -28,6 +28,7 @@ class TrackManager {
 			}
 			if (this.tracks[i].track.dead) {
 				this.tracksId.delete(this.tracks[i].track.id)
+				console.log(this.tracks[i].track.speed);
 				this.tracks.splice(i, 1);
 			} else {
 				i++;
@@ -111,11 +112,11 @@ export class SectionBezier implements ISection {
 	}
 
 	public getDurationFromSpeed(speed: number): { duration: number, finalSpeed: number } | null {
-		const delta = speed * speed + 4 * this.acceleration * this.length;
+		const delta = (speed * speed) + (2 * this.acceleration * this.length);
 		if (delta < 0) {
 			return null;
 		}
-		const t = (-speed + Math.sqrt(delta)) / (2 * this.acceleration);
+		const t = (-speed + Math.sqrt(delta)) / (this.acceleration);
 		const s = speed + this.acceleration * t;
 		return { duration: t, finalSpeed: s };
 	}

@@ -26,6 +26,12 @@ class app3d {
 
 	private cssRenderer!: CSSRenderer;
 
+	public readonly authRoot: Vector3;
+	public readonly homeRoot: Vector3;
+	public readonly playRoot: Vector3;
+	public readonly lobbyRoot: Vector3;
+	public readonly tournamentRoot: Vector3;
+
 	constructor() {
 
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;

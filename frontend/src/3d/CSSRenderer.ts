@@ -72,6 +72,7 @@ export class CSSRenderer {
 		const scaleY = 0.01 / obj.width;
 
 		obj.html.style.transform = `translate(-50%, -50%) matrix3d(${m[0] * scaleX}, ${m[1]}, ${m[2] * scaleX}, ${m[3]}, ${-m[4]}, ${-m[5] * scaleY}, ${-m[6]}, ${-m[7]}, ${m[8]}, ${m[9]}, ${m[10]}, ${m[11]}, ${-world[12] + m[12]}, ${-world[13] + m[13]}, ${world[14] - m[14]}, ${world[15] * 0.00001})`;
+
 	}
 
 	public setObjectEnable(index: number, status: boolean) {

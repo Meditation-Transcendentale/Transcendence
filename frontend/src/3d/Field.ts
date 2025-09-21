@@ -124,16 +124,19 @@ export class Field {
 
 
 		this.trackTarget = new Track(1.);
-		this.trackTarget.addSection(new SectionStatic(3., new Vector3(0., 4, 0.)));
+		this.trackTarget.addSection(new SectionStatic(1.35, new Vector3(0., 4, 0.)));
 
 
 		this.trackCamera = new Track(1.);
-		this.trackCamera.addSection(new SectionBezier(20, {
+		const s = new SectionBezier(40, {
 			origin: new Vector3(0, 2, 40),
 			destination: new Vector3(10, 7, 18),
 			control: new Vector3(-20, 0, 20),
 			segments: 1000
-		}))
+		})
+		console.log("section: ", s.getDurationFromSpeed(1.))
+		this.trackCamera.addSection(s)
+
 	}
 
 	public update(time: number, deltaTime: number) {

@@ -133,7 +133,7 @@ export class GrassShader extends CustomMaterial {
 
 		//NORMAL IN FRAGMENT
 		this.Fragment_Before_Lights(`
-			normalW = normalize(cross(dFdx(vPositionW), dFdy(vPositionW)));
+			// normalW = normalize(cross(dFdx(vPositionW), dFdy(vPositionW)));
 			// normalW.y = abs(normalW.y);
 			// vec3 nor = rotationY(normalW, M_PI * 0.5 * (vMainUV1.x * 2. - 1.)); //Rounded Normal
 			// normalW = rotationAxis(vPositionM,M_PI * 0.1 * (vMainUV1.x * 2. - 1.), normalW );
