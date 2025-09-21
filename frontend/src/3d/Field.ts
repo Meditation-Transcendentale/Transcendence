@@ -17,6 +17,12 @@ import { Picker } from "./Picker";
 import { UIaddDetails, UIaddToggle } from "./UtilsUI.js";
 import { CameraUtils } from "./CameraUtils.js";
 import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } from "./TrackManager.js";
+import { App3D } from "./App.js";
+
+interface ITravelling {
+	target: Track;
+	camera: Track;
+}
 
 export class Field {
 	private scene: Scene;
@@ -48,8 +54,13 @@ export class Field {
 
 	private lowPerf: boolean;
 
-	private trackTarget!: Track;
-	private trackCamera!: Track;
+	private travellingAuthHome!: ITravelling;
+	private travellingPlayHome!: ITravelling;
+	private travellingLobbyHome!: ITravelling;
+	private travellingTournamentHome!: ITravelling;
+
+	private pastVue: string = "auth";
+
 
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
@@ -107,6 +118,8 @@ export class Field {
 			uniforms: ["world", "viewProjection", "depthValues"]
 		})
 
+		this.initTravelling();
+
 	}
 
 	public async load() {
@@ -121,21 +134,6 @@ export class Field {
 
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
 		this.fog.addMeshToDepth(this.picker.mesh, this.defaultDepthMaterial);
-
-
-		this.trackTarget = new Track(1.);
-		this.trackTarget.addSection(new SectionStatic(1.35, new Vector3(0., 4, 0.)));
-
-
-		this.trackCamera = new Track(1.);
-		const s = new SectionBezier(40, {
-			origin: new Vector3(0, 2, 40),
-			destination: new Vector3(10, 7, 18),
-			control: new Vector3(-20, 0, 20),
-			segments: 1000
-		})
-		console.log("section: ", s.getDurationFromSpeed(1.))
-		this.trackCamera.addSection(s)
 
 	}
 
@@ -165,17 +163,31 @@ export class Field {
 				break;
 			}
 			case 'home': {
-				// this.camera.position.set(0, 5, 15);
-				// this.camera.setTarget(new Vector3(0, 7, 0));
-				gTrackManager.addTrack(this.trackCamera, (point: Vector3) => { this.camera.position.copyFrom(point); });
-				gTrackManager.addTrack(this.trackTarget, (point: Vector3) => { this.camera.setTarget(point) });
-				// this.camera.update();
+				switch (this.pastVue) {
+					case 'auth': {
+						gTrackManager.addTrack(this.travellingAuthHome.camera, (point: Vector3) => { this.camera.position.copyFrom(point); })
+						gTrackManager.addTrack(this.travellingAuthHome.target, (point: Vector3) => { this.camera.setTarget(point) });
+						break;
+					}
+					case 'play': {
+						gTrackManager.addTrack(this.travellingPlayHome.camera, (point: Vector3) => { this.camera.position.copyFrom(point); })
+						gTrackManager.addTrack(this.travellingPlayHome.target, (point: Vector3) => { this.camera.setTarget(point) });
+						break;
+					}
+					default: {
+						// this.camera.position.set(-7, 3, 10);
+						// this.camera.setTarget(new Vector3(0, 4, 0));
+						gTrackManager.addTrack(this.travellingAuthHome.camera, (point: Vector3) => { this.camera.position.copyFrom(point); })
+						gTrackManager.addTrack(this.travellingAuthHome.target, (point: Vector3) => { this.camera.setTarget(point) });
+
+						break;
+					}
+				}
 				this.light.isEnabled(true);
-				// this.camera.getViewMatrix().fromArray(CameraUtils.LookAt(new Vector3(0, 5, 15), new Vector3(0, 7, 0), Vector3.Up()));
 				this.setAllEnable(true);
 				break;
 			}
-			case 'login': {
+			case 'auth': {
 				this.camera.position.set(0, 4, 40);
 				this.camera.setTarget(new Vector3(0, 6, 30));
 				this.setAllEnable(true);
@@ -253,8 +265,8 @@ export class Field {
 				this.setAllEnable(false);
 				break;
 			}
-
 		}
+		this.pastVue = vue;
 	}
 
 	public setLowPerf() {
@@ -303,6 +315,35 @@ export class Field {
 		this.toogleGrass = UIaddToggle("reduce grass", false, {}, (n: boolean) => {
 			this.grass.reduceGrass(n);
 		})
+	}
+
+	private initTravelling() {
+		this.travellingAuthHome = {
+			target: new Track(1.),
+			camera: new Track(1.)
+		}
+		this.travellingAuthHome.target.addSection(new SectionStatic(1.35, new Vector3(0, 4, 0)));
+		this.travellingAuthHome.camera.addSection(new SectionBezier(40, {
+			origin: new Vector3(0, 10, 40),
+			destination: new Vector3(-7, 3, 10),
+			control: new Vector3(-15, 0, 25),
+		}))
+		this.travellingPlayHome = {
+			target: new Track(100.),
+			camera: new Track(100.)
+		}
+		this.travellingPlayHome.target.addSection(new SectionBezier(-200, {
+			origin: new Vector3(20, 11, -8),
+			destination: new Vector3(0, 4, 0),
+			control: new Vector3(5, 6, -7),
+		}));
+		this.travellingPlayHome.camera.addSection(new SectionBezier(-200, {
+			origin: new Vector3(-13, 4, -7),
+			destination: new Vector3(-7, 3, 10),
+			control: new Vector3(-15, 3, 0),
+		}))
+
+
 
 	}
 }

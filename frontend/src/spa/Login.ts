@@ -76,7 +76,7 @@ class Login {
 		})
 		this.ref.swRegister.toggleAttribute("down", true)
 		this.ref.swLogin.addEventListener("click", () => {
-			App3D.setVue("login");
+			App3D.setVue("auth");
 			this.ref.swLogin.toggleAttribute("down", false);
 			this.ref.swRegister.toggleAttribute("down", true);
 		})
