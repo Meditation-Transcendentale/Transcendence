@@ -7,6 +7,7 @@ interface GameUIModules {
 	countdown?: CountdownModule;
 	ending?: EndingModule;
 	images?: ImageModule;
+	playercounter?: PlayerCounterModule;
 }
 
 interface ModulePosition {
@@ -30,6 +31,7 @@ interface GameUIConfig {
 		countdown?: ModulePosition;
 		ending?: ModulePosition;
 		images?: ModulePosition;
+		playercounter?: ModulePosition;
 	};
 }
 
@@ -41,6 +43,7 @@ interface GameUIHtmlReference {
 	countdownModule: HTMLDivElement;
 	endingModule: HTMLDivElement;
 	imageModule: HTMLDivElement;
+	playercounterModule: HTMLDivElement;
 }
 
 class GameUI {
@@ -63,7 +66,8 @@ class GameUI {
 			buttonModule: div.querySelector("#button-module") as HTMLDivElement,
 			countdownModule: div.querySelector("#countdown-module") as HTMLDivElement,
 			endingModule: div.querySelector("#ending-module") as HTMLDivElement,
-			imageModule: div.querySelector("#image-module") as HTMLDivElement
+			imageModule: div.querySelector("#image-module") as HTMLDivElement,
+			playercounterModule: div.querySelector("#playercounter-module") as HTMLDivElement
 		};
 
 		this.initializeModules();
@@ -89,6 +93,8 @@ class GameUI {
 					break;
 				case 'images':
 					this.modules.images = new ImageModule(this.ref.imageModule);
+				case 'playercounter':
+					this.modules.playercounter = new PlayerCounterModule(this.ref.playercounterModule);
 			}
 		});
 	}
@@ -312,6 +318,9 @@ class GameUI {
 			case 'countdown': return this.ref.countdownModule;
 			case 'ending': return this.ref.endingModule;
 			case 'images': return this.ref.imageModule;
+			// case 'death': return this.ref.deathModule;
+			case 'playercounter': return this.ref.playercounterModule;
+			// case 'spectate': return this.ref.spectateModule;
 			default: return null;
 		}
 	}
@@ -350,6 +359,10 @@ class GameUI {
 
 	public hideImage(id: string) {
 		this.modules.images?.removeImage(id);
+	}
+
+	public updatePlayerCount(playerLeft: number) {
+		this.modules.playercounter?.update(playerLeft);
 	}
 
 }
@@ -689,61 +702,90 @@ class ImageModule implements GameUIModule{
 		img.style.left = '50%';
 		img.style.transform = 'translate(-50%, -50%)';
 
-		// img.style.top = '';
-		// img.style.left = '';
-		// img.style.right = '';
-		// img.style.bottom = '';
-		// img.style.transform = '';
-
-		// if (position.anchor) {
-		// 	switch (position.anchor) {
-		// 		case 'center-right':
-		// 			img.style.top = '50%';
-		// 			img.style.right = '20px';
-		// 			img.style.transform = 'translateY(-50%)';
-		// 			break;
-		// 		case 'center-left':
-		// 			img.style.top = '50%';
-		// 			img.style.left = '20px';
-		// 			img.style.transform = 'translateY(50%)';
-		// 			break;
-		// 		case 'top-right':
-		// 			img.style.top = '20px';
-		// 			img.style.right = '20px';
-		// 			break;
-		// 		case 'top-left':
-		// 			img.style.top = '20px';
-		// 			img.style.left = '20px';
-		// 			break;
-		// 		case 'bottom-right':
-		// 			img.style.bottom = '20px';
-		// 			img.style.right = '20px';
-		// 			break;
-		// 		case 'bottom-left':
-		// 			img.style.bottom = '20px';
-		// 			img.style.left = '20px';
-		// 			break;
-		// 	}
-		// } else {
-		// 	if (typeof position.x === 'number') {
-		// 		img.style.left = position.x + 'px';
-		// 	}
-		// 	if (typeof position.y === 'number') {
-		// 		img.style.top = position.y + 'px';
-		// 	}
-		// }
-
 		if (position.offset) {
-			// const t = img.style.transform || '';
-			// img.style.transform = `${t} translate(${position.offset.x}px, ${position.offset.y}px)`;
 			img.style.transform += ` translate(${position.offset.x}vh, ${position.offset.y}vh)`;
 		}
 	}
 }
 
-//SpectateModule
-//BRDeathCounterModule
-//BRNotifDeathModule
+// interface DeathHtmlReference{
+// 	deathContainer: HTMLDivElement;
+// }
 
+// class DeathModule implements GameUIModule{
+// 	private div: HTMLDivElement;
+// 	private ref: DeathHtmlReference;
+
+// 	constructor(div: HTMLDivElement) {
+// 		this.div = div;
+// 		this.ref = {
+// 			deathContainer: div.querySelector("#death-container") as HTMLDivElement
+// 		};
+// 	}
+
+// 	load() {
+// 		this.div.style.display = 'flex';
+// 	}
+
+// 	unload() {
+// 		this.div.style.display = 'none';
+// 	}
+
+
+// }
+
+interface PlayerCounterHtmlReference{
+	playerCounterValue: HTMLSpanElement;
+}
+
+class PlayerCounterModule implements GameUIModule{
+	private div: HTMLDivElement;
+	private ref: PlayerCounterHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			playerCounterValue: div.querySelector("#playercounter-value") as HTMLSpanElement
+		};
+	}
+
+	load() {
+		this.div.style.display = 'flex';
+	}
+
+	unload() {
+		this.div.style.display = 'none';
+	}
+
+	update(playerLeft: number){
+		this.ref.playerCounterValue.textContent = playerLeft.toString();
+	}
+}
+
+
+// interface SpectateHtmlReference{
+// 	spectateContainer: HTMLDivElement;
+// }
+
+// class SpectateModule implements GameUIModule{
+// 	private div: HTMLDivElement;
+// 	private ref: SpectateHtmlReference;
+
+// 	constructor(div: HTMLDivElement) {
+// 		this.div = div;
+// 		this.ref = {
+// 			spectateContainer: div.querySelector("#spectate-container") as HTMLDivElement
+// 		};
+// 	}
+
+// 	load() {
+// 		this.div.style.display = 'flex';
+// 	}
+
+// 	unload() {
+// 		this.div.style.display = 'none';
+// 	}
+
+// }
 
 export default GameUI;

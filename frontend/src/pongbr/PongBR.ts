@@ -24,6 +24,7 @@ import earcut from "earcut";
 import { MotionBlurPostProcess } from "@babylonjs/core";
 import { createBlackHoleBackdrop } from "./blackhole.js";
 import { SpaceSkybox } from "./skybox.js";
+import GameUI from "../spa/GameUI.js";
 
 
 export let localPaddleId: any = null;
@@ -35,7 +36,7 @@ export class PongBR {
 	private inputManager!: InputManager;
 	private camera!: ArcRotateCamera;
 	private canvas;
-	private scoreUI: any;
+	// private gameUI: GameUI;
 	private baseMeshes: any;
 	private instanceManagers: any;
 	private uuid!: string;
@@ -48,13 +49,15 @@ export class PongBR {
 	private thinInstanceSystem!: ThinInstanceSystem;
 	private spaceSkybox!: SpaceSkybox;
 	public currentBallScale: Vector3 = new Vector3(1, 1, 1);
+	private gameUI: GameUI;
 
 
-	constructor(canvas: any, scene: Scene) {
+	constructor(canvas: any, scene: Scene, gameUI: GameUI) {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.inited = false;
 		this.pongRoot = this.scene.getTransformNodeByName('pongbrRoot') as TransformNode;
+		this.gameUI = gameUI;
 	}
 
 	public async init() {
@@ -161,7 +164,7 @@ export class PongBR {
 		this.networkingSystem = new NetworkingSystem(
 			this.wsManager,
 			this.uuid,
-			this.scoreUI,
+			this.gameUI,
 			this
 		);
 		this.ecs.addSystem(this.networkingSystem);
@@ -192,7 +195,7 @@ export class PongBR {
 		});
 
 		this.spaceSkybox.onGameLoad();
-		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot);
+		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot, this.gameUI);
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
 
 		this.currentBallScale = new Vector3(1, 1, 1);
@@ -245,7 +248,7 @@ export class PongBR {
 			this.camera
 		);
 		this.ecs.addSystem(this.thinInstanceSystem);
-		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot);
+		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot, this.gameUI);
 	}
 
 	public transitionToRound(nextCount: number, entities: Entity[], physicsState?: any, playerMapping?: Record<number, number>) {
@@ -300,7 +303,7 @@ export class PongBR {
 			transform?.disable();
 		}
 
-		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer);
+		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI);
 
 		this.networkingSystem.forceIndexRebuild();
 	}

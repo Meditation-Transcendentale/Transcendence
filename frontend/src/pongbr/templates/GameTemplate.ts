@@ -8,6 +8,7 @@ import { WallComponent } from "../components/WallComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { InputComponent } from "../components/InputComponent.js";
 import { UIComponent } from "../components/UIComponent.js";
+import GameUI from "../../spa/GameUI.js";
 
 export interface GameTemplateConfig {
 	numberOfBalls: number;
@@ -16,12 +17,12 @@ export interface GameTemplateConfig {
 	wallWidth: number;
 }
 
-export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number): void {
+export function createGameTemplate(ecs: ECSManager, config: GameTemplateConfig, localPaddleId: number, gameUI: GameUI): void {
 	console.log("localplayerif in template=" + localPaddleId);
 
-	const scoreUI = new Entity();
-	scoreUI.addComponent(new UIComponent());
-	ecs.addEntity(scoreUI);
+	const ui = new Entity();
+	ui.addComponent(new UIComponent(gameUI));
+	ecs.addEntity(ui);
 
 	for (let i = 0; i < 2; i++) {
 		const paddleEntity = new Entity();

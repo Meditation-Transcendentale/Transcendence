@@ -14,6 +14,7 @@ import { TransformComponent } from "../components/TransformComponent";
 import { PortalComponent } from "../components/PortalComponent";
 import { TransformNode, Vector3 } from "@babylonImport";
 import { ECSManager } from "../ecs/ECSManager";
+import GameUI from "../../spa/GameUI";
 
 // ─── In-File Default Configuration ─────────────────────────────────────
 const DEFAULT_CONFIG = {
@@ -36,9 +37,9 @@ export type PaddleBundle = {
 };
 
 // ─── 1. Score UI ─────────────────────────────────────────────────────
-export function buildScoreUI(ecs: any): Entity {
+export function buildUI(ecs: any, gameUI: GameUI): Entity {
 	const ui = new Entity();
-	ui.addComponent(new UIComponent());
+	ui.addComponent(new UIComponent(gameUI));
 	ecs.addEntity(ui);
 	return ui;
 }
@@ -182,9 +183,9 @@ export function buildPortal(ecs: any, pongRoot: TransformNode) {
 
 }
 // ─── 5. Assemble Game Template ─────────────────────────────────────
-export function createGameTemplate(ecs: ECSManager, playerCount: number, pongRoot: TransformNode): PaddleBundle[] {
+export function createGameTemplate(ecs: ECSManager, playerCount: number, pongRoot: TransformNode, gameUI: GameUI): PaddleBundle[] {
 	const config = DEFAULT_CONFIG;
-	buildScoreUI(ecs);
+	buildUI(ecs, gameUI);
 	const bundles = buildPaddles(ecs, playerCount, pongRoot);
 	//buildWalls(ecs, config, pongRoot);
 	buildBall(ecs, pongRoot);

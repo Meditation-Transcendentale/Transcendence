@@ -5,7 +5,6 @@ import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // 
 
 // import * as POST from "@babylonjs/core/PostProcesses";
 
-
 // export { Inspector } from '@babylonjs/inspector';
 // import {
 // 	VolumetricLightScatteringPostProcess
