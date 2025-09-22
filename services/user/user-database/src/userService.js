@@ -117,6 +117,9 @@ const userService = {
 	},
 	getUserInfosFromUUID: (uuid) => {
 		const user = getUserInfosFromUUIDStmt.get(uuid);
+			console.log("PRINT USER =" + user)
+			console.log("PRINT UUID=" + uuid)
+		
 		return user;
 	},
 	getUserFromUUID: (uuid) => {
