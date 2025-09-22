@@ -1,5 +1,5 @@
 
-import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, Inspector, FreeCamera } from "@babylonImport";
+import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, FreeCamera } from "@babylonImport";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -76,11 +76,11 @@ export class Pong {
 
 		this.pongRoot = new TransformNode("pongRoot", this.scene);
 		this.pongRoot.position.set(2000, -3500, -3500);
-		this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
-		this.cam.position.x = 0;
-		this.cam.position.y = 40;
-		this.cam.position.z = -2;
-		this.cam.detachControl();
+		// this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
+		// this.cam.position.x = 0;
+		// this.cam.position.y = 40;
+		// this.cam.position.z = -2;
+		// this.cam.detachControl();
 		this.baseMeshes = createBaseMeshes(this.scene, this.config, this.pongRoot);
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
 		this.uuid = getOrCreateUUID();
@@ -114,6 +114,12 @@ export class Pong {
 			`uuid=${encodeURIComponent(uuid)}&` +
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
+
+		this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
+		this.cam.position.x = 0;
+		this.cam.position.y = 35;
+		this.cam.position.z = -2;
+		this.cam.detachControl();
 
 		if (!this.inited) {
 			await this.init();

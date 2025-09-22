@@ -125,8 +125,8 @@ export function buildPaddles(
 		ecs.addEntity(deathWall);
 
 		// ---- Pillars ----
-		// const angle = midAngle - maxOffset - halfArc;
-		const angle = sliceStart + pillarArc / 2;
+		const angle = midAngle - maxOffset - halfArc;
+		// const angle = sliceStart + pillarArc / 2;
 		const baseX = Math.cos(angle) * (arenaRadius + pillarSize / 2);
 		const baseZ = Math.sin(angle) * (arenaRadius + pillarSize / 2);
 

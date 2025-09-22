@@ -73,3 +73,17 @@ export function getPhasePaddleSize(phase = 'Phase 1', arenaRadius = CFG.ARENA_RA
 export function getPhaseBallConfig(phase = 'Phase 1') {
 	return PHASE_BALL_CONFIGS[phase] || PHASE_BALL_CONFIGS['Phase 1'];
 }
+
+export function getBallScaleForPlayerCount(playerCount) {
+	let scaleFactor;
+	switch (playerCount) {
+		case 100: scaleFactor = 1; break;
+		case 50: scaleFactor = 1.5; break;
+		case 25: scaleFactor = 2; break;
+		case 12: scaleFactor = 2.5; break;
+		case 3: scaleFactor = 6.0; break;
+		default: scaleFactor = 25 / playerCount;
+	}
+	return scaleFactor;
+}
+

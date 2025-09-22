@@ -1,11 +1,12 @@
 
-import { Color3, Engine, Matrix, Vector3 } from "@babylonImport";
+import { Engine, Vector3 } from "@babylonImport";
 
 import { Environment } from "./Environment";
 import { Vue } from "../Vue";
 import { css3dObject, CSSRenderer } from "./CSSRenderer";
 import { Interpolator } from "./Interpolator";
-import { UIaddColor, UIaddNumber, UIaddToggle, UIaddVec3 } from "./UtilsUI";
+
+import { UIaddDetails, UIaddVec3 } from "./UtilsUI";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -26,40 +27,40 @@ class app3d {
 	private cssRenderer!: CSSRenderer;
 
 	constructor() {
-		//console.log("eeeeee");
 
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
 		this.canvas.focus();
-		//
+
+
 		this.engine = new Engine(this.canvas, true, {
 			useHighPrecisionFloats: true,
-			useHighPrecisionMatrix: true
+			useHighPrecisionMatrix: true,
+			antialias: true,
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
-		this.engine.setHardwareScalingLevel(1.0);
-		//this.engine.useReverseDepthBuffee = true;
-		//console.log(this.engine.getRenderWidth(), this.engine.getRenderHeight());
-		//
+		this.engine.setHardwareScalingLevel(2.0);
+		this.engine.getCaps().textureFloatRender = true;
+
 		window.addEventListener('resize', () => {
 			this.engine.resize(true);
 			this.environment.resize();
-			this.cssRenderer.resize(this.engine.getRenderWidth(), this.engine.getRenderHeight())
+			this.cssRenderer.resize(window.innerWidth, window.innerHeight)
 		})
 
 		this.environment = new Environment(this.engine, this.canvas);
-		//
 		this.fps = document.getElementById('fps') as HTMLElement;
 
 		this.vues = new Map<string, Vue>;
 
-		this.cssRenderer = new CSSRenderer(this.environment.fieldCamera, this.engine.getRenderWidth(), this.engine.getRenderHeight());
+		this.cssRenderer = new CSSRenderer(this.environment.fieldCamera, window.innerWidth, window.innerHeight);
 
 	}
 
 
 	public async init() {
 		await this.environment.init();
-		document.querySelector("#utils-details")?.remove();
+
+		// document.querySelector("#utils-details")?.remove();
 	}
 
 
@@ -87,6 +88,9 @@ class app3d {
 		this.engine?.dispose();
 	}
 
+	public enableBr(value: boolean) {
+		this.environment.enableBr(value);
+	}
 	public enableHome() {
 		this.environment.enableHome();
 	}
@@ -108,9 +112,6 @@ class app3d {
 	public setVue(vue: string) {
 		this.cssRenderer.dirty = true;
 		this.environment.setVue(vue);
-		//if (!this.vues.has(vue)) {
-		//	this.vues.set(vue, this.environment.setVue(vue));
-		//}
 	}
 
 	public getVue(vue: string): Vue | undefined {

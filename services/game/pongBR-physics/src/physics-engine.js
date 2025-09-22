@@ -1,6 +1,6 @@
 // physics-engine.js
 
-import { CFG, ENTITY_MASKS, getPhaseBallConfig, getPhaseConfig, getPhasePaddleSize, getPhaseStage } from './physics-config.js';
+import { CFG, ENTITY_MASKS, getBallScaleForPlayerCount, getPhaseBallConfig, getPhaseConfig, getPhasePaddleSize, getPhaseStage } from './physics-config.js';
 import { PhysicsData } from './physics-data.js';
 import { UniformGrid } from './spatial-grid.js';
 import { PhysicsSystems } from './collision-systems.js';
@@ -180,22 +180,24 @@ export class PhysicsEngine {
 	spawnSingleBall() {
 		const cfg = this.cfg;
 		const pd = this.pd;
+		const playerCount = this.gameState.playerStates.activePlayers.size;
+		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(playerCount);
 
 		const ballEnt = pd.create(ENTITY_MASKS.BALL);
 		this.entities.balls.push(ballEnt);
 
-		pd.radius[ballEnt] = cfg.BALL_RADIUS;
+		pd.radius[ballEnt] = ballRadius;
 
 		const safeRadius = cfg.ARENA_RADIUS * cfg.SPAWN_SAFETY_MARGIN;
 		const r = Math.sqrt(Math.random()) * safeRadius;
 		const theta = Math.random() * 2 * Math.PI;
-		// pd.posX[ballEnt] = r * Math.cos(theta);
-		// pd.posY[ballEnt] = r * Math.sin(theta);
-		pd.posX[ballEnt] = 0;
-		pd.posY[ballEnt] = 0;
+		pd.posX[ballEnt] = r * Math.cos(theta);
+		pd.posY[ballEnt] = r * Math.sin(theta);
+		// pd.posX[ballEnt] = 0;
+		// pd.posY[ballEnt] = 0;
 
-		// const dir = Math.random() * 2 * Math.PI;
-		const dir = 0.0007853981633974484;
+		const dir = Math.random() * 2 * Math.PI;
+		// const dir = 0.0007853981633974484;
 		const speedVariation = 0.8 + (Math.random() * 0.4);
 		const speed = cfg.INITIAL_SPEED * speedVariation;
 		pd.velX[ballEnt] = Math.cos(dir) * speed;
@@ -212,12 +214,14 @@ export class PhysicsEngine {
 	createBalls(numBalls) {
 		const cfg = this.cfg;
 		const pd = this.pd;
+		const playerCount = this.gameState.playerStates.activePlayers.size;
+		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(playerCount);
 
 		for (let b = 0; b < numBalls; b++) {
 			const ballEnt = pd.create(ENTITY_MASKS.BALL);
 			this.entities.balls[b] = ballEnt;
 
-			pd.radius[ballEnt] = cfg.BALL_RADIUS;
+			pd.radius[ballEnt] = ballRadius;
 
 			const maxSpawnRadius = cfg.ARENA_RADIUS * 0.6;
 			const r = Math.sqrt(Math.random()) * maxSpawnRadius;
@@ -388,6 +392,7 @@ export class PhysicsEngine {
 			}
 		});
 
+		console.log(numActivePlayers);
 		const newAngleStep = (2 * Math.PI) / numActivePlayers;
 		const paddleArc = newAngleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
@@ -472,28 +477,6 @@ export class PhysicsEngine {
 		this.startPhaseSpawning(this.gameState.currentPhase);
 	}
 
-	// resetBallsForNewPhase() {
-	// 	const pd = this.pd;
-	// 	const cfg = this.cfg;
-	// 	const numActivePlayers = this.gameState.playerStates.activePlayers.size;
-	//
-	//
-	// 	this.entities.balls.forEach(ballEnt => {
-	// 		if (ballEnt !== undefined && pd.isActive(ballEnt)) {
-	// 			pd.destroy(ballEnt);
-	// 		}
-	// 	});
-	//
-	// 	this.entities.balls.length = 0;
-	//
-	// 	const ballsPerPlayer = Math.floor(cfg.INITIAL_BALLS / cfg.MAX_PLAYERS);
-	// 	const newBallCount = Math.max(ballsPerPlayer * numActivePlayers / 2, 3);
-	//
-	//
-	// 	this.createBalls(newBallCount);
-	//
-	// }
-
 	updatePaddleInputState(fixedPlayerId, moveInput) {
 		if (this.gameState.isRebuilding) return;
 
@@ -559,7 +542,7 @@ export class PhysicsEngine {
 			for (const ballEnt of this.entities.balls) {
 				if (!pd.isActive(ballEnt) || pd.isEliminated[ballEnt] === 1) continue;
 				for (const pillarEnt of this.entities.pillars) {
-					if (!pd.isActive(pillarEnt)) continue;
+					// if (!pd.isActive(pillarEnt)) continue;
 					PhysicsSystems.ballStaticCollision(pd, ballEnt, pillarEnt, cfg);
 				}
 			}

@@ -27,11 +27,11 @@ export default class Game {
 			enabledModules: ['score', 'buttons', 'countdown', 'ending', 'images'],
 			theme: 'pong',
 			modulePositions: {
-				score: { x: 'center', y: 'top'},
+				score: { x: 'center', y: 'top' },
 				buttons: { x: 'center', y: 'bottom' },
-				countdown: {x: 'center', y: 'center'},
-				ending: {x:'center', y:'center'},
-				images: {x:'center', y:'center'}
+				countdown: { x: 'center', y: 'center' },
+				ending: { x: 'center', y: 'center' },
+				images: { x: 'center', y: 'center' }
 			}
 		});
 	}
@@ -49,7 +49,7 @@ export default class Game {
 
 	public load(params: URLSearchParams) {
 		App3D.disableHome();
-		App3D.setVue('game');
+		App3D.setVue(params.get("map") as string);
 		//App3D.loadVue('game');
 		//document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
