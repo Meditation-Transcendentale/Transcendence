@@ -173,6 +173,7 @@ export class NetworkingSystem extends System {
 						wall?.disable();
 					}
 				});
+				console.log("number paddle ____________ ", paddleFinds);
 				const paddleTime = performance.now() - paddleStartTime;
 
 				// Performance logging for comparison

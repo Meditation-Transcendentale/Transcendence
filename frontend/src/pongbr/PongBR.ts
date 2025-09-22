@@ -24,6 +24,7 @@ import earcut from "earcut";
 import { MotionBlurPostProcess } from "@babylonjs/core";
 import { createBlackHoleBackdrop } from "./blackhole.js";
 import { SpaceSkybox } from "./skybox.js";
+import GameUI from "../spa/GameUI.js";
 
 
 export let localPaddleId: any = null;
@@ -48,13 +49,15 @@ export class PongBR {
 	private thinInstanceSystem!: ThinInstanceSystem;
 	private spaceSkybox!: SpaceSkybox;
 	public currentBallScale: Vector3 = new Vector3(1, 1, 1);
+	private gameUI?: GameUI;
 
 
-	constructor(canvas: any, scene: Scene) {
+	constructor(canvas: any, scene: Scene, gameUI: GameUI) {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.inited = false;
 		this.pongRoot = this.scene.getTransformNodeByName('pongbrRoot') as TransformNode;
+		this.gameUI = gameUI;
 	}
 
 	public async init() {
