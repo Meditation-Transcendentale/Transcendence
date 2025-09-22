@@ -119,10 +119,10 @@ export class Environment {
 		loaded.meshes[0].parent = this.pongRoot;
 		this.gameMeshes.push(loaded.meshes[0] as Mesh);
 
-		// const headMesh = this.scene.getMeshByName('Head.001') as Mesh;
-		// const headmat = new StandardMaterial('headmat', this.scene);
-		// headmat.diffuseColor = new Color3(1., 1, 1);
-		// // headMesh.material = headmat;
+		const headMesh = this.scene.getMeshByName('Head.001') as Mesh;
+		const headmat = new StandardMaterial('headmat', this.scene);
+		headmat.diffuseColor = new Color3(1., 1, 1);
+		// headMesh.material = headmat;
 
 
 		const material = headMesh.material as PBRMaterial;
@@ -137,16 +137,16 @@ export class Environment {
 		eyemat.emissiveColor = new Color3(1, 1, 1);
 		eyeMesh.material = eyemat;
 
-		// if (mouthMesh && mouthMesh.morphTargetManager) {
-		// 	const smileTarget = mouthMesh.morphTargetManager.getTarget(0);
+		if (mouthMesh && mouthMesh.morphTargetManager) {
+			const smileTarget = mouthMesh.morphTargetManager.getTarget(0);
 
-		// 	smileTarget.influence = 0.;
+			smileTarget.influence = 0.;
 
-		// 	console.log("Statue is now smiling!");
-		// }
+			console.log("Statue is now smiling!");
+		}
 
-		// if (headMesh && headMesh.morphTargetManager) {
-		// 	const smileTarget = headMesh.morphTargetManager.getTarget(0);
+		if (headMesh && headMesh.morphTargetManager) {
+			const smileTarget = headMesh.morphTargetManager.getTarget(0);
 
 			smileTarget.influence = 1.;
 
@@ -230,6 +230,7 @@ export class Environment {
 			this.update();
 		})
 	}
+
 
 	public render(time: number) {
 		this.deltaTime = time - this.lastTime;

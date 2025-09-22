@@ -58,7 +58,7 @@ export default class TournamentPage {
   constructor(div: HTMLElement) {
     this.div = div;
     this.tournamentId = null;
-    this.css = div.querySelector("link") as HTMLLinkElement;
+    this.css = this.div.querySelector("link") as HTMLLinkElement;
     document.body.appendChild(this.css);
     this.initDOM();
   }
