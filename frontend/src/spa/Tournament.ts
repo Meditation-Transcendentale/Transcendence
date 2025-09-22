@@ -37,7 +37,7 @@ type ServerMsg = {
 };
 
 export default class TournamentPage {
-  private div: HTMLElement;
+  private div: HTMLDivElement;
   private ws: WebSocket | null = null;
 
   private tournamentId: string | null;
@@ -55,10 +55,13 @@ export default class TournamentPage {
   private toolbarEl!: HTMLDivElement;
   private treeEl!: HTMLDivElement;
 
-  constructor(div: HTMLElement) {
+  constructor(div: HTMLDivElement) {
+    console.log("div parameter:", div);
+    console.log("div type:", typeof div);
+    console.log("div instanceof HTMLElement:", div instanceof HTMLElement);
     this.div = div;
     this.tournamentId = null;
-    this.css = this.div.querySelector("link") as HTMLLinkElement;
+    this.css = div.querySelector("link") as HTMLLinkElement;
     document.body.appendChild(this.css);
     this.initDOM();
   }
@@ -101,6 +104,7 @@ export default class TournamentPage {
       }
       if (payload.startGame) {
         console.log(`START GAME RECEIVED`);
+        Router.setComeback(encodeURI(`/tournament?id=${this.tournamentId}`));
         Router.nav(
           encodeURI(
             `/cajoue?id=${payload.startGame.gameId}&mod=tournament&map=default&tournamentId=${this.tournamentId}`

@@ -123,8 +123,8 @@ export class NetworkingSystem extends System {
 
 			// === Game End ===
 			if (serverMsg.end) {
-				if (this.mode = "tournament")
-					Router.nav(`/tournament`, false, true);
+				console.log(`COMING BACK TO: ${Router.getComebackRoute()}`);
+				Router.comeback();
 				
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
