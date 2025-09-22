@@ -94,6 +94,13 @@ export class Monolith {
 			...options
 		};
 
+		this.depthMaterial = new ShaderMaterial("monolithDepth", this.scene, "monolithDepth", {
+			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
+			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "origin",
+				"oldOrigin", "deadZoneCenter", "deadZoneWidth", "deadZoneHeight", "deadZoneDepth", "textPosition0", "textSize0", "textGlow0"]
+		});
+
+
 		this.initializeVector3Pool();
 
 		this.applyQualitySettings();
@@ -101,11 +108,6 @@ export class Monolith {
 		this.buildDefaultSDF();
 
 		this.text = new TextRenderer(this, this.scene);
-
-		this.depthMaterial = new ShaderMaterial("monolithDepth", this.scene, "monolithDepth", {
-			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
-			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "worldCenter", "origin"]
-		});
 
 	}
 
@@ -212,6 +214,14 @@ export class Monolith {
 		shaderMaterial.setFloat("baseWaveIntensity", 0.02);
 		shaderMaterial.setFloat("mouseInfluenceRadius", 1.);
 		this.material = shaderMaterial;
+
+		this.depthMaterial.setFloat("time", 0);
+		this.depthMaterial.setFloat("animationSpeed", this.options.animationSpeed);
+		this.depthMaterial.setFloat("animationIntensity", this.options.animationIntensity);
+
+		this.depthMaterial.setFloat("baseWaveIntensity", 0.02);
+		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.);
+
 
 		return shaderMaterial;
 	}
@@ -618,6 +628,11 @@ export class Monolith {
 		this.material.setFloat("deadZoneWidth", width);
 		this.material.setFloat("deadZoneHeight", height);
 		this.material.setFloat("deadZoneDepth", depth);
+
+		this.depthMaterial.setVector3("deadZoneCenter", center);
+		this.depthMaterial.setFloat("deadZoneWidth", width);
+		this.depthMaterial.setFloat("deadZoneHeight", height);
+		this.depthMaterial.setFloat("deadZoneDepth", depth);
 	}
 
 	public enableShaderAnimation(enabled: boolean) {
@@ -640,6 +655,7 @@ export class Monolith {
 		this.options.animationSpeed = speed;
 		if (this.material instanceof ShaderMaterial) {
 			this.material.setFloat("animationSpeed", speed);
+			this.depthMaterial.setFloat("animationSpeed", speed);
 		}
 	}
 
@@ -647,6 +663,7 @@ export class Monolith {
 		this.options.animationIntensity = intensity;
 		if (this.material instanceof ShaderMaterial) {
 			this.material.setFloat("animationIntensity", intensity);
+			this.depthMaterial.setFloat("animationIntensity", intensity);
 		}
 	}
 
@@ -690,6 +707,7 @@ export class Monolith {
 		this.lastUpdateValues.cursorChanged = cursorChanged;
 
 		this.material.setVec3("oldOrigin", this.oldcursor);
+		this.depthMaterial.setVector3("oldOrigin", this.oldcursor);
 		this.lastUpdateValues.oldCursorChanged = oldCursorChanged;
 
 		this.material.setFloat("animationSpeed", this.options.animationSpeed);
@@ -705,7 +723,6 @@ export class Monolith {
 		this.material.setFloat("baseWaveIntensity", 0.02);
 		this.material.setFloat("mouseInfluenceRadius", 0.8);
 
-		this.depthMaterial.setVector3("worldCenter", Vector3.Zero());
 		this.depthMaterial.setFloat("baseWaveIntensity", 0.02);
 		this.depthMaterial.setFloat("mouseInfluenceRadius", 0.8);
 

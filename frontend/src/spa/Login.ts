@@ -56,12 +56,6 @@ class Login {
 			height: 1,
 			world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 9, 30))
 		})
-		this.ref.login.html.addEventListener("mouseover", () => {
-			App3D.onHoverEffect(1);
-		})
-		this.ref.login.html.addEventListener("mouseleave", () => {
-			App3D.onHoverEffect(0);
-		})
 		this.ref.lpassword.addEventListener("keypress", (e) => {
 			if (e.key != "Enter") { return; }
 			this.login();
@@ -99,12 +93,6 @@ class Login {
 			width: 1.2,
 			height: 1.2,
 			world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 2, 33))
-		})
-		this.ref.register.html.addEventListener("mouseover", () => {
-			App3D.onHoverEffect(2);
-		})
-		this.ref.register.html.addEventListener("mouseleave", () => {
-			App3D.onHoverEffect(0);
 		})
 		this.ref.rusername.addEventListener("keypress", (e) => {
 			if (e.key !== "Enter") { return; }
@@ -180,7 +168,6 @@ class Login {
 	}
 
 	private loginResolve(json: any) {
-		App3D.onHoverEffect(0);
 		Router.nav("/home", true);
 	}
 

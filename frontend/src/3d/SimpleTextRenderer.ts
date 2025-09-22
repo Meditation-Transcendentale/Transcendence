@@ -141,6 +141,12 @@ export class TextRenderer {
 			material.setFloat(`textSize${index}`, 5.0);
 			material.setFloat(`textGlow${index}`, zone.glow);
 			material.setVec3(`textFace${index}`, zone.face);
+
+			// this.monolith.depthMaterial.setTexture(`textTexture${index}`, zone.texture);
+			this.monolith.depthMaterial.setVector3(`textPosition${index}`, zone.position);
+			this.monolith.depthMaterial.setFloat(`textSize${index}`, 5.0);
+			this.monolith.depthMaterial.setFloat(`textGlow${index}`, zone.glow);
+			this.monolith.depthMaterial.setVector3(`textFace${index}`, zone.face);
 		});
 	}
 

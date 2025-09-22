@@ -27,6 +27,8 @@ class RouterC {
 
 	public AUTHENTIFICATION: boolean = true;
 
+	private comebackRoute: {path: string, restore: boolean, history: boolean};
+
 	constructor() {
 		this.initRoute = null;
 		this.location = `http://${window.location.hostname}:7000`;
@@ -232,6 +234,15 @@ class RouterC {
 		const ts = await import(/* @vite-ignore */ `${path}`);
 		return ts;
 	}
+
+	public setComeback(path: string, restore: boolean = false, history: boolean = true) {
+		this.comebackRoute = {path: path, restore: restore, history: history};
+	}
+
+	public comeback() {
+		this.nav(this.comebackRoute.path, this.comebackRoute.restore, this.comebackRoute.history);
+	}
+
 }
 const Router = new RouterC();
 
