@@ -165,6 +165,8 @@ export class Picker {
 			this.scene.getTransformMatrix(),
 			v
 		)
+		x = (x / window.innerWidth) * this.scene.getEngine().getRenderWidth();
+		y = (y / window.innerHeight) * this.scene.getEngine().getRenderHeight();
 		const px = (this.ballDiameter / Vector3.Distance(this.camera.position, this.meshBall.position)) * (this.scene.getEngine().getRenderHeight() / (2 * Math.tan(this.camera.fov * 0.5)))
 
 		const xx = p.x * this.scene.getEngine().getRenderWidth() - x;
