@@ -361,6 +361,10 @@ class GameUI {
 		this.modules.images?.removeImage(id);
 	}
 
+	public updatePlayerCount(playerLeft: number) {
+		this.modules.playercounter?.update(playerLeft);
+	}
+
 }
 
 interface GameUIModule {

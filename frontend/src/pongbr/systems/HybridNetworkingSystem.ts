@@ -10,11 +10,12 @@ import { WallComponent } from "../components/WallComponent.js";
 import { localPaddleId, PongBR } from "../PongBR.js";
 import { PhaseState, PhaseTransitionEvent, RebuildCompleteEvent, GameStateInfo } from "../state/PhaseState.js";
 import { Vector3 } from "@babylonImport";
+import GameUI from "../../spa/GameUI.js";
 
 export class HybridNetworkingSystem extends System {
 	private wsManager: WebSocketManager;
 	private uuid: string;
-	private scoreUI: any;
+	private gameUI: GameUI;
 	private game: PongBR;
 	private phaseState: PhaseState;
 	private currentPhysicsState: any = null;
@@ -25,11 +26,13 @@ export class HybridNetworkingSystem extends System {
 	private wallPlayerIdToEntity = new Map<number, Entity>();
 	private indexesDirty = true;
 
-	constructor(wsManager: WebSocketManager, uuid: string, scoreUI: any, game: PongBR) {
+	private spectateButtonOn: boolean = false;
+
+	constructor(wsManager: WebSocketManager, uuid: string, gameUI: GameUI, game: PongBR) {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
-		this.scoreUI = scoreUI;
+		this.gameUI = gameUI;
 		this.game = game;
 		this.phaseState = new PhaseState();
 	}
@@ -161,6 +164,7 @@ export class HybridNetworkingSystem extends System {
 					}
 				});
 
+				let playerCount = 0;
 				paddles.forEach(p => {
 					let e = this.paddleIdToEntity.get(p.id);
 					if (!e) {
@@ -179,7 +183,16 @@ export class HybridNetworkingSystem extends System {
 						if (!w) return;
 						paddle?.disable();
 						wall?.enable();
+						if (playerId == localPaddleId && this.spectateButtonOn == false){
+							this.gameUI.showButton('spectate', 'Spectate', () => {
+								//what to do
+								console.log('spectate button');
+							});
+							console.log("dead");
+							this.spectateButtonOn = true;
+						}
 					} else {
+						playerCount++;
 						const paddleComp = e.getComponent(PaddleComponent)!;
 						if (p.id != localPaddleId)
 							paddleComp.offset = p.offset as number;
@@ -191,6 +204,7 @@ export class HybridNetworkingSystem extends System {
 						wall?.disable();
 					}
 				});
+				this.gameUI.updatePlayerCount(playerCount);
 			}
 
 			if (serverMsg.end) {

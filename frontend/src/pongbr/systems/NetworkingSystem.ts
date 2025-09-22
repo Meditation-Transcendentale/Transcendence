@@ -10,11 +10,12 @@ import { userinterface } from "../utils/proto/message.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { localPaddleId, PongBR } from "../PongBR.js";
 import { PhaseState, PhaseTransitionEvent, RebuildCompleteEvent, GameStateInfo } from "../state/PhaseState.js";
+import GameUI from "../../spa/GameUI.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
 	private uuid: string;
-	private scoreUI: any;
+	private gameUI: any;
 	private myScore: number;
 	private opponentScore: number;
 	private game: PongBR;
@@ -22,11 +23,11 @@ export class NetworkingSystem extends System {
 	private currentPhysicsState: any = null;
 	// private endUI = globalEndUI;
 
-	constructor(wsManager: WebSocketManager, uuid: string, scoreUI: any, game: PongBR) {
+	constructor(wsManager: WebSocketManager, uuid: string, gameUI: GameUI, game: PongBR) {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
-		this.scoreUI = scoreUI;
+		this.gameUI = gameUI;
 		this.myScore = 0;
 		this.opponentScore = 0;
 		this.game = game;

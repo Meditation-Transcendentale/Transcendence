@@ -28,7 +28,7 @@ export default class br {
 				buttons: { x: 'right', y: 'bottom' },
 				ending: {x:'center', y:'center'},
 				images: {x:'center', y:'center'},
-				playercounter: {x:'center', y:'center'}
+				playercounter: {x:"left", y:'top'}
 			}
 		});
 	}
