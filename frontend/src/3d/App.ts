@@ -38,13 +38,13 @@ class app3d {
 			antialias: true,
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
-		this.engine.setHardwareScalingLevel(1.0);
+		this.engine.setHardwareScalingLevel(2.0);
 		this.engine.getCaps().textureFloatRender = true;
 
 		window.addEventListener('resize', () => {
 			this.engine.resize(true);
 			this.environment.resize();
-			this.cssRenderer.resize(this.engine.getRenderWidth(), this.engine.getRenderHeight())
+			this.cssRenderer.resize(window.innerWidth, window.innerHeight)
 		})
 
 		this.environment = new Environment(this.engine, this.canvas);
@@ -52,7 +52,7 @@ class app3d {
 
 		this.vues = new Map<string, Vue>;
 
-		this.cssRenderer = new CSSRenderer(this.environment.fieldCamera, this.engine.getRenderWidth(), this.engine.getRenderHeight());
+		this.cssRenderer = new CSSRenderer(this.environment.fieldCamera, window.innerWidth, window.innerHeight);
 
 	}
 

@@ -51,6 +51,8 @@ export class Field {
 	private trackTarget!: Track;
 	private trackCamera!: Track;
 
+	private ultraLowPerf = false;
+
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
 		this.camera = camera;
@@ -301,5 +303,13 @@ export class Field {
 			this.grass.reduceGrass(n);
 		})
 
+	}
+
+	public ultraLowPerf() {
+		this.ultraLowPerf = true;
+		this.grass.setEnable(false);
+		this.picker.setEnable(false);
+		this.monolith.setPicking(false);
+		this.monolith.getMesh().setEnable(false);
 	}
 }
