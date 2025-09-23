@@ -7,6 +7,15 @@
 	background: White !important;
 }
 
+input:autofill {
+	filter: none !important;
+	box-shadow: 0 0 0 100px #8f88 inseta !important;
+}
+
+input {
+	filter: none;
+}
+
 html,
 body {
 	width: 100%;

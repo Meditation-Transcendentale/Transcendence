@@ -164,10 +164,10 @@ export class Field {
 				break;
 			}
 			case 'home': {
-				// this.camera.position.set(0, 5, 15);
-				// this.camera.setTarget(new Vector3(0, 7, 0));
-				gTrackManager.addTrack(this.trackCamera, (point: Vector3) => { this.camera.position.copyFrom(point); });
-				gTrackManager.addTrack(this.trackTarget, (point: Vector3) => { this.camera.setTarget(point) });
+				this.camera.position.set(0, 5, 15);
+				this.camera.setTarget(new Vector3(0, 7, 0));
+				// gTrackManager.addTrack(this.trackCamera, (point: Vector3) => { this.camera.position.copyFrom(point); });
+				// gTrackManager.addTrack(this.trackTarget, (point: Vector3) => { this.camera.setTarget(point) });
 				// this.camera.update();
 				this.light.isEnabled(true);
 				// this.camera.getViewMatrix().fromArray(CameraUtils.LookAt(new Vector3(0, 5, 15), new Vector3(0, 7, 0), Vector3.Up()));
