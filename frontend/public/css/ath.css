@@ -233,3 +233,25 @@ tr>td:last-child {
 	transform: translate(-50%, -50%);
 	z-index: inherit;
 }
+
+#security-window {
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	display: block;
+	width: 50%;
+	text-align: center;
+	padding: 2vh 0;
+	transform: translate(-50%, -50%);
+}
+
+#window-2fa {
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	display: block;
+	width: 50%;
+	padding: 2vh 0;
+	transform: translate(-50%, -50%);
+
+}

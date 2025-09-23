@@ -25,23 +25,37 @@
 				<form class="login-form" id="loginForm">
 					<div class="input-line">
 						<span class="input-prompt">username</span>
-						<input type="text" id="username" name="username" class="terminal-input" placeholder="enter_username" required>
+						<input type="text" id="username" name="username" class="terminal-input disabledable" placeholder="enter_username" required>
 					</div>
 					
 					<div class="input-line">
 						<span class="input-prompt">password</span>
-						<input type="password" id="password" name="password" class="terminal-input" placeholder="•••••••••••••••••" required>
+						<input type="password" id="password" name="password" class="terminal-input disabledable" placeholder="•••••••••••••••••" required>
 					</div>
 					
 					<div class="login-execute">
 						<div class="execute-line">
 							<span class="execute-prompt">eclipse@quantum:~$</span>
-							<button type="submit" class="terminal-btn" name="login" >./authenticate --init</button>
-							<button type="submit" class="terminal-btn" name="register">./register --init</button>
+							<button type="submit" class="terminal-btn disabledable" name="login" >./authenticate --init</button>
+							<button type="submit" class="terminal-btn disabledable" name="register">./register --init</button>
 						</div>
 					</div>
 					<div id="login-error" class="login-error hidden">
 						OUAI GROSS ERRURE
+					</div>
+					<div id="twofa-container" class="hidden">
+						<div id="token-input-container">
+							<input class="token-number terminal-input" name="twofa1" pattern="[0-9]" maxlength="1" required/>
+							<input class="token-number terminal-input" name="twofa2" pattern="[0-9]" maxlength="1" required/>
+							<input class="token-number terminal-input" name="twofa3" pattern="[0-9]" maxlength="1" required/>
+							<input class="token-number terminal-input" name="twofa4" pattern="[0-9]" maxlength="1" required/>
+							<input class="token-number terminal-input" name="twofa5" pattern="[0-9]" maxlength="1" required/>
+							<input class="token-number terminal-input" name="twofa6" pattern="[0-9]" maxlength="1" required/>
+						</div>
+						<div id="twofa-button-container" class="execute-line">
+							<button type="submit" class="terminal-btn" name="token" >./authenticate --init --token</button>
+							<button id="token-reset" type="submit" class="terminal-btn" name="dismiss">./authenticate --reset</button>
+						</div>
 					</div>
 				</form>
 				<div class="execute-line">
