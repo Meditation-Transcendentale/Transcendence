@@ -110,7 +110,6 @@ export default class Lobby {
 		this.map = params.get("map") as string;
 		console.log(`LOBBY MAP = ${this.map}`);
 		this.ref.playersList.innerHTML = "";
-		this.createPlayerDiv(User.uuid as string, false, true);
 		this.setupWs(this.id);
 		this.ref.lobbyId.innerHTML = `${this.id}`;
 
@@ -214,7 +213,7 @@ export default class Lobby {
 				this.players.get(r[i].uuid)!.status.innerText = (r[i].ready ? "yes" : "no");
 
 			} else {
-				this.createPlayerDiv(r[i].uuid, r[i].ready, false);
+				this.createPlayerDiv(r[i].uuid, r[i].ready);
 			}
 		}
 		for (let i of this.players.keys()) {
@@ -230,7 +229,8 @@ export default class Lobby {
 		}
 	}
 
-	private async createPlayerDiv(uuid: string, ready: boolean, self: boolean) {
+	private async createPlayerDiv(uuid: string, ready: boolean) {
+		const self = User.uuid == uuid;
 		const div = document.createElement('tr');
 		const name = document.createElement('td');
 		const status = document.createElement('td');
@@ -251,7 +251,11 @@ export default class Lobby {
 		}
 		div.appendChild(name);
 		div.appendChild(status);
-		this.ref.playersList.appendChild(div);
+		if (self) {
+			this.ref.playersList.prepend(div);
+		} else {
+			this.ref.playersList.appendChild(div);
+		}
 
 		this.players.set(uuid, { td: div, name: name, status: status });
 	}
