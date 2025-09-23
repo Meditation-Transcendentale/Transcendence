@@ -14,7 +14,7 @@ import { decodeServerMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
 import { localPaddleId } from "../Pong";
-import Router from "../../spa/Router.js";
+import Router from "../../spa/Router";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;

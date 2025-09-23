@@ -45,6 +45,11 @@ const customAliasPlugin = {
 			path: '../babyImport',
 			external: true,
 		}));
+		build.onResolve({ filter: /Router$/ }, args => {
+				return {
+				path: "../spa/Router",
+				external: true}
+			})
 	},
 };
 
