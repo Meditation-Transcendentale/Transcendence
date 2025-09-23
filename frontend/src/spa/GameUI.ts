@@ -341,8 +341,8 @@ class GameUI {
 		this.modules.timer?.stop();
 	}
 
-	public showEnd(score1: number, score2: number, result: boolean) {
-		this.modules.ending?.setResult(score1, score2, result);
+	public showEnd(score1: number, score2: number, result: boolean, mode: string) {
+		this.modules.ending?.setResult(score1, score2, result, mode);
 	}
 
 	public showButton(id: string, text: string, callback: () => void, style?: string) {
@@ -612,15 +612,24 @@ class EndingModule implements GameUIModule{
 		this.div.style.display = 'none';
 	}
 
-	setResult(score1: number, score2: number, result: boolean) {
+	setResult(score1: number, score2: number, result: boolean, mode: string) {
 		if (this.ref.score1Value && this.ref.score2Value) {
 			this.ref.score1Value.textContent = score1.toString();
 			this.ref.score2Value.textContent = score2.toString();
 		}
-		if (result)
-			this.ref.result.innerHTML = 'You <span class="win">Win</span>';
-		else
-			this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
+
+		
+		if (mode == "local"){
+			if (result)
+				this.ref.result.innerHTML = 'Player 1 <span class="win">Win</span>';
+			else
+				this.ref.result.innerHTML = 'Player 2 <span class="win">Win</span>';
+		} else if (mode == "ai" || mode == "online"){
+			if (result)
+				this.ref.result.innerHTML = 'You <span class="win">Win</span>';
+			else
+				this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
+		}
 
 		this.div.style.display = 'flex';
 	}

@@ -186,6 +186,7 @@ export class HybridNetworkingSystem extends System {
 						if (playerId == localPaddleId && this.spectateButtonOn == false){
 							this.gameUI.showButton('spectate', 'Spectate', () => {
 								//what to do
+								
 								console.log('spectate button');
 							});
 							console.log("dead");
