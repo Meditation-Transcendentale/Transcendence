@@ -38,16 +38,6 @@ class RouterC {
 
 		this.routes = new Map<string, routePage>;
 
-		this.routes.set("/login", {
-			html: "/login",
-			ts: "./Login",
-			callback: (url: URL) => { this.loadInMain(url) }
-		} as routePage);
-		this.routes.set("/register", {
-			html: "/register",
-			ts: "./Register",
-			callback: (url: URL) => { this.loadInMain(url) }
-		} as routePage);
 		this.routes.set("/home", {
 			html: "/home",
 			ts: "./Home",
@@ -150,7 +140,7 @@ class RouterC {
 			//this.oldURL = url.href;
 			await meRequest("no-cache")
 				.then(() => {
-					if (url.pathname == "/auth" || url.pathname == "/register" || (this.first && url.pathname == "/cajoue")) {
+					if (url.pathname == "/auth" || (this.first && url.pathname == "/cajoue")) {
 						url.pathname = "/home";
 						url.search = "";
 					}
@@ -159,7 +149,7 @@ class RouterC {
 				})
 				.catch(() => {
 					this.oldURL = url.href;
-					if (url.pathname != "/auth" && url.pathname != "/register") {
+					if (url.pathname != "/auth") {
 						url.pathname = "/auth";
 						url.search = "";
 						if (!this.first) {
@@ -170,7 +160,7 @@ class RouterC {
 					}
 				})
 		} else {
-			if (url.pathname == "/auth" || url.pathname == "/register") {
+			if (url.pathname == "/auth" ) {
 				url.pathname = "/home";
 				url.search = "";
 			}
@@ -181,7 +171,7 @@ class RouterC {
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
 
 		//url.pathname = "/home";
-		if (url.pathname !== "/auth" && url.pathname !== "/register") {
+		if (url.pathname !== "/auth" ) {
 			this.loadAth();
 		}
 		this.routes.get(url.pathname)?.callback(url);
