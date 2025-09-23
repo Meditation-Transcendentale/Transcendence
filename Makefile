@@ -10,6 +10,9 @@ TARGET ?= all
 METRICS ?= false
 TEST ?= false
 
+COMMENTED_LINE = // database.exec(test);
+UNCOMMENTED_LINE = database.exec(test);
+
 ifeq ($(TARGET),user)
 	DOCKER_COMPOSE_FILE = $(DOCKER_COMPOSE_USER)
 else ifeq ($(TARGET),stats)
@@ -61,6 +64,12 @@ cleanShared:
 	if [ -d ./shared ]; then \
 		rm -rf ./shared; \
 	fi
+
+filldb:
+	sed -i 's|^$(COMMENTED_LINE)|$(UNCOMMENTED_LINE)|' database_certs-init/src/initDB.js
+	$(MAKE) re
+	sed -i 's|^$(UNCOMMENTED_LINE)|$(COMMENTED_LINE)|' database_certs-init/src/initDB.js
+	
 
 update-hostname-env:
 	@if grep -q '^HOSTNAME=' .env; then \
