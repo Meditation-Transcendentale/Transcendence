@@ -102,7 +102,7 @@ async function handleNatsSubscription(subject, handler) {
 
 handleErrorsNats(async () => {
 	await Promise.all([
-		handleNatsSubscription("test.stats", async (msg) => {
+		handleNatsSubscription("stats.endgame", async (msg) => {
 
 			const decodedData = jc.decode(msg.data);
 
