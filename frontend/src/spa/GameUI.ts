@@ -93,8 +93,10 @@ class GameUI {
 					break;
 				case 'images':
 					this.modules.images = new ImageModule(this.ref.imageModule);
+					break;
 				case 'playercounter':
 					this.modules.playercounter = new PlayerCounterModule(this.ref.playercounterModule);
+					break;
 			}
 		});
 	}
