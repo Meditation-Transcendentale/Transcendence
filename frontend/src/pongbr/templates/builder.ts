@@ -90,7 +90,7 @@ export function buildPaddles(
 			console.log(`Frontend paddle 1: midAngle=${midAngle.toFixed(3)}, rotY=${paddleRotY.toFixed(3)}`);
 		if (i == 0) {
 			paddle.addComponent(new InputComponent(true));
-			// pongRoot.rotation.y = -paddleRotY;
+			pongRoot.rotation.y = -paddleRotY;
 			console.log(`Frontend paddle 0: midAngle=${midAngle.toFixed(3)}, rotY=${paddleRotY.toFixed(3)}`);
 		}
 		else
@@ -122,12 +122,10 @@ export function buildPaddles(
 		deathWall.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleRotY, 0), new Vector3(goalSize.z, 1, 2 * Math.PI * 200 / playerCount), pongRoot));
 		const transform = deathWall.getComponent(TransformComponent);
 		transform?.disable();
-		//deathWall.addComponent(new DisabledComponent());
 		ecs.addEntity(deathWall);
 
 		// ---- Pillars ----
 		const angle = midAngle - maxOffset - halfArc;
-		// const angle = sliceStart + pillarArc / 2;
 		const baseX = Math.cos(angle) * (arenaRadius + pillarSize / 2);
 		const baseZ = Math.sin(angle) * (arenaRadius + pillarSize / 2);
 
@@ -148,7 +146,7 @@ export function buildPaddles(
 				pongRoot
 			)
 		);
-		ecs.addEntity(pillar);		// ---- Bundle ----
+		ecs.addEntity(pillar);
 
 		bundles.push({ sliceIndex: i, paddle, goal, deathWall, pillar });
 	}
@@ -187,7 +185,6 @@ export function createGameTemplate(ecs: ECSManager, playerCount: number, pongRoo
 	const config = DEFAULT_CONFIG;
 	buildUI(ecs, gameUI);
 	const bundles = buildPaddles(ecs, playerCount, pongRoot);
-	//buildWalls(ecs, config, pongRoot);
 	buildBall(ecs, pongRoot);
 	buildPortal(ecs, pongRoot);
 	return bundles;

@@ -232,6 +232,15 @@ void main() {
 `
 
 
+export function initStatue(scene: Scene, pongRoot: TransformNode): Mesh {
+	const statue = scene.getMeshByName('__root__') as Mesh;
+	statue.parent = pongRoot;
+	statue.rotationQuaternion = null;
+	statue.position.set(-650, 400, 0);
+	statue.rotation.set(0, 0, 0);
+	statue.scaling.setAll(70);
+	return statue;
+}
 
 export function createWallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: 1, height: 1, depth: 1 }, scene);
