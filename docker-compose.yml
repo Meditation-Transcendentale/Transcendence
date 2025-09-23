@@ -297,3 +297,6 @@ networks:
   metrics-network:
     driver: bridge
     name: metrics-network
+  nats-network:
+    driver: bridge
+    name: nats-network
