@@ -216,9 +216,6 @@ const userService = {
 	},
 	getFriendlist: (userId) => {
 		const friendlist = getFriendlistStmt.all(userId, userId, userId, userId, userId);
-		if (friendlist.length === 0) {
-			throw { status: friendshipReturn.FRIEND_020.http, code: friendshipReturn.FRIEND_020.code, message: friendshipReturn.FRIEND_020.message };
-		}
 		return friendlist;
 	},
 	getUserForFriendResearch: (username) => {
