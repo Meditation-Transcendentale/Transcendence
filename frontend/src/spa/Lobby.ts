@@ -109,11 +109,11 @@ export default class Lobby {
 		this.id = params.get("id") as string;
 		this.map = params.get("map") as string;
 		console.log(`LOBBY MAP = ${this.map}`);
-		this.setupWs(this.id);
 		this.ref.playersList.innerHTML = "";
+		this.createPlayerDiv(User.uuid as string, false, true);
+		this.setupWs(this.id);
 		this.ref.lobbyId.innerHTML = `${this.id}`;
 
-		this.createPlayerDiv(User.uuid as string, false, true);
 		document.body.appendChild(this.css);
 
 
