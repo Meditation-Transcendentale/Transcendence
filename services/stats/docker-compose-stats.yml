@@ -10,6 +10,7 @@ services:
     command: ["-c", "/nats-server.conf"]
     networks:
       - transcendence-network
+      - nats-network
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
