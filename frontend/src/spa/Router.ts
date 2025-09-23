@@ -103,6 +103,12 @@ class RouterC {
 			ts: "./Tournament",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
+		this.routes.set("/auth", { 
+			html: "/auth",
+			ts: "./Auth",
+			callback: (url: URL) => { this.loadInMain(url) }
+		} as routePage);
+
 
 
 
@@ -144,7 +150,7 @@ class RouterC {
 			//this.oldURL = url.href;
 			await meRequest("no-cache")
 				.then(() => {
-					if (url.pathname == "/login" || url.pathname == "/register" || (this.first && url.pathname == "/cajoue")) {
+					if (url.pathname == "/auth" || url.pathname == "/register" || (this.first && url.pathname == "/cajoue")) {
 						url.pathname = "/home";
 						url.search = "";
 					}
@@ -153,8 +159,8 @@ class RouterC {
 				})
 				.catch(() => {
 					this.oldURL = url.href;
-					if (url.pathname != "/login" && url.pathname != "/register") {
-						url.pathname = "/login";
+					if (url.pathname != "/auth" && url.pathname != "/register") {
+						url.pathname = "/auth";
 						url.search = "";
 						if (!this.first) {
 							meReject();
@@ -164,7 +170,7 @@ class RouterC {
 					}
 				})
 		} else {
-			if (url.pathname == "/login" || url.pathname == "/register") {
+			if (url.pathname == "/auth" || url.pathname == "/register") {
 				url.pathname = "/home";
 				url.search = "";
 			}
@@ -175,7 +181,7 @@ class RouterC {
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
 
 		//url.pathname = "/home";
-		if (url.pathname !== "/login" && url.pathname !== "/register") {
+		if (url.pathname !== "/auth" && url.pathname !== "/register") {
 			this.loadAth();
 		}
 		this.routes.get(url.pathname)?.callback(url);
