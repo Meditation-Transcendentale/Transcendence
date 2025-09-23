@@ -30,6 +30,7 @@ class RouterC {
 	private comebackRoutePath: string;
 
 	constructor() {
+		console.log("ROUTER CONSTRUCTOR AAHAHAHHAHAHAAHAH");
 		this.initRoute = null;
 		this.location = `http://${window.location.hostname}:7000`;
 		this.oldURL = "";

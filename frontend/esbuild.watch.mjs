@@ -45,8 +45,22 @@ const customAliasPlugin = {
 			path: '../babyImport',
 			external: true,
 		}));
+		build.onResolve({ filter: /Router$/ }, args => {
+				console.log("kejfwekhf");
+				return {
+				path: "../spa/Router",
+				external: true}
+			})
 	},
 };
+
+
+const routerExternal = {
+	name: 'router-external',
+	setup(build) {
+		
+	},
+}
 
 //fs.watch('public/css', { recursive: true }, (eventType, filename) => {
 //	if (filename && filename.endsWith('.css')) {
@@ -125,7 +139,7 @@ const pongbrctx = await esbuild.context({
 	minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
-	plugins: [notifyPlugin, customAliasPlugin]
+	plugins: [notifyPlugin, customAliasPlugin, routerExternal]
 })
 
 const pongctx = await esbuild.context({
@@ -135,13 +149,13 @@ const pongctx = await esbuild.context({
 	treeShaking: true,
 	legalComments: 'none',
 	format: "esm",
-	minify: true,
-	minifySyntax: true,
-	minifyWhitespace: true,
-	minifyIdentifiers: true,
+	//minify: true,
+	//minifySyntax: true,
+	//minifyWhitespace: true,
+	//minifyIdentifiers: true,
 	splitting: false,
 	resolveExtensions: ['.ts', '.js'],
-	plugins: [notifyPlugin, customAliasPlugin]
+	plugins: [notifyPlugin, customAliasPlugin, routerExternal]
 })
 
 const brickctx = await esbuild.context({
