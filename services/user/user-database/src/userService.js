@@ -128,7 +128,6 @@ const userService = {
 	},
 	getUserFromHeader: (headers) => {
 		const userHeader = headers['user'];
-		console.log("user header:", userHeader);
 		if (!userHeader) {
 			throw { status : statusCode.UNAUTHORIZED, code: 401, message: returnMessages.UNAUTHORIZED };
 		}
