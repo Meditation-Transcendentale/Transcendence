@@ -90,7 +90,7 @@ export class Picker {
 
 	public render(deltaTime: number) {
 		if (!this.enabled) { return; }
-		this.moveBall(deltaTime);
+		this.moveBall(Math.min(deltaTime, 1.));
 		this.swapRT();
 		this.effectRenderer.render(this.pickerEffect, this.rtB);
 	}
@@ -106,6 +106,10 @@ export class Picker {
 		})
 		window.addEventListener("mousemove", (ev) => {
 			this.pointer.set(ev.clientX, ev.clientY);
+		})
+
+		window.addEventListener("mouseout", () => {
+			this.ballHit = false;
 		})
 	}
 
