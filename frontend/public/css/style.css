@@ -550,3 +550,8 @@ input[type="number"] {
 input[type="range"] {
 	vertical-align: middle;
 }
+
+.already-open {
+	color: white;
+	display: inline-block;
+}

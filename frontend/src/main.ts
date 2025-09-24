@@ -31,11 +31,11 @@ async function init() {
 	// let postRequest = await import("./spa/requests.ts").postRequest;
 
 
-	await	App3D.init()
-		// .then(() => {
-			Router.nav(window.location.href.substring(window.location.origin.length), false, false);
-			App3D.run()
-		// })
+	await App3D.init()
+	// .then(() => {
+	Router.nav(window.location.href.substring(window.location.origin.length), false, false);
+	App3D.run()
+	// })
 
 	window.onbeforeunload = () => {
 		App3D.dispose();
@@ -55,7 +55,9 @@ async function init() {
 		//	postRequest("friends/add", { inputUsername: "Erwan"});
 		//}
 	})
-	loader.remove();
+
+
+	loader!.remove();
 }
 
 
@@ -67,9 +69,41 @@ function addLoader() {
 	loader.appendChild(l);
 	document.body.appendChild(loader);
 }
-window.addEventListener("DOMContentLoaded", () => { 
+
+function alreadyOpen() {
+	const t = document.createElement("span");
+	t.innerText = "Transcendance already open in another Tab";
+	t.className = "already-open";
+	loader!.querySelector(".loader")?.remove();
+	loader!.appendChild(t);
+
+}
+
+async function checkOnlyOneTab() {
+	let first = true;
+	const channel = new BroadcastChannel('tab');
+
+	channel.postMessage("another-tab");
+	channel.addEventListener("message", (msg) => {
+		if (msg.data === "another-tab" && first) {
+			channel.postMessage("already-open");
+		}
+		if (msg.data === "already-open") {
+			first = false;
+			//alert("aaaaaaaa");
+		}
+	})
+	setTimeout(() => {
+		if (first) { init() }
+		else { alreadyOpen() }
+	}, 10)
+
+
+}
+
+window.addEventListener("DOMContentLoaded", () => {
 	addLoader();
-	init();
+	checkOnlyOneTab();
 })
 
 
