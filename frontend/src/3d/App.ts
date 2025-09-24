@@ -38,7 +38,7 @@ class app3d {
 			antialias: true,
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
-		this.engine.setHardwareScalingLevel(2.0);
+		// this.engine.setHardwareScalingLevel(2.0);
 		this.engine.getCaps().textureFloatRender = true;
 
 		window.addEventListener('resize', () => {
