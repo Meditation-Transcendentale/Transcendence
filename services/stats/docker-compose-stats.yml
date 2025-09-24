@@ -4,6 +4,8 @@ services:
     container_name: nats
     environment:
       - NATS_TOKEN=${NATS_TOKEN}
+      - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
+      - NATS_LEAF_TOKEN=${NATS_LEAF_TOKEN}
     volumes:
       - ./services/stats/nats-server.conf:/nats-server.conf:ro
       - ./shared/certs:/etc/certs:ro
@@ -49,6 +51,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - NATS_URL=${NATS_URL}
       - NATS_TOKEN=${NATS_TOKEN}
+
     networks:
       - transcendence-network
     depends_on:

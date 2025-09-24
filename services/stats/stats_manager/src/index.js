@@ -105,6 +105,7 @@ handleErrorsNats(async () => {
 		handleNatsSubscription("stats.endgame", async (msg) => {
 
 			const decodedData = jc.decode(msg.data);
+			console.log("Received data for stats.endgame:", decodedData);
 
 			if (Array.isArray(decodedData)) {
 				nats.request('stats.addBRMatchStatsInfos', msg.data, { timeout: 1000 });

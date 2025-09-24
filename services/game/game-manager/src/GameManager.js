@@ -14,6 +14,10 @@ import {
 	encodeMatchEnd
 } from './proto/helper.js';
 
+
+import {JSONCodec} from 'nats';
+const jc = JSONCodec();
+
 export class GameManager {
 	constructor(nc) {
 		this.nc = nc;

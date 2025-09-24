@@ -132,6 +132,7 @@ const userService = {
 			throw { status : statusCode.UNAUTHORIZED, code: 401, message: returnMessages.UNAUTHORIZED };
 		}
 		const userToken = JSON.parse(userHeader);
+		console.log("userToken:", userToken);
 		const user = userService.getUserFromUUID(userToken.uuid);
 		return user;
 	},
