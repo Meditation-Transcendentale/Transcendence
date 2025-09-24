@@ -86,15 +86,7 @@ const twoFARoutes = (app) => {
 
 	app.post('/verify-2fa', handleErrorsValid(async (req, res) => {
 
-
-		console.log("headers:", req.headers);
-		let user;
-		if (req.body.userUUID === undefined) {
-			user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers }); 
-		} else {
-			user = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid: req.body.userUUID });
-		}
-		console.log(user);
+		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers }); 
 
 		if (!user.two_fa_enabled) {
 			throw { status: userReturn.USER_026.http, code: userReturn.USER_026.code, message: userReturn.USER_026.message, valid: false };

@@ -11,26 +11,10 @@ services:
     command: ["-c", "/nats-server.conf"]
     networks:
       - game-network
-    depends_on:
-      database_certs-init:
-        condition: service_completed_successfully
-
-  nats_leaf:
-    image: nats:latest
-    container_name: nats_leaf
-    volumes:
-      - ./services/game/nats-leaf.conf:/nats-leaf.conf:ro
-      - ./shared/certs:/etc/certs:ro
-    command: ["-c", "/nats-leaf.conf"]
-    networks:
-      - game-network
       - nats-network
     depends_on:
-      nats_game:
-        condition: service_started
       database_certs-init:
         condition: service_completed_successfully
-
 
   lobby-manager:
     container_name: lobby_manager

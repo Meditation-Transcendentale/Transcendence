@@ -128,11 +128,11 @@ const userService = {
 	},
 	getUserFromHeader: (headers) => {
 		const userHeader = headers['user'];
+		console.log("user header:", userHeader);
 		if (!userHeader) {
 			throw { status : statusCode.UNAUTHORIZED, code: 401, message: returnMessages.UNAUTHORIZED };
 		}
 		const userToken = JSON.parse(userHeader);
-		console.log("userToken:", userToken);
 		const user = userService.getUserFromUUID(userToken.uuid);
 		return user;
 	},
