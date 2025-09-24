@@ -160,9 +160,6 @@ const userService = {
 	},
 	getFriendsRequests: (userId) => {
 		const friendRequestsList = getFriendsRequestsStmt.all(userId);
-		if (friendRequestsList.length === 0) {
-			throw { status: friendshipReturn.FRIEND_002.http, code: friendshipReturn.FRIEND_002.code, message: friendshipReturn.FRIEND_002.message };
-		}
 		return friendRequestsList;
 	},
 	isFriendshipExisting: (userId1, userId2) => {
@@ -187,9 +184,6 @@ const userService = {
 	},
 	getBlockedUsers: (userId) => {
 		const blockedUsers = getBlockedUsersStmt.all(userId);
-		if (blockedUsers.length === 0) {
-			throw { status: friendshipReturn.FRIEND_019.http, code: friendshipReturn.FRIEND_019.code, message: friendshipReturn.FRIEND_019.message };
-		}
 		return blockedUsers;
 	},
 	updateUsername: (username, userId) => {
