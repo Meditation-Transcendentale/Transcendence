@@ -117,23 +117,22 @@ export class GrassShader extends CustomMaterial {
 
 		this.Vertex_Before_NormalUpdated(
 			`
-				// vec3 viewDir = vEyePosition.xyz - vec3(pos.x, 0., pos.y) ;
-				// normalUpdated = normalize(vec3(viewDir.x, 0., viewDir.z));
+				vec3 viewDir = vEyePosition.xyz - vec3(pos.x, 0., pos.y) ;
+				normalUpdated = normalize(vec3(viewDir.x, 0., viewDir.z));
 				// normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
 				// normalUpdated = rotationAxis(normalUpdated, totalWave.z * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
-				normalUpdated = vec3(0.,0.,1.);
+				// normalUpdated = vec3(0.,0.,1.);
 				normalUpdated = rotationY(normalUpdated, baseColor.r);
 				normalUpdated = rotationAxis(normalUpdated, totalWave.z * M_PI* 0.3 , vec3(-totalWave.y, 0., -totalWave.x));
 				normalUpdated = rotationAxis(normalUpdated, strengh, vec3(windDir.y, 0., windDir.x));
 				normalUpdated.y = abs(normalUpdated.y);
-
 			`
 		)
 
 
 		//NORMAL IN FRAGMENT
 		this.Fragment_Before_Lights(`
-			normalW = normalize(cross(dFdx(vPositionW), dFdy(vPositionW)));
+			// normalW = normalize(cross(dFdx(vPositionW), dFdy(vPositionW)));
 			// normalW.y = abs(normalW.y);
 			// vec3 nor = rotationY(normalW, M_PI * 0.5 * (vMainUV1.x * 2. - 1.)); //Rounded Normal
 			// normalW = rotationAxis(vPositionM,M_PI * 0.1 * (vMainUV1.x * 2. - 1.), normalW );

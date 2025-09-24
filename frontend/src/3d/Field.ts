@@ -140,7 +140,7 @@ export class Field {
 
 	public update(time: number, deltaTime: number) {
 		if (this.active) {
-			this.picker.render();
+			this.picker.render(deltaTime);
 			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
 			this.fog.render();
 			this.monolith.update(time, this.camera);

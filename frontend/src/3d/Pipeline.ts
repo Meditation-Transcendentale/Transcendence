@@ -86,8 +86,8 @@ export class Pipeline {
 		this.bloomEffect = new BloomEffect(this.scene.getEngine(), 0.25, 0.1, 32., Engine.TEXTURETYPE_HALF_FLOAT);
 
 		this.renderingPipeline.addEffect(this.fogEffect);
-		this.renderingPipeline.addEffect(this.colorCorrectionEffect);
 		this.renderingPipeline.addEffect(this.bloomEffect);
+		this.renderingPipeline.addEffect(this.colorCorrectionEffect);
 
 		this.scene.postProcessRenderPipelineManager.addPipeline(this.renderingPipeline);
 		this.scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("pipeline", this.camera);
