@@ -7,7 +7,7 @@
 	background: black;
 	color: #00ff00;
 	font-family: 'Courier New', monospace;
-	font-size: 14px !important; 
+	font-size: 14px !important;
 	padding: 20px;
 	height: 100%;
 	overflow-y: auto;
@@ -17,7 +17,7 @@
 }
 
 #exemple-exemple .boot-terminal * {
-	font-size: 14px !important; 
+	font-size: 14px !important;
 }
 
 #exemple-exemple .boot-line {
@@ -50,7 +50,9 @@
 }
 
 @keyframes fadeInLine {
-	to { opacity: 1; }
+	to {
+		opacity: 1;
+	}
 }
 
 #exemple-exemple .cursor {
@@ -63,8 +65,16 @@
 }
 
 @keyframes blink {
-	0%, 50% { opacity: 1; }
-	51%, 100% { opacity: 0; }
+
+	0%,
+	50% {
+		opacity: 1;
+	}
+
+	51%,
+	100% {
+		opacity: 0;
+	}
 }
 
 #exemple-exemple .progress-line {
@@ -100,17 +110,17 @@
 }
 
 #exemple-exemple.window {
-    position: relative !important;
-    
-    border: none !important;
-    box-shadow: none !important;
-    
-    z-index: 9999 !important;
-    
-    min-height: unset !important;
-    min-width: unset !important;
-    
-    background-color: #000 !important;
+	position: relative !important;
+
+	border: none !important;
+	box-shadow: none !important;
+
+	z-index: 9999 !important;
+
+	min-height: unset !important;
+	min-width: unset !important;
+
+	background-color: #000 !important;
 }
 
 .hidden {
@@ -144,6 +154,7 @@
 	align-items: center;
 	justify-content: center;
 }
+
 .login-container {
 	max-width: 800px;
 	margin: 0;
@@ -151,7 +162,7 @@
 	border: none;
 	padding: 0;
 	box-shadow: none;
-		width: 100%;
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -349,11 +360,14 @@
 }
 
 @keyframes pulse {
-	0%, 100% { 
+
+	0%,
+	100% {
 		opacity: 1;
 		transform: scale(1);
 	}
-	50% { 
+
+	50% {
 		opacity: 0.7;
 		transform: scale(1.05);
 	}
@@ -368,21 +382,26 @@
 		opacity: 1;
 		filter: none;
 	}
+
 	20% {
 		filter: hue-rotate(90deg);
 	}
+
 	40% {
 		filter: hue-rotate(180deg) blur(1px);
 		transform: scale(1.02);
 	}
+
 	60% {
 		filter: hue-rotate(270deg) blur(2px);
 		transform: scale(0.98);
 	}
+
 	80% {
 		filter: hue-rotate(360deg) blur(5px);
 		opacity: 0.3;
 	}
+
 	100% {
 		opacity: 0;
 		visibility: hidden;
@@ -392,8 +411,42 @@
 }
 
 .login-error {
-	position: relative;
-	top: 2vh;
 	width: 100%;
 	text-align: center;
+}
+
+#twofa-container {
+	width: 100%;
+}
+
+#token-input-container {
+	width: 100%;
+	align-content: center;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.token-number {
+	/* display: inline-block !important; */
+	font-size: 30px !important;
+	width: 40px;
+	text-align: center;
+}
+
+#twofa-button-container {
+	width: 100%;
+	justify-content: center;
+}
+
+.terminal-input:disabled {
+	color: #470405 !important;
+	border-color: #470405 !important;
+	background-color: #141316 !important;
+
+}
+
+.terminal-btn:disabled {
+	color: #470405 !important;
+	border-color: #470405 !important;
+	background-color: #141316 !important;
 }

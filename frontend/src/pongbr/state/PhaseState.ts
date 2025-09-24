@@ -160,7 +160,7 @@ export class PhaseState {
 			return 1.0;
 		}
 
-		const totalRebuildTime = 3000; // From physics REBUILD_DURATION
+		const totalRebuildTime = 3000;
 		const elapsed = totalRebuildTime - this.rebuildTimeRemaining;
 		return Math.min(1.0, Math.max(0.0, elapsed / totalRebuildTime));
 	}

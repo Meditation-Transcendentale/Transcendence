@@ -31,7 +31,7 @@ await app.register(import('@fastify/formbody'));
 app.register(fastifyMultipart, {
 	limits: {
 		fileSize: 5 * 1024 * 1024
-	} 
+	}
 });
 
 const verifyApiKey = (req, res, done) => {
@@ -91,7 +91,7 @@ app.get('/metrics', async (req, res) => {
 
 app.addHook('onRequest', verifyApiKey);
 
-const nats = await connect({ 
+const nats = await connect({
 	servers: process.env.NATS_URL,
 	token: process.env.NATS_TOKEN,
 	tls: { rejectUnauthorized: false }
@@ -159,7 +159,7 @@ async function getAvatarCdnUrl(avatar, uuid) {
 
 app.patch('/username', handleErrors(async (req, res) => {
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
-		
+
 	if (!req.body) {
 		throw { status: userReturn.USER_021.http, code: userReturn.USER_021.code, message: userReturn.USER_021.message };
 	}
@@ -178,7 +178,7 @@ app.patch('/username', handleErrors(async (req, res) => {
 }));
 
 app.patch('/avatar', handleErrors(async (req, res) => {
-	
+
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
 	const avatar = await req.file();
@@ -191,7 +191,7 @@ app.patch('/avatar', handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, 'user.updateAvatar', { avatar: cdnPath, userId: user.id });
 
 	res.header('Cache-Control', 'no-store');
-	res.code(statusCode.SUCCESS).send({ message: returnMessages.AVATAR_UPDATED, data: { cdnPath }});
+	res.code(statusCode.SUCCESS).send({ message: returnMessages.AVATAR_UPDATED, data: { cdnPath } });
 
 }));
 
@@ -205,12 +205,12 @@ app.patch('/password', handleErrors(async (req, res) => {
 		throw { status: userReturn.USER_021.http, code: userReturn.USER_021.code, message: userReturn.USER_021.message };
 	}
 
-	const { password, newPassword, token } = req.body;
+	const { password, newPassword, token } = JSON.parse(req.body);
 
 	if (!password) {
 		throw { status: userReturn.USER_005.http, code: userReturn.USER_005.code, message: userReturn.USER_005.message };
 	}
-	
+
 	if (!newPassword) {
 		throw { status: userReturn.USER_006.http, code: userReturn.USER_006.code, message: userReturn.USER_006.message };
 	}

@@ -59,7 +59,7 @@ class FriendlistC {
 			.catch((err) => { console.log(err.json()) })
 		getRequest("friends/get/requests")
 			.then((json) => { this.friendlistInviteResolve(json) })
-			.catch((err) => { console.log(err.json()) })
+			.catch((err) => { })
 	}
 
 	public load() {

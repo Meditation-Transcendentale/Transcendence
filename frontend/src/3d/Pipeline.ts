@@ -51,7 +51,7 @@ export class Pipeline {
 
 
 		this.colorCorrectionPostProcess = new PostProcess("colorCorrection", "colorCorrection", {
-			uniforms: ["contrast", "brightness", "gamma"],
+			uniforms: ["contrast", "brightness", "gamma", "tonemapping"],
 			size: 1.,
 			camera: this.camera,
 			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
@@ -60,12 +60,14 @@ export class Pipeline {
 		})
 		this.contrast = 1.;
 		this.brightness = 0.;
-		this.gamma = 1.;
+		this.gamma = 2.2;
+		this.tonemapping = 0;
 
 		this.colorCorrectionPostProcess.onApply = (effect) => {
 			effect.setFloat("contrast", this.contrast);
 			effect.setFloat("brightness", this.brightness);
 			effect.setFloat("gamma", this.gamma);
+			effect.setInt("tonemapping", this.tonemapping);
 		}
 
 		this.camera.detachPostProcess(this.colorCorrectionPostProcess);
@@ -145,6 +147,13 @@ export class Pipeline {
 			max: 3,
 			div: details
 		}, (n: number) => { this.gamma = n });
+		UIaddSlider("tonemap", this.tonemapping, {
+			step: 1.,
+			min: 0,
+			max: 7,
+			div: details
+		}, (n: number) => { this.tonemapping = n });
+
 		UIaddSlider("bloom weight", this.bloomEffect.weight, {
 			step: 0.1,
 			min: 0,
