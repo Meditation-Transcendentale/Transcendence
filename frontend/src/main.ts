@@ -11,6 +11,8 @@ import { postRequest } from "./spa/requests";
 //}
 //
 
+let loader;
+
 async function init() {
 	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
 
@@ -22,12 +24,18 @@ async function init() {
 	};
 
 	//Router.AUTHENTIFICATION = false;
+	// let App3D = await import("./3d/App.ts").default();
+	// let	NotificationManager = await import("./spa/NotificationManager").default();
+	// let Popup = await import("./spa/Popup.ts").default();
+	// let Router = await import("./spa/Router.ts").default();
+	// let postRequest = await import("./spa/requests.ts").postRequest;
 
-	App3D.init()
-		.then(() => {
+
+	await	App3D.init()
+		// .then(() => {
 			Router.nav(window.location.href.substring(window.location.origin.length), false, false);
 			App3D.run()
-		})
+		// })
 
 	window.onbeforeunload = () => {
 		App3D.dispose();
@@ -47,7 +55,21 @@ async function init() {
 		//	postRequest("friends/add", { inputUsername: "Erwan"});
 		//}
 	})
+	loader.remove();
 }
-window.addEventListener("DOMContentLoaded", () => { init() })
+
+
+function addLoader() {
+	loader = document.createElement("div");
+	loader.className = "loader-div";
+	const l = document.createElement("span");
+	l.className = "loader";
+	loader.appendChild(l);
+	document.body.appendChild(loader);
+}
+window.addEventListener("DOMContentLoaded", () => { 
+	addLoader();
+	init();
+})
 
 

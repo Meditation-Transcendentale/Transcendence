@@ -1,6 +1,7 @@
 @import url("font.css");
 @import url("inputs.css");
 @import url("popup.css");
+@import url("loading.css");
 
 ::selection {
 	color: black !important;
