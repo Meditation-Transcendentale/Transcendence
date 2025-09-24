@@ -51,6 +51,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - NATS_URL=${NATS_URL}
       - NATS_TOKEN=${NATS_TOKEN}
+
     networks:
       - transcendence-network
     depends_on:

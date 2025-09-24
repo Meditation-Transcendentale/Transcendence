@@ -16,7 +16,6 @@ services:
       database_certs-init:
         condition: service_completed_successfully
 
-
   lobby-manager:
     container_name: lobby_manager
     build:
