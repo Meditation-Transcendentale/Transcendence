@@ -76,7 +76,7 @@ export class Field {
 		this.camera.attachControl();
 		this.camera.minZ = 0.01;
 		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
-		this.light.intensity = 2.5;
+		this.light.intensity = 1.;
 		// this.light.specular = Color3.Black();
 
 
@@ -270,7 +270,7 @@ export class Field {
 
 	public setLight(status: boolean) {
 		if (status == true)
-			this.light.intensity = 2.5;
+			this.light.intensity = 1.;
 		else
 			this.light.intensity = 0;
 	}
@@ -281,7 +281,7 @@ export class Field {
 		this.picker.setEnable(status);
 		this.monolith.setPicking(status);
 		this.grass.setEnable(status);
-		this.setLight(status)
+		// this.setLight(status)
 		this.active = status;
 	}
 

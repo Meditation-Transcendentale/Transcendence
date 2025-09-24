@@ -15,11 +15,11 @@ import {
 	FreeCamera,
 } from "@babylonImport";
 import { Field } from "./Field";
-import { DefaultRenderingPipeline, DirectionalLight, DynamicTexture, Material, PBRMaterial, PointLight, ShadowGenerator, SpotLight, Texture } from "@babylonjs/core";
+import { DefaultRenderingPipeline, DirectionalLight, DynamicTexture, HemisphericLight, Material, PBRMaterial, PointLight, ShadowGenerator, SpotLight, Texture } from "@babylonjs/core";
 import { gTrackManager } from "./TrackManager";
-// import { Inspector } from '@babylonjs/inspector';
+import { Inspector } from '@babylonjs/inspector';
 // import "@babylonjs/core/Debug/debugLayer";
-// import "@babylonjs/inspector";
+import "@babylonjs/inspector";
 // import * as BABYLON from 'babylonjs';
 // import 'babylonjs-inspector';
 
@@ -100,11 +100,11 @@ export class Environment {
 		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 5, tessellation: 128 }, this.scene);
 		arenaMesh.parent = this.pongRoot;
 		const arenaMaterial = new PBRMaterial("gameplayArena", this.scene);
-		arenaMaterial.albedoColor = new Color3(0.08, 0.10, 0.12);
-		arenaMaterial.emissiveColor = new Color3(0.01, 0.03, 0.05);
-		arenaMaterial.roughness = 0.95;
+		arenaMaterial.albedoColor = new Color3(0.08, 0.08, 0.08);
+		arenaMaterial.emissiveColor = new Color3(0.01, 0.01, 0.01);
+		arenaMaterial.roughness = 0.85;
 		arenaMaterial.metallic = 0.02;
-
+		arenaMesh.material = arenaMaterial;
 		this.gameMeshes.push(arenaMesh);
 
 	}
@@ -171,20 +171,23 @@ export class Environment {
 			2,
 			this.scene
 		);
-		const whitelight2 = new SpotLight(
-			"whitelight2",
-			new Vector3(0, 400, 0),
-			new Vector3(0, -1, 0),
-			Math.PI,
-			2,
-			this.scene
-		);
+
+		const hemish = this.scene.getLightByName("hemish") as HemisphericLight;
+		hemish.excludedMeshes.push(headMesh);
+		// const whitelight2 = new SpotLight(
+		// 	"whitelight2",
+		// 	new Vector3(0, 400, 0),
+		// 	new Vector3(0, -1, 0),
+		// 	Math.PI,
+		// 	2,
+		// 	this.scene
+		// );
 
 		whitelight.parent = this.pongRoot;
-		whitelight2.parent = this.pongRoot;
+		// whitelight2.parent = this.pongRoot;
 		whitelight.shadowMinZ = 1;
 		whitelight.intensity = 8;
-		whitelight2.intensity = 1;
+		// whitelight2.intensity = 1;
 		whitelight.shadowMaxZ = 10;
 		redlight.shadowMinZ = 1;
 		redlight.shadowMaxZ = 80;

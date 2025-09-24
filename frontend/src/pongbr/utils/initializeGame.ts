@@ -1,5 +1,6 @@
-import { Color3, Effect, Mesh, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
+import { Color3, Effect, Mesh, MeshBuilder, PBRMaterial, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
 import { PaddleMaterial } from './PaddleMaterial';
+import { HemisphericLight, DirectionalLight } from "@babylonImport";
 
 Effect.ShadersRepository = "";
 
@@ -29,10 +30,11 @@ export function createWallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 export function createBallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 0.5 }, scene);
 	ballMesh.parent = pongRoot;
-	const ballMaterial = new StandardMaterial("ballMaterial", scene);
-	ballMaterial.diffuseColor.set(1, 0, 0);
-	ballMaterial.emissiveColor.set(0.3, 0.3, 0.3);
-	ballMaterial.specularColor.set(0.5, 0.5, 0.5);
+	const ballMaterial = new PBRMaterial("ballMaterial", scene);
+	ballMaterial.albedoColor = new Color3(0.95, 0.95, 0.95); // Near white
+	ballMaterial.emissiveColor = new Color3(0.2, 0.2, 0.2); // Soft self-glow
+	ballMaterial.roughness = 0.3; // Slightly reflective
+	ballMaterial.metallic = 0.1;
 	ballMesh.setEnabled(true);
 	ballMesh.setPivotPoint(Vector3.Zero());
 	ballMesh.position.y = 2.5;
@@ -57,6 +59,7 @@ export function createPaddleMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 		tileWidth: 0.1
 	}, scene);
 	paddle.parent = pongRoot;
+	paddle.receiveShadows = false;
 	const mat = new PaddleMaterial('paddleMaterial', scene);
 
 	mat.setUniform("arenaRadius", arenaRadius);
@@ -80,7 +83,7 @@ export function createPillarMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	m.parent = pongRoot;
 	m.isVisible = true;
 	const mat = new StandardMaterial("pillarMat", scene);
-	mat.diffuseColor = Color3.Blue();
+	mat.diffuseColor.set(0.1, 0.1, 0.1);
 	m.material = mat;
 	return m;
 }
@@ -94,19 +97,22 @@ export function createGoalMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	m.parent = pongRoot;
 	const mat = new StandardMaterial("goalMat", scene);
 	mat.diffuseColor.set(1, 0, 0);
+	mat.emissiveColor.set(0, 0, 0);
+	mat.roughness = 0;
+	m.receiveShadows = false;
 	m.material = mat;
 	m.setEnabled(false);
 	m.setPivotPoint(Vector3.Zero());
 	return m;
 }
 
-
 export function createBaseMeshes(scene: Scene, pongRoot: TransformNode) {
-	return {
+	const meshes = {
 		ball: createBallMesh(scene, pongRoot),
 		paddle: createPaddleMesh(scene, pongRoot),
 		wall: createWallMesh(scene, pongRoot),
 		pillar: createPillarMesh(scene, pongRoot),
 		goal: createGoalMesh(scene, pongRoot),
-	}
+	};
+	return meshes;
 }
