@@ -54,7 +54,6 @@ export class Field {
 	private trackTarget!: Track;
 	private trackCamera!: Track;
 
-	private ultraLowPerf = false;
 
 	private spotLight: SpotLight;
 
@@ -82,9 +81,9 @@ export class Field {
 		this.camera.minZ = 0.01;
 		// const light2 = new DirectionalLight("direclight", new Vector3(0, -0.2, -1), this.scene);
 		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
-		this.light.intensity = 0.08;
+		this.light.intensity = 0.7;
 
-		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.3, 1, this.scene);
+		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.3, 33, this.scene);
 
 		UIaddSlider("light intensity", this.spotLight.intensity, {
 			step: 0.1,
@@ -331,13 +330,5 @@ export class Field {
 			this.grass.reduceGrass(n);
 		})
 
-	}
-
-	public ultraLowPerf() {
-		this.ultraLowPerf = true;
-		this.grass.setEnable(false);
-		this.picker.setEnable(false);
-		this.monolith.setPicking(false);
-		this.monolith.getMesh().setEnable(false);
 	}
 }

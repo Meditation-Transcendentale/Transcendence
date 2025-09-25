@@ -1,4 +1,4 @@
-import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
+import { Camera, Mesh, MeshBuilder, Scene, Vector3, LoadAssetContainerAsync, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
 
@@ -573,6 +573,7 @@ export class Monolith {
 			size: this.options.voxelSize,
 			updatable: false
 		}, this.scene);
+
 
 		this.voxelPositions = [...positions];
 		const totalMatrices = positions.length;
