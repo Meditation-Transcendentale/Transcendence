@@ -84,7 +84,7 @@ export class Picker {
 		this.cursor.y = (this.meshBall.position.z / this.groundSize.y) + 0.5;
 		this.pick = 1;
 
-		this.ballOrigin = new Vector3(0, this.groundPosition.y, 4);
+		this.ballOrigin = new Vector3(0, this.groundPosition.y, 0);
 
 	}
 
