@@ -3718,14 +3718,245 @@ export const shared = $root.shared = (() => {
         return MatchStart;
     })();
 
+    shared.ScoreUpdate = (function() {
+
+        /**
+         * Properties of a ScoreUpdate.
+         * @memberof shared
+         * @interface IScoreUpdate
+         * @property {Array.<number>|null} [score] ScoreUpdate score
+         */
+
+        /**
+         * Constructs a new ScoreUpdate.
+         * @memberof shared
+         * @classdesc Represents a ScoreUpdate.
+         * @implements IScoreUpdate
+         * @constructor
+         * @param {shared.IScoreUpdate=} [properties] Properties to set
+         */
+        function ScoreUpdate(properties) {
+            this.score = [];
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * ScoreUpdate score.
+         * @member {Array.<number>} score
+         * @memberof shared.ScoreUpdate
+         * @instance
+         */
+        ScoreUpdate.prototype.score = $util.emptyArray;
+
+        /**
+         * Creates a new ScoreUpdate instance using the specified properties.
+         * @function create
+         * @memberof shared.ScoreUpdate
+         * @static
+         * @param {shared.IScoreUpdate=} [properties] Properties to set
+         * @returns {shared.ScoreUpdate} ScoreUpdate instance
+         */
+        ScoreUpdate.create = function create(properties) {
+            return new ScoreUpdate(properties);
+        };
+
+        /**
+         * Encodes the specified ScoreUpdate message. Does not implicitly {@link shared.ScoreUpdate.verify|verify} messages.
+         * @function encode
+         * @memberof shared.ScoreUpdate
+         * @static
+         * @param {shared.IScoreUpdate} message ScoreUpdate message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        ScoreUpdate.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.score != null && message.score.length) {
+                writer.uint32(/* id 1, wireType 2 =*/10).fork();
+                for (let i = 0; i < message.score.length; ++i)
+                    writer.int32(message.score[i]);
+                writer.ldelim();
+            }
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ScoreUpdate message, length delimited. Does not implicitly {@link shared.ScoreUpdate.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.ScoreUpdate
+         * @static
+         * @param {shared.IScoreUpdate} message ScoreUpdate message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        ScoreUpdate.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a ScoreUpdate message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.ScoreUpdate
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.ScoreUpdate} ScoreUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        ScoreUpdate.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.ScoreUpdate();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.score && message.score.length))
+                            message.score = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.score.push(reader.int32());
+                        } else
+                            message.score.push(reader.int32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a ScoreUpdate message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.ScoreUpdate
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.ScoreUpdate} ScoreUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        ScoreUpdate.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a ScoreUpdate message.
+         * @function verify
+         * @memberof shared.ScoreUpdate
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ScoreUpdate.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.score != null && message.hasOwnProperty("score")) {
+                if (!Array.isArray(message.score))
+                    return "score: array expected";
+                for (let i = 0; i < message.score.length; ++i)
+                    if (!$util.isInteger(message.score[i]))
+                        return "score: integer[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a ScoreUpdate message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.ScoreUpdate
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.ScoreUpdate} ScoreUpdate
+         */
+        ScoreUpdate.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.ScoreUpdate)
+                return object;
+            let message = new $root.shared.ScoreUpdate();
+            if (object.score) {
+                if (!Array.isArray(object.score))
+                    throw TypeError(".shared.ScoreUpdate.score: array expected");
+                message.score = [];
+                for (let i = 0; i < object.score.length; ++i)
+                    message.score[i] = object.score[i] | 0;
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a ScoreUpdate message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.ScoreUpdate
+         * @static
+         * @param {shared.ScoreUpdate} message ScoreUpdate
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ScoreUpdate.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults)
+                object.score = [];
+            if (message.score && message.score.length) {
+                object.score = [];
+                for (let j = 0; j < message.score.length; ++j)
+                    object.score[j] = message.score[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this ScoreUpdate to JSON.
+         * @function toJSON
+         * @memberof shared.ScoreUpdate
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        ScoreUpdate.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for ScoreUpdate
+         * @function getTypeUrl
+         * @memberof shared.ScoreUpdate
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        ScoreUpdate.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.ScoreUpdate";
+        };
+
+        return ScoreUpdate;
+    })();
+
     shared.MatchEnd = (function() {
 
         /**
          * Properties of a MatchEnd.
          * @memberof shared
          * @interface IMatchEnd
-         * @property {number|null} [winnerId] MatchEnd winnerId
+         * @property {string|null} [winnerId] MatchEnd winnerId
+         * @property {string|null} [loserId] MatchEnd loserId
          * @property {Array.<number>|null} [score] MatchEnd score
+         * @property {string|null} [forfeitId] MatchEnd forfeitId
          */
 
         /**
@@ -3746,11 +3977,19 @@ export const shared = $root.shared = (() => {
 
         /**
          * MatchEnd winnerId.
-         * @member {number} winnerId
+         * @member {string} winnerId
          * @memberof shared.MatchEnd
          * @instance
          */
-        MatchEnd.prototype.winnerId = 0;
+        MatchEnd.prototype.winnerId = "";
+
+        /**
+         * MatchEnd loserId.
+         * @member {string} loserId
+         * @memberof shared.MatchEnd
+         * @instance
+         */
+        MatchEnd.prototype.loserId = "";
 
         /**
          * MatchEnd score.
@@ -3759,6 +3998,14 @@ export const shared = $root.shared = (() => {
          * @instance
          */
         MatchEnd.prototype.score = $util.emptyArray;
+
+        /**
+         * MatchEnd forfeitId.
+         * @member {string} forfeitId
+         * @memberof shared.MatchEnd
+         * @instance
+         */
+        MatchEnd.prototype.forfeitId = "";
 
         /**
          * Creates a new MatchEnd instance using the specified properties.
@@ -3785,13 +4032,17 @@ export const shared = $root.shared = (() => {
             if (!writer)
                 writer = $Writer.create();
             if (message.winnerId != null && Object.hasOwnProperty.call(message, "winnerId"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.winnerId);
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.winnerId);
+            if (message.loserId != null && Object.hasOwnProperty.call(message, "loserId"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.loserId);
             if (message.score != null && message.score.length) {
-                writer.uint32(/* id 2, wireType 2 =*/18).fork();
+                writer.uint32(/* id 3, wireType 2 =*/26).fork();
                 for (let i = 0; i < message.score.length; ++i)
                     writer.int32(message.score[i]);
                 writer.ldelim();
             }
+            if (message.forfeitId != null && Object.hasOwnProperty.call(message, "forfeitId"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.forfeitId);
             return writer;
         };
 
@@ -3829,10 +4080,14 @@ export const shared = $root.shared = (() => {
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.winnerId = reader.int32();
+                        message.winnerId = reader.string();
                         break;
                     }
                 case 2: {
+                        message.loserId = reader.string();
+                        break;
+                    }
+                case 3: {
                         if (!(message.score && message.score.length))
                             message.score = [];
                         if ((tag & 7) === 2) {
@@ -3841,6 +4096,10 @@ export const shared = $root.shared = (() => {
                                 message.score.push(reader.int32());
                         } else
                             message.score.push(reader.int32());
+                        break;
+                    }
+                case 4: {
+                        message.forfeitId = reader.string();
                         break;
                     }
                 default:
@@ -3879,8 +4138,11 @@ export const shared = $root.shared = (() => {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.winnerId != null && message.hasOwnProperty("winnerId"))
-                if (!$util.isInteger(message.winnerId))
-                    return "winnerId: integer expected";
+                if (!$util.isString(message.winnerId))
+                    return "winnerId: string expected";
+            if (message.loserId != null && message.hasOwnProperty("loserId"))
+                if (!$util.isString(message.loserId))
+                    return "loserId: string expected";
             if (message.score != null && message.hasOwnProperty("score")) {
                 if (!Array.isArray(message.score))
                     return "score: array expected";
@@ -3888,6 +4150,9 @@ export const shared = $root.shared = (() => {
                     if (!$util.isInteger(message.score[i]))
                         return "score: integer[] expected";
             }
+            if (message.forfeitId != null && message.hasOwnProperty("forfeitId"))
+                if (!$util.isString(message.forfeitId))
+                    return "forfeitId: string expected";
             return null;
         };
 
@@ -3904,7 +4169,9 @@ export const shared = $root.shared = (() => {
                 return object;
             let message = new $root.shared.MatchEnd();
             if (object.winnerId != null)
-                message.winnerId = object.winnerId | 0;
+                message.winnerId = String(object.winnerId);
+            if (object.loserId != null)
+                message.loserId = String(object.loserId);
             if (object.score) {
                 if (!Array.isArray(object.score))
                     throw TypeError(".shared.MatchEnd.score: array expected");
@@ -3912,6 +4179,8 @@ export const shared = $root.shared = (() => {
                 for (let i = 0; i < object.score.length; ++i)
                     message.score[i] = object.score[i] | 0;
             }
+            if (object.forfeitId != null)
+                message.forfeitId = String(object.forfeitId);
             return message;
         };
 
@@ -3930,15 +4199,22 @@ export const shared = $root.shared = (() => {
             let object = {};
             if (options.arrays || options.defaults)
                 object.score = [];
-            if (options.defaults)
-                object.winnerId = 0;
+            if (options.defaults) {
+                object.winnerId = "";
+                object.loserId = "";
+                object.forfeitId = "";
+            }
             if (message.winnerId != null && message.hasOwnProperty("winnerId"))
                 object.winnerId = message.winnerId;
+            if (message.loserId != null && message.hasOwnProperty("loserId"))
+                object.loserId = message.loserId;
             if (message.score && message.score.length) {
                 object.score = [];
                 for (let j = 0; j < message.score.length; ++j)
                     object.score[j] = message.score[j];
             }
+            if (message.forfeitId != null && message.hasOwnProperty("forfeitId"))
+                object.forfeitId = message.forfeitId;
             return object;
         };
 
