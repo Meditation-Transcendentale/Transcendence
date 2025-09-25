@@ -16,6 +16,7 @@ export class MonolithMaterial extends CustomMaterial {
 		this.AddUniform('baseWaveIntensity', 'float', 1.0);
 		this.AddUniform('mouseInfluenceRadius', 'float', 1.0);
 		this.AddUniform('worldCenter', 'vec3', Vector3.Zero());
+		this.AddUniform('floatingOffset', 'vec3', Vector3.Zero());
 		this.AddUniform('origin', 'vec3', Vector3.Zero());
 		this.AddUniform('oldOrigin', 'vec3', Vector3.Zero());
 		this.AddUniform('deadZoneCenter', 'vec3', Vector3.Zero());
@@ -130,6 +131,9 @@ bool isInTextRegion(vec3 worldPos) {
 		this.Vertex_After_WorldPosComputed(`
 
 vec3 worldPos2 = finalWorld[3].xyz;
+vec3 originalWorldPos = worldPos.xyz;
+worldPos2 += floatingOffset;
+worldPos.xyz += floatingOffset;
 // Random per-voxel offset
 vec3 animOffset = hash3(instanceID);
 float t = time * animationSpeed;
@@ -176,7 +180,6 @@ mouseAnimation += mouseDirection * radialPulse * animationIntensity;
 mouseAnimation+= pushDirection * 0.05 * mouseInfluence;
 // In vertex shader
 
-vec3 originalWorldPos = worldPos.xyz;
 
 if(textGlow0 > 0.0) {
     vec3 textOffset = worldPos2 - textPosition0;
@@ -221,6 +224,7 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 		this.Vertex_MainEnd(`
 			//vFly = vec3(0., vec2(1. - clamp(direction.z, 0.0, 1.)));
     vOriginalWorldPos = originalWorldPos;
+
 		`)
 
 
