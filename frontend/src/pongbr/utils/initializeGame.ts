@@ -30,8 +30,8 @@ export function createBallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 0.5 }, scene);
 	ballMesh.parent = pongRoot;
 	const ballMaterial = new StandardMaterial("ballMaterial", scene);
-	ballMaterial.diffuseColor.set(1, 0, 0);
-	ballMaterial.emissiveColor.set(0.3, 0.3, 0.3);
+	ballMaterial.diffuseColor.set(0, 0, 0);
+	ballMaterial.emissiveColor.set(0.9, 0.9, 0.9);
 	ballMaterial.specularColor.set(0.5, 0.5, 0.5);
 	ballMesh.setEnabled(true);
 	ballMesh.setPivotPoint(Vector3.Zero());

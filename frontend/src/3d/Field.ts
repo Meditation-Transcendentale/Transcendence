@@ -77,11 +77,11 @@ export class Field {
 
 		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
-		this.camera.attachControl();
+		// this.camera.attachControl();
 		this.camera.minZ = 0.01;
 		// const light2 = new DirectionalLight("direclight", new Vector3(0, -0.2, -1), this.scene);
 		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
-		this.light.intensity = 0.7;
+		this.light.intensity = 0.;
 
 		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.3, 33, this.scene);
 

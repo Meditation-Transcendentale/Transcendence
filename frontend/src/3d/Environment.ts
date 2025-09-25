@@ -99,11 +99,12 @@ export class Environment {
 		this.pongRoot.scaling.set(0.1, 0.1, 0.1);
 		const arenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 5, tessellation: 128 }, this.scene);
 		arenaMesh.parent = this.pongRoot;
-		const arenaMaterial = new PBRMaterial("gameplayArena", this.scene);
-		arenaMaterial.albedoColor = new Color3(0.08, 0.10, 0.12);
-		arenaMaterial.emissiveColor = new Color3(0.01, 0.03, 0.05);
+		const arenaMaterial = new StandardMaterial("gameplayArena", this.scene);
+		arenaMaterial.diffuseColor = new Color3(0.08, 0.10, 0.12);
+		arenaMaterial.emissiveColor = new Color3(0.01, 0.01, 0.01);
 		arenaMaterial.roughness = 0.95;
-		arenaMaterial.metallic = 0.02;
+		// arenaMaterial.metallic = 0.02;
+		arenaMesh.material = arenaMaterial;
 
 		this.gameMeshes.push(arenaMesh);
 
@@ -161,7 +162,7 @@ export class Environment {
 			this.scene
 		);
 		redlight.diffuse = Color3.Red();
-		redlight.intensity = 100;
+		redlight.intensity = 10;
 		redlight.parent = this.pongRoot;
 		const whitelight = new SpotLight(
 			"whitelight",
@@ -182,8 +183,9 @@ export class Environment {
 
 		whitelight.parent = this.pongRoot;
 		whitelight2.parent = this.pongRoot;
+		whitelight.falloffType = 1;
 		whitelight.shadowMinZ = 1;
-		whitelight.intensity = 8;
+		whitelight.intensity = 500;
 		whitelight2.intensity = 1;
 		whitelight.shadowMaxZ = 10;
 		redlight.shadowMinZ = 1;
@@ -195,6 +197,7 @@ export class Environment {
 		shadowGenerator1.addShadowCaster(headMesh);
 		shadowGenerator2.addShadowCaster(headMesh);
 
+		whitelight2.excludedMeshes.push(headMesh);
 		await this.field.load();
 
 		this.scene.meshes.forEach((mesh) => {
@@ -206,7 +209,7 @@ export class Environment {
 
 
 
-		this.pongRoot.isEnabled(false);
+		// this.pongRoot.isEnabled(false);
 		// this.scene.debugLayer.show();
 
 		this.scene.imageProcessingConfiguration.toneMappingEnabled = false;
