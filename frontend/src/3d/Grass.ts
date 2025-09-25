@@ -16,11 +16,11 @@ type _thinInstancesOptions = {
 };
 
 const optionsA: _thinInstancesOptions = {
-	density: 5,
+	density: 10,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.5,
-	scale: new Vector3(1.5, 2.5, 1.5)
+	scale: new Vector3(.8, 1.5, .8)
 };
 
 const optionsB: _thinInstancesOptions = {
@@ -28,7 +28,7 @@ const optionsB: _thinInstancesOptions = {
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 1,
-	scale: new Vector3(2., 2.2, 2.)
+	scale: optionsA.scale
 };
 
 

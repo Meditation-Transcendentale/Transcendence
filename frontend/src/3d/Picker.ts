@@ -24,7 +24,7 @@ export class Picker {
 	private meshBall!: Mesh;
 	private material!: ShaderMaterial;
 
-	private ballDiameter = 1.5;
+	private ballDiameter = 1.;
 	private ballHit!: boolean;
 	private ballLight: PointLight;
 
@@ -63,7 +63,7 @@ export class Picker {
 		this.cursor = new Vector2();
 		this.pick = 0;
 		this.attenuation = 0.3;
-		this.radius = 1.1 / this.groundSize.x;
+		this.radius = 1. / this.groundSize.x;
 		this.oldTime = 0.;
 
 		this.pickerEffect.onApplyObservable.add(() => {

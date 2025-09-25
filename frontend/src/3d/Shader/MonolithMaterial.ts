@@ -408,7 +408,7 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 		this.specularColor = Color3.White();
 		this.specularPower = 16;
 		// this.emissiveColor = new Color3(0.02, 0.02, 0.02);
-		this.invertNormalMapX = true;
+		// this.invertNormalMapX = true;
 		// this.invertNormalMapY = true;
 		// this.invertNormalMapZ = true;
 
