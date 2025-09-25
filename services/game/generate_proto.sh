@@ -1,15 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-# ----------------------------------------------------------------------
-# Script: scripts/generate_protos_all.sh
-# Purpose: Generate and patch protobuf ESM files for all services,
-#          choosing the correct .proto files for each service.
-# Usage: 
-#   chmod +x scripts/generate_protos_all.sh 
-#   ./scripts/generate_protos_all.sh
-# ----------------------------------------------------------------------
-
-# 1. Load nvm so that `npx` (and node) are on $PATH.
 export NVM_DIR="$HOME/.nvm"
 if [ -s "$NVM_DIR/nvm.sh" ]; then
   source "$NVM_DIR/nvm.sh"
