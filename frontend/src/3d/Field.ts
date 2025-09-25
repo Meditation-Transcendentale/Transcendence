@@ -6,6 +6,7 @@ import {
 	ShaderMaterial,
 	EffectRenderer,
 	Vector2,
+	GlowLayer,
 } from "@babylonImport";
 import "./Shader/Shader.ts";
 import { Grass } from "./Grass";
@@ -80,7 +81,7 @@ export class Field {
 		// this.light.specular = Color3.Black();
 
 
-		this.monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
+		this.monolith = createTempleMonolith(scene, 15, this.cursorMonolith);
 		this.monolith.enableShaderAnimation(true);
 		this.monolith.setAnimationSpeed(4.);
 		this.monolith.setAnimationIntensity(0.5);
@@ -90,7 +91,6 @@ export class Field {
 		this.monolith.setTextFace('create', 'left');
 		this.monolith.setTextFace('join', 'left');
 		this.monolith.setTextFace('play', 'front');
-
 		this.active = true;
 
 		this.grass.depth = this.fieldDepth;

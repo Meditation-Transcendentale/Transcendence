@@ -40,7 +40,7 @@ export class Monolith {
 
 	private voxelMesh: Mesh | null = null;
 	public material!: MonolithMaterial;
-	private options: MonolithOptions;
+	public options: MonolithOptions;
 	private defaultCursorPosition!: Vector3;
 	private sdfSystem: SDFSystem;
 	private cursor: Vector3;
@@ -57,6 +57,7 @@ export class Monolith {
 	private text: TextRenderer | null = null;
 	private lastCursorPosition: Vector3 | null = null;
 	private lastOldCursorPosition: Vector3 | null = null;
+	private customBounds: BoundingBox | null = null;
 
 	private vector3Pool: Vector3[] = [];
 	private pooledVectors: Set<Vector3> = new Set();
@@ -97,7 +98,7 @@ export class Monolith {
 		this.depthMaterial = new ShaderMaterial("monolithDepth", this.scene, "monolithDepth", {
 			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
 			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "origin",
-				"oldOrigin", "deadZoneCenter", "deadZoneWidth", "deadZoneHeight", "deadZoneDepth", "textPosition0", "textSize0", "textGlow0"]
+				"oldOrigin", "deadZoneCenter", "deadZoneWidth", "deadZoneHeight", "deadZoneDepth", "textPosition0", "textSize0", "textGlow0", "floatingOffset"]
 		});
 
 
@@ -125,6 +126,10 @@ export class Monolith {
 		vector.set(x, y, z);
 		this.pooledVectors.add(vector);
 		return vector;
+	}
+
+	public setCustomBounds(min: Vector3, max: Vector3) {
+		this.customBounds = { min, max };
 	}
 
 	private releaseVector3(vector: Vector3): void {
@@ -285,6 +290,10 @@ export class Monolith {
 				min: Vector3.Zero(),
 				max: Vector3.One()
 			};
+		}
+		if (this.customBounds) {
+			console.log("Using custom bounds:", this.customBounds);
+			return this.customBounds;
 		}
 
 		const testPoints = 20;
@@ -699,6 +708,16 @@ export class Monolith {
 		this.material.setFloat("time", time);
 		this.depthMaterial.setFloat("time", time);
 		this.lastUpdateValues.time = time;
+		const floatAmplitude = this.options.height * 0.01;
+		if (this.voxelMesh) {
+			const floatY = Math.sin(time * 0.8) * floatAmplitude;
+			const floatX = Math.sin(time * 0.6) * floatAmplitude * 0.25;
+			const floatZ = Math.cos(time * 0.4) * floatAmplitude * 0.2;
+
+			this.material.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+			this.depthMaterial.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+
+		}
 
 		const cursorChanged = !this.cursor.equals(this.lastCursorPosition || Vector3.Zero());
 		const oldCursorChanged = !this.oldcursor.equals(this.lastOldCursorPosition || Vector3.Zero());
@@ -729,6 +748,7 @@ export class Monolith {
 		if (this.text) {
 			this.text.update();
 		}
+
 
 	}
 
