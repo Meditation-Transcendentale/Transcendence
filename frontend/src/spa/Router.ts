@@ -30,7 +30,6 @@ class RouterC {
 	private comebackRoutePath: string;
 
 	constructor() {
-		console.log("ROUTER CONSTRUCTOR AAHAHAHHAHAHAAHAH");
 		this.initRoute = null;
 		this.location = `http://${window.location.hostname}:7000`;
 		this.oldURL = "";
@@ -193,17 +192,12 @@ class RouterC {
 		const route = this.routes.get(url.pathname);
 		console.log(route);
 		if (!route?.instance) {
-			console.log("loading HTML");
 			const html = await this.getHTML(route!.html);
-			console.log("loading TS");
 			const ts = await this.getTS(route!.ts);
-			console.log("loaded TS");
 			route!.instance = new ts.default(html);
 		}
 		await this.currentPage?.unload();
-		console.log("UNLOADED");
 		this.currentPage = (route?.instance as IPage);
-		console.log("LOADING");
 		this.currentPage.load(url.searchParams);
 	}
 
@@ -240,14 +234,12 @@ class RouterC {
 
 	public setComeback(comeBackPath: string, restore: boolean = false, history: boolean = true) {
 		this.comebackRoutePath = comeBackPath;
-		console.log(`NEW COMEBACK ROUTE: ${this.comebackRoutePath}`)
 	}
 
 	public comeback() {
 		const tempPath = this.comebackRoutePath;
 		this.comebackRoutePath = "/home";
 		this.nav(tempPath, false, true);
-		// this.comebackRoutePath = `/home`;
 	}
 
 	public getComebackRoute () {

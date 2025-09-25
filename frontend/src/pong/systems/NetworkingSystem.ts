@@ -88,7 +88,7 @@ export class NetworkingSystem extends System {
 					matchedEntities.forEach(e => {
 						const paddleComp = e.getComponent(PaddleComponent)!;
 						const inputComp = e.getComponent(InputComponent)!;
-						if ((inputComp.gameMode === "online" || inputComp.gameMode === "ai") && paddleComp.id != localPaddleId) {
+						if ((inputComp.gameMode === "online" || inputComp.gameMode === "ai" || inputComp.gameMode === "tournament") && paddleComp.id != localPaddleId) {
 							paddleComp.offset = p.offset;
 						}
 
@@ -113,7 +113,10 @@ export class NetworkingSystem extends System {
 						.find(i => i !== localPaddleId)!;
 					this.opponentScore = score[otherId] ?? 0;
 					if (ui) {
-						ui.gameUI.updateScore(this.myScore, this.opponentScore);
+						if (localPaddleId != 0)
+							ui.gameUI.updateScore(this.opponentScore, this.myScore);
+						else
+							ui.gameUI.updateScore(this.myScore, this.opponentScore);
 					}
 					// if (ui && (myScore == 5 || theirScore == 5)){
 					// 	ui.gameUI.showEnd(myScore, theirScore, myScore == 5);
@@ -123,7 +126,6 @@ export class NetworkingSystem extends System {
 
 			// === Game End ===
 			if (serverMsg.end) {
-				console.log(`COMING BACK TO: ${Router.getComebackRoute()}`);
 				Router.comeback();
 				
 				const e = entities.find(e => e.hasComponent(UIComponent));

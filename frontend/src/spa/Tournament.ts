@@ -67,7 +67,6 @@ export default class TournamentPage {
   }
 
   public load(params: URLSearchParams) {
-    console.log("AAAAAAAAAAAAAAAAAAAAA");
     if (!this.tournamentId) this.tournamentId = params.get("id") as string;
 
     const url = `wss://${
@@ -107,7 +106,7 @@ export default class TournamentPage {
         Router.setComeback(encodeURI(`/tournament?id=${this.tournamentId}`));
         Router.nav(
           encodeURI(
-            `/cajoue?id=${payload.startGame.gameId}&mod=tournament&map=default&tournamentId=${this.tournamentId}`
+            `/cajoue?id=${payload.startGame.gameId}&mod=tournament&map=void&tournamentId=${this.tournamentId}`
           ),
           false,
           true
@@ -130,7 +129,7 @@ export default class TournamentPage {
   }
 
   unload() {
-    // this.div.remove();
+    this.div.remove();
     this.stopReadyCountdown();
     if (this.ws) {
       try {
