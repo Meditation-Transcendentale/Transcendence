@@ -214,6 +214,10 @@ export class Environment {
 		this.scene.imageProcessingConfiguration.exposure = 1.;
 		this.scene.imageProcessingConfiguration.contrast = 1.;
 
+		// whitelight.setEnabled(false);
+		// redlight.setEnabled(false);
+		// whitelight2.setEnabled(false);
+
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
 		}
@@ -226,9 +230,9 @@ export class Environment {
 		this.field.setLowPerf();
 
 
-		this.scene.onBeforeRenderObservable.add(() => {
+		this.scene.onBeforeCameraRenderObservable.add(() => {
 			this.update();
-		})
+		});
 	}
 
 	public render(time: number) {
