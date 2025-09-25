@@ -1,5 +1,5 @@
 
-import { Color3, CustomMaterial, Effect, Scene, Texture, Vector3 } from "@babylonImport"
+import { Color3, CustomMaterial, Effect, FresnelParameters, Scene, Texture, Vector3 } from "@babylonImport"
 
 export class MonolithMaterial extends CustomMaterial {
 	constructor(name: string, scene: Scene) {
@@ -53,11 +53,18 @@ export class MonolithMaterial extends CustomMaterial {
 		this.AddUniform('textFace2', 'vec3', Vector3.Zero());
 		this.AddUniform('textFace3', 'vec3', Vector3.Zero());
 
+		// this.AddUniform('colorTexture', 'sampler2D', 0);
+		// this.AddUniform('normalTexture', 'sampler2D', 0);
+		// this.AddUniform('roughnessTexture', 'sampler2D', 0);
+		// this.AddUniform('metalnessTexture', 'sampler2D', 0);
+		// this.AddUniform('displacementTexture', 'sampler2D', 0);
+		// this.AddUniform('useTextures', 'float', 0.0);
+		this.AddUniform('textureScale', 'float', 1.0);
+
 		this.AddUniform('textCount', 'float', 0.0);
 
 		this.Vertex_Begin(`
-			#define MAINUV1 1
-			#define UV1 1
+			precision highp float;
 			#define M_PI 3.1415926535897932384626433832795
 
 			
@@ -118,7 +125,6 @@ bool isInTextRegion(vec3 worldPos) {
 		`)
 
 		this.Vertex_MainBegin(`
-			//mat4 finalWorld = mat4(world0, world1, world2, world3);
 			
 		`)
 
@@ -219,17 +225,16 @@ float maxDisplacement = 1.0;
 oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 
 
+
 `)
 
 		this.Vertex_MainEnd(`
-			//vFly = vec3(0., vec2(1. - clamp(direction.z, 0.0, 1.)));
     vOriginalWorldPos = originalWorldPos;
 
 		`)
 
 
 		this.Fragment_Begin(`
-			#define MAINUV1 1
     varying vec3 vOriginalWorldPos;
 			varying float oclusion;
 		`)
@@ -238,23 +243,22 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 			varying vec3 vFly;
 		`)
 
+		this.Fragment_Before_Lights(`
+			
+		`);
+
 		this.Fragment_MainEnd(`
     vec3 originalPos = vOriginalWorldPos; 
-    vec3 baseColor2 = vec3(0.3, 0.25, 0.2);
+    vec3 baseColor2 = vec3(0., 0., 0.);
+
 	 vec3 faceNormal = normalize(vNormalW);
-	//vec3 textFace0 = vec3(0., 0., 1.);
-	//vec3 textFace1 = vec3(0., 0., 1.);
-	//vec3 textFace2 = vec3(0., 0., 1.);
-	//vec3 textFace3 = vec3(0., 0., 1.);
 
 	 if(textCount > 0.0) {
-        // Zone 0
         if(textSize0 > 0.0) {
             vec3 textOffset0 = originalPos - textPosition0;
 			vec3 face = textFace0;
 			vec2 textUV0;
 			
-			// Front/Back faces 
 			if(abs(face.z) > 0.5) {
 				textUV0 = vec2(
 					(-textOffset0.x / textSize0) + 0.5,
@@ -262,7 +266,6 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 				);
 			}
 
-			// Left/Right faces   
 			else if(abs(face.x) > 0.5) {
 				textUV0 = vec2(
 					(-textOffset0.z / textSize0) + 0.5,
@@ -270,7 +273,6 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 				);
 			}
 
-			// Top/Bottom faces 
 			else if(abs(face.y) > 0.5) {
 				textUV0 = vec2(
 					(textOffset0.x / textSize0) + 0.5,
@@ -285,10 +287,14 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
                     baseColor2 = mix(baseColor2, baseColor2 * 0.2, textColor0.a);
 
                     if(textGlow0 > 0.0) {
-                        vec3 glowColor = vec3(0.0, 1.0, 0.5);
+                        vec3 glowColor = vec3(3.0, 0., 0.);
                         float pulse = sin(time * 4.0) * 0.5 + 0.5;
                         baseColor2 += glowColor * textGlow0 * textColor0.a * (0.7 + pulse * 0.3);
                     }
+					if (textGlow == 0.0)
+					{
+    					baseColor2 += vec3(0.5, 0., 0.);
+					}
                 }
             }
         }
@@ -388,17 +394,26 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 
 			gl_FragColor.a = 1.;
 		`)
+		const colorTex = new Texture("/assets/MetalPlates008_2K-JPG_Color.jpg", scene);
+		const normalTex = new Texture("/assets/Foil001_2K-JPG_NormalGL.jpg", scene);
+		const roughnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Roughness.jpg", scene);
+		const metalnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Metalness.jpg", scene);
+		const displacementTex = new Texture("/assets/MetalPlates008_2K-JPG_Displacement.jpg", scene);
 
-		// this.emissiveColor = new Color3(0.1, 0.1, 0.1);
-		// this.diffuseColor = new Color3(0., 0., 1.);
-		//
-		this.specularPower = 5;
-		// this.ambientColor = Color3.FromHexString("#c1121f")
-		this.diffuseColor = Color3.FromHexString("#ffffff");
-		this.diffuseColor = Color3.FromHexString("#000000");
-		//this.specularColor = Color3.FromHexString("#c1121f");
-		this.specularColor = Color3.FromHexString("#ffffff");
-		this.backFaceCulling = false;
+		this.diffuseTexture = colorTex;
+		this.bumpTexture = normalTex;
+		// this.specularTexture = displacementTex;
+
+		this.diffuseColor = new Color3(0.0, 0.0, 0.0);
+		this.specularColor = Color3.White();
+		this.specularPower = 16;
+		// this.emissiveColor = new Color3(0.02, 0.02, 0.02);
+
+		colorTex.uScale = colorTex.vScale = 0.5;
+		normalTex.uScale = normalTex.vScale = 2.;
+		roughnessTex.uScale = roughnessTex.vScale = 0.5;
+		colorTex.level = 0.7;
+
 	}
 
 	setFloat(name: string, value: number) {

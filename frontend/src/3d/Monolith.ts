@@ -744,6 +744,8 @@ export class Monolith {
 
 		this.depthMaterial.setFloat("baseWaveIntensity", 0.02);
 		this.depthMaterial.setFloat("mouseInfluenceRadius", 0.8);
+		this.material.setFloat("textureScale", 0.1);
+
 
 		if (this.text) {
 			this.text.update();
