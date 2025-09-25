@@ -75,7 +75,7 @@ export class Field {
 		this.camera.rotation.y = Math.PI;
 		this.camera.attachControl();
 		this.camera.minZ = 0.01;
-		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
+		this.light = new HemisphericLight("hemishhhhh", new Vector3(0, 1, 0), this.scene);
 		this.light.intensity = 2.5;
 		// this.light.specular = Color3.Black();
 
@@ -190,6 +190,7 @@ export class Field {
 				this.scene.activeCamera = this.scene.getCameraByName('br');
 				this.scene.activeCamera?.attachControl();
 				this.setAllEnable(false);
+				this.setLight(false)
 
 				break;
 			}
@@ -238,11 +239,13 @@ export class Field {
 				break;
 			}
 			case 'grass': {
-				this.camera.detachControl();
+				console.log("case grass");
+				// this.camera.detachControl();
 				this.camera.position.set(0, 50, 0);
 				this.camera.setTarget(new Vector3(0, 0, 0));
 				this.monolith.setPicking(false);
 				this.picker.setEnable(false);
+				this.setLight(true);
 				break;
 			}
 			case 'void': {
@@ -281,7 +284,7 @@ export class Field {
 		this.picker.setEnable(status);
 		this.monolith.setPicking(status);
 		this.grass.setEnable(status);
-		this.setLight(status)
+		this.setLight(true)
 		this.active = status;
 	}
 

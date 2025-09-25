@@ -18,7 +18,7 @@ export default class brick {
 			enabledModules: ['score', 'timer', 'buttons'],
 			theme: 'pong',
 			modulePositions: {
-				score: { x: 'center', y: 'top', offset: { x: 100, y: 0 } },
+				score: { x: 'center', y: 'top', offset: { x: 300, y: 0 } },
 				timer: { x: 'center', y: 'top', offset: { x: -100, y: 0 } },
 				buttons: { x: 'center', y: 'bottom' }
 			}
@@ -36,7 +36,7 @@ export default class brick {
 
 	public load(params: URLSearchParams) {
 		App3D.setVue('brick');
-		App3D.disableHome();
+		// App3D.disableHome();
 		//document.querySelector("canvas")?.focus();
 		// this.pongbr?.dispose();
 
@@ -45,15 +45,17 @@ export default class brick {
 
 		this.gameUI.load();
 		this.gameUI.showButton('restart', 'Restart', () => {
-			console.log('Game restarted');
+			this.game?.restart();
+			console.log('Restart');
 		});
-		this.gameUI.showButton('coucou', 'coucou', () => {
-			console.log('Game restarted');
+		this.gameUI.showButton('quit', 'Quit', () => {
+			Router.nav('/home', false, true);
+			console.log('Quit');
 		});
 
 
 		if (!this.game)
-			this.game = new BrickBreaker(document.querySelector("#canvas") as HTMLCanvasElement, App3D.scene);
+			this.game = new BrickBreaker(document.querySelector("#canvas") as HTMLCanvasElement, App3D.scene, this.gameUI);
 		this.game.start();
 	}
 }

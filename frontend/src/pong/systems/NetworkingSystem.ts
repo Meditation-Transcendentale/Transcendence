@@ -113,7 +113,7 @@ export class NetworkingSystem extends System {
 						.find(i => i !== localPaddleId)!;
 					this.opponentScore = score[otherId] ?? 0;
 					if (ui) {
-						ui.gameUI.updateScore(this.myScore, this.opponentScore);
+						ui.gameUI.updateScoreVersus(this.myScore, this.opponentScore);
 					}
 					// if (ui && (myScore == 5 || theirScore == 5)){
 					// 	ui.gameUI.showEnd(myScore, theirScore, myScore == 5);

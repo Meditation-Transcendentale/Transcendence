@@ -6,7 +6,7 @@ import { BrickBreaker } from "./brickbreaker";
 export class Ball {
 	public ball: Mesh;
 	public velocity: Vector3 = new Vector3(0, 0, 0);
-	private speed: number = 10;
+	private speed: number = 5;
 	private speedScale: number = 1;
 	private touched: boolean = false;
 	private scene: Scene;
@@ -17,6 +17,8 @@ export class Ball {
 	private newposition: Vector3 = new Vector3(0, 0.25, 0);
 	private isDirty: boolean = false;
 	public bricksLeft: number = 0;
+	// public launched: boolean = false;
+	// private score: number = 0;
 
 	constructor(scene: Scene, material: StandardMaterial, root: TransformNode, game: BrickBreaker) {
 		this.ball = MeshBuilder.CreateSphere("ball", { diameter: 0.5 }, scene);
@@ -55,6 +57,10 @@ export class Ball {
 					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x, 0, this.newposition.z - playerGoalPos.z).normalize();
 					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
 					this.speedScale = Math.min(this.speedScale * 1.1, 5);
+					// if (this.launched == false){
+					// 	this.game.gameUI.startTimer();
+					// 	this.launched = true;
+					// }
 				} else if (collideGoal && this.isDirty) {
 					this.touched = false;
 					this.ball.material = this.matUntouched;
@@ -92,6 +98,10 @@ export class Ball {
 			const target = bricks[colIndex][layerIndex];
 			if (target && target.isEnabled()) {
 				if (this.touched) {
+					this.game.score += (layers - layerIndex) * this.speedScale * 10;
+					if (this.bricksLeft == 0)
+						this.game.score += layerIndex + 1 * this.speedScale * 10;
+					this.game.gameUI.updateScore(Math.round(this.game.score));
 					target.setEnabled(false);
 					this.bricksLeft--;
 					this.ball.material = this.matUntouched;
@@ -163,7 +173,7 @@ export class Ball {
 
 	private endGame() {
 		// end screen UI
-		this.game.dispose();
+		// this.game.dispose();
 	}
 
 	reset(): void {
@@ -174,6 +184,7 @@ export class Ball {
 		this.velocity.z = 0;
 		this.updatePosition(0, 0);
 		this.speedScale = 1;
+		// this.score = 0;
 	}
 
 	public getMesh(): Mesh {

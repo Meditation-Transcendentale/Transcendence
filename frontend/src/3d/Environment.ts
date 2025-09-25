@@ -257,7 +257,7 @@ export class Environment {
 	}
 
 	public disableHome() {
-		this.updateHome = false;
+		//this.updateHome = false;
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(true);
 		}
