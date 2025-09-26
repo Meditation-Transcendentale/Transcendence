@@ -123,9 +123,9 @@ export class NetworkingSystem extends System {
 
 			// === Game End ===
 			if (serverMsg.end) {
-				if (this.mode = "tournament")
-					Router.nav(`/tournament`, false, true);
-				
+				// if (this.mode = "tournament")
+				// 	Router.nav(`/tournament`, false, true);
+
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
 
