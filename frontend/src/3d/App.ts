@@ -6,7 +6,8 @@ import { Vue } from "../Vue";
 import { css3dObject, CSSRenderer } from "./CSSRenderer";
 import { Interpolator } from "./Interpolator";
 
-import { UIaddDetails, UIaddVec3 } from "./UtilsUI";
+import { UIaddDetails, UIaddSliderVec3, UIaddVec3 } from "./UtilsUI";
+import { hash33 } from "./PerlinWorley";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -60,6 +61,17 @@ class app3d {
 	public async init() {
 		await this.environment.init();
 
+		const v = new Vector3(0, 0, 0);
+		const a = new Float32Array(3);
+
+		UIaddSliderVec3("hash", v, {
+			step: 0.01,
+			min: -2,
+			max: 2,
+		}, () => {
+			v.toArray(a, 0);
+			console.log(hash33(a));
+		})
 		// document.querySelector("#utils-details")?.remove();
 	}
 

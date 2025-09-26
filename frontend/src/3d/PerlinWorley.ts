@@ -28,22 +28,20 @@ function dot(u: Float32Array, v: Float32Array): number {
 	return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
 }
 
-function hash33(vec3: Float32Array): Float32Array {
-	ivec3[0] = vec3[0];
-	ivec3[1] = vec3[1];
-	ivec3[2] = vec3[2];
-	uvec3[0] = ivec3[0] * UI3[0];
-	uvec3[1] = ivec3[1] * UI3[1];
-	uvec3[2] = ivec3[2] * UI3[2];
+
+export function hash33(vec3: Float32Array): Float32Array {
+	uvec3[0] = vec3[0] * UI3[0];
+	uvec3[1] = vec3[1] * UI3[1];
+	uvec3[2] = vec3[2] * UI3[2];
 	uint[0] = uvec3[0] ^ uvec3[1] ^ uvec3[2];
 	uvec3[0] = uint[0] * UI3[0];
 	uvec3[1] = uint[0] * UI3[1];
 	uvec3[2] = uint[0] * UI3[2];
 
 	const ret = new Float32Array(3);
-	ret[0] = -1. * 2. * uvec3[0] * UIF;
-	ret[1] = -1. * 2. * uvec3[1] * UIF;
-	ret[2] = -1. * 2. * uvec3[2] * UIF;
+	ret[0] = -1. + 2. * uvec3[0] * UIF;
+	ret[1] = -1. + 2. * uvec3[1] * UIF;
+	ret[2] = -1. + 2. * uvec3[2] * UIF;
 
 	return ret;
 }
