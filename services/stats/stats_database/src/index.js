@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: "../../../.env" });
 
+import { decodeMatchEnd } from "./proto/helper.js";
+
 
 const jc = JSONCodec();
 const nats = await connect({ 
@@ -75,23 +77,24 @@ handleErrorsNats(async () => {
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("stats.addClassicMatchStatsInfos", async (msg) => {
-			const matchInfos = jc.decode(msg.data);
+			
+			const matchInfos = decodeMatchEnd(msg.data);
 
-			const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos.winner }), { timeout: 1000 });
+			const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos.winnerId }), { timeout: 1000 });
 			const winnerDecoded = jc.decode(winner.data);
-
 
 			const matchId = statService.addMatchInfos('classic', winnerDecoded.data.id, 2);
 
-			const [score1, score2] = matchInfos.score.split('-').map(Number);
+			const [score1, score2] = matchInfos.score.map(Number);
+
 			let score;
 
-			if (matchInfos.forfait == false || (matchInfos.forfait == true && score1 != score2)) {
+			if (matchInfos.forfeit === undefined || (matchInfos.forfeit !== undefined && score1 != score2)) {
 				score = { 
 					winner_goals: Math.max(score1, score2),
 					loser_goals: Math.min(score1, score2)
 				}
-			} else if (matchInfos.forfait == true && score1 == score2) {
+			} else if (matchInfos.forfeit !== undefined && score1 == score2) {
 				score = { 
 					winner_goals: score1,
 					loser_goals: score2
@@ -105,19 +108,19 @@ handleErrorsNats(async () => {
 				goals_scored: score.winner_goals,
 				goals_conceded: score.loser_goals
 			}
-			const looser = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos.looser }), { timeout: 1000 });
-			const looserDecoded = jc.decode(looser.data);
-			
-			const looserUser = { 
+			const loser = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos.loserId }), { timeout: 1000 });
+			const loserDecoded = jc.decode(loser.data);
+
+			const loserUser = { 
 				match_id: matchId,
-				user_id: looserDecoded.data.id,
+				user_id: loserDecoded.data.id,
 				is_winner: false,
 				goals_scored: score.loser_goals,
 				goals_conceded: score.winner_goals
 			}
 
 			statService.addClassicMatchStatsInfos(winnerUser);
-			statService.addClassicMatchStatsInfos(looserUser);
+			statService.addClassicMatchStatsInfos(loserUser);
 
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),

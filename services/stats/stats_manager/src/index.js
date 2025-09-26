@@ -92,7 +92,10 @@ async function handleNatsSubscription(subject, handler) {
 			const status = error.status || 500;
 			const message = error.message || "Internal Server Error";
 			const code = error.code || 500;
-			nats.publish(msg.reply, jc.encode({ success: false, status, message, code }));
+			if (msg.reply) {
+				nats.publish(msg.reply, jc.encode({ success: false, status, message, code }));
+			}
+			console.error(`Error handling message on subject ${subject}:`, error);
 		}
 	}
 }
@@ -102,17 +105,11 @@ async function handleNatsSubscription(subject, handler) {
 handleErrorsNatsNoReply(async () => {
 	await Promise.all([
 		handleNatsSubscription("games.online.*.match.end", async (msg) => {
-			console.log("Received data for online.endgame:");
-			// nats.request('stats.addClassicMatchStatsInfos', msg.data, { timeout: 1000 });
+			nats.request('stats.addClassicMatchStatsInfos', msg.data, { timeout: 1000 });
 		}),
 		handleNatsSubscription("games.br.*.match.end", async (msg) => {
-			const decodedData = jc.decode(msg.data);
-			console.log("Received data for stats.endgame:", decodedData);
 			nats.request('stats.addBRMatchStatsInfos', msg.data, { timeout: 1000 });
 		}),
-		handleNatsSubscription("stats.ping", async (msg) => {
-			console.log("Received ping request");
-		})
 	]);
 })();
 

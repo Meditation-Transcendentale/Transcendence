@@ -20,7 +20,9 @@ const handleErrorsNats = (fn) => async (msg) => {
 		const status = error.status || statusCode.INTERNAL_SERVER_ERROR;
 		const message = error.message || returnMessages.INTERNAL_SERVER_ERROR;
 		const code = error.code || 500;
-		nats.publish(msg.reply, jc.encode({ status, message, code }));
+		if (msg.reply) {
+			nats.publish(msg.reply, jc.encode({ status, message, code }));
+		}
 	}
 };
 
