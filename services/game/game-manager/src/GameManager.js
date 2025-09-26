@@ -199,6 +199,7 @@ export class GameManager {
 				score: match.state.score,
 			});
 			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
+      // this.nc.publish('stats.ping', new Uint8Array());
 		} else {
 			this.nc.publish(
 				`games.${match.mode}.${gameId}.match.end`,

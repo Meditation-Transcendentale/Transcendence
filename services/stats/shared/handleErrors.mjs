@@ -24,4 +24,15 @@ const handleErrorsNats = (fn) => async (msg) => {
 	}
 };
 
-export { handleErrors, handleErrorsNats };
+const handleErrorsNatsNoReply = (fn) => async (msg) => {
+	try {
+		await fn(msg);
+	} catch (error) {
+		console.error(`Error in NATS message:`, error);
+		const status = error.status || statusCode.INTERNAL_SERVER_ERROR;
+		const message = error.message || returnMessages.INTERNAL_SERVER_ERROR;
+		const code = error.code || 500;
+	}
+};
+
+export { handleErrors, handleErrorsNats, handleErrorsNatsNoReply };

@@ -5,7 +5,7 @@ import { connect, JSONCodec } from "nats";
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
-import { handleErrorsNats } from "../../shared/handleErrors.mjs";
+import { handleErrorsNatsNoReply } from "../../shared/handleErrors.mjs";
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import statsRoutes from "./statsRoutes.js";
 
@@ -99,18 +99,20 @@ async function handleNatsSubscription(subject, handler) {
 
 
 
-handleErrorsNats(async () => {
+handleErrorsNatsNoReply(async () => {
 	await Promise.all([
 		handleNatsSubscription("games.online.*.match.end", async (msg) => {
-			const decodedData = jc.decode(msg.data);
-			console.log("Received data for stats.endgame:", decodedData);
-			nats.request('stats.addClassicMatchStatsInfos', msg.data, { timeout: 1000 });
+			console.log("Received data for online.endgame:");
+			// nats.request('stats.addClassicMatchStatsInfos', msg.data, { timeout: 1000 });
 		}),
 		handleNatsSubscription("games.br.*.match.end", async (msg) => {
 			const decodedData = jc.decode(msg.data);
 			console.log("Received data for stats.endgame:", decodedData);
 			nats.request('stats.addBRMatchStatsInfos', msg.data, { timeout: 1000 });
 		}),
+		handleNatsSubscription("stats.ping", async (msg) => {
+			console.log("Received ping request");
+		})
 	]);
 })();
 
