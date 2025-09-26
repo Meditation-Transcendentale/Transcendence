@@ -3,7 +3,8 @@ import {
     decodeMatchEnd,
     encodeTournamentServerMessage,
     encodeMatchCreateRequest,
-    decodeMatchCreateResponse
+    decodeMatchCreateResponse,
+    decodeMatchScoreUpdate
 } from './proto/helper.js';
 import natsClient from './natsClient.js';
 
@@ -18,20 +19,20 @@ function shuffle(arr) {
 
 class MatchNode {
     constructor() {
-        this.player1Id = null;
-        this.player2Id = null;
-        this.left = null;
-        this.right = null;
-        this.parent = null;
-        this.winnerId = null;
-        this.gameId = null;
-        this.score = null;
-        this.creating = false;
+        this.player1Id = null; //uuid
+        this.player2Id = null; //uuid
+        this.left = null; //MatchNode
+        this.right = null; //MatchNode
+        this.parent = null; //MatchNode
+        this.winnerId = null; //uuid
+        this.gameId = null; //gameId
+        this.score = null; //{values(int[]), forfeit(boolean)}
+        this.creating = false; //boolean
     }
 
-    setResult(matchData) {
-        this.score = matchData.score ?? null;
-        this.winnerId = matchData.winnerId === 0 ? this.player1Id : this.player2Id;
+    setResult(matchData, forfeit) {
+        this.score = {values: matchData.score ?? null, forfeit: forfeit ? true : false} ;
+        this.winnerId = matchData.winnerId === this.player1Id ? this.player1Id : this.player2Id;
         if (this.parent) this.parent.receiveWinner(this.winnerId);
     }
 
@@ -86,11 +87,26 @@ class Tournament {
 
             const decoded = decodeMatchEnd(data);
             match.setResult(decoded);
+            this.getPlayerByUuid(decoded.loserId).isEliminated = true;
+            if (decoded.forfeitId) this.getPlayerByUuid(decoded.forfeitId).isConnected = false;
 
             this.autoAdvanceWalkovers();
             this.sendUpdate();
             this.maybeStartReadyCheck();
         });
+
+        natsClient.subscribe('games.tournament.*.score', (data, msg) => {
+            const parts = String(msg.subject || '').split('.');
+            const gameId = parts[2];
+            if (!gameId) return;
+
+            const match = this.findMatchByGameId(this.root, gameId);
+            if (!match) return;
+
+            const decoded = decodeMatchScoreUpdate(data);
+            match.score = {values: decoded.score, forfeit: false};
+            this.sendUpdate();
+        })
     }
 
     sendReadyCheck() {

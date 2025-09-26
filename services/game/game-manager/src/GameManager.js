@@ -227,10 +227,9 @@ export class GameManager {
       const buf = encodeMatchEnd({
         winnerId:
           match.player[0] === uuid ? match.players[1] : match.players[0],
-        loserId:
-          uuid,
+        loserId: uuid,
         score: match.state.score,
-		forfeit: uuid
+        forfeit: uuid,
       });
       this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
     } else {
@@ -284,12 +283,11 @@ export class GameManager {
         newState.score[resp.goal.scorerId] =
           (newState.score[resp.goal.scorerId] || 0) + 1;
 
-        if (match.mode === "tournament") {
-          const scoreBuf = encodeScoreUpdate({ score: newState.score });
-          this.nc.publish(`games.tournament.${gameId}.score`, scoreBuf);
-        }
         if (newState.score[resp.goal.scorerId] >= (5 || Infinity)) {
           newState.isGameOver = true;
+        } else if (match.mode === "tournament") {
+          const scoreBuf = encodeScoreUpdate({ score: newState.score });
+          this.nc.publish(`games.tournament.${gameId}.score`, scoreBuf);
         }
       }
 
