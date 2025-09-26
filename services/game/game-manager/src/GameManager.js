@@ -189,7 +189,6 @@ export class GameManager {
 		}
 
 		match.status = "ended";
-		console.log("END PLAYERS  =" + match.players);
 
 		if (match.mode != `br`) {
 			const buf = encodeMatchEnd({

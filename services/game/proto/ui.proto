@@ -50,9 +50,9 @@ message WelcomeMessage {
 
 message GameStartMessage {}
 
-message GameEndMessage {
-  repeated int32 score = 1;
-}
+// message GameEndMessage {
+//   repeated int32 score = 1;
+// }
 
 // Envelope for *all* server→client messages
 message ServerMessage {
@@ -61,7 +61,7 @@ message ServerMessage {
     WelcomeMessage     welcome = 2;
     GameStartMessage   start   = 3;
     shared.MatchState  state   = 4;
-    GameEndMessage     end     = 5;
+    shared.MatchEnd     end     = 5;
   }
 }
 
