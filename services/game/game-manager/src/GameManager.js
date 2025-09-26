@@ -201,9 +201,9 @@ export class GameManager {
       this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
     } else {
       this.nc.publish(
-        `games.${match.mode}.${gameId}.match.end`,
-        new Uint8Array()
+        `games.${match.mode}.${gameId}.match.end`, new Uint8Array()
       );
+
       // this.nc.request('stats.endgame', jc.encode(), { timeout: 1000 });
     }
     this.games.delete(gameId);

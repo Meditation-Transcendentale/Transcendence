@@ -115,4 +115,11 @@ INSERT INTO active_user (user_id, status) VALUES
 (10, 'online'),
 (11, 'offline');
 
-
+INSERT INTO brickbreaker_stats ( user_id, easy_mode_hscore, normal_mode_hscore, hard_mode_hscore) VALUES
+(1, 1500, 1200, 800),
+(2, 1800, 1300, 900),
+(4, 1700, 1400, 950),
+(6, 1650, 1350, 750),
+(7, 1750, 1450, 950),
+(9, 1900, 1550, 1100),
+(10, 2000, 1600, 1200);
