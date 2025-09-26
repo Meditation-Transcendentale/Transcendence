@@ -48,11 +48,11 @@ function calculateStats(playerStats, mode) {
 
 export default async function statsRoutes(app) {
 
-	app.get('/player/:username/:mode', handleErrors(async (req, res) => {
+	app.get('/player/:uuid/:mode', handleErrors(async (req, res) => {
 
-		const { username, mode } = req.params;
+		const { uuid, mode } = req.params;
 
-		const user = await nats.request('user.getUserFromUsername', jc.encode({ username }), { timeout: 1000 });
+		const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
 		if (!userResult.success) {
 			throw { status: userResult.status, code: userResult.code, message: userResult.message };
@@ -79,11 +79,11 @@ export default async function statsRoutes(app) {
 		});
 	}));
 
-	app.get('/get/brickbreaker/:username', handleErrors(async (req, res) => {
+	app.get('/get/brickbreaker/:uuid', handleErrors(async (req, res) => {
 
-		const { username } = req.params;
-		
-		const user = await nats.request('user.getUserFromUsername', jc.encode({ username }), { timeout: 1000 });
+		const { uuid } = req.params;
+
+		const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
 		if (!userResult.success) {
 			throw { status: userResult.status, code: userResult.code, message: userResult.message };
