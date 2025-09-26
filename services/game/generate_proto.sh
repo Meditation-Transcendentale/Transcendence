@@ -31,6 +31,8 @@ SERVICES=(
   "friends-service"
   "spa"
   "stats_database"
+  "100ptest"
+
 )
 
 echo "🛠 Starting protobuf generation for all services..."
@@ -40,6 +42,9 @@ for svc in "${SERVICES[@]}"; do
   case "$svc" in
     frontend-pong)
       OUT_DIR="../../frontend/src/pong/utils/proto"
+      ;;
+    100ptest)
+      OUT_DIR="../../100pTestContainer/src/proto"
       ;;
     notifications)
       OUT_DIR="../../services/notifications/notifications-manager/src/proto"
@@ -148,6 +153,15 @@ for svc in "${SERVICES[@]}"; do
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
         "$SHARED_PROTO_DIR/lobby.proto"
+        "$SHARED_PROTO_DIR/notif.proto"
+        "$SHARED_PROTO_DIR/tournament.proto"
+      )
+      ;;
+    "100ptest")
+      PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/shared.proto"
+        "$SHARED_PROTO_DIR/lobby.proto"
+        "$SHARED_PROTO_DIR/ui.proto"
         "$SHARED_PROTO_DIR/notif.proto"
         "$SHARED_PROTO_DIR/tournament.proto"
       )

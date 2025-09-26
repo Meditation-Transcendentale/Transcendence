@@ -27,7 +27,7 @@ class RouterC {
 
 	public AUTHENTIFICATION: boolean = true;
 
-	private comebackRoute: {path: string, restore: boolean, history: boolean};
+	private comebackRoutePath: string;
 
 	constructor() {
 		this.initRoute = null;
@@ -35,6 +35,8 @@ class RouterC {
 		this.oldURL = "";
 		this.currentPage = null;
 		this.parser = new DOMParser();
+		this.comebackRoutePath = "/home";
+		// this.comebackRoute = {path: `/home`, restore: false, history: true};
 
 		this.routes = new Map<string, routePage>;
 
@@ -186,17 +188,12 @@ class RouterC {
 		const route = this.routes.get(url.pathname);
 		console.log(route);
 		if (!route?.instance) {
-			console.log("loading HTML");
 			const html = await this.getHTML(route!.html);
-			console.log("loading TS");
 			const ts = await this.getTS(route!.ts);
-			console.log("loaded TS");
 			route!.instance = new ts.default(html);
 		}
 		await this.currentPage?.unload();
-		console.log("UNLOADED");
 		this.currentPage = (route?.instance as IPage);
-		console.log("LOADING");
 		this.currentPage.load(url.searchParams);
 	}
 
@@ -231,12 +228,18 @@ class RouterC {
 		return ts;
 	}
 
-	public setComeback(path: string, restore: boolean = false, history: boolean = true) {
-		this.comebackRoute = {path: path, restore: restore, history: history};
+	public setComeback(comeBackPath: string, restore: boolean = false, history: boolean = true) {
+		this.comebackRoutePath = comeBackPath;
 	}
 
 	public comeback() {
-		this.nav(this.comebackRoute.path, this.comebackRoute.restore, this.comebackRoute.history);
+		const tempPath = this.comebackRoutePath;
+		this.comebackRoutePath = "/home";
+		this.nav(tempPath, false, true);
+	}
+
+	public getComebackRoute () {
+		return (this.comebackRoutePath);
 	}
 
 }
