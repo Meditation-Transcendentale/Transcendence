@@ -3,7 +3,8 @@ import {
     decodeMatchEnd,
     encodeTournamentServerMessage,
     encodeMatchCreateRequest,
-    decodeMatchCreateResponse
+    decodeMatchCreateResponse,
+    decodeMatchScoreUpdate
 } from './proto/helper.js';
 import natsClient from './natsClient.js';
 
