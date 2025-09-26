@@ -5,7 +5,6 @@ precision highp float;
 
 uniform sampler2D	textureSampler;
 
-uniform float	pick;
 uniform float	attenuation;
 uniform float	radius;
 uniform vec2	origin;
@@ -22,7 +21,7 @@ vec3	getPick() {
 
 void main() {
 	vec4 color = texture(textureSampler, vUV) * attenuation ;
-	vec3 p = getPick() * pick;
+	vec3 p = getPick();
 	
 	p.z += color.z;
 	p.xy = normalize((color.xy * 2. - 1.) + p.xy) * 0.5 + 0.5;

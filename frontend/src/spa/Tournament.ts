@@ -6,8 +6,19 @@ import { User } from "./User";
 import { postRequest } from "./requests";
 import { App3D } from "../3d/App";
 import Router from "./Router";
+  encodeTournamentClientMessage,
+  decodeTournamentServerMessage,
+} from "./proto/helper";
+import { User } from "./User";
+import { postRequest } from "./requests";
+import { App3D } from "../3d/App";
+import Router from "./Router";
 
 type PlayerState = {
+  uuid: string;
+  ready: boolean;
+  connected: boolean;
+  eliminated: boolean;
   uuid: string;
   ready: boolean;
   connected: boolean;
@@ -17,9 +28,18 @@ type PlayerState = {
 type Score = {
   values?: number[];
   forfeit?: boolean;
+  values?: number[];
+  forfeit?: boolean;
 };
 
 type MatchNode = {
+  player1Id?: string | null;
+  player2Id?: string | null;
+  left?: MatchNode | null;
+  right?: MatchNode | null;
+  winnerId?: string | null;
+  score?: Score | null;
+  gameId?: string | null;
   player1Id?: string | null;
   player2Id?: string | null;
   left?: MatchNode | null;
@@ -34,6 +54,10 @@ type ServerMsg = {
   readyCheck?: { deadlineMs: number };
   startGame?: { gameId: string };
   error?: { message: string };
+  update?: { tournamentRoot?: MatchNode | null; players?: PlayerState[] };
+  readyCheck?: { deadlineMs: number };
+  startGame?: { gameId: string };
+  error?: { message: string };
 };
 
 export default class TournamentPage {
@@ -41,16 +65,26 @@ export default class TournamentPage {
   private ws: WebSocket | null = null;
 
   private tournamentId: string | null;
+  private tournamentId: string | null;
 
+  private tree: MatchNode | null = null;
+  private players = new Map<string, PlayerState>();
   private tree: MatchNode | null = null;
   private players = new Map<string, PlayerState>();
 
   private readyActive = false;
   private readyDeadline = 0;
   private countdownTimer: number | null = null;
+  private readyActive = false;
+  private readyDeadline = 0;
+  private countdownTimer: number | null = null;
 
   private css: HTMLLinkElement;
+  private css: HTMLLinkElement;
 
+  private rootEl!: HTMLDivElement;
+  private toolbarEl!: HTMLDivElement;
+  private treeEl!: HTMLDivElement;
   private rootEl!: HTMLDivElement;
   private toolbarEl!: HTMLDivElement;
   private treeEl!: HTMLDivElement;
@@ -74,10 +108,24 @@ export default class TournamentPage {
     }:7000/sacrifice?uuid=${encodeURIComponent(
       User.uuid as string
     )}&tournamentId=${encodeURIComponent(this.tournamentId as string)}`;
+    const url = `wss://${
+      window.location.hostname
+    }:7000/sacrifice?uuid=${encodeURIComponent(
+      User.uuid as string
+    )}&tournamentId=${encodeURIComponent(this.tournamentId as string)}`;
 
     this.ws = new WebSocket(url);
     this.ws.binaryType = "arraybuffer";
+    this.ws = new WebSocket(url);
+    this.ws.binaryType = "arraybuffer";
 
+    this.ws.onmessage = async (msg) => {
+      console.log(`MESSAGE RECEIVED`);
+      const buf = new Uint8Array(msg.data as ArrayBuffer);
+      if (!buf) return;
+      const payload = decodeTournamentServerMessage(
+        new Uint8Array(buf)
+      ) as ServerMsg;
     this.ws.onmessage = async (msg) => {
       console.log(`MESSAGE RECEIVED`);
       const buf = new Uint8Array(msg.data as ArrayBuffer);
@@ -120,9 +168,18 @@ export default class TournamentPage {
       this.ws = null;
       this.stopReadyCountdown();
     };
+    this.ws.onclose = () => {
+      this.ws = null;
+      this.stopReadyCountdown();
+    };
 
     App3D.setVue("tournament");
+    App3D.setVue("tournament");
 
+    if (!document.body.contains(this.div)) {
+      document.body.appendChild(this.div);
+    }
+  }
     if (!document.body.contains(this.div)) {
       document.body.appendChild(this.div);
     }
@@ -141,14 +198,25 @@ export default class TournamentPage {
 
   private initDOM() {
     this.div.innerHTML = "";
+  private initDOM() {
+    this.div.innerHTML = "";
 
+    this.rootEl = document.createElement("div");
+    this.rootEl.id = "tournament";
+    this.rootEl.className = "tournament-root";
     this.rootEl = document.createElement("div");
     this.rootEl.id = "tournament";
     this.rootEl.className = "tournament-root";
 
     this.toolbarEl = document.createElement("div");
     this.toolbarEl.className = "toolbar";
+    this.toolbarEl = document.createElement("div");
+    this.toolbarEl.className = "toolbar";
 
+    const countdown = document.createElement("span");
+    countdown.className = "ready-countdown";
+    countdown.style.marginRight = "auto";
+    countdown.style.fontVariantNumeric = "tabular-nums";
     const countdown = document.createElement("span");
     countdown.className = "ready-countdown";
     countdown.style.marginRight = "auto";
@@ -158,7 +226,12 @@ export default class TournamentPage {
     leaveBtn.id = "leave-btn";
     leaveBtn.textContent = "Leave";
     leaveBtn.addEventListener("click", () => this.sendQuit());
+    const leaveBtn = document.createElement("button");
+    leaveBtn.id = "leave-btn";
+    leaveBtn.textContent = "Leave";
+    leaveBtn.addEventListener("click", () => this.sendQuit());
 
+    this.toolbarEl.append(countdown, leaveBtn);
     this.toolbarEl.append(countdown, leaveBtn);
 
     this.treeEl = document.createElement("div");
@@ -173,10 +246,25 @@ export default class TournamentPage {
 
     this.rootEl.append(this.toolbarEl, this.treeEl);
     this.div.appendChild(this.rootEl);
+    this.rootEl.append(this.toolbarEl, this.treeEl);
+    this.div.appendChild(this.rootEl);
 
     this.render();
   }
 
+  private sendReady() {
+    if (!this.ws) return;
+    const buf = encodeTournamentClientMessage({ ready: {} });
+    this.ws.send(buf);
+    if (User.uuid) {
+      const me = this.players.get(User.uuid);
+      if (me) {
+        me.ready = true;
+        this.players.set(User.uuid, me);
+        this.render();
+      }
+    }
+  }
   private sendReady() {
     if (!this.ws) return;
     const buf = encodeTournamentClientMessage({ ready: {} });
@@ -197,7 +285,33 @@ export default class TournamentPage {
     const buf = encodeTournamentClientMessage({ quit: {} });
     this.ws.send(buf);
   }
+  private sendQuit() {
+    if (!this.ws) return;
+    this.tournamentId = null;
+    const buf = encodeTournamentClientMessage({ quit: {} });
+    this.ws.send(buf);
+  }
 
+  private startReadyCountdown() {
+    const badge = this.toolbarEl.querySelector(
+      ".ready-countdown"
+    ) as HTMLSpanElement | null;
+    const tick = () => {
+      if (!badge) return;
+      const ms = Math.max(0, this.readyDeadline - Date.now());
+      const s = Math.ceil(ms / 1000);
+      badge.textContent = `Ready check: ${s}s`;
+      if (ms <= 0) {
+        this.stopReadyCountdown();
+        this.readyActive = false;
+        badge.textContent = "";
+        this.render();
+      }
+    };
+    tick();
+    this.stopReadyCountdown();
+    this.countdownTimer = window.setInterval(tick, 200);
+  }
   private startReadyCountdown() {
     const badge = this.toolbarEl.querySelector(
       ".ready-countdown"
@@ -231,14 +345,23 @@ export default class TournamentPage {
       !!node.player1Id && !!node.player2Id && !node.gameId && !node.winnerId
     );
   }
+  private isActive(node: MatchNode): boolean {
+    return (
+      !!node.player1Id && !!node.player2Id && !node.gameId && !node.winnerId
+    );
+  }
 
   private rowScore(node: MatchNode, pid: string | null): string | null {
     if (!node.winnerId && !node.score) return null;
     if (node.score?.forfeit) return pid && node.winnerId === pid ? "W/O" : "DQ";
     if (node.winnerId) return pid && node.winnerId === pid ? "WIN" : "—";
-    if (node.score?.values?.length) return node.score.values.join("–");
+    if (node.score?.values?.length)
+      return pid && node.player1Id === pid
+        ? node.score.values[0].toString()
+        : node.score.values[1].toString();
     return null;
   }
+
 
   private renderRow(
     node: MatchNode,

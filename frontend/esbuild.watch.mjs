@@ -46,7 +46,6 @@ const customAliasPlugin = {
 			external: true,
 		}));
 		build.onResolve({ filter: /Router$/ }, args => {
-				console.log("kejfwekhf");
 				return {
 				path: "../spa/Router",
 				external: true}

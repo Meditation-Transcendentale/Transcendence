@@ -1,10 +1,20 @@
 @import url("font.css");
 @import url("inputs.css");
 @import url("popup.css");
+@import url("loading.css");
 
 ::selection {
 	color: black !important;
 	background: White !important;
+}
+
+input:autofill {
+	filter: none !important;
+	box-shadow: 0 0 0 100px #8f88 inseta !important;
+}
+
+input {
+	filter: none;
 }
 
 html,
@@ -539,4 +549,9 @@ input[type="number"] {
 
 input[type="range"] {
 	vertical-align: middle;
+}
+
+.already-open {
+	color: white;
+	display: inline-block;
 }

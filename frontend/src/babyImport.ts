@@ -5,7 +5,6 @@ import "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess"; // 
 
 // import * as POST from "@babylonjs/core/PostProcesses";
 
-
 // export { Inspector } from '@babylonjs/inspector';
 // import {
 // 	VolumetricLightScatteringPostProcess
@@ -45,6 +44,7 @@ export { Button } from "@babylonjs/gui/2D/controls/button";
 export { Control } from "@babylonjs/gui/2D/controls/control";
 export { Scalar } from "@babylonjs/core/Maths/math.scalar";
 export { CustomMaterial } from '@babylonjs/materials/custom';
+export { PBRCustomMaterial } from '@babylonjs/materials/custom';
 export { BoundingBox } from '@babylonjs/core/Culling/boundingBox';
 export { Material } from "@babylonjs/core/Materials/material";
 export { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";

@@ -6,6 +6,9 @@ import {
 	ShaderMaterial,
 	EffectRenderer,
 	Vector2,
+	GlowLayer,
+	DirectionalLight,
+	SpotLight,
 } from "@babylonImport";
 import "./Shader/Shader.ts";
 import { Grass } from "./Grass";
@@ -14,7 +17,7 @@ import { Monolith } from "./Monolith";
 import { createTempleMonolith } from "./Builder";
 import { Fog } from "./Fog";
 import { Picker } from "./Picker";
-import { UIaddDetails, UIaddToggle } from "./UtilsUI.js";
+import { UIaddDetails, UIaddSlider, UIaddToggle } from "./UtilsUI.js";
 import { CameraUtils } from "./CameraUtils.js";
 import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } from "./TrackManager.js";
 
@@ -51,7 +54,8 @@ export class Field {
 	private trackTarget!: Track;
 	private trackCamera!: Track;
 
-	private ultraLowPerf = false;
+
+	private spotLight: SpotLight;
 
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
@@ -75,12 +79,33 @@ export class Field {
 		this.camera.rotation.y = Math.PI;
 		this.camera.attachControl();
 		this.camera.minZ = 0.01;
+		// const light2 = new DirectionalLight("direclight", new Vector3(0, -0.2, -1), this.scene);
 		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
-		this.light.intensity = 2.5;
+		this.light.intensity = 0.7;
+
+		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.3, 33, this.scene);
+
+		UIaddSlider("light intensity", this.spotLight.intensity, {
+			step: 0.1,
+			min: 0.,
+			max: 100
+		}, (n: number) => { this.spotLight.intensity = n });
+		UIaddSlider("hemis intensity", this.light.intensity, {
+			step: 0.01,
+			min: 0.,
+			max: 1
+		}, (n: number) => { this.light.intensity = n });
+
+		UIaddSlider("light exponent", this.spotLight.exponent, {
+			step: 0.1,
+			min: 0.,
+			max: 100
+		}, (n: number) => { this.spotLight.exponent = n });
+
 		// this.light.specular = Color3.Black();
 
 
-		this.monolith = createTempleMonolith(scene, 10, this.cursorMonolith);
+		this.monolith = createTempleMonolith(scene, 15, this.cursorMonolith);
 		this.monolith.enableShaderAnimation(true);
 		this.monolith.setAnimationSpeed(4.);
 		this.monolith.setAnimationIntensity(0.5);
@@ -90,7 +115,6 @@ export class Field {
 		this.monolith.setTextFace('create', 'left');
 		this.monolith.setTextFace('join', 'left');
 		this.monolith.setTextFace('play', 'front');
-
 		this.active = true;
 
 		this.grass.depth = this.fieldDepth;
@@ -140,7 +164,10 @@ export class Field {
 
 	public update(time: number, deltaTime: number) {
 		if (this.active) {
-			this.picker.render();
+			this.spotLight.direction = this.camera.getForwardRay().direction;
+			// console.log(this.spotLight.direction);
+			// this.spotLight.setDirectionToTarget(this.camera.getTarget());
+			this.picker.render(deltaTime);
 			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
 			this.fog.render();
 			this.monolith.update(time, this.camera);
@@ -164,10 +191,10 @@ export class Field {
 				break;
 			}
 			case 'home': {
-				// this.camera.position.set(0, 5, 15);
-				// this.camera.setTarget(new Vector3(0, 7, 0));
-				gTrackManager.addTrack(this.trackCamera, (point: Vector3) => { this.camera.position.copyFrom(point); });
-				gTrackManager.addTrack(this.trackTarget, (point: Vector3) => { this.camera.setTarget(point) });
+				this.camera.position.set(0, 5, 15);
+				this.camera.setTarget(new Vector3(0, 7, 0));
+				// gTrackManager.addTrack(this.trackCamera, (point: Vector3) => { this.camera.position.copyFrom(point); });
+				// gTrackManager.addTrack(this.trackTarget, (point: Vector3) => { this.camera.setTarget(point) });
 				// this.camera.update();
 				this.light.isEnabled(true);
 				// this.camera.getViewMatrix().fromArray(CameraUtils.LookAt(new Vector3(0, 5, 15), new Vector3(0, 7, 0), Vector3.Up()));
@@ -269,10 +296,10 @@ export class Field {
 	}
 
 	public setLight(status: boolean) {
-		if (status == true)
-			this.light.intensity = 2.5;
-		else
-			this.light.intensity = 0;
+		// if (status == true)
+		// this.light.intensity = 2.5;
+		// else
+		// this.light.intensity = 0;
 	}
 
 	public setAllEnable(status: boolean) {
@@ -303,13 +330,5 @@ export class Field {
 			this.grass.reduceGrass(n);
 		})
 
-	}
-
-	public ultraLowPerf() {
-		this.ultraLowPerf = true;
-		this.grass.setEnable(false);
-		this.picker.setEnable(false);
-		this.monolith.setPicking(false);
-		this.monolith.getMesh().setEnable(false);
 	}
 }

@@ -25,11 +25,10 @@ INSERT INTO users (uuid, username, password) VALUES
 -- ('testpassword10', '$2b$10$gE77Xee6p0.8dSZtLxt4Pup7AfYYJhAOSHC6rkaV.Gu0a8GFGIOV6'),
 
 
--- INSERT INTO match (game_mode, winner_id, total_players) VALUES 
--- ('classic', 1, 2), ('classic', 2, 2), ('classic', 3, 2),
--- ('br', 3, 5), ('br', 2, 5), ('br', 1, 5),
--- ('io', 1, 5), ('io', 2, 5), ('io', 3, 5),
--- ('classic', 1, 2), ('classic', 1, 2), ('classic', 1, 2);
+INSERT INTO match (game_mode, winner_id, total_players) VALUES 
+('classic', 1, 2), ('classic', 2, 2), ('classic', 3, 2),
+('br', 3, 5), ('br', 9, 5), ('br', 1, 5),
+('classic', 5, 2), ('classic', 7, 2), ('classic', 10, 2);
 
 -- INSERT INTO match_stats (match_id, user_id, is_winner, goals_scored, goals_conceded, placement) VALUES 
 -- (1, 1, 1, 5, 2, NULL), 

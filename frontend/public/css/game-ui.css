@@ -219,3 +219,14 @@
 .game-image.big {
 	width: 200px;
 }
+
+.playercounter-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+
+    font-size: 5vh;
+	font-weight: bold;
+	color: white;
+}

@@ -32,6 +32,8 @@ export class Picker {
 
 	private pointer: Vector2;
 
+	private ballOrigin: Vector3;
+
 	constructor(scene: Scene, camera: Camera, effectRenderer: EffectRenderer, position: Vector3, size: Vector2) {
 		this.scene = scene;
 		this.camera = camera;
@@ -55,7 +57,7 @@ export class Picker {
 			useShaderStore: true,
 			fragmentShader: "picker",
 			samplers: ["textureSampler"],
-			uniforms: ["pick", "attenuation", "radius", "origin"]
+			uniforms: ["attenuation", "radius", "origin"]
 		});
 
 		this.cursor = new Vector2();
@@ -69,7 +71,6 @@ export class Picker {
 			this.deltaTime = t - this.oldTime;
 			this.oldTime = t;
 			this.pickerEffect.effect.setTexture("textureSampler", this.rtA);
-			this.pickerEffect.effect.setFloat("pick", this.pick);
 			this.pickerEffect.effect.setFloat("attenuation", Math.pow(this.attenuation, this.deltaTime));
 			this.pickerEffect.effect.setFloat("radius", this.radius);
 			this.pickerEffect.effect.setVector2("origin", this.cursor);
@@ -83,11 +84,13 @@ export class Picker {
 		this.cursor.y = (this.meshBall.position.z / this.groundSize.y) + 0.5;
 		this.pick = 1;
 
+		this.ballOrigin = new Vector3(0, this.groundPosition.y, 0);
+
 	}
 
-	public render() {
+	public render(deltaTime: number) {
 		if (!this.enabled) { return; }
-		this.moveBall();
+		this.moveBall(Math.min(deltaTime, 1.));
 		this.swapRT();
 		this.effectRenderer.render(this.pickerEffect, this.rtB);
 	}
@@ -103,6 +106,10 @@ export class Picker {
 		})
 		window.addEventListener("mousemove", (ev) => {
 			this.pointer.set(ev.clientX, ev.clientY);
+		})
+
+		window.addEventListener("mouseout", () => {
+			this.ballHit = false;
 		})
 	}
 
@@ -175,8 +182,19 @@ export class Picker {
 		return Math.sqrt(xx * xx + yy * yy) < px * 0.5;
 	}
 
-	private moveBall() {
-		if (!this.ballHit || !this.enabled) {
+	private moveBall(deltaTime: number) {
+		if (!this.enabled) {
+			return;
+		}
+		if (!this.ballHit) {
+
+			this.meshBall.position.addInPlaceFromFloats(
+				(this.ballOrigin.x - this.mesh.position.x) * deltaTime * 1,
+				0,
+				(this.ballOrigin.z - this.mesh.position.z) * deltaTime * 1,
+			);
+			this.cursor.x = (this.meshBall.position.x / (this.groundSize.x)) + 0.5;
+			this.cursor.y = (this.meshBall.position.z / (this.groundSize.y)) + 0.5;
 			return;
 		}
 		const ray = this.scene.createPickingRay(this.pointer.x, this.pointer.y).direction;
@@ -186,8 +204,7 @@ export class Picker {
 		let y = this.camera.position.z - ray.z * delta;
 		this.cursor.x = (x / (this.groundSize.x)) + 0.5;
 		this.cursor.y = (y / (this.groundSize.y)) + 0.5;
-		this.pick = ray.y < 0. && Math.abs(this.cursor.x - 0.5) < 0.5 && Math.abs(this.cursor.y - 0.5) < .5 ? 1 : 0;
-		if (Math.abs(x) < this.groundSize.x * 0.6 && Math.abs(y) < this.groundSize.y * 0.6) {
+		if (Math.abs(x) < this.groundSize.x * 0.5 && Math.abs(y) < this.groundSize.y * 0.5) {
 			this.meshBall.position.set(
 				x, this.groundPosition.y, y
 			)

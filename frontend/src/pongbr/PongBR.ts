@@ -2,28 +2,24 @@ import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
 import { InputSystem } from "./systems/InputSystem.js";
-//import { NetworkingSystem } from "./systems/NetworkingSystem.js";
-import { HybridNetworkingSystem as NetworkingSystem } from "./systems/HybridNetworkingSystem.js";
+import { NetworkingSystem } from "./systems/NetworkingSystem.js";
 import { ThinInstanceSystem } from "./systems/ThinInstanceSystem.js";
 import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { ThinInstanceManager } from "./rendering/ThinInstanceManager.js";
-import { createBaseMeshes } from "./utils/initializeGame.js";
+import { createBaseMeshes, initStatue } from "./utils/initializeGame.js";
 import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
 import type { userinterface } from './utils/proto/message.js';
-import { buildPaddles, PaddleBundle } from "./templates/builder.js";
+import { PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
-import { AnimationSystem } from "./systems/AnimationSystem.js";
-import { ArcRotateCamera, Color3, Color4, PointLight, Scene, TransformNode, Vector3, Vector2, Engine, Mesh, UniversalCamera, DefaultRenderingPipeline, PolygonMeshBuilder } from "@babylonImport";
+import { ArcRotateCamera, Scene, TransformNode, Vector3, Mesh, } from "@babylonImport";
 import { BallComponent } from "./components/BallComponent.js";
-import { PaddleComponent } from "./components/PaddleComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
 import { WallComponent } from "./components/WallComponent.js";
 import { Entity } from "./ecs/Entity.js";
-import earcut from "earcut";
-import { MotionBlurPostProcess } from "@babylonjs/core";
-import { createBlackHoleBackdrop } from "./blackhole.js";
-import { SpaceSkybox } from "./skybox.js";
+import { createBlackHoleBackdrop } from "./templates/blackhole.js";
+import { SpaceSkybox } from "./templates/skybox.js";
+import GameUI from "../spa/GameUI.js";
 
 
 export let localPaddleId: any = null;
@@ -35,7 +31,6 @@ export class PongBR {
 	private inputManager!: InputManager;
 	private camera!: ArcRotateCamera;
 	private canvas;
-	private scoreUI: any;
 	private baseMeshes: any;
 	private instanceManagers: any;
 	private uuid!: string;
@@ -47,18 +42,20 @@ export class PongBR {
 	private inputSystem!: InputSystem;
 	private thinInstanceSystem!: ThinInstanceSystem;
 	private spaceSkybox!: SpaceSkybox;
+	private statue!: Mesh;
 	public currentBallScale: Vector3 = new Vector3(1, 1, 1);
+	private gameUI: GameUI;
 
 
-	constructor(canvas: any, scene: Scene) {
+	constructor(canvas: any, scene: Scene, gameUI: GameUI) {
 		this.canvas = canvas;
 		this.scene = scene;
 		this.inited = false;
 		this.pongRoot = this.scene.getTransformNodeByName('pongbrRoot') as TransformNode;
+		this.gameUI = gameUI;
 	}
 
 	public async init() {
-		console.log("INIT");
 		const arena = this.scene.getMeshByName('arenaBox') as Mesh;
 		arena.parent = this.pongRoot;
 
@@ -73,59 +70,10 @@ export class PongBR {
 		this.camera.beta = Math.PI / 2.1;
 		this.camera.radius = 300;
 
-		//var pipeline = new DefaultRenderingPipeline(
-		//	"brPipeline",
-		//	true,
-		//	this.scene,
-		//	[this.camera]
-		//);
-		//pipeline.samples = 4;
-		//pipeline.sharpenEnabled = true;
 		this.baseMeshes = createBaseMeshes(this.scene, this.rotatingContainer);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
-		// const defaultPipeline = new DefaultRenderingPipeline("gameplayPipeline", true, this.scene, [this.camera]);
-		//
-		// defaultPipeline.bloomEnabled = true;
-		// defaultPipeline.bloomThreshold = 0.8; // Only very bright objects (balls)
-		// defaultPipeline.bloomWeight = 0.25; // Subtle - won't overwhelm
-		// defaultPipeline.bloomKernel = 32; // Tight glow, not spreading
-		// defaultPipeline.bloomScale = 0.5;
-		//
-		// defaultPipeline.imageProcessingEnabled = true;
-		// defaultPipeline.imageProcessing.contrast = 1.05; // Very slight contrast boost
-		// defaultPipeline.imageProcessing.exposure = 0.9;
-
-		// const radian = 2 * Math.PI;
-		//
-		// let points: Vector2[] = [];
-		// for (let k = 128; k >= 0; --k) {
-		// 	let point = new Vector2(Math.cos(radian * k / 128) * 202, Math.sin(radian * k / 128) * 202);
-		// 	points.push(point);
-		// }
-		// for (let k = 0; k <= 128; ++k) {
-		// 	let point = new Vector2(Math.cos(radian * k / 128) * 203, Math.sin(radian * k / 128) * 203);
-		// 	points.push(point);
-		// }
-		// const builder = new PolygonMeshBuilder("brick", points, this.scene, earcut);
-		// const mesh = builder.build(true, 1.);
-		// mesh.parent = this.rotatingContainer;
-		// mesh.position.y += 0.45;
-		const statue = this.scene.getMeshByName('__root__') as Mesh;
-		console.log("Statue type:", statue?.getClassName());
-		statue.parent = this.pongRoot;
-		statue.rotationQuaternion = null;
-		statue.position.set(-650, 400, 0);
-		statue.rotation.set(0, 0, 0);
-		statue.scaling.setAll(70);
-		// createSkybox(this.scene);
-		// createSimpleTextureSkybox(this.scene, "/assets/galaxy.jpg");
-		// const spaceSkybox = createCustomizableSpaceSkybox(this.scene, {
-		// 	brightness: 0.003,
-		// 	speed: 0.001,
-		// 	rotationSpeed: 0.0000001
-		// });
-		// createHighQualityProceduralSkybox(this.scene);
-		createBlackHoleBackdrop(this.scene, statue.position, this.pongRoot);
+		this.statue = initStatue(this.scene, this.pongRoot);
+		createBlackHoleBackdrop(this.scene, this.statue.position, this.pongRoot);
 		this.spaceSkybox = new SpaceSkybox(this.scene);
 		this.spaceSkybox.applyPreset('Monochrome');
 
@@ -134,7 +82,6 @@ export class PongBR {
 		this.initECS(this.instanceManagers, this.rotatingContainer);
 
 		this.stateManager = new StateManager(this.ecs);
-		// this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
 		this.inited = true;
 
 
@@ -161,7 +108,7 @@ export class PongBR {
 		this.networkingSystem = new NetworkingSystem(
 			this.wsManager,
 			this.uuid,
-			this.scoreUI,
+			this.gameUI,
 			this
 		);
 		this.ecs.addSystem(this.networkingSystem);
@@ -178,37 +125,21 @@ export class PongBR {
 		allEntities.forEach(entity => {
 			if (entity.hasComponent(BallComponent)) {
 				this.ecs.removeEntity(entity);
-				//const ballComponent = entity.getComponent(BallComponent)!;
-				//const transform = entity.getComponent(TransformComponent);
-				//
-				//ballComponent.position.set(0, 0.5, 0);
-				//ballComponent.velocity.set(0, 0, 0);
-				//
-				//if (transform) {
-				//	transform.baseScale = new Vector3(1, 1, 1);
-				//	transform.enable();
-				//}
 			}
 		});
 
 		this.spaceSkybox.onGameLoad();
-		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot);
+		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot, this.gameUI);
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
 
 		this.currentBallScale = new Vector3(1, 1, 1);
 
 		this.networkingSystem.forceIndexRebuild();
 
-		console.log("start");
 		this.inputManager.enable();
 		this.pongRoot.setEnabled(true);
 		this.stateManager.setter(true);
 		this.stateManager.update();
-
-		// this.scene.onBeforeRenderObservable.add(() => {
-		// 	this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
-		// });
-
 	}
 	public stop(): void {
 
@@ -225,7 +156,6 @@ export class PongBR {
 			ball: new ThinInstanceManager(baseMeshes.ball, 200, 50, 100),
 			paddle: new ThinInstanceManager(baseMeshes.paddle, 100, 50, 100),
 			wall: new ThinInstanceManager(baseMeshes.wall, 100, 50, 100),
-			// portal: new ThinInstanceManager(baseMeshes.portal, 4, 50, 100),
 			pillar: new ThinInstanceManager(baseMeshes.pillar, 200, 50, 100),
 			goal: new ThinInstanceManager(baseMeshes.goal, 100, 50, 100),
 		}
@@ -234,18 +164,16 @@ export class PongBR {
 	private initECS(instanceManagers: any, pongRoot: TransformNode) {
 		this.ecs = new ECSManager();
 		this.ecs.addSystem(new MovementSystem());
-		this.ecs.addSystem(new AnimationSystem());
 		this.thinInstanceSystem = new ThinInstanceSystem(
 			instanceManagers.ball,
 			instanceManagers.paddle,
 			instanceManagers.wall,
-			// instanceManagers.portal,
 			instanceManagers.goal,
 			instanceManagers.pillar,
 			this.camera
 		);
 		this.ecs.addSystem(this.thinInstanceSystem);
-		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot);
+		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot, this.gameUI);
 	}
 
 	public transitionToRound(nextCount: number, entities: Entity[], physicsState?: any, playerMapping?: Record<number, number>) {
@@ -262,7 +190,6 @@ export class PongBR {
 			});
 		}
 
-		const cfg = { arenaRadius: 100, wallWidth: 1, paddleHeight: 1, paddleDepth: 1, goalDepth: 1 };
 		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
 
 		let scaleFactor: number;
@@ -300,7 +227,7 @@ export class PongBR {
 			transform?.disable();
 		}
 
-		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer);
+		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI);
 
 		this.networkingSystem.forceIndexRebuild();
 	}

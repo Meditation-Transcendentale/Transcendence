@@ -86,7 +86,7 @@ const twoFARoutes = (app) => {
 
 	app.post('/verify-2fa', handleErrorsValid(async (req, res) => {
 
-		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
+		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers }); 
 
 		if (!user.two_fa_enabled) {
 			throw { status: userReturn.USER_026.http, code: userReturn.USER_026.code, message: userReturn.USER_026.message, valid: false };

@@ -102,9 +102,10 @@ async function handleNatsSubscription(subject, handler) {
 
 handleErrorsNats(async () => {
 	await Promise.all([
-		handleNatsSubscription("test.stats", async (msg) => {
+		handleNatsSubscription("stats.endgame", async (msg) => {
 
 			const decodedData = jc.decode(msg.data);
+			console.log("Received data for stats.endgame:", decodedData);
 
 			if (Array.isArray(decodedData)) {
 				nats.request('stats.addBRMatchStatsInfos', msg.data, { timeout: 1000 });
