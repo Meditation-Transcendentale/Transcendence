@@ -97,6 +97,10 @@ message MatchEnd {
   string forfeitId = 4;
 }
 
+message MatchEndBr { 
+  repeated string rank = 1;
+}
+
 message PhysicsRequest {
   string gameId = 1;
   int64 tick = 2;
