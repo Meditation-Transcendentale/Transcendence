@@ -1,6 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import https from 'https';
+import { decodeServerMessage, decodeTournamentServerMessage, encodeClientMessage, encodeTournamentClientMessage } from "./proto/helper";
 import WebSocket from 'ws';
 
 dotenv.config({ path: "../../.env" });
@@ -15,12 +16,108 @@ function decodeServerMessage(buffer) {
 		return buffer;
 	}
 }
+// Args
+// lobby id  ---  lobbyid=XXXXXX
+// user number --- nbuser=XXXX
 
-async function main()
-{
+function setupWsGame(gameId, tournamentId, uuid) {
+
+}
+
+function setupWsTournament(tournamentId, uuid) {
+	const url = `wss://${window.location.hostname
+		}:7000/sacrifice?uuid=${encodeURIComponent(
+			uuid
+		)}&tournamentId=${encodeURIComponent(tournamentId)}`;
+
+	this.ws = new WebSocket(url);
+	this.ws.binaryType = "arraybuffer";
+
+	this.ws.onmessage = async (msg) => {
+		const buf = new Uint8Array(msg.data);
+		const payload = decodeTournamentServerMessage(new Uint8Array(buf));
+
+		if (payload.readyCheck) {
+			const buf = encodeTournamentClientMessage({ ready: {} });
+			this.ws.send(buf);
+		}
+
+		if (payload.startGame) {
+			const gameId = payload.startGame.gameId;
+			Router.nav(
+				encodeURI(
+					`/cajoue?id=${payload.startGame.gameId}&mod=tournament&map=void&tournamentId=${this.tournamentId}`
+				),
+				false,
+				true
+			);
+			this.ws?.close();
+		}
+		this.render();
+	};
+
+	this.ws.onclose = () => {
+		this.ws = null;
+		this.stopReadyCountdown();
+	};
+
+	App3D.setVue("tournament");
+
+	if (!document.body.contains(this.div)) {
+		document.body.appendChild(this.div);
+	}
+}
+
+function setupWsLobby(id, uuid) {
+	const url = `wss://${window.location.hostname}:7000/lobbies?uuid=${encodeURIComponent(uuid)}&lobbyId=${encodeURIComponent(id)}`;
+	const ws = new WebSocket(url);
+	ws.binaryType = "arraybuffer";
+
+	this.ws.onopen = (e) => {
+	}
+
+	this.ws.onmessage = (msg) => {
+		const buf = new Uint8Array(msg.data);
+		const payload = decodeServerMessage(buf);
+		let mode;
+		if (payload.error != null)
+			return;
+
+		if (payload.update != null) {
+			mode = payload.update.mode;
+		}
+
+		if (payload.start != null) {
+			const gameId = payload.start.gameId;
+			const map = payload.start.map;
+			this.ws?.close();
+		}
+
+		if (payload.startTournament != null) {
+			const tournamentId = payload.startTournament.tournamentId;
+			setupWsTournament(tournamentId, uuid);
+			this.ws?.close();
+		}
+	}
+
+	this.ws.onclose = () => {
+		this.id = null;
+		this.ws = null;
+		console.log("WS CLOSE");
+		User.status = null;
+	}
+
+	this.ws.onerror = (err) => {
+		console.warn(err);
+	}
+}
+
+async function main() {
 	const agent = new https.Agent({ rejectUnauthorized: false });
 	let lobbyId = null;
-	for (let i = 1; i <= 20; i++) {
+	const lobbyid = process.argv.slice(2);
+	const nbuser = process.argv.slice(3);
+	for (let i = 1; i <= nbuser; i++) {
 
 		let username = `user${i}`;
 		let password = `Password${i}`;
@@ -28,45 +125,45 @@ async function main()
 
 
 		try {
-			await axios.post(`${API_URL}/register`, {
-				username: username,
-				password: password
-			}, { headers: { 'x-api-key': process.env.API_GATEWAY_KEY }, httpsAgent: agent });
+			// await axios.post(`${API_URL}/register`, {
+			// 	username: username,
+			// 	password: password
+			// }, { headers: { 'x-api-key': process.env.API_GATEWAY_KEY }, httpsAgent: agent });
 
 			// console.log(`Registered: ${username}`);
 
 			const response = await axios.post(`${API_URL}/auth/login`, {
 				username: username,
 				password: password
-			}, { 
-				headers: { 'x-api-key': process.env.API_GATEWAY_KEY }, 
-				httpsAgent: agent, 
-				withCredentials: true 
+			}, {
+				headers: { 'x-api-key': process.env.API_GATEWAY_KEY },
+				httpsAgent: agent,
+				withCredentials: true
 			});
 
 			const cookies = response.headers['set-cookie'];
 
 			// console.log(`Logged in: ${username}`);
-			
-			if (i == 1) {
-				const state = await axios.post(`${API_URL}/lobby/create`,{
-					mode: 'br',
-					map: 'default'
-				}, {
-					headers: {
-						'x-api-key': process.env.API_GATEWAY_KEY,
-						'Cookie': cookies ? cookies.join('; ') : ''
-					}, 
-					httpsAgent: agent
-				});
 
-				lobbyId = state.data.lobbyId;
-				// console.log('Created a battle royale lobby:', lobbyId);
-			}
+			// if (i == 1) {
+			// 	const state = await axios.post(`${API_URL}/lobby/create`, {
+			// 		mode: 'br',
+			// 		map: 'default'
+			// 	}, {
+			// 		headers: {
+			// 			'x-api-key': process.env.API_GATEWAY_KEY,
+			// 			'Cookie': cookies ? cookies.join('; ') : ''
+			// 		},
+			// 		httpsAgent: agent
+			// 	});
+			//
+			// 	lobbyId = state.data.lobbyId;
+			// 	// console.log('Created a battle royale lobby:', lobbyId);
+			// }
 
-			const user = await axios.get(`${API_URL}/info/me`, { 
-				headers: { 
-					'x-api-key': process.env.API_GATEWAY_KEY, 
+			const user = await axios.get(`${API_URL}/info/me`, {
+				headers: {
+					'x-api-key': process.env.API_GATEWAY_KEY,
 					'Cookie': cookies ? cookies.join('; ') : ''
 				},
 				httpsAgent: agent
@@ -114,16 +211,16 @@ async function main()
 
 			// 	console.log('Searched:', `user${i - 1}`, 'UUID:', searchResponse.data.data.uuid);
 
-				// await axios.post(`${API_URL}/friends/add`, {
-				// 	inputUuid: searchResponse.data.data.uuid
-				// }, { 
-				// 	headers: { 
-				// 		'x-api-key': process.env.API_GATEWAY_KEY, 
-				// 		'Cookie': cookies ? cookies.join('; ') : ''
-				// 	}, 
-				// 	httpsAgent: agent });
+			// await axios.post(`${API_URL}/friends/add`, {
+			// 	inputUuid: searchResponse.data.data.uuid
+			// }, { 
+			// 	headers: { 
+			// 		'x-api-key': process.env.API_GATEWAY_KEY, 
+			// 		'Cookie': cookies ? cookies.join('; ') : ''
+			// 	}, 
+			// 	httpsAgent: agent });
 
-				// console.log('Friend request sent to:', `user${i - 1}`);
+			// console.log('Friend request sent to:', `user${i - 1}`);
 			// }
 
 		}
