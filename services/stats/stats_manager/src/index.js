@@ -7,7 +7,6 @@ import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client
 
 import { handleErrorsNats } from "../../shared/handleErrors.mjs";
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
-import handleGameFinished from "./natsHandler.js";
 import statsRoutes from "./statsRoutes.js";
 
 dotenv.config({ path: "../../../.env" });
@@ -102,21 +101,16 @@ async function handleNatsSubscription(subject, handler) {
 
 handleErrorsNats(async () => {
 	await Promise.all([
-		handleNatsSubscription("stats.endgame", async (msg) => {
-
+		handleNatsSubscription("games.online.*.match.end", async (msg) => {
 			const decodedData = jc.decode(msg.data);
 			console.log("Received data for stats.endgame:", decodedData);
-
-			if (Array.isArray(decodedData)) {
-				nats.request('stats.addBRMatchStatsInfos', msg.data, { timeout: 1000 });
-			} else if (decodedData && typeof decodedData === 'object') {
-				nats.request('stats.addClassicMatchStatsInfos', msg.data, { timeout: 1000 });
-			} else {
-				console.log("Received data of unknown type:", decodedData);
-			}
-
-			nats.publish(msg.reply, jc.encode({ success: true }));
-		})
+			nats.request('stats.addClassicMatchStatsInfos', msg.data, { timeout: 1000 });
+		}),
+		handleNatsSubscription("games.br.*.match.end", async (msg) => {
+			const decodedData = jc.decode(msg.data);
+			console.log("Received data for stats.endgame:", decodedData);
+			nats.request('stats.addBRMatchStatsInfos', msg.data, { timeout: 1000 });
+		}),
 	]);
 })();
 

@@ -79,6 +79,39 @@ export default async function statsRoutes(app) {
 		});
 	}));
 
+	app.get('/get/brickbreaker/:username', handleErrors(async (req, res) => {
+
+		const { username } = req.params;
+		
+		const user = await nats.request('user.getUserFromUsername', jc.encode({ username }), { timeout: 1000 });
+		const userResult = jc.decode(user.data);
+		if (!userResult.success) {
+			throw { status: userResult.status, code: userResult.code, message: userResult.message };
+		}
+		const playerId = userResult.data.id;
+
+		const response = await nats.request(`stats.getBrickBreakerStats`, jc.encode(playerId), { timeout: 1000 });
+
+		const result = jc.decode(response.data);
+		if (!result.success) {
+			throw { status: result.status, code: result.code, message: result.message };
+		}
+		const brickBreakerStats = result.data;
+		
+		res.code(statusCode.SUCCESS).send({ brickBreakerStats });
+	}));
+
+	app.get('/get/leaderboard/brickbreaker', handleErrors(async (req, res) => {
+
+		const natsResponse = await nats.request(`stats.getBrickBreakerLeaderboard`, jc.encode({}), { timeout: 1000 });
+		const leaderboards = jc.decode(natsResponse.data);
+		if (!leaderboards.success) {
+			throw { status: leaderboards.status, code: leaderboards.code, message: leaderboards.message };
+		}
+
+		res.code(statusCode.SUCCESS).send({ leaderboards: leaderboards.data });
+	}));
+
 	app.get('/health', (req, res) => {
 		res.status(200).send('OK');
 	});

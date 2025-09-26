@@ -18,6 +18,32 @@ const getPlayerStatsBRModeStmt = database.prepare(`
 	WHERE match_stats.user_id = ? AND match.game_mode = ?
 	ORDER BY created_at
 `);
+const getBrickBreakerStatsStmt = database.prepare(`
+	SELECT easy_mode_hscore, normal_mode_hscore, hard_mode_hscore
+	FROM brickbreaker_stats
+	WHERE user_id = ?
+`);
+const getBrickBreakerLeaderboard_easyStmt = database.prepare(`
+	SELECT users.username, brickbreaker_stats.easy_mode_hscore
+	FROM brickbreaker_stats
+	JOIN users ON brickbreaker_stats.user_id = users.id
+	ORDER BY brickbreaker_stats.easy_mode_hscore DESC
+	LIMIT 10
+`);
+const getBrickBreakerLeaderboard_normalStmt = database.prepare(`
+	SELECT users.username, brickbreaker_stats.normal_mode_hscore
+	FROM brickbreaker_stats
+	JOIN users ON brickbreaker_stats.user_id = users.id
+	ORDER BY brickbreaker_stats.normal_mode_hscore DESC
+	LIMIT 10
+`);
+const getBrickBreakerLeaderboard_hardStmt = database.prepare(`
+	SELECT users.username, brickbreaker_stats.hard_mode_hscore
+	FROM brickbreaker_stats
+	JOIN users ON brickbreaker_stats.user_id = users.id
+	ORDER BY brickbreaker_stats.hard_mode_hscore DESC
+	LIMIT 10
+`);
 const isUserIdExistingStmt = database.prepare(`SELECT * FROM users WHERE id = ?`);
 const addMatchInfosStmt = database.prepare(`INSERT INTO match (game_mode, winner_id, total_players) VALUES (?, ?, ?)`);
 const addMatchStatsInfosStmt = database.prepare(`INSERT INTO match_stats (match_id, user_id, is_winner, goals_scored, goals_conceded, placement) VALUES (?, ?, ?, ?, ?, ?)`);
@@ -68,6 +94,22 @@ const statService = {
 			result.goals_conceded,
 			null
 		);
+	},
+	getBrickBreakerStats: (playerId) => {
+		const brickBreakerStats = getBrickBreakerStatsStmt.get(playerId);
+		return brickBreakerStats;
+	},
+	getBrickBreakerLeaderboard_easy: () => {
+		const leaderboard_easy = getBrickBreakerLeaderboard_easyStmt.all();
+		return leaderboard_easy;
+	},
+	getBrickBreakerLeaderboard_normal: () => {
+		const leaderboard_normal = getBrickBreakerLeaderboard_normalStmt.all();
+		return leaderboard_normal;
+	},
+	getBrickBreakerLeaderboard_hard: () => {
+		const leaderboard_hard = getBrickBreakerLeaderboard_hardStmt.all();
+		return leaderboard_hard;
 	},
 	testAll: () => {
 		const allMatch = testAllMatch.all();

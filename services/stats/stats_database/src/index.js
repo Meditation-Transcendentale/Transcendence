@@ -121,9 +121,24 @@ handleErrorsNats(async () => {
 
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
+		handleNatsSubscription("stats.getBrickBreakerStats", async (msg) => {
+			const playerId = jc.decode(msg.data);
+			statService.isUserIdExisting(playerId);
+			const brickBreakerStats = statService.getBrickBreakerStats(playerId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: brickBreakerStats }));
+		}),
+		handleNatsSubscription("stats.getBrickBreakerLeaderboard", async (msg) => {
+			const leaderboard = {
+				easy: statService.getBrickBreakerLeaderboard_easy(),
+				normal: statService.getBrickBreakerLeaderboard_normal(),
+				hard: statService.getBrickBreakerLeaderboard_hard()
+			};
+			nats.publish(msg.reply, jc.encode({ success: true, data: leaderboard }));		
+		}),
 		handleNatsSubscription("test.statsDatabase", async (msg) => {
 			const result = statService.testAll();
 			nats.publish(msg.reply, jc.encode({ success: true, data: result }));
-		})
+		}),
+
 	]);
 })();
