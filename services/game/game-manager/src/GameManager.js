@@ -204,7 +204,6 @@ export class GameManager {
 				`games.${match.mode}.${gameId}.match.end`,
 				new Uint8Array()
 			);
-			// this.nc.request('stats.endgame', jc.encode(), { timeout: 1000 });
 		}
 		this.games.delete(gameId);
 
@@ -214,6 +213,7 @@ export class GameManager {
 
 	quitMatch(gameId, uuid) {
 		const match = this.games.get(gameId);
+
 		if (!match) return false;
 
 		if (match.interval) {
@@ -226,7 +226,7 @@ export class GameManager {
 		if (match.mode != `br`) {
 			const buf = encodeMatchEnd({
 				winnerId:
-					match.player[0] === uuid ? match.players[1] : match.players[0],
+					match.players[0] === uuid ? match.players[1] : match.players[0],
 				loserId:
 					uuid,
 				score: match.state.score,

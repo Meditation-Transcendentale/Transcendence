@@ -79,7 +79,7 @@ export default class UIService {
 			(async () => {
 				for await (const m of sub) {
 					const [, , gameId] = m.subject.split('.');
-					const { winnerId } = decodeMatchEnd(m.data);
+					// const { winnerId } = decodeMatchEnd(m.data);
 					const buf = encodeServerMessage({ end: m.data });
 
 					for (const sid of this.games.get(gameId) || []) {
@@ -94,7 +94,7 @@ export default class UIService {
 					this.allowedByGame.delete(gameId);
 					this.games.delete(gameId);
 					this.readyPlayers.delete(gameId);
-					console.log(`Game ${gameId} ended, winner paddleId=${winnerId}`);
+					// console.log(`Game ${gameId} ended, winner paddleId=${winnerId}`);
 				}
 			})();
 		}

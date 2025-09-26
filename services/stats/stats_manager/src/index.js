@@ -5,7 +5,7 @@ import { connect, JSONCodec } from "nats";
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
-import { handleErrorsNats } from "../../shared/handleErrors.mjs";
+import { handleErrorsNatsNoReply } from "../../shared/handleErrors.mjs";
 import { statusCode, returnMessages } from "../../shared/returnValues.mjs";
 import statsRoutes from "./statsRoutes.js";
 
@@ -92,23 +92,22 @@ async function handleNatsSubscription(subject, handler) {
 			const status = error.status || 500;
 			const message = error.message || "Internal Server Error";
 			const code = error.code || 500;
-			nats.publish(msg.reply, jc.encode({ success: false, status, message, code }));
+			if (msg.reply) {
+				nats.publish(msg.reply, jc.encode({ success: false, status, message, code }));
+			}
+			console.error(`Error handling message on subject ${subject}:`, error);
 		}
 	}
 }
 
 
 
-handleErrorsNats(async () => {
+handleErrorsNatsNoReply(async () => {
 	await Promise.all([
 		handleNatsSubscription("games.online.*.match.end", async (msg) => {
-			const decodedData = jc.decode(msg.data);
-			console.log("Received data for stats.endgame:", decodedData);
 			nats.request('stats.addClassicMatchStatsInfos', msg.data, { timeout: 1000 });
 		}),
 		handleNatsSubscription("games.br.*.match.end", async (msg) => {
-			const decodedData = jc.decode(msg.data);
-			console.log("Received data for stats.endgame:", decodedData);
 			nats.request('stats.addBRMatchStatsInfos', msg.data, { timeout: 1000 });
 		}),
 	]);

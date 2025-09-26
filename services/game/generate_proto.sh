@@ -30,7 +30,9 @@ SERVICES=(
   "tournament"
   "friends-service"
   "spa"
+  "stats_database"
   "100ptest"
+
 )
 
 echo "🛠 Starting protobuf generation for all services..."
@@ -56,6 +58,9 @@ for svc in "${SERVICES[@]}"; do
     spa)
       OUT_DIR="../../frontend/src/spa/proto"
       ;;
+	stats_database)
+	  OUT_DIR="../../services/stats/stats_database/src/proto"
+	  ;;
     *)
       OUT_DIR="$svc/src/proto"
       ;;
@@ -139,6 +144,11 @@ for svc in "${SERVICES[@]}"; do
         "$SHARED_PROTO_DIR/notif.proto"
       )
       ;;
+	"stats_database")
+	  PROTO_SOURCES=(
+		"$SHARED_PROTO_DIR/shared.proto"
+	  )
+	  ;; 
     "spa")
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/shared.proto"
