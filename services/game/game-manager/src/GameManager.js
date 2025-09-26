@@ -276,7 +276,7 @@ export class GameManager {
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles;
-			newState.stage = resp.stage;
+			newState.stage = resp.stage;https://www.warcraftlogs.com/reports/nDxGpP4KMY1jAzZb?fight=38&type=damage-done&source=15
 			newState.ranks = resp.ranks;
 			newState.events = resp.events || []; // ADD THIS
 			newState.gameState = resp.gameState || {};
