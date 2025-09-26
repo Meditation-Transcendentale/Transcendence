@@ -19,15 +19,15 @@ function shuffle(arr) {
 
 class MatchNode {
     constructor() {
-        this.player1Id = null; //uuid
-        this.player2Id = null; //uuid
-        this.left = null; //MatchNode
-        this.right = null; //MatchNode
-        this.parent = null; //MatchNode
-        this.winnerId = null; //uuid
-        this.gameId = null; //gameId
-        this.score = null; //{values(int[]), forfeit(boolean)}
-        this.creating = false; //boolean
+        this.player1Id = null;
+        this.player2Id = null;
+        this.left = null;
+        this.right = null;
+        this.parent = null;
+        this.winnerId = null;
+        this.gameId = null;
+        this.score = null;
+        this.creating = false;
     }
 
     setResult(matchData, forfeit) {
