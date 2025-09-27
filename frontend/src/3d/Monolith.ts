@@ -89,7 +89,7 @@ export class Monolith {
 			enableShaderAnimation: false,
 			animationSpeed: 1.0,
 			animationIntensity: 0.1,
-			qualityMode: 'medium',
+			qualityMode: 'low',
 			surfaceOnly: true,
 			mergeTolerance: 0.001,
 			...options

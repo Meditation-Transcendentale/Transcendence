@@ -90,9 +90,10 @@ export class Field {
 		this.camera.minZ = 0.01;
 		// const light2 = new DirectionalLight("direclight", new Vector3(0, -0.2, -1), this.scene);
 		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
-		this.light.intensity = 0.7;
+		this.light.intensity = 0.1;
 
 		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.5, 10, this.scene);
+		// this.spotLight = new SpotLight("torche", new Vector3(), new Vector3(0, 0, -1), Math.PI * 0.5, 10, this.scene);
 		this.spotLight.range = 30.;
 		this.spotLight.specular.scaleInPlace(6.);
 		this.spotLight.intensity = 2.7;
@@ -190,46 +191,14 @@ export class Field {
 
 		this.fog.setSpotLight(this.spotLight);
 
-
-		// const data = PelinWorley3D(64);
-		// const tt = new RawTexture3D(
-		// 	data,
-		// 	64,
-		// 	64,
-		// 	64,
-		// 	Engine.TEXTUREFORMAT_R,
-		// 	this.scene,
-		// 	false,
-		// 	false,
-		// 	Engine.TEXTURE_NEAREST_SAMPLINGMODE,
-		// 	Engine.TEXTURETYPE_FLOAT
-		// );
-		// const b = MeshBuilder.CreateBox("test", { size: 2 });
-		// const m = new ShaderMaterial("test", this.scene, "texture3DCheck", {
-		// 	attributes: ["position", "normal", "uv"],
-		// 	uniforms: ["world", "viewProjection", "depth"],
-		// 	samplers: ["textureSampler"]
-		// })
-		//
-		// m.setTexture("textureSampler", tt);
-		// b.material = m;
-		// b.position.set(-5, 3, 0);
-		//
-		// UIaddSlider("depth", 0, {
-		// 	step: 0.01,
-		// 	min: 0,
-		// 	max: 1,
-		// }, (n: number) => { m.setFloat("depth", n) })
-		// const b2 = b.clone();
-		// b2.position.set(-7, 3, 0);
-		// b2.material = m;
-
 	}
 
 	public update(time: number, deltaTime: number) {
 		if (this.active) {
 			this.spotLight.direction = this.camera.getForwardRay().direction;
 			this.spotLight.direction.normalize();
+			// this.spotLight.position.copyFrom(this.camera.position).addInPlaceFromFloats(0, 5, 0);
+			// this.spotLight.setDirectionToTarget(this.camera.getForwardRay().direction.scaleInPlace(3).addInPlace(this.camera.position))
 
 			// console.log(this.spotLight.direction);
 			// this.spotLight.setDirectionToTarget(this.camera.getTarget());
