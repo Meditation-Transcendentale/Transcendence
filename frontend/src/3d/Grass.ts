@@ -16,11 +16,11 @@ type _thinInstancesOptions = {
 };
 
 const optionsA: _thinInstancesOptions = {
-	density: 10,
+	density: 5,
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 0.5,
-	scale: new Vector3(.8, 1.5, .8)
+	scale: new Vector3(1.5, 2.5, 1.5)
 };
 
 const optionsB: _thinInstancesOptions = {
@@ -57,6 +57,7 @@ export class Grass {
 	private reduced: boolean;
 
 	public ballPosition!: Vector3;
+	public ballLightColor!: Color3;
 
 	constructor(scene: Scene, size: number) {
 		this._size = size;
@@ -111,6 +112,7 @@ export class Grass {
 		this._grassShader.setTexture("textureSampler", texture);
 		this._grassShader.setVec3("ballPosition", this.ballPosition);
 		this._grassShader.setFloat("ballRadius", radius);
+		this._grassShader.setColor3("ballLightColor", this.ballLightColor);
 
 		this._pastTime = time;
 

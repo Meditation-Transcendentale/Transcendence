@@ -77,6 +77,7 @@ export class Field {
 		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 0.5, 0), new Vector2(40, 40));
 
 		this.grass.ballPosition = this.picker.position;
+		this.grass.ballLightColor = this.picker.ballLightColor;
 
 		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
@@ -86,7 +87,9 @@ export class Field {
 		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
 		this.light.intensity = 0.7;
 
-		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.3, 33, this.scene);
+		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.5, 10, this.scene);
+		this.spotLight.range = 30.;
+		this.spotLight.specular.scaleInPlace(6.);
 
 		UIaddSlider("light intensity", this.spotLight.intensity, {
 			step: 0.1,
@@ -103,7 +106,10 @@ export class Field {
 			step: 0.1,
 			min: 0.,
 			max: 100
-		}, (n: number) => { this.spotLight.exponent = n });
+		}, (n: number) => {
+			this.spotLight.exponent = n;
+			this.fog.spotLightExponent = n
+		});
 
 		// this.light.specular = Color3.Black();
 
@@ -130,6 +136,7 @@ export class Field {
 		m.diffuseColor = Color3.Black();
 		m.specularColor = Color3.Black();
 		this.ground.material = m;
+		// this.ground.setEnabled(false);
 
 		this.defaultDepthMaterial = new ShaderMaterial("defaultDepth", this.scene, "defaultDepth", {
 			attributes: ['position'],
@@ -164,48 +171,60 @@ export class Field {
 			segments: 1000
 		}))
 
-		const data = PelinWorley3D(64);
-		const tt = new RawTexture3D(
-			data,
-			64,
-			64,
-			64,
-			Engine.TEXTUREFORMAT_R,
-			this.scene,
-			false,
-			false,
-			Engine.TEXTURE_NEAREST_SAMPLINGMODE,
-			Engine.TEXTURETYPE_FLOAT
-		);
-		const b = MeshBuilder.CreateBox("test", { size: 2 });
-		const m = new ShaderMaterial("test", this.scene, "texture3DCheck", {
-			attributes: ["position", "normal", "uv"],
-			uniforms: ["world", "viewProjection", "depth"],
-			samplers: ["textureSampler"]
-		})
+		this.fog.ballLightRadius = this.picker.ballRadius;
+		this.fog.ballLightColor = this.picker.ballLightColor;
+		this.fog.ballPosition = this.picker.position;
 
-		m.setTexture("textureSampler", tt);
-		b.material = m;
-		b.position.set(-5, 3, 0);
+		this.fog.setSpotLight(this.spotLight);
 
-		UIaddSlider("depth", 0, {
-			step: 0.01,
-			min: 0,
-			max: 1,
-		}, (n: number) => { m.setFloat("depth", n) })
-		const b2 = b.clone();
-		b2.position.set(-7, 3, 0);
-		b2.material = m;
+
+		// const data = PelinWorley3D(64);
+		// const tt = new RawTexture3D(
+		// 	data,
+		// 	64,
+		// 	64,
+		// 	64,
+		// 	Engine.TEXTUREFORMAT_R,
+		// 	this.scene,
+		// 	false,
+		// 	false,
+		// 	Engine.TEXTURE_NEAREST_SAMPLINGMODE,
+		// 	Engine.TEXTURETYPE_FLOAT
+		// );
+		// const b = MeshBuilder.CreateBox("test", { size: 2 });
+		// const m = new ShaderMaterial("test", this.scene, "texture3DCheck", {
+		// 	attributes: ["position", "normal", "uv"],
+		// 	uniforms: ["world", "viewProjection", "depth"],
+		// 	samplers: ["textureSampler"]
+		// })
+		//
+		// m.setTexture("textureSampler", tt);
+		// b.material = m;
+		// b.position.set(-5, 3, 0);
+		//
+		// UIaddSlider("depth", 0, {
+		// 	step: 0.01,
+		// 	min: 0,
+		// 	max: 1,
+		// }, (n: number) => { m.setFloat("depth", n) })
+		// const b2 = b.clone();
+		// b2.position.set(-7, 3, 0);
+		// b2.material = m;
 
 	}
 
 	public update(time: number, deltaTime: number) {
 		if (this.active) {
 			this.spotLight.direction = this.camera.getForwardRay().direction;
+			this.spotLight.direction.normalize();
+
 			// console.log(this.spotLight.direction);
 			// this.spotLight.setDirectionToTarget(this.camera.getTarget());
 			this.picker.render(deltaTime);
 			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
+			this.fog.ballPosition = this.picker.position;
+			this.fog.spotLightPosition = this.spotLight.position;
+			this.fog.spotLightDirection = this.spotLight.direction;
 			this.fog.render();
 			this.monolith.update(time, this.camera);
 		}

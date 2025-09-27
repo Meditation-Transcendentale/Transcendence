@@ -1,4 +1,5 @@
 import { Color3, CustomMaterial, RenderTargetTexture, Scene, Vector3 } from "@babylonImport";
+import { UIaddColor, UIaddSliderVec3 } from "../UtilsUI";
 
 export class GrassShader extends CustomMaterial {
 	constructor(name: string, scene: Scene) {
@@ -9,6 +10,7 @@ export class GrassShader extends CustomMaterial {
 		this.AddUniform('textureSampler', 'sampler2D', null);
 		this.AddUniform("ballPosition", "vec3", null);
 		this.AddUniform("ballRadius", "float", 0.);
+		this.AddUniform("ballLightColor", "vec3", null);
 
 		this.AddAttribute('baseColor');
 		this.AddAttribute('uv');
@@ -117,11 +119,11 @@ export class GrassShader extends CustomMaterial {
 
 		this.Vertex_Before_NormalUpdated(
 			`
-				vec3 viewDir = vEyePosition.xyz - vec3(pos.x, 0., pos.y) ;
-				normalUpdated = normalize(vec3(viewDir.x, 0., viewDir.z));
+				// vec3 viewDir = vEyePosition.xyz - vec3(pos.x, 0., pos.y);
+				// normalUpdated = normalize(vec3(viewDir.x, 0., viewDir.z));
 				// normalUpdated = rotationY(normalUpdated, M_PI * 0.05 * (uv.x * 2. - 1.)); //Rounded Normal
 				// normalUpdated = rotationAxis(normalUpdated, totalWave.z * M_PI* 0.5 , vec3(-totalWave.y, 0., -totalWave.x));
-				// normalUpdated = vec3(0.,0.,1.);
+				normalUpdated = vec3(0.,0.,1.);
 				normalUpdated = rotationY(normalUpdated, baseColor.r);
 				normalUpdated = rotationAxis(normalUpdated, totalWave.z * M_PI* 0.3 , vec3(-totalWave.y, 0., -totalWave.x));
 				normalUpdated = rotationAxis(normalUpdated, strengh, vec3(windDir.y, 0., windDir.x));
@@ -309,7 +311,6 @@ export class GrassShader extends CustomMaterial {
 			// gl_FragColor.rgb *= vPositionM.y * 1.5 * baseColor.g;
 			// gl_FragColor.rgb = vec3(floor(gl_FragColor.r * 4. + 0.5) * (1. / 4.));
 			// gl_FragColor.rgb = vec3(vMainUV1, 0.);
-			// gl_FragColor.rgb = vec3(normalW * 0.5 + 0.5);
 			// gl_FragColor.rgb = vec3(ddt);
 			// gl_FragColor.rgb = vec3(vPositionM.rg, 0.);
 			// gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0., 1.);
@@ -317,7 +318,8 @@ export class GrassShader extends CustomMaterial {
 			// gl_FragColor.rgb = vec3(normalW * 0.5 + 0.5);
 			// gl_FragColor.rgb = vec3(normalW.y);
 
-			gl_FragColor.rgb += max((ballRadius - length(ballPosition - vPositionW)) / ballRadius, 0.) * vec3(2., 0., 0.);
+			gl_FragColor.rgb += max((ballRadius - length(ballPosition - vPositionW)) / ballRadius, 0.) * ballLightColor;
+			// gl_FragColor.rgb = vec3(normalW * 0.5 + 0.5);
 		`)
 
 		this.Fragment_Before_Fog(`
@@ -331,13 +333,17 @@ export class GrassShader extends CustomMaterial {
 		this.backFaceCulling = false;
 		// this.twoSidedLighting = true;
 		this.diffuseColor = Color3.FromHexString("#4b8024");
-		this.diffuseColor = Color3.FromHexString("#ae8307")
+		this.diffuseColor = Color3.FromHexString("#ae8307");
+		this.diffuseColor = Color3.FromHexString("#5b7457");
+		this.diffuseColor = Color3.FromHexString("#266A1B");
+		this.specularColor = this.diffuseColor.scale(3.);
+		UIaddColor("grass color", this.diffuseColor, {}, () => { });
 		//this.diffuseColor = new Color3(0.6, 1., 0.28);
 		//this.diffuseColor = new Color3(1., 1., 1.);
 
 		// this.emissiveColor = new Color3(0.3, 0.3, 0.3);
 
-		this.specularPower = 96;
+		this.specularPower = 64;
 		// this.specularColor = new Color3(2., 2., 2.);
 
 	}
@@ -356,6 +362,15 @@ export class GrassShader extends CustomMaterial {
 			//console.log(this.getEffect().defines);
 		});
 	}
+
+	setColor3(name: string, value: Color3) {
+
+		this.onBindObservable.addOnce(() => {
+			this.getEffect().setColor3(name, value);
+			//console.log(this.getEffect().defines);
+		});
+	}
+
 
 
 	setFloatArray3(name: string, values: number[]) {

@@ -23,6 +23,7 @@ export class Pipeline {
 	private contrast: number;
 	private brightness: number;
 	private gamma: number;
+	private tonemapping: number;
 
 	constructor(scene: Scene, camera: Camera, fogRt: RenderTargetTexture) {
 		this.scene = scene;
@@ -33,7 +34,7 @@ export class Pipeline {
 
 		this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "pipeline");
 
-		this.fogPostProcess = new PostProcess("fogApply", "fogApply", {
+		this.fogPostProcess = new PostProcess("fogApply", "fogApply3D", {
 			uniforms: ["fogAbsorption"],
 			samplers: ["fogTexture"],
 			size: 1.,

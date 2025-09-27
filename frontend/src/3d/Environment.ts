@@ -214,9 +214,9 @@ export class Environment {
 		this.scene.imageProcessingConfiguration.exposure = 1.;
 		this.scene.imageProcessingConfiguration.contrast = 1.;
 
-		// whitelight.setEnabled(false);
-		// redlight.setEnabled(false);
-		// whitelight2.setEnabled(false);
+		whitelight.setEnabled(false);
+		redlight.setEnabled(false);
+		whitelight2.setEnabled(false);
 
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);

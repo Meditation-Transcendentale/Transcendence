@@ -148,3 +148,170 @@ void main(void) {
 }
 `;
 
+
+Effect.ShadersStore["fog3DFragmentShader"] = `
+precision highp float;
+precision highp sampler3D;
+precision highp sampler2D;
+
+#define M_PI 3.1415926535897932384626433832795
+#define EPS	0.1
+
+layout(std140) uniform camera {
+	float	cameraMaxZ;
+	vec3	cameraPosition;
+	mat4	projection;
+	mat4	iprojection;
+	mat4	iview;
+	mat4	world;
+};
+
+layout(std140) uniform data {
+	float	noiseOffset;
+	float	stepSize;
+	float	maxDistance;
+	float	densityMultiplier;
+	float	lightScattering;
+	float	ballLightRadius;
+	float	spotLightExp;
+	float	spotLightAngle;
+	float	spotLightRange;
+	vec3	fogAbsorption;
+	vec3	fogScale;
+	vec3	ballPosition;
+	vec3	ballLightColor;
+	vec3	spotLightPosition;
+	vec3	spotLightDirection;
+	vec3	spotLightColor;
+};
+
+uniform vec2	resolution;
+uniform float	time;
+
+uniform sampler2D	depthTexture;
+uniform sampler3D	densityTexture;
+
+
+varying vec2 vUV;
+
+float heyney_greenstein(float angle, float scattering) {
+			return (1. - angle * angle) / (4. * M_PI * pow(1. + scattering * scattering - (2.0 * scattering) * angle, 1.5));
+}
+
+vec3 worldPosFromDepth(){
+	float depth = texture2D(depthTexture, vUV).r;
+	vec4 ndc = vec4(
+		(vUV.x - 0.5) * 2.0,
+				(vUV.y - 0.5) * 2.0,
+			projection[2].z + projection[3].z / (depth * cameraMaxZ),
+		1.0
+			);
+	vec4 worldSpaceCoord = iview * iprojection * ndc;
+	worldSpaceCoord /= worldSpaceCoord.w;
+	return worldSpaceCoord.xyz;
+}
+
+float hash(float p) { 
+	p = fract(p * 0.1031); 
+	p *= p + 33.33; 
+	return fract(p * (p + p)); 
+}
+
+float travelStartOffset(void) {
+	vec2 uv = vUV * resolution * 0.5;
+	uv -= fract(uv);
+	uv *= 0.1;
+	return hash(uv.x * uv.y + time) * noiseOffset;
+}
+
+
+
+
+float sampleDensity(vec3 pos) {
+	vec3 uv = mod(pos, fogScale.x) / fogScale.x;
+	uv.x += time * 0.1;
+	if (pos.y > fogScale.y) {
+		return 0.;
+	}
+	float d = length(pos.xz) / 40.;
+	d = (0.9 - min(d, 0.9)) * 4. + 1.;
+	// d  = pow(d, 5.);
+	return pow(texture(densityTexture, uv).r, d) * densityMultiplier;
+}
+
+float attenuation(float r, float f, float d) {
+  float denom = d / r + 1.0;
+  float attenuation = 1.0 / (denom*denom);
+  float t = (attenuation - f) / (1.0 - f);
+  return max(t, 0.0);
+}
+
+vec3	getColor(vec3 pos, vec3 ray, float density) {
+	vec3 L = pos - ballPosition;
+	float d = length(L);
+	
+	return ballLightColor * attenuation(ballLightRadius, 0.1, d) * density  *  heyney_greenstein(dot(ray, -L / d), lightScattering);
+}
+
+float getAttenuation(float cosAngle, float exponent) {
+    return max(0., pow(cosAngle, exponent));
+}
+
+vec3	getSpotLight(vec3 pos, vec3 ray, float density) {
+	vec3 L = spotLightPosition - pos;
+	float d = length(L);
+	float a = max(0., 1. - d / spotLightRange);
+	float cosA = max(0., dot(spotLightDirection, -L / d));
+	if (cosA >= spotLightAngle) {
+		a *= getAttenuation(cosA, spotLightExp);
+		return spotLightColor * a * density * 0.01; //* heyney_greenstein(dot(ray, spotLightDirection), lightScattering);
+	}
+	return vec3(0.);
+}
+
+void main(void) {
+	vec3 position = cameraPosition;
+
+	// gl_FragColor.rgb = vec3(texture(depthTexture, vUV).r);
+	// return;
+	vec3 worldPos = worldPosFromDepth();
+
+
+	float distanceToHit = length(worldPos - cameraPosition);
+	vec3 ray = normalize(worldPos - cameraPosition);
+
+	float travel = travelStartOffset();
+
+	vec4 fogColor = vec4(0.,0.,0.,0.);
+
+	vec2 v = vec2(0., 100.);
+	vec3 p = position + travel * ray;
+	float maxDist = min(maxDistance, distanceToHit);
+
+	float s = 100.;
+	vec3 r = stepSize * ray;
+	vec2 uv;
+
+	float	totalDensity = 0.;
+	float transmittance = 1.;
+	float density = 0.;
+	vec3 color = vec3(0.);
+	while (travel < maxDist) {
+		density = sampleDensity(p) * stepSize;
+		if (density > 0.) {
+			transmittance *= exp(-density);
+			color += getColor(p, ray, density);
+			//color += fogAbsorption * heyney_greenstein(dot(ray, vec3(0, -1, 0)), lightScattering) * density ;
+			color += getSpotLight(p, ray, density);
+			totalDensity += density;
+		}
+		
+		travel += stepSize;
+		p += r;
+
+	}
+	gl_FragColor.rgb = color *  (1. - transmittance);
+	// gl_FragColor.rgb =  color *  max(transmittance, 0.);
+	gl_FragColor.a = totalDensity + max(distanceToHit - travel, 0.) * densityMultiplier;
+}
+`;

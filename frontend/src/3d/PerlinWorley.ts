@@ -53,6 +53,7 @@ function remap(x: number, a: number, b: number, c: number, d: number): number {
 	return (((x - a) / (b - a)) * (d - c)) + c;
 }
 
+//same mod as GLSL definition
 function mod(x: number, y: number): number {
 	return x - y * Math.floor(x / y);
 }
@@ -155,9 +156,9 @@ function worleyNoise(uv: Float32Array, freq: number): number {
 				fvec3[0] = x; //offset
 				fvec3[1] = y;
 				fvec3[2] = z;
-				fvec3b[0] = (id[0] + fvec3[0]) % freq;
-				fvec3b[1] = (id[1] + fvec3[1]) % freq;
-				fvec3b[2] = (id[2] + fvec3[2]) % freq;
+				fvec3b[0] = mod(id[0] + fvec3[0], freq);
+				fvec3b[1] = mod(id[1] + fvec3[1], freq);
+				fvec3b[2] = mod(id[2] + fvec3[2], freq);
 				const h = hash33(fvec3b);
 				h[0] = (h[0] * 0.5 + 0.5) + fvec3[0];
 				h[1] = (h[1] * 0.5 + 0.5) + fvec3[1];
@@ -174,7 +175,7 @@ function worleyNoise(uv: Float32Array, freq: number): number {
 	return 1. - minDist;
 }
 
-function perlinfbm(p: Float32Array, freq: number, octaves: number) {
+function perlinFbm(p: Float32Array, freq: number, octaves: number) {
 	const G = 0.554784736034;//Math.pow(2, -0.85);
 	let amp = 1.;
 	let noise = 0.;
@@ -213,7 +214,7 @@ function worleyFbm(p: Float32Array, freq: number) {
 }
 
 function perlinWorley(uvw: Float32Array, freq: number, octave: number) {
-	let pfbm = perlinfbm(uvw, freq, octave) * 0.5 + 0.5;
+	let pfbm = perlinFbm(uvw, freq, octave) * 0.5 + 0.5;
 	pfbm = Math.abs(pfbm * 2. - 1.); // billowy perlin noise
 
 	let wfbm = worleyFbm(uvw, freq);
@@ -221,7 +222,6 @@ function perlinWorley(uvw: Float32Array, freq: number, octave: number) {
 }
 
 
-// f
 export function PelinWorley3D(size: number, freq: number = 4., octave: number = 7.): Float32Array {
 	const final = new Float32Array(size * size * size);
 
