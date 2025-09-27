@@ -312,6 +312,6 @@ void main(void) {
 	}
 	gl_FragColor.rgb = color *  (1. - transmittance);
 	// gl_FragColor.rgb =  color *  max(transmittance, 0.);
-	gl_FragColor.a = totalDensity + max(distanceToHit - travel, 0.) * densityMultiplier;
+	gl_FragColor.a = totalDensity + clamp(distanceToHit - travel, 0., 50.) * densityMultiplier;
 }
 `;

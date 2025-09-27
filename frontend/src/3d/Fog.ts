@@ -509,17 +509,6 @@ export class Fog {
 		this.cameraUBO.updateMatrix("projection", this.camera.getProjectionMatrix());
 		this.cameraUBO.updateMatrix("iprojection", this.camera.getProjectionMatrix().invertToRef(iproj));
 
-		// float	lightScattering;
-		// float	ballLightRadius;
-		// float	spotLightExp;
-		// float	spotLightAngle;
-		// vec3	fogAbsorption;
-		// vec3	fogScale;
-		// vec3	ballPosition;
-		// vec3	ballLightColor;
-		// vec3	spotLightPosition;
-		// vec3	spotLightDirection;
-		// vec3	spotLightColor;
 
 		this.dataUBO.addUniform("noiseOffset", 1);
 		this.dataUBO.addUniform("stepSize", 1);
@@ -537,18 +526,10 @@ export class Fog {
 		this.dataUBO.addUniform("spotLightPosition", 3);
 		this.dataUBO.addUniform("spotLightDirection", 3);
 		this.dataUBO.addUniform("spotLightColor", 3);
-		// layout(std140) uniform data {
-		// 	float	noiseOffset;
-		// 	float	stepSize;
-		// 	float	maxDistance;
-		// 	float	densityMultiplier;
-		// 	float	lightScattering;
-		// 	vec3	fogAbsorption;
-		// 	vec3	fogScale;
-		// };
+
 		const noiseOffsetDefault = 0.5;
 		const stepSizeDefault = 0.5;
-		const maxDistanceDefault = 50.;
+		const maxDistanceDefault = 20.;
 		const densityMultiplierDefault = 2.5;
 		const lightScatteringDefault = 0.2;
 		const fogAbsorptionDefault = new Vector3(0.1, 0.1, 0.1);
@@ -569,7 +550,7 @@ export class Fog {
 
 		const noiseOffsetDefault = 0.5;
 		const stepSizeDefault = 0.5;
-		const maxDistanceDefault = 50.;
+		const maxDistanceDefault = 20.;
 		const densityMultiplierDefault = 2.5;
 		const lightScatteringDefault = 0.2;
 		const fogAbsorptionDefault = new Vector3(0.1, 0.1, 0.1);

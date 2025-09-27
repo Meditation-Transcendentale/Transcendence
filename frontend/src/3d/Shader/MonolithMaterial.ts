@@ -394,11 +394,11 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 
 			gl_FragColor.a = 1.;
 		`)
-		const colorTex = new Texture("/assets/MetalPlates008_2K-JPG_Color.jpg", scene);
+		// const colorTex = new Texture("/assets/MetalPlates008_2K-JPG_Color.jpg", scene);
 		const normalTex = new Texture("/assets/chunk_normal.jpg", scene);
-		const roughnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Roughness.jpg", scene);
-		const metalnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Metalness.jpg", scene);
-		const displacementTex = new Texture("/assets/MetalPlates008_2K-JPG_Displacement.jpg", scene);
+		// const roughnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Roughness.jpg", scene);
+		// const metalnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Metalness.jpg", scene);
+		// const displacementTex = new Texture("/assets/MetalPlates008_2K-JPG_Displacement.jpg", scene);
 
 		// this.diffuseTexture = colorTex;
 		this.bumpTexture = normalTex;
@@ -410,12 +410,11 @@ oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 		// this.emissiveColor = new Color3(0.02, 0.02, 0.02);
 		// this.invertNormalMapX = true;
 		// this.invertNormalMapY = true;
-		// this.invertNormalMapZ = true;
 
-		colorTex.uScale = colorTex.vScale = 0.5;
+		// colorTex.uScale = colorTex.vScale = 0.5;
 		normalTex.uScale = normalTex.vScale = 1.;
-		roughnessTex.uScale = roughnessTex.vScale = 0.5;
-		colorTex.level = 0.7;
+		// roughnessTex.uScale = roughnessTex.vScale = 0.5;
+		// colorTex.level = 0.7;
 
 	}
 

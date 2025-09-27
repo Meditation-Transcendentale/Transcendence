@@ -23,6 +23,7 @@ import { UIaddDetails, UIaddSlider, UIaddToggle } from "./UtilsUI.js";
 import { CameraUtils } from "./CameraUtils.js";
 import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } from "./TrackManager.js";
 import { PelinWorley3D } from "./PerlinWorley.js";
+import { Butterfly } from "./Butterfly.js";
 
 export class Field {
 	private scene: Scene;
@@ -37,6 +38,7 @@ export class Field {
 	private monolith: Monolith;
 	private pipeline: Pipeline;
 	private picker: Picker;
+	private butterfly: Butterfly;
 
 	private cursor: Vector3;
 	private cursorMonolith: Vector3;
@@ -90,6 +92,7 @@ export class Field {
 		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.5, 10, this.scene);
 		this.spotLight.range = 30.;
 		this.spotLight.specular.scaleInPlace(6.);
+		this.spotLight.intensity = 2.7;
 
 		UIaddSlider("light intensity", this.spotLight.intensity, {
 			step: 0.1,
@@ -143,11 +146,14 @@ export class Field {
 			uniforms: ["world", "viewProjection", "depthValues"]
 		})
 
+		this.butterfly = new Butterfly(this.scene);
+
 	}
 
 	public async load() {
 		await this.grass.init();
 		await this.monolith.init();
+		await this.butterfly.init();
 
 		for (let i = 0; i < this.grass._tiles.length; i++) {
 			this.fog.addMeshToDepth(this.grass._tiles[i]._mesh, this.grass.grassDepthMaterial);
@@ -222,6 +228,7 @@ export class Field {
 			// this.spotLight.setDirectionToTarget(this.camera.getTarget());
 			this.picker.render(deltaTime);
 			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
+			this.butterfly.update(time, deltaTime);
 			this.fog.ballPosition = this.picker.position;
 			this.fog.spotLightPosition = this.spotLight.position;
 			this.fog.spotLightDirection = this.spotLight.direction;
