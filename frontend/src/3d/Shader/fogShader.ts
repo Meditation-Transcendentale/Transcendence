@@ -293,13 +293,13 @@ void main(void) {
 	vec2 uv;
 
 	float	totalDensity = 0.;
-	float transmittance = 1.;
+	// float transmittance = 1.;
 	float density = 0.;
 	vec3 color = vec3(0.);
 	while (travel < maxDist) {
 		density = sampleDensity(p) * stepSize;
 		if (density > 0.) {
-			transmittance *= exp(-density);
+			// transmittance *= exp(-density);
 			color += getColor(p, ray, density);
 			//color += fogAbsorption * heyney_greenstein(dot(ray, vec3(0, -1, 0)), lightScattering) * density ;
 			color += getSpotLight(p, ray, density);
@@ -310,8 +310,8 @@ void main(void) {
 		p += r;
 
 	}
-	gl_FragColor.rgb = color *  (1. - transmittance);
+	gl_FragColor.rgb = color *  (1. - exp(-totalDensity));
 	// gl_FragColor.rgb =  color *  max(transmittance, 0.);
-	gl_FragColor.a = totalDensity + clamp(distanceToHit - travel, 0., 50.) * densityMultiplier;
+	gl_FragColor.a = totalDensity + clamp(distanceToHit - travel, 0., 100.) * densityMultiplier;
 }
 `;

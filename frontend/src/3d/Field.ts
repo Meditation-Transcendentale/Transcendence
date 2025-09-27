@@ -24,6 +24,7 @@ import { CameraUtils } from "./CameraUtils.js";
 import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } from "./TrackManager.js";
 import { PelinWorley3D } from "./PerlinWorley.js";
 import { Butterfly } from "./Butterfly.js";
+import { SpaceSkybox } from "../pongbr/templates/skybox.js";
 
 export class Field {
 	private scene: Scene;
@@ -61,6 +62,8 @@ export class Field {
 
 
 	private spotLight: SpotLight;
+
+	private skybox: SpaceSkybox;
 
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
@@ -148,12 +151,16 @@ export class Field {
 
 		this.butterfly = new Butterfly(this.scene);
 
+		// this.skybox = new SpaceSkybox(this.scene);
+
 	}
 
 	public async load() {
 		await this.grass.init();
 		await this.monolith.init();
 		await this.butterfly.init();
+
+		// this.skybox.applyPreset("Classic");
 
 		for (let i = 0; i < this.grass._tiles.length; i++) {
 			this.fog.addMeshToDepth(this.grass._tiles[i]._mesh, this.grass.grassDepthMaterial);

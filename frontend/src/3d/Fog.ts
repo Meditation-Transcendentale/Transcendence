@@ -529,7 +529,7 @@ export class Fog {
 
 		const noiseOffsetDefault = 0.5;
 		const stepSizeDefault = 0.5;
-		const maxDistanceDefault = 20.;
+		const maxDistanceDefault = 50.;
 		const densityMultiplierDefault = 2.5;
 		const lightScatteringDefault = 0.2;
 		const fogAbsorptionDefault = new Vector3(0.1, 0.1, 0.1);
@@ -550,7 +550,7 @@ export class Fog {
 
 		const noiseOffsetDefault = 0.5;
 		const stepSizeDefault = 0.5;
-		const maxDistanceDefault = 20.;
+		const maxDistanceDefault = 50.;
 		const densityMultiplierDefault = 2.5;
 		const lightScatteringDefault = 0.2;
 		const fogAbsorptionDefault = new Vector3(0.1, 0.1, 0.1);
