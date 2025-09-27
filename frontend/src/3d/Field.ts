@@ -105,16 +105,11 @@ export class Field {
 		// this.light.specular = Color3.Black();
 
 
+
 		this.monolith = createTempleMonolith(scene, 15, this.cursorMonolith);
 		this.monolith.enableShaderAnimation(true);
 		this.monolith.setAnimationSpeed(4.);
 		this.monolith.setAnimationIntensity(0.5);
-		this.monolith.addText('play', "PLAY", 0, 7.1, 1.7, 2.0);
-		this.monolith.addText('create', "CREATE", 2., 7.5, 0., 2.0);
-		this.monolith.addText('join', "JOIN", -1.9, 5.5, 0., 2.0);
-		this.monolith.setTextFace('create', 'left');
-		this.monolith.setTextFace('join', 'left');
-		this.monolith.setTextFace('play', 'front');
 		this.active = true;
 
 		this.grass.depth = this.fieldDepth;
@@ -144,6 +139,8 @@ export class Field {
 		}
 
 		this.fog.addMeshToDepth(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial);
+		this.fog.addMeshToDepth(this.monolith.getMeshCube() as Mesh, this.monolith.depthMaterialCube);
+
 
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
 		this.fog.addMeshToDepth(this.picker.mesh, this.defaultDepthMaterial);
