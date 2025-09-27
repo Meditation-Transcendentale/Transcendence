@@ -25,14 +25,17 @@ const uint = new Uint32Array(1);
 const int = new Int32Array(1);
 
 function dot(u: Float32Array, v: Float32Array): number {
-	return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+	return (u[0] * v[0]) + (u[1] * v[1]) + (u[2] * v[2]);
 }
 
 
 export function hash33(vec3: Float32Array): Float32Array {
-	uvec3[0] = vec3[0] * UI3[0];
-	uvec3[1] = vec3[1] * UI3[1];
-	uvec3[2] = vec3[2] * UI3[2];
+	ivec3[0] = vec3[0];
+	ivec3[1] = vec3[1];
+	ivec3[2] = vec3[2];
+	uvec3[0] = ivec3[0] * UI3[0];
+	uvec3[1] = ivec3[1] * UI3[1];
+	uvec3[2] = ivec3[2] * UI3[2];
 	uint[0] = uvec3[0] ^ uvec3[1] ^ uvec3[2];
 	uvec3[0] = uint[0] * UI3[0];
 	uvec3[1] = uint[0] * UI3[1];
@@ -50,6 +53,10 @@ function remap(x: number, a: number, b: number, c: number, d: number): number {
 	return (((x - a) / (b - a)) * (d - c)) + c;
 }
 
+function mod(x: number, y: number): number {
+	return x - y * Math.floor(x / y);
+}
+
 function gradientNoise(x: Float32Array, freq: number): number {
 	const p = new Float32Array([Math.floor(x[0]), Math.floor(x[1]), Math.floor(x[2])]);
 	const w = new Float32Array([x[0] - Math.floor(x[0]), x[1] - Math.floor(x[1]), x[2] - Math.floor(x[2])]);
@@ -60,37 +67,37 @@ function gradientNoise(x: Float32Array, freq: number): number {
 		w[2] * w[2] * w[2] * (w[2] * (w[2] * 6. - 15.) + 10.),
 	])
 
-	fvec3[0] = (p[0] + 0) % freq;
-	fvec3[1] = (p[1] + 0) % freq;
-	fvec3[2] = (p[2] + 0) % freq;
+	fvec3[0] = mod(p[0] + 0, freq);
+	fvec3[1] = mod(p[1] + 0, freq);
+	fvec3[2] = mod(p[2] + 0, freq);
 	const ga = hash33(fvec3);
-	fvec3[0] = (p[0] + 1) % freq;
-	fvec3[1] = (p[1] + 0) % freq;
-	fvec3[2] = (p[2] + 0) % freq;
+	fvec3[0] = mod(p[0] + 1, freq);
+	fvec3[1] = mod(p[1] + 0, freq);
+	fvec3[2] = mod(p[2] + 0, freq);
 	const gb = hash33(fvec3);
-	fvec3[0] = (p[0] + 0) % freq;
-	fvec3[1] = (p[1] + 1) % freq;
-	fvec3[2] = (p[2] + 0) % freq;
+	fvec3[0] = mod(p[0] + 0, freq);
+	fvec3[1] = mod(p[1] + 1, freq);
+	fvec3[2] = mod(p[2] + 0, freq);
 	const gc = hash33(fvec3);
-	fvec3[0] = (p[0] + 1) % freq;
-	fvec3[1] = (p[1] + 1) % freq;
-	fvec3[2] = (p[2] + 0) % freq;
+	fvec3[0] = mod(p[0] + 1, freq);
+	fvec3[1] = mod(p[1] + 1, freq);
+	fvec3[2] = mod(p[2] + 0, freq);
 	const gd = hash33(fvec3);
-	fvec3[0] = (p[0] + 0) % freq;
-	fvec3[1] = (p[1] + 0) % freq;
-	fvec3[2] = (p[2] + 1) % freq;
+	fvec3[0] = mod(p[0] + 0, freq);
+	fvec3[1] = mod(p[1] + 0, freq);
+	fvec3[2] = mod(p[2] + 1, freq);
 	const ge = hash33(fvec3);
-	fvec3[0] = (p[0] + 1) % freq;
-	fvec3[1] = (p[1] + 0) % freq;
-	fvec3[2] = (p[2] + 1) % freq;
+	fvec3[0] = mod(p[0] + 1, freq);
+	fvec3[1] = mod(p[1] + 0, freq);
+	fvec3[2] = mod(p[2] + 1, freq);
 	const gf = hash33(fvec3);
-	fvec3[0] = (p[0] + 0) % freq;
-	fvec3[1] = (p[1] + 1) % freq;
-	fvec3[2] = (p[2] + 1) % freq;
+	fvec3[0] = mod(p[0] + 0, freq);
+	fvec3[1] = mod(p[1] + 1, freq);
+	fvec3[2] = mod(p[2] + 1, freq);
 	const gg = hash33(fvec3);
-	fvec3[0] = (p[0] + 1) % freq;
-	fvec3[1] = (p[1] + 1) % freq;
-	fvec3[2] = (p[2] + 1) % freq;
+	fvec3[0] = mod(p[0] + 1, freq);
+	fvec3[1] = mod(p[1] + 1, freq);
+	fvec3[2] = mod(p[2] + 1, freq);
 	const gh = hash33(fvec3);
 
 	fvec3[0] = w[0] - 0;
@@ -132,7 +139,7 @@ function gradientNoise(x: Float32Array, freq: number): number {
 		u[2] * (ve - va) +
 		u[0] * u[1] * (va - vb - vc + vd) +
 		u[1] * u[2] * (va - vc - ve + vg) +
-		u[2] * u[1] * (va - vb - ve - vf) +
+		u[2] * u[0] * (va - vb - ve + vf) +
 		u[0] * u[1] * u[2] * (-va + vb + vc - vd + ve - vf - vg + vh);
 }
 
@@ -168,7 +175,7 @@ function worleyNoise(uv: Float32Array, freq: number): number {
 }
 
 function perlinfbm(p: Float32Array, freq: number, octaves: number) {
-	const G = Math.pow(2, -0.85);
+	const G = 0.554784736034;//Math.pow(2, -0.85);
 	let amp = 1.;
 	let noise = 0.;
 
@@ -222,9 +229,9 @@ export function PelinWorley3D(size: number, freq: number = 4., octave: number = 
 	for (let x = 0; x < size; x++) {
 		for (let y = 0; y < size; y++) {
 			for (let z = 0; z < size; z++) {
-				tfvec3[0] = x / 64;
-				tfvec3[1] = y / 64;
-				tfvec3[2] = z / 64;
+				tfvec3[0] = x / 63;
+				tfvec3[1] = y / 63;
+				tfvec3[2] = z / 63;
 				final[x + y * size + z * size * size] = perlinWorley(tfvec3, freq, octave);
 			}
 		}

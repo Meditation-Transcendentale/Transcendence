@@ -9,6 +9,8 @@ import {
 	GlowLayer,
 	DirectionalLight,
 	SpotLight,
+	RawTexture3D,
+	Engine,
 } from "@babylonImport";
 import "./Shader/Shader.ts";
 import { Grass } from "./Grass";
@@ -20,6 +22,7 @@ import { Picker } from "./Picker";
 import { UIaddDetails, UIaddSlider, UIaddToggle } from "./UtilsUI.js";
 import { CameraUtils } from "./CameraUtils.js";
 import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } from "./TrackManager.js";
+import { PelinWorley3D } from "./PerlinWorley.js";
 
 export class Field {
 	private scene: Scene;
@@ -160,6 +163,40 @@ export class Field {
 			control: new Vector3(-20, 0, 20),
 			segments: 1000
 		}))
+
+		const data = PelinWorley3D(64);
+		const tt = new RawTexture3D(
+			data,
+			64,
+			64,
+			64,
+			Engine.TEXTUREFORMAT_R,
+			this.scene,
+			false,
+			false,
+			Engine.TEXTURE_NEAREST_SAMPLINGMODE,
+			Engine.TEXTURETYPE_FLOAT
+		);
+		const b = MeshBuilder.CreateBox("test", { size: 2 });
+		const m = new ShaderMaterial("test", this.scene, "texture3DCheck", {
+			attributes: ["position", "normal", "uv"],
+			uniforms: ["world", "viewProjection", "depth"],
+			samplers: ["textureSampler"]
+		})
+
+		m.setTexture("textureSampler", tt);
+		b.material = m;
+		b.position.set(-5, 3, 0);
+
+		UIaddSlider("depth", 0, {
+			step: 0.01,
+			min: 0,
+			max: 1,
+		}, (n: number) => { m.setFloat("depth", n) })
+		const b2 = b.clone();
+		b2.position.set(-7, 3, 0);
+		b2.material = m;
+
 	}
 
 	public update(time: number, deltaTime: number) {
