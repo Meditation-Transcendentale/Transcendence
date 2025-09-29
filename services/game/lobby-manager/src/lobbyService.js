@@ -119,6 +119,7 @@ export default class LobbyService {
 		const lobby = this.lobbies.get(lobbyId)
 		if (!lobby) throw new Error('Lobby not found')
 		lobby.addPlayer(userId)
+		console.log (`ADDED ${userId}`);
 		return lobby.getState()
 	}
 

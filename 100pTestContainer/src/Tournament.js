@@ -2,7 +2,8 @@ import {
 	decodeServerMessage,
 	decodeTournamentServerMessage,
 	encodeTournamentClientMessage,
-} from "./proto/helper";
+} from "./proto/helper.js";
+import { tournament } from "./proto/message.js";
 
 export async function startGameTournament(user) {
 	const uuid = user.uuid();
@@ -11,7 +12,7 @@ export async function startGameTournament(user) {
 		`wss://${window.location.hostname}:7000/game?` +
 		`uuid=${encodeURIComponent(uuid)}&` +
 		`gameId=${encodeURIComponent(gameId)}`;
-	const ws = new Websocket(url);
+	const ws = new Websocket(url, { rejectUnauthorized: false });
 	ws.binaryType = "arraybuffer";
 
 	ws.onmessage = async (msg) => {
@@ -28,12 +29,13 @@ export async function startGameTournament(user) {
 export async function settingUpTournament(user) {
 	const uuid = user.uuid();
 	const tournamentId = user.tournamentId();
+	console.log (`${uuid}|${tournamentId}`);
 	const url = `wss://${window.location.hostname
-		}:5019/sacrifice?uuid=${encodeURIComponent(
+		}:7000/sacrifice?uuid=${encodeURIComponent(
 			uuid
 		)}&tournamentId=${encodeURIComponent(tournamentId)}`;
 
-	const ws = new WebSocket(url);
+	const ws = new WebSocket(url, { rejectUnauthorized: false });
 	ws.binaryType = "arraybuffer";
 
 	ws.onmessage = async (msg) => {
@@ -46,7 +48,7 @@ export async function settingUpTournament(user) {
 		}
 		if (payload.startGame) {
 			const gameId = payload.startGame.gameId;
-			user.gameId(gameId);
+			user.setGameId(gameId);
 			ws.close();
 		}
 	};
