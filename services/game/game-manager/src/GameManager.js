@@ -226,11 +226,11 @@ export class GameManager {
 		if (match.mode != `br`) {
 			const buf = encodeMatchEnd({
 				winnerId:
-					match.players[0] === uuid ? match.players[1] : match.players[0],
+					match.instance.players[0] === uuid ? match.instance.players[1] : match.instance.players[0],
 				loserId:
-					uuid,
+					uuid.toString(),
 				score: match.state.score,
-				forfeit: uuid
+				forfeit: uuid.toString(),
 			});
 			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		} else {
