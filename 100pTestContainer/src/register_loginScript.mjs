@@ -68,49 +68,6 @@ function setupWsTournament(tournamentId, uuid) {
 	}
 }
 
-function setupWsLobby(id, uuid) {
-	const url = `wss://${window.location.hostname}:7000/lobbies?uuid=${encodeURIComponent(uuid)}&lobbyId=${encodeURIComponent(id)}`;
-	const ws = new WebSocket(url);
-	ws.binaryType = "arraybuffer";
-
-	this.ws.onopen = (e) => {
-	}
-
-	this.ws.onmessage = (msg) => {
-		const buf = new Uint8Array(msg.data);
-		const payload = decodeServerMessage(buf);
-		let mode;
-		if (payload.error != null)
-			return;
-
-		if (payload.update != null) {
-			mode = payload.update.mode;
-		}
-
-		if (payload.start != null) {
-			const gameId = payload.start.gameId;
-			const map = payload.start.map;
-			this.ws?.close();
-		}
-
-		if (payload.startTournament != null) {
-			const tournamentId = payload.startTournament.tournamentId;
-			setupWsTournament(tournamentId, uuid);
-			this.ws?.close();
-		}
-	}
-
-	this.ws.onclose = () => {
-		this.id = null;
-		this.ws = null;
-		console.log("WS CLOSE");
-		User.status = null;
-	}
-
-	this.ws.onerror = (err) => {
-		console.warn(err);
-	}
-}
 
 async function main() {
 	const agent = new https.Agent({ rejectUnauthorized: false });
