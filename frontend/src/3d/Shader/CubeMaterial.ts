@@ -1,7 +1,7 @@
 
 import { Color3, CustomMaterial, Effect, FresnelParameters, Scene, Texture, Vector3 } from "@babylonImport"
 
-export class MonolithMaterial extends CustomMaterial {
+export class CubeMaterial extends CustomMaterial {
 	constructor(name: string, scene: Scene) {
 		super(name, scene);
 

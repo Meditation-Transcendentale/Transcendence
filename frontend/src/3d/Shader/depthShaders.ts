@@ -121,14 +121,7 @@ uniform float baseWaveIntensity;
 uniform float mouseInfluenceRadius;
 uniform vec3 origin;
 uniform vec3 oldOrigin;
-uniform vec3 deadZoneCenter;
-uniform float deadZoneWidth;
-uniform float deadZoneHeight;
-uniform float deadZoneDepth;
-uniform vec3 textPosition0; 
-uniform float textSize0;
-uniform float textGlow0;
-uniform vec3 textFace0;
+uniform float textGlow;
 uniform vec3 floatingOffset;
 
 varying	float	vDepthMetric;
@@ -142,39 +135,6 @@ vec3 hash3(float p) {
     vec3 q = vec3(hash(p), hash(p + 1.0), hash(p + 2.0));
     return q * 2.0 - 1.0;
 }
-
-bool isInTextRegion(vec3 worldPos) {
-    if(textSize0 > 0.0) {
-        vec3 textOffset0 = worldPos - textPosition0;
-        vec3 face0 = textFace0;
-        vec2 textUV0;
-		float size = textSize0 * 0.2;
-        
-        if(abs(face0.z) > 0.5) { 
-            textUV0 = vec2(
-                (-textOffset0.x / size) + 0.5,
-                (textOffset0.y / size) + 0.5
-            );
-        } else if(abs(face0.x) > 0.5) {
-            textUV0 = vec2(
-                (-textOffset0.z / size) + 0.5,
-                (textOffset0.y / size) + 0.5
-            );
-        } else if(abs(face0.y) > 0.5) { 
-            textUV0 = vec2(
-                (textOffset0.x / size) + 0.5,
-                (textOffset0.z / size) + 0.5
-            );
-        }
-        
-        if(textUV0.x >= 0.0 && textUV0.x <= 1.0 && textUV0.y >= 0.0 && textUV0.y <= 1.0) {
-            return true;
-        }
-    }
-    
-    return false;
-}
-
 
 void main(void) {
 	vec3 positionUpdated = position;
@@ -190,14 +150,7 @@ void main(void) {
 	// Random per-voxel offset
 	vec3 animOffset = hash3(instanceID);
 	float t = time * animationSpeed;
-	// === RECTANGULAR DEAD ZONE CALCULATION ===
-	vec3 offsetFromDeadZone = abs(worldPos2 - deadZoneCenter);
-	vec3 deadZoneSize = vec3(deadZoneWidth, deadZoneHeight, deadZoneDepth);
-	vec3 normalizedOffset = offsetFromDeadZone / deadZoneSize;
-	float maxNormalizedOffset = max(max(normalizedOffset.x, normalizedOffset.y), normalizedOffset.z);
-	float deadZoneMask = step(1.0, maxNormalizedOffset); 
 
-bool inTextRegion = isInTextRegion(worldPos2);
 	// === BASE WAVE ANIMATION (Always Active) ===
 	float wavePhase = t + dot(worldPos2, vec3(0.1, 0.05, 0.08));
 	vec3 baseWave = vec3(
@@ -224,29 +177,15 @@ bool inTextRegion = isInTextRegion(worldPos2);
 	    cos(t * 2.8 + animOffset.z * 6.28) * animOffset.z
 	) * animationIntensity * 3.;
 	float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
-if(inTextRegion) {
-    mouseInfluence = 0.0;
-}
-
 
 	mouseAnimation += mouseDirection * radialPulse * animationIntensity;
 	mouseAnimation+= pushDirection * 0.05 * mouseInfluence;
-	// In vertex shader
 
 	vec3 originalWorldPos = worldPos.xyz;
 
-if(textGlow0 > 0.0) {
-    vec3 textOffset = worldPos2 - textPosition0;
-    float distance = length(textOffset);
-    
-    float edgeDistance = textSize0 * 0.2; 
-    if(distance > edgeDistance) {
-        float edgePhasing = smoothstep(textSize0 * 1.8, edgeDistance, distance) * textGlow0;
-        
-        if(edgePhasing > 0.0) {
+if(textGlow > 0.0) {
             float phaseOffset = hash(instanceID) * 6.28;
             float phaseAmount = sin(time * 1.5 + phaseOffset) * 0.5 + 0.5;
-            phaseAmount *= edgePhasing ; 
             
             vec3 dimensionOffset = vec3(
                 sin(instanceID * 0.1) * 0.1,
@@ -255,12 +194,10 @@ if(textGlow0 > 0.0) {
             );
             
             worldPos.xyz += dimensionOffset * phaseAmount;
-        }
-    }
 }
 
 	// === COMBINE ANIMATIONS ===
-	vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) * deadZoneMask;
+	vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) ;
 	worldPos.xyz += totalDisplacement;
 
 
@@ -279,6 +216,125 @@ void main(void) {
     glFragColor = vec4(vDepthMetric, 0.0, 0.0, 1.0);
 }
 `;
+
+Effect.ShadersStore["cubeDepthVertexShader"] = `
+precision highp float;
+
+attribute vec3	position;
+attribute vec4	world0;
+attribute vec4	world1;
+attribute vec4	world2;
+attribute vec4	world3;
+attribute float instanceID;
+
+uniform mat4	world;
+uniform mat4	viewProjection;
+uniform vec2	depthValues;
+
+uniform float time;
+uniform float animationSpeed;
+uniform float animationIntensity;
+uniform float baseWaveIntensity;
+uniform float mouseInfluenceRadius;
+uniform vec3 origin;
+uniform vec3 oldOrigin;
+uniform float textGlow;
+uniform vec3 floatingOffset;
+
+varying	float	vDepthMetric;
+
+float hash(float p) {
+    p = fract(p * 0.1031);
+    p *= p + 33.33;
+    return fract(p * (p + p));
+}
+vec3 hash3(float p) {
+    vec3 q = vec3(hash(p), hash(p + 1.0), hash(p + 2.0));
+    return q * 2.0 - 1.0;
+}
+
+void main(void) {
+	vec3 positionUpdated = position;
+
+	mat4 finalWorld = mat4(world0, world1, world2, world3);
+	finalWorld = world*finalWorld;
+	vec4 worldPos = finalWorld*vec4(positionUpdated, 1.0);
+	worldPos.xyz += floatingOffset;
+
+	vec3 worldPos2 = finalWorld[3].xyz;
+	worldPos2 += floatingOffset;
+
+	// Random per-voxel offset
+	vec3 animOffset = hash3(instanceID);
+	float t = time * animationSpeed;
+
+	// === BASE WAVE ANIMATION (Always Active) ===
+	float wavePhase = t + dot(worldPos2, vec3(0.1, 0.05, 0.08));
+	vec3 baseWave = vec3(
+	    sin(wavePhase + animOffset.x * 3.14159) * 0.3,
+	    sin(wavePhase * 0.7 + animOffset.y * 3.14159) * 0.2,
+	    cos(wavePhase * 0.9 + animOffset.z * 3.14159) * 0.25
+	) * baseWaveIntensity;
+	// Add vertical wave that travels up the structure
+	float verticalWave = sin(worldPos2.y * 0.3 - t * 2.0) * 0.1 * baseWaveIntensity;
+	baseWave.x += verticalWave;
+	baseWave.z += verticalWave * 0.5;
+	// === MOUSE INFLUENCE ANIMATION ===
+	float distanceToMouse = length(worldPos2 - origin);
+	float mouseInfluence = smoothstep(mouseInfluenceRadius, 0.0, distanceToMouse);
+	// Calculate mouse movement direction
+	vec3 mouseMovement = origin - oldOrigin;
+	float mouseSpeed = length(mouseMovement);
+	vec3 mouseDirection = mouseMovement ; // Movement direction
+	vec3 pushDirection = normalize(worldPos2 - origin + vec3(0.001)); // Direction from mouse to voxel
+	float pushStrength = mouseSpeed * 2.0; // Scale with mouse speed
+	vec3 mouseAnimation = vec3(
+	    sin(t * 3.0 + animOffset.x * 6.28) * animOffset.x,
+	    sin(t * 2.5 + animOffset.y * 6.28) * animOffset.y,
+	    cos(t * 2.8 + animOffset.z * 6.28) * animOffset.z
+	) * animationIntensity * 3.;
+	float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
+
+	mouseAnimation += mouseDirection * radialPulse * animationIntensity;
+	mouseAnimation+= pushDirection * 0.05 * mouseInfluence;
+
+	vec3 originalWorldPos = worldPos.xyz;
+
+if(textGlow > 0.0) {
+            float phaseOffset = hash(instanceID) * 6.28;
+            float phaseAmount = sin(time * 1.5 + phaseOffset) * 0.5 + 0.5;
+            
+            vec3 dimensionOffset = vec3(
+                sin(instanceID * 0.1) * 0.1,
+                cos(instanceID * 0.13) * 0.15,
+                sin(instanceID * 0.17) * 0.18
+            );
+            
+            worldPos.xyz += dimensionOffset * phaseAmount;
+}
+
+	// === COMBINE ANIMATIONS ===
+	vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) ;
+	worldPos.xyz += totalDisplacement;
+
+
+	gl_Position = viewProjection*worldPos;
+
+	vDepthMetric = ((gl_Position.z + depthValues.x)/depthValues.y);
+}
+`;
+
+
+Effect.ShadersStore["cubeDepthFragmentShader"] = `
+precision highp float;
+
+varying float vDepthMetric;
+
+void main(void) {
+    glFragColor = vec4(vDepthMetric, 0.0, 0.0, 1.0);
+}
+`;
+
 
 Effect.ShadersStore["defaultDepthVertexShader"] = `
 precision highp float;
