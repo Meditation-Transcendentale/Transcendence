@@ -1,5 +1,5 @@
 import { Camera, Color3, EffectRenderer, EffectWrapper, Engine, Matrix, Mesh, MeshBuilder, PointLight, RenderTargetTexture, Scene, ShaderMaterial, Vector2, Vector3, Vector4 } from "@babylonImport";
-import { UIaddDetails, UIaddSlider } from "./UtilsUI";
+import { UIaddColor, UIaddDetails, UIaddSlider } from "./UtilsUI";
 
 export class Picker {
 	private scene: Scene;
@@ -123,8 +123,9 @@ export class Picker {
 		})
 
 		// this.material.setVector4("color", new Vector4(12., 0., 0., 0.2));
-		const c = Color3.FromHexString("#3b3d7d").scale(10.);
-		this.material.setVector4("color", new Vector4(c.r, c.g, c.b, 0.2));
+		const c = Color3.FromHexString("#3b3d7d");
+		const v = new Vector4(c.r, c.g, c.b, 0.2);
+		this.material.setVector4("color", v);
 		this.material.alphaMode = Engine.ALPHA_DISABLE;
 
 		this.material.onBindObservable.add
@@ -134,8 +135,9 @@ export class Picker {
 
 		this.ballLight = new PointLight("ball light", this.meshBall.position, this.scene);
 		// this.ballLight.diffuse = new Color3(3., 0., 0.);
-		this.ballLight.diffuse = Color3.FromHexString("#3b3d7d").scale(2.);
+		this.ballLight.diffuse = c.clone();
 		this.ballLight.specular = this.ballLight.diffuse;
+		this.ballLight.intensity = 2;
 		this.ballLight.range = 3;
 		// p.setEnabled(false);
 
@@ -158,6 +160,7 @@ export class Picker {
 			max: this.groundSize.x,
 			div: details
 		}, (n: number) => { this.radius = n / this.groundSize.x });
+
 	}
 
 
@@ -238,6 +241,10 @@ export class Picker {
 
 	public get light(): PointLight {
 		return this.ballLight;
+	}
+
+	public updateBallColor() {
+		this.material.setVector4("color", new Vector4(this.ballLight.diffuse.r, this.ballLight.diffuse.g, this.ballLight.diffuse.b, 0.2))
 	}
 
 	public setEnable(status: boolean) {

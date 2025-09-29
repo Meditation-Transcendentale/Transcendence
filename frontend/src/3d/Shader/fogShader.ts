@@ -249,7 +249,7 @@ float sampleDensity(vec3 pos) {
 		return 0.;
 	}
 	float d = length(pos.xz) / 40.;
-	d = (0.9 - min(d, 0.9)) * 4. + 1.;
+	d = (0.9 - min(d, 0.9)) * 2. + 1.;
 	// d  = pow(d, 5.);
 	return pow(texture(densityTexture, uv).r, d) * densityMultiplier;
 }
@@ -300,7 +300,7 @@ float	computeSpotLight(vec3 worldPosition, float density) {
 	float	cosA = max(0., dot(spotDirection, -L / d));
 	if (cosA >= spotAngle) {
 		a *= getAttenuation(cosA, spotExp);
-		return a * density  * 0.02;
+		return a * density  * 0.005;
 	}
 	return 0.;
 }
@@ -334,6 +334,7 @@ void main(void) {
 	vec3 color = vec3(0.);
 	float spot = 0.;
 	float pointa = 0.;
+	float pointb = 0.;
 	while (travel < maxDist) {
 		density = sampleDensity(p) * stepSize;
 		if (density > 0.) {
@@ -343,7 +344,7 @@ void main(void) {
 			// color += getSpotLight(p, ray, density);
 			spot += computeSpotLight(p, density);
 			pointa += computePointLight(p, density, pointAPosition, pointARange, pointAColor);
-			// color += computePointLight(p, density, pointBPosition, pointBRange, pointBColor);
+			pointb += computePointLight(p, density, pointBPosition, pointBRange, pointBColor);
 			totalDensity += density;
 		}
 		
@@ -351,7 +352,7 @@ void main(void) {
 		p += r;
 
 	}
-	gl_FragColor.rgb = (color + spot * spotColor + pointa * pointAColor) *  (1. - exp(-totalDensity));
+	gl_FragColor.rgb = (color + spot  * spotIntensity * spotColor  + pointa * pointAIntensity * pointAColor + pointb * pointBColor * pointBIntensity) *  (1. - exp(-totalDensity));
 	// gl_FragColor.rgb =  color *  max(transmittance, 0.);
 	gl_FragColor.a = totalDensity + clamp(distanceToHit - travel, 0., 100.) * densityMultiplier;
 }

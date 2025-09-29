@@ -19,7 +19,7 @@ import { Monolith } from "./Monolith";
 import { createTempleMonolith } from "./Builder";
 import { Fog } from "./Fog";
 import { Picker } from "./Picker";
-import { UIaddDetails, UIaddSlider, UIaddToggle } from "./UtilsUI.js";
+import { UIaddColor, UIaddDetails, UIaddSlider, UIaddToggle } from "./UtilsUI.js";
 import { CameraUtils } from "./CameraUtils.js";
 import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } from "./TrackManager.js";
 import { PelinWorley3D } from "./PerlinWorley.js";
@@ -63,7 +63,6 @@ export class Field {
 
 	private spotLight: SpotLight;
 
-	private skybox: SpaceSkybox;
 
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
@@ -75,7 +74,6 @@ export class Field {
 		this.cursor = new Vector3();
 		this.cursorMonolith = new Vector3();
 
-		this.initUI();
 
 		this.grass = new Grass(this.scene, 20);
 		this.fog = new Fog(this.scene, this.camera, this.effectRenderer, 0.5);
@@ -99,25 +97,6 @@ export class Field {
 		this.spotLight.specular.scaleInPlace(6.);
 		this.spotLight.intensity = 2.7;
 
-		UIaddSlider("light intensity", this.spotLight.intensity, {
-			step: 0.1,
-			min: 0.,
-			max: 100
-		}, (n: number) => { this.spotLight.intensity = n });
-		UIaddSlider("hemis intensity", this.light.intensity, {
-			step: 0.01,
-			min: 0.,
-			max: 1
-		}, (n: number) => { this.light.intensity = n });
-
-		UIaddSlider("light exponent", this.spotLight.exponent, {
-			step: 0.1,
-			min: 0.,
-			max: 100
-		}, (n: number) => {
-			this.spotLight.exponent = n;
-			this.fog.lightsUbo.updateFloat("spotExp", n);
-		});
 
 		// this.light.specular = Color3.Black();
 
@@ -148,6 +127,7 @@ export class Field {
 
 		this.butterfly = new Butterfly(this.scene);
 
+		this.initUI();
 		// this.skybox = new SpaceSkybox(this.scene);
 
 	}
@@ -213,15 +193,15 @@ export class Field {
 		ubo.updateFloat("spotExp", this.spotLight.exponent);
 		ubo.updateFloat("pointAIntensity", this.picker.light.intensity);
 		ubo.updateFloat("pointARange", this.picker.light.range);
-		ubo.updateFloat("pointBIntensity", 0);
-		ubo.updateFloat("pointBRange", 0);
+		ubo.updateFloat("pointBIntensity", this.monolith.light.intensity);
+		ubo.updateFloat("pointBRange", this.monolith.light.range);
 		ubo.updateColor3("spotColor", this.spotLight.diffuse);
 		ubo.updateVector3("spotPosition", this.spotLight.position);
 		ubo.updateVector3("spotDirection", this.spotLight.direction);
 		ubo.updateColor3("pointAColor", this.picker.ballLightColor);
 		ubo.updateVector3("pointAPosition", this.picker.light.position);
-		ubo.updateColor3("pointBColor", this.picker.light.diffuse);
-		ubo.updateVector3("pointBPosition", this.picker.light.position);
+		ubo.updateColor3("pointBColor", this.monolith.light.diffuse);
+		ubo.updateVector3("pointBPosition", this.monolith.light.position);
 
 	}
 
@@ -240,6 +220,7 @@ export class Field {
 			this.butterfly.update(time, deltaTime);
 
 			this.fog.lightsUbo.updateVector3("pointAPosition", this.picker.position);
+			this.fog.lightsUbo.updateVector3("pointBPosition", this.monolith.light.position);
 			this.fog.lightsUbo.updateVector3("spotPosition", this.spotLight.position);
 			this.fog.lightsUbo.updateVector3("spotDirection", this.spotLight.direction);
 			this.fog.render();
@@ -401,6 +382,86 @@ export class Field {
 		this.toogleGrass = UIaddToggle("reduce grass", false, {}, (n: boolean) => {
 			this.grass.reduceGrass(n);
 		})
+		const flashlight = UIaddDetails("flash light", document.querySelector("#lights-details"));
+		UIaddSlider("intensity", this.spotLight.intensity, {
+			step: 0.1,
+			min: 0.,
+			max: 30,
+			div: flashlight
+		}, (n: number) => {
+			this.spotLight.intensity = n;
+			this.fog.lightsUbo.updateFloat("spotIntensity", n)
+		});
+		UIaddSlider("exponent", this.spotLight.exponent, {
+			step: 0.1,
+			min: 0.,
+			max: 100,
+			div: flashlight
+		}, (n: number) => {
+			this.spotLight.exponent = n;
+			this.fog.lightsUbo.updateFloat("spotExp", n);
+		});
+		UIaddColor("color", this.spotLight.diffuse, {
+			div: flashlight
+		}, () => {
+			this.fog.lightsUbo.updateColor3("spotColor", this.spotLight.diffuse);
+		})
+		const balllight = UIaddDetails("ball light", document.querySelector("#lights-details"));
+		UIaddSlider("intensity", this.picker.light.intensity, {
+			step: 0.1,
+			min: 0.,
+			max: 10,
+			div: balllight
+		}, (n: number) => {
+			this.picker.light.intensity = n;
+			this.fog.lightsUbo.updateFloat("pointAIntensity", n)
+		});
+		UIaddSlider("range", this.picker.light.range, {
+			step: 0.1,
+			min: 0.,
+			max: 10,
+			div: balllight
+		}, (n: number) => {
+			this.picker.light.range = n;
+			this.fog.lightsUbo.updateFloat("pointARange", n);
+		});
+		UIaddColor("color", this.picker.light.diffuse, {
+			div: balllight
+		}, () => {
+			this.picker.updateBallColor();
+			this.fog.lightsUbo.updateColor3("pointAColor", this.picker.light.diffuse);
+		})
 
+		const cubelight = UIaddDetails("cube light", document.querySelector("#lights-details"));
+		UIaddSlider("intensity", this.monolith.light.intensity, {
+			step: 0.1,
+			min: 0.,
+			max: 10,
+			div: cubelight
+		}, (n: number) => {
+			this.monolith.light.intensity = n;
+			this.fog.lightsUbo.updateFloat("pointBIntensity", n)
+		});
+		UIaddSlider("range", this.monolith.light.range, {
+			step: 0.1,
+			min: 0.,
+			max: 10,
+			div: cubelight
+		}, (n: number) => {
+			this.monolith.light.range = n;
+			this.fog.lightsUbo.updateFloat("pointBRange", n);
+		});
+		UIaddColor("color", this.monolith.light.diffuse, {
+			div: cubelight
+		}, () => {
+			this.fog.lightsUbo.updateColor3("pointBColor", this.monolith.light.diffuse);
+		})
+
+		UIaddSlider("hemis intensity", this.light.intensity, {
+			step: 0.01,
+			min: 0.,
+			max: 1,
+			div: document.querySelector("#lights-details")
+		}, (n: number) => { this.light.intensity = n });
 	}
 }

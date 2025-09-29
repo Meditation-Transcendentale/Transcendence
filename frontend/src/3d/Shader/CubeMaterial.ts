@@ -158,7 +158,8 @@ export class CubeMaterial extends CustomMaterial {
     
     gl_FragColor.rgb *= (1.0 - edgeFactor * 0.1);
     
-    gl_FragColor.a = 1.0;
+	gl_FragColor *= 2.;
+    gl_FragColor.a = .1;
 `)
 
 		const colorTex = new Texture("/assets/MetalPlates008_2K-JPG_Color.jpg", scene);
@@ -167,14 +168,16 @@ export class CubeMaterial extends CustomMaterial {
 		// const metalnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Metalness.jpg", scene);
 		// const displacementTex = new Texture("/assets/MetalPlates008_2K-JPG_Displacement.jpg", scene);
 		//
-		this.diffuseTexture = colorTex;
+		// this.diffuseTexture = colorTex;
 		// this.bumpTexture = normalTex;
 		// this.specularTexture = displacementTex;
 
 		// this.diffuseColor = new Color3(0.1, 0.1, 0.1);
-		this.specularColor = new Color3(0.3, 0.3, 0.3); // Add some specular
-		this.specularPower = 64; // Sharp specular highlights
+		this.specularColor = new Color3(0.0, 0.0, 0.0); // Add some specular
+		this.specularPower = 2; // Sharp specular highlights
 		this.emissiveColor = new Color3(0.01, 0.01, 0.01); // Very subtle glow
+		this.diffuseColor = Color3.Black();
+		this.alphaMode = 0;
 
 		// this.diffuseColor = new Color3(0.1, 0.1, 0.1);
 		// this.specularColor = Color3.White();
