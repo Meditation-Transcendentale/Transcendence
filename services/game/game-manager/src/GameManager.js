@@ -224,13 +224,15 @@ export class GameManager {
 		match.status = "ended";
 
 		if (match.mode != `br`) {
+			console.log("encoding match end");
 			const buf = encodeMatchEnd({
 				winnerId:
 					match.instance.players[0] === uuid ? match.instance.players[1] : match.instance.players[0],
 				loserId:
-					uuid.toString(),
+					match.instance.players[0] === uuid ? match.instance.players[0] : match.instance.players[1],
 				score: match.state.score,
-				forfeit: uuid.toString(),
+				forfeitId:
+					match.instance.players[0] === uuid ? match.instance.players[0] : match.instance.players[1],
 			});
 			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		} else {

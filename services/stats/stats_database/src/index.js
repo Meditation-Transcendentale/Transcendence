@@ -59,7 +59,7 @@ handleErrorsNats(async () => {
 
 			matchInfos.winner_id = winnerDecoded.data.id;
 
-			const matchId = statService.addMatchInfos('br', matchInfos.winner_id, matchInfos.length);
+			const matchId = statService.addMatchInfos('br', matchInfos.winnerId, matchInfos.length);
 
 			for (let i = 0; i < matchInfos.length; i++) {
 				const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos[i].uuid }), { timeout: 1000 });
@@ -80,6 +80,7 @@ handleErrorsNats(async () => {
 			
 			const matchInfos = decodeMatchEnd(msg.data);
 
+			console.log (`${matchInfos.winnerId}|${matchInfos.loserId}|${matchInfos.score[0]}|${matchInfos.score[1]}|${matchInfos.forfeitId}`);
 			const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos.winnerId }), { timeout: 1000 });
 			const winnerDecoded = jc.decode(winner.data);
 
@@ -89,12 +90,12 @@ handleErrorsNats(async () => {
 
 			let score;
 
-			if (matchInfos.forfeit === undefined || (matchInfos.forfeit !== undefined && score1 != score2)) {
+			if (matchInfos.forfeitId === undefined || (matchInfos.forfeitId !== undefined && score1 != score2)) {
 				score = { 
 					winner_goals: Math.max(score1, score2),
 					loser_goals: Math.min(score1, score2)
 				}
-			} else if (matchInfos.forfeit !== undefined && score1 == score2) {
+			} else if (matchInfos.forfeitId !== undefined && score1 == score2) {
 				score = { 
 					winner_goals: score1,
 					loser_goals: score2

@@ -157,6 +157,7 @@ export default class UIService {
 
 		const { uuid, mode, gameId } = sess;
 
+		console.log ("QUITTING");
 		const topic = `games.${mode}.${gameId}.match.quit`;
 		natsClient.publish(topic, encodeMatchQuit({ uuid }));
 
