@@ -48,6 +48,7 @@ class app3d {
 			this.cssRenderer.resize(window.innerWidth, window.innerHeight)
 		})
 
+		UIaddDetails("MISC", null, "misc-details");
 		UIaddDetails("COLORS", null, "colors-details");
 		UIaddDetails("LIGHTS", null, "lights-details");
 

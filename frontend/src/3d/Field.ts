@@ -375,11 +375,12 @@ export class Field {
 
 	private initUI() {
 		// const details = UIaddDetails("--GENERAL");
-		this.toogleFog = UIaddToggle("fog", true, {}, (n: boolean) => {
+		const misc = document.querySelector("#misc-details");
+		this.toogleFog = UIaddToggle("fog", true, { div: misc }, (n: boolean) => {
 			this.fog.setEnabled(n);
 			this.pipeline.setFogEnable(n);
 		})
-		this.toogleGrass = UIaddToggle("reduce grass", false, {}, (n: boolean) => {
+		this.toogleGrass = UIaddToggle("reduce grass", false, { div: misc }, (n: boolean) => {
 			this.grass.reduceGrass(n);
 		})
 		const flashlight = UIaddDetails("flash light", document.querySelector("#lights-details"));
