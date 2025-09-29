@@ -134,7 +134,7 @@ export class Picker {
 
 		this.ballLight = new PointLight("ball light", this.meshBall.position, this.scene);
 		// this.ballLight.diffuse = new Color3(3., 0., 0.);
-		this.ballLight.diffuse = Color3.FromHexString("#3b3d7d").scale(10.);
+		this.ballLight.diffuse = Color3.FromHexString("#3b3d7d").scale(2.);
 		this.ballLight.specular = this.ballLight.diffuse;
 		this.ballLight.range = 3;
 		// p.setEnabled(false);
@@ -234,6 +234,10 @@ export class Picker {
 
 	public get ballLightColor(): Color3 {
 		return this.ballLight.diffuse;
+	}
+
+	public get light(): PointLight {
+		return this.ballLight;
 	}
 
 	public setEnable(status: boolean) {

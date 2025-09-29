@@ -115,7 +115,7 @@ export class Field {
 			max: 100
 		}, (n: number) => {
 			this.spotLight.exponent = n;
-			this.fog.spotLightExponent = n
+			this.fog.lightsUbo.updateFloat("spotExp", n);
 		});
 
 		// this.light.specular = Color3.Black();
@@ -182,11 +182,45 @@ export class Field {
 			segments: 1000
 		}))
 
-		this.fog.ballLightRadius = this.picker.ballRadius;
-		this.fog.ballLightColor = this.picker.ballLightColor;
-		this.fog.ballPosition = this.picker.position;
+		// this.fog.ballLightRadius = this.picker.ballRadius;
+		// this.fog.ballLightColor = this.picker.ballLightColor;
+		// this.fog.ballPosition = this.picker.position;
+		//
+		// this.fog.setSpotLight(this.spotLight);
 
-		this.fog.setSpotLight(this.spotLight);
+		// layout(std140) uniform lights {
+		// 	float	spotIntensity;
+		// 	float	spotRange;
+		// 	float	spotAngle;
+		// 	float	spotExp;
+		// 	float	pointAIntensity;
+		// 	float	pointARange;
+		// 	float	pointBIntensity;
+		// 	float	pointBRange;
+		// 	vec3	spotColor;
+		// 	vec3	spotPosition;
+		// 	vec3	spotDirection;
+		// 	vec3	pointAColor;
+		// 	vec3	pointAPosition;
+		// 	vec3	pointBColor;
+		// 	vec3	pointBPosition;
+		// };
+		const ubo = this.fog.lightsUbo;
+		ubo.updateFloat("spotIntensity", this.spotLight.intensity);
+		ubo.updateFloat("spotRange", this.spotLight.range);
+		ubo.updateFloat("spotAngle", Math.cos(this.spotLight.angle));
+		ubo.updateFloat("spotExp", this.spotLight.exponent);
+		ubo.updateFloat("pointAIntensity", this.picker.light.intensity);
+		ubo.updateFloat("pointARange", this.picker.light.range);
+		ubo.updateFloat("pointBIntensity", 0);
+		ubo.updateFloat("pointBRange", 0);
+		ubo.updateColor3("spotColor", this.spotLight.diffuse);
+		ubo.updateVector3("spotPosition", this.spotLight.position);
+		ubo.updateVector3("spotDirection", this.spotLight.direction);
+		ubo.updateColor3("pointAColor", this.picker.ballLightColor);
+		ubo.updateVector3("pointAPosition", this.picker.light.position);
+		ubo.updateColor3("pointBColor", this.picker.light.diffuse);
+		ubo.updateVector3("pointBPosition", this.picker.light.position);
 
 	}
 
@@ -203,9 +237,10 @@ export class Field {
 			this.monolith.update(time, this.camera);
 			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
 			this.butterfly.update(time, deltaTime);
-			this.fog.ballPosition = this.picker.position;
-			this.fog.spotLightPosition = this.spotLight.position;
-			this.fog.spotLightDirection = this.spotLight.direction;
+
+			this.fog.lightsUbo.updateVector3("pointAPosition", this.picker.position);
+			this.fog.lightsUbo.updateVector3("spotPosition", this.spotLight.position);
+			this.fog.lightsUbo.updateVector3("spotDirection", this.spotLight.direction);
 			this.fog.render();
 		}
 	}

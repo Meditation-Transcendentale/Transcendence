@@ -157,6 +157,24 @@ precision highp sampler2D;
 #define M_PI 3.1415926535897932384626433832795
 #define EPS	0.1
 
+layout(std140) uniform lights {
+	float	spotIntensity;
+	float	spotRange;
+	float	spotAngle;
+	float	spotExp;
+	float	pointAIntensity;
+	float	pointARange;
+	float	pointBIntensity;
+	float	pointBRange;
+	vec3	spotColor;
+	vec3	spotPosition;
+	vec3	spotDirection;
+	vec3	pointAColor;
+	vec3	pointAPosition;
+	vec3	pointBColor;
+	vec3	pointBPosition;
+};
+
 layout(std140) uniform camera {
 	float	cameraMaxZ;
 	vec3	cameraPosition;
@@ -172,18 +190,12 @@ layout(std140) uniform data {
 	float	maxDistance;
 	float	densityMultiplier;
 	float	lightScattering;
-	float	ballLightRadius;
-	float	spotLightExp;
-	float	spotLightAngle;
-	float	spotLightRange;
 	vec3	fogAbsorption;
 	vec3	fogScale;
-	vec3	ballPosition;
-	vec3	ballLightColor;
-	vec3	spotLightPosition;
-	vec3	spotLightDirection;
-	vec3	spotLightColor;
+	mat4	dummyToTakePlace;
 };
+
+
 
 uniform vec2	resolution;
 uniform float	time;
@@ -246,25 +258,46 @@ float attenuation(float r, float f, float d) {
   return max(t, 0.0);
 }
 
-vec3	getColor(vec3 pos, vec3 ray, float density) {
-	vec3 L = pos - ballPosition;
-	float d = length(L);
-	
-	return ballLightColor * attenuation(ballLightRadius, 0.1, d) * density  *  heyney_greenstein(dot(ray, -L / d), lightScattering);
-}
+// vec3	getColor(vec3 pos, vec3 ray, float density) {
+// 	vec3 L = pos - ballPosition;
+// 	float d = length(L);
+//
+// 	return ballLightColor * attenuation(ballLightRadius, 0.1, d) * density  *  heyney_greenstein(dot(ray, -L / d), lightScattering);
+// }
 
 float getAttenuation(float cosAngle, float exponent) {
     return max(0., pow(cosAngle, exponent));
 }
 
-vec3	getSpotLight(vec3 pos, vec3 ray, float density) {
-	vec3 L = spotLightPosition - pos;
-	float d = length(L);
-	float a = max(0., 1. - d / spotLightRange);
-	float cosA = max(0., dot(spotLightDirection, -L / d));
-	if (cosA >= spotLightAngle) {
-		a *= getAttenuation(cosA, spotLightExp);
-		return spotLightColor * a * density * 0.01; //* heyney_greenstein(dot(ray, spotLightDirection), lightScattering);
+// vec3	getSpotLight(vec3 pos, vec3 ray, float density) {
+// 	vec3 L = spotLightPosition - pos;
+// 	float d = length(L);
+// 	float a = max(0., 1. - d / spotLightRange);
+// 	float cosA = max(0., dot(spotLightDirection, -L / d));
+// 	if (cosA >= spotLightAngle) {
+// 		a *= getAttenuation(cosA, spotLightExp);
+// 		return spotLightColor * a * density * 0.01; //* heyney_greenstein(dot(ray, spotLightDirection), lightScattering);
+// 	}
+// 	return vec3(0.);
+// }
+//
+
+// need to add attenuation MAYBE
+vec3	computePointLight(vec3 worldPosition, float density, vec3 lightPosition, float lightRange, vec3 lightColor) {
+	vec3	L = worldPosition - lightPosition;
+	float	d = length(L);
+
+	return lightColor * attenuation(lightRange, 0.1, d) * density * exp(-d);
+}
+
+vec3	computeSpotLight(vec3 worldPosition, float density) {
+	vec3	L = spotPosition - worldPosition;
+	float	d = length(L);
+	float	a = max(0., 1. - d / spotRange);
+	float	cosA = max(0., dot(spotDirection, -L / d));
+	if (cosA >= spotAngle) {
+		a *= getAttenuation(cosA, spotExp);
+		return spotColor * a * density  * 0.02;
 	}
 	return vec3(0.);
 }
@@ -300,9 +333,12 @@ void main(void) {
 		density = sampleDensity(p) * stepSize;
 		if (density > 0.) {
 			// transmittance *= exp(-density);
-			color += getColor(p, ray, density);
-			//color += fogAbsorption * heyney_greenstein(dot(ray, vec3(0, -1, 0)), lightScattering) * density ;
-			color += getSpotLight(p, ray, density);
+			// color += getColor(p, ray, density);
+			// //color += fogAbsorption * heyney_greenstein(dot(ray, vec3(0, -1, 0)), lightScattering) * density ;
+			// color += getSpotLight(p, ray, density);
+			color += computeSpotLight(p, density);
+			color += computePointLight(p, density, pointAPosition, pointARange, pointAColor);
+			// color += computePointLight(p, density, pointBPosition, pointBRange, pointBColor);
 			totalDensity += density;
 		}
 		
