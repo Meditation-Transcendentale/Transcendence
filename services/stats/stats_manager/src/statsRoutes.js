@@ -112,6 +112,13 @@ export default async function statsRoutes(app) {
 		res.code(statusCode.SUCCESS).send({ leaderboards: leaderboards.data });
 	}));
 
+	app.patch('add/brickbreaker/:uuid', handleErrors(async (req, res) => {
+
+		const { uuid } = req.params;
+
+		
+	}));
+
 	app.get('/health', (req, res) => {
 		res.status(200).send('OK');
 	});
