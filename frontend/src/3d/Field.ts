@@ -163,7 +163,7 @@ export class Field {
 		}
 
 		this.fog.addMeshToDepth(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial);
-		this.fog.addMeshToDepth(this.monolith.getMeshCube() as Mesh, this.monolith.depthMaterialCube);
+		this.fog.addMeshToDepth(this.monolith.getMeshCube() as Mesh, this.defaultDepthMaterial);
 
 
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
@@ -200,13 +200,13 @@ export class Field {
 			// console.log(this.spotLight.direction);
 			// this.spotLight.setDirectionToTarget(this.camera.getTarget());
 			this.picker.render(deltaTime);
+			this.monolith.update(time, this.camera);
 			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
 			this.butterfly.update(time, deltaTime);
 			this.fog.ballPosition = this.picker.position;
 			this.fog.spotLightPosition = this.spotLight.position;
 			this.fog.spotLightDirection = this.spotLight.direction;
 			this.fog.render();
-			this.monolith.update(time, this.camera);
 		}
 	}
 
