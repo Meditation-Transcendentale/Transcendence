@@ -228,9 +228,6 @@ const userService = {
 	},
 	getAllUsers: () => {
 		const users = getAllUsersStmt.all();
-		if (users.length === 0) {
-			throw { status: statusCode.NOT_FOUND, message: returnMessages.NO_USERS_FOUND };
-		}
 		return users;
 	},
 	addUserStatus: (userId, status) => {

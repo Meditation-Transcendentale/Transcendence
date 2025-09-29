@@ -58,7 +58,7 @@ class Auth {
 		})
 
 		this.ref.FTIntraInput?.addEventListener("click", (e) => {
-			console.log("FTIntra login not implemented yet.");
+			this.ft_login();
 		})
 
 		this.initToken();
@@ -75,6 +75,22 @@ class Auth {
 	public async unload() {
 		this.css.remove();
 		this.ref.container.remove();
+	}
+
+	private ft_login() {
+		const intraUrl = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-a52a0d9baca0584c24f69c90aaea3aae24b86c22f3e4e27838f8ce9249d5fd93&redirect_uri=https%3A%2F%2Flocalhost%3A3000%2Fauth%2F42&response_type=code";
+		window.open(intraUrl, "42Intra", "width=600,height=600");
+
+		window.addEventListener("message", (event) => {
+			if (event.origin !== "https://localhost:3000") return;
+
+			if (event.data.type === "ft_login_success") {
+				Router.nav("/home", true);
+			} else if (event.data.type === "ft_login_error") {
+				this.ref.error.innerText = "Connection with 42 failed.";
+				this.ref.error.classList.remove("hidden");
+			}
+		});
 	}
 
 	private login(data: FormData, token = "") {

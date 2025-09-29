@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
 import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
-import { handleErrors, handleErrorsValid } from "../../shared/handleErrors.mjs";
+import { handleErrors, handleErrorsValid, handleErrors42 } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
 
 dotenv.config({ path: "../../../../.env" });
@@ -189,6 +189,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
 		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatarCdnUrl });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+		await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "offline" });
 	}
 
 	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
@@ -202,7 +203,6 @@ let cached42Token = { token: null, expires_at: 0 };
 
 async function get42accessToken(code) {
 
-	console.log('42 code:', cached42Token);
 	const now = Date.now();
 	if (cached42Token.token && now < cached42Token.expires_at - 10000) {
 		return { token42: cached42Token.token};
@@ -231,7 +231,7 @@ async function get42accessToken(code) {
 
 
 
-app.get('/42', handleErrors(async (req, res) => {
+app.get('/42', handleErrors42(async (req, res) => {
 	
 	const { token42 } = await get42accessToken(req.query.code);
 	// console.log('42 token:', token42);
@@ -252,17 +252,30 @@ app.get('/42', handleErrors(async (req, res) => {
 
 	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
 	if (!user) {
+		console.log('Creating new user with username:', username);
 		const uuid = uuidv4();
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
-		// console.log('Avatar CDN URL:', avatarCdnUrl);
-		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatarCdnUrl });
+		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatar_path: avatarCdnUrl });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+		await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "offline" });
 	}
 
 	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
-	res.code(statusCode.SUCCESS).send({ message: returnMessages.INTRA42_LOGGED_IN});
+	res.header("Content-Type", "text/html");
+	res.send(`
+		<!DOCTYPE html>
+		<html>
+			<head><title>Connexion 42</title></head>
+			<body>
+			<script>
+				window.opener.postMessage({ type: "ft_login_success" }, "*");
+				window.close();
+			</script>
+			</body>
+		</html>
+	`);
 }));
 
 app.post('/auth', handleErrorsValid(async (req, res) => {
