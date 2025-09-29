@@ -82,7 +82,6 @@ export class Pipeline {
 			reusable: false
 		})
 
-
 		this.camera.detachPostProcess(this.colorCorrectionPostProcess);
 		this.camera.detachPostProcess(this.fogPostProcess);
 		this.camera.detachPostProcess(this.fxaaPostProcess);

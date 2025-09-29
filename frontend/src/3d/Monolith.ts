@@ -41,7 +41,7 @@ export class Monolith {
 	private voxelMesh: Mesh | null = null;
 	private cube!: Mesh;
 	public material!: MonolithMaterial;
-	public cubeMaterial!: CubeMaterial;
+	public cubeMaterial!: CubeMaterial | StandardMaterial;
 	public options: MonolithOptions;
 	private defaultCursorPosition!: Vector3;
 	private sdfSystem: SDFSystem;
@@ -109,6 +109,19 @@ export class Monolith {
 				"oldOrigin", "deadZoneCenter", "deadZoneWidth", "deadZoneHeight", "deadZoneDepth", "textPosition0", "textSize0", "textGlow0", "floatingOffset"]
 		});
 
+		this.cube = MeshBuilder.CreateBox("thecube", {
+			size: 1,
+			updatable: false,
+
+		},
+			this.scene);
+		// this.cube.position.z += 0.01;
+		// this.cube.scaling = new Vector3(0.05, 0.05, 0.05);
+		// this.cube.createNormals(true);
+		// this.cube.convertToFlatShadedMesh();
+		// this.cube.disableEdgesRendering();
+
+		this.cube.position = new Vector3(0, 4.5, 0);
 
 		this.initializeVector3Pool();
 
@@ -232,22 +245,24 @@ export class Monolith {
 		this.depthMaterial.setFloat("baseWaveIntensity", 0.02);
 		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.);
 
+		// const cubeMaterial = new StandardMaterial("cubeMaterial", this.scene);
+		// cubeMaterial.diffuseColor = Color3.White()
 		const cubeMaterial = new CubeMaterial("cubeMaterial", this.scene);
 
-		cubeMaterial.setFloat("time", 0);
-		cubeMaterial.setFloat("animationSpeed", this.options.animationSpeed);
-		cubeMaterial.setFloat("animationIntensity", this.options.animationIntensity);
-		cubeMaterial.setVec3("worldCenter", Vector3.Zero());
-
-		cubeMaterial.setFloat("baseWaveIntensity", 0.02);
-		cubeMaterial.setFloat("mouseInfluenceRadius", 1.);
-
-		this.depthMaterialCube.setFloat("time", 0);
-		this.depthMaterialCube.setFloat("animationSpeed", this.options.animationSpeed);
-		this.depthMaterialCube.setFloat("animationIntensity", this.options.animationIntensity);
-
-		this.depthMaterialCube.setFloat("baseWaveIntensity", 0.02);
-		this.depthMaterialCube.setFloat("mouseInfluenceRadius", 1.);
+		// cubeMaterial.setFloat("time", 0);
+		// cubeMaterial.setFloat("animationSpeed", this.options.animationSpeed);
+		// cubeMaterial.setFloat("animationIntensity", this.options.animationIntensity);
+		// cubeMaterial.setVec3("worldCenter", Vector3.Zero());
+		//
+		// cubeMaterial.setFloat("baseWaveIntensity", 0.02);
+		// cubeMaterial.setFloat("mouseInfluenceRadius", 1.);
+		// //
+		// this.depthMaterialCube.setFloat("time", 0);
+		// this.depthMaterialCube.setFloat("animationSpeed", this.options.animationSpeed);
+		// this.depthMaterialCube.setFloat("animationIntensity", this.options.animationIntensity);
+		//
+		// this.depthMaterialCube.setFloat("baseWaveIntensity", 0.02);
+		// this.depthMaterialCube.setFloat("mouseInfluenceRadius", 1.);
 		this.cubeMaterial = cubeMaterial;
 
 		return shaderMaterial;
@@ -596,12 +611,6 @@ export class Monolith {
 			updatable: false
 		}, this.scene);
 
-		this.cube = MeshBuilder.CreateBox("thecube", {
-			size: 1,
-		},
-			this.scene);
-
-		this.cube.position = new Vector3(0, 4.5, 0);
 
 
 
@@ -739,7 +748,7 @@ export class Monolith {
 	public update(time: number, camera: Camera) {
 		this.material.setFloat("time", time);
 		this.depthMaterial.setFloat("time", time);
-		this.cubeMaterial.setFloat("time", time);
+		// this.cubeMaterial.setFloat("time", time);
 		this.depthMaterialCube.setFloat("time", time);
 		this.lastUpdateValues.time = time;
 		const floatAmplitude = this.options.height * 0.01;
@@ -747,20 +756,21 @@ export class Monolith {
 		const floatX = Math.sin(time * 0.6) * floatAmplitude * 0.25;
 		const floatZ = Math.cos(time * 0.4) * floatAmplitude * 0.2;
 		if (this.voxelMesh) {
-		
+
 			this.material.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 			// this.cubeMaterial.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 			this.depthMaterial.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 			// this.depthMaterialCube.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 
-		// this.voxelMesh.position.set(floatX, floatY + 4.5, floatZ);
+			// this.voxelMesh.position.set(floatX, floatY + 4.5, floatZ);
 		}
 		this.cube.position.set(floatX, floatY + 4.5, floatZ);
+		// this.cube.rotation.y += floatY / 2;
 		const cursorChanged = !this.cursor.equals(this.lastCursorPosition || Vector3.Zero());
 		const oldCursorChanged = !this.oldcursor.equals(this.lastOldCursorPosition || Vector3.Zero());
 		this.material.setVec3("origin", this.cursor);
 		this.depthMaterial.setVector3("origin", this.cursor);
-		this.cubeMaterial.setVec3("origin", this.cursor);
+		// this.cubeMaterial.setVec3("origin", this.cursor);
 		this.depthMaterialCube.setVector3("origin", this.cursor);
 		this.lastUpdateValues.cursorChanged = cursorChanged;
 
@@ -770,7 +780,7 @@ export class Monolith {
 
 		this.material.setFloat("animationSpeed", this.options.animationSpeed);
 		this.depthMaterial.setFloat("animationSpeed", this.options.animationSpeed);
-		this.cubeMaterial.setFloat("animationSpeed", 0);
+		// this.cubeMaterial.setFloat("animationSpeed", 0);
 		this.depthMaterialCube.setFloat("animationSpeed", 0);
 		this.lastUpdateValues.animationSpeed = this.options.animationSpeed;
 
