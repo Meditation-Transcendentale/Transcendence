@@ -219,7 +219,7 @@ export class SpaceSkybox {
                 v = pow(max(v, 0.0), vec3(gamma));
                 v = (v - 0.5) * contrast + 0.5;
                 
-                gl_FragColor = vec4(v * 0.01, 1.0);
+                gl_FragColor = vec4(v * 0.01, 1.);
             }
         `;
 	}

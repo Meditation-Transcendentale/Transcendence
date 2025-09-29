@@ -91,7 +91,7 @@ export class Monolith {
 			enableShaderAnimation: false,
 			animationSpeed: 1.0,
 			animationIntensity: 0.1,
-			qualityMode: 'medium',
+			qualityMode: 'low',
 			surfaceOnly: true,
 			mergeTolerance: 0.001,
 			...options
@@ -743,18 +743,19 @@ export class Monolith {
 		this.depthMaterialCube.setFloat("time", time);
 		this.lastUpdateValues.time = time;
 		const floatAmplitude = this.options.height * 0.01;
+		const floatY = Math.sin(time * 0.8) * floatAmplitude;
+		const floatX = Math.sin(time * 0.6) * floatAmplitude * 0.25;
+		const floatZ = Math.cos(time * 0.4) * floatAmplitude * 0.2;
 		if (this.voxelMesh) {
-			const floatY = Math.sin(time * 0.8) * floatAmplitude;
-			const floatX = Math.sin(time * 0.6) * floatAmplitude * 0.25;
-			const floatZ = Math.cos(time * 0.4) * floatAmplitude * 0.2;
-
+		
 			this.material.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
-			this.cubeMaterial.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+			// this.cubeMaterial.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 			this.depthMaterial.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
-			this.depthMaterialCube.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+			// this.depthMaterialCube.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 
+		// this.voxelMesh.position.set(floatX, floatY + 4.5, floatZ);
 		}
-
+		this.cube.position.set(floatX, floatY + 4.5, floatZ);
 		const cursorChanged = !this.cursor.equals(this.lastCursorPosition || Vector3.Zero());
 		const oldCursorChanged = !this.oldcursor.equals(this.lastOldCursorPosition || Vector3.Zero());
 		this.material.setVec3("origin", this.cursor);

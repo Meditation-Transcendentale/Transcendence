@@ -26,7 +26,7 @@ export class Picker {
 
 	private ballDiameter = 1.5;
 	private ballHit!: boolean;
-	private ballLight: PointLight;
+	private ballLight!: PointLight;
 
 	private enabled: boolean;
 
@@ -63,7 +63,7 @@ export class Picker {
 		this.cursor = new Vector2();
 		this.pick = 0;
 		this.attenuation = 0.3;
-		this.radius = 1.1 / this.groundSize.x;
+		this.radius = 1.6 / this.groundSize.x;
 		this.oldTime = 0.;
 
 		this.pickerEffect.onApplyObservable.add(() => {
@@ -122,7 +122,9 @@ export class Picker {
 			uniforms: ["world", "viewProjection", "color"]
 		})
 
-		this.material.setVector4("color", new Vector4(12., 0., 0., 0.2));
+		// this.material.setVector4("color", new Vector4(12., 0., 0., 0.2));
+		const c = Color3.FromHexString("#3b3d7d").scale(10.);
+		this.material.setVector4("color", new Vector4(c.r, c.g, c.b, 0.2));
 		this.material.alphaMode = Engine.ALPHA_DISABLE;
 
 		this.material.onBindObservable.add
@@ -131,7 +133,8 @@ export class Picker {
 		this.meshBall.position.set(0, this.groundPosition.y, 4);
 
 		this.ballLight = new PointLight("ball light", this.meshBall.position, this.scene);
-		this.ballLight.diffuse = new Color3(8., 0., 0.);
+		// this.ballLight.diffuse = new Color3(3., 0., 0.);
+		this.ballLight.diffuse = Color3.FromHexString("#3b3d7d").scale(10.);
 		this.ballLight.specular = this.ballLight.diffuse;
 		this.ballLight.range = 3;
 		// p.setEnabled(false);
@@ -227,6 +230,10 @@ export class Picker {
 
 	public get ballRadius(): number {
 		return this.ballLight.range;
+	}
+
+	public get ballLightColor(): Color3 {
+		return this.ballLight.diffuse;
 	}
 
 	public setEnable(status: boolean) {

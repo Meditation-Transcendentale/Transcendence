@@ -9,6 +9,8 @@ import {
 	GlowLayer,
 	DirectionalLight,
 	SpotLight,
+	RawTexture3D,
+	Engine,
 } from "@babylonImport";
 import "./Shader/Shader.ts";
 import { Grass } from "./Grass";
@@ -20,6 +22,9 @@ import { Picker } from "./Picker";
 import { UIaddDetails, UIaddSlider, UIaddToggle } from "./UtilsUI.js";
 import { CameraUtils } from "./CameraUtils.js";
 import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } from "./TrackManager.js";
+import { PelinWorley3D } from "./PerlinWorley.js";
+import { Butterfly } from "./Butterfly.js";
+import { SpaceSkybox } from "../pongbr/templates/skybox.js";
 
 export class Field {
 	private scene: Scene;
@@ -34,6 +39,7 @@ export class Field {
 	private monolith: Monolith;
 	private pipeline: Pipeline;
 	private picker: Picker;
+	private butterfly: Butterfly;
 
 	private cursor: Vector3;
 	private cursorMonolith: Vector3;
@@ -57,6 +63,8 @@ export class Field {
 
 	private spotLight: SpotLight;
 
+	private skybox: SpaceSkybox;
+
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
 		this.camera = camera;
@@ -74,6 +82,7 @@ export class Field {
 		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 0.5, 0), new Vector2(40, 40));
 
 		this.grass.ballPosition = this.picker.position;
+		this.grass.ballLightColor = this.picker.ballLightColor;
 
 		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
@@ -81,9 +90,13 @@ export class Field {
 		this.camera.minZ = 0.01;
 		// const light2 = new DirectionalLight("direclight", new Vector3(0, -0.2, -1), this.scene);
 		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
-		this.light.intensity = 0.7;
+		this.light.intensity = 0.1;
 
-		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.3, 33, this.scene);
+		this.spotLight = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.5, 10, this.scene);
+		// this.spotLight = new SpotLight("torche", new Vector3(), new Vector3(0, 0, -1), Math.PI * 0.5, 10, this.scene);
+		this.spotLight.range = 30.;
+		this.spotLight.specular.scaleInPlace(6.);
+		this.spotLight.intensity = 2.7;
 
 		UIaddSlider("light intensity", this.spotLight.intensity, {
 			step: 0.1,
@@ -100,7 +113,10 @@ export class Field {
 			step: 0.1,
 			min: 0.,
 			max: 100
-		}, (n: number) => { this.spotLight.exponent = n });
+		}, (n: number) => {
+			this.spotLight.exponent = n;
+			this.fog.spotLightExponent = n
+		});
 
 		// this.light.specular = Color3.Black();
 
@@ -122,24 +138,32 @@ export class Field {
 		m.diffuseColor = Color3.Black();
 		m.specularColor = Color3.Black();
 		this.ground.material = m;
+		// this.ground.setEnabled(false);
 
 		this.defaultDepthMaterial = new ShaderMaterial("defaultDepth", this.scene, "defaultDepth", {
 			attributes: ['position'],
 			uniforms: ["world", "viewProjection", "depthValues"]
 		})
 
+		this.butterfly = new Butterfly(this.scene);
+
+		// this.skybox = new SpaceSkybox(this.scene);
+
 	}
 
 	public async load() {
 		await this.grass.init();
 		await this.monolith.init();
+		await this.butterfly.init();
+
+		// this.skybox.applyPreset("Classic");
 
 		for (let i = 0; i < this.grass._tiles.length; i++) {
 			this.fog.addMeshToDepth(this.grass._tiles[i]._mesh, this.grass.grassDepthMaterial);
 		}
 
 		this.fog.addMeshToDepth(this.monolith.getMesh() as Mesh, this.monolith.depthMaterial);
-		this.fog.addMeshToDepth(this.monolith.getMeshCube() as Mesh, this.monolith.depthMaterialCube);
+		this.fog.addMeshToDepth(this.monolith.getMeshCube() as Mesh, this.defaultDepthMaterial);
 
 
 		this.fog.addMeshToDepth(this.ground, this.defaultDepthMaterial);
@@ -157,17 +181,32 @@ export class Field {
 			control: new Vector3(-20, 0, 20),
 			segments: 1000
 		}))
+
+		this.fog.ballLightRadius = this.picker.ballRadius;
+		this.fog.ballLightColor = this.picker.ballLightColor;
+		this.fog.ballPosition = this.picker.position;
+
+		this.fog.setSpotLight(this.spotLight);
+
 	}
 
 	public update(time: number, deltaTime: number) {
 		if (this.active) {
 			this.spotLight.direction = this.camera.getForwardRay().direction;
+			this.spotLight.direction.normalize();
+			// this.spotLight.position.copyFrom(this.camera.position).addInPlaceFromFloats(0, 5, 0);
+			// this.spotLight.setDirectionToTarget(this.camera.getForwardRay().direction.scaleInPlace(3).addInPlace(this.camera.position))
+
 			// console.log(this.spotLight.direction);
 			// this.spotLight.setDirectionToTarget(this.camera.getTarget());
 			this.picker.render(deltaTime);
-			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
-			this.fog.render();
 			this.monolith.update(time, this.camera);
+			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
+			this.butterfly.update(time, deltaTime);
+			this.fog.ballPosition = this.picker.position;
+			this.fog.spotLightPosition = this.spotLight.position;
+			this.fog.spotLightDirection = this.spotLight.direction;
+			this.fog.render();
 		}
 	}
 

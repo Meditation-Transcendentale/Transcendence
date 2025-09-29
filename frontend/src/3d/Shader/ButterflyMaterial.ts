@@ -60,7 +60,9 @@ export class ButterflyMaterial extends CustomMaterial {
 
 		this.Fragment_MainEnd(`
 			// gl_FragColor.rgb *= (vPositionW.y < 0.6 ? vec3(1., 0.1, 0.1) : vec3(1.));
-			gl_FragColor.a = 1.;
+			gl_FragColor.a = 0.1;
+			gl_FragColor.rgb *= vec3(3., 0., 0.);
+			gl_FragColor.rgb += vec3(2.31, 2.39, 4.9);
 		`)
 
 		// this.emissiveColor = new Color3(0.1, 0.1, 0.1);
@@ -68,11 +70,16 @@ export class ButterflyMaterial extends CustomMaterial {
 		//
 		this.specularPower = 2;
 		// this.ambientColor = Color3.FromHexString("#c1121f")
-		this.diffuseColor = Color3.FromHexString("#03045e");
-		this.diffuseColor = Color3.FromHexString("#ffffff");
-		this.specularColor = Color3.FromHexString("#c1121f");
-		this.specularColor = Color3.FromHexString("#03045e");
+		// this.emissiveColor = Color3.FromHexString("#3b3d7d").scale(10.)
+		console.log("buttr", this.emissiveColor);
+		this.specularColor = Color3.Black();
+		this.diffuseColor = new Color3(1, 1, 1);
 		this.backFaceCulling = false;
+
+
+		this.twoSidedLighting = true;
+		this.alphaMode = 0;
+		// this.alpha = 0.0;
 	}
 
 	setFloat(name: string, value: number) {

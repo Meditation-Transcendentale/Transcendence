@@ -75,6 +75,7 @@ export { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 export { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 export { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 export { Curve3 } from "@babylonjs/core/Maths/math.path";
+export { RawTexture3D } from "@babylonjs/core/Materials/Textures/rawTexture3D";
 
 import "@babylonjs/core/Culling/ray";
 
