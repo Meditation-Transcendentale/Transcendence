@@ -48,11 +48,11 @@ function calculateStats(playerStats, mode) {
 
 export default async function statsRoutes(app) {
 
-	app.get('/player/:username/:mode', handleErrors(async (req, res) => {
+	app.get('/player/:uuid/:mode', handleErrors(async (req, res) => {
 
-		const { username, mode } = req.params;
+		const { uuid, mode } = req.params;
 
-		const user = await nats.request('user.getUserFromUsername', jc.encode({ username }), { timeout: 1000 });
+		const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
 		if (!userResult.success) {
 			throw { status: userResult.status, code: userResult.code, message: userResult.message };
@@ -77,6 +77,39 @@ export default async function statsRoutes(app) {
 				[`history`]: playerStats
 			}
 		});
+	}));
+
+	app.get('/get/brickbreaker/:uuid', handleErrors(async (req, res) => {
+
+		const { uuid } = req.params;
+
+		const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid }), { timeout: 1000 });
+		const userResult = jc.decode(user.data);
+		if (!userResult.success) {
+			throw { status: userResult.status, code: userResult.code, message: userResult.message };
+		}
+		const playerId = userResult.data.id;
+
+		const response = await nats.request(`stats.getBrickBreakerStats`, jc.encode(playerId), { timeout: 1000 });
+
+		const result = jc.decode(response.data);
+		if (!result.success) {
+			throw { status: result.status, code: result.code, message: result.message };
+		}
+		const brickBreakerStats = result.data;
+		
+		res.code(statusCode.SUCCESS).send({ brickBreakerStats });
+	}));
+
+	app.get('/get/leaderboard/brickbreaker', handleErrors(async (req, res) => {
+
+		const natsResponse = await nats.request(`stats.getBrickBreakerLeaderboard`, jc.encode({}), { timeout: 1000 });
+		const leaderboards = jc.decode(natsResponse.data);
+		if (!leaderboards.success) {
+			throw { status: leaderboards.status, code: leaderboards.code, message: leaderboards.message };
+		}
+
+		res.code(statusCode.SUCCESS).send({ leaderboards: leaderboards.data });
 	}));
 
 	app.get('/health', (req, res) => {

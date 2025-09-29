@@ -1,0 +1,239 @@
+import * as Proto from './message.js';
+
+export function encodeFriendUpdate(
+	payload
+) {
+	const err = Proto.notif.FriendUpdate.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.notif.FriendUpdate
+		.encode(Proto.notif.FriendUpdate.create(payload))
+		.finish();
+}
+
+export function decodeFriendUpdate(
+	buffer
+) {
+	return Proto.notif.FriendUpdate.decode(buffer);
+}
+
+export function encodeGameInvite(
+	payload
+) {
+	const err = Proto.notif.GameInvite.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.notif.GameInvite
+		.encode(Proto.notif.GameInvite.create(payload))
+		.finish();
+}
+
+export function decodeGameInvite(
+	buffer
+) {
+	return Proto.notif.GameInvite.decode(buffer);
+}
+
+export function encodeStatusUpdate(
+	payload
+) {
+	const err = Proto.notif.StatusUpdate.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.notif.StatusUpdate
+		.encode(Proto.notif.StatusUpdate.create(payload))
+		.finish();
+}
+
+export function decodeStatusUpdate(
+	buffer
+) {
+	return Proto.notif.StatusUpdate.decode(buffer);
+}
+
+export function encodeNotificationMessage(
+	payload
+) {
+	const err = Proto.notif.NotificationMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.notif.NotificationMessage
+		.encode(Proto.notif.NotificationMessage.create(payload))
+		.finish();
+}
+
+/**
+ * Decode a Lobby ServerMessage received by the front-end.
+ * @param buffer - protobuf‐encoded bytes
+ * @returns a `lobby.ServerMessage` instance
+ */
+export function decodeNotificationMessage(
+	buffer
+) {
+	return Proto.notif.NotificationMessage.decode(buffer);
+}
+
+/**
+ * ----------------------------
+ * Lobby Client ↔ Server Helpers
+ * ----------------------------
+ *
+ * These functions allow the front‐end (UI) to encode/decode messages
+ * defined in `lobby.proto` (package “lobby”), compiled into `message.js`.
+ *
+ * Lobby.proto defines:
+ *   - lobby.ClientMessage      // client→server (Quit / Ready)
+ *   - lobby.ServerMessage      // server→client (Start / Update / Error)
+ *   - lobby.UserStatus         // NATS: user status publish/subscribe
+ *   - lobby.MatchCreateRequest  // NATS: create match
+ *   - lobby.MatchCreateResponse // NATS: create match response
+ */
+
+/**
+ * Encode a Lobby ClientMessage (quit or ready) for sending over WebSocket.
+ * @param payload - a valid `lobby.IClientMessage`
+ * @returns `Uint8Array` (the protobuf‐encoded bytes)
+ */
+export function encodeClientMessage(
+	payload
+) {
+	const err = Proto.lobby.ClientMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.lobby.ClientMessage
+		.encode(Proto.lobby.ClientMessage.create(payload))
+		.finish();
+}
+
+/**
+ * Decode a Lobby ClientMessage (if you ever receive one back on the front-end).
+ * @param buffer - protobuf‐encoded bytes
+ * @returns a `lobby.ClientMessage` instance
+ */
+export function decodeClientMessage(
+	buffer
+) {
+	return Proto.lobby.ClientMessage.decode(buffer);
+}
+
+/**
+ * Encode a Lobby ServerMessage (start / update / error) for sending to front-end.
+ * @param payload - a valid `lobby.IServerMessage`
+ * @returns `Uint8Array`
+ */
+export function encodeServerMessage(
+	payload
+) {
+	const err = Proto.lobby.ServerMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.lobby.ServerMessage
+		.encode(Proto.lobby.ServerMessage.create(payload))
+		.finish();
+}
+
+/**
+ * Decode a Lobby ServerMessage received by the front-end.
+ * @param buffer - protobuf‐encoded bytes
+ * @returns a `lobby.ServerMessage` instance
+ */
+export function decodeServerMessage(
+	buffer
+) {
+	return Proto.lobby.ServerMessage.decode(buffer);
+}
+
+/**
+ * Encode a UserStatus for NATS publish (if front-end ever sends status).
+ * @param payload - a valid `lobby.IUserStatus`
+ * @returns `Uint8Array`
+ */
+export function encodeUserStatus(
+	payload
+) {
+	const err = Proto.lobby.UserStatus.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.lobby.UserStatus
+		.encode(Proto.lobby.UserStatus.create(payload))
+		.finish();
+}
+
+/**
+ * Decode a UserStatus from NATS (front-end subscription).
+ * @param buffer - protobuf‐encoded bytes
+ * @returns a `lobby.UserStatus` instance
+ */
+export function decodeUserStatus(
+	buffer
+) {
+	return Proto.lobby.UserStatus.decode(buffer);
+}
+
+/**
+ * Encode a MatchCreateRequest for NATS (front-end → lobby-manager).
+ * @param payload - a valid `lobby.IMatchCreateRequest`
+ * @returns `Uint8Array`
+ */
+export function encodeMatchCreateRequest(
+	payload
+) {
+	const err = Proto.lobby.MatchCreateRequest.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.lobby.MatchCreateRequest
+		.encode(Proto.lobby.MatchCreateRequest.create(payload))
+		.finish();
+}
+
+/**
+ * Decode a MatchCreateResponse from NATS (lobby-manager → front-end).
+ * @param buffer - protobuf‐encoded bytes
+ * @returns a `lobby.MatchCreateResponse` instance
+ */
+export function decodeMatchCreateResponse(
+	buffer
+) {
+	return Proto.lobby.MatchCreateResponse.decode(buffer);
+}
+
+export function encodeTournamentServerMessage(
+	payload
+) {
+	const err = Proto.tournament.TournamentServerMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.tournament.TournamentServerMessage
+		.encode(Proto.tournament.TournamentServerMessage.create(payload))
+		.finish();
+}
+
+export function decodeTournamentServerMessage(
+	buffer
+) {
+	return Proto.tournament.TournamentServerMessage.decode(buffer);
+}
+
+export function encodeTournamentClientMessage(
+	payload
+) {
+	const err = Proto.tournament.TournamentClientMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.tournament.TournamentClientMessage
+		.encode(Proto.tournament.TournamentClientMessage.create(payload))
+		.finish();
+}
+
+export function decodeTournamentClientMessage(
+	buffer
+) {
+	return Proto.tournament.TournamentClientMessage.decode(buffer);
+}
+
+export function encodeTournamentQuitMessage(
+	payload
+) {
+	const err = Proto.tournament.TournamentQuitMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.tournament.TournamentQuitMessage
+		.encode(Proto.tournament.TournamentQuitMessage.create(payload))
+		.finish();
+}
+
+export function decodeTournamentQuitMessage(
+	buffer
+) {
+	return Proto.tournament.TournamentQuitMessage.decode(buffer);
+}
+

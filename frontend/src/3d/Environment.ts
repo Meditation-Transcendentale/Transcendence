@@ -236,6 +236,7 @@ export class Environment {
 		});
 	}
 
+
 	public render(time: number) {
 		this.deltaTime = time - this.lastTime;
 		this.lastTime = time;

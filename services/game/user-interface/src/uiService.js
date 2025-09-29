@@ -79,8 +79,8 @@ export default class UIService {
 			(async () => {
 				for await (const m of sub) {
 					const [, , gameId] = m.subject.split('.');
-					const { winner } = decodeMatchEnd(m.data);
-					const buf = encodeServerMessage({ end: [winner] });
+					// const { winnerId } = decodeMatchEnd(m.data);
+					const buf = encodeServerMessage({ end: m.data });
 
 					for (const sid of this.games.get(gameId) || []) {
 						const s = this.sessions.get(sid);
@@ -94,7 +94,7 @@ export default class UIService {
 					this.allowedByGame.delete(gameId);
 					this.games.delete(gameId);
 					this.readyPlayers.delete(gameId);
-					console.log(`Game ${gameId} ended, winner paddleId=${winner}`);
+					// console.log(`Game ${gameId} ended, winner paddleId=${winnerId}`);
 				}
 			})();
 		}
@@ -157,6 +157,7 @@ export default class UIService {
 
 		const { uuid, mode, gameId } = sess;
 
+		console.log ("QUITTING");
 		const topic = `games.${mode}.${gameId}.match.quit`;
 		natsClient.publish(topic, encodeMatchQuit({ uuid }));
 
