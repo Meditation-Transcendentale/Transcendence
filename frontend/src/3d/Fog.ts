@@ -438,7 +438,8 @@ export class Fog {
 			Engine.TEXTURETYPE_FLOAT
 		);
 
-		this.fogTexture = new RenderTargetTexture("fog", { width: this.scene.getEngine().getRenderWidth() * this.ratio, height: this.scene.getEngine().getRenderHeight() * this.ratio }, scene, {
+		const ro = this.scene.getEngine().getRenderHeight() / this.scene.getEngine().getRenderWidth();
+		this.fogTexture = new RenderTargetTexture("fog", { width: 1080 * this.ratio, height: 1080 * this.ratio * ro }, scene, {
 			format: Engine.TEXTUREFORMAT_RGBA,
 			type: Engine.TEXTURETYPE_HALF_FLOAT,
 			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
@@ -674,10 +675,11 @@ export class Fog {
 
 	public resize() {
 		const iproj = new Matrix();
+		const ro = this.scene.getEngine().getRenderHeight() / this.scene.getEngine().getRenderWidth();
 		this.cameraUBO.updateMatrix("projection", this.camera.getProjectionMatrix());
 		this.cameraUBO.updateMatrix("iprojection", this.camera.getProjectionMatrix().invertToRef(iproj));
 		this.depthTexture.resize({ width: this.scene.getEngine().getRenderWidth() * this.ratio, height: this.scene.getEngine().getRenderHeight() * this.ratio })
-		this.fogTexture.resize({ width: this.scene.getEngine().getRenderWidth() * this.ratio, height: this.scene.getEngine().getRenderHeight() * this.ratio })
+		this.fogTexture.resize({ width: 1080 * this.ratio, height: 1080 * this.ratio * ro });
 		this.blurTexture.resize({ width: this.scene.getEngine().getRenderWidth() * this.ratio, height: this.scene.getEngine().getRenderHeight() * this.ratio })
 		this.delta.set(1. / this.fogTexture.getRenderWidth(), 1. / this.fogTexture.getRenderHeight())
 	}

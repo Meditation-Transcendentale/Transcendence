@@ -119,6 +119,9 @@ void main(void) {
 
 	float	rayTransmittance = 0.;
 	vec3	fog = vec3(0.);
+	float	spot = 0.;
+	float	pointa = 0.;
+
 	while (travel < maxDist) {
 		h = texture(surfaceTexture, p.xz * (1. / worldSize) + 0.5).r  * waveMaxDisplacement + waterHeight;
 		s = waterSdf(p, p.y > 0. ? h : waterHeight);
@@ -283,23 +286,23 @@ float getAttenuation(float cosAngle, float exponent) {
 //
 
 // need to add attenuation MAYBE
-vec3	computePointLight(vec3 worldPosition, float density, vec3 lightPosition, float lightRange, vec3 lightColor) {
+float	computePointLight(vec3 worldPosition, float density, vec3 lightPosition, float lightRange, vec3 lightColor) {
 	vec3	L = worldPosition - lightPosition;
 	float	d = length(L);
 
-	return lightColor * attenuation(lightRange, 0.1, d) * density * exp(-d);
+	return attenuation(lightRange, 0.1, d) * density * exp(-d);
 }
 
-vec3	computeSpotLight(vec3 worldPosition, float density) {
+float	computeSpotLight(vec3 worldPosition, float density) {
 	vec3	L = spotPosition - worldPosition;
 	float	d = length(L);
 	float	a = max(0., 1. - d / spotRange);
 	float	cosA = max(0., dot(spotDirection, -L / d));
 	if (cosA >= spotAngle) {
 		a *= getAttenuation(cosA, spotExp);
-		return spotColor * a * density  * 0.02;
+		return a * density  * 0.02;
 	}
-	return vec3(0.);
+	return 0.;
 }
 
 void main(void) {
@@ -329,6 +332,8 @@ void main(void) {
 	// float transmittance = 1.;
 	float density = 0.;
 	vec3 color = vec3(0.);
+	float spot = 0.;
+	float pointa = 0.;
 	while (travel < maxDist) {
 		density = sampleDensity(p) * stepSize;
 		if (density > 0.) {
@@ -336,8 +341,8 @@ void main(void) {
 			// color += getColor(p, ray, density);
 			// //color += fogAbsorption * heyney_greenstein(dot(ray, vec3(0, -1, 0)), lightScattering) * density ;
 			// color += getSpotLight(p, ray, density);
-			color += computeSpotLight(p, density);
-			color += computePointLight(p, density, pointAPosition, pointARange, pointAColor);
+			spot += computeSpotLight(p, density);
+			pointa += computePointLight(p, density, pointAPosition, pointARange, pointAColor);
 			// color += computePointLight(p, density, pointBPosition, pointBRange, pointBColor);
 			totalDensity += density;
 		}
@@ -346,7 +351,7 @@ void main(void) {
 		p += r;
 
 	}
-	gl_FragColor.rgb = color *  (1. - exp(-totalDensity));
+	gl_FragColor.rgb = (color + spot * spotColor + pointa * pointAColor) *  (1. - exp(-totalDensity));
 	// gl_FragColor.rgb =  color *  max(transmittance, 0.);
 	gl_FragColor.a = totalDensity + clamp(distanceToHit - travel, 0., 100.) * densityMultiplier;
 }

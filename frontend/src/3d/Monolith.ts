@@ -747,13 +747,13 @@ export class Monolith {
 		const floatX = Math.sin(time * 0.6) * floatAmplitude * 0.25;
 		const floatZ = Math.cos(time * 0.4) * floatAmplitude * 0.2;
 		if (this.voxelMesh) {
-		
+
 			this.material.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 			// this.cubeMaterial.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 			this.depthMaterial.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 			// this.depthMaterialCube.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 
-		// this.voxelMesh.position.set(floatX, floatY + 4.5, floatZ);
+			// this.voxelMesh.position.set(floatX, floatY + 4.5, floatZ);
 		}
 		this.cube.position.set(floatX, floatY + 4.5, floatZ);
 		const cursorChanged = !this.cursor.equals(this.lastCursorPosition || Vector3.Zero());
