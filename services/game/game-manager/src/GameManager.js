@@ -224,7 +224,6 @@ export class GameManager {
 		match.status = "ended";
 
 		if (match.mode != `br`) {
-			console.log("encoding match end");
 			const buf = encodeMatchEnd({
 				winnerId:
 					match.instance.players[0] === uuid ? match.instance.players[1] : match.instance.players[0],
