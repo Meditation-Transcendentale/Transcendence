@@ -5,6 +5,7 @@ interface authHtmlReference {
 	container: HTMLDivElement;
 	form: HTMLFormElement;
 	googleInput: HTMLInputElement;
+	FTIntraInput: HTMLInputElement;
 	error: HTMLDivElement;
 	tokenDiv: HTMLDivElement;
 	tokenReset: HTMLButtonElement;
@@ -23,6 +24,7 @@ class Auth {
 			container: div.querySelector("#login-content") as HTMLDivElement,
 			form: div.querySelector("#loginForm") as HTMLFormElement,
 			googleInput: div.querySelector("#google-input") as HTMLInputElement,
+			FTIntraInput: div.querySelector("#FTIntra-input") as HTMLInputElement,
 			error: div.querySelector("#login-error") as HTMLDivElement,
 			tokenDiv: div.querySelector("#twofa-container") as HTMLDivElement,
 			tokenReset: div.querySelector("#token-reset") as HTMLButtonElement
@@ -49,6 +51,14 @@ class Auth {
 		this.ref.tokenReset.addEventListener("click", (e) => {
 			this.setTokenRequired(false);
 			this.ref.error.innerText = "";
+		})
+
+		this.ref.googleInput.addEventListener("click", (e) => {
+			console.log("Google login not implemented yet.");
+		})
+
+		this.ref.FTIntraInput?.addEventListener("click", (e) => {
+			console.log("FTIntra login not implemented yet.");
 		})
 
 		this.initToken();
