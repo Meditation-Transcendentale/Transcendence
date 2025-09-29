@@ -87,7 +87,8 @@ export class Field {
 		this.camera.setTarget(new Vector3(0, 6, 30))
 		this.camera.rotation.y = Math.PI;
 		this.camera.attachControl();
-		this.camera.minZ = 0.01;
+		this.camera.minZ = 0.1;
+		// this.camera.maxZ = 100;
 		// const light2 = new DirectionalLight("direclight", new Vector3(0, -0.2, -1), this.scene);
 		this.light = new HemisphericLight("hemish", new Vector3(0, 1, 0), this.scene);
 		this.light.intensity = 0.1;
