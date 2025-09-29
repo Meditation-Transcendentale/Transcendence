@@ -1,4 +1,5 @@
 import {
+  decodeServerMessage,
   decodeTournamentServerMessage,
   encodeTournamentClientMessage,
 } from "./proto/helper";
@@ -13,7 +14,11 @@ async function startGameTournament(gameId, uuid) {
 
     ws.onmessage = async (msg) => {
         const buf = new Uint8Array(msg.data);
-        
+        const payload = decodeServerMessage(buf);
+        if (payload.end) {
+          ws.close();
+          return;
+        }
     }
 }
 
