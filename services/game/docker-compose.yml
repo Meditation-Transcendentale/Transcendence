@@ -134,9 +134,11 @@ services:
       - nats
     command: npm run dev
     restart: unless-stopped
+    networks:
+      - transcendence-network
     environment:
       - SERVICE_NAME=tournament
       - NATS_URL=nats://nats:4222
-      - PORT=5019
+      - PORT=5009
     ports:
-      - "5019:5019"
+      - "5009:5009"

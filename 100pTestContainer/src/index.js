@@ -91,6 +91,7 @@ async function lobbyConnectionInit(user) {
         user.setTournamentId(tournamentId);
         console.log(`${user.uuid}:START TOURNAMENT RECEIVED=${tournamentId}`);
         ws?.close();
+        // setTimeout(() => {}, 5000);
         resolve();
       }
     };
@@ -110,6 +111,7 @@ async function main() {
   const users = [];
   await userConnectionInit(users, nbuser, lobbyId, agent);
   await Promise.all(users.map((user) => lobbyConnectionInit(user)));
+  // setTimeout(() => {}, 100000);
   for (let i = 0; i < Math.log2(nbuser); i++) {
     await Promise.all(
       users.map(async (user) => {

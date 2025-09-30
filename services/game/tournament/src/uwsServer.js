@@ -11,17 +11,13 @@ export function createUwsApp(path, tournamentService) {
 
     app.ws(path, {
         idleTimeout: 120,
-        maxBackpressure: 1024 * 1024,
-        maxPayloadLength: 1024 * 1024,
 
         upgrade: (res, req, context) => {
+            console.log("SALSALSALSS");
             try {
                 const tournamentId = req.getQuery('tournamentId');
                 const userId = req.getQuery('uuid');
-                if (!tournamentId || !userId) {
-                    res.writeStatus('400 Bad Request').end();
-                    return;
-                }
+                console.log (tournamentId, userId);
                 res.upgrade(
                     { tournamentId, userId },
                     req.getHeader('sec-websocket-key'),
@@ -47,6 +43,7 @@ export function createUwsApp(path, tournamentService) {
                 console.log(`new connection: ${ws}`);
                 tournamentService.join(ws.tournamentId, ws.userId);
             } catch (err) {
+                console.error(err);
                 const buf = encodeTournamentServerMessage({ error: { message: err.message }});
                 ws.send(buf, true);
             }
