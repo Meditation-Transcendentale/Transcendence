@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "timestamp": 1759218174008,
+  "voxelCount": 2500,
+  "config": {
+    "height": 15,
+    "width": 1.2,
+    "depth": 6,
+    "voxelSize": 0.24,
+    "sdfThreshold": 0.02,
+    "surfaceOnly": true,
+    "qualityMode": "low"
+  }
+}

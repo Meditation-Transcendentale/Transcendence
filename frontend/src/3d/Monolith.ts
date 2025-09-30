@@ -2,7 +2,7 @@ import { Camera, Mesh, MeshBuilder, Scene, Vector3, LoadAssetContainerAsync, Sta
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
 import { CubeMaterial } from "./Shader/CubeMaterial";
-
+import { voxelData as templeMedium } from './temple-medium';
 
 type MonolithOptions = {
 	height: number;
@@ -91,7 +91,7 @@ export class Monolith {
 			enableShaderAnimation: false,
 			animationSpeed: 1.0,
 			animationIntensity: 0.1,
-			qualityMode: 'low',
+			qualityMode: 'medium',
 			surfaceOnly: true,
 			mergeTolerance: 0.001,
 			...options
@@ -125,9 +125,21 @@ export class Monolith {
 
 		this.initializeVector3Pool();
 
-		this.applyQualitySettings();
+		// this.applyQualitySettings();
 
-		this.buildDefaultSDF();
+		// this.buildDefaultSDF();
+	}
+	public async loadPrebuiltVoxels(): Promise<boolean> {
+		const positions = templeMedium.positions.map(([x, y, z]) =>
+			new Vector3(x, y, z)
+		);
+		this.options.voxelSize = templeMedium.voxelSize;
+
+		if (positions.length > 0) {
+			this.voxelMesh = await this.createOptimizedVoxelMesh(positions);
+		}
+		this.setupGPUPicking();
+		return true;
 	}
 
 	private initializeVector3Pool(): void {
@@ -223,7 +235,12 @@ export class Monolith {
 	}
 
 	public async init() {
-		await this.generateVoxelSystem();
+		const loaded = await this.loadPrebuiltVoxels("medium");
+
+		if (!loaded) {
+			console.log('⚙️ Generating voxels client-side (fallback)');
+			await this.generateVoxelSystem();
+		}
 	}
 
 	private createMaterial(): MonolithMaterial {
