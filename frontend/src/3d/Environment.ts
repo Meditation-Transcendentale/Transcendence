@@ -284,8 +284,8 @@ export class Environment {
 	}
 
 
-	public setCube(name: string, clickEv?: any, hoverEv?: any) {
-		this.field.cubeEvent.enable = true;
+	public setCube(name: string, clickEv: any = null, hoverEv: any = null) {
+		this.field.cubeEvent.enable = clickEv != null || hoverEv != null;
 		this.field.cubeEvent.name = name;
 		this.field.cubeEvent.clickEvent = clickEv;
 		this.field.cubeEvent.hoverEvent = hoverEv;

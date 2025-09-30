@@ -4,6 +4,7 @@ import { getRequest, postRequest } from "./requests";
 import Router from "./Router";
 import { createButton } from "./utils";
 import { Popup } from "./Popup";
+import { HtmlElementTexture } from "@babylonjs/core";
 
 
 interface playHtmlReference {
@@ -39,6 +40,8 @@ interface playHtmlReference {
 	voidmap: HTMLInputElement;
 	monolithmap: HTMLInputElement;
 	grassmap: HTMLInputElement;
+	joinIdDiv: { html: HTMLDivElement, id: number };
+	joinListDiv: { html: HTMLDivElement, id: number };
 };
 
 enum playState {
@@ -113,7 +116,9 @@ export default class Play {
 			voidmap: div.querySelector("#void-map") as HTMLInputElement,
 			monolithmap: div.querySelector("#monolith-map") as HTMLInputElement,
 			grassmap: div.querySelector("#grass-map") as HTMLInputElement,
-			pongModes: div.querySelector("#create-pong") as HTMLInputElement
+			pongModes: div.querySelector("#create-pong") as HTMLInputElement,
+			joinIdDiv: { html: div.querySelector("#join-input-container") as HTMLDivElement, id: -1 },
+			joinListDiv: { html: div.querySelector("#join-list-container") as HTMLDivElement, id: -1 }
 		}
 
 
@@ -124,34 +129,49 @@ export default class Play {
 
 		this.state = playState.create;
 
-		this.ref.switch.id = App3D.addCSS3dObject({
-			html: this.ref.switch.html,
-			width: 1.5,
-			height: 1.5,
-			world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-2, 6.6, 0)),
-			enable: false
-		})
+		// this.ref.switch.id = App3D.addCSS3dObject({
+		// 	html: this.ref.switch.html,
+		// 	width: 1.5,
+		// 	height: 1.5,
+		// 	world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-2, 6.6, 0)),
+		// 	enable: false
+		// })
 		this.ref.createOption.id = App3D.addCSS3dObject({
 			html: this.ref.createOption.html,
 			width: 1.5,
 			height: 1.5,
-			world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-5, 5, -8)),
+			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.05).multiply(Matrix.Translation(-3, 3, -14)),
 			enable: false
 		})
 		this.ref.create.id = App3D.addCSS3dObject({
 			html: this.ref.create.html,
 			width: 1.5,
 			height: 1.5,
-			world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-4, 5, -8)),
+			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.05).multiply(Matrix.Translation(-3, 3, -14)),
 			enable: false
 		})
 		this.ref.join.id = App3D.addCSS3dObject({
 			html: this.ref.join.html,
 			width: 1.5,
 			height: 1.5,
-			world: Matrix.RotationY(-Math.PI / 2.).multiply(Matrix.Translation(-5, 5, -10)),
+			world: Matrix.RotationY(Math.PI * 0.6).multiply(Matrix.Translation(-1, 4.5, 17)),
 			enable: false
 		})
+		this.ref.joinListDiv.id = App3D.addCSS3dObject({
+			html: this.ref.joinListDiv.html,
+			width: 1.5,
+			height: 1.5,
+			world: Matrix.RotationY(Math.PI * 0.6).multiply(Matrix.Translation(-1, 4.5, 14)),
+			enable: false
+		})
+		this.ref.joinIdDiv.id = App3D.addCSS3dObject({
+			html: this.ref.joinIdDiv.html,
+			width: 1.5,
+			height: 1.5,
+			world: Matrix.RotationY(Math.PI * 0.75).multiply(Matrix.Translation(0.5, 3, 10)),
+			enable: false
+		})
+
 
 		// this.ref.swJoin.toggleAttribute("down");
 		// this.ref.swCreate.addEventListener("click", () => {
@@ -173,17 +193,21 @@ export default class Play {
 		// })
 
 		this.joinEv = () => {
+			App3D.setVue("join");
 			getRequest("lobby/list", "no-cache")
 				.then((json: any) => { console.log(json); this.parseListResp(json) })
 				.catch((err) => { console.log(err) });
 			App3D.setCSS3dObjectEnable(this.ref.create.id, false);
-			App3D.setCSS3dObjectEnable(this.ref.join.id, true);
+			App3D.setCSS3dObjectEnable(this.ref.joinListDiv.id, true);
+			App3D.setCSS3dObjectEnable(this.ref.joinIdDiv.id, true);
 			this.state = playState.join;
 			App3D.setCube("create", () => { this.createEv() });
 		}
 		this.createEv = () => {
+			App3D.setVue("create");
 			App3D.setCSS3dObjectEnable(this.ref.create.id, true);
-			App3D.setCSS3dObjectEnable(this.ref.join.id, false);
+			App3D.setCSS3dObjectEnable(this.ref.joinListDiv.id, false);
+			App3D.setCSS3dObjectEnable(this.ref.joinIdDiv.id, false);
 			this.state = playState.create;
 			App3D.setCube("join", () => { this.joinEv() });
 		}
@@ -407,19 +431,21 @@ export default class Play {
 	}
 
 	public load(params: URLSearchParams) {
-		App3D.setVue("play");
 		switch (this.state) {
 			case playState.create: {
+				App3D.setVue("create");
 				App3D.setCube("join", () => { this.joinEv(); })
 				App3D.setCSS3dObjectEnable(this.ref.create.id, true);
 				break;
 			}
 			case playState.join: {
+				App3D.setVue("join");
 				App3D.setCube("create", () => { this.createEv(); })
 				getRequest("lobby/list")
 					.then((json: any) => { this.parseListResp(json) })
 					.catch((err) => { console.log(err) });
-				App3D.setCSS3dObjectEnable(this.ref.join.id, true);
+				App3D.setCSS3dObjectEnable(this.ref.joinListDiv.id, true);
+				App3D.setCSS3dObjectEnable(this.ref.joinIdDiv.id, true);
 				break;
 			}
 		}
@@ -427,10 +453,13 @@ export default class Play {
 	}
 
 	public async unload() {
+		App3D.setCube("");
 		this.returnButton();
 		this.createOption(false);
 		App3D.setCSS3dObjectEnable(this.ref.create.id, false);
-		App3D.setCSS3dObjectEnable(this.ref.join.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.joinListDiv.id, false);
+		App3D.setCSS3dObjectEnable(this.ref.joinIdDiv.id, false);
+		// App3D.setCSS3dObjectEnable(this.ref.join.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.lobbyInfoWindow.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.createOption.id, false);
 		this.css.remove();
