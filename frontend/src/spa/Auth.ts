@@ -1,4 +1,5 @@
 import Router from "./Router";
+import { google } from "./proto/message";
 import { postRequest } from "./requests";
 
 interface authHtmlReference {
@@ -54,7 +55,7 @@ class Auth {
 		})
 
 		this.ref.googleInput.addEventListener("click", (e) => {
-			console.log("Google login not implemented yet.");
+			this.google_login();
 		})
 
 		this.ref.FTIntraInput?.addEventListener("click", (e) => {
@@ -62,6 +63,8 @@ class Auth {
 		})
 
 		this.initToken();
+
+		this.initGoogle();
 	}
 
 	public load(params: URLSearchParams) {
@@ -75,6 +78,14 @@ class Auth {
 	public async unload() {
 		this.css.remove();
 		this.ref.container.remove();
+	}
+
+	private google_login() {
+		window.google.accounts.id.prompt();
+		// window.google.accounts.id.renderButton(this.ref.googleInput, {
+		// 	theme: "outline",
+		// 	size: "large",
+		// });
 	}
 
 	private ft_login() {
@@ -150,6 +161,19 @@ class Auth {
 			this.ref.tokenDiv.classList.add("hidden");
 
 		}
+	}
+
+	private initGoogle() {
+		window.google.accounts?.id?.initialize({
+			client_id: "1089807862778-laga27uqspepmtq7pbp55khbbjn86sqd.apps.googleusercontent.com",
+			callback: (res: any) => {
+				postRequest("auth/auth-google", {
+					token: res.credential
+				})
+					.then((json) => { this.loginResolve(json) })
+					.catch((resp) => { this.requestReject(new FormData(), resp) })
+			}
+		});
 	}
 
 	private initToken() {

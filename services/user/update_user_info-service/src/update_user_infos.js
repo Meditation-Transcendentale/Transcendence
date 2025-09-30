@@ -147,7 +147,7 @@ async function getAvatarCdnUrl(avatar, uuid) {
 	}
 	await removeOldAvatars(uuid);
 	const randomAddition = Math.random().toString(36).substring(2, 8);
-	console.log(`Avatar upload: ${uuid}, type: ${fileType.ext}, random: ${randomAddition}`);
+	// console.log(`Avatar upload: ${uuid}, type: ${fileType.ext}, random: ${randomAddition}`);
 
 	const filename = `${uuid}_${randomAddition}.${fileType.ext}`;
 	const fullPath = `/app/cdn_data/${filename}`;

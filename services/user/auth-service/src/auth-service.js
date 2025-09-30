@@ -141,6 +141,15 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_IN, token: accessToken });
 }));
 
+async function removeOldAvatars(uuid) {
+	const files = fs.readdirSync('/app/cdn_data');
+	for (const file of files) {
+		if (file.startsWith(uuid + '_')) {
+			fs.unlinkSync(`/app/cdn_data/${file}`);
+		}
+	}
+}
+
 async function getAvatarCdnUrl(picture, uuid) {
 	const response = await fetch(picture);
 	if (response.status !== 200) {
@@ -149,7 +158,10 @@ async function getAvatarCdnUrl(picture, uuid) {
 
 	const arrayBuffer = await response.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
-	const filename = `${uuid}.png`;
+	
+	await removeOldAvatars(uuid);
+	const randomAddition = Math.random().toString(36).substring(2, 8);
+	const filename = `${uuid}_${randomAddition}.png`;
 	const fullPath = `/app/cdn_data/${filename}`;
 
 	fs.writeFileSync(fullPath, buffer);
@@ -161,7 +173,6 @@ async function getAvatarCdnUrl(picture, uuid) {
 // https://developers.google.com/oauthplayground/
 
 app.post('/auth-google', handleErrors(async (req, res) => {
-	
 	const { token } = req.body;
 	let retCode = statusCode.SUCCESS, retMessage = returnMessages.LOGGED_IN;
 
@@ -178,8 +189,11 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 	});
 	
 	const payload = ticket.getPayload();
+	console.log("Google payload:", payload);
 
 	const { sub: google_id, name: username, picture: avatar_path } = payload;
+
+	console.log('Google ID:', google_id);
 
 	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
 	if (!user) {
@@ -187,7 +201,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
 		// console.log('Avatar CDN URL:', avatarCdnUrl);
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
-		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatarCdnUrl });
+		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatar_path: avatarCdnUrl });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 		await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "offline" });
 	}

@@ -121,6 +121,7 @@ const userService = {
 	},
 	getUserFromUUID: (uuid) => {
 		const user = getUserFromUUIDStmt.get(uuid);
+		console.log("getUserFromUUID:", user);
 		if (!user) {
 			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
@@ -214,6 +215,7 @@ const userService = {
 	},
 	getUserForFriendResearch: (username) => {
 		const user = getUserForFriendResearchStmt.get(username);
+		console.log("getUserForFriendResearch:", username, user);
 		if (!user) {
 			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
