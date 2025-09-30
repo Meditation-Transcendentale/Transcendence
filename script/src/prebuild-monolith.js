@@ -228,15 +228,12 @@ class MonolithPrebuild {
 		const settings = qualitySettings[config.qualityMode];
 		config.voxelSize = settings.voxelSize;
 
-		// Build voxel grid first
 		const grid = await this.fillVoxelGrid(customBounds, config, sdfTree);
 
-		// Extract surface or all voxels
 		const positions = config.surfaceOnly
 			? this.extractSurfaceVoxels(grid, config, sdfTree)
 			: this.extractAllVoxels(grid);
 
-		// Limit voxel count
 		const finalPositions = this.limitVoxelCount(positions, settings.maxVoxelCount);
 
 		const endTime = Date.now();
@@ -258,7 +255,6 @@ class MonolithPrebuild {
 
 		console.log(`   Grid: ${width}x${height}x${depth} = ${width * height * depth} voxels to test`);
 
-		// Create grid data structure
 		const grid = {
 			origin: bounds.min,
 			voxelSize: config.voxelSize,
@@ -366,7 +362,6 @@ class MonolithPrebuild {
 				const neighborIndex = nx + ny * grid.width + nz * grid.width * grid.height;
 
 				if (grid.data[neighborIndex] === 0) {
-					// Neighbor is empty, verify it's actually outside with SDF
 					const neighborPos = new Vector3(
 						grid.origin.x + nx * grid.voxelSize,
 						grid.origin.y + ny * grid.voxelSize,
@@ -483,7 +478,7 @@ async function main() {
 		depth: 6,
 		voxelSize: 0.06,
 		sdfThreshold: 0.02,
-		surfaceOnly: true  // ADDED - default to surface only
+		surfaceOnly: true
 	};
 
 	const qualities = ['low', 'medium', 'high'];
@@ -497,8 +492,6 @@ async function main() {
 
 		const config = { ...baseConfig, qualityMode: quality };
 		const positions = await prebuild.generateVoxelData(config, sdfTree, bounds);
-		const filename = `temple-${quality}.bin`;
-		await prebuild.saveToFile(positions, config, `../frontend/public/assets/${filename}`);
 		await prebuild.saveAsTypeScript(positions, config, `../frontend/src/3d/temple-${quality}.ts`);
 	}
 
