@@ -532,6 +532,8 @@ input[on] {
 	color: black;
 }
 
+
+
 input[type="number"] {
 	max-width: 6vh;
 	color: black;
@@ -554,4 +556,13 @@ input[type="range"] {
 .already-open {
 	color: white;
 	display: inline-block;
+}
+
+
+.details-dark {
+	background-color: #a0a0a0 !important;
+}
+
+.details-light {
+	background-color: #c0c0c0 !important;
 }

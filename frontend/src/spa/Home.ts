@@ -118,9 +118,9 @@ class Home {
 		//.catch(() => window.location.reload());
 		App3D.setVue("home");
 		//App3D.setCSS3dObjectEnable(this.ref.stats.id, true);
-		App3D.setCSS3dObjectEnable(this.ref.play.id, true);
+		// App3D.setCSS3dObjectEnable(this.ref.play.id, true);
 		//App3D.setCSS3dObjectEnable(this.ref.bricks.id, true);
-		App3D.setCSS3dObjectEnable(this.ref.exemple.id, true);
+		// App3D.setCSS3dObjectEnable(this.ref.exemple.id, true);
 		//(document.querySelector("#main-container") as HTMLDivElement)?.remove();
 
 		// document.querySelector("#main-container")?.appendChild(this.div);
@@ -173,38 +173,38 @@ class Home {
 			.then((json) => raiseStatus(false, json.message));
 	}
 
-	private setNotificationManager(url: string){
+	private setNotificationManager(url: string) {
 		const notificationSocket = new WebSocket(url);
 		notificationSocket.onopen = () => {
 			console.log('Connected to notificationSocket server');
-		  }
-		  
+		}
+
 		notificationSocket.onmessage = (event) => {
 			const message = JSON.parse(event.data);
 			console.log('Received message:', message);
-		  
+
 			switch (message.type) {
-			  case 'notification.friendRequest':
-				console.log('Friend request:', message.data);
-				break
-			  case 'notification.friendAccept':
-				console.log('Friend accepted:', message.data);
-				break
-			  case 'notification.gameInvite':
-				console.log('Game invite:', message.data);
-				break
-			  case 'notification.status':
-				console.log('Status update:', message.data);
-				break
-			  default:
-				console.warn('Unknown message type:', message.type);
+				case 'notification.friendRequest':
+					console.log('Friend request:', message.data);
+					break
+				case 'notification.friendAccept':
+					console.log('Friend accepted:', message.data);
+					break
+				case 'notification.gameInvite':
+					console.log('Game invite:', message.data);
+					break
+				case 'notification.status':
+					console.log('Status update:', message.data);
+					break
+				default:
+					console.warn('Unknown message type:', message.type);
 			}
 		}
-		  
+
 		notificationSocket.onerror = (err) => {
 			console.error('WebSocket error:', err);
 		}
-		  
+
 		notificationSocket.onclose = () => {
 			console.log('WebSocket connection closed');
 		}

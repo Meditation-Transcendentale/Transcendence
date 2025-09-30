@@ -3,6 +3,9 @@ import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
 import { CubeMaterial } from "./Shader/CubeMaterial";
 import { voxelData as templeMedium } from './temple-medium';
+import { UIaddColor } from "./UtilsUI";
+
+
 
 type MonolithOptions = {
 	height: number;
@@ -75,6 +78,8 @@ export class Monolith {
 	public depthMaterial: ShaderMaterial;
 	public depthMaterialCube: ShaderMaterial;
 
+	private cubeLight: PointLight;
+
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
 		this.sdfSystem = new SDFSystem();
@@ -117,6 +122,10 @@ export class Monolith {
 			this.scene);
 
 		this.cube.position = new Vector3(0, 4.5, 0);
+		this.cubeLight = new PointLight("cube light", this.cube.position, this.scene);
+		this.cubeLight.range = 2;
+		this.cubeLight.diffuse = Color3.Purple();
+		this.cubeLight.intensity = 2;
 
 		this.initializeVector3Pool();
 	}
@@ -212,6 +221,7 @@ export class Monolith {
 		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.);
 
 		const cubeMaterial = new CubeMaterial("cubeMaterial", this.scene);
+		cubeMaterial.emissiveColor = this.light.diffuse;
 
 		this.cubeMaterial = cubeMaterial;
 
@@ -571,6 +581,15 @@ export class Monolith {
 
 	public setPicking(value: boolean) {
 		this.isPickingEnabled = value;
+	}
+
+	public clearCaches() {
+		this.surfaceCache.clear();
+		this.distanceCache.clear();
+	}
+
+	public get light(): PointLight {
+		return this.cubeLight;
 	}
 
 }
