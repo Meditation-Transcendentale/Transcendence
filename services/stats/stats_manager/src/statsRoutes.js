@@ -120,14 +120,17 @@ export default async function statsRoutes(app) {
 		}
 
 		switch (true) {
-			case (mode === 'easy'): 
-				await nats.request(`stats.addBrickBreakerEasyStats`, jc.encode({ playerId: userResult.data.id, score}), { timeout: 1000 });
+			case (mode === 'easy'):
+				console.log("easy mode");
+				await nats.request(`stats.updateBrickBreakerEasyStats`, jc.encode({ playerId: userResult.data.id, score}), { timeout: 1000 });
 				break;
-			case (mode === 'medium'): 
-				await nats.request(`stats.addBrickBreakerMediumStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
+			case (mode === 'medium'):
+				console.log("medium mode");
+				await nats.request(`stats.updateBrickBreakerNormalStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
 				break;
-			case (mode === 'hard'): 
-				await nats.request(`stats.addBrickBreakerHardStats`, jc.encode({ playerId: userResult.data.id, score}), { timeout: 1000 });
+			case (mode === 'hard'):
+				console.log("hard mode");
+				await nats.request(`stats.updateBrickBreakerHardStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
 				break;
 			default:
 				throw { status: 400, code: 40031, message: 'No score provided' };
