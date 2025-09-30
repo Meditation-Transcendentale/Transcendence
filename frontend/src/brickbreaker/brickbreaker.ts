@@ -129,9 +129,15 @@ export class BrickBreaker {
 		//	this.renderObserver = null;
 		//	console.log("BrickBreaker removed from render loop");
 		//}
-		const body = new FormData();
-        body.append(this.mode, this.score.toString());
-        patchRequest("/stats/update/brickbreaker", body, false)
+
+		console.log("Final score:", this.score);
+		// const body = new FormData();
+        // body.append(this.mode, this.score.toString());
+		// console.log(body);
+        patchRequest("/stats/update/brickbreaker", {mode: this.mode, score: this.score}, false)
+			.then(() => {
+				console.log("Score updated");
+			})
             .catch(() => {
                 console.error("Error update score");
             });
