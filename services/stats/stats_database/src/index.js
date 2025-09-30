@@ -139,6 +139,26 @@ handleErrorsNats(async () => {
 			};
 			nats.publish(msg.reply, jc.encode({ success: true, data: leaderboard }));		
 		}),
+		handleNatsSubscription("stats.addBrickBreakerStats", async (msg) => {
+			const { playerId } = jc.decode(msg.data);
+			statService.addBrickBreakerStats(playerId);
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
+		handleNatsSubscription("stats.updateBrickBreakerEasyStats", async (msg) => {
+			const { playerId, score } = jc.decode(msg.data);
+			statService.updateBrickBreakerEasyStats(playerId, score);
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
+		handleNatsSubscription("stats.updateBrickBreakerNormalStats", async (msg) => {
+			const { playerId, score } = jc.decode(msg.data);
+			statService.updateBrickBreakerNormalStats(playerId, score);
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
+		handleNatsSubscription("stats.updateBrickBreakerHardStats", async (msg) => {
+			const { playerId, score } = jc.decode(msg.data);
+			statService.updateBrickBreakerHardStats(playerId, score);
+			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
 		handleNatsSubscription("test.statsDatabase", async (msg) => {
 			const result = statService.testAll();
 			nats.publish(msg.reply, jc.encode({ success: true, data: result }));

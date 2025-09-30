@@ -39,8 +39,8 @@ handleErrorsNats(async () => {
 			nats.publish(msg.reply, jc.encode({ success: true, data: userExists }));
 		}),
 		handleNatsSubscription("user.addGoogleUser", async (msg) => {
-			const { uuid, googleId, username, avatar_path } = jc.decode(msg.data);
-			userService.addGoogleUser(uuid, googleId, username, avatar_path);
+			const { uuid, google_id, username, avatar_path } = jc.decode(msg.data);
+			userService.addGoogleUser(uuid, google_id, username, avatar_path);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("user.add42User", async (msg) => {

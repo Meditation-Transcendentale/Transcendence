@@ -1,4 +1,5 @@
 import Router from "./Router";
+import { google } from "./proto/message";
 import { postRequest } from "./requests";
 
 interface authHtmlReference {
@@ -54,14 +55,16 @@ class Auth {
 		})
 
 		this.ref.googleInput.addEventListener("click", (e) => {
-			console.log("Google login not implemented yet.");
+			this.google_login();
 		})
 
 		this.ref.FTIntraInput?.addEventListener("click", (e) => {
-			console.log("FTIntra login not implemented yet.");
+			this.ft_login();
 		})
 
 		this.initToken();
+
+		this.initGoogle();
 	}
 
 	public load(params: URLSearchParams) {
@@ -75,6 +78,30 @@ class Auth {
 	public async unload() {
 		this.css.remove();
 		this.ref.container.remove();
+	}
+
+	private google_login() {
+		window.google.accounts.id.prompt();
+		// window.google.accounts.id.renderButton(this.ref.googleInput, {
+		// 	theme: "outline",
+		// 	size: "large",
+		// });
+	}
+
+	private ft_login() {
+		const intraUrl = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-a52a0d9baca0584c24f69c90aaea3aae24b86c22f3e4e27838f8ce9249d5fd93&redirect_uri=https%3A%2F%2Flocalhost%3A3000%2Fauth%2F42&response_type=code";
+		window.open(intraUrl, "42Intra", "width=600,height=600");
+
+		window.addEventListener("message", (event) => {
+			if (event.origin !== "https://localhost:3000") return;
+
+			if (event.data.type === "ft_login_success") {
+				Router.nav("/home", true);
+			} else if (event.data.type === "ft_login_error") {
+				this.ref.error.innerText = "Connection with 42 failed.";
+				this.ref.error.classList.remove("hidden");
+			}
+		});
 	}
 
 	private login(data: FormData, token = "") {
@@ -134,6 +161,19 @@ class Auth {
 			this.ref.tokenDiv.classList.add("hidden");
 
 		}
+	}
+
+	private initGoogle() {
+		window.google.accounts?.id?.initialize({
+			client_id: "1089807862778-laga27uqspepmtq7pbp55khbbjn86sqd.apps.googleusercontent.com",
+			callback: (res: any) => {
+				postRequest("auth/auth-google", {
+					token: res.credential
+				})
+					.then((json) => { this.loginResolve(json) })
+					.catch((resp) => { this.requestReject(new FormData(), resp) })
+			}
+		});
 	}
 
 	private initToken() {

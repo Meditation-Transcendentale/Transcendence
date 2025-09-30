@@ -47,6 +47,10 @@ const getBrickBreakerLeaderboard_hardStmt = database.prepare(`
 const isUserIdExistingStmt = database.prepare(`SELECT * FROM users WHERE id = ?`);
 const addMatchInfosStmt = database.prepare(`INSERT INTO match (game_mode, winner_id, total_players) VALUES (?, ?, ?)`);
 const addMatchStatsInfosStmt = database.prepare(`INSERT INTO match_stats (match_id, user_id, is_winner, goals_scored, goals_conceded, placement) VALUES (?, ?, ?, ?, ?, ?)`);
+const addBrickBreakerStatsStmt = database.prepare(`INSERT INTO brickbreaker_stats (user_id, easy_mode_hscore, normal_mode_hscore, hard_mode_hscore) VALUES (?, ?, ?, ?)`);
+const updateBrickBreakerEasyStatsStmt = database.prepare(`UPDATE brickbreaker_stats SET easy_mode_hscore = ? WHERE user_id = ?`);
+const updateBrickBreakerNormalStatsStmt = database.prepare(`UPDATE brickbreaker_stats SET normal_mode_hscore = ? WHERE user_id = ?`);
+const updateBrickBreakerHardStatsStmt = database.prepare(`UPDATE brickbreaker_stats SET hard_mode_hscore = ? WHERE user_id = ?`);
 
 
 const testAllMatch = database.prepare(`SELECT * FROM match`);
@@ -110,6 +114,18 @@ const statService = {
 	getBrickBreakerLeaderboard_hard: () => {
 		const leaderboard_hard = getBrickBreakerLeaderboard_hardStmt.all();
 		return leaderboard_hard;
+	},
+	addBrickBreakerStats: (playerId) => {
+		addBrickBreakerStatsStmt.run(playerId, 0, 0, 0);
+	},
+	updateBrickBreakerEasyStats: (playerId, score) => {
+		updateBrickBreakerEasyStatsStmt.run(score, playerId);
+	},
+	updateBrickBreakerNormalStats: (playerId, score) => {
+		updateBrickBreakerNormalStatsStmt.run(score, playerId);
+	},
+	updateBrickBreakerHardStats: (playerId, score) => {
+		updateBrickBreakerHardStatsStmt.run(score, playerId);
 	},
 	testAll: () => {
 		const allMatch = testAllMatch.all();

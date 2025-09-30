@@ -4,6 +4,7 @@ import { Player } from "./Player";
 import { getRequest, patchRequest } from "../spa/requests";
 import earcut from "earcut";
 import GameUI from "../spa/GameUI";
+import { getRequest, patchRequest } from "../spa/requests";
 
 let resizeTimeout: number;
 let engine: any;
@@ -25,6 +26,7 @@ export class BrickBreaker {
 	public root: TransformNode;
 	private id: number = 0;
 	private start1: boolean = true;
+	private mode: string = "medium";
 	public gameUI: GameUI;
 	public score: number = 0;
 	private pbEasy: number = 0;
@@ -64,8 +66,10 @@ export class BrickBreaker {
 			return;
 		}
 
-		let pb = getRequest("stats/get/brickbreaker");
-		console.log("pb_____", pb);
+		getRequest("/stats/get/brickbreaker")
+			.then((json) => { this.handlePb(json) })
+			.catch((err) => { console.log(err) });
+
 		this.reset();
 
 		this.layers = Math.ceil((Math.random() * 5) + 1);
@@ -81,6 +85,21 @@ export class BrickBreaker {
 
 		console.log("BrickBreaker added to render loop");
 	}
+
+	private handlePb(json: any) {
+		console.log(json.brickBreakerStats);
+	}
+
+
+	// public stop(): void {
+	// 	if (this.renderObserver) {
+	// 		this.scene.onBeforeRenderObservable.remove(this.renderObserver);
+	// 		this.renderObserver = null;
+	// 		console.log("BrickBreaker removed from render loop");
+	// 	}
+	// 	this.player.disableInput();
+	// 	this.reset();
+	// }
 
 	public restart(): void {
 		this.reset();
@@ -110,6 +129,12 @@ export class BrickBreaker {
 		//	this.renderObserver = null;
 		//	console.log("BrickBreaker removed from render loop");
 		//}
+		const body = new FormData();
+        body.append(this.mode, this.score.toString());
+        patchRequest("/stats/update/brickbreaker", body, false)
+            .catch(() => {
+                console.error("Error update score");
+            });
 		this.camera.parent = null;
 		this.start1 = false;
 		this.player.disableInput();
