@@ -44,6 +44,7 @@ export { Button } from "@babylonjs/gui/2D/controls/button";
 export { Control } from "@babylonjs/gui/2D/controls/control";
 export { Scalar } from "@babylonjs/core/Maths/math.scalar";
 export { CustomMaterial } from '@babylonjs/materials/custom';
+export { PBRCustomMaterial } from '@babylonjs/materials/custom';
 export { BoundingBox } from '@babylonjs/core/Culling/boundingBox';
 export { Material } from "@babylonjs/core/Materials/material";
 export { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
@@ -74,6 +75,7 @@ export { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 export { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 export { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 export { Curve3 } from "@babylonjs/core/Maths/math.path";
+export { RawTexture3D } from "@babylonjs/core/Materials/Textures/rawTexture3D";
 
 import "@babylonjs/core/Culling/ray";
 

@@ -1,10 +1,20 @@
 @import url("font.css");
 @import url("inputs.css");
 @import url("popup.css");
+@import url("loading.css");
 
 ::selection {
 	color: black !important;
 	background: White !important;
+}
+
+input:autofill {
+	filter: none !important;
+	box-shadow: 0 0 0 100px #8f88 inseta !important;
+}
+
+input {
+	filter: none;
 }
 
 html,
@@ -522,6 +532,8 @@ input[on] {
 	color: black;
 }
 
+
+
 input[type="number"] {
 	max-width: 6vh;
 	color: black;
@@ -539,4 +551,18 @@ input[type="number"] {
 
 input[type="range"] {
 	vertical-align: middle;
+}
+
+.already-open {
+	color: white;
+	display: inline-block;
+}
+
+
+.details-dark {
+	background-color: #a0a0a0 !important;
+}
+
+.details-light {
+	background-color: #c0c0c0 !important;
 }

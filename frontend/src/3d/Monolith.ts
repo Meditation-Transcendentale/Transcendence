@@ -1,8 +1,9 @@
-import { Camera, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
+import { Camera, Mesh, MeshBuilder, Scene, Vector3, LoadAssetContainerAsync, StandardMaterial, Color3, Matrix, Material, ShaderMaterial, Effect, VertexBuffer, GPUPicker, Ray, HemisphericLight, PointLight } from "@babylonImport";
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
+import { CubeMaterial } from "./Shader/CubeMaterial";
+import { UIaddColor } from "./UtilsUI";
 
-import { TextRenderer } from "./SimpleTextRenderer";
 
 type MonolithOptions = {
 	height: number;
@@ -39,8 +40,10 @@ export class Monolith {
 	public scene: Scene;
 
 	private voxelMesh: Mesh | null = null;
+	private cube!: Mesh;
 	public material!: MonolithMaterial;
-	private options: MonolithOptions;
+	public cubeMaterial!: CubeMaterial | StandardMaterial;
+	public options: MonolithOptions;
 	private defaultCursorPosition!: Vector3;
 	private sdfSystem: SDFSystem;
 	private cursor: Vector3;
@@ -54,9 +57,9 @@ export class Monolith {
 	private pickThrottleMs = 16;
 	private matrixBuffer: Float32Array | null = null;
 	private lastVoxelCount = 0;
-	private text: TextRenderer | null = null;
 	private lastCursorPosition: Vector3 | null = null;
 	private lastOldCursorPosition: Vector3 | null = null;
+	private customBounds: BoundingBox | null = null;
 
 	private vector3Pool: Vector3[] = [];
 	private pooledVectors: Set<Vector3> = new Set();
@@ -71,6 +74,9 @@ export class Monolith {
 	private static readonly _tempMatrix = Matrix.Identity();
 
 	public depthMaterial: ShaderMaterial;
+	public depthMaterialCube: ShaderMaterial;
+
+	private cubeLight: PointLight;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
@@ -88,7 +94,7 @@ export class Monolith {
 			enableShaderAnimation: false,
 			animationSpeed: 1.0,
 			animationIntensity: 0.1,
-			qualityMode: 'low',
+			qualityMode: 'medium',
 			surfaceOnly: true,
 			mergeTolerance: 0.001,
 			...options
@@ -97,18 +103,38 @@ export class Monolith {
 		this.depthMaterial = new ShaderMaterial("monolithDepth", this.scene, "monolithDepth", {
 			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
 			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "origin",
-				"oldOrigin", "deadZoneCenter", "deadZoneWidth", "deadZoneHeight", "deadZoneDepth", "textPosition0", "textSize0", "textGlow0"]
+				"oldOrigin", "deadZoneCenter", "deadZoneWidth", "deadZoneHeight", "deadZoneDepth", "textPosition0", "textSize0", "textGlow0", "floatingOffset"]
 		});
 
+		this.depthMaterialCube = new ShaderMaterial("cubeDepth", this.scene, "cubeDepth", {
+			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
+			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "origin",
+				"oldOrigin", "deadZoneCenter", "deadZoneWidth", "deadZoneHeight", "deadZoneDepth", "textPosition0", "textSize0", "textGlow0", "floatingOffset"]
+		});
+
+		this.cube = MeshBuilder.CreateBox("thecube", {
+			size: 1,
+			updatable: false,
+
+		},
+			this.scene);
+		// this.cube.position.z += 0.01;
+		// this.cube.scaling = new Vector3(0.05, 0.05, 0.05);
+		// this.cube.createNormals(true);
+		// this.cube.convertToFlatShadedMesh();
+		// this.cube.disableEdgesRendering();
+
+		this.cube.position = new Vector3(0, 4.5, 0);
+		this.cubeLight = new PointLight("cube light", this.cube.position, this.scene);
+		this.cubeLight.range = 2;
+		this.cubeLight.diffuse = Color3.Purple();
+		this.cubeLight.intensity = 2;
 
 		this.initializeVector3Pool();
 
 		this.applyQualitySettings();
 
 		this.buildDefaultSDF();
-
-		this.text = new TextRenderer(this, this.scene);
-
 	}
 
 	private initializeVector3Pool(): void {
@@ -125,6 +151,10 @@ export class Monolith {
 		vector.set(x, y, z);
 		this.pooledVectors.add(vector);
 		return vector;
+	}
+
+	public setCustomBounds(min: Vector3, max: Vector3) {
+		this.customBounds = { min, max };
 	}
 
 	private releaseVector3(vector: Vector3): void {
@@ -222,6 +252,26 @@ export class Monolith {
 		this.depthMaterial.setFloat("baseWaveIntensity", 0.02);
 		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.);
 
+		// const cubeMaterial = new StandardMaterial("cubeMaterial", this.scene);
+		// cubeMaterial.diffuseColor = Color3.White()
+		const cubeMaterial = new CubeMaterial("cubeMaterial", this.scene);
+		cubeMaterial.emissiveColor = this.light.diffuse;
+
+		// cubeMaterial.setFloat("time", 0);
+		// cubeMaterial.setFloat("animationSpeed", this.options.animationSpeed);
+		// cubeMaterial.setFloat("animationIntensity", this.options.animationIntensity);
+		// cubeMaterial.setVec3("worldCenter", Vector3.Zero());
+		//
+		// cubeMaterial.setFloat("baseWaveIntensity", 0.02);
+		// cubeMaterial.setFloat("mouseInfluenceRadius", 1.);
+		// //
+		// this.depthMaterialCube.setFloat("time", 0);
+		// this.depthMaterialCube.setFloat("animationSpeed", this.options.animationSpeed);
+		// this.depthMaterialCube.setFloat("animationIntensity", this.options.animationIntensity);
+		//
+		// this.depthMaterialCube.setFloat("baseWaveIntensity", 0.02);
+		// this.depthMaterialCube.setFloat("mouseInfluenceRadius", 1.);
+		this.cubeMaterial = cubeMaterial;
 
 		return shaderMaterial;
 	}
@@ -285,6 +335,10 @@ export class Monolith {
 				min: Vector3.Zero(),
 				max: Vector3.One()
 			};
+		}
+		if (this.customBounds) {
+			console.log("Using custom bounds:", this.customBounds);
+			return this.customBounds;
 		}
 
 		const testPoints = 20;
@@ -565,6 +619,9 @@ export class Monolith {
 			updatable: false
 		}, this.scene);
 
+
+
+
 		this.voxelPositions = [...positions];
 		const totalMatrices = positions.length;
 		const matrixBuffer = this.matrixBuffer;
@@ -615,6 +672,7 @@ export class Monolith {
 		}
 
 		baseCube.material = this.material;
+		this.cube.material = this.cubeMaterial;
 
 		if (baseCube.freezeWorldMatrix) {
 			baseCube.freezeWorldMatrix();
@@ -698,12 +756,30 @@ export class Monolith {
 	public update(time: number, camera: Camera) {
 		this.material.setFloat("time", time);
 		this.depthMaterial.setFloat("time", time);
+		// this.cubeMaterial.setFloat("time", time);
+		this.depthMaterialCube.setFloat("time", time);
 		this.lastUpdateValues.time = time;
+		const floatAmplitude = this.options.height * 0.01;
+		const floatY = Math.sin(time * 0.8) * floatAmplitude;
+		const floatX = Math.sin(time * 0.6) * floatAmplitude * 0.25;
+		const floatZ = Math.cos(time * 0.4) * floatAmplitude * 0.2;
+		if (this.voxelMesh) {
 
+			this.material.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+			// this.cubeMaterial.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+			this.depthMaterial.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+			// this.depthMaterialCube.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+
+			// this.voxelMesh.position.set(floatX, floatY + 4.5, floatZ);
+		}
+		this.cube.position.set(floatX, floatY + 4.5, floatZ);
+		// this.cube.rotation.y += floatY / 2;
 		const cursorChanged = !this.cursor.equals(this.lastCursorPosition || Vector3.Zero());
 		const oldCursorChanged = !this.oldcursor.equals(this.lastOldCursorPosition || Vector3.Zero());
 		this.material.setVec3("origin", this.cursor);
 		this.depthMaterial.setVector3("origin", this.cursor);
+		// this.cubeMaterial.setVec3("origin", this.cursor);
+		this.depthMaterialCube.setVector3("origin", this.cursor);
 		this.lastUpdateValues.cursorChanged = cursorChanged;
 
 		this.material.setVec3("oldOrigin", this.oldcursor);
@@ -712,6 +788,8 @@ export class Monolith {
 
 		this.material.setFloat("animationSpeed", this.options.animationSpeed);
 		this.depthMaterial.setFloat("animationSpeed", this.options.animationSpeed);
+		// this.cubeMaterial.setFloat("animationSpeed", 0);
+		this.depthMaterialCube.setFloat("animationSpeed", 0);
 		this.lastUpdateValues.animationSpeed = this.options.animationSpeed;
 
 		this.material.setFloat("animationIntensity", this.options.animationIntensity);
@@ -725,15 +803,15 @@ export class Monolith {
 
 		this.depthMaterial.setFloat("baseWaveIntensity", 0.02);
 		this.depthMaterial.setFloat("mouseInfluenceRadius", 0.8);
-
-		if (this.text) {
-			this.text.update();
-		}
-
+		this.material.setFloat("textureScale", 0.1);
 	}
 
 	public getMesh(): Mesh | null {
 		return this.voxelMesh;
+	}
+
+	public getMeshCube(): Mesh | null {
+		return this.cube;
 	}
 
 	public dispose() {
@@ -754,52 +832,6 @@ export class Monolith {
 
 	}
 
-	public addText(id: string, text: string, x: number = 0, y: number = 0, z: number = 3, size: number = 1.5) {
-		if (this.text) {
-			this.text.addTextZone(id, text, x, y, z, size);
-		}
-	}
-
-	public updateText(id: string, newText: string) {
-		if (this.text) {
-			this.text.updateTextZone(id, newText);
-		}
-	}
-
-	public removeText(id: string) {
-		if (this.text) {
-			this.text.removeTextZone(id);
-		}
-	}
-
-	public showText(id: string) {
-		if (this.text) {
-			this.text.showZone(id);
-		}
-	}
-
-	public setTextGlow(id: string, intensity: number) {
-		if (this.text) {
-			this.text.setGlow(id, intensity);
-		}
-	}
-
-	public hideAllText() {
-		if (this.text) {
-			this.text.hideAllText();
-		}
-	}
-
-	public setTextFace(id: string, face: 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom') {
-		if (this.text) {
-			this.text.setTextFace(id, face);
-		}
-	}
-
-	public getTextZones(): string[] {
-		return this.text?.getZones() || [];
-	}
-
 	public setPicking(value: boolean) {
 		this.isPickingEnabled = value;
 	}
@@ -807,6 +839,10 @@ export class Monolith {
 	public clearCaches() {
 		this.surfaceCache.clear();
 		this.distanceCache.clear();
+	}
+
+	public get light(): PointLight {
+		return this.cubeLight;
 	}
 }
 

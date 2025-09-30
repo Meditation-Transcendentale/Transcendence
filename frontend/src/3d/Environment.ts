@@ -55,7 +55,8 @@ export class Environment {
 
 		this.scene = new Scene(engine);
 		this.scene.autoClear = true; // Color buffer
-		this.scene.clearColor = new Color4(0., 0., 0., 1);
+		// this.scene.clearColor = new Color4(0., 0., 0., 1);
+		this.scene.clearColor = new Color4(158. / 256, 176. / 256, 188. / 256, 1.);
 
 		this.scene.setRenderingAutoClearDepthStencil(0, true);
 
@@ -202,7 +203,7 @@ export class Environment {
 		})
 
 
-		this.scene.clearColor = new Color4(0., 0., 0., 0.);
+		// this.scene.clearColor = new Color4(0., 0., 0., 0.);
 
 
 
@@ -213,6 +214,11 @@ export class Environment {
 		this.scene.imageProcessingConfiguration.applyByPostProcess = false;
 		this.scene.imageProcessingConfiguration.exposure = 1.;
 		this.scene.imageProcessingConfiguration.contrast = 1.;
+
+		whitelight.setEnabled(false);
+		redlight.setEnabled(false);
+		whitelight2.setEnabled(false);
+
 
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
@@ -226,10 +232,11 @@ export class Environment {
 		this.field.setLowPerf();
 
 
-		this.scene.onBeforeRenderObservable.add(() => {
+		this.scene.onBeforeCameraRenderObservable.add(() => {
 			this.update();
-		})
+		});
 	}
+
 
 	public render(time: number) {
 		this.deltaTime = time - this.lastTime;

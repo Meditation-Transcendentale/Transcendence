@@ -1,7 +1,7 @@
 import { gFriendList } from "./Friendlist";
 import { NotificationManager } from "./NotificationManager";
 import { Popup } from "./Popup";
-import { cdnRequest, getRequest, meRequest, patchRequest, postRequest } from "./requests";
+import { cdnRequest, deleteRequest, getRequest, meRequest, patchRequest, postRequest } from "./requests";
 import Stats from "./Stats";
 import { User } from "./User";
 
@@ -10,6 +10,7 @@ interface athHtmlReference {
 	setting: HTMLInputElement,
 	quit: HTMLInputElement,
 	friendlist: HTMLInputElement,
+	security: HTMLInputElement
 }
 
 class Ath {
@@ -19,6 +20,7 @@ class Ath {
 
 	private quit!: AthQuit;
 	private profile!: Profile;
+	private security!: Security;
 
 	private loaded = false;
 
@@ -32,17 +34,20 @@ class Ath {
 			menu: div.querySelector("#menu") as HTMLDivElement,
 			setting: div.querySelector("#setting-btn") as HTMLInputElement,
 			quit: div.querySelector("#quit-btn") as HTMLInputElement,
-			friendlist: div.querySelector("#friend-btn") as HTMLInputElement
+			friendlist: div.querySelector("#friend-btn") as HTMLInputElement,
+			security: div.querySelector("#security-btn") as HTMLInputElement
+
 		}
 		this.css = div.querySelector("link") as HTMLElement;
 
 		this.quit = new AthQuit(div);
 		this.profile = new Profile(div.querySelector("#profile-div") as HTMLDivElement);
+		this.security = new Security(div.querySelector("#security-window") as HTMLDivElement);
 		//this.setting = new AthSetting(div);
 		// this.notif = new AthNotif(div);
 
 		this.ref.setting.addEventListener('click', () => {
-			this.profile.load(User.username as string, true);
+			this.profile.load(User.uuid as string, true);
 		})
 
 		this.ref.quit.addEventListener("click", () => {
@@ -51,6 +56,10 @@ class Ath {
 
 		this.ref.friendlist.addEventListener("click", () => {
 			gFriendList.load();
+		})
+
+		this.ref.security.addEventListener("click", () => {
+			this.security.load();
 		})
 
 		gFriendList.init(div.querySelector("#friendlist-container") as HTMLDivElement);
@@ -191,6 +200,7 @@ class AthSetting {
 
 
 
+
 	}
 
 	public load(player: string) {
@@ -280,7 +290,7 @@ class Profile {
 			body.append('avatar', this.ref.avatarFile.files[0]);
 			patchRequest("update-info/avatar", body, false)
 				.then((json: any) => {
-					this.ref.avatar.src = `/cdn${json.data.cdnPath}`;
+					this.ref.avatar.src = `${json.data.cdnPath}`;
 				})
 				.catch((err) => {
 					NotificationManager.addText(err);
@@ -320,7 +330,7 @@ class Profile {
 			this.ref.avatarFile.disabled = false;
 			this.ref.usernameInput.value = User.username as string;
 			this.ref.edit.disabled = true;
-			this.ref.avatar.src = `/cdn${User.avatar}`;
+			this.ref.avatar.src = `${User.avatar}`;
 			this.ref.usernameContainer.appendChild(this.ref.usernameInput);
 			this.ref.usernameContainer.appendChild(this.ref.edit);
 			Popup.addPopup(this.div);
@@ -329,11 +339,91 @@ class Profile {
 				.then((json: any) => {
 					this.ref.avatarFile.disabled = true;
 					this.ref.username.innerText = json.data.username;
-					this.ref.avatar.src = `/cdn${json.data.avatar_path}`;
+					this.ref.avatar.src = `${json.data.avatar_path}`;
 					this.ref.usernameContainer.appendChild(this.ref.username);
 					Popup.addPopup(this.div);
 				})
 		}
+	}
+}
+
+interface securityHtmlReference {
+	password: HTMLInputElement,
+	twofa: HTMLInputElement,
+	twofaWindow: HTMLDivElement,
+	qrcode: HTMLImageElement
+}
+
+class Security {
+	private div: HTMLDivElement;
+	private ref: securityHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+
+		this.ref = {
+			password: div.querySelector("#new-password") as HTMLInputElement,
+			twofa: div.querySelector("#enable-2fa") as HTMLInputElement,
+			twofaWindow: div.querySelector("#window-2fa") as HTMLDivElement,
+			qrcode: div.querySelector("#qrcode-2fa") as HTMLImageElement
+		}
+
+		this.ref.twofaWindow.remove();
+
+		this.ref.password.addEventListener("keypress", (ev) => {
+			if (ev.key == "Enter" && this.ref.password.value.length > 0) {
+				Popup.addValidation(true, User.twofa != 0, (p: string, t: string, success: any) => {
+					patchRequest("update-info/password", { password: p, newPassword: this.ref.password.value, token: t })
+						.then((json: any) => {
+							success();
+							NotificationManager.addText(json.message);
+						})
+						.catch((err) => {
+							err.json()
+								.then((json: any) => { NotificationManager.addText(json.message) });
+						})
+				})
+			}
+		})
+
+		this.ref.twofa.addEventListener("change", () => {
+			Popup.addValidation(true, false, (p: string, t: string, success: any) => {
+				if (User.twofa == 0) {
+					postRequest("update-info/enable-2fa", { password: p })
+						.then((json: any) => {
+							success();
+							User.twofa = 1;
+							NotificationManager.addText(json.message);
+							const base64 = (json.qrCode as string).substring("data:image/png;base64,".length)
+							this.ref.qrcode.src = "data:image/png;base64," + base64;;
+							Popup.addPopup(this.ref.twofaWindow);
+						})
+						.catch((err: any) => {
+							err.json()
+								.then((json: any) => { NotificationManager.addText(json.message) });
+						})
+				} else {
+					deleteRequest("update-info/disable-2fa", { password: p })
+						.then((json: any) => {
+							success();
+							User.twofa = 0;
+							NotificationManager.addText(json.message);
+						})
+						.catch((err: any) => {
+							err.json()
+								.then((json: any) => { NotificationManager.addText(json.message) });
+						})
+
+				}
+			})
+		})
+	}
+
+	public load() {
+		Popup.removePopup();
+		this.ref.password.value = "";
+		this.ref.twofa.checked = User.twofa != 0;
+		Popup.addPopup(this.div);
 	}
 }
 

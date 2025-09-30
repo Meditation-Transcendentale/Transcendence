@@ -27,7 +27,7 @@ class RouterC {
 
 	public AUTHENTIFICATION: boolean = true;
 
-	private comebackRoute: {path: string, restore: boolean, history: boolean};
+	private comebackRoutePath: string;
 
 	constructor() {
 		this.initRoute = null;
@@ -35,19 +35,11 @@ class RouterC {
 		this.oldURL = "";
 		this.currentPage = null;
 		this.parser = new DOMParser();
+		this.comebackRoutePath = "/home";
+		// this.comebackRoute = {path: `/home`, restore: false, history: true};
 
 		this.routes = new Map<string, routePage>;
 
-		this.routes.set("/login", {
-			html: "/login",
-			ts: "./Login",
-			callback: (url: URL) => { this.loadInMain(url) }
-		} as routePage);
-		this.routes.set("/register", {
-			html: "/register",
-			ts: "./Register",
-			callback: (url: URL) => { this.loadInMain(url) }
-		} as routePage);
 		this.routes.set("/home", {
 			html: "/home",
 			ts: "./Home",
@@ -103,6 +95,12 @@ class RouterC {
 			ts: "./Tournament",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
+		this.routes.set("/auth", { 
+			html: "/auth",
+			ts: "./Auth",
+			callback: (url: URL) => { this.loadInMain(url) }
+		} as routePage);
+
 
 
 
@@ -144,7 +142,7 @@ class RouterC {
 			//this.oldURL = url.href;
 			await meRequest("no-cache")
 				.then(() => {
-					if (url.pathname == "/login" || url.pathname == "/register" || (this.first && url.pathname == "/cajoue")) {
+					if (url.pathname == "/auth" || (this.first && url.pathname == "/cajoue")) {
 						url.pathname = "/home";
 						url.search = "";
 					}
@@ -153,8 +151,8 @@ class RouterC {
 				})
 				.catch(() => {
 					this.oldURL = url.href;
-					if (url.pathname != "/login" && url.pathname != "/register") {
-						url.pathname = "/login";
+					if (url.pathname != "/auth") {
+						url.pathname = "/auth";
 						url.search = "";
 						if (!this.first) {
 							meReject();
@@ -164,7 +162,7 @@ class RouterC {
 					}
 				})
 		} else {
-			if (url.pathname == "/login" || url.pathname == "/register") {
+			if (url.pathname == "/auth" ) {
 				url.pathname = "/home";
 				url.search = "";
 			}
@@ -175,7 +173,7 @@ class RouterC {
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
 
 		//url.pathname = "/home";
-		if (url.pathname !== "/login" && url.pathname !== "/register") {
+		if (url.pathname !== "/auth" ) {
 			this.loadAth();
 		}
 		this.routes.get(url.pathname)?.callback(url);
@@ -190,17 +188,12 @@ class RouterC {
 		const route = this.routes.get(url.pathname);
 		console.log(route);
 		if (!route?.instance) {
-			console.log("loading HTML");
 			const html = await this.getHTML(route!.html);
-			console.log("loading TS");
 			const ts = await this.getTS(route!.ts);
-			console.log("loaded TS");
 			route!.instance = new ts.default(html);
 		}
 		await this.currentPage?.unload();
-		console.log("UNLOADED");
 		this.currentPage = (route?.instance as IPage);
-		console.log("LOADING");
 		this.currentPage.load(url.searchParams);
 	}
 
@@ -235,12 +228,18 @@ class RouterC {
 		return ts;
 	}
 
-	public setComeback(path: string, restore: boolean = false, history: boolean = true) {
-		this.comebackRoute = {path: path, restore: restore, history: history};
+	public setComeback(comeBackPath: string, restore: boolean = false, history: boolean = true) {
+		this.comebackRoutePath = comeBackPath;
 	}
 
 	public comeback() {
-		this.nav(this.comebackRoute.path, this.comebackRoute.restore, this.comebackRoute.history);
+		const tempPath = this.comebackRoutePath;
+		this.comebackRoutePath = "/home";
+		this.nav(tempPath, false, true);
+	}
+
+	public getComebackRoute () {
+		return (this.comebackRoutePath);
 	}
 
 }

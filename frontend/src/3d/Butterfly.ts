@@ -1,5 +1,5 @@
 import { GlowLayer, LoadAssetContainerAsync, Matrix, Mesh, Scene, TransformNode, Vector3 } from "@babylonImport";
-import { ButterflyMaterial } from "./Shader/Shader";
+import { ButterflyMaterial } from "./Shader/ButterflyMaterial";
 
 export class Butterfly {
 
@@ -26,13 +26,13 @@ export class Butterfly {
 
 	private speed = 0.8;
 
-	private octree: OctreeBlock;
+	// private octree: OctreeBlock;
 	private flock: number = 1;
 	private disperse: number = 0;
 
 	public glowMat!: ButterflyMaterial;
 
-	public origin: Vector3;
+	// public origin: Vector3;
 
 	private grid!: Grid2D;
 
@@ -40,18 +40,17 @@ export class Butterfly {
 
 
 
-	constructor(scene: Scene, origin: Vector3) {
+	constructor(scene: Scene, origin?: Vector3) {
 		this.scene = scene;
-		this.origin = origin;
+		// this.origin = origin;
 
 		this.material = new ButterflyMaterial("butterfly", this.scene);
-		this.glowMat = new ButterflyMaterial("butterfly", this.scene);
 
 		this.root = new TransformNode("butterflyRoot", this.scene);
-		this.root.position = new Vector3(0, 1, -20);
-		this.root.scaling = new Vector3(2, 2, 2);
+		this.root.position = new Vector3(0, 1.5, 0);
+		this.root.scaling = new Vector3(0.5, 0.5, 0.5);
 
-		this.octree = new OctreeBlock(5, new Vector3(0, 1, 0), 11);
+		// this.octree = new OctreeBlock(5, new Vector3(0, 1, 0), 11);
 		this.grid = new Grid2D({
 			width: 42,
 			depth: 42,
@@ -83,7 +82,7 @@ export class Butterfly {
 		this.mesh.material = this.material;
 		this.mesh.alwaysSelectAsActiveMesh = true;
 
-		this.mesh.setEnabled(false);
+		// this.mesh.setEnabled(false);
 		this.thinInstance(this.n, 30);
 		//this.octree.print();
 
@@ -104,7 +103,7 @@ export class Butterfly {
 			this.once = 1;
 		}
 		this.material.setFloat("time", time);
-		this.glowMat.setFloat("time", time);
+		// this.glowMat.setFloat("time", time);
 		//const bf = performance.now();
 		this.applyForcesGrid(deltaTime);
 		//const af = performance.now();
@@ -117,7 +116,7 @@ export class Butterfly {
 		const repel = new Vector3();
 		const align = new Vector3();
 		const flock = new Vector3();
-		const cursor = new Vector3();
+		// const cursor = new Vector3();
 
 		const speed = this.speed * deltaTime;
 
@@ -151,17 +150,18 @@ export class Butterfly {
 				flock.subtractInPlace(ff > 0 ? ip : v0);
 				align.subtractInPlace(ff > 0 ? iv : v0);
 
-				this.origin.subtractToRef(ip, cursor);
-				const cursorL = cursor.length();
-				cursor.scaleInPlace(cursorL < 2 ? 0.02 : 0.);
-				const cursorField = cursorL < 2.5 ? 0 : 1.;
+				// this.origin.subtractToRef(ip, cursor);
+				// const cursorL = cursor.length();
+				// cursor.scaleInPlace(cursorL < 2 ? 0.02 : 0.);
+				// const cursorField = cursorL < 2.5 ? 0 : 1.;
 
-				flock.scaleInPlace(0.5 * speed * this.flock * cursorField);
+				// flock.scaleInPlace(0.5 * speed * this.flock * cursorField);
+				flock.scaleInPlace(0.5 * speed * this.flock);
 				// flock.subtractInPlace(onEdge == true ? ip.scale(speed)  : v0);
 				align.scaleInPlace(1 * speed);
 				repel.scaleInPlace(2 * speed);
 
-				iv.addInPlace(align).addInPlace(flock).addInPlace(repel).addInPlace(cursor);
+				iv.addInPlace(align).addInPlace(flock).addInPlace(repel);//.addInPlace(cursor);
 				const l = iv.length();
 				//iv.scaleInPlace((l > this.speed * 2 ? this.speed * 1.2 / l : 1) * (l < this.speed ? this.speed / l : 1));
 				if (l > speed * 2) {
@@ -275,7 +275,6 @@ export class Butterfly {
 
 			this.positions.push(position);
 			this.velocities.push(v);
-			this.octree.add(i, position);
 			this.directions[i * 3] = v.x;
 			this.directions[i * 3 + 1] = v.z;
 			this.directions[i * 3 + 2] = 1;

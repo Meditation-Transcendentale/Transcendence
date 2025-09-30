@@ -3718,14 +3718,245 @@ export const shared = $root.shared = (() => {
         return MatchStart;
     })();
 
+    shared.MatchScoreUpdate = (function() {
+
+        /**
+         * Properties of a MatchScoreUpdate.
+         * @memberof shared
+         * @interface IMatchScoreUpdate
+         * @property {Array.<number>|null} [score] MatchScoreUpdate score
+         */
+
+        /**
+         * Constructs a new MatchScoreUpdate.
+         * @memberof shared
+         * @classdesc Represents a MatchScoreUpdate.
+         * @implements IMatchScoreUpdate
+         * @constructor
+         * @param {shared.IMatchScoreUpdate=} [properties] Properties to set
+         */
+        function MatchScoreUpdate(properties) {
+            this.score = [];
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * MatchScoreUpdate score.
+         * @member {Array.<number>} score
+         * @memberof shared.MatchScoreUpdate
+         * @instance
+         */
+        MatchScoreUpdate.prototype.score = $util.emptyArray;
+
+        /**
+         * Creates a new MatchScoreUpdate instance using the specified properties.
+         * @function create
+         * @memberof shared.MatchScoreUpdate
+         * @static
+         * @param {shared.IMatchScoreUpdate=} [properties] Properties to set
+         * @returns {shared.MatchScoreUpdate} MatchScoreUpdate instance
+         */
+        MatchScoreUpdate.create = function create(properties) {
+            return new MatchScoreUpdate(properties);
+        };
+
+        /**
+         * Encodes the specified MatchScoreUpdate message. Does not implicitly {@link shared.MatchScoreUpdate.verify|verify} messages.
+         * @function encode
+         * @memberof shared.MatchScoreUpdate
+         * @static
+         * @param {shared.IMatchScoreUpdate} message MatchScoreUpdate message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        MatchScoreUpdate.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.score != null && message.score.length) {
+                writer.uint32(/* id 1, wireType 2 =*/10).fork();
+                for (let i = 0; i < message.score.length; ++i)
+                    writer.int32(message.score[i]);
+                writer.ldelim();
+            }
+            return writer;
+        };
+
+        /**
+         * Encodes the specified MatchScoreUpdate message, length delimited. Does not implicitly {@link shared.MatchScoreUpdate.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.MatchScoreUpdate
+         * @static
+         * @param {shared.IMatchScoreUpdate} message MatchScoreUpdate message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        MatchScoreUpdate.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a MatchScoreUpdate message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.MatchScoreUpdate
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.MatchScoreUpdate} MatchScoreUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        MatchScoreUpdate.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.MatchScoreUpdate();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.score && message.score.length))
+                            message.score = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.score.push(reader.int32());
+                        } else
+                            message.score.push(reader.int32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a MatchScoreUpdate message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.MatchScoreUpdate
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.MatchScoreUpdate} MatchScoreUpdate
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        MatchScoreUpdate.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a MatchScoreUpdate message.
+         * @function verify
+         * @memberof shared.MatchScoreUpdate
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        MatchScoreUpdate.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.score != null && message.hasOwnProperty("score")) {
+                if (!Array.isArray(message.score))
+                    return "score: array expected";
+                for (let i = 0; i < message.score.length; ++i)
+                    if (!$util.isInteger(message.score[i]))
+                        return "score: integer[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a MatchScoreUpdate message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.MatchScoreUpdate
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.MatchScoreUpdate} MatchScoreUpdate
+         */
+        MatchScoreUpdate.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.MatchScoreUpdate)
+                return object;
+            let message = new $root.shared.MatchScoreUpdate();
+            if (object.score) {
+                if (!Array.isArray(object.score))
+                    throw TypeError(".shared.MatchScoreUpdate.score: array expected");
+                message.score = [];
+                for (let i = 0; i < object.score.length; ++i)
+                    message.score[i] = object.score[i] | 0;
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a MatchScoreUpdate message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.MatchScoreUpdate
+         * @static
+         * @param {shared.MatchScoreUpdate} message MatchScoreUpdate
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        MatchScoreUpdate.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults)
+                object.score = [];
+            if (message.score && message.score.length) {
+                object.score = [];
+                for (let j = 0; j < message.score.length; ++j)
+                    object.score[j] = message.score[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this MatchScoreUpdate to JSON.
+         * @function toJSON
+         * @memberof shared.MatchScoreUpdate
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        MatchScoreUpdate.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for MatchScoreUpdate
+         * @function getTypeUrl
+         * @memberof shared.MatchScoreUpdate
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        MatchScoreUpdate.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.MatchScoreUpdate";
+        };
+
+        return MatchScoreUpdate;
+    })();
+
     shared.MatchEnd = (function() {
 
         /**
          * Properties of a MatchEnd.
          * @memberof shared
          * @interface IMatchEnd
-         * @property {number|null} [winnerId] MatchEnd winnerId
+         * @property {string|null} [winnerId] MatchEnd winnerId
+         * @property {string|null} [loserId] MatchEnd loserId
          * @property {Array.<number>|null} [score] MatchEnd score
+         * @property {string|null} [forfeitId] MatchEnd forfeitId
          */
 
         /**
@@ -3746,11 +3977,19 @@ export const shared = $root.shared = (() => {
 
         /**
          * MatchEnd winnerId.
-         * @member {number} winnerId
+         * @member {string} winnerId
          * @memberof shared.MatchEnd
          * @instance
          */
-        MatchEnd.prototype.winnerId = 0;
+        MatchEnd.prototype.winnerId = "";
+
+        /**
+         * MatchEnd loserId.
+         * @member {string} loserId
+         * @memberof shared.MatchEnd
+         * @instance
+         */
+        MatchEnd.prototype.loserId = "";
 
         /**
          * MatchEnd score.
@@ -3759,6 +3998,14 @@ export const shared = $root.shared = (() => {
          * @instance
          */
         MatchEnd.prototype.score = $util.emptyArray;
+
+        /**
+         * MatchEnd forfeitId.
+         * @member {string} forfeitId
+         * @memberof shared.MatchEnd
+         * @instance
+         */
+        MatchEnd.prototype.forfeitId = "";
 
         /**
          * Creates a new MatchEnd instance using the specified properties.
@@ -3785,13 +4032,17 @@ export const shared = $root.shared = (() => {
             if (!writer)
                 writer = $Writer.create();
             if (message.winnerId != null && Object.hasOwnProperty.call(message, "winnerId"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.winnerId);
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.winnerId);
+            if (message.loserId != null && Object.hasOwnProperty.call(message, "loserId"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.loserId);
             if (message.score != null && message.score.length) {
-                writer.uint32(/* id 2, wireType 2 =*/18).fork();
+                writer.uint32(/* id 3, wireType 2 =*/26).fork();
                 for (let i = 0; i < message.score.length; ++i)
                     writer.int32(message.score[i]);
                 writer.ldelim();
             }
+            if (message.forfeitId != null && Object.hasOwnProperty.call(message, "forfeitId"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.forfeitId);
             return writer;
         };
 
@@ -3829,10 +4080,14 @@ export const shared = $root.shared = (() => {
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.winnerId = reader.int32();
+                        message.winnerId = reader.string();
                         break;
                     }
                 case 2: {
+                        message.loserId = reader.string();
+                        break;
+                    }
+                case 3: {
                         if (!(message.score && message.score.length))
                             message.score = [];
                         if ((tag & 7) === 2) {
@@ -3841,6 +4096,10 @@ export const shared = $root.shared = (() => {
                                 message.score.push(reader.int32());
                         } else
                             message.score.push(reader.int32());
+                        break;
+                    }
+                case 4: {
+                        message.forfeitId = reader.string();
                         break;
                     }
                 default:
@@ -3879,8 +4138,11 @@ export const shared = $root.shared = (() => {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.winnerId != null && message.hasOwnProperty("winnerId"))
-                if (!$util.isInteger(message.winnerId))
-                    return "winnerId: integer expected";
+                if (!$util.isString(message.winnerId))
+                    return "winnerId: string expected";
+            if (message.loserId != null && message.hasOwnProperty("loserId"))
+                if (!$util.isString(message.loserId))
+                    return "loserId: string expected";
             if (message.score != null && message.hasOwnProperty("score")) {
                 if (!Array.isArray(message.score))
                     return "score: array expected";
@@ -3888,6 +4150,9 @@ export const shared = $root.shared = (() => {
                     if (!$util.isInteger(message.score[i]))
                         return "score: integer[] expected";
             }
+            if (message.forfeitId != null && message.hasOwnProperty("forfeitId"))
+                if (!$util.isString(message.forfeitId))
+                    return "forfeitId: string expected";
             return null;
         };
 
@@ -3904,7 +4169,9 @@ export const shared = $root.shared = (() => {
                 return object;
             let message = new $root.shared.MatchEnd();
             if (object.winnerId != null)
-                message.winnerId = object.winnerId | 0;
+                message.winnerId = String(object.winnerId);
+            if (object.loserId != null)
+                message.loserId = String(object.loserId);
             if (object.score) {
                 if (!Array.isArray(object.score))
                     throw TypeError(".shared.MatchEnd.score: array expected");
@@ -3912,6 +4179,8 @@ export const shared = $root.shared = (() => {
                 for (let i = 0; i < object.score.length; ++i)
                     message.score[i] = object.score[i] | 0;
             }
+            if (object.forfeitId != null)
+                message.forfeitId = String(object.forfeitId);
             return message;
         };
 
@@ -3930,15 +4199,22 @@ export const shared = $root.shared = (() => {
             let object = {};
             if (options.arrays || options.defaults)
                 object.score = [];
-            if (options.defaults)
-                object.winnerId = 0;
+            if (options.defaults) {
+                object.winnerId = "";
+                object.loserId = "";
+                object.forfeitId = "";
+            }
             if (message.winnerId != null && message.hasOwnProperty("winnerId"))
                 object.winnerId = message.winnerId;
+            if (message.loserId != null && message.hasOwnProperty("loserId"))
+                object.loserId = message.loserId;
             if (message.score && message.score.length) {
                 object.score = [];
                 for (let j = 0; j < message.score.length; ++j)
                     object.score[j] = message.score[j];
             }
+            if (message.forfeitId != null && message.hasOwnProperty("forfeitId"))
+                object.forfeitId = message.forfeitId;
             return object;
         };
 
@@ -3969,6 +4245,227 @@ export const shared = $root.shared = (() => {
         };
 
         return MatchEnd;
+    })();
+
+    shared.MatchEndBr = (function() {
+
+        /**
+         * Properties of a MatchEndBr.
+         * @memberof shared
+         * @interface IMatchEndBr
+         * @property {Array.<string>|null} [rank] MatchEndBr rank
+         */
+
+        /**
+         * Constructs a new MatchEndBr.
+         * @memberof shared
+         * @classdesc Represents a MatchEndBr.
+         * @implements IMatchEndBr
+         * @constructor
+         * @param {shared.IMatchEndBr=} [properties] Properties to set
+         */
+        function MatchEndBr(properties) {
+            this.rank = [];
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * MatchEndBr rank.
+         * @member {Array.<string>} rank
+         * @memberof shared.MatchEndBr
+         * @instance
+         */
+        MatchEndBr.prototype.rank = $util.emptyArray;
+
+        /**
+         * Creates a new MatchEndBr instance using the specified properties.
+         * @function create
+         * @memberof shared.MatchEndBr
+         * @static
+         * @param {shared.IMatchEndBr=} [properties] Properties to set
+         * @returns {shared.MatchEndBr} MatchEndBr instance
+         */
+        MatchEndBr.create = function create(properties) {
+            return new MatchEndBr(properties);
+        };
+
+        /**
+         * Encodes the specified MatchEndBr message. Does not implicitly {@link shared.MatchEndBr.verify|verify} messages.
+         * @function encode
+         * @memberof shared.MatchEndBr
+         * @static
+         * @param {shared.IMatchEndBr} message MatchEndBr message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        MatchEndBr.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.rank != null && message.rank.length)
+                for (let i = 0; i < message.rank.length; ++i)
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.rank[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified MatchEndBr message, length delimited. Does not implicitly {@link shared.MatchEndBr.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.MatchEndBr
+         * @static
+         * @param {shared.IMatchEndBr} message MatchEndBr message or plain object to encode
+         * @param {$protobuf.default.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.default.Writer} Writer
+         */
+        MatchEndBr.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a MatchEndBr message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.MatchEndBr
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.MatchEndBr} MatchEndBr
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        MatchEndBr.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.MatchEndBr();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.rank && message.rank.length))
+                            message.rank = [];
+                        message.rank.push(reader.string());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a MatchEndBr message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.MatchEndBr
+         * @static
+         * @param {$protobuf.default.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.MatchEndBr} MatchEndBr
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.default.util.ProtocolError} If required fields are missing
+         */
+        MatchEndBr.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a MatchEndBr message.
+         * @function verify
+         * @memberof shared.MatchEndBr
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        MatchEndBr.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.rank != null && message.hasOwnProperty("rank")) {
+                if (!Array.isArray(message.rank))
+                    return "rank: array expected";
+                for (let i = 0; i < message.rank.length; ++i)
+                    if (!$util.isString(message.rank[i]))
+                        return "rank: string[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a MatchEndBr message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.MatchEndBr
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.MatchEndBr} MatchEndBr
+         */
+        MatchEndBr.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.MatchEndBr)
+                return object;
+            let message = new $root.shared.MatchEndBr();
+            if (object.rank) {
+                if (!Array.isArray(object.rank))
+                    throw TypeError(".shared.MatchEndBr.rank: array expected");
+                message.rank = [];
+                for (let i = 0; i < object.rank.length; ++i)
+                    message.rank[i] = String(object.rank[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a MatchEndBr message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.MatchEndBr
+         * @static
+         * @param {shared.MatchEndBr} message MatchEndBr
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        MatchEndBr.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.arrays || options.defaults)
+                object.rank = [];
+            if (message.rank && message.rank.length) {
+                object.rank = [];
+                for (let j = 0; j < message.rank.length; ++j)
+                    object.rank[j] = message.rank[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this MatchEndBr to JSON.
+         * @function toJSON
+         * @memberof shared.MatchEndBr
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        MatchEndBr.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.default.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for MatchEndBr
+         * @function getTypeUrl
+         * @memberof shared.MatchEndBr
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        MatchEndBr.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.MatchEndBr";
+        };
+
+        return MatchEndBr;
     })();
 
     shared.PhysicsRequest = (function() {

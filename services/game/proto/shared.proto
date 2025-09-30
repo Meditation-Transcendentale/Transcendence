@@ -86,9 +86,19 @@ message MatchQuit { string uuid = 1; }
 
 message MatchStart {}
 
+message MatchScoreUpdate {
+  repeated int32 score = 1;
+}
+
 message MatchEnd { 
-  int32 winnerId = 1;
-  repeated int32 score = 2;
+  string winnerId = 1;
+  string loserId = 2;
+  repeated int32 score = 3;
+  string forfeitId = 4;
+}
+
+message MatchEndBr { 
+  repeated string rank = 1;
 }
 
 message PhysicsRequest {

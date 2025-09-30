@@ -4,6 +4,7 @@
 		<input id="setting-btn" type="button" value="U" />
 		<input id="quit-btn" type="button" value="Q" />
 		<input id="friend-btn" type="button" value="F" />
+		<input id="security-btn" type="button" value="S" />
 	</div>
 	<div id="profile-div">
 		<label class="image-edit">
@@ -71,6 +72,17 @@
 				<div id="friendlist-search-result">
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<div id="security-window" class="window">
+		<label for="new-password">New Password</label>
+		<input name="new-password" id="new-password" type="password" placeholder="......" autocomplete="off"/>
+		<label id="2fa-label" for="2fa-checker">Enable 2FA:</label>
+		<input type="checkbox" name="2fa-checkbox" id="enable-2fa"/>
+		<div id="window-2fa" class="window">
+			<img id="qrcode-2fa" width="200" />
+			<span>Scan the QR Code using Google Authenticator</span>
 		</div>
 	</div>
 

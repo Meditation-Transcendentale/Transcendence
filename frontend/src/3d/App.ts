@@ -6,7 +6,8 @@ import { Vue } from "../Vue";
 import { css3dObject, CSSRenderer } from "./CSSRenderer";
 import { Interpolator } from "./Interpolator";
 
-import { UIaddDetails, UIaddVec3 } from "./UtilsUI";
+import { UIaddDetails, UIaddSliderVec3, UIaddVec3 } from "./UtilsUI";
+import { hash33 } from "./PerlinWorley";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -38,7 +39,7 @@ class app3d {
 			antialias: true,
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
-		this.engine.setHardwareScalingLevel(8.0);
+		// this.engine.setHardwareScalingLevel(2.0);
 		this.engine.getCaps().textureFloatRender = true;
 
 		window.addEventListener('resize', () => {
@@ -46,6 +47,10 @@ class app3d {
 			this.environment.resize();
 			this.cssRenderer.resize(window.innerWidth, window.innerHeight)
 		})
+
+		UIaddDetails("MISC", null, "misc-details");
+		UIaddDetails("COLORS", null, "colors-details");
+		UIaddDetails("LIGHTS", null, "lights-details");
 
 		this.environment = new Environment(this.engine, this.canvas);
 		this.fps = document.getElementById('fps') as HTMLElement;

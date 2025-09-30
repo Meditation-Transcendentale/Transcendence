@@ -3,7 +3,8 @@ import {
     decodeMatchEnd,
     encodeTournamentServerMessage,
     encodeMatchCreateRequest,
-    decodeMatchCreateResponse
+    decodeMatchCreateResponse,
+    decodeMatchScoreUpdate
 } from './proto/helper.js';
 import natsClient from './natsClient.js';
 
@@ -29,9 +30,9 @@ class MatchNode {
         this.creating = false;
     }
 
-    setResult(matchData) {
-        this.score = matchData.score ?? null;
-        this.winnerId = matchData.winnerId === 0 ? this.player1Id : this.player2Id;
+    setResult(matchData, forfeit) {
+        this.score = {values: matchData.score ?? null, forfeit: forfeit ? true : false} ;
+        this.winnerId = matchData.winnerId === this.player1Id ? this.player1Id : this.player2Id;
         if (this.parent) this.parent.receiveWinner(this.winnerId);
     }
 
@@ -86,11 +87,26 @@ class Tournament {
 
             const decoded = decodeMatchEnd(data);
             match.setResult(decoded);
+            this.getPlayerByUuid(decoded.loserId).isEliminated = true;
+            if (decoded.forfeitId) this.getPlayerByUuid(decoded.forfeitId).isConnected = false;
 
             this.autoAdvanceWalkovers();
             this.sendUpdate();
             this.maybeStartReadyCheck();
         });
+
+        natsClient.subscribe('games.tournament.*.score', (data, msg) => {
+            const parts = String(msg.subject || '').split('.');
+            const gameId = parts[2];
+            if (!gameId) return;
+
+            const match = this.findMatchByGameId(this.root, gameId);
+            if (!match) return;
+
+            const decoded = decodeMatchScoreUpdate(data);
+            match.score = {values: decoded.score, forfeit: false};
+            this.sendUpdate();
+        })
     }
 
     sendReadyCheck() {

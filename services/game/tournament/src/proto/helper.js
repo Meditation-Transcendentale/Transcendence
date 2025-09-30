@@ -162,3 +162,7 @@ export function encodeTournamentClientMessage(payload) {
 export function decodeTournamentClientMessage(buffer) {
 	return Proto.tournament.TournamentClientMessage.decode(buffer);
 }
+
+export function decodeMatchScoreUpdate(buffer) {
+	return Proto.shared.ScoreUpdate.decode(buffer);
+}

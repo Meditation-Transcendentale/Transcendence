@@ -1,5 +1,5 @@
 import { Camera, Color3, EffectRenderer, EffectWrapper, Engine, Matrix, Mesh, MeshBuilder, PointLight, RenderTargetTexture, Scene, ShaderMaterial, Vector2, Vector3, Vector4 } from "@babylonImport";
-import { UIaddDetails, UIaddSlider } from "./UtilsUI";
+import { UIaddColor, UIaddDetails, UIaddSlider } from "./UtilsUI";
 
 export class Picker {
 	private scene: Scene;
@@ -26,11 +26,13 @@ export class Picker {
 
 	private ballDiameter = 1.5;
 	private ballHit!: boolean;
-	private ballLight: PointLight;
+	private ballLight!: PointLight;
 
 	private enabled: boolean;
 
 	private pointer: Vector2;
+
+	private ballOrigin: Vector3;
 
 	constructor(scene: Scene, camera: Camera, effectRenderer: EffectRenderer, position: Vector3, size: Vector2) {
 		this.scene = scene;
@@ -55,13 +57,13 @@ export class Picker {
 			useShaderStore: true,
 			fragmentShader: "picker",
 			samplers: ["textureSampler"],
-			uniforms: ["pick", "attenuation", "radius", "origin"]
+			uniforms: ["attenuation", "radius", "origin"]
 		});
 
 		this.cursor = new Vector2();
 		this.pick = 0;
 		this.attenuation = 0.3;
-		this.radius = 1.1 / this.groundSize.x;
+		this.radius = 1.6 / this.groundSize.x;
 		this.oldTime = 0.;
 
 		this.pickerEffect.onApplyObservable.add(() => {
@@ -69,7 +71,6 @@ export class Picker {
 			this.deltaTime = t - this.oldTime;
 			this.oldTime = t;
 			this.pickerEffect.effect.setTexture("textureSampler", this.rtA);
-			this.pickerEffect.effect.setFloat("pick", this.pick);
 			this.pickerEffect.effect.setFloat("attenuation", Math.pow(this.attenuation, this.deltaTime));
 			this.pickerEffect.effect.setFloat("radius", this.radius);
 			this.pickerEffect.effect.setVector2("origin", this.cursor);
@@ -83,11 +84,13 @@ export class Picker {
 		this.cursor.y = (this.meshBall.position.z / this.groundSize.y) + 0.5;
 		this.pick = 1;
 
+		this.ballOrigin = new Vector3(0, this.groundPosition.y, 0);
+
 	}
 
-	public render() {
+	public render(deltaTime: number) {
 		if (!this.enabled) { return; }
-		this.moveBall();
+		this.moveBall(Math.min(deltaTime, 1.));
 		this.swapRT();
 		this.effectRenderer.render(this.pickerEffect, this.rtB);
 	}
@@ -104,6 +107,10 @@ export class Picker {
 		window.addEventListener("mousemove", (ev) => {
 			this.pointer.set(ev.clientX, ev.clientY);
 		})
+
+		window.addEventListener("mouseout", () => {
+			this.ballHit = false;
+		})
 	}
 
 	private initMesh() {
@@ -115,7 +122,10 @@ export class Picker {
 			uniforms: ["world", "viewProjection", "color"]
 		})
 
-		this.material.setVector4("color", new Vector4(12., 0., 0., 0.2));
+		// this.material.setVector4("color", new Vector4(12., 0., 0., 0.2));
+		const c = Color3.FromHexString("#3b3d7d");
+		const v = new Vector4(c.r, c.g, c.b, 0.2);
+		this.material.setVector4("color", v);
 		this.material.alphaMode = Engine.ALPHA_DISABLE;
 
 		this.material.onBindObservable.add
@@ -124,8 +134,10 @@ export class Picker {
 		this.meshBall.position.set(0, this.groundPosition.y, 4);
 
 		this.ballLight = new PointLight("ball light", this.meshBall.position, this.scene);
-		this.ballLight.diffuse = new Color3(8., 0., 0.);
+		// this.ballLight.diffuse = new Color3(3., 0., 0.);
+		this.ballLight.diffuse = c.clone();
 		this.ballLight.specular = this.ballLight.diffuse;
+		this.ballLight.intensity = 2;
 		this.ballLight.range = 3;
 		// p.setEnabled(false);
 
@@ -148,6 +160,7 @@ export class Picker {
 			max: this.groundSize.x,
 			div: details
 		}, (n: number) => { this.radius = n / this.groundSize.x });
+
 	}
 
 
@@ -175,8 +188,19 @@ export class Picker {
 		return Math.sqrt(xx * xx + yy * yy) < px * 0.5;
 	}
 
-	private moveBall() {
-		if (!this.ballHit || !this.enabled) {
+	private moveBall(deltaTime: number) {
+		if (!this.enabled) {
+			return;
+		}
+		if (!this.ballHit) {
+
+			this.meshBall.position.addInPlaceFromFloats(
+				(this.ballOrigin.x - this.mesh.position.x) * deltaTime * 1,
+				0,
+				(this.ballOrigin.z - this.mesh.position.z) * deltaTime * 1,
+			);
+			this.cursor.x = (this.meshBall.position.x / (this.groundSize.x)) + 0.5;
+			this.cursor.y = (this.meshBall.position.z / (this.groundSize.y)) + 0.5;
 			return;
 		}
 		const ray = this.scene.createPickingRay(this.pointer.x, this.pointer.y).direction;
@@ -186,8 +210,7 @@ export class Picker {
 		let y = this.camera.position.z - ray.z * delta;
 		this.cursor.x = (x / (this.groundSize.x)) + 0.5;
 		this.cursor.y = (y / (this.groundSize.y)) + 0.5;
-		this.pick = ray.y < 0. && Math.abs(this.cursor.x - 0.5) < 0.5 && Math.abs(this.cursor.y - 0.5) < .5 ? 1 : 0;
-		if (Math.abs(x) < this.groundSize.x * 0.6 && Math.abs(y) < this.groundSize.y * 0.6) {
+		if (Math.abs(x) < this.groundSize.x * 0.5 && Math.abs(y) < this.groundSize.y * 0.5) {
 			this.meshBall.position.set(
 				x, this.groundPosition.y, y
 			)
@@ -210,6 +233,18 @@ export class Picker {
 
 	public get ballRadius(): number {
 		return this.ballLight.range;
+	}
+
+	public get ballLightColor(): Color3 {
+		return this.ballLight.diffuse;
+	}
+
+	public get light(): PointLight {
+		return this.ballLight;
+	}
+
+	public updateBallColor() {
+		this.material.setVector4("color", new Vector4(this.ballLight.diffuse.r, this.ballLight.diffuse.g, this.ballLight.diffuse.b, 0.2))
 	}
 
 	public setEnable(status: boolean) {

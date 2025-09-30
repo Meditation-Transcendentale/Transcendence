@@ -1,6 +1,6 @@
 // services/game/game-manager/src/GameManager.js
-import natsClient from './natsClient.js';
-import { Game } from './Game.js';
+import natsClient from "./natsClient.js";
+import { Game } from "./Game.js";
 import {
 	decodeMatchCreateRequest,
 	encodeMatchCreateResponse,
@@ -9,10 +9,11 @@ import {
 	decodePhysicsResponse,
 	encodeStateUpdate,
 	encodeMatchSetup,
+	encodeScoreUpdate,
 	decodeStateUpdate,
 	decodeMatchQuit,
-	encodeMatchEnd
-} from './proto/helper.js';
+	encodeMatchEnd,
+} from "./proto/helper.js";
 
 export class GameManager {
 	constructor(nc) {
@@ -21,58 +22,59 @@ export class GameManager {
 	}
 
 	start() {
-		console.log('[game-manager] Ready to manage games');
+		console.log("[game-manager] Ready to manage games");
 	}
 
 	async init(natsUrl) {
 		this.nc = await natsClient.connect(natsUrl);
 
 		// Subscribe to "games.*.match.create" (req/rep)
-		const subCreate = this.nc.subscribe('games.*.match.create');
+		const subCreate = this.nc.subscribe("games.*.match.create");
 		(async () => {
 			for await (const msg of subCreate) {
-				const [, mode] = msg.subject.split('.');
+				const [, mode] = msg.subject.split(".");
 				await this._onMatchCreate(mode, msg);
 			}
 		})();
 
 		// Subscribe to "games.*.match.start" (req/rep)
-		const subStart = this.nc.subscribe('games.*.*.match.start');
+		const subStart = this.nc.subscribe("games.*.*.match.start");
 		(async () => {
 			for await (const msg of subStart) {
-				const [, , gameId] = msg.subject.split('.');
+				const [, , gameId] = msg.subject.split(".");
 				await this._onMatchStart(gameId);
 			}
 		})();
 
 		// Subscribe to "games.*.match.end" (req/rep)
-		const subEnd = this.nc.subscribe('games.*.*.match.quit');
+		const subEnd = this.nc.subscribe("games.*.*.match.quit");
 		(async () => {
 			for await (const msg of subEnd) {
-				const [, , gameId] = msg.subject.split('.');
+				const [, , gameId] = msg.subject.split(".");
 				const uuid = decodeMatchQuit(msg.data);
-				await this._onMatchEnd(gameId);
+				await this.quitMatch(gameId, uuid);
 			}
 		})();
 
 		// Subscribe to "games.*.*.match.input" (pub/sub)
-		const subInput = this.nc.subscribe('games.*.*.match.input');
+		const subInput = this.nc.subscribe("games.*.*.match.input");
 		(async () => {
 			for await (const msg of subInput) {
-				const [, , gameId] = msg.subject.split('.');
+				const [, , gameId] = msg.subject.split(".");
 				const request = decodeMatchInput(msg.data);
 				this._onMatchInput(gameId, request);
 			}
 		})();
 
-		console.log('[GameManager] NATS subscriptions established');
+		console.log("[GameManager] NATS subscriptions established");
 	}
 
 	// ─── NATS Handlers ──────────────────────────────────────────────
 
 	/** Handle a match.create request */
 	async _onMatchCreate(mode, msg) {
-		let gameId = '', error = '';
+		let gameId = "",
+			error = "";
 		const request = decodeMatchCreateRequest(msg.data);
 		try {
 			const players = request.players;
@@ -80,18 +82,21 @@ export class GameManager {
 				mode,
 				players: players,
 			});
-			this.nc.publish(`games.${mode}.${gameId}.match.setup`, encodeMatchSetup({ players: players }));
+			this.nc.publish(
+				`games.${mode}.${gameId}.match.setup`,
+				encodeMatchSetup({ players: players })
+			);
 		} catch (err) {
 			console.log(err.message);
 			error = err.message;
 		}
-		console.log('📬 replying on', msg.reply);
+		console.log("📬 replying on", msg.reply);
 		if (msg.reply) {
 			const respBuf = encodeMatchCreateResponse({ gameId: gameId.toString() });
 			msg.respond(respBuf);
-			console.log('✅ replied with gameId=', gameId);
+			console.log("✅ replied with gameId=", gameId);
 		} else {
-			console.warn('⚠️ no reply subject; request() will time out.');
+			console.warn("⚠️ no reply subject; request() will time out.");
 		}
 	}
 
@@ -112,7 +117,7 @@ export class GameManager {
 	/** Handle incoming player inputs */
 	_onMatchInput(gameId, request) {
 		const match = this.games.get(gameId);
-		if (!match || match.status !== 'running') return;
+		if (!match || match.status !== "running") return;
 
 		// queue inputs for next tick
 		this.handleInput({
@@ -133,14 +138,14 @@ export class GameManager {
 			instance,
 			mode,
 			state,
-			inputs: {},       // tick → PlayerInput[]
+			inputs: {}, // tick → PlayerInput[]
 			tick: 0,
-			status: 'created',
+			status: "created",
 			interval: null,
 			isPaused: false,
 			resumeTick: 0,
 			pendingServe: false,
-			isGameOver: false
+			isGameOver: false,
 		});
 		console.log(`[GameManager] Created match ${gameId} (${mode})`);
 		return gameId;
@@ -148,9 +153,9 @@ export class GameManager {
 
 	launchMatch(gameId) {
 		const match = this.games.get(gameId.toString());
-		if (!match || match.status !== 'created') return false;
+		if (!match || match.status !== "created") return false;
 
-		match.status = 'running';
+		match.status = "running";
 		const tickMs = 1000 / 60;
 
 		match.interval = setInterval(() => {
@@ -183,17 +188,59 @@ export class GameManager {
 			match.interval = null;
 		}
 
-		match.status = 'ended';
+		match.status = "ended";
 
 		if (match.mode != `br`) {
 			const buf = encodeMatchEnd({
-				winnerId: match.state.score[0] == 5 ? match.state.paddles[0].playerId : match.state.paddles[1].playerId,
-				score: match.state.score
+				winnerId:
+					match.state.score[0] == 5 ? match.instance.players[0] : match.instance.players[1],
+				loserId:
+					match.state.score[0] == 5 ? match.instance.players[1] : match.instance.players[0],
+				score: match.state.score,
 			});
 			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
+		} else {
+			this.nc.publish(
+				`games.${match.mode}.${gameId}.match.end`,
+				new Uint8Array()
+			);
 		}
-		else
-			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, new Uint8Array());
+		this.games.delete(gameId);
+
+		console.log(`[GameManager] Ended match ${gameId}`);
+		return true;
+	}
+
+	quitMatch(gameId, uuid) {
+		const match = this.games.get(gameId);
+
+		if (!match) return false;
+
+		if (match.interval) {
+			clearInterval(match.interval);
+			match.interval = null;
+		}
+
+		match.status = "ended";
+
+		if (match.mode != `br`) {
+			const buf = encodeMatchEnd({
+				winnerId:
+					match.instance.players[0] === uuid ? match.instance.players[1] : match.instance.players[0],
+				loserId:
+					match.instance.players[0] === uuid ? match.instance.players[0] : match.instance.players[1],
+				score: match.state.score,
+				forfeitId:
+					match.instance.players[0] === uuid ? match.instance.players[0] : match.instance.players[1],
+			});
+			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
+		} else {
+			this.nc.publish(
+				`games.${match.mode}.${gameId}.match.end`,
+				new Uint8Array()
+			);
+			// this.nc.request('stats.endgame', jc.encode(), { timeout: 1000 });
+		}
 		this.games.delete(gameId);
 
 		console.log(`[GameManager] Ended match ${gameId}`);
@@ -205,7 +252,7 @@ export class GameManager {
 	/** Tick a single match: req/rep → physics → update → broadcast */
 	async _tickMatch(gameId) {
 		const match = this.games.get(gameId);
-		if (!match || match.status !== 'running') return;
+		if (!match || match.status !== "running") return;
 
 		match.tick++;
 
@@ -214,21 +261,34 @@ export class GameManager {
 
 		try {
 			// Send PhysicsRequest over NATS req/rep
-			const reqBuf = encodePhysicsRequest({ gameId: gameId.toString(), tick: match.tick, input: inputs, stage: lastState.stage });
-			const respMsg = await this.nc.request(`games.${match.mode}.${gameId}.physics.request`, reqBuf);
+			const reqBuf = encodePhysicsRequest({
+				gameId: gameId.toString(),
+				tick: match.tick,
+				input: inputs,
+				stage: lastState.stage,
+			});
+			const respMsg = await this.nc.request(
+				`games.${match.mode}.${gameId}.physics.request`,
+				reqBuf
+			);
 			const resp = decodePhysicsResponse(respMsg.data);
 
 			const newState = lastState;
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles;
-			newState.stage = resp.stage;
+			newState.stage = resp.stage;https://www.warcraftlogs.com/reports/nDxGpP4KMY1jAzZb?fight=38&type=damage-done&source=15
 			newState.ranks = resp.ranks;
-			newState.events = resp.events || [];        // ADD THIS
+			newState.events = resp.events || []; // ADD THIS
 			newState.gameState = resp.gameState || {};
 			if (resp.goal) {
-				newState.score[resp.goal.scorerId] = (newState.score[resp.goal.scorerId] || 0) + 1;
+				newState.score[resp.goal.scorerId] =
+					(newState.score[resp.goal.scorerId] || 0) + 1;
 
+				if (match.mode === "tournament") {
+					const scoreBuf = encodeScoreUpdate({ score: newState.score });
+					this.nc.publish(`games.tournament.${gameId}.score`, scoreBuf);
+				}
 				if (newState.score[resp.goal.scorerId] >= (5 || Infinity)) {
 					newState.isGameOver = true;
 				}
@@ -246,13 +306,10 @@ export class GameManager {
 				ranks: newState.ranks,
 				stage: newState.stage,
 				events: newState.events,
-				gameState: newState.gameState
+				gameState: newState.gameState,
 			});
 
-			this.nc.publish(
-				`games.${match.mode}.${gameId}.match.state`,
-				buf
-			);
+			this.nc.publish(`games.${match.mode}.${gameId}.match.state`, buf);
 			if (match.state.isGameOver || resp.end) {
 				this.endMatch(gameId);
 				return;

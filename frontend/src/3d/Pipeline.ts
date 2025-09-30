@@ -1,4 +1,4 @@
-import { BloomEffect, Camera, Engine, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, RenderTargetTexture, Scene, Vector3 } from "@babylonImport";
+import { BloomEffect, Camera, Engine, FxaaPostProcess, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, RenderTargetTexture, Scene, Vector3 } from "@babylonImport";
 import { UIaddDetails, UIaddSlider, UIaddSliderVec3, UIaddToggle } from "./UtilsUI";
 
 
@@ -11,10 +11,13 @@ export class Pipeline {
 
 	private fogPostProcess: PostProcess;
 	private colorCorrectionPostProcess: PostProcess;
+	private fxaaPostProcess: FxaaPostProcess;
+
 
 	private fogEffect: PostProcessRenderEffect;
 	private colorCorrectionEffect: PostProcessRenderEffect;
 	private bloomEffect: BloomEffect;
+	private fxaaEffect: PostProcessRenderEffect;
 
 	private fogTexture: RenderTargetTexture;
 
@@ -23,6 +26,7 @@ export class Pipeline {
 	private contrast: number;
 	private brightness: number;
 	private gamma: number;
+	private tonemapping: number;
 
 	constructor(scene: Scene, camera: Camera, fogRt: RenderTargetTexture) {
 		this.scene = scene;
@@ -33,7 +37,7 @@ export class Pipeline {
 
 		this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "pipeline");
 
-		this.fogPostProcess = new PostProcess("fogApply", "fogApply", {
+		this.fogPostProcess = new PostProcess("fogApply", "fogApply3D", {
 			uniforms: ["fogAbsorption"],
 			samplers: ["fogTexture"],
 			size: 1.,
@@ -51,7 +55,7 @@ export class Pipeline {
 
 
 		this.colorCorrectionPostProcess = new PostProcess("colorCorrection", "colorCorrection", {
-			uniforms: ["contrast", "brightness", "gamma"],
+			uniforms: ["contrast", "brightness", "gamma", "tonemapping"],
 			size: 1.,
 			camera: this.camera,
 			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
@@ -60,16 +64,27 @@ export class Pipeline {
 		})
 		this.contrast = 1.;
 		this.brightness = 0.;
-		this.gamma = 1.;
+		this.gamma = 1;
+		this.tonemapping = 0;
 
 		this.colorCorrectionPostProcess.onApply = (effect) => {
 			effect.setFloat("contrast", this.contrast);
 			effect.setFloat("brightness", this.brightness);
 			effect.setFloat("gamma", this.gamma);
+			effect.setInt("tonemapping", this.tonemapping);
 		}
+
+		this.fxaaPostProcess = new FxaaPostProcess("fxaa", {
+			size: 1.,
+			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
+			textureType: Engine.TEXTURETYPE_HALF_FLOAT,
+			camera: this.camera,
+			reusable: false
+		})
 
 		this.camera.detachPostProcess(this.colorCorrectionPostProcess);
 		this.camera.detachPostProcess(this.fogPostProcess);
+		this.camera.detachPostProcess(this.fxaaPostProcess);
 
 
 
@@ -81,11 +96,16 @@ export class Pipeline {
 		this.colorCorrectionEffect = new PostProcessRenderEffect(this.scene.getEngine(), "colorCorrectionEffect", () => {
 			return [this.colorCorrectionPostProcess];
 		});
-		this.bloomEffect = new BloomEffect(this.scene.getEngine(), 0.25, 0.1, 32., Engine.TEXTURETYPE_HALF_FLOAT);
+		this.bloomEffect = new BloomEffect(this.scene.getEngine(), 0.25, 0.8, 32., Engine.TEXTURETYPE_HALF_FLOAT);
+
+		this.fxaaEffect = new PostProcessRenderEffect(this.scene.getEngine(), "fxaaEffect", () => {
+			return [this.fxaaPostProcess];
+		})
 
 		this.renderingPipeline.addEffect(this.fogEffect);
-		this.renderingPipeline.addEffect(this.colorCorrectionEffect);
 		this.renderingPipeline.addEffect(this.bloomEffect);
+		this.renderingPipeline.addEffect(this.colorCorrectionEffect);
+		this.renderingPipeline.addEffect(this.fxaaEffect);
 
 		this.scene.postProcessRenderPipelineManager.addPipeline(this.renderingPipeline);
 		this.scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("pipeline", this.camera);
@@ -119,6 +139,14 @@ export class Pipeline {
 				this.scene.postProcessRenderPipelineManager.disableEffectInPipeline("pipeline", this.bloomEffect._name, this.camera);
 			}
 		})
+		UIaddToggle("fxaa", true, { div: details }, (n: boolean) => {
+			if (n) {
+				this.scene.postProcessRenderPipelineManager.enableEffectInPipeline("pipeline", this.fxaaEffect._name, this.camera);
+			} else {
+				this.scene.postProcessRenderPipelineManager.disableEffectInPipeline("pipeline", this.fxaaEffect._name, this.camera);
+			}
+		})
+
 
 		UIaddSliderVec3("fog asborption", this.fogAbsorption, {
 			step: 0.05,
@@ -145,6 +173,13 @@ export class Pipeline {
 			max: 3,
 			div: details
 		}, (n: number) => { this.gamma = n });
+		UIaddSlider("tonemap", this.tonemapping, {
+			step: 1.,
+			min: 0,
+			max: 8,
+			div: details
+		}, (n: number) => { this.tonemapping = n });
+
 		UIaddSlider("bloom weight", this.bloomEffect.weight, {
 			step: 0.1,
 			min: 0,
