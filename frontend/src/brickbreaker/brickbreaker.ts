@@ -3,6 +3,7 @@ import { Ball } from "./Ball";
 import { Player } from "./Player";
 import earcut from "earcut";
 import GameUI from "../spa/GameUI";
+import { getRequest, patchRequest } from "../spa/requests";
 
 let resizeTimeout: number;
 let engine: any;
@@ -24,6 +25,7 @@ export class BrickBreaker {
 	public root: TransformNode;
 	private id: number = 0;
 	private start1: boolean = true;
+	private mode: string = "medium";
 
 
 
@@ -67,6 +69,10 @@ export class BrickBreaker {
 			return;
 		}
 
+		getRequest("/stats/get/brickbreaker")
+			.then((json) => { this.handlePb(json) })
+			.catch((err) => { console.log(err) });
+
 		this.reset();
 
 		this.layers = Math.ceil((Math.random() * 5) + 1);
@@ -84,6 +90,10 @@ export class BrickBreaker {
 		this.player.enableInput();
 
 		console.log("BrickBreaker added to render loop");
+	}
+
+	private handlePb(json: any) {
+		console.log(json.brickBreakerStats);
 	}
 
 
@@ -119,6 +129,12 @@ export class BrickBreaker {
 		//	this.renderObserver = null;
 		//	console.log("BrickBreaker removed from render loop");
 		//}
+		const body = new FormData();
+        body.append(this.mode, this.score.toString());
+        patchRequest("/stats/update/brickbreaker", body, false)
+            .catch(() => {
+                console.error("Error update score");
+            });
 		this.camera.parent = null;
 		this.start1 = false;
 		this.player.disableInput();

@@ -123,6 +123,7 @@ app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
 	const user = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid });
 
 	await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "offline" });
+	await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: user.id });
 
 	res.code(statusCode.CREATED).send({ message: returnMessages.USER_CREATED });
 }));

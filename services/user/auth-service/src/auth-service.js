@@ -204,6 +204,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatar_path: avatarCdnUrl });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 		await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "offline" });
+		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: user.id });
 	}
 
 	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
@@ -272,6 +273,7 @@ app.get('/42', handleErrors42(async (req, res) => {
 		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatar_path: avatarCdnUrl });
 		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 		await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "offline" });
+		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: user.id });
 	}
 
 	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
