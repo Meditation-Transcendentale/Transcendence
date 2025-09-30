@@ -101,7 +101,8 @@ export class Ball {
 					this.game.score += (layers - layerIndex) * this.speedScale * 10;
 					if (this.bricksLeft == 0)
 						this.game.score += layerIndex + 1 * this.speedScale * 10;
-					this.game.gameUI.updateScore(Math.round(this.game.score));
+					this.game.score = Math.round(this.game.score);
+					this.game.gameUI.updateScore(this.game.score);
 					target.setEnabled(false);
 					this.bricksLeft--;
 					this.ball.material = this.matUntouched;
