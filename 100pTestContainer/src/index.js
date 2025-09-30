@@ -17,8 +17,7 @@ dotenv.config({ path: "../../.env" });
 
 const API_URL = "https://localhost:7000/api";
 
-function lobbyConnectionInit(user) {
-  console.log(`NEW LOBBY CONNECTION ${user.uuid}`);
+async function lobbyConnectionInit(user) {
   const url = `wss://localhost:7000/lobbies?uuid=${encodeURIComponent(
     user.uuid
   )}&lobbyId=${encodeURIComponent(user.lobbyId)}`;
@@ -26,9 +25,11 @@ function lobbyConnectionInit(user) {
   ws.binaryType = "arraybuffer";
 
   ws.onopen = (e) => {
-	setTimeout( 
-		() => { ws?.send(encodeClientMessage({ ready: { lobbyId: (user.lobbyId).toString() } })); }, 1000
-	);
+    setTimeout(() => {
+      ws?.send(
+        encodeClientMessage({ ready: { lobbyId: user.lobbyId.toString() } })
+      );
+    }, 1000);
   };
 
   ws.onmessage = (msg) => {
@@ -40,16 +41,20 @@ function lobbyConnectionInit(user) {
       const gameId = payload.start.gameId;
       user.setGameId(gameId);
       ws?.close();
+      resolve();
     }
 
     if (payload.startTournament != null) {
       const tournamentId = payload.startTournament.tournamentId;
+      console.log (tournamentId);
       user.setTournamentId(tournamentId);
+      console.log (`START TOURNAMENT RECEIVED:${tournamentId}`)
       ws?.close();
+      resolve();
     }
   };
 
-  ws.onclose = () => {};
+  ws.onclose = () => { resolve(); };
 
   ws.onerror = (err) => {
     console.warn(err);
@@ -120,13 +125,13 @@ async function main() {
   console.log(lobbyId, nbuser);
   const users = [];
   await userConnectionInit(users, nbuser, lobbyId, agent);
-  await lobbySetup(users, nbuser);
-  if (users[0].tournamentId) {
+  await lobbySetup(users, nbuser).then(async () => {
     for (let i = 0; i < Math.log2(nbuser); i++) {
-      await tournamentSetup(users, nbuser);
-      await gameSetup(users, nbuser);
+      await tournamentSetup(users, nbuser).then (async() => {
+        await gameSetup(users, nbuser);
+      });
     }
-  }
+  });
   console.log("The end");
 }
 
