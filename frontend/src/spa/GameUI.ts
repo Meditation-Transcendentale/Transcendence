@@ -1,6 +1,7 @@
 import { Popup } from "./Popup";
 
 interface GameUIModules {
+	scorevs?: ScoreVersusModule;
 	score?: ScoreModule;
 	timer?: TimerModule;
 	buttons?: ButtonModule;
@@ -25,6 +26,7 @@ interface GameUIConfig {
 	theme?: 'pong' | 'br' | 'brick';
 	globalPosition?: 'top' | 'bottom' | 'overlay';
 	modulePositions?: {
+		scorevs?: ModulePosition;
 		score?: ModulePosition;
 		timer?: ModulePosition;
 		buttons?: ModulePosition;
@@ -37,6 +39,7 @@ interface GameUIConfig {
 
 interface GameUIHtmlReference {
 	container: HTMLDivElement;
+	scorevsModule: HTMLDivElement;
 	scoreModule: HTMLDivElement;
 	timerModule: HTMLDivElement;
 	buttonModule: HTMLDivElement;
@@ -61,6 +64,7 @@ class GameUI {
 
 		this.ref = {
 			container: this.div,
+			scorevsModule: div.querySelector("#scorevs-module") as HTMLDivElement,
 			scoreModule: div.querySelector("#score-module") as HTMLDivElement,
 			timerModule: div.querySelector("#timer-module") as HTMLDivElement,
 			buttonModule: div.querySelector("#button-module") as HTMLDivElement,
@@ -76,6 +80,9 @@ class GameUI {
 	private initializeModules() {
 		this.config.enabledModules.forEach(moduleName => {
 			switch (moduleName) {
+				case 'scorevs':
+					this.modules.scorevs = new ScoreVersusModule(this.ref.scorevsModule);
+					break;
 				case 'score':
 					this.modules.score = new ScoreModule(this.ref.scoreModule);
 					break;
@@ -93,8 +100,10 @@ class GameUI {
 					break;
 				case 'images':
 					this.modules.images = new ImageModule(this.ref.imageModule);
+					break;
 				case 'playercounter':
 					this.modules.playercounter = new PlayerCounterModule(this.ref.playercounterModule);
+					break;
 			}
 		});
 	}
@@ -312,6 +321,7 @@ class GameUI {
 
 	private getModuleElement(moduleName: keyof GameUIModules): HTMLElement | null {
 		switch (moduleName) {
+			case 'scorevs': return this.ref.scoreversusModule;
 			case 'score': return this.ref.scoreModule;
 			case 'timer': return this.ref.timerModule;
 			case 'buttons': return this.ref.buttonModule;
@@ -325,8 +335,12 @@ class GameUI {
 		}
 	}
 
-	public updateScore(score1: number, score2: number) {
-		this.modules.score?.updateScore(score1, score2);
+	public updateScore(score: number){
+		this.modules.score?.updateScore(score);
+	}
+
+	public updateScoreVersus(score1: number, score2: number) {
+		this.modules.scorevs?.updateScore(score1, score2);
 	}
 
 	public startCountdown(initialValue: number) {
@@ -341,8 +355,8 @@ class GameUI {
 		this.modules.timer?.stop();
 	}
 
-	public showEnd(score1: number, score2: number, result: boolean) {
-		this.modules.ending?.setResult(score1, score2, result);
+	public showEnd(score1: number, score2: number, result: boolean, mode: string) {
+		this.modules.ending?.setResult(score1, score2, result, mode);
 	}
 
 	public showButton(id: string, text: string, callback: () => void, style?: string) {
@@ -365,17 +379,14 @@ class GameUI {
 		this.modules.playercounter?.update(playerLeft);
 	}
 
+	public updatePBScore(score: number){
+		this.modules.score?.updatePBScore(score);
+	}
 }
 
 interface GameUIModule {
 	load(): void;
 	unload(): void;
-}
-
-interface ScoreHtmlReference {
-	scoreLabel: HTMLSpanElement;
-	score1Value: HTMLSpanElement;
-	score2Value: HTMLSpanElement;
 }
 
 interface CountdownHtmlReference {
@@ -437,10 +448,14 @@ class CountdownModule implements GameUIModule {
 	}
 }
 
-class ScoreModule implements GameUIModule {
+interface ScoreVersusHtmlReference {
+	score1Value: HTMLSpanElement;
+	score2Value: HTMLSpanElement;
+}
+
+class ScoreVersusModule implements GameUIModule {
 	private div: HTMLDivElement;
-	private ref: ScoreHtmlReference;
-	private scoreValue = 0;
+	private ref: ScoreVersusHtmlReference;
 	private score1 = 0;
 	private score2 = 0;
 
@@ -448,7 +463,6 @@ class ScoreModule implements GameUIModule {
 		this.div = div;
 
 		this.ref = {
-			scoreLabel: div.querySelector("#score-label") as HTMLSpanElement,
 			score1Value: div.querySelector("#score1-value") as HTMLSpanElement,
 			score2Value: div.querySelector("#score2-value") as HTMLSpanElement
 		};
@@ -470,6 +484,52 @@ class ScoreModule implements GameUIModule {
 		if (this.ref.score1Value && this.ref.score2Value) {
 			this.ref.score1Value.textContent = score1.toString();
 			this.ref.score2Value.textContent = score2.toString();
+		}
+	}
+}
+
+interface ScoreHtmlReference {
+	scoreValue: HTMLSpanElement;
+	scorePBValue: HTMLSpanElement;
+}
+
+class ScoreModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: ScoreHtmlReference;
+	private scoreValue = 0;
+	private pb = 0;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+
+		this.ref = {
+			scoreValue: div.querySelector("#score-value") as HTMLSpanElement,
+			scorePBValue: div.querySelector("#scorepb-value") as HTMLSpanElement
+		};
+	}
+
+	load() {
+		this.div.style.display = 'flex';
+	}
+
+	unload() {
+		this.div.style.display = 'none';
+	}
+
+	updateScore(score: number) {
+		this.scoreValue = score;
+		if (this.ref.scoreValue) {
+			this.ref.scoreValue.textContent = score.toString();
+		}
+		if (this.scoreValue > this.pb){
+			this.updatePBScore(this.scoreValue);
+		}
+	}
+
+	updatePBScore(score: number) {
+		this.pb = score;
+		if (this.ref.scorePBValue) {
+			this.ref.scorePBValue.textContent = score.toString();
 		}
 	}
 }
@@ -612,15 +672,24 @@ class EndingModule implements GameUIModule{
 		this.div.style.display = 'none';
 	}
 
-	setResult(score1: number, score2: number, result: boolean) {
+	setResult(score1: number, score2: number, result: boolean, mode: string) {
 		if (this.ref.score1Value && this.ref.score2Value) {
 			this.ref.score1Value.textContent = score1.toString();
 			this.ref.score2Value.textContent = score2.toString();
 		}
-		if (result)
-			this.ref.result.innerHTML = 'You <span class="win">Win</span>';
-		else
-			this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
+
+		
+		if (mode == "local"){
+			if (result)
+				this.ref.result.innerHTML = 'Player 1 <span class="win">Win</span>';
+			else
+				this.ref.result.innerHTML = 'Player 2 <span class="win">Win</span>';
+		} else if (mode == "ai" || mode == "online"){
+			if (result)
+				this.ref.result.innerHTML = 'You <span class="win">Win</span>';
+			else
+				this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
+		}
 
 		this.div.style.display = 'flex';
 	}

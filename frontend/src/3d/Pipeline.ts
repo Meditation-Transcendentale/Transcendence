@@ -82,7 +82,6 @@ export class Pipeline {
 			reusable: false
 		})
 
-
 		this.camera.detachPostProcess(this.colorCorrectionPostProcess);
 		this.camera.detachPostProcess(this.fogPostProcess);
 		this.camera.detachPostProcess(this.fxaaPostProcess);
@@ -177,7 +176,7 @@ export class Pipeline {
 		UIaddSlider("tonemap", this.tonemapping, {
 			step: 1.,
 			min: 0,
-			max: 7,
+			max: 8,
 			div: details
 		}, (n: number) => { this.tonemapping = n });
 

@@ -219,6 +219,7 @@ export class Environment {
 		redlight.setEnabled(false);
 		whitelight2.setEnabled(false);
 
+
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
 		}
@@ -263,7 +264,7 @@ export class Environment {
 	}
 
 	public disableHome() {
-		this.updateHome = false;
+		//this.updateHome = false;
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(true);
 		}
@@ -280,6 +281,14 @@ export class Environment {
 
 	public resize() {
 		this.field.resize();
+	}
+
+
+	public setCube(name: string, clickEv?: any, hoverEv?: any) {
+		this.field.cubeEvent.enable = true;
+		this.field.cubeEvent.name = name;
+		this.field.cubeEvent.clickEvent = clickEv;
+		this.field.cubeEvent.hoverEvent = hoverEv;
 	}
 
 	public dispose() {

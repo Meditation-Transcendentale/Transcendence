@@ -19,7 +19,8 @@ precision highp float;
 uniform vec4	color;
 
 void main(void) {
-	gl_FragColor = color;
+	gl_FragColor.rgb = color.rgb *  5.;
+	gl_FragColor.a = color.a;
 }
 `;
 

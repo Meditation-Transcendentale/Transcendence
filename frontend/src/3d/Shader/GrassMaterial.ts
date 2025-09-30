@@ -337,7 +337,7 @@ export class GrassShader extends CustomMaterial {
 		this.diffuseColor = Color3.FromHexString("#5b7457");
 		this.diffuseColor = Color3.FromHexString("#266A1B");
 		this.specularColor = this.diffuseColor.scale(3.);
-		UIaddColor("grass color", this.diffuseColor, {}, () => { });
+		UIaddColor("grass", this.diffuseColor, { div: document.querySelector("#colors-details") }, () => { });
 		//this.diffuseColor = new Color3(0.6, 1., 0.28);
 		//this.diffuseColor = new Color3(1., 1., 1.);
 

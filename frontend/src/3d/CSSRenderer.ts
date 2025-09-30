@@ -19,6 +19,7 @@ export class CSSRenderer {
 	private objects: Array<css3dObject>;
 
 
+
 	constructor(camera: Camera, width: number, height: number) {
 		this.camera = camera;
 		this.width = width;

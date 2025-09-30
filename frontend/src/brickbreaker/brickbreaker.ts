@@ -1,6 +1,7 @@
 import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4, Observer, TransformNode, FreeCamera } from "@babylonImport";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
+import { getRequest, patchRequest } from "../spa/requests";
 import earcut from "earcut";
 import GameUI from "../spa/GameUI";
 import { getRequest, patchRequest } from "../spa/requests";
@@ -26,30 +27,26 @@ export class BrickBreaker {
 	private id: number = 0;
 	private start1: boolean = true;
 	private mode: string = "medium";
+	public gameUI: GameUI;
+	public score: number = 0;
+	private pbEasy: number = 0;
+	private pbMedium: number = 0;
+	private pbHard: number = 0;
 
 
 
-	constructor(canvas: HTMLCanvasElement, scene: Scene) {
+	constructor(canvas: HTMLCanvasElement, scene: Scene, gameUI: GameUI) {
 		this.canvas = canvas;
 		this.scene = scene;
+		this.gameUI = gameUI;
 		this.engine = scene.getEngine() as Engine;
 		this.root = new TransformNode("pongbrRoot", this.scene);
 		this.root.position.set(200, 500, 500);
-		//this.root.rotation.z -= 30.9000;
 		this.root.scaling.set(1, 1, 1);
 
-
-
-		//this.setupCamera();
-		//this.setupLight();
 		this.createArena();
 
 		this.camera = this.scene.getCameraByName("fieldCamera") as FreeCamera;
-		//this.camera.attachControl(this.canvas, true);
-		// this.layers = Math.ceil((Math.random() * 5) + 1);
-		// this.layers = 2;
-		// this.cols = Math.ceil((Math.random() * 5) + 1);
-		// this.bricks = this.generateBricks(10, this.layers, this.cols);
 
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
@@ -84,9 +81,6 @@ export class BrickBreaker {
 		this.lastTime = performance.now();
 		this.start1 = true;
 		this.update();
-		//this.renderObserver = this.scene.onBeforeRenderObservable.add(() => {
-		//	this.update();
-		//});
 		this.player.enableInput();
 
 		console.log("BrickBreaker added to render loop");
@@ -107,6 +101,13 @@ export class BrickBreaker {
 	// 	this.reset();
 	// }
 
+	public restart(): void {
+		this.reset();
+		document.querySelector("#canvas")?.focus();
+		this.ball.bricksLeft = this.layers * this.cols;
+		this.bricks = this.generateBricks(10, this.layers, this.cols);
+	}
+
 	private update(): void {
 
 		const currentTime = performance.now();
@@ -121,7 +122,6 @@ export class BrickBreaker {
 			cancelAnimationFrame(this.id);
 		}
 	}
-
 
 	public stop(): void {
 		//if (this.renderObserver) {
@@ -141,15 +141,6 @@ export class BrickBreaker {
 		// this.reset();
 	}
 
-	//private update(): void {
-	//	const currentTime = performance.now();
-	//	const delta = (currentTime - this.lastTime) / 1000;
-	//	this.lastTime = currentTime;
-	//
-	//	this.player.update();
-	//	this.ball.update(delta, this.player, this.cols, this.layers, this.bricks);
-	//}
-
 	public reset(): void {
 		if (this.bricks && this.bricks.length > 0){
 			this.bricks.forEach(layer => {
@@ -158,28 +149,11 @@ export class BrickBreaker {
 				});
 			});
 		}
+		this.score = 0;
+		this.gameUI.updateScore(0);
 		this.ball.reset();
 		this.player.reset();
 		this.lastTime = performance.now();
-	}
-
-	private setupCamera() {
-		// this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 10, Vector3.Zero(), this.scene);
-		// this.camera.attachControl(this.canvas, true);
-		// this.camera.mode = ArcRotateCamera.ORTHOGRAPHIC_CAMERA;
-		// this.camera.orthoLeft = -16;
-		// this.camera.orthoRight = 16;
-		// this.camera.orthoTop = 9;
-		// this.camera.orthoBottom = -9;
-		//this.camera = new ArcRotateCamera("camera", Math.PI / 2, 0, 30, Vector3.Zero(), this.scene);
-		this.camera = this.scene.getCameraByName("brick") as ArcRotateCamera;
-		// this.camera.attachControl(this.canvas, true);
-		this.camera.parent = this.root;
-	}
-
-	private setupLight() {
-		this.light = new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
-		this.light.parent = this.root;
 	}
 
 	private createArena() {

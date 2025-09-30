@@ -27,6 +27,8 @@ class app3d {
 
 	private cssRenderer!: CSSRenderer;
 
+	private _cubeEvent: any;
+
 	constructor() {
 
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -39,7 +41,7 @@ class app3d {
 			antialias: true,
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
-		this.engine.setHardwareScalingLevel(2.0);
+		// this.engine.setHardwareScalingLevel(2.0);
 		this.engine.getCaps().textureFloatRender = true;
 
 		window.addEventListener('resize', () => {
@@ -47,6 +49,10 @@ class app3d {
 			this.environment.resize();
 			this.cssRenderer.resize(window.innerWidth, window.innerHeight)
 		})
+
+		UIaddDetails("MISC", null, "misc-details");
+		UIaddDetails("COLORS", null, "colors-details");
+		UIaddDetails("LIGHTS", null, "lights-details");
 
 		this.environment = new Environment(this.engine, this.canvas);
 		this.fps = document.getElementById('fps') as HTMLElement;
@@ -61,17 +67,6 @@ class app3d {
 	public async init() {
 		await this.environment.init();
 
-		const v = new Vector3(0, 0, 0);
-		const a = new Float32Array(3);
-
-		UIaddSliderVec3("hash", v, {
-			step: 0.01,
-			min: -2,
-			max: 2,
-		}, () => {
-			v.toArray(a, 0);
-			console.log(hash33(a));
-		})
 		// document.querySelector("#utils-details")?.remove();
 	}
 
@@ -144,6 +139,10 @@ class app3d {
 
 	public onHoverEffect(status: number) {
 		this.environment.onHover(status);
+	}
+
+	public setCube(name: string, clickEv?: any, hoverEv?: any) {
+		this.environment.setCube(name, clickEv, hoverEv);
 	}
 }
 
