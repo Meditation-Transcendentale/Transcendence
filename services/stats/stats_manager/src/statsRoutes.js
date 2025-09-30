@@ -107,12 +107,6 @@ export default async function statsRoutes(app) {
 
 		const { mode, score } = JSON.parse(req.body);
 
-		console.log("req.body:", req.body);
-		// parsing to do 
-
-		console.log("mode:", mode);
-		console.log("score:", score);
-
 		const user = await nats.request('user.getUserFromHeader', jc.encode({ headers: req.headers }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
 		if (!userResult.success) {
@@ -121,15 +115,12 @@ export default async function statsRoutes(app) {
 
 		switch (true) {
 			case (mode === 'easy'):
-				console.log("easy mode");
 				await nats.request(`stats.updateBrickBreakerEasyStats`, jc.encode({ playerId: userResult.data.id, score}), { timeout: 1000 });
 				break;
 			case (mode === 'medium'):
-				console.log("medium mode");
 				await nats.request(`stats.updateBrickBreakerNormalStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
 				break;
 			case (mode === 'hard'):
-				console.log("hard mode");
 				await nats.request(`stats.updateBrickBreakerHardStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
 				break;
 			default:
