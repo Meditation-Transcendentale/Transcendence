@@ -45,7 +45,7 @@ export class InputSystem extends System {
 			let offsetChange = 0;
 			let upKeys = [];
 			let downKeys = [];
-			console.log(input.gameMode);
+			// console.log(input.gameMode);
 			if ((input.gameMode === "online" || input.gameMode === "ai" || input.gameMode === "tournament") && paddle.id == localPaddleId) {
 				if (paddle.id == 0){
 					upKeys = ["KeyW", "ArrowUp"];
@@ -69,11 +69,11 @@ export class InputSystem extends System {
 
 			paddle.move = 0;
 			if (UpPressed && !DownPressed) {
-				console.log("UP");
+				// console.log("UP");
 				paddle.move = 1;
 			}
 			else if (DownPressed && !UpPressed) {
-				console.log("DOWN");
+				// console.log("DOWN");
 				paddle.move = -1;
 			}
 

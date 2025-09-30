@@ -270,6 +270,7 @@ export class Field {
 				this.scene.activeCamera = this.scene.getCameraByName('br');
 				this.scene.activeCamera?.attachControl();
 				this.setAllEnable(false);
+				this.setLight(false)
 
 				break;
 			}
@@ -318,11 +319,13 @@ export class Field {
 				break;
 			}
 			case 'grass': {
-				this.camera.detachControl();
+				console.log("case grass");
+				// this.camera.detachControl();
 				this.camera.position.set(0, 50, 0);
 				this.camera.setTarget(new Vector3(0, 0, 0));
 				this.monolith.setPicking(false);
 				this.picker.setEnable(false);
+				this.setLight(true);
 				break;
 			}
 			case 'void': {
@@ -361,7 +364,7 @@ export class Field {
 		this.picker.setEnable(status);
 		this.monolith.setPicking(status);
 		this.grass.setEnable(status);
-		this.setLight(status)
+		this.setLight(true)
 		this.active = status;
 	}
 

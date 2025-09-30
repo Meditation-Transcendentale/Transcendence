@@ -44,7 +44,7 @@ export class MovementSystem extends System {
 				if (paddle.id == localPaddleId || input.gameMode == "local") {
 					const dist = Math.abs(paddle.offset - paddle.serverOffset);
 					if (dist > 0) {
-						console.log("dist", dist);
+						// console.log("dist", dist);
 						if (dist >= 0.5) {
 							paddle.offset = paddle.serverOffset;
 						} else {
