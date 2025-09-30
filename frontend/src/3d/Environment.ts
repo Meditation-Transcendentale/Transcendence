@@ -219,6 +219,7 @@ export class Environment {
 		redlight.setEnabled(false);
 		whitelight2.setEnabled(false);
 
+
 		for (let i = 0; i < this.gameMeshes.length; i++) {
 			this.gameMeshes[i].setEnabled(false);
 		}

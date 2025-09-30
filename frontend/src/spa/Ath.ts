@@ -47,7 +47,7 @@ class Ath {
 		// this.notif = new AthNotif(div);
 
 		this.ref.setting.addEventListener('click', () => {
-			this.profile.load(User.username as string, true);
+			this.profile.load(User.uuid as string, true);
 		})
 
 		this.ref.quit.addEventListener("click", () => {
@@ -290,7 +290,7 @@ class Profile {
 			body.append('avatar', this.ref.avatarFile.files[0]);
 			patchRequest("update-info/avatar", body, false)
 				.then((json: any) => {
-					this.ref.avatar.src = `/cdn${json.data.cdnPath}`;
+					this.ref.avatar.src = `${json.data.cdnPath}`;
 				})
 				.catch((err) => {
 					NotificationManager.addText(err);
@@ -330,7 +330,7 @@ class Profile {
 			this.ref.avatarFile.disabled = false;
 			this.ref.usernameInput.value = User.username as string;
 			this.ref.edit.disabled = true;
-			this.ref.avatar.src = `/cdn${User.avatar}`;
+			this.ref.avatar.src = `${User.avatar}`;
 			this.ref.usernameContainer.appendChild(this.ref.usernameInput);
 			this.ref.usernameContainer.appendChild(this.ref.edit);
 			Popup.addPopup(this.div);
@@ -339,7 +339,7 @@ class Profile {
 				.then((json: any) => {
 					this.ref.avatarFile.disabled = true;
 					this.ref.username.innerText = json.data.username;
-					this.ref.avatar.src = `/cdn${json.data.avatar_path}`;
+					this.ref.avatar.src = `${json.data.avatar_path}`;
 					this.ref.usernameContainer.appendChild(this.ref.username);
 					Popup.addPopup(this.div);
 				})
