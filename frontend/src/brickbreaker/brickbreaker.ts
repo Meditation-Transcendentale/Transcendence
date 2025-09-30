@@ -134,7 +134,7 @@ export class BrickBreaker {
 		// const body = new FormData();
         // body.append(this.mode, this.score.toString());
 		// console.log(body);
-        patchRequest("/stats/update/brickbreaker", {mode: this.mode, score: this.score}, false)
+        patchRequest("stats/update/brickbreaker", {mode: this.mode, score: this.score}, true)
 			.then(() => {
 				console.log("Score updated");
 			})
