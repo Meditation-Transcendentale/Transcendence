@@ -27,6 +27,8 @@ class app3d {
 
 	private cssRenderer!: CSSRenderer;
 
+	private _cubeEvent: any;
+
 	constructor() {
 
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -137,6 +139,10 @@ class app3d {
 
 	public onHoverEffect(status: number) {
 		this.environment.onHover(status);
+	}
+
+	public setCube(name: string, clickEv?: any, hoverEv?: any) {
+		this.environment.setCube(name, clickEv, hoverEv);
 	}
 }
 

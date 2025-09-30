@@ -71,6 +71,9 @@ export default class Play {
 
 	private createState: createState;
 
+	private createEv: any;
+	private joinEv: any;
+
 
 
 	private gameIP = window.location.hostname;
@@ -150,24 +153,40 @@ export default class Play {
 			enable: false
 		})
 
-		this.ref.swJoin.toggleAttribute("down");
-		this.ref.swCreate.addEventListener("click", () => {
-			App3D.setCSS3dObjectEnable(this.ref.create.id, true);
-			App3D.setCSS3dObjectEnable(this.ref.join.id, false);
-			this.ref.swJoin.toggleAttribute("down", true);
-			this.ref.swCreate.toggleAttribute("down", false);
-			this.state = playState.create;
-		})
-		this.ref.swJoin.addEventListener("click", () => {
+		// this.ref.swJoin.toggleAttribute("down");
+		// this.ref.swCreate.addEventListener("click", () => {
+		// 	App3D.setCSS3dObjectEnable(this.ref.create.id, true);
+		// 	App3D.setCSS3dObjectEnable(this.ref.join.id, false);
+		// 	this.ref.swJoin.toggleAttribute("down", true);
+		// 	this.ref.swCreate.toggleAttribute("down", false);
+		// 	this.state = playState.create;
+		// })
+		// this.ref.swJoin.addEventListener("click", () => {
+		// 	getRequest("lobby/list", "no-cache")
+		// 		.then((json: any) => { console.log(json); this.parseListResp(json) })
+		// 		.catch((err) => { console.log(err) });
+		// 	App3D.setCSS3dObjectEnable(this.ref.create.id, false);
+		// 	App3D.setCSS3dObjectEnable(this.ref.join.id, true);
+		// 	this.ref.swJoin.toggleAttribute("down", false);
+		// 	this.ref.swCreate.toggleAttribute("down", true);
+		// 	this.state = playState.join;
+		// })
+
+		this.joinEv = () => {
 			getRequest("lobby/list", "no-cache")
 				.then((json: any) => { console.log(json); this.parseListResp(json) })
 				.catch((err) => { console.log(err) });
 			App3D.setCSS3dObjectEnable(this.ref.create.id, false);
 			App3D.setCSS3dObjectEnable(this.ref.join.id, true);
-			this.ref.swJoin.toggleAttribute("down", false);
-			this.ref.swCreate.toggleAttribute("down", true);
 			this.state = playState.join;
-		})
+			App3D.setCube("create", () => { this.createEv() });
+		}
+		this.createEv = () => {
+			App3D.setCSS3dObjectEnable(this.ref.create.id, true);
+			App3D.setCSS3dObjectEnable(this.ref.join.id, false);
+			this.state = playState.create;
+			App3D.setCube("join", () => { this.joinEv() });
+		}
 
 		//this.ref.pongModes.disabled = true;
 		this.ref.createWin.toggleAttribute("off");
@@ -389,13 +408,14 @@ export default class Play {
 
 	public load(params: URLSearchParams) {
 		App3D.setVue("play");
-		App3D.setCSS3dObjectEnable(this.ref.switch.id, true);
 		switch (this.state) {
 			case playState.create: {
+				App3D.setCube("join", () => { this.joinEv(); })
 				App3D.setCSS3dObjectEnable(this.ref.create.id, true);
 				break;
 			}
 			case playState.join: {
+				App3D.setCube("create", () => { this.createEv(); })
 				getRequest("lobby/list")
 					.then((json: any) => { this.parseListResp(json) })
 					.catch((err) => { console.log(err) });
@@ -409,7 +429,6 @@ export default class Play {
 	public async unload() {
 		this.returnButton();
 		this.createOption(false);
-		App3D.setCSS3dObjectEnable(this.ref.switch.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.create.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.join.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.lobbyInfoWindow.id, false);

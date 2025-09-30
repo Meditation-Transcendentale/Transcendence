@@ -283,6 +283,14 @@ export class Environment {
 		this.field.resize();
 	}
 
+
+	public setCube(name: string, clickEv?: any, hoverEv?: any) {
+		this.field.cubeEvent.enable = true;
+		this.field.cubeEvent.name = name;
+		this.field.cubeEvent.clickEvent = clickEv;
+		this.field.cubeEvent.hoverEvent = hoverEv;
+	}
+
 	public dispose() {
 		this.field?.dispose();
 		this.camera?.dispose();
