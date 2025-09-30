@@ -25,6 +25,7 @@ import { gTrackManager, SectionBezier, SectionManual, SectionStatic, Track } fro
 import { PelinWorley3D } from "./PerlinWorley.js";
 import { Butterfly } from "./Butterfly.js";
 import { SpaceSkybox } from "../pongbr/templates/skybox.js";
+import { cubeEvent } from "./cubeEvent.js";
 
 export class Field {
 	private scene: Scene;
@@ -63,6 +64,8 @@ export class Field {
 
 	private spotLight: SpotLight;
 
+	public cubeEvent: cubeEvent;
+
 
 	constructor(scene: Scene, camera: FreeCamera) {
 		this.scene = scene;
@@ -77,7 +80,7 @@ export class Field {
 
 		this.grass = new Grass(this.scene, 20);
 		this.fog = new Fog(this.scene, this.camera, this.effectRenderer, 0.5);
-		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 0.5, 0), new Vector2(40, 40));
+		this.picker = new Picker(this.scene, this.camera, this.effectRenderer, new Vector3(0, 0.75, 0), new Vector2(40, 40));
 
 		this.grass.ballPosition = this.picker.position;
 		this.grass.ballLightColor = this.picker.ballLightColor;
@@ -128,6 +131,7 @@ export class Field {
 		this.butterfly = new Butterfly(this.scene);
 
 		this.initUI();
+		this.cubeEvent = new cubeEvent(this.monolith.getMeshCube() as Mesh);
 		// this.skybox = new SpaceSkybox(this.scene);
 
 	}
@@ -218,6 +222,7 @@ export class Field {
 			this.monolith.update(time, this.camera);
 			this.grass.update(time, this.scene.activeCamera as Camera, this.picker.texture, this.picker.ballRadius);
 			this.butterfly.update(time, deltaTime);
+			this.cubeEvent.update(this.camera, time, deltaTime);
 
 			this.fog.lightsUbo.updateVector3("pointAPosition", this.picker.position);
 			this.fog.lightsUbo.updateVector3("pointBPosition", this.monolith.light.position);

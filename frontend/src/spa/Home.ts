@@ -117,6 +117,7 @@ class Home {
 		//meRequest()
 		//.catch(() => window.location.reload());
 		App3D.setVue("home");
+		App3D.setCube("play", () => { Router.nav("/play"); });
 		//App3D.setCSS3dObjectEnable(this.ref.stats.id, true);
 		// App3D.setCSS3dObjectEnable(this.ref.play.id, true);
 		//App3D.setCSS3dObjectEnable(this.ref.bricks.id, true);
