@@ -18,7 +18,7 @@ export default class brick {
 			enabledModules: ['score', 'timer', 'buttons'],
 			theme: 'pong',
 			modulePositions: {
-				score: { x: 'center', y: 'top', offset: { x: 300, y: 0 } },
+				score: { x: 'left', y: 'top', offset: { x: 200, y: 0 }},
 				timer: { x: 'center', y: 'top', offset: { x: -100, y: 0 } },
 				buttons: { x: 'center', y: 'bottom' }
 			}

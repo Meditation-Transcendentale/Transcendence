@@ -379,6 +379,9 @@ class GameUI {
 		this.modules.playercounter?.update(playerLeft);
 	}
 
+	public updatePBScore(score: number){
+		this.modules.score?.updatePBScore(score);
+	}
 }
 
 interface GameUIModule {
@@ -487,18 +490,21 @@ class ScoreVersusModule implements GameUIModule {
 
 interface ScoreHtmlReference {
 	scoreValue: HTMLSpanElement;
+	scorePBValue: HTMLSpanElement;
 }
 
 class ScoreModule implements GameUIModule {
 	private div: HTMLDivElement;
 	private ref: ScoreHtmlReference;
 	private scoreValue = 0;
+	private pb = 0;
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
 
 		this.ref = {
-			scoreValue: div.querySelector("#score-value") as HTMLSpanElement
+			scoreValue: div.querySelector("#score-value") as HTMLSpanElement,
+			scorePBValue: div.querySelector("#scorepb-value") as HTMLSpanElement
 		};
 	}
 
@@ -514,6 +520,16 @@ class ScoreModule implements GameUIModule {
 		this.scoreValue = score;
 		if (this.ref.scoreValue) {
 			this.ref.scoreValue.textContent = score.toString();
+		}
+		if (this.scoreValue > this.pb){
+			this.updatePBScore(this.scoreValue);
+		}
+	}
+
+	updatePBScore(score: number) {
+		this.pb = score;
+		if (this.ref.scorePBValue) {
+			this.ref.scorePBValue.textContent = score.toString();
 		}
 	}
 }

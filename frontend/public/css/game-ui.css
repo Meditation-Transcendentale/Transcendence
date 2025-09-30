@@ -34,8 +34,30 @@
     line-height: 1;
 }
 
-.score-value{
+#scorevs-module .score-value{
 	font-size: 15vh;
+	font-weight: bold;
+	color: white;
+}
+
+#score-module{
+    position: fixed;
+    
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+
+#score-module .score-container{
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+
+#score-module .score-value{
+    font-size: 10vh;
 	font-weight: bold;
 	color: white;
 }
@@ -123,7 +145,7 @@
 }
 
 #ending-module {
-    display: flex; /* ou flex mais pas centré par défaut */
+    display: flex;
     position: fixed;
     top: 0;
     left: 0;

@@ -1,6 +1,7 @@
 import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4, Observer, TransformNode, FreeCamera } from "@babylonImport";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
+import { getRequest, patchRequest } from "../spa/requests";
 import earcut from "earcut";
 import GameUI from "../spa/GameUI";
 
@@ -26,6 +27,9 @@ export class BrickBreaker {
 	private start1: boolean = true;
 	public gameUI: GameUI;
 	public score: number = 0;
+	private pbEasy: number = 0;
+	private pbMedium: number = 0;
+	private pbHard: number = 0;
 
 
 
@@ -60,6 +64,8 @@ export class BrickBreaker {
 			return;
 		}
 
+		let pb = getRequest("stats/get/brickbreaker");
+		console.log("pb_____", pb);
 		this.reset();
 
 		this.layers = Math.ceil((Math.random() * 5) + 1);
@@ -119,7 +125,7 @@ export class BrickBreaker {
 			});
 		}
 		this.score = 0;
-		// this.gameUI.stopTimer();
+		this.gameUI.updateScore(0);
 		this.ball.reset();
 		this.player.reset();
 		this.lastTime = performance.now();
