@@ -17,68 +17,6 @@ dotenv.config({ path: "../../.env" });
 
 const API_URL = "https://localhost:7000/api";
 
-async function lobbyConnectionInit(user) {
-  const url = `wss://localhost:7000/lobbies?uuid=${encodeURIComponent(
-    user.uuid
-  )}&lobbyId=${encodeURIComponent(user.lobbyId)}`;
-  const ws = new WebSocket(url, { rejectUnauthorized: false });
-  ws.binaryType = "arraybuffer";
-
-  ws.onopen = (e) => {
-    setTimeout(() => {
-      ws?.send(
-        encodeClientMessage({ ready: { lobbyId: user.lobbyId.toString() } })
-      );
-    }, 1000);
-  };
-
-  ws.onmessage = (msg) => {
-    const buf = new Uint8Array(msg.data);
-    const payload = decodeServerMessage(buf);
-    if (payload.error != null) return;
-
-    if (payload.start != null) {
-      const gameId = payload.start.gameId;
-      user.setGameId(gameId);
-      ws?.close();
-      resolve();
-    }
-
-    if (payload.startTournament != null) {
-      const tournamentId = payload.startTournament.tournamentId;
-      console.log (tournamentId);
-      user.setTournamentId(tournamentId);
-      console.log (`START TOURNAMENT RECEIVED:${tournamentId}`)
-      ws?.close();
-      resolve();
-    }
-  };
-
-  ws.onclose = () => { resolve(); };
-
-  ws.onerror = (err) => {
-    console.warn(err);
-  };
-}
-
-async function lobbySetup(users, nbuser) {
-  for (let i = 0; i < nbuser; i++) {
-    lobbyConnectionInit(users[i]);
-  }
-}
-
-async function gameSetup(users, nbuser) {
-  for (let i = 0; i < nbuser; i++) {
-    if (users[i].gameId) startGameTournament(users[i]);
-  }
-}
-
-async function tournamentSetup(users, nbuser) {
-  for (let i = 0; i < nbuser; i++) {
-    settingUpTournament(users[i]);
-  }
-}
-
 async function userConnectionInit(Users, nbuser, lobbyId, agent) {
   console.log(
     `[PLAYER TEST] connection ${nbuser} users for lobbyId: ${lobbyId}`
@@ -113,6 +51,52 @@ async function userConnectionInit(Users, nbuser, lobbyId, agent) {
   }
 }
 
+async function lobbyConnectionInit(user) {
+  const url = `wss://localhost:7000/lobbies?uuid=${encodeURIComponent(
+    user.uuid
+  )}&lobbyId=${encodeURIComponent(user.lobbyId)}`;
+  const ws = new WebSocket(url, { rejectUnauthorized: false });
+  ws.binaryType = "arraybuffer";
+
+  ws.onopen = (e) => {
+    setTimeout(() => {
+      ws?.send(
+        encodeClientMessage({ ready: { lobbyId: user.lobbyId.toString() } })
+      );
+    }, 1000);
+  };
+
+  ws.onclose = () => {};
+
+  ws.onerror = (err) => {
+    console.warn(err);
+  };
+
+  return new Promise((resolve) => {
+    ws.onmessage = (msg) => {
+      const buf = new Uint8Array(msg.data);
+      const payload = decodeServerMessage(buf);
+      if (payload.error != null) return;
+
+      if (payload.start != null) {
+        const gameId = payload.start.gameId;
+        user.setGameId(gameId);
+        ws?.close();
+        resolve();
+      }
+
+      if (payload.startTournament != null) {
+        const tournamentId = payload.startTournament.tournamentId;
+        console.log(tournamentId);
+        user.setTournamentId(tournamentId);
+        console.log(`${user.uuid}:START TOURNAMENT RECEIVED=${tournamentId}`);
+        ws?.close();
+        resolve();
+      }
+    };
+  });
+}
+
 async function main() {
   console.log(`[PLAYER TEST] started`);
   const agent = new https.Agent({
@@ -125,13 +109,19 @@ async function main() {
   console.log(lobbyId, nbuser);
   const users = [];
   await userConnectionInit(users, nbuser, lobbyId, agent);
-  await lobbySetup(users, nbuser).then(async () => {
-    for (let i = 0; i < Math.log2(nbuser); i++) {
-      await tournamentSetup(users, nbuser).then (async() => {
-        await gameSetup(users, nbuser);
-      });
-    }
-  });
+  await Promise.all(users.map((user) => lobbyConnectionInit(user)));
+  for (let i = 0; i < Math.log2(nbuser); i++) {
+    await Promise.all(
+      users.map(async (user) => {
+        await settingUpTournament(user);
+      })
+    );
+    await Promise.all(
+      users.map(async (user) => {
+        await startGameTournament(user);
+      })
+    );
+  }
   console.log("The end");
 }
 
