@@ -95,7 +95,7 @@ class RouterC {
 			ts: "./Tournament",
 			callback: (url: URL) => { this.loadInMain(url) }
 		} as routePage);
-		this.routes.set("/auth", { 
+		this.routes.set("/auth", {
 			html: "/auth",
 			ts: "./Auth",
 			callback: (url: URL) => { this.loadInMain(url) }
@@ -162,7 +162,7 @@ class RouterC {
 					}
 				})
 		} else {
-			if (url.pathname == "/auth" ) {
+			if (url.pathname == "/auth") {
 				url.pathname = "/home";
 				url.search = "";
 			}
@@ -173,7 +173,7 @@ class RouterC {
 		console.log("%c Navigating to %s", "color: white; background-color: blue", url.href);
 
 		//url.pathname = "/home";
-		if (url.pathname !== "/auth" ) {
+		if (url.pathname !== "/auth") {
 			this.loadAth();
 		}
 		this.routes.get(url.pathname)?.callback(url);
@@ -238,7 +238,7 @@ class RouterC {
 		this.nav(tempPath, false, true);
 	}
 
-	public getComebackRoute () {
+	public getComebackRoute() {
 		return (this.comebackRoutePath);
 	}
 
