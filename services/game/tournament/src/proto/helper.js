@@ -164,5 +164,5 @@ export function decodeTournamentClientMessage(buffer) {
 }
 
 export function decodeMatchScoreUpdate(buffer) {
-	return Proto.shared.ScoreUpdate.decode(buffer);
+	return Proto.shared.MatchScoreUpdate.decode(buffer);
 }

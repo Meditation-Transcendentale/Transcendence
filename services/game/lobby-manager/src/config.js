@@ -11,6 +11,6 @@ export default {
 		local: 1,
 		br: 1,
 		pongIO: 20,
-		tournament: 4,
+		tournament: 8,
 	},
 };

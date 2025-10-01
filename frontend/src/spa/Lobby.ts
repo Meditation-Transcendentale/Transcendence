@@ -249,6 +249,8 @@ export default class Lobby {
 		const name = document.createElement('td');
 		const status = document.createElement('td');
 
+		this.players.set(uuid, { td: div, name: name, status: status });
+
 		name.className = "username";
 		status.className = "status";
 
@@ -271,7 +273,6 @@ export default class Lobby {
 			this.ref.playersList.appendChild(div);
 		}
 
-		this.players.set(uuid, { td: div, name: name, status: status });
 	}
 
 	private async wsSend(type: string) {
