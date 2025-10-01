@@ -113,16 +113,17 @@ async function main() {
   await Promise.all(users.map((user) => lobbyConnectionInit(user)));
   // setTimeout(() => {}, 100000);
   for (let i = 0; i < Math.log2(nbuser); i++) {
-    await Promise.all(
-      users.map(async (user) => {
-        await settingUpTournament(user);
-      })
-    );
-    await Promise.all(
-      users.map(async (user) => {
-        await startGameTournament(user);
-      })
-    );
+    const tournamentPromises = [];
+    for (let j = 0; j < nbuser; j++) {
+      tournamentPromises.push(settingUpTournament(users[j]));
+    }
+    await Promise.all(tournamentPromises);
+
+    const gamePromises = [];
+    for (let j = 0; j < nbuser; j++) {
+      gamePromises.push(startGameTournament(users[j]));
+    }
+    await Promise.all(gamePromises);
   }
   console.log("The end");
 }

@@ -3896,109 +3896,6 @@ export namespace tournament {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
-    /** Properties of a Score. */
-    interface IScore {
-
-        /** Score values */
-        values?: (number[]|null);
-
-        /** Score forfeit */
-        forfeit?: (boolean|null);
-    }
-
-    /** Represents a Score. */
-    class Score implements IScore {
-
-        /**
-         * Constructs a new Score.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: tournament.IScore);
-
-        /** Score values. */
-        public values: number[];
-
-        /** Score forfeit. */
-        public forfeit: boolean;
-
-        /**
-         * Creates a new Score instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns Score instance
-         */
-        public static create(properties?: tournament.IScore): tournament.Score;
-
-        /**
-         * Encodes the specified Score message. Does not implicitly {@link tournament.Score.verify|verify} messages.
-         * @param message Score message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: tournament.IScore, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified Score message, length delimited. Does not implicitly {@link tournament.Score.verify|verify} messages.
-         * @param message Score message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: tournament.IScore, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a Score message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns Score
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tournament.Score;
-
-        /**
-         * Decodes a Score message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns Score
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tournament.Score;
-
-        /**
-         * Verifies a Score message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a Score message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns Score
-         */
-        public static fromObject(object: { [k: string]: any }): tournament.Score;
-
-        /**
-         * Creates a plain object from a Score message. Also converts values to other types if specified.
-         * @param message Score
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: tournament.Score, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this Score to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for Score
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
     /** Properties of a MatchNode. */
     interface IMatchNode {
 
@@ -4009,7 +3906,7 @@ export namespace tournament {
         player2Id?: (string|null);
 
         /** MatchNode score */
-        score?: (tournament.IScore|null);
+        score?: (number[]|null);
 
         /** MatchNode gameId */
         gameId?: (string|null);
@@ -4022,6 +3919,9 @@ export namespace tournament {
 
         /** MatchNode winnerId */
         winnerId?: (string|null);
+
+        /** MatchNode forfeitId */
+        forfeitId?: (string|null);
     }
 
     /** Represents a MatchNode. */
@@ -4040,7 +3940,7 @@ export namespace tournament {
         public player2Id: string;
 
         /** MatchNode score. */
-        public score?: (tournament.IScore|null);
+        public score: number[];
 
         /** MatchNode gameId. */
         public gameId: string;
@@ -4053,6 +3953,9 @@ export namespace tournament {
 
         /** MatchNode winnerId. */
         public winnerId: string;
+
+        /** MatchNode forfeitId. */
+        public forfeitId: string;
 
         /**
          * Creates a new MatchNode instance using the specified properties.

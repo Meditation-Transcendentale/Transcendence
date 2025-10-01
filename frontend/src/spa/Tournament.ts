@@ -14,18 +14,14 @@ type PlayerState = {
   eliminated: boolean;
 };
 
-type Score = {
-  values?: number[];
-  forfeit?: boolean;
-};
-
 type MatchNode = {
   player1Id?: string | null;
   player2Id?: string | null;
   left?: MatchNode | null;
   right?: MatchNode | null;
   winnerId?: string | null;
-  score?: Score | null;
+  score?: number[] | null;
+  forfeitId?: string | null;
   gameId?: string | null;
 };
 
@@ -234,12 +230,12 @@ export default class TournamentPage {
 
   private rowScore(node: MatchNode, pid: string | null): string | null {
     if (!node.winnerId && !node.score) return null;
-    if (node.score?.forfeit) return pid && node.winnerId === pid ? "W/O" : "DQ";
+    if (node.forfeitId) return pid && node.winnerId === pid ? "W/O" : "DQ";
     if (node.winnerId) return pid && node.winnerId === pid ? "WIN" : "—";
     if (node.score?.values?.length)
       return pid && node.player1Id === pid
-        ? node.score.values[0].toString()
-        : node.score.values[1].toString();
+        ? node.score[0].toString()
+        : node.score[1].toString();
     return null;
   }
 
