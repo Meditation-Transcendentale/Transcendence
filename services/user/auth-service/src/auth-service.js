@@ -2,7 +2,7 @@ import fastify from 'fastify';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import fastifyCookie from 'fastify-cookie';
+import fastifyCookie from '@fastify/cookie';
 import bcrypt from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
 import https from 'https';

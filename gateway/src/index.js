@@ -2,7 +2,7 @@ import fastify from "fastify";
 import fs from "fs";
 import dotenv from "dotenv";
 import fastifyHttpProxy from "@fastify/http-proxy";
-import fastifyCookie from "fastify-cookie";
+import fastifyCookie from "@fastify/cookie";
 import fastifyCaching from "@fastify/caching";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyCompress from "@fastify/compress";
