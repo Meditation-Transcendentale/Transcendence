@@ -10,7 +10,6 @@ import {
 	encodeStatusUpdate
 } from './proto/helper.js'
 
-// Simple Lobby model
 class Lobby {
 	constructor({ id, mode, map }) {
 		this.id = id;
@@ -18,7 +17,6 @@ class Lobby {
 		this.map = map;
 		console.log(mode);
 		this.maxPlayers = config.MAX_PLAYERS[mode] ?? 2;
-		// userId -> { isReady, lastSeen }
 		this.players = new Map();
 		this.createdAt = Date.now();
 		this.lastActivity = Date.now();
@@ -77,6 +75,13 @@ class Lobby {
 	allReady() {
 		return (
 			this.players.size == this.maxPlayers &&
+			[...this.players.values()].every(p => p.isReady)
+		)
+	}
+
+	allReadyBr() {
+		return (
+			this.mode == "br" &&
 			[...this.players.values()].every(p => p.isReady)
 		)
 	}
@@ -148,7 +153,7 @@ export default class LobbyService {
 		lobby.markReady(userId)
 		const state = lobby.getState()
 
-		if (lobby.allReady()) {
+		if (lobby.allReady() || lobby.allReadyBr()) {
 			if (lobby.mode == `tournament`) {
 				console.log(lobby.players.keys());
 				const reqBufTournament = encodeTournamentCreateRequest({
