@@ -37,4 +37,27 @@ const handleErrorsNats = (fn) => async (msg) => {
 	}
 };
 
-export { handleErrors, handleErrorsValid, handleErrorsNats };
+const handleErrors42 = (fn) => async (req, res) => {
+	try {
+		await fn(req, res);
+	} catch (error) {
+		console.error(`Error in ${req.method} ${req.url}:`, error);
+		const status = error.status || statusCode.INTERNAL_SERVER_ERROR;
+		const message = error.message || returnMessages.INTERNAL_SERVER_ERROR;
+		const code = error.code || 500;
+		res.send(`
+			<!DOCTYPE html>
+			<html>
+				<head><title>Connexion 42</title></head>
+				<body>
+				<script>
+					window.opener.postMessage({ type: "ft_login_error" }, "*");
+					window.close();
+				</script>
+				</body>
+			</html>
+		`);
+	}
+};
+
+export { handleErrors, handleErrorsValid, handleErrorsNats, handleErrors42 };

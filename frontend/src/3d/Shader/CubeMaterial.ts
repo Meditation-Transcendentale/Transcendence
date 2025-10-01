@@ -64,124 +64,134 @@ export class CubeMaterial extends CustomMaterial {
 
 		this.Vertex_After_WorldPosComputed(`
 
-										   vec3 worldPos2 = finalWorld[3].xyz;
-										   vec3 originalWorldPos = worldPos.xyz;
-										   worldPos2 += floatingOffset;
+										   // vec3 worldPos2 = finalWorld[3].xyz;
+										   // vec3 originalWorldPos = worldPos.xyz;
+										   // worldPos2 += floatingOffset;
 										   worldPos.xyz += floatingOffset;
 										   // Random per-voxel offset
-										   vec3 animOffset = hash3(instanceID);
-										   float t = time * animationSpeed;
-
-										   // === BASE WAVE ANIMATION (Always Active) ===
-										   float wavePhase = t + dot(worldPos2, vec3(0.1, 0.05, 0.08));
-										   vec3 baseWave = vec3(
-											   sin(wavePhase + animOffset.x * 3.14159) * 0.3,
-											   sin(wavePhase * 0.7 + animOffset.y * 3.14159) * 0.2,
-											   cos(wavePhase * 0.9 + animOffset.z * 3.14159) * 0.25
-										   ) * baseWaveIntensity;
-										   // Add vertical wave that travels up the structure
-										   float verticalWave = sin(worldPos2.y * 0.3 - t * 2.0) * 0.1 * baseWaveIntensity;
-										   baseWave.x += verticalWave;
-										   baseWave.z += verticalWave * 0.5;
-										   // === MOUSE INFLUENCE ANIMATION ===
-										   float distanceToMouse = length(worldPos2 - origin);
-										   float mouseInfluence = smoothstep(mouseInfluenceRadius, 0.0, distanceToMouse);
-
-										   // Calculate mouse movement direction
-										   vec3 mouseMovement = origin - oldOrigin;
-										   float mouseSpeed = length(mouseMovement);
-										   vec3 mouseDirection = mouseMovement ; // Movement direction
-										   vec3 pushDirection = normalize(worldPos2 - origin + vec3(0.001)); // Direction from mouse to voxel
-										   float pushStrength = mouseSpeed * 2.0; // Scale with mouse speed
-										   vec3 mouseAnimation = vec3(
-											   sin(t * 3.0 + animOffset.x * 6.28) * animOffset.x,
-											   sin(t * 2.5 + animOffset.y * 6.28) * animOffset.y,
-											   cos(t * 2.8 + animOffset.z * 6.28) * animOffset.z
-										   ) * animationIntensity * 3.;
-										   float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
-
-										   mouseAnimation += mouseDirection * radialPulse * animationIntensity;
-										   mouseAnimation+= pushDirection * 0.05 * mouseInfluence;
-
-										   if(textGlow > 0.0) {
-
-											   float phaseOffset = hash(instanceID) * 6.28;
-											   float phaseAmount = sin(time * 1.5 + phaseOffset) * 0.5 + 0.5;
-
-											   vec3 dimensionOffset = vec3(
-												   sin(instanceID * 0.1) * 0.1,
-												   cos(instanceID * 0.13) * 0.15,
-												   sin(instanceID * 0.17) * 0.18
-											   );
-
-											   worldPos.xyz += dimensionOffset * phaseAmount;
-										   }
-
-										   // === COMBINE ANIMATIONS ===
-										   vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) ;
-										   worldPos.xyz += totalDisplacement;
-										   float displacement = length(worldPos.xyz - originalWorldPos.xyz);
-										   float maxDisplacement = 1.0;
-										   oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
+										   // vec3 animOffset = hash3(instanceID);
+										   // float t = time * animationSpeed;
+										   //
+										   // // === BASE WAVE ANIMATION (Always Active) ===
+										   // float wavePhase = t + dot(worldPos2, vec3(0.1, 0.05, 0.08));
+										   // vec3 baseWave = vec3(
+										   //  sin(wavePhase + animOffset.x * 3.14159) * 0.3,
+										   //  sin(wavePhase * 0.7 + animOffset.y * 3.14159) * 0.2,
+										   //  cos(wavePhase * 0.9 + animOffset.z * 3.14159) * 0.25
+										   // ) * baseWaveIntensity;
+										   // // Add vertical wave that travels up the structure
+										   // float verticalWave = sin(worldPos2.y * 0.3 - t * 2.0) * 0.1 * baseWaveIntensity;
+										   // baseWave.x += verticalWave;
+										   // baseWave.z += verticalWave * 0.5;
+										   // // === MOUSE INFLUENCE ANIMATION ===
+										   // float distanceToMouse = length(worldPos2 - origin);
+										   // float mouseInfluence = smoothstep(mouseInfluenceRadius, 0.0, distanceToMouse);
+										   //
+										   // // Calculate mouse movement direction
+										   // vec3 mouseMovement = origin - oldOrigin;
+										   // float mouseSpeed = length(mouseMovement);
+										   // vec3 mouseDirection = mouseMovement ; // Movement direction
+										   // vec3 pushDirection = normalize(worldPos2 - origin + vec3(0.001)); // Direction from mouse to voxel
+										   // float pushStrength = mouseSpeed * 2.0; // Scale with mouse speed
+										   // vec3 mouseAnimation = vec3(
+										   //  sin(t * 3.0 + animOffset.x * 6.28) * animOffset.x,
+										   //  sin(t * 2.5 + animOffset.y * 6.28) * animOffset.y,
+										   //  cos(t * 2.8 + animOffset.z * 6.28) * animOffset.z
+										   // ) * animationIntensity * 3.;
+										   // float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
+										   //
+										   // mouseAnimation += mouseDirection * radialPulse * animationIntensity;
+										   // mouseAnimation+= pushDirection * 0.05 * mouseInfluence;
+										   //
+										   // if(textGlow > 0.0) {
+										   //
+										   //  float phaseOffset = hash(instanceID) * 6.28;
+										   //  float phaseAmount = sin(time * 1.5 + phaseOffset) * 0.5 + 0.5;
+										   //
+										   //  vec3 dimensionOffset = vec3(
+										   //   sin(instanceID * 0.1) * 0.1,
+										   //   cos(instanceID * 0.13) * 0.15,
+										   //   sin(instanceID * 0.17) * 0.18
+										   //  );
+										   //
+										   //  worldPos.xyz += dimensionOffset * phaseAmount;
+										   // }
+										   //
+										   // // === COMBINE ANIMATIONS ===
+										   // vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) ;
+										   // worldPos.xyz += totalDisplacement;
+										   // float displacement = length(worldPos.xyz - originalWorldPos.xyz);
+										   // float maxDisplacement = 1.0;
+										   // oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
 
 
 
 `)
 
-		this.Vertex_MainEnd(`
-    vOriginalWorldPos = originalWorldPos;
-
-		`)
-
-
 		this.Fragment_Begin(`
     varying vec3 vOriginalWorldPos;
-			varying float oclusion;
-		`)
-
+    varying float oclusion;
+`)
 		this.Fragment_Definitions(`
-			varying vec3 vFly;
-		`)
-
-		this.Fragment_Before_Lights(`
-			
-		`);
+    float bayerDither4x4(vec2 screenPos) {
+        mat4 bayerMatrix = mat4(
+            0.0, 8.0, 2.0, 10.0,
+            12.0, 4.0, 14.0, 6.0,
+            3.0, 11.0, 1.0, 9.0,
+            15.0, 7.0, 13.0, 5.0
+        ) / 16.0;
+        vec2 pos = mod(floor(screenPos), 4.0);
+        int x = int(pos.x);
+        int y = int(pos.y);
+        return bayerMatrix[x][y];
+    }
+`)
 
 		this.Fragment_MainEnd(`
-    vec3 originalPos = vOriginalWorldPos; 
-    vec3 baseColor2 = vec3(0., 0., 0.);
-
-	vec3 faceNormal = normalize(vNormalW);
-
-        
+    vec3 viewDir = normalize(vEyePosition.xyz - vPositionW);
+    vec3 faceNormal = normalize(vNormalW);
     
-	gl_FragColor.rgb *= oclusion;
-    gl_FragColor.rgb += baseColor2;
+    float edgeFactor = pow(1.0 - abs(dot(viewDir, faceNormal)), 3.0);
+    
+    float dither = (bayerDither4x4(gl_FragCoord.xy) - 0.5) * 0.015;
+    gl_FragColor.rgb += dither * edgeFactor;
+    
+    gl_FragColor.rgb *= (1.0 - edgeFactor * 0.1);
+    
+	gl_FragColor *= 2.;
+    gl_FragColor.a = .1;
+`)
 
-			gl_FragColor.a = 1.;
-		`)
 		const colorTex = new Texture("/assets/MetalPlates008_2K-JPG_Color.jpg", scene);
-		const normalTex = new Texture("/assets/chunk_normal.jpg", scene);
-		const roughnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Roughness.jpg", scene);
-		const metalnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Metalness.jpg", scene);
-		const displacementTex = new Texture("/assets/MetalPlates008_2K-JPG_Displacement.jpg", scene);
-
+		// const normalTex = new Texture("/assets/chunk_normal.jpg", scene);
+		// const roughnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Roughness.jpg", scene);
+		// const metalnessTex = new Texture("/assets/MetalPlates008_2K-JPG_Metalness.jpg", scene);
+		// const displacementTex = new Texture("/assets/MetalPlates008_2K-JPG_Displacement.jpg", scene);
+		//
 		// this.diffuseTexture = colorTex;
-		this.bumpTexture = normalTex;
+		// this.bumpTexture = normalTex;
 		// this.specularTexture = displacementTex;
 
-		this.diffuseColor = new Color3(0.0, 0.0, 0.0);
-		this.specularColor = Color3.White();
-		this.specularPower = 16;
+		// this.diffuseColor = new Color3(0.1, 0.1, 0.1);
+		this.specularColor = new Color3(0.0, 0.0, 0.0); // Add some specular
+		this.specularPower = 2; // Sharp specular highlights
+		this.emissiveColor = new Color3(0.01, 0.01, 0.01); // Very subtle glow
+		this.diffuseColor = Color3.Black();
+		this.alphaMode = 0;
+
+		// this.diffuseColor = new Color3(0.1, 0.1, 0.1);
+		// this.specularColor = Color3.White();
+		// this.emissiveColor = Color3.Black();
+		// this.specularPower = 16;
 		// this.emissiveColor = new Color3(0.02, 0.02, 0.02);
-		this.invertNormalMapX = true;
+		// this.invertNormalMapX = true;
 		// this.invertNormalMapY = true;
 		// this.invertNormalMapZ = true;
 
-		colorTex.uScale = colorTex.vScale = 0.5;
-		normalTex.uScale = normalTex.vScale = 1.;
-		roughnessTex.uScale = roughnessTex.vScale = 0.5;
-		colorTex.level = 0.7;
+		// colorTex.uScale = colorTex.vScale = 0.5;
+		// normalTex.uScale = normalTex.vScale = 1.;
+		// roughnessTex.uScale = roughnessTex.vScale = 0.5;
+		// colorTex.level = 0.7;
 
 	}
 

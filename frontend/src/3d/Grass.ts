@@ -28,7 +28,7 @@ const optionsB: _thinInstancesOptions = {
 	stiffness: 0.4,
 	rotation: 0.2,
 	size: 1,
-	scale: new Vector3(2., 2.2, 2.)
+	scale: optionsA.scale
 };
 
 
@@ -57,6 +57,7 @@ export class Grass {
 	private reduced: boolean;
 
 	public ballPosition!: Vector3;
+	public ballLightColor!: Color3;
 
 	constructor(scene: Scene, size: number) {
 		this._size = size;
@@ -95,12 +96,12 @@ export class Grass {
 
 		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 4, -this.depth, 0)), this._size * 2, this._size * 2));
 		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 4, -this.depth, 0)), this._size * 2, this._size * 2));
-		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 4, -this.depth, -size * 4)), this._size * 2, this._size * 2));
-		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 4, -this.depth, -size * 4)), this._size * 2, this._size * 2));
 		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(0, -this.depth, -size * 4)), this._size * 2, this._size * 2));
-		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 4, -this.depth, -size * 8)), this._size * 2, this._size * 2));
-		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 4, -this.depth, -size * 8)), this._size * 2, this._size * 2));
-		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(0, -this.depth, -size * 8)), this._size * 2, this._size * 2));
+		this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(0, -this.depth, size * 4)), this._size * 2, this._size * 2));
+		// this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(0, -this.depth, -size * 4)), this._size * 2, this._size * 2));
+		// this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(size * 4, -this.depth, -size * 8)), this._size * 2, this._size * 2));
+		// this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(-size * 4, -this.depth, -size * 8)), this._size * 2, this._size * 2));
+		// this._tiles.push(new Tile(this.meshB, this._grassShader, o.add(new Vector3(0, -this.depth, -size * 8)), this._size * 2, this._size * 2));
 
 	}
 
@@ -111,6 +112,7 @@ export class Grass {
 		this._grassShader.setTexture("textureSampler", texture);
 		this._grassShader.setVec3("ballPosition", this.ballPosition);
 		this._grassShader.setFloat("ballRadius", radius);
+		this._grassShader.setColor3("ballLightColor", this.ballLightColor);
 
 		this._pastTime = time;
 

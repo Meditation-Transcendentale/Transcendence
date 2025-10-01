@@ -76,21 +76,21 @@ export default class Lobby {
 			html: this.ref.playersWindow.html,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(Math.PI).multiply(Matrix.Translation(0, 9, -40)),
+			world: Matrix.RotationY(-Math.PI * 0.3).multiply(Matrix.Translation(5, 5, 1)),
 			enable: false
 		});
 		this.ref.infoWindow.id = App3D.addCSS3dObject({
 			html: this.ref.infoWindow.html,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(5 * Math.PI / 4).multiply(Matrix.Translation(5, 10, -40)),
+			world: Matrix.RotationY(-Math.PI * 0.2).multiply(Matrix.Translation(4.5, 9, 12)),
 			enable: false
 		});
 		this.ref.inviteWindow.id = App3D.addCSS3dObject({
 			html: this.ref.inviteWindow.html,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(3 * Math.PI / 4).multiply(Matrix.Translation(-5, 8, -40)),
+			world: Matrix.RotationY(-Math.PI * 0.5).multiply(Matrix.Translation(15, 5, 0)),
 			enable: false
 		});
 		console.log(` invite = ${this.ref.inviteWindow.id} info = ${this.ref.infoWindow.id} `);
@@ -112,22 +112,32 @@ export default class Lobby {
 		this.ref.playersList.innerHTML = "";
 		this.setupWs(this.id);
 		this.ref.lobbyId.innerHTML = `${this.id}`;
+		this.ref.inviteList.innerHTML = "";
 
 		document.body.appendChild(this.css);
 
 
 		App3D.setVue("lobby");
+		App3D.setCube("ready", () => {
+			if (this.ws != null) {
+				this.ws?.send(encodeClientMessage({ ready: { lobbyId: this.id as string } }));
+				App3D.setCube("");
+			}
+		})
 		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, true);
 		App3D.setCSS3dObjectEnable(this.ref.infoWindow.id, true);
-		App3D.setCSS3dObjectEnable(this.ref.inviteWindow.id, true);
+
+		if (this.mode != "ai" && this.mode != "local") {
+		}
 
 		this.ref.lobbyIdCopy.addEventListener("click", () => {
-			navigator.clipboard.writeText(this.id);
+			navigator.clipboard.writeText(this.id as string);
 		})
 
 	}
 
 	public async unload() {
+		App3D.setCube("");
 		App3D.setCSS3dObjectEnable(this.ref.playersWindow.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.infoWindow.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.inviteWindow.id, false);
@@ -151,6 +161,7 @@ export default class Lobby {
 			User.status = { lobby: id };
 		}
 
+		let once = true;
 		this.ws.onmessage = (msg) => {
 			const buf = new Uint8Array(msg.data as ArrayBuffer);
 			const payload = decodeServerMessage(buf);
@@ -167,15 +178,18 @@ export default class Lobby {
 
 			if (payload.update != null) {
 				this.mode = payload.update.mode as string;
-				if (this.mode != "ai" && this.mode != "local") {
-					this.initInviteList();
-				}
 				this.ref.lobbyMode.innerHTML = `MODE : ${this.mode}`;
 				this.map = payload.update.map as string;
 				this.ref.lobbyMap.innerHTML = `MAP : ${this.map}`;
 				console.log(this.map);
 				this.updatePlayers(payload.update.players as Array<{ uuid: string, ready: boolean }>);
 				console.log(`Update :${payload}`);
+				if (this.mode != "ai" && this.mode != "local") {
+					if (once)
+						App3D.setCSS3dObjectEnable(this.ref.inviteWindow.id, true);
+					once = false;
+					this.initInviteList(payload.update.players as Array<{ uuid: string, ready: boolean }>);
+				}
 			}
 
 			if (payload.start != null) {
@@ -267,11 +281,19 @@ export default class Lobby {
 		if (this.ws) { this.ws?.send(msg); }
 	}
 
-	private initInviteList() {
+	private initInviteList(r: Array<{ uuid: string, ready: boolean }>) {
 		this.ref.inviteList.innerHTML = "";
 		const uuids = gFriendList.onlineFriends;
 		for (let i of uuids) {
-			this.createPlayerInvite(i[0]);
+			let b = true;
+			for (let y = 0; y < r.length; y++) {
+				if (r[y].uuid == i[0]) {
+					b = false;
+					break;
+				}
+			}
+			if (b)
+				this.createPlayerInvite(i[0]);
 		}
 	}
 

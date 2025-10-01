@@ -79,11 +79,13 @@ export default async function statsRoutes(app) {
 		});
 	}));
 
-	app.get('/get/brickbreaker/:uuid', handleErrors(async (req, res) => {
+	app.get('/get/brickbreaker', handleErrors(async (req, res) => {
 
-		const { uuid } = req.params;
+		// const { uuid } = req.params;
 
-		const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid }), { timeout: 1000 });
+		// const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid }), { timeout: 1000 });
+		const user = await nats.request('user.getUserFromHeader', jc.encode({ headers: req.headers }), { timeout: 1000 });
+
 		const userResult = jc.decode(user.data);
 		if (!userResult.success) {
 			throw { status: userResult.status, code: userResult.code, message: userResult.message };
@@ -99,6 +101,34 @@ export default async function statsRoutes(app) {
 		const brickBreakerStats = result.data;
 		
 		res.code(statusCode.SUCCESS).send({ brickBreakerStats });
+	}));
+
+	app.patch('/update/brickbreaker', handleErrors(async (req, res) => {
+
+		const { mode, score } = JSON.parse(req.body);
+
+		const user = await nats.request('user.getUserFromHeader', jc.encode({ headers: req.headers }), { timeout: 1000 });
+		const userResult = jc.decode(user.data);
+		if (!userResult.success) {
+			throw { status: userResult.status, code: userResult.code, message: userResult.message };
+		}
+
+		switch (true) {
+			case (mode === 'easy'):
+				await nats.request(`stats.updateBrickBreakerEasyStats`, jc.encode({ playerId: userResult.data.id, score}), { timeout: 1000 });
+				break;
+			case (mode === 'medium'):
+				await nats.request(`stats.updateBrickBreakerNormalStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
+				break;
+			case (mode === 'hard'):
+				await nats.request(`stats.updateBrickBreakerHardStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
+				break;
+			default:
+				throw { status: 400, code: 40031, message: 'No score provided' };
+		}
+ 
+		res.code(statusCode.SUCCESS).send({ message: 'Stats updated' });
+
 	}));
 
 	app.get('/get/leaderboard/brickbreaker', handleErrors(async (req, res) => {

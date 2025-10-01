@@ -130,7 +130,7 @@ export class Pong {
 			this.pongRoot.position.set(0.1, 10, 0);
 			this.pongRoot.scalingDeterminant = 0.07;
 		} else if (maps == "grass") {
-			this.pongRoot.position.set(5, 0, 5);
+			this.pongRoot.position.set(5, 10, 5);
 			this.pongRoot.scalingDeterminant = 0.25;
 		} else if (maps == "void") {
 			this.pongRoot.position.set(100, 0, 100);

@@ -6,7 +6,8 @@ import { Vue } from "../Vue";
 import { css3dObject, CSSRenderer } from "./CSSRenderer";
 import { Interpolator } from "./Interpolator";
 
-import { UIaddDetails, UIaddVec3 } from "./UtilsUI";
+import { UIaddDetails, UIaddSliderVec3, UIaddVec3 } from "./UtilsUI";
+import { hash33 } from "./PerlinWorley";
 
 const handleSubmit = function(e: Event) {
 	e.preventDefault();
@@ -26,6 +27,8 @@ class app3d {
 
 	private cssRenderer!: CSSRenderer;
 
+	private _cubeEvent: any;
+
 	constructor() {
 
 		this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -38,7 +41,7 @@ class app3d {
 			antialias: true,
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
-		// this.engine.setHardwareScalingLevel(8.0);
+		// this.engine.setHardwareScalingLevel(2.0);
 		this.engine.getCaps().textureFloatRender = true;
 
 		window.addEventListener('resize', () => {
@@ -46,6 +49,10 @@ class app3d {
 			this.environment.resize();
 			this.cssRenderer.resize(window.innerWidth, window.innerHeight)
 		})
+
+		UIaddDetails("MISC", null, "misc-details");
+		UIaddDetails("COLORS", null, "colors-details");
+		UIaddDetails("LIGHTS", null, "lights-details");
 
 		this.environment = new Environment(this.engine, this.canvas);
 		this.fps = document.getElementById('fps') as HTMLElement;
@@ -132,6 +139,10 @@ class app3d {
 
 	public onHoverEffect(status: number) {
 		this.environment.onHover(status);
+	}
+
+	public setCube(name: string, clickEv?: any, hoverEv?: any) {
+		this.environment.setCube(name, clickEv, hoverEv);
 	}
 }
 

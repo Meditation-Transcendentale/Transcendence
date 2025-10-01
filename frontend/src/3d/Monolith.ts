@@ -2,6 +2,9 @@ import { Camera, Mesh, MeshBuilder, Scene, Vector3, LoadAssetContainerAsync, Sta
 import { SDFSystem, SDFNode, SDFBuilder } from "./Sdf";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
 import { CubeMaterial } from "./Shader/CubeMaterial";
+import { voxelData as templeMedium } from './temple-medium';
+import { UIaddColor } from "./UtilsUI";
+
 
 
 type MonolithOptions = {
@@ -41,7 +44,7 @@ export class Monolith {
 	private voxelMesh: Mesh | null = null;
 	private cube!: Mesh;
 	public material!: MonolithMaterial;
-	public cubeMaterial!: CubeMaterial;
+	public cubeMaterial!: CubeMaterial | StandardMaterial;
 	public options: MonolithOptions;
 	private defaultCursorPosition!: Vector3;
 	private sdfSystem: SDFSystem;
@@ -74,6 +77,8 @@ export class Monolith {
 
 	public depthMaterial: ShaderMaterial;
 	public depthMaterialCube: ShaderMaterial;
+
+	private cubeLight: PointLight;
 
 	constructor(scene: Scene, size: number, cursor: Vector3, options?: Partial<MonolithOptions>) {
 		this.scene = scene;
@@ -109,12 +114,33 @@ export class Monolith {
 				"oldOrigin", "deadZoneCenter", "deadZoneWidth", "deadZoneHeight", "deadZoneDepth", "textPosition0", "textSize0", "textGlow0", "floatingOffset"]
 		});
 
+		this.cube = MeshBuilder.CreateBox("thecube", {
+			size: 1,
+			updatable: false,
+
+		},
+			this.scene);
+
+		this.cube.position = new Vector3(0, 4.5, 0);
+		this.cubeLight = new PointLight("cube light", this.cube.position, this.scene);
+		this.cubeLight.range = 2;
+		this.cubeLight.diffuse = Color3.Purple();
+		this.cubeLight.intensity = 2;
 
 		this.initializeVector3Pool();
+	}
 
-		this.applyQualitySettings();
+	public async loadPrebuiltVoxels(): Promise<boolean> {
+		const positions = templeMedium.positions.map(([x, y, z]) =>
+			new Vector3(x, y, z)
+		);
+		this.options.voxelSize = templeMedium.voxelSize;
 
-		this.buildDefaultSDF();
+		if (positions.length > 0) {
+			this.voxelMesh = await this.createOptimizedVoxelMesh(positions);
+		}
+		this.setupGPUPicking();
+		return true;
 	}
 
 	private initializeVector3Pool(): void {
@@ -158,13 +184,6 @@ export class Monolith {
 		return x + y * grid.width + z * grid.width * grid.height;
 	}
 
-	private setVoxel(x: number, y: number, z: number, grid: VoxelGrid, value: boolean): void {
-		const index = this.getVoxelIndex(x, y, z, grid);
-		if (index >= 0) {
-			grid.data[index] = value ? 1 : 0;
-		}
-	}
-
 	private getVoxel(x: number, y: number, z: number, grid: VoxelGrid): boolean {
 		const index = this.getVoxelIndex(x, y, z, grid);
 		return index >= 0 ? grid.data[index] === 1 : false;
@@ -178,39 +197,8 @@ export class Monolith {
 		return [x, y, z];
 	}
 
-	private applyQualitySettings() {
-		const qualitySettings = {
-			low: {
-				voxelSize: this.options.voxelSize * 4,
-				maxVoxelCount: 2500,
-				surfaceOnly: true
-			},
-			medium: {
-				voxelSize: this.options.voxelSize * 1.5,
-				maxVoxelCount: 50000,
-				surfaceOnly: true
-			},
-			high: {
-				voxelSize: this.options.voxelSize,
-				maxVoxelCount: 100000,
-				surfaceOnly: true
-			},
-			ultra: {
-				voxelSize: this.options.voxelSize * 0.8,
-				maxVoxelCount: 200000,
-				surfaceOnly: true
-			}
-		};
-
-		const settings = qualitySettings[this.options.qualityMode];
-		this.options.voxelSize = settings.voxelSize;
-		this.options.maxVoxelCount = settings.maxVoxelCount;
-		this.options.surfaceOnly = settings.surfaceOnly;
-
-	}
-
 	public async init() {
-		await this.generateVoxelSystem();
+		await this.loadPrebuiltVoxels();
 	}
 
 	private createMaterial(): MonolithMaterial {
@@ -233,21 +221,8 @@ export class Monolith {
 		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.);
 
 		const cubeMaterial = new CubeMaterial("cubeMaterial", this.scene);
+		cubeMaterial.emissiveColor = this.light.diffuse;
 
-		cubeMaterial.setFloat("time", 0);
-		cubeMaterial.setFloat("animationSpeed", this.options.animationSpeed);
-		cubeMaterial.setFloat("animationIntensity", this.options.animationIntensity);
-		cubeMaterial.setVec3("worldCenter", Vector3.Zero());
-
-		cubeMaterial.setFloat("baseWaveIntensity", 0.02);
-		cubeMaterial.setFloat("mouseInfluenceRadius", 1.);
-
-		this.depthMaterialCube.setFloat("time", 0);
-		this.depthMaterialCube.setFloat("animationSpeed", this.options.animationSpeed);
-		this.depthMaterialCube.setFloat("animationIntensity", this.options.animationIntensity);
-
-		this.depthMaterialCube.setFloat("baseWaveIntensity", 0.02);
-		this.depthMaterialCube.setFloat("mouseInfluenceRadius", 1.);
 		this.cubeMaterial = cubeMaterial;
 
 		return shaderMaterial;
@@ -291,107 +266,8 @@ export class Monolith {
 		});
 	}
 
-	private buildDefaultSDF() {
-		const basePyramid = SDFBuilder.pyramid(1.0, {
-			scale: new Vector3(
-				this.options.width * 0.5,
-				this.options.height,
-				this.options.depth * 0.5
-			)
-		});
-		this.sdfTree = basePyramid;
-	}
-
 	public setSDFTree(sdfTree: SDFNode) {
 		this.sdfTree = sdfTree;
-	}
-
-	private calculateOptimalBounds(): BoundingBox {
-		if (!this.sdfTree) {
-			return {
-				min: Vector3.Zero(),
-				max: Vector3.One()
-			};
-		}
-		if (this.customBounds) {
-			console.log("Using custom bounds:", this.customBounds);
-			return this.customBounds;
-		}
-
-		const testPoints = 20;
-		let minBounds = Monolith._tempVector.set(Infinity, Infinity, Infinity);
-		let maxBounds = Monolith._tempVector2.set(-Infinity, -Infinity, -Infinity);
-
-		const maxDim = Math.max(this.options.width, this.options.height, this.options.depth);
-		const searchRadius = maxDim * 1.2;
-		const tempTestPos = Monolith._tempVector3;
-
-		let sdfEvaluations = 0;
-
-		for (let i = 0; i < testPoints; i++) {
-			for (let j = 0; j < testPoints; j++) {
-				for (let k = 0; k < testPoints; k++) {
-					tempTestPos.set(
-						(i / (testPoints - 1) - 0.5) * searchRadius * 2,
-						(j / (testPoints - 1)) * searchRadius,
-						(k / (testPoints - 1) - 0.5) * searchRadius * 2
-					);
-
-					const distance = this.sdfSystem.evaluate(tempTestPos, this.sdfTree);
-					sdfEvaluations++;
-
-					if (distance < this.options.sdfThreshold * 2) {
-						if (tempTestPos.x < minBounds.x) minBounds.x = tempTestPos.x;
-						if (tempTestPos.y < minBounds.y) minBounds.y = tempTestPos.y;
-						if (tempTestPos.z < minBounds.z) minBounds.z = tempTestPos.z;
-
-						if (tempTestPos.x > maxBounds.x) maxBounds.x = tempTestPos.x;
-						if (tempTestPos.y > maxBounds.y) maxBounds.y = tempTestPos.y;
-						if (tempTestPos.z > maxBounds.z) maxBounds.z = tempTestPos.z;
-					}
-				}
-			}
-		}
-
-
-		const padding = this.options.voxelSize * 2;
-
-		return {
-			min: new Vector3(minBounds.x - padding, minBounds.y - padding, minBounds.z - padding),
-			max: new Vector3(maxBounds.x + padding, maxBounds.y + padding, maxBounds.z + padding)
-		};
-	}
-
-	private createVoxelGrid(bounds: BoundingBox): VoxelGrid {
-		const alignedMin = new Vector3(
-			Math.floor(bounds.min.x / this.options.voxelSize) * this.options.voxelSize,
-			Math.floor(bounds.min.y / this.options.voxelSize) * this.options.voxelSize,
-			Math.floor(bounds.min.z / this.options.voxelSize) * this.options.voxelSize
-		);
-
-		const alignedMax = new Vector3(
-			Math.ceil(bounds.max.x / this.options.voxelSize) * this.options.voxelSize,
-			Math.ceil(bounds.max.y / this.options.voxelSize) * this.options.voxelSize,
-			Math.ceil(bounds.max.z / this.options.voxelSize) * this.options.voxelSize
-		);
-
-		const size = alignedMax.subtract(alignedMin);
-		const width = Math.ceil(size.x / this.options.voxelSize);
-		const height = Math.ceil(size.y / this.options.voxelSize);
-		const depth = Math.ceil(size.z / this.options.voxelSize);
-
-		const totalVoxels = width * height * depth;
-
-
-		return {
-			origin: alignedMin,
-			dimensions: new Vector3(width, height, depth),
-			voxelSize: this.options.voxelSize,
-			data: new Uint8Array(totalVoxels),
-			width,
-			height,
-			depth
-		};
 	}
 
 	private isSurfaceVoxel(x: number, y: number, z: number, grid: VoxelGrid): boolean {
@@ -442,107 +318,6 @@ export class Monolith {
 
 		this.surfaceCache.set(index, isSurface);
 		return isSurface;
-	}
-
-	private evaluateSDFBatch(positions: Vector3[], batchSize: number = 100): number[] {
-		const results: number[] = [];
-		let totalEvaluations = 0;
-
-		for (let i = 0; i < positions.length; i += batchSize) {
-			const batch = positions.slice(i, Math.min(i + batchSize, positions.length));
-
-			for (const pos of batch) {
-				if (this.sdfTree) {
-					results.push(this.sdfSystem.evaluate(pos, this.sdfTree));
-					totalEvaluations++;
-				} else {
-					results.push(Infinity);
-				}
-			}
-		}
-
-		return results;
-	}
-
-	private async generateVoxelSystem() {
-		if (!this.sdfTree) return;
-
-		this.sdfSystem.resetEvaluationCount();
-
-		if (this.voxelMesh) {
-			this.voxelMesh.dispose();
-			this.voxelMesh = null;
-		}
-
-		this.surfaceCache.clear();
-		this.distanceCache.clear();
-
-		const bounds = this.calculateOptimalBounds();
-		this.voxelGrid = this.createVoxelGrid(bounds);
-
-		await this.fillVoxelGridDirect(this.voxelGrid);
-
-		const surfaceVoxels = this.extractVoxels(this.voxelGrid);
-
-		const finalVoxels = this.limitVoxelCount(surfaceVoxels);
-
-		if (finalVoxels.length > 0) {
-			this.voxelMesh = await this.createOptimizedVoxelMesh(finalVoxels);
-		}
-
-		this.setupGPUPicking();
-	}
-
-	private async fillVoxelGridDirect(grid: VoxelGrid) {
-		const totalVoxels = grid.width * grid.height * grid.depth;
-
-		let processed = 0;
-		let generated = 0;
-
-		for (let z = 0; z < grid.depth; z++) {
-			for (let y = 0; y < grid.height; y++) {
-				const positions: Vector3[] = [];
-				const coordinates: [number, number, number][] = [];
-
-				for (let x = 0; x < grid.width; x++) {
-					const worldPos = new Vector3(
-						grid.origin.x + x * grid.voxelSize,
-						grid.origin.y + y * grid.voxelSize,
-						grid.origin.z + z * grid.voxelSize
-					);
-
-					const distFromOrigin = Math.sqrt(worldPos.x * worldPos.x + worldPos.z * worldPos.z);
-					const maxRadius = Math.max(this.options.width, this.options.depth) * 1.1;
-
-					if (worldPos.y > this.options.height * 1.2 ||
-						worldPos.y < -this.options.height * 0.1 ||
-						distFromOrigin > maxRadius) {
-						processed++;
-						continue;
-					}
-
-					positions.push(worldPos);
-					coordinates.push([x, y, z]);
-					processed++;
-				}
-
-				if (positions.length > 0) {
-					const distances = this.evaluateSDFBatch(positions);
-
-					for (let j = 0; j < distances.length; j++) {
-						if (distances[j] < this.options.sdfThreshold) {
-							const [x, y, z] = coordinates[j];
-							this.setVoxel(x, y, z, grid, true);
-							generated++;
-						}
-					}
-				}
-
-				if ((y * grid.depth + z) % 1000 === 0) {
-					await new Promise(resolve => setTimeout(resolve, 1));
-				}
-			}
-		}
 	}
 
 	private extractVoxels(grid: VoxelGrid): Vector3[] {
@@ -596,12 +371,6 @@ export class Monolith {
 			updatable: false
 		}, this.scene);
 
-		this.cube = MeshBuilder.CreateBox("thecube", {
-			size: 1,
-		},
-			this.scene);
-
-		this.cube.position = new Vector3(0, 4.5, 0);
 
 
 
@@ -722,11 +491,6 @@ export class Monolith {
 		this.enableShaderAnimation(config.enabled);
 	}
 
-	public setQualityMode(mode: 'low' | 'medium' | 'high' | 'ultra') {
-		this.options.qualityMode = mode;
-		this.applyQualitySettings();
-		this.generateVoxelSystem();
-	}
 
 	private lastUpdateValues = {
 		time: -1,
@@ -739,27 +503,29 @@ export class Monolith {
 	public update(time: number, camera: Camera) {
 		this.material.setFloat("time", time);
 		this.depthMaterial.setFloat("time", time);
-		this.cubeMaterial.setFloat("time", time);
+		// this.cubeMaterial.setFloat("time", time);
 		this.depthMaterialCube.setFloat("time", time);
 		this.lastUpdateValues.time = time;
 		const floatAmplitude = this.options.height * 0.01;
+		const floatY = Math.sin(time * 0.8) * floatAmplitude;
+		const floatX = Math.sin(time * 0.6) * floatAmplitude * 0.25;
+		const floatZ = Math.cos(time * 0.4) * floatAmplitude * 0.2;
 		if (this.voxelMesh) {
-			const floatY = Math.sin(time * 0.8) * floatAmplitude;
-			const floatX = Math.sin(time * 0.6) * floatAmplitude * 0.25;
-			const floatZ = Math.cos(time * 0.4) * floatAmplitude * 0.2;
 
 			this.material.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
-			this.cubeMaterial.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+			// this.cubeMaterial.setVec3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 			this.depthMaterial.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
-			this.depthMaterialCube.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
+			// this.depthMaterialCube.setVector3("floatingOffset", new Vector3(floatX, floatY, floatZ));
 
+			// this.voxelMesh.position.set(floatX, floatY + 4.5, floatZ);
 		}
-
+		this.cube.position.set(floatX, floatY + 4.5, floatZ);
+		// this.cube.rotation.y += floatY / 2;
 		const cursorChanged = !this.cursor.equals(this.lastCursorPosition || Vector3.Zero());
 		const oldCursorChanged = !this.oldcursor.equals(this.lastOldCursorPosition || Vector3.Zero());
 		this.material.setVec3("origin", this.cursor);
 		this.depthMaterial.setVector3("origin", this.cursor);
-		this.cubeMaterial.setVec3("origin", this.cursor);
+		// this.cubeMaterial.setVec3("origin", this.cursor);
 		this.depthMaterialCube.setVector3("origin", this.cursor);
 		this.lastUpdateValues.cursorChanged = cursorChanged;
 
@@ -769,7 +535,7 @@ export class Monolith {
 
 		this.material.setFloat("animationSpeed", this.options.animationSpeed);
 		this.depthMaterial.setFloat("animationSpeed", this.options.animationSpeed);
-		this.cubeMaterial.setFloat("animationSpeed", 0);
+		// this.cubeMaterial.setFloat("animationSpeed", 0);
 		this.depthMaterialCube.setFloat("animationSpeed", 0);
 		this.lastUpdateValues.animationSpeed = this.options.animationSpeed;
 
@@ -821,5 +587,10 @@ export class Monolith {
 		this.surfaceCache.clear();
 		this.distanceCache.clear();
 	}
+
+	public get light(): PointLight {
+		return this.cubeLight;
+	}
+
 }
 

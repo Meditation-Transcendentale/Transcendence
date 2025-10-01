@@ -4,14 +4,14 @@ interface iUIOption {
 	step?: number;
 	min?: number;
 	max?: number;
-	div?: HTMLElement | null;
+	div?: Element | null;
 }
 
 interface iUIOptionSet {
 	step: number;
 	min: number;
 	max: number;
-	div: HTMLElement | null;
+	div: Element | null;
 }
 
 const defaultUIOption: iUIOption = {
@@ -21,13 +21,22 @@ const defaultUIOption: iUIOption = {
 	div: null
 }
 
-export function UIaddDetails(name: string): HTMLElement {
+let detailI = 0.;
+
+export function UIaddDetails(name: string, parent?: Element | null, id?: string,): HTMLElement {
 	const d = document.createElement("details");
 	const s = document.createElement("summary");
+	if (id)
+		d.id = id;
 	s.innerText = name;
 	d.appendChild(s);
-	d.className = "utils-details";
-	document.querySelector("#utils-details")?.appendChild(d);
+	d.className = "utils-details " + (detailI % 2 == 0 ? "details-dark" : "details-light");
+	detailI += 1;
+	if (parent != null && parent != undefined) {
+		parent.appendChild(d);
+	} else {
+		document.querySelector("#utils-details")?.appendChild(d);
+	}
 	return d;
 }
 

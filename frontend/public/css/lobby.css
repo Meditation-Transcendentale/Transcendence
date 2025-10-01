@@ -1,7 +1,7 @@
 #players-window {
 	display: inline-block;
-	width: 60vh;
-	height: 100vh;
+	width: 50vh;
+	height: 70vh;
 	/*width: fit-content;*/
 	overflow: scroll;
 	pointer-events: auto;
@@ -15,6 +15,7 @@
 #lobby-id-copy.button {
 	background-color: var(--window-color) !important;
 	color: var(--window-background) !important;
+	font-size: inherit;
 }
 
 #lobby-id-copy.button:hover {
@@ -31,8 +32,8 @@
 	display: flex;
 	flex-direction: column;
 	/*display: inline-block;*/
-	width: 40vh;
-	height: 60vh;
+	width: 85vh;
+	height: 40vh;
 	overflow: scroll;
 	pointer-events: auto;
 }
@@ -43,16 +44,17 @@
 	height: 60vh;
 	overflow: scroll;
 	pointer-events: auto;
+	font-size: 5vh;
 }
 
 #invite-window>.window-bar {
-	font-size: 4vh;
+	font-size: 5vh;
 	user-select: none;
 }
 
 #info-window>.window-bar {
 	/*align-self: flex-end;*/
-	font-size: 4vh;
+	font-size: 5vh;
 	user-select: none;
 }
 
@@ -60,7 +62,7 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	font-size: 4vh;
+	font-size: 5vh;
 	user-select: none;
 }
 
@@ -69,7 +71,7 @@
 	flex-direction: row;
 	/*align-self: flex-start;*/
 	flex-grow: 0;
-	font-size: 2vh;
+	font-size: 5vh;
 	user-select: none;
 }
 

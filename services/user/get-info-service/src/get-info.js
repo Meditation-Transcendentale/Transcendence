@@ -101,13 +101,14 @@ app.post('/search', handleErrors(async (req, res) => {
 		throw { status: userReturn.USER_036.http, code: userReturn.USER_036.code, message: userReturn.USER_036.message };
 	}
 
+	console.log(`Searching for user by ${type}: ${identifier}`);
 	let responseData;
 	switch (type) {
 		case 'username':
-			const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
-			if (asker.username === identifier) {
-				throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
-			}
+			// const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
+			// if (asker.username === identifier) {
+			// 	throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
+			// }
 			responseData = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: identifier });
 			break;
 		case 'uuid':
