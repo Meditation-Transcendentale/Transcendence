@@ -9,7 +9,7 @@ import {
 	decodePhysicsResponse,
 	encodeStateUpdate,
 	encodeMatchSetup,
-	encodeScoreUpdate,
+	encodeMatchScoreUpdate,
 	decodeStateUpdate,
 	decodeMatchQuit,
 	encodeMatchEnd,
@@ -277,7 +277,7 @@ export class GameManager {
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles;
-			newState.stage = resp.stage;https://www.warcraftlogs.com/reports/nDxGpP4KMY1jAzZb?fight=38&type=damage-done&source=15
+			newState.stage = resp.stage;
 			newState.ranks = resp.ranks;
 			newState.events = resp.events || []; // ADD THIS
 			newState.gameState = resp.gameState || {};
@@ -286,7 +286,8 @@ export class GameManager {
 					(newState.score[resp.goal.scorerId] || 0) + 1;
 
 				if (match.mode === "tournament") {
-					const scoreBuf = encodeScoreUpdate({ score: newState.score });
+					console.log (`${newState.score}|${newState.score[0]}|${newState.score[1]}|${resp.goal.scorerId}`);
+					const scoreBuf = encodeMatchScoreUpdate({ score: newState.score });
 					this.nc.publish(`games.tournament.${gameId}.score`, scoreBuf);
 				}
 				if (newState.score[resp.goal.scorerId] >= (5 || Infinity)) {

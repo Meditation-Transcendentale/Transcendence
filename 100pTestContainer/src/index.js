@@ -3,7 +3,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 import https from "https";
 import {
-  decodeServerMessage,
+  decodeLobbyServerMessage,
   decodeTournamentServerMessage,
   encodeClientMessage,
   encodeTournamentClientMessage,
@@ -75,7 +75,7 @@ async function lobbyConnectionInit(user) {
   return new Promise((resolve) => {
     ws.onmessage = (msg) => {
       const buf = new Uint8Array(msg.data);
-      const payload = decodeServerMessage(buf);
+      const payload = decodeLobbyServerMessage(buf);
       if (payload.error != null) return;
 
       if (payload.start != null) {

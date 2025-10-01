@@ -98,11 +98,11 @@ export function decodeMatchEnd(buffer) {
   return Proto.shared.MatchEnd.decode(buffer);
 }
 
-export function encodeScoreUpdate(payload) {
-  const err = Proto.shared.ScoreUpdate.verify(payload);
+export function encodeMatchScoreUpdate(payload) {
+  const err = Proto.shared.MatchScoreUpdate.verify(payload);
   if (err) throw new Error(err);
-  return Proto.shared.ScoreUpdate.encode(
-    Proto.shared.ScoreUpdate.create(payload)
+  return Proto.shared.MatchScoreUpdate.encode(
+    Proto.shared.MatchScoreUpdate.create(payload)
   ).finish();
 }
 

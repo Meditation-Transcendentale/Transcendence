@@ -1,28 +1,35 @@
 import {
-  decodeServerMessage,
+  decodeUserInterfaceServerMessage,
+  encodeUserInterfaceClientMessage,
   decodeTournamentServerMessage,
   encodeTournamentClientMessage,
 } from "./proto/helper.js";
-import { tournament } from "./proto/message.js";
 import WebSocket from "ws";
+import { userinterface } from "./proto/message.js";
 
 export async function startGameTournament(user) {
-  const uuid = user.uuid;
-  const gameId = user.gameId;
   const url =
     `wss://localhost:7000/game?` +
-    `uuid=${encodeURIComponent(uuid)}&` +
-    `gameId=${encodeURIComponent(gameId)}`;
-  console.log(`${user.uuid}: gameId:${gameId}`);
-  const ws = new Websocket(url, { rejectUnauthorized: false });
+    `uuid=${encodeURIComponent(user.uuid)}&` +
+    `gameId=${encodeURIComponent(user.gameId)}`;
+  console.log(`${user.uuid}: gameId:${user.gameId}`);
+  const ws = new WebSocket(url, { rejectUnauthorized: false });
   ws.binaryType = "arraybuffer";
+
+  ws.onopen = (e) => {
+    setTimeout(() => {
+      ws?.send(
+        encodeUserInterfaceClientMessage({ ready: { } })
+      );
+    }, 1000);
+  };
 
   return new Promise((resolve) => {
     ws.onmessage = async (msg) => {
       const buf = new Uint8Array(msg.data);
-      const payload = decodeServerMessage(buf);
+      const payload = decodeUserInterfaceServerMessage(buf);
       if (payload.end) {
-        user.gameId(null);
+        user.setGameId(null);
         ws.close();
         resolve();
         return;
@@ -37,19 +44,8 @@ export async function settingUpTournament(user) {
     user.uuid
   )}&tournamentId=${encodeURIComponent(user.tournamentId)}`;
 
-  // const url = `wss://localhost:7000/sacrifice`;
-  console.log(`url:${url}`);
   const ws = new WebSocket(url, { rejectUnauthorized: false });
   ws.binaryType = "arraybuffer";
-  ws.onopen = (e) => {
-  };
-  ws.onclose = () => {};
-  ws.onerror = (e) => {
-    console.error("❌ WebSocket error occurred");
-    console.error("Error event:", e);
-    console.error("WebSocket readyState:", ws.readyState);
-    console.error("WebSocket url:", ws.url);
-  };
 
   return new Promise((resolve) => {
     ws.onmessage = (msg) => {
