@@ -416,7 +416,8 @@ export class Fog {
 
 		this.effectRenderer = effectRenderer;
 
-		this.depthTexture = new RenderTargetTexture("depth", { width: this.scene.getEngine().getRenderWidth() * this.ratio, height: this.scene.getEngine().getRenderHeight() * this.ratio }, scene, {
+		const ro = this.scene.getEngine().getRenderHeight() / this.scene.getEngine().getRenderWidth();
+		this.depthTexture = new RenderTargetTexture("depth", { width: 1080 * ro, height: 1080 * ro }, scene, {
 			type: Engine.TEXTURETYPE_FLOAT,
 			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
 		});
@@ -438,7 +439,6 @@ export class Fog {
 			Engine.TEXTURETYPE_FLOAT
 		);
 
-		const ro = this.scene.getEngine().getRenderHeight() / this.scene.getEngine().getRenderWidth();
 		this.fogTexture = new RenderTargetTexture("fog", { width: 1080 * this.ratio, height: 1080 * this.ratio * ro }, scene, {
 			format: Engine.TEXTUREFORMAT_RGBA,
 			type: Engine.TEXTURETYPE_HALF_FLOAT,
