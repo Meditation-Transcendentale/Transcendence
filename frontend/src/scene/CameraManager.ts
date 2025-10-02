@@ -1,5 +1,5 @@
-import { FreeCamera, RenderTargetTexture, Vector3 } from "@babylonjs/core"
-import { sceneManager } from "./SceneManager";
+import { Vector3 } from "@babylonjs/core"
+import { Assets } from "./Assets";
 
 interface ICameraVue {
 	position: Vector3,
@@ -7,13 +7,11 @@ interface ICameraVue {
 }
 
 export class CameraManager {
-	public camera: FreeCamera;
+	public assets: Assets;
 	private vues: Map<string, ICameraVue>;
 
-	constructor() {
-		this.camera = sceneManager.camera;
-
-		(sceneManager.textures.get("fogDepth") as RenderTargetTexture).activeCamera = this.camera;
+	constructor(assets: Assets) {
+		this.assets = assets;
 
 		this.vues = new Map<string, ICameraVue>;
 		this.vues.set("home", {
@@ -26,7 +24,7 @@ export class CameraManager {
 		const vue = this.vues.get(key);
 		if (!vue)
 			return;
-		this.camera.position.copyFrom(vue.position);
-		this.camera.setTarget(vue.target);
+		this.assets.camera.position.copyFrom(vue.position);
+		this.assets.camera.setTarget(vue.target);
 	}
 }

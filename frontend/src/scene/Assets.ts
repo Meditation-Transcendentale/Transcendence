@@ -1,0 +1,284 @@
+import { Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Mesh, MeshBuilder, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3 } from "../babylon";
+import { stateManager } from "../state/StateManager";
+import { perlinWorley3D } from "./PerlinWorley";
+import { sceneManager } from "./SceneManager";
+import { ButterflyMaterial } from "./Shader/ButterflyMaterial";
+import { GrassMaterial } from "./Shader/GrassMaterial";
+import { MonolithMaterial } from "./Shader/MonolithMaterial";
+
+export class Assets {
+	public engine: Engine;
+	public scene: Scene;
+	public camera: FreeCamera;
+	public effectRenderer: EffectRenderer;
+
+	public grassLowMesh!: Mesh;
+	public grassHighMesh!: Mesh;
+	public ballMesh!: Mesh;
+	public butterflyMesh!: Mesh;
+	public groundMesh!: Mesh;
+	public cubeMesh!: Mesh;
+	public monolithMesh!: Mesh;
+
+	public flashLight!: SpotLight;
+	public hemisphericLight!: HemisphericLight;
+	public cubeLight!: PointLight;
+	public ballLight!: PointLight;
+
+	public fogDepthTexture!: RenderTargetTexture;
+	public fogDensityTexture!: RawTexture3D;
+	public fogRenderTexture!: RenderTargetTexture;
+	public ballGrassTextureA!: RenderTargetTexture;
+	public ballGrassTextureB!: RenderTargetTexture;
+
+	public fogUBO!: UniformBuffer;
+	public monolithUBO!: UniformBuffer;
+
+	public ballRoot!: TransformNode;
+	public monolithRoot!: TransformNode;
+	public butterflyRoot!: TransformNode;
+
+	public ballMaterial!: ShaderMaterial;
+	public cubeMaterial!: ShaderMaterial;
+	public butterflyMaterial!: ButterflyMaterial;
+	public grassMaterial!: GrassMaterial;
+	public monolithMaterial!: MonolithMaterial;
+
+	public depthMaterial!: ShaderMaterial;
+	public grassDepthMaterial!: ShaderMaterial;
+	public monolithDepthMaterial!: ShaderMaterial;
+
+	constructor(engine: Engine) {
+		this.engine = engine;
+		this.scene = new Scene(engine);
+		this.scene.autoClear = true; // Color buffer
+		this.scene.clearColor = new Color4(0., 0., 0., 1);
+
+		this.scene.setRenderingAutoClearDepthStencil(0, true);
+
+
+		this.camera = new FreeCamera("camera", new Vector3(0, 6, 40), this.scene, true);
+		this.camera.updateUpVectorFromRotation = true;
+
+		this.effectRenderer = new EffectRenderer(this.engine);
+	}
+
+	public async loadMandatory() {
+		await this.loadMeshMandatory();
+		this.loadLightsMandatory();
+		this.loadTextureMandatory();
+		this.loadUBOMandatory();
+		this.loadMaterialMandatory();
+		this.loadRootMandatory();
+	}
+
+	public async loadAssetsAsync() {
+
+	}
+
+	private async loadMeshMandatory() {
+		let loaded = await LoadAssetContainerAsync("/assets/grassLOD.glb", this.scene);
+		loaded.meshes[2].name = "grassHigh";
+		loaded.meshes[4].name = "grassLow";
+		loaded.meshes[2].setEnabled(false);
+		loaded.meshes[4].setEnabled(false);
+		this.grassHighMesh = loaded.meshes[2] as Mesh;
+		this.grassLowMesh = loaded.meshes[4] as Mesh;
+		this.scene.addMesh(loaded.meshes[2]);
+		this.scene.addMesh(loaded.meshes[4]);
+
+		loaded = await LoadAssetContainerAsync("/assets/butterfly2.glb", this.scene);
+		loaded.meshes[1].name = "butterfly";
+		loaded.meshes[1].setEnabled(false);
+		this.butterflyMesh = loaded.meshes[1] as Mesh;
+		this.scene.addMesh(loaded.meshes[1]);
+
+		this.ballMesh = MeshBuilder.CreateSphere("ball", { diameter: 1 }, this.scene);
+		this.ballMesh.setEnabled(false);
+
+		this.groundMesh = MeshBuilder.CreateGround("ground", { width: 200, height: 200 }, this.scene);
+		this.groundMesh.setEnabled(false);
+
+		this.cubeMesh = MeshBuilder.CreateBox("thecube", { size: 1 }, this.scene);
+		this.cubeMesh.position = new Vector3(0, 4.5, 0);
+
+		// const c = Color3.FromHexString("#3b3d7d");
+		// const v = new Vector3(c.r, c.g, c.b);
+		// v._isDirty = true;
+		// this.tracker.add("ballColor", v);
+		// this.tracker.track("ballColor", (color: Vector3) => {
+		// 	if (!color._isDirty)
+		// 		return;
+		// 	(b.material as ShaderMaterial).setVector4("color", new Vector4(color.x, color.y, color.z, 0.2));
+		// 	color._isDirty = false;
+		// });
+	}
+
+	private loadLightsMandatory() {
+		this.flashLight = new SpotLight("flashlight", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.5, 10, this.scene);
+		this.flashLight.range = 30;
+		this.flashLight.specular.scaleInPlace(6.);
+		this.flashLight.intensity = 2.7;
+
+		this.hemisphericLight = new HemisphericLight("sun", Vector3.Up(), this.scene);
+		this.hemisphericLight.intensity = 0.2;
+
+		this.ballLight = new PointLight("ball light", this.ballMesh.position, this.scene);
+		this.ballLight.diffuse = Color3.FromHexString("#3b3d7d");
+		this.ballLight.specular = this.ballLight.diffuse;
+		this.ballLight.intensity = 2;
+		this.ballLight.range = 3;
+
+		this.cubeLight = new PointLight("cube light", this.cubeMesh.position, this.scene);
+		this.cubeLight.range = 2;
+		this.cubeLight.diffuse = Color3.Purple();
+		this.cubeLight.intensity = 2;
+	}
+
+	private loadTextureMandatory() {
+		const fogMaxResolution = 1080;
+		const fogRatio = 0.5;
+		stateManager.set("fogMaxResolution", fogMaxResolution);
+		stateManager.set("fogRatio", fogRatio);
+		this.fogDepthTexture = new RenderTargetTexture("fogDepth", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * sceneManager.resolutionRatio }, this.scene, {
+			type: Engine.TEXTURETYPE_FLOAT,
+			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
+		});
+		this.fogDepthTexture.activeCamera = this.camera;
+
+		this.fogDepthTexture.renderList = [];
+		this.fogDepthTexture.clearColor = new Color4(1., 0., 0., 1.);
+		this.fogDensityTexture = new RawTexture3D(
+			perlinWorley3D(64),
+			64, 64, 64,
+			Engine.TEXTUREFORMAT_R,
+			this.scene,
+			false,
+			false,
+			Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
+			Engine.TEXTURETYPE_FLOAT
+		);
+
+		this.fogRenderTexture = new RenderTargetTexture("fog", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * sceneManager.resolutionRatio }, this.scene, {
+			format: Engine.TEXTUREFORMAT_RGBA,
+			type: Engine.TEXTURETYPE_HALF_FLOAT,
+			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
+		});
+
+		this.ballGrassTextureA = new RenderTargetTexture("ballGrass", { width: 256, height: 256 }, this.scene, {
+			format: Engine.TEXTUREFORMAT_RGBA,
+			type: Engine.TEXTURETYPE_HALF_FLOAT,
+			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
+		})
+		this.ballGrassTextureB = this.ballGrassTextureA.clone();
+	}
+
+	private loadUBOMandatory() {
+		this.fogUBO = new UniformBuffer(this.engine);
+		this.fogUBO.addUniform("maxZ", 1);
+		this.fogUBO.addUniform("noiseOffset", 1);
+		this.fogUBO.addUniform("stepSize", 1);
+		this.fogUBO.addUniform("maxDistance", 1);
+		this.fogUBO.addUniform("densityMultiplier", 1);
+		this.fogUBO.addUniform("lightScattering", 1);
+		this.fogUBO.addUniform("spotIntensity", 1);
+		this.fogUBO.addUniform("spotRange", 1);
+		this.fogUBO.addUniform("spotAngle", 1);
+		this.fogUBO.addUniform("spotExp", 1);
+		this.fogUBO.addUniform("pointAIntensity", 1);
+		this.fogUBO.addUniform("pointARange", 1);
+		this.fogUBO.addUniform("pointBIntensity", 1);
+		this.fogUBO.addUniform("pointBRange", 1);
+		this.fogUBO.addUniform("fogScale", 3);
+		this.fogUBO.addUniform("fogAbsorption", 3);
+		this.fogUBO.addUniform("position", 3);
+		this.fogUBO.addUniform("spotColor", 3);
+		this.fogUBO.addUniform("spotPosition", 3);
+		this.fogUBO.addUniform("spotDirection", 3);
+		this.fogUBO.addUniform("pointAColor", 3);
+		this.fogUBO.addUniform("pointAPosition", 3);
+		this.fogUBO.addUniform("pointBColor", 3);
+		this.fogUBO.addUniform("pointBPosition", 3);
+		this.fogUBO.addUniform("projection", 16);
+		this.fogUBO.addUniform("iprojection", 16);
+		this.fogUBO.addUniform("iview", 16);
+		this.fogUBO.addUniform("world", 16);
+
+
+		this.monolithUBO = new UniformBuffer(this.engine);
+	}
+
+	private loadMaterialMandatory() {
+		this.depthMaterial.onBindObservable.add(() => {
+			this.depthMaterial.setVector2("depthValues", new Vector2(this.camera.minZ, this.camera.maxZ));
+		})
+
+		this.ballMaterial = new ShaderMaterial("picker ball", this.scene, "oneColor", {
+			attributes: ["position"],
+			uniforms: ["world", "viewProjection", "color"]
+		})
+		this.ballMaterial.alphaMode = Engine.ALPHA_DISABLE;
+		this.ballMesh.material = this.ballMaterial;
+
+		this.cubeMaterial = new ShaderMaterial("picker ball", this.scene, "oneColor", {
+			attributes: ["position"],
+			uniforms: ["world", "viewProjection", "color"]
+		})
+		this.cubeMaterial.alphaMode = Engine.ALPHA_DISABLE;
+		this.cubeMesh.material = this.cubeMaterial;
+
+		this.grassMaterial = new GrassMaterial("grass", this.scene);
+		this.butterflyMaterial = new ButterflyMaterial("butterfly", this.scene);
+		this.butterflyMesh.material = this.butterflyMaterial;
+		this.monolithMaterial = new MonolithMaterial("monolith", this.scene);
+		// this.monolithMesh.material = this.monolithMaterial;
+
+		const m = new StandardMaterial("ground", this.scene);
+		m.diffuseColor = Color3.Black();
+		m.disableLighting = true;
+		this.groundMesh.material = m;
+
+		this.depthMaterial = new ShaderMaterial("defaultDepth", this.scene, "defaultDepth", {
+			attributes: ['position'],
+			uniforms: ["world", "viewProjection", "depthValues"]
+		})
+		this.grassDepthMaterial = new ShaderMaterial("grassDepth", this.scene, "grassDepth", {
+			attributes: ["position", "world0", "world1", "world2", "world3", "baseColor"],
+			uniforms: ["world", "viewProjection", "depthValues", "time"],
+			samplers: ["textureSampler"]
+		})
+		this.grassDepthMaterial.backFaceCulling = false;
+		this.monolithDepthMaterial = new ShaderMaterial("monolithDepth", this.scene, "monolithDepth", {
+			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
+			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "origin",
+				"oldOrigin", "deadZoneCenter", "deadZoneWidth", "deadZoneHeight", "deadZoneDepth", "textPosition0", "textSize0", "textGlow0", "floatingOffset"]
+		});
+
+		this.depthMaterial.onBindObservable.add(() => {
+			this.depthMaterial.setVector2("depthValues", new Vector2(this.camera.minZ, this.camera.maxZ));
+		})
+		this.grassDepthMaterial.onBindObservable.add(() => {
+			this.grassDepthMaterial.setVector2("depthValues", new Vector2(this.camera.minZ, this.camera.maxZ));
+		})
+		this.monolithDepthMaterial.onBindObservable.add(() => {
+			this.monolithDepthMaterial.setVector2("depthValues", new Vector2(this.camera.minZ, this.camera.maxZ));
+		})
+	}
+
+	public loadRootMandatory() {
+		this.ballRoot = new TransformNode("ballRoot", this.scene);
+		this.ballMesh.parent = this.ballRoot;
+		this.ballLight.parent = this.ballRoot;
+
+		this.monolithRoot = new TransformNode("monolithRoot", this.scene);
+		this.cubeMesh.parent = this.monolithRoot;
+		this.cubeLight.parent = this.monolithRoot;
+
+		this.butterflyRoot = new TransformNode("butterflyRoot", sceneManager.scene);
+		this.butterflyRoot.position = new Vector3(0, 1.5, 0);
+		this.butterflyRoot.scaling = new Vector3(0.5, 0.5, 0.5);
+		this.butterflyMesh.parent = this.butterflyRoot;
+
+
+	}
+}

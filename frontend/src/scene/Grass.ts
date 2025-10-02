@@ -1,10 +1,9 @@
-
-
 import { Camera, Color3, Color4, LoadAssetContainerAsync, Matrix, Mesh, RenderTargetTexture, Scene, ShaderMaterial, Vector2, Vector3 } from "../babylon";
 import { Tile } from "./Tile";
 import { GrassMaterial } from "./Shader/GrassMaterial";
 import "./Shader/depthShaders";
 import { sceneManager } from "./SceneManager";
+import { Assets } from "./Assets";
 
 
 
@@ -35,7 +34,7 @@ const optionsLow: _thinInstancesOptions = {
 
 
 export class Grass {
-	public scene: Scene;
+	public assets: Assets;
 	public tiles: Tile[];
 
 	private size: number;
@@ -45,58 +44,38 @@ export class Grass {
 
 	private reduced: boolean;
 
-	private grassHigh: Mesh;
-	private grassLow: Mesh;
-
-	private material: GrassMaterial;
-	public depthMaterial: ShaderMaterial;
-
 	private _enable: boolean;
 
-	constructor() {
+	constructor(assets: Assets) {
+		this.assets = assets;
 		this.size = 20;
 		this.tiles = [];
-		this.scene = sceneManager.scene;
 
 		this._enable = false;
 		this.reduced = false;
 
 
-		this.grassHigh = sceneManager.meshes.get("grassHigh") as Mesh;
-		this.grassLow = sceneManager.meshes.get("grassLow") as Mesh;
-		this.grassHigh.doNotSyncBoundingInfo = true;
+		this.assets.grassHighMesh.doNotSyncBoundingInfo = true;
+		this.assets.grassLowMesh.doNotSyncBoundingInfo = true;
 		// this.grassHigh.alwaysSelectAsActiveMesh = true;
-		this.grassLow.doNotSyncBoundingInfo = true;
 		// this.grassLow.alwaysSelectAsActiveMesh = true;
 
-
-
-		this.material = new GrassMaterial("grass", this.scene);
-		this.depthMaterial = new ShaderMaterial("grassDepth", this.scene, "grassDepth", {
-			attributes: ["position", "world0", "world1", "world2", "world3", "baseColor"],
-			uniforms: ["world", "viewProjection", "depthValues", "time"],
-			samplers: ["textureSampler"]
-		})
-		this.depthMaterial.backFaceCulling = false;
-		this.depthMaterial.onBindObservable.add(() => {
-			this.depthMaterial.setVector2("depthValues", new Vector2(sceneManager.camera.minZ, sceneManager.camera.maxZ));
-		})
-
-
-		this.setThinInstances(this.grassHigh, this.size, this.size, optionsHigh);
-		this.setThinInstances(this.grassLow, this.size * 2, this.size * 2, optionsLow);
+		this.setThinInstances(this.assets.grassHighMesh, this.size, this.size, optionsHigh);
+		this.setThinInstances(this.assets.grassLowMesh, this.size * 2, this.size * 2, optionsLow);
 
 		const o = new Vector3(0, -0.5, 0);
 		const size = this.size * 0.5
-		this.tiles.push(new Tile(this.grassHigh, this.material, o.add(new Vector3(size, 0, size)), this.size, this.size));
-		this.tiles.push(new Tile(this.grassHigh, this.material, o.add(new Vector3(-size, 0, size)), this.size, this.size));
-		this.tiles.push(new Tile(this.grassHigh, this.material, o.add(new Vector3(size, 0, -size)), this.size, this.size));
-		this.tiles.push(new Tile(this.grassHigh, this.material, o.add(new Vector3(-size, 0, -size)), this.size, this.size));
+		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(size, 0, size)), this.size, this.size));
+		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(-size, 0, size)), this.size, this.size));
+		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(size, 0, -size)), this.size, this.size));
+		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(-size, 0, -size)), this.size, this.size));
 
-		this.tiles.push(new Tile(this.grassLow, this.material, o.add(new Vector3(size * 4, 0, 0)), this.size * 2, this.size * 2));
-		this.tiles.push(new Tile(this.grassLow, this.material, o.add(new Vector3(-size * 4, 0, 0)), this.size * 2, this.size * 2));
-		this.tiles.push(new Tile(this.grassLow, this.material, o.add(new Vector3(0, 0, -size * 4)), this.size * 2, this.size * 2));
-		this.tiles.push(new Tile(this.grassLow, this.material, o.add(new Vector3(0, 0, size * 4)), this.size * 2, this.size * 2));
+		this.tiles.push(new Tile(this.assets.grassLowMesh, this.assets.grassMaterial, o.add(new Vector3(size * 4, 0, 0)), this.size * 2, this.size * 2));
+		this.tiles.push(new Tile(this.assets.grassLowMesh, this.assets.grassMaterial, o.add(new Vector3(-size * 4, 0, 0)), this.size * 2, this.size * 2));
+		this.tiles.push(new Tile(this.assets.grassLowMesh, this.assets.grassMaterial, o.add(new Vector3(0, 0, -size * 4)), this.size * 2, this.size * 2));
+		this.tiles.push(new Tile(this.assets.grassLowMesh, this.assets.grassMaterial, o.add(new Vector3(0, 0, size * 4)), this.size * 2, this.size * 2));
+
+		this.reduceGrass(true);
 	}
 
 
@@ -104,7 +83,7 @@ export class Grass {
 		if (!this._enable) { return; }
 		// this._grassShader.setFloat("time", time);
 		// this._grassShader.setFloat("oldTime", this._pastTime);
-		this.material.setTexture("textureSampler", sceneManager.textures.get("fog") as RenderTargetTexture);
+		this.assets.grassMaterial.setTexture("textureSampler", this.assets.ballGrassTextureA);
 		// this._grassShader.setVec3("ballPosition", this.ballPosition);
 		// this._grassShader.setFloat("ballRadius", radius);
 		// this._grassShader.setColor3("ballLightColor", this.ballLightColor);

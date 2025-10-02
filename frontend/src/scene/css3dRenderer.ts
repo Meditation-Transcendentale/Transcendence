@@ -1,4 +1,5 @@
 import { Camera, Matrix } from "../babylon";
+import { Assets } from "./Assets";
 import { sceneManager } from "./SceneManager";
 
 export interface ICss3dObject {
@@ -21,8 +22,8 @@ export class Css3dRenderer {
 
 
 
-	constructor() {
-		this.camera = sceneManager.camera;
+	constructor(assets: Assets) {
+		this.camera = assets.camera;
 		this.width = sceneManager.resolution.width;
 		this.height = sceneManager.resolution.height;
 

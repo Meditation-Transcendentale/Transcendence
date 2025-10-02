@@ -1,53 +1,36 @@
 import { Matrix, Mesh, TransformNode, Vector3 } from "../babylon";
 import { ButterflyMaterial } from "./Shader/ButterflyMaterial";
 import { sceneManager } from "./SceneManager";
+import { Assets } from "./Assets";
 
 export class Butterfly {
 
-	public root: TransformNode;
+	private assets: Assets;
 
-	public mesh!: Mesh;
-	private material: ButterflyMaterial;
+	private grid: Grid2D;
 
 	private once = 0;
 
 	private moves!: Float32Array;
-
 	public positions: Array<Vector3>;
-
 	private velocities: Array<Vector3>;
-
 	private directions!: Float32Array;
 	private flying!: Float32Array;
 
-
 	private n: number = 100;
-
 	private speed = 0.8;
-
 	private flock: number = 1;
 	private disperse: number = 0;
 
-	private grid: Grid2D;
-
 	private _enable: boolean;
 
+	constructor(assets: Assets) {
+		this.assets = assets;
 
+		this.assets.butterflyMesh.scaling.setAll(0.4);
+		this.assets.butterflyMesh.alwaysSelectAsActiveMesh = true;
+		this.assets.butterflyMesh.doNotSyncBoundingInfo = true;
 
-
-	constructor() {
-		this.material = new ButterflyMaterial("butterfly", sceneManager.scene);
-
-		this.mesh = sceneManager.meshes.get("butterfly") as Mesh;
-		this.mesh.material = this.material;
-		this.mesh.position.set(0, 0, 0);
-		this.mesh.scaling.setAll(0.4);
-		this.mesh.alwaysSelectAsActiveMesh = true;
-
-		this.root = new TransformNode("butterflyRoot", sceneManager.scene);
-		this.root.position = new Vector3(0, 1.5, 0);
-		this.root.scaling = new Vector3(0.5, 0.5, 0.5);
-		this.mesh.parent = this.root;
 
 		this.grid = new Grid2D({
 			width: 42,
@@ -72,7 +55,7 @@ export class Butterfly {
 			this.activeFlock();
 			this.once = 1;
 		}
-		this.material.setFloat("time", time);
+		this.assets.butterflyMaterial.setFloat("time", time);
 		this.applyForcesGrid(deltaTime);
 	}
 
@@ -173,8 +156,8 @@ export class Butterfly {
 		cell.indexes.fill(-1, 0, cell.count);
 		cell.count = 0;
 
-		this.mesh.thinInstanceBufferUpdated("move");
-		this.mesh.thinInstanceBufferUpdated("direction");
+		this.assets.butterflyMesh.thinInstanceBufferUpdated("move");
+		this.assets.butterflyMesh.thinInstanceBufferUpdated("direction");
 
 		this.grid.addArray(this.positions);
 	}
@@ -245,14 +228,14 @@ export class Butterfly {
 			this.grid.add(i, position);
 		}
 
-		this.mesh.thinInstanceSetBuffer('matrix', bufferMatrix, 16, true);
-		this.mesh.thinInstanceSetBuffer('move', this.moves, 3, false);
-		this.mesh.thinInstanceSetBuffer('direction', this.directions, 3, false);
+		this.assets.butterflyMesh.thinInstanceSetBuffer('matrix', bufferMatrix, 16, true);
+		this.assets.butterflyMesh.thinInstanceSetBuffer('move', this.moves, 3, false);
+		this.assets.butterflyMesh.thinInstanceSetBuffer('direction', this.directions, 3, false);
 	}
 
 	public set enable(value: boolean) {
 		this._enable = value;
-		this.mesh.setEnabled(value);
+		this.assets.butterflyMesh.setEnabled(value);
 	}
 }
 

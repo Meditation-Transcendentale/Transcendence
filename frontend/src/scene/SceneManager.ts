@@ -10,13 +10,11 @@ import { Grass } from "./Grass";
 import { Fog } from "./Fog";
 import { Css3dRenderer } from "./css3dRenderer";
 import { LightManager } from "./LightsManager";
+import { Assets } from "./Assets";
 
 class SceneManager {
 	public engine: Engine;
-	public scene: Scene;
 	public css3dRenderer!: Css3dRenderer;
-	public effectRenderer: EffectRenderer;
-	public camera: FreeCamera;
 
 	private canvas: HTMLCanvasElement;
 	private fps: HTMLElement;
@@ -24,11 +22,7 @@ class SceneManager {
 	public beforeRender: Set<any>;
 	public time!: number;
 
-	public meshes: Map<string, Mesh>;
-	public lights: Map<string, Light>;
-	public textures: Map<string, Texture>;
-	public ubos: Map<string, UniformBuffer>;
-
+	public assets: Assets;
 	public tracker: Tracker;
 
 	public cameraManager!: CameraManager;
@@ -38,8 +32,6 @@ class SceneManager {
 	private butterfly!: Butterfly;
 	private grass!: Grass;
 	private fog!: Fog;
-
-	private depthMaterial!: ShaderMaterial;
 
 	constructor() {
 		console.log("%c SCENE Manager", "color: white; background-color: red");
@@ -65,30 +57,17 @@ class SceneManager {
 
 		this.fps = document.getElementById('fps') as HTMLElement;
 
-		this.scene = new Scene(this.engine);
-		this.scene.autoClear = true; // Color buffer
-		this.scene.clearColor = new Color4(0., 0., 0., 1);
-
-		this.scene.setRenderingAutoClearDepthStencil(0, true);
-
 
 		this.beforeRender = new Set<any>;
+
+
+		this.assets = new Assets(this.engine);
+		this.tracker = new Tracker();
+
 		this.scene.onBeforeCameraRenderObservable.add(() => {
 			this.update();
 		});
 
-		this.meshes = new Map<string, Mesh>;
-		this.lights = new Map<string, Light>;
-		this.textures = new Map<string, Texture>;
-
-		this.tracker = new Tracker();
-
-		this.ubos = new Map<string, UniformBuffer>;
-
-		this.effectRenderer = new EffectRenderer(this.engine);
-
-		this.camera = new FreeCamera("camera", new Vector3(0, 6, 40), this.scene, true);
-		this.camera.updateUpVectorFromRotation = true;
 	}
 
 	public run() {
@@ -117,128 +96,21 @@ class SceneManager {
 
 
 	public async loadMandatory() {
-		await this.loadAssets();
+		await this.assets.loadMandatory()
 
-		this.cameraManager = new CameraManager();
-		this.css3dRenderer = new Css3dRenderer();
-		this.uboManager = new UBOManager();
-		this.lightsManager = new LightManager();
+		this.cameraManager = new CameraManager(this.assets);
+		this.css3dRenderer = new Css3dRenderer(this.assets);
+		this.uboManager = new UBOManager(this.assets);
+		this.lightsManager = new LightManager(this.assets);
 
-		this.butterfly = new Butterfly();
-		this.grass = new Grass();
-		this.grass.reduceGrass(true);
-		this.fog = new Fog();
+		this.butterfly = new Butterfly(this.assets);
+		this.grass = new Grass(this.assets);
+		this.fog = new Fog(this.assets);
 
 		this.initFogDepthTexture();
 
 
 		window.addEventListener("resize", () => { this.resize() })
-
-	}
-
-	public async loadAssets() {
-		let loaded = await LoadAssetContainerAsync("/assets/grassLOD.glb", this.scene);
-		loaded.meshes[2].name = "grassHigh";
-		loaded.meshes[4].name = "grassLow";
-		loaded.meshes[2].setEnabled(false);
-		loaded.meshes[4].setEnabled(false);
-		this.meshes.set("grassHigh", loaded.meshes[2] as Mesh);
-		this.meshes.set("grassLow", loaded.meshes[4] as Mesh);
-		this.scene.addMesh(loaded.meshes[2]);
-		this.scene.addMesh(loaded.meshes[4]);
-
-		loaded = await LoadAssetContainerAsync("/assets/butterfly2.glb", this.scene);
-		loaded.meshes[1].name = "butterfly";
-		loaded.meshes[1].setEnabled(false);
-		this.meshes.set("butterfly", loaded.meshes[1] as Mesh);
-		this.scene.addMesh(loaded.meshes[1]);
-
-		const fogMaxResolution = 1080;
-		const fogRatio = 0.5;
-		stateManager.set("fogMaxResolution", fogMaxResolution);
-		stateManager.set("fogRatio", fogRatio);
-		{
-			const text = new RenderTargetTexture("fogDepth", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * this.resolutionRatio }, this.scene, {
-				type: Engine.TEXTURETYPE_FLOAT,
-				samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
-			});
-			text.renderList = [];
-			text.clearColor = new Color4(1., 0., 0., 1.);
-			this.textures.set("fogDepth", text);
-		}
-		{
-			const text = new RawTexture3D(
-				perlinWorley3D(64),
-				64, 64, 64,
-				Engine.TEXTUREFORMAT_R,
-				this.scene,
-				false,
-				false,
-				Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
-				Engine.TEXTURETYPE_FLOAT)
-			this.textures.set("fogDensity", text);
-		}
-		{
-			const text = new RenderTargetTexture("fog", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * this.resolutionRatio }, this.scene, {
-				format: Engine.TEXTUREFORMAT_RGBA,
-				type: Engine.TEXTURETYPE_HALF_FLOAT,
-				samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
-			})
-			this.textures.set("fog", text);
-		}
-
-		this.ubos.set("camera", new UniformBuffer(this.engine));
-		this.ubos.set("fogData", new UniformBuffer(this.engine));
-		this.ubos.set("fogLights", new UniformBuffer(this.engine));
-
-		{
-			const b = MeshBuilder.CreateSphere("ball", { diameter: 1 }, this.scene);
-			b.setEnabled(false);
-			const m = new ShaderMaterial("picker ball", this.scene, "oneColor", {
-				attributes: ["position"],
-				uniforms: ["world", "viewProjection", "color"]
-			})
-			b.material = m;
-			m.alphaMode = Engine.ALPHA_DISABLE;
-			this.meshes.set("ball", b);
-			const c = Color3.FromHexString("#3b3d7d");
-			const v = new Vector3(c.r, c.g, c.b);
-			v._isDirty = true;
-			this.tracker.add("ballColor", v);
-			this.tracker.track("ballColor", (color: Vector3) => {
-				if (!color._isDirty)
-					return;
-				(b.material as ShaderMaterial).setVector4("color", new Vector4(color.x, color.y, color.z, 0.2));
-				color._isDirty = false;
-			});
-		}
-
-		{
-			const b = MeshBuilder.CreateGround("ground", { width: 200, height: 200 }, this.scene);
-			const m = new StandardMaterial("ground", this.scene);
-			m.diffuseColor = Color3.Black();
-			m.disableLighting = true;
-			b.setEnabled(false);
-			b.material = m;
-			this.meshes.set("ground", b);
-		}
-
-		this.depthMaterial = new ShaderMaterial("defaultDepth", this.scene, "defaultDepth", {
-			attributes: ['position'],
-			uniforms: ["world", "viewProjection", "depthValues"]
-		})
-		this.depthMaterial.onBindObservable.add(() => {
-			this.depthMaterial.setVector2("depthValues", new Vector2(this.camera.minZ, this.camera.maxZ));
-		})
-
-		{
-			const l = new SpotLight("torche", this.camera.position, new Vector3(0, 0, -1), Math.PI * 0.5, 10, this.scene);
-			l.range = 30.;
-			l.specular.scaleInPlace(6.);
-			l.intensity = 2.7;
-			this.lights.set("torche", l);
-		}
-
 
 	}
 
@@ -257,15 +129,23 @@ class SceneManager {
 		return this.engine.getRenderHeight() / this.engine.getRenderWidth();
 	}
 
+	public get scene(): Scene {
+		return this.assets.scene;
+	}
+
+	public get camera(): FreeCamera {
+		return this.assets.camera;
+	}
+
 	public resize() {
 		this.engine.resize(true);
 		const fogMaxResolution = stateManager.get("fogMaxResolution") as number;
 		const fogRatio = stateManager.get("fogRatio") as number;
-		(this.textures.get("fog") as RenderTargetTexture)?.resize({
+		this.assets.fogRenderTexture?.resize({
 			width: fogMaxResolution * fogRatio * this.resolutionRatio,
 			height: fogMaxResolution * fogRatio
 		});
-		(this.textures.get("fogDepth") as RenderTargetTexture)?.resize({
+		this.assets.fogDepthTexture?.resize({
 			width: fogMaxResolution * fogRatio * this.resolutionRatio,
 			height: fogMaxResolution * fogRatio
 		});
@@ -283,8 +163,8 @@ class SceneManager {
 			case "home": {
 				this.camera.attachControl();
 				this.grass.enable = true;
-				this.meshes.get("ball")?.setEnabled(true);
-				this.meshes.get("ground")?.setEnabled(true);
+				this.assets.ballMesh.setEnabled(true);
+				this.assets.groundMesh.setEnabled(true);
 				this.butterfly.enable = true;
 				this.fog.enable = true;
 				break;
@@ -293,25 +173,21 @@ class SceneManager {
 	}
 
 	private initFogDepthTexture() {
-		const depth = this.textures.get("fogDepth") as RenderTargetTexture;
-		{
-			const m = this.meshes.get("ball") as Mesh;
-			depth.renderList!.push(m);
-			depth.setMaterialForRendering(m, this.depthMaterial);
-		}
-		{
-			const m = this.meshes.get("ground") as Mesh;
-			depth.renderList!.push(m);
-			depth.setMaterialForRendering(m, this.depthMaterial);
-		}
+		this.assets.fogDepthTexture.renderList!.push(this.assets.ballMesh);
+		this.assets.fogDepthTexture.setMaterialForRendering(this.assets.ballMesh, this.assets.depthMaterial);
+
+		this.assets.fogDepthTexture.renderList!.push(this.assets.groundMesh);
+		this.assets.fogDepthTexture.setMaterialForRendering(this.assets.groundMesh, this.assets.depthMaterial);
+
+		this.assets.fogDepthTexture.renderList!.push(this.assets.cubeMesh);
+		this.assets.fogDepthTexture.setMaterialForRendering(this.assets.cubeMesh, this.assets.depthMaterial);
+
 		for (let i = 0; i < this.grass.tiles.length; i++) {
 			const m = this.grass.tiles[i]._mesh;
-			depth.renderList!.push(m);
-			depth.setMaterialForRendering(m, this.grass.depthMaterial);
+			this.assets.fogDepthTexture.renderList!.push(m);
+			this.assets.fogDepthTexture.setMaterialForRendering(m, this.assets.grassDepthMaterial);
 		}
-
 	}
-
 }
 
 export const sceneManager = new SceneManager();
