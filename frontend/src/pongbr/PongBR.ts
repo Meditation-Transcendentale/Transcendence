@@ -129,8 +129,9 @@ export class PongBR {
 		});
 
 		this.spaceSkybox.onGameLoad();
-		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot, this.gameUI);
+		this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, localPaddleId);
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
+		this.baseMeshes.paddle.material.setUniform("paddleId", localPaddleId);
 
 		this.currentBallScale = new Vector3(1, 1, 1);
 
@@ -173,7 +174,7 @@ export class PongBR {
 			this.camera
 		);
 		this.ecs.addSystem(this.thinInstanceSystem);
-		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot, this.gameUI);
+		this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, localPaddleId);
 	}
 
 	public transitionToRound(nextCount: number, entities: Entity[], physicsState?: any, playerMapping?: Record<number, number>) {
@@ -227,7 +228,25 @@ export class PongBR {
 			transform?.disable();
 		}
 
-		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI);
+		let newLocalPaddleIndex = -1;
+
+		if (localPaddleId !== null && localPaddleId !== undefined) {
+			if (eliminatedPlayerIds.has(localPaddleId)) {
+				newLocalPaddleIndex = -1;
+			} else if (playerMapping && playerMapping[localPaddleId] !== undefined) {
+				newLocalPaddleIndex = playerMapping[localPaddleId];
+			} else {
+				if (activePlayers.has(localPaddleId)) {
+					newLocalPaddleIndex = localPaddleId;
+				} else {
+					newLocalPaddleIndex = -1;
+				}
+			}
+		}
+
+		this.baseMeshes.paddle.material.setUniform("paddleId", newLocalPaddleIndex);
+
+		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI, newLocalPaddleIndex);
 
 		this.networkingSystem.forceIndexRebuild();
 	}

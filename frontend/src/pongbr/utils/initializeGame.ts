@@ -62,6 +62,7 @@ export function createPaddleMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	mat.setUniform("arenaRadius", arenaRadius);
 	mat.setUniform("playerCount", 100.);
 	mat.setUniform("fillFraction", 0.25);
+	mat.setUniform("paddleId", -1.);
 	paddle.material = mat;
 	mat.diffuseColor = Color3.Red();
 	paddle.isVisible = true;

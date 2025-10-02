@@ -11,6 +11,7 @@ import { localPaddleId, PongBR } from "../PongBR.js";
 import { PhaseState, PhaseTransitionEvent, RebuildCompleteEvent, GameStateInfo } from "../state/PhaseState.js";
 import { Vector3 } from "@babylonImport";
 import GameUI from "../../spa/GameUI.js";
+import { InputComponent } from "../components/InputComponent.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -176,11 +177,14 @@ export class NetworkingSystem extends System {
 					const playerId = e.getComponent(PaddleComponent)!.id;
 					const w = this.wallPlayerIdToEntity.get(playerId);
 
-					const paddle = e.getComponent(TransformComponent);
+					const paddle = e.getComponent(TransformComponent) as TransformComponent;
 					const wall = w?.getComponent(TransformComponent);
 
 					if (p.dead) {
 						if (!w) return;
+						const input = e.getComponent(InputComponent) as InputComponent;
+						if (input)
+							input.isLocal = false;
 						paddle?.disable();
 						wall?.enable();
 						if (playerId == localPaddleId && this.spectateButtonOn == false) {
@@ -194,8 +198,10 @@ export class NetworkingSystem extends System {
 					} else {
 						playerCount++;
 						const paddleComp = e.getComponent(PaddleComponent)!;
-						if (p.id != localPaddleId)
+						if (p.id != localPaddleId) {
 							paddleComp.offset = p.offset as number;
+							paddle.rotation.y = paddleComp.baseRotation - paddleComp.offset;
+						}
 						else {
 							paddleComp.serverOffset = p.offset as number;
 						}
