@@ -137,7 +137,6 @@ class Tournament {
     for (const p of this.players) {
       if (!p.isEliminated) p.isReady = false;
     }
-    setTimeout(() => {
         this.readyActive = true;
         this.readyDeadlineMs = Date.now() + 20_000;
         if (this.readyTimer) clearTimeout(this.readyTimer);
@@ -148,7 +147,6 @@ class Tournament {
           readyCheck: { deadlineMs: this.readyDeadlineMs },
         });
         this.uwsApp.publish(this.id, buf, true);
-    }, 2000)
     this.sendUpdate();
   }
 
@@ -269,11 +267,8 @@ class Tournament {
       } else {
         if (p1 && !p1.isEliminated) p1.isEliminated = true;
         if (p2 && !p2.isEliminated) p2.isEliminated = true;
-        match.setResult({
-          winnerId: match.player1Id,
-          score: [0, 0],
-          forfeitId: match.player2Id,
-        });
+        match.forfeitId = null;
+        match.score = [0,0];
       }
     }
 
@@ -399,11 +394,12 @@ class Tournament {
 
     const m = this.findMatchByPlayer(this.root, userId);
     if (m && !m.winnerId && m.player1Id && m.player2Id) {
-      const winnerSide = m.player1Id === userId ? 1 : 0;
-      m.setResult({
-        winnerId: winnerSide,
-        score: { values: m.score.values, forfeit: true },
-      });
+        const winnerId = (m.player1Id === userId) ? m.player2Id : m.player1Id;
+        m.setResult ({
+            winnerId,
+            score: [0, 0],
+            forfeitI: userId,
+        })
     }
 
     this.autoAdvanceWalkovers();

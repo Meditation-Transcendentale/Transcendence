@@ -68,10 +68,9 @@ export async function settingUpTournament(user) {
       const payload = decodeTournamentServerMessage(new Uint8Array(buf));
 
       if (payload.readyCheck) {
-        setTimeout(() => {
           const readyBuf = encodeTournamentClientMessage({ ready: {} });
+          console.log (`${user.uuid} is sending ready. ${payload.readyCheck.deadlineMs}`);
           ws.send(readyBuf);
-        }, 2000);
       }
       if (payload.startGame) {
         const gameId = payload.startGame.gameId;
@@ -81,8 +80,5 @@ export async function settingUpTournament(user) {
         resolve();
       }
     };
-    setTimeout(() => {
-      resolve();
-    }, 10000);
   });
 }
