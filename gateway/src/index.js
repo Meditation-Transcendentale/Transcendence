@@ -213,23 +213,6 @@ app.register(fastifyHttpProxy, {
 	}
 });
 
-// app.register(fastifyHttpProxy, {
-// 	upstream: 'https://user_interface:5004',
-// 	prefix: '/game',
-// 	websocket: true,
-// 	http2: false,
-// 	preHandler: verifyJWT,
-// 	replyOptions: {
-// 		rewriteRequestHeaders: (req, headers) => {
-// 			if (req.user) {
-// 				headers['user'] = JSON.stringify(req.user);
-// 			}
-// 			headers['x-api-key'] = process.env.API_GATEWAY_KEY;
-// 			return headers;
-// 		}
-// 	}
-// });
-
 app.get('/health', (req, res) => {
 	res.status(200).send('OK');
 });
