@@ -77,11 +77,11 @@ export function getPhaseBallConfig(phase = 'Phase 1') {
 export function getBallScaleForPlayerCount(playerCount) {
 	let scaleFactor;
 	switch (playerCount) {
-		case 100: scaleFactor = 1; break;
-		case 50: scaleFactor = 1.5; break;
-		case 25: scaleFactor = 2; break;
-		case 12: scaleFactor = 2.5; break;
-		case 3: scaleFactor = 6.0; break;
+		case 100: scaleFactor = 2.; break;
+		case 50: scaleFactor = 4.; break;
+		case 25: scaleFactor = 8.; break;
+		case 12: scaleFactor = 10; break;
+		case 3: scaleFactor = 12.; break;
 		default: scaleFactor = 25 / playerCount;
 	}
 	return scaleFactor;

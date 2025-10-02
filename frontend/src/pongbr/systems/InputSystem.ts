@@ -54,6 +54,7 @@ export class InputSystem extends System {
 			let offsetChange = this.move * 1.2 / paddle.speed * dt;
 			paddle.offset = Scalar.Clamp(paddle.offset + offsetChange, -paddle.maxoffset, paddle.maxoffset);
 			//transform.rotation.y = paddle.baseRotation + paddle.offset;
+			console.log(`playerid : ${localPaddleId} paddle: ${paddle.paddleIndex}`)
 			if (this.move != this.lastSentMove) {
 				const payload: userinterface.IClientMessage = {
 					paddleUpdate: {

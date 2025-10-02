@@ -83,6 +83,10 @@ export class PongBR {
 
 		this.stateManager = new StateManager(this.ecs);
 		this.inited = true;
+		this.scene.onBeforeCameraRenderObservable.add(() => {
+			this.baseMeshes.paddle.material.setUniform("time", performance.now() / 1000);
+		});
+
 
 
 	}
@@ -129,10 +133,11 @@ export class PongBR {
 		});
 
 		this.spaceSkybox.onGameLoad();
-		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot, this.gameUI);
+		this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, localPaddleId);
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
+		this.baseMeshes.paddle.material.setUniform("paddleId", localPaddleId);
 
-		this.currentBallScale = new Vector3(1, 1, 1);
+		this.currentBallScale = new Vector3(2, 2, 2);
 
 		this.networkingSystem.forceIndexRebuild();
 
@@ -173,7 +178,7 @@ export class PongBR {
 			this.camera
 		);
 		this.ecs.addSystem(this.thinInstanceSystem);
-		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot, this.gameUI);
+		this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, localPaddleId);
 	}
 
 	public transitionToRound(nextCount: number, entities: Entity[], physicsState?: any, playerMapping?: Record<number, number>) {
@@ -194,11 +199,11 @@ export class PongBR {
 
 		let scaleFactor: number;
 		switch (nextCount) {
-			case 100: scaleFactor = 1; break;
-			case 50: scaleFactor = 1.5; break;
-			case 25: scaleFactor = 2; break;
-			case 12: scaleFactor = 2.5; break;
-			case 3: scaleFactor = 6.0; break;
+			case 100: scaleFactor = 2.; break;
+			case 50: scaleFactor = 4.; break;
+			case 25: scaleFactor = 8.; break;
+			case 12: scaleFactor = 10; break;
+			case 3: scaleFactor = 12.; break;
 			default: scaleFactor = 25 / nextCount;
 		}
 		this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
@@ -227,7 +232,25 @@ export class PongBR {
 			transform?.disable();
 		}
 
-		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI);
+		let newLocalPaddleIndex = -1;
+
+		if (localPaddleId !== null && localPaddleId !== undefined) {
+			if (eliminatedPlayerIds.has(localPaddleId)) {
+				newLocalPaddleIndex = -1;
+			} else if (playerMapping && playerMapping[localPaddleId] !== undefined) {
+				newLocalPaddleIndex = playerMapping[localPaddleId];
+			} else {
+				if (activePlayers.has(localPaddleId)) {
+					newLocalPaddleIndex = localPaddleId;
+				} else {
+					newLocalPaddleIndex = -1;
+				}
+			}
+		}
+
+		this.baseMeshes.paddle.material.setUniform("paddleId", newLocalPaddleIndex);
+
+		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI, newLocalPaddleIndex);
 
 		this.networkingSystem.forceIndexRebuild();
 	}

@@ -381,10 +381,10 @@ export class Field {
 	}
 
 	public setLight(status: boolean) {
-		// if (status == true)
-		// this.light.intensity = 2.5;
-		// else
-		// this.light.intensity = 0;
+		if (status == true)
+			this.light.intensity = 0.1;
+		else
+			this.light.intensity = 0;
 	}
 
 	public setAllEnable(status: boolean) {

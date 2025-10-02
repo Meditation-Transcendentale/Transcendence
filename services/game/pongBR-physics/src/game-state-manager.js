@@ -34,7 +34,11 @@ export class GameStateManager {
 			this.playerStates.activePlayers.add(pid);
 		}
 		this.playerMapping = {};
-		this.currentPhase = 'Phase 1';
+		for (let pid = 0; pid < numPlayers; pid++) {
+			this.playerMapping[pid] = pid;
+		}
+
+		this.currentPhase = 'Pre-Game';
 		this.isRebuilding = false;
 		this.gameOver = false;
 		this.gameEvents = [];
@@ -112,6 +116,7 @@ export class GameStateManager {
 	}
 
 	triggerPhaseTransition(newPhase) {
+
 		this.currentPhase = newPhase;
 		this.gameEvents.push({
 			type: 'PHASE_TRANSITION',
@@ -148,7 +153,7 @@ export class GameStateManager {
 	completeArenaRebuild() {
 		// console.log(`Completing arena rebuild for ${this.currentPhase}`);
 		this.isRebuilding = false;
-		this.playerStates.eliminated.clear();
+		// this.playerStates.eliminated.clear();
 
 		this.gameEvents.push({
 			type: 'REBUILD_COMPLETE',
