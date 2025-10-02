@@ -91,6 +91,8 @@ export class CSSRenderer {
 		this.height = height;
 		this.perspective = this.height * 0.5 * this.camera.getProjectionMatrix().m[5];
 		document.body.style.perspective = `${this.perspective}px`;
+		this.cameraDiv.style.width = `${this.width}px`;
+		this.cameraDiv.style.height = `${this.height}px`;
 		this.dirty = true;
 	}
 }
