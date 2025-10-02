@@ -321,7 +321,7 @@ class GameUI {
 
 	private getModuleElement(moduleName: keyof GameUIModules): HTMLElement | null {
 		switch (moduleName) {
-			case 'scorevs': return this.ref.scoreversusModule;
+			case 'scorevs': return this.ref.scorevsModule;
 			case 'score': return this.ref.scoreModule;
 			case 'timer': return this.ref.timerModule;
 			case 'buttons': return this.ref.buttonModule;
@@ -337,6 +337,10 @@ class GameUI {
 
 	public updateScore(score: number){
 		this.modules.score?.updateScore(score);
+	}
+
+	public updateHighScore(score: number){
+		this.modules.score?.updateHighScore(score);
 	}
 
 	public updateScoreVersus(score1: number, score2: number) {
@@ -377,10 +381,6 @@ class GameUI {
 
 	public updatePlayerCount(playerLeft: number) {
 		this.modules.playercounter?.update(playerLeft);
-	}
-
-	public updatePBScore(score: number){
-		this.modules.score?.updatePBScore(score);
 	}
 }
 
@@ -486,6 +486,7 @@ class ScoreVersusModule implements GameUIModule {
 			this.ref.score2Value.textContent = score2.toString();
 		}
 	}
+
 }
 
 interface ScoreHtmlReference {
@@ -522,11 +523,11 @@ class ScoreModule implements GameUIModule {
 			this.ref.scoreValue.textContent = score.toString();
 		}
 		if (this.scoreValue > this.pb){
-			this.updatePBScore(this.scoreValue);
+			this.updateHighScore(this.scoreValue);
 		}
 	}
 
-	updatePBScore(score: number) {
+	updateHighScore(score: number) {
 		this.pb = score;
 		if (this.ref.scorePBValue) {
 			this.ref.scorePBValue.textContent = score.toString();
