@@ -56,7 +56,7 @@ export default class brick {
 
 		if (!this.game)
 			this.game = new BrickBreaker(document.querySelector("#canvas") as HTMLCanvasElement, App3D.scene, this.gameUI);
-		this.game.start();
+		this.game.start(params.get("mod")!);
 	}
 }
 

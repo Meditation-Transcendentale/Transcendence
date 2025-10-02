@@ -105,7 +105,7 @@ export default async function statsRoutes(app) {
 
 	app.patch('/update/brickbreaker', handleErrors(async (req, res) => {
 
-		const { mode, score } = req.body;
+		const { mode, score } = JSON.parse(req.body);
 
 		console.log("req.body:", req.body);
 		// parsing to do 
@@ -121,13 +121,13 @@ export default async function statsRoutes(app) {
 
 		switch (true) {
 			case (mode === 'easy'): 
-				await nats.request(`stats.addBrickBreakerEasyStats`, jc.encode({ playerId: userResult.data.id, score: easy.parseInt() }), { timeout: 1000 });
+				await nats.request(`stats.addBrickBreakerEasyStats`, jc.encode({ playerId: userResult.data.id, score: score }), { timeout: 1000 });
 				break;
 			case (mode === 'medium'): 
-				await nats.request(`stats.addBrickBreakerMediumStats`, jc.encode({ playerId: userResult.data.id, score: medium.parseInt() }), { timeout: 1000 });
+				await nats.request(`stats.addBrickBreakerMediumStats`, jc.encode({ playerId: userResult.data.id, score: score }), { timeout: 1000 });
 				break;
 			case (mode === 'hard'): 
-				await nats.request(`stats.addBrickBreakerHardStats`, jc.encode({ playerId: userResult.data.id, score: hard.parseInt() }), { timeout: 1000 });
+				await nats.request(`stats.addBrickBreakerHardStats`, jc.encode({ playerId: userResult.data.id, score: score }), { timeout: 1000 });
 				break;
 			default:
 				throw { status: 400, code: 40031, message: 'No score provided' };

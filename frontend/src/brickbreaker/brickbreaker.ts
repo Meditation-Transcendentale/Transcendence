@@ -4,7 +4,6 @@ import { Player } from "./Player";
 import { getRequest, patchRequest } from "../spa/requests";
 import earcut from "earcut";
 import GameUI from "../spa/GameUI";
-import { getRequest, patchRequest } from "../spa/requests";
 
 let resizeTimeout: number;
 let engine: any;
@@ -26,12 +25,12 @@ export class BrickBreaker {
 	public root: TransformNode;
 	private id: number = 0;
 	private start1: boolean = true;
-	private mode: string = "medium";
 	public gameUI: GameUI;
 	public score: number = 0;
-	private pbEasy: number = 0;
-	private pbMedium: number = 0;
-	private pbHard: number = 0;
+	public pbEasy: number = 0;
+	public pbNormal: number = 0;
+	public pbHard: number = 0;
+	public mode: string = "normal";
 
 
 
@@ -60,20 +59,38 @@ export class BrickBreaker {
 
 	}
 
-	public start(): void {
+	handlePb(json: any){
+		// console.log("pb___________",json.brickBreakerStats);
+		this.pbEasy = json.brickBreakerStats.easy_mode_hscore;
+		this.pbNormal = json.brickBreakerStats.normal_mode_hscore;
+		this.pbHard = json.brickBreakerStats.hard_mode_hscore;
+
+		console.log(this.pbEasy, this.pbNormal, this.pbHard);
+	}
+
+	public start(mod: string): void {
 		if (this.renderObserver) {
 			console.warn("BrickBreaker is already running");
 			return;
 		}
 
 		getRequest("/stats/get/brickbreaker")
-			.then((json) => { this.handlePb(json) })
-			.catch((err) => { console.log(err) });
-
+            .then((json) => { this.handlePb(json) })
+            .catch((err) => { console.log(err) });
 		this.reset();
 
-		this.layers = Math.ceil((Math.random() * 5) + 1);
-		this.cols = Math.ceil((Math.random() * 5) + 1);
+		if (mod === "easy"){
+			this.layers = 2;
+			this.cols = 4;
+		} else if (mod === "normal"){
+			this.layers = 4;
+			this.cols = 5;
+		} else if (mod === "hard"){
+			this.layers = 6;
+			this.cols = 6;
+		}
+		// this.layers = Math.ceil((Math.random() * 5) + 1);
+		// this.cols = Math.ceil((Math.random() * 5) + 1);
 		this.ball.bricksLeft = this.layers * this.cols;
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
 
@@ -85,21 +102,6 @@ export class BrickBreaker {
 
 		console.log("BrickBreaker added to render loop");
 	}
-
-	private handlePb(json: any) {
-		console.log(json.brickBreakerStats);
-	}
-
-
-	// public stop(): void {
-	// 	if (this.renderObserver) {
-	// 		this.scene.onBeforeRenderObservable.remove(this.renderObserver);
-	// 		this.renderObserver = null;
-	// 		console.log("BrickBreaker removed from render loop");
-	// 	}
-	// 	this.player.disableInput();
-	// 	this.reset();
-	// }
 
 	public restart(): void {
 		this.reset();
@@ -129,18 +131,12 @@ export class BrickBreaker {
 		//	this.renderObserver = null;
 		//	console.log("BrickBreaker removed from render loop");
 		//}
-
-		console.log("Final score:", this.score);
 		// const body = new FormData();
-        // body.append(this.mode, this.score.toString());
-		// console.log(body);
-        patchRequest("/stats/update/brickbreaker", {mode: this.mode, score: this.score}, false)
-			.then(() => {
-				console.log("Score updated");
+		// body.append(this.mode, this.score.toString());
+		patchRequest("stats/update/brickbreaker", {mode: this.mode, score: this.score}, true)
+			.catch(() => {
+				console.error("Error update score");
 			})
-            .catch(() => {
-                console.error("Error update score");
-            });
 		this.camera.parent = null;
 		this.start1 = false;
 		this.player.disableInput();

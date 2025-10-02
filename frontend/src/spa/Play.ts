@@ -39,6 +39,10 @@ interface playHtmlReference {
 	voidmap: HTMLInputElement;
 	monolithmap: HTMLInputElement;
 	grassmap: HTMLInputElement;
+	brickEasy: HTMLInputElement;
+	brickNormal: HTMLInputElement;
+	brickHard: HTMLInputElement;
+	brickModes: HTMLInputElement;
 };
 
 enum playState {
@@ -113,7 +117,11 @@ export default class Play {
 			voidmap: div.querySelector("#void-map") as HTMLInputElement,
 			monolithmap: div.querySelector("#monolith-map") as HTMLInputElement,
 			grassmap: div.querySelector("#grass-map") as HTMLInputElement,
-			pongModes: div.querySelector("#create-pong") as HTMLInputElement
+			pongModes: div.querySelector("#create-pong") as HTMLInputElement,
+			brickEasy: div.querySelector("#brick-easy") as HTMLInputElement,
+			brickNormal: div.querySelector("#brick-normal") as HTMLInputElement,
+			brickHard: div.querySelector("#brick-hard") as HTMLInputElement,
+			brickModes: div.querySelector("#create-brick") as HTMLInputElement
 		}
 
 
@@ -282,6 +290,21 @@ export default class Play {
 
 		this.ref.brickMode.addEventListener("click", () => {
 			this.createState.mod = "brick";
+			this.ref.brickModes.classList.remove('window--play-disabled')
+			this.ref.brickModes.classList.add('window--play-enable')
+			this.ref.createGame.classList.remove('window--play-enable')
+			this.ref.createGame.classList.add('window--play-disabled')
+			this.ref.createReturn.classList.remove('create-return-disable')
+			this.ref.createReturn.classList.add('create-return-enable')
+			document.getElementById('create-brick')?.classList.add('enabled');
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			// this.returnButton();
+			//this.createOption(true);
+			// Router.nav("/brick", false, true)
+		})
+
+		this.ref.brickEasy.addEventListener("click", () => {
 			this.ref.brMode.removeAttribute("on");
 			this.ref.pongonline.removeAttribute("on");
 			this.ref.ponglocal.removeAttribute("on");
@@ -290,9 +313,35 @@ export default class Play {
 			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
 			else { this.ref.createWin.setAttribute("off", "") }
 			this.returnButton();
-			//this.createOption(true);
-			Router.nav("/brick", false, true)
-		})
+			Router.nav("/brick?mod=easy", false, true);
+			// this.createOption(true);
+		});
+
+		this.ref.brickNormal.addEventListener("click", () => {
+			this.ref.brMode.removeAttribute("on");
+			this.ref.pongonline.removeAttribute("on");
+			this.ref.ponglocal.removeAttribute("on");
+			this.ref.pongai.removeAttribute("on");
+			this.ref.tournamentMode.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.returnButton();
+			Router.nav("/brick?mod=normal", false, true);
+			// this.createOption(true);
+		});
+
+		this.ref.brickHard.addEventListener("click", () => {
+			this.ref.brMode.removeAttribute("on");
+			this.ref.pongonline.removeAttribute("on");
+			this.ref.ponglocal.removeAttribute("on");
+			this.ref.pongai.removeAttribute("on");
+			this.ref.tournamentMode.removeAttribute("on");
+			if (this.createState.mod && this.createState.map) { this.ref.createWin.removeAttribute("off") }
+			else { this.ref.createWin.setAttribute("off", "") }
+			this.returnButton();
+			Router.nav("/brick?mod=hard", false, true);
+			// this.createOption(true);
+		});
 
 		//this.ref.pongMode.addEventListener("click", () => {
 		//	this.createState.mod = this.ref.pongMode.toggleAttribute("on") ? "br" : null;
@@ -439,6 +488,8 @@ export default class Play {
 	private returnButton() {
 		this.ref.pongModes.classList.add('window--play-disabled')
 		this.ref.pongModes.classList.remove('window--play-enable')
+		this.ref.brickModes.classList.add('window--play-disabled')
+		this.ref.brickModes.classList.remove('window--play-enable')
 		this.ref.createGame.classList.add('window--play-enable')
 		this.ref.createGame.classList.remove('window--play-disabled')
 		this.ref.createReturn.classList.add('create-return-disable')
@@ -459,8 +510,11 @@ export default class Play {
 		const mode = this.createState.mod;
 
 		switch (mode) {
-			case 'brick':
+			case 'hard':
+			case 'normal':
+			case 'easy':
 				this.toggleMainWindow(!on);
+				this.toggleOptionWindow(on);
 				break;
 
 			case 'ai':

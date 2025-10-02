@@ -114,9 +114,9 @@ export class NetworkingSystem extends System {
 					this.opponentScore = score[otherId] ?? 0;
 					if (ui) {
 						if (localPaddleId != 0)
-							ui.gameUI.updateScore(this.opponentScore, this.myScore);
+							ui.gameUI.updateScoreVersus(this.opponentScore, this.myScore);
 						else
-							ui.gameUI.updateScore(this.myScore, this.opponentScore);
+							ui.gameUI.updateScoreVersus(this.myScore, this.opponentScore);
 					}
 					// if (ui && (myScore == 5 || theirScore == 5)){
 					// 	ui.gameUI.showEnd(myScore, theirScore, myScore == 5);

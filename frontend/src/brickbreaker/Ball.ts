@@ -102,6 +102,12 @@ export class Ball {
 					if (this.bricksLeft == 0)
 						this.game.score += layerIndex + 1 * this.speedScale * 10;
 					this.game.score = Math.round(this.game.score);
+					if (this.game.mode === "easy" && this.game.score > this.game.pbEasy)
+						this.game.pbEasy = this.game.score;
+					else if (this.game.mode === "normal" && this.game.score > this.game.pbNormal)
+						this.game.pbNormal = this.game.score;
+					else if (this.game.mode === "hard" && this.game.score > this.game.pbHard)
+						this.game.pbHard = this.game.score;
 					this.game.gameUI.updateScore(this.game.score);
 					target.setEnabled(false);
 					this.bricksLeft--;
