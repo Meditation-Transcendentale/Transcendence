@@ -105,22 +105,22 @@ async function main() {
     // cert: fs.readFileSync(process.env.SSL_CERT),
     // key: fs.readFileSync(process.env.SSL_KEY),
   });
-  const lobbyId = process.argv.slice(2, 3);
-  const nbuser = process.argv.slice(3);
+  const lobbyId = String(process.argv[2]);
+  const nbuser = Number(process.argv[3]);
   console.log(lobbyId, nbuser);
   const users = [];
   await userConnectionInit(users, nbuser, lobbyId, agent);
   await Promise.all(users.map((user) => lobbyConnectionInit(user)));
   // setTimeout(() => {}, 100000);
-  for (let i = 0; i < Math.log2(nbuser); i++) {
+  for (let i = 0; i < Math.log2(8); i++) {
     const tournamentPromises = [];
-    for (let j = 0; j < nbuser; j++) {
+    for (let j = 0; j < users.length; j++) {
       tournamentPromises.push(settingUpTournament(users[j]));
     }
     await Promise.all(tournamentPromises);
 
     const gamePromises = [];
-    for (let j = 0; j < nbuser; j++) {
+    for (let j = 0; j < users.length; j++) {
       gamePromises.push(startGameTournament(users[j]));
     }
     await Promise.all(gamePromises);
