@@ -59,6 +59,7 @@ app.setErrorHandler((error, req, res) => {
 });
 
 const verifyJWT = async (req, res) => {
+	console.log(`Incoming request: ${req.raw.method} ${req.raw.url}`);
 	if (req.raw.url && req.raw.url.endsWith('/metrics') || req.raw.url.endsWith('/health')) {
 		if (req.raw.url.endsWith('/health')) {
 			return;
@@ -76,6 +77,7 @@ const verifyJWT = async (req, res) => {
 
 	const token = req.cookies.accessToken;
 	if (!token) {
+		console.log('No token provided');
 		return res.code(401).send({ message: 'No token provided' });
 	}
 
@@ -87,9 +89,11 @@ const verifyJWT = async (req, res) => {
 	const data = response.data;
 
 	if (!data.valid) {
+		console.log('Invalid token');
 		return res.code(401).send({ message: 'Invalid token' });
 	}
 	req.user = data.user;
+	console.log(`Authenticated user:`);
 };
 
 const addApiKeyHeader = (req, headers) => {
@@ -208,6 +212,23 @@ app.register(fastifyHttpProxy, {
 		rewriteRequestHeaders: addApiKeyHeader
 	}
 });
+
+// app.register(fastifyHttpProxy, {
+// 	upstream: 'https://user_interface:5004',
+// 	prefix: '/game',
+// 	websocket: true,
+// 	http2: false,
+// 	preHandler: verifyJWT,
+// 	replyOptions: {
+// 		rewriteRequestHeaders: (req, headers) => {
+// 			if (req.user) {
+// 				headers['user'] = JSON.stringify(req.user);
+// 			}
+// 			headers['x-api-key'] = process.env.API_GATEWAY_KEY;
+// 			return headers;
+// 		}
+// 	}
+// });
 
 app.get('/health', (req, res) => {
 	res.status(200).send('OK');

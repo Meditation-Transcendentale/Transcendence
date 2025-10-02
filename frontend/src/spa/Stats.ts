@@ -1,6 +1,6 @@
 import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
-import { getRequest } from "./requests";
+import { getRequest, postRequest } from "./requests";
 import { createDivception, raiseStatus } from "./utils";
 
 type statsHtmlReference = {
@@ -118,9 +118,8 @@ class Stats {
 			this.ref.swPong.toggleAttribute("down", false);
 			this.ref.swBR.toggleAttribute("down", true);
 
-			getRequest(`stats/player/${this.player}/classic`)
+			postRequest(`stats/player`, { uuid: this.player, mode: "classic" })
 				.then((json: any) => {
-					//console.log(json.playerStats);
 					this.classicResolve(json.playerStats);
 				})
 		})
@@ -136,12 +135,11 @@ class Stats {
 			this.ref.swPong.toggleAttribute("down", true);
 			this.ref.swBR.toggleAttribute("down", false);
 
-			getRequest(`stats/player/${this.player}/br`)
+			postRequest(`stats/player`, { uuid: this.player, mode: "br" })
 				.then((json: any) => {
-					//console.log(json.playerStats);
 					this.brResolve(json.playerStats);
 				})
-				.catch((resp) => { this.statsReject(resp) });
+
 		})
 	}
 
@@ -217,13 +215,13 @@ class Stats {
 		this.ref.stats.appendChild(this.classicPlayerStats!.div);
 		this.mode = 1;
 		this.ref.swBR.toggleAttribute("down", true);
-		getRequest(`stats/player/${this.player}/classic`)
+		
+		postRequest(`stats/player`, { uuid: this.player, mode: "classic" })
 			.then((json: any) => {
-				//console.log(json)
 				this.classicResolve(json.playerStats);
-				//		document.querySelector("#home-container")?.appendChild(this.div);
 			})
 			.catch((resp) => { this.statsReject(resp) });
+		
 	}
 
 	public async unload() {

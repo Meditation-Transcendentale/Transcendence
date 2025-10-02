@@ -189,14 +189,13 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 	});
 	
 	const payload = ticket.getPayload();
-	console.log("Google payload:", payload);
 
 	const { sub: google_id, name: username, picture: avatar_path } = payload;
 
-	console.log('Google ID:', google_id);
 
 	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
 	if (!user) {
+		console.log('Creating new user with username:', username);
 		const uuid = uuidv4();
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
 		// console.log('Avatar CDN URL:', avatarCdnUrl);
