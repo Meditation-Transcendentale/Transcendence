@@ -1,6 +1,6 @@
 services:
   nats_game:
-    image: nats:latest
+    image: nats:2.12.0
     container_name: nats_game
     environment:
       - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
