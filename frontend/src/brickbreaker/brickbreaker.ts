@@ -79,6 +79,7 @@ export class BrickBreaker {
             .catch((err) => { console.log(err) });
 		this.reset();
 
+		this.mode = mod;
 		if (mod === "easy"){
 			this.layers = 2;
 			this.cols = 4;
