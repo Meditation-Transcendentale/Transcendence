@@ -124,11 +124,18 @@ export class NetworkingSystem extends System {
 						const result = this.phaseState.handleRebuildComplete(rebuildEvent);
 
 						this.indexesDirty = true;
-
 						if (result.shouldTransition) {
-							this.game.transitionToRound(result.playerCount, entities, this.currentPhysicsState);
-						} else if (result.shouldRemap && rebuildEvent.playerMapping) {
+							this.game.transitionToRound(
+								result.playerCount,
+								entities,
+								this.currentPhysicsState,
+								rebuildEvent.playerMapping
+							);
+						}
+
+						if (rebuildEvent.playerMapping && Object.keys(rebuildEvent.playerMapping).length > 0) {
 							this.phaseState.remapPaddleEntities(entities, rebuildEvent.playerMapping);
+							this.indexesDirty = true;
 						}
 					}
 				});

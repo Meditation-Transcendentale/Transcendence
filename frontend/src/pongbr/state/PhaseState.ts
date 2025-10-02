@@ -83,13 +83,13 @@ export class PhaseState {
 		}
 	}
 
-	handleRebuildComplete(event: RebuildCompleteEvent): { shouldTransition: boolean; playerCount: number; shouldRemap: boolean } {
+	handleRebuildComplete(event: RebuildCompleteEvent): { shouldTransition: boolean; playerCount: number; } {
 		console.log(`Rebuild complete: ${event.phase}`);
 
 		const config = PhaseState.PHASE_CONFIG[event.phase];
 		if (!config) {
 			console.error(`❌ Unknown phase: ${event.phase}`);
-			return { shouldTransition: false, playerCount: 100, shouldRemap: false };
+			return { shouldTransition: false, playerCount: 100 };
 		}
 
 		const oldVisualStage = this.visualStage;
@@ -99,23 +99,14 @@ export class PhaseState {
 		this.pendingStage = undefined;
 
 		const shouldTransition = oldVisualStage !== config.stage;
-		let shouldRemap = false;
 
 		if (shouldTransition) {
 			this.visualStage = config.stage;
-			this.justRebuilt = true;
-		} else {
-			if (this.justRebuilt) {
-				this.justRebuilt = false;
-			} else {
-				shouldRemap = true;
-			}
+			console.log(`🎬 Visual stage transition: ${oldVisualStage} → ${config.stage}`);
 		}
-
 		return {
 			shouldTransition,
 			playerCount: config.playerCount,
-			shouldRemap
 		};
 	}
 
