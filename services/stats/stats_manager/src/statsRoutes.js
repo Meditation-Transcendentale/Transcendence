@@ -107,12 +107,6 @@ export default async function statsRoutes(app) {
 
 		const { mode, score } = JSON.parse(req.body);
 
-		console.log("req.body:", req.body);
-		// parsing to do 
-
-		console.log("mode:", mode);
-		console.log("score:", score);
-		
 		const user = await nats.request('user.getUserFromHeader', jc.encode({ headers: req.headers }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
 		if (!userResult.success) {
@@ -120,14 +114,14 @@ export default async function statsRoutes(app) {
 		}
 
 		switch (true) {
-			case (mode === 'easy'): 
-				await nats.request(`stats.addBrickBreakerEasyStats`, jc.encode({ playerId: userResult.data.id, score: score }), { timeout: 1000 });
+			case (mode === 'easy'):
+				await nats.request(`stats.updateBrickBreakerEasyStats`, jc.encode({ playerId: userResult.data.id, score}), { timeout: 1000 });
 				break;
-			case (mode === 'medium'): 
-				await nats.request(`stats.addBrickBreakerMediumStats`, jc.encode({ playerId: userResult.data.id, score: score }), { timeout: 1000 });
+			case (mode === 'medium'):
+				await nats.request(`stats.updateBrickBreakerNormalStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
 				break;
-			case (mode === 'hard'): 
-				await nats.request(`stats.addBrickBreakerHardStats`, jc.encode({ playerId: userResult.data.id, score: score }), { timeout: 1000 });
+			case (mode === 'hard'):
+				await nats.request(`stats.updateBrickBreakerHardStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
 				break;
 			default:
 				throw { status: 400, code: 40031, message: 'No score provided' };

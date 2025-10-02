@@ -1,4 +1,3 @@
-# Dockerfile for lobby-manager
 FROM node:24-bookworm-slim
 WORKDIR /usr/src/app
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*

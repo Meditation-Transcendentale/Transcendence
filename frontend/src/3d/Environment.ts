@@ -15,7 +15,7 @@ import {
 	FreeCamera,
 } from "@babylonImport";
 import { Field } from "./Field";
-import { DefaultRenderingPipeline, DirectionalLight, DynamicTexture, Material, PBRMaterial, PointLight, ShadowGenerator, SpotLight, Texture } from "@babylonjs/core";
+import { DefaultRenderingPipeline, DirectionalLight, DynamicTexture, Material, PBRMaterial, PointLight, ShadowGenerator, SimplificationQueue, SimplificationSettings, SimplificationType, SpotLight, Texture } from "@babylonjs/core";
 import { gTrackManager } from "./TrackManager";
 // import { Inspector } from '@babylonjs/inspector';
 // import "@babylonjs/core/Debug/debugLayer";
@@ -123,28 +123,28 @@ export class Environment {
 		const headMesh = this.scene.getMeshByName('Head.001') as Mesh;
 		const headmat = new StandardMaterial('headmat', this.scene);
 		headmat.diffuseColor = new Color3(1., 1, 1);
+		headMesh.isPickable = false;
 		// headMesh.material = headmat;
-
 
 		const material = headMesh.material as PBRMaterial;
 		material.usePhysicalLightFalloff = false;
 		material.invertNormalMapX = true;
 		material.invertNormalMapY = true;
 
-		const mouthMesh = this.scene.getMeshByName('Mouth.001') as Mesh;
+		// const mouthMesh = this.scene.getMeshByName('Mouth.001') as Mesh;
 		const eyeMesh = this.scene.getMeshByName('Eyes.001') as Mesh;
 		const eyemat = new StandardMaterial('eyemat', this.scene);
 		eyemat.diffuseColor = new Color3(1., 0, 0);
 		eyemat.emissiveColor = new Color3(1, 1, 1);
 		eyeMesh.material = eyemat;
 
-		if (mouthMesh && mouthMesh.morphTargetManager) {
-			const smileTarget = mouthMesh.morphTargetManager.getTarget(0);
-
-			smileTarget.influence = 0.;
-
-			console.log("Statue is now smiling!");
-		}
+		// if (mouthMesh && mouthMesh.morphTargetManager) {
+		// 	const smileTarget = mouthMesh.morphTargetManager.getTarget(0);
+		//
+		// 	smileTarget.influence = 0.;
+		//
+		// 	console.log("Statue is now smiling!");
+		// }
 
 		if (headMesh && headMesh.morphTargetManager) {
 			const smileTarget = headMesh.morphTargetManager.getTarget(0);
@@ -184,17 +184,18 @@ export class Environment {
 		whitelight.parent = this.pongRoot;
 		whitelight2.parent = this.pongRoot;
 		whitelight.shadowMinZ = 1;
-		whitelight.intensity = 8;
+		whitelight.intensity = 4;
 		whitelight2.intensity = 1;
 		whitelight.shadowMaxZ = 10;
 		redlight.shadowMinZ = 1;
 		redlight.shadowMaxZ = 80;
-		const shadowGenerator1 = new ShadowGenerator(2048, redlight);
-		const shadowGenerator2 = new ShadowGenerator(2048, whitelight);
+		const shadowGenerator1 = new ShadowGenerator(512, redlight);
+		const shadowGenerator2 = new ShadowGenerator(512, whitelight);
 		shadowGenerator1.useBlurCloseExponentialShadowMap = true;
 		shadowGenerator2.useBlurCloseExponentialShadowMap = true;
 		shadowGenerator1.addShadowCaster(headMesh);
 		shadowGenerator2.addShadowCaster(headMesh);
+		whitelight2.excludedMeshes.push(headMesh);
 
 		await this.field.load();
 
@@ -215,9 +216,9 @@ export class Environment {
 		this.scene.imageProcessingConfiguration.exposure = 1.;
 		this.scene.imageProcessingConfiguration.contrast = 1.;
 
-		whitelight.setEnabled(false);
-		redlight.setEnabled(false);
-		whitelight2.setEnabled(false);
+		// whitelight.setEnabled(false);
+		// redlight.setEnabled(false);
+		// whitelight2.setEnabled(false);
 
 
 		for (let i = 0; i < this.gameMeshes.length; i++) {
@@ -284,8 +285,8 @@ export class Environment {
 	}
 
 
-	public setCube(name: string, clickEv?: any, hoverEv?: any) {
-		this.field.cubeEvent.enable = true;
+	public setCube(name: string, clickEv: any = null, hoverEv: any = null) {
+		this.field.cubeEvent.enable = clickEv != null || hoverEv != null;
 		this.field.cubeEvent.name = name;
 		this.field.cubeEvent.clickEvent = clickEv;
 		this.field.cubeEvent.hoverEvent = hoverEv;

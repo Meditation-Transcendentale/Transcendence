@@ -154,6 +154,7 @@ class Home {
 	}
 
 	public async unload() {
+		App3D.setCube("");
 		//App3D.setCSS3dObjectEnable(this.ref.stats.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.play.id, false);
 		App3D.setCSS3dObjectEnable(this.ref.bricks.id, false);

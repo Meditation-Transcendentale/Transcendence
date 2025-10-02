@@ -1,4 +1,4 @@
-import { Color3, Effect, Mesh, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
+import { Color3, Effect, Mesh, MeshBuilder, PBRMaterial, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "@babylonImport";
 import { PaddleMaterial } from './PaddleMaterial';
 
 Effect.ShadersRepository = "";
@@ -10,6 +10,12 @@ export function initStatue(scene: Scene, pongRoot: TransformNode): Mesh {
 	statue.position.set(-650, 400, 0);
 	statue.rotation.set(0, 0, 0);
 	statue.scaling.setAll(70);
+	statue.freezeWorldMatrix();
+	statue.doNotSyncBoundingInfo = true;
+	const headMesh = scene.getMeshByName('Head.001') as Mesh;
+	const material = headMesh.material as PBRMaterial;
+	material.freeze();
+
 	return statue;
 }
 
@@ -35,7 +41,7 @@ export function createBallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	ballMaterial.specularColor.set(0.5, 0.5, 0.5);
 	ballMesh.setEnabled(true);
 	ballMesh.setPivotPoint(Vector3.Zero());
-	ballMesh.position.y = 2.5;
+	ballMesh.position.y = 0.0;
 	ballMesh.material = ballMaterial;
 
 	return ballMesh;
@@ -62,6 +68,7 @@ export function createPaddleMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	mat.setUniform("arenaRadius", arenaRadius);
 	mat.setUniform("playerCount", 100.);
 	mat.setUniform("fillFraction", 0.25);
+	mat.setUniform("paddleId", -1.);
 	paddle.material = mat;
 	mat.diffuseColor = Color3.Red();
 	paddle.isVisible = true;

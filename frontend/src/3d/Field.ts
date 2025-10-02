@@ -133,6 +133,13 @@ export class Field {
 		this.initUI();
 		this.cubeEvent = new cubeEvent(this.monolith.getMeshCube() as Mesh);
 		// this.skybox = new SpaceSkybox(this.scene);
+		//
+		window.addEventListener("keypress", (ev) => {
+			if (ev.key == "p") {
+				console.log("position", this.camera.position)
+				console.log("direction", this.camera.getForwardRay().direction);
+			}
+		})
 
 	}
 
@@ -242,19 +249,33 @@ export class Field {
 
 	public setVue(vue: string) {
 		switch (vue) {
-			case 'play': {
-				this.camera.position.set(-13, 4, -7);
-				this.camera.setTarget(new Vector3(20, 11, -8));
+			case 'create': {
+				this.camera.position.set(-10, 3.5, -18);
+				this.camera.setTarget(this.camera.position.add(new Vector3(0.86, 0.14, 0.5)))
+				// this.camera.setTarget(new Vector3(20, 11, -8));
 				this.setAllEnable(true);
+				this.picker.ballOrigin.set(4, 0, -18);
+				break;
+			}
+			case 'join': {
+				this.camera.position.set(6.4, 3, 16.9);
+				this.camera.setTarget(this.camera.position.add(new Vector3(-0.8, 0.2, -0.6)))
+				// this.camera.setTarget(new Vector3(20, 11, -8));
+				this.setAllEnable(true);
+				this.picker.ballOrigin.set(-4, 0, 10);
 				break;
 			}
 			case 'home': {
-				this.camera.position.set(0, 5, 15);
-				this.camera.setTarget(new Vector3(0, 7, 0));
+				// this.camera.position.set(0, 5, 15);
+				// this.camera.setTarget(new Vector3(0, 7, 0));
+				this.camera.position.set(-2.7, 4.5, 22);
+				this.camera.setTarget(this.camera.position.add(new Vector3(0.075, 0.07, -0.99)))
+
 				// gTrackManager.addTrack(this.trackCamera, (point: Vector3) => { this.camera.position.copyFrom(point); });
 				// gTrackManager.addTrack(this.trackTarget, (point: Vector3) => { this.camera.setTarget(point) });
 				// this.camera.update();
 				this.light.isEnabled(true);
+				this.picker.ballOrigin.set(0, 0, 4);
 				// this.camera.getViewMatrix().fromArray(CameraUtils.LookAt(new Vector3(0, 5, 15), new Vector3(0, 7, 0), Vector3.Up()));
 				this.setAllEnable(true);
 				break;
@@ -280,8 +301,11 @@ export class Field {
 				break;
 			}
 			case 'lobby': {
-				this.camera.position.set(0, 4, -30);
-				this.camera.setTarget(new Vector3(0, 9, -40));
+				// this.camera.position.set(0, 4, -30);
+				// this.camera.setTarget(new Vector3(0, 9, -40));
+				this.camera.position.set(-1.88, 5.1, -4.96);
+				this.camera.setTarget(this.camera.position.add(new Vector3(0.75, 0.03, 0.65)))
+				this.picker.ballOrigin.set(13, 0, -1);
 
 				break;
 			}
@@ -357,10 +381,10 @@ export class Field {
 	}
 
 	public setLight(status: boolean) {
-		// if (status == true)
-		// this.light.intensity = 2.5;
-		// else
-		// this.light.intensity = 0;
+		if (status == true)
+			this.light.intensity = 0.1;
+		else
+			this.light.intensity = 0;
 	}
 
 	public setAllEnable(status: boolean) {

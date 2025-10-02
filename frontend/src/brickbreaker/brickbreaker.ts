@@ -132,10 +132,11 @@ export class BrickBreaker {
 		//	console.log("BrickBreaker removed from render loop");
 		//}
 		// const body = new FormData();
-		// body.append(this.mode, this.score.toString());
-		patchRequest("stats/update/brickbreaker", {mode: this.mode, score: this.score}, true)
-			.catch(() => {
-				console.error("Error update score");
+        // body.append(this.mode, this.score.toString());
+		// console.log(body);
+        patchRequest("stats/update/brickbreaker", {mode: this.mode, score: this.score}, true)
+			.then(() => {
+				console.log("Score updated");
 			})
 		this.camera.parent = null;
 		this.start1 = false;

@@ -100,6 +100,16 @@ export function encodeClientMessage(
 		.finish();
 }
 
+export function encodeUserInterfaceClientMessage(
+	payload
+) {
+	const err = Proto.userinterface.ClientMessage.verify(payload);
+	if (err) throw new Error(err);
+	return Proto.userinterface.ClientMessage
+		.encode(Proto.userinterface.ClientMessage.create(payload))
+		.finish();
+}
+
 /**
  * Decode a Lobby ClientMessage (if you ever receive one back on the front-end).
  * @param buffer - protobuf‐encoded bytes
@@ -131,10 +141,16 @@ export function encodeServerMessage(
  * @param buffer - protobuf‐encoded bytes
  * @returns a `lobby.ServerMessage` instance
  */
-export function decodeServerMessage(
+export function decodeLobbyServerMessage(
 	buffer
 ) {
 	return Proto.lobby.ServerMessage.decode(buffer);
+}
+
+export function decodeUserInterfaceServerMessage(
+	buffer
+) {
+	return Proto.userinterface.ServerMessage.decode(buffer);
 }
 
 /**

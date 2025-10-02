@@ -32,7 +32,7 @@ export class Picker {
 
 	private pointer: Vector2;
 
-	private ballOrigin: Vector3;
+	public ballOrigin: Vector3;
 
 	constructor(scene: Scene, camera: Camera, effectRenderer: EffectRenderer, position: Vector3, size: Vector2) {
 		this.scene = scene;
