@@ -152,7 +152,7 @@ export class NetworkingSystem extends System {
 						transform?.enable();
 
 						const scaleFactor = this.game.currentBallScale ? this.game.currentBallScale.x : 1.0;
-						const adjustedY = 0.5 + (scaleFactor - 1.0) * 0.1;
+						const adjustedY = 3.0 + (scaleFactor - 1.0) * 0.1;
 
 						ball.serverPosition.set(b.x as number, adjustedY, b.y as number);
 						ball.lastServerUpdate = performance.now();

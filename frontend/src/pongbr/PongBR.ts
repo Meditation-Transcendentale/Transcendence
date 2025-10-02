@@ -83,6 +83,10 @@ export class PongBR {
 
 		this.stateManager = new StateManager(this.ecs);
 		this.inited = true;
+		this.scene.onBeforeCameraRenderObservable.add(() => {
+			this.baseMeshes.paddle.material.setUniform("time", performance.now() / 1000);
+		});
+
 
 
 	}
@@ -133,7 +137,7 @@ export class PongBR {
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
 		this.baseMeshes.paddle.material.setUniform("paddleId", localPaddleId);
 
-		this.currentBallScale = new Vector3(1, 1, 1);
+		this.currentBallScale = new Vector3(2, 2, 2);
 
 		this.networkingSystem.forceIndexRebuild();
 
@@ -195,11 +199,11 @@ export class PongBR {
 
 		let scaleFactor: number;
 		switch (nextCount) {
-			case 100: scaleFactor = 1; break;
-			case 50: scaleFactor = 1.5; break;
-			case 25: scaleFactor = 2; break;
-			case 12: scaleFactor = 2.5; break;
-			case 3: scaleFactor = 6.0; break;
+			case 100: scaleFactor = 2.; break;
+			case 50: scaleFactor = 4.; break;
+			case 25: scaleFactor = 8.; break;
+			case 12: scaleFactor = 10; break;
+			case 3: scaleFactor = 12.; break;
 			default: scaleFactor = 25 / nextCount;
 		}
 		this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);

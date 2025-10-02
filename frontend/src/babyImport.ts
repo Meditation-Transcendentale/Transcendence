@@ -78,4 +78,5 @@ export { Curve3 } from "@babylonjs/core/Maths/math.path";
 export { RawTexture3D } from "@babylonjs/core/Materials/Textures/rawTexture3D";
 
 import "@babylonjs/core/Culling/ray";
+export { SimplificationQueue, SimplificationSettings } from "@babylonjs/core";
 

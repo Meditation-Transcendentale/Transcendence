@@ -43,10 +43,10 @@ export class SpaceSkybox {
 		this.scene = scene;
 
 		this.settings = {
-			iterations: 25,
+			iterations: 20,
 			formuparam: 0.53,
-			volsteps: 20,
-			stepsize: 0.1,
+			volsteps: 10,
+			stepsize: 0.15,
 			zoom: 0.200,
 			tile: 0.850,
 			speed: 0.010,
@@ -61,9 +61,9 @@ export class SpaceSkybox {
 			gamma: 1.0,
 			autoRotate: true,
 			rotationSpeed: 0.05,
-			sphereSegments: 128,
-			skyboxSize: 2000,
-			resolution: new Vector2(2048, 2048),
+			sphereSegments: 32,
+			skyboxSize: 1000,
+			resolution: new Vector2(512, 512),
 			...options
 		};
 
@@ -147,8 +147,8 @@ export class SpaceSkybox {
             
             void main(void) {
                 vec3 viewDir = normalize(vPosition);
-                float quantize = 700.0;
-                viewDir = normalize(round(viewDir * quantize) / quantize);
+                // float quantize = 700.0;
+                // viewDir = normalize(round(viewDir * quantize) / quantize);
                 
                 float phi = atan(viewDir.z, viewDir.x);
                 float theta = acos(clamp(viewDir.y, -1.0, 1.0));
@@ -156,10 +156,10 @@ export class SpaceSkybox {
                 float u1 = 0.5 + phi / (2.0 * 3.14159265);
                 float v1 = theta / 3.14159265;
                 
-                float poleBlend = smoothstep(0.98, 1.0, abs(viewDir.y));
-                if (poleBlend > 0.0) {
-                    u1 = 0.5;
-                }
+                // float poleBlend = smoothstep(0.98, 1.0, abs(viewDir.y));
+                // if (poleBlend > 0.0) {
+                //     u1 = 0.5;
+                // }
                 
                 vec2 fragCoord = vec2(u1, v1) * iResolution;
                 vec2 uv = fragCoord.xy / iResolution.xy - 0.5;
@@ -468,8 +468,8 @@ export const SpaceSkyboxPresets: Record<SpaceSkyboxPreset, Partial<SpaceSkyboxOp
 		saturation: 0.03,
 		contrast: 0.3,
 		brightness: 0.003,
-		speed: 0.001,
-		rotationSpeed: 0.01
+		speed: 0.0001,
+		rotationSpeed: 0.001
 	},
 
 	Horror: {
