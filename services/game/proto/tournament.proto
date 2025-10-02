@@ -59,9 +59,10 @@ message TournamentStartGameMessage {
 
 message TournamentServerMessage {
   oneof payload {
-    TournamentUpdateMessage update   = 1;
-    TournamentErrorMessage error     = 2;
+    TournamentUpdateMessage update = 1;
+    TournamentErrorMessage error = 2;
     TournamentReadyCheckMessage readyCheck = 3;
-    TournamentStartGameMessage startGame   = 4;
+    TournamentStartGameMessage startGame = 4;
+    TournamentFinishedMessage finished = 5;
   }
 }

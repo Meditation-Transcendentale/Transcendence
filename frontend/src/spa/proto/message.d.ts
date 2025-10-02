@@ -5016,6 +5016,9 @@ export namespace tournament {
 
         /** TournamentServerMessage startGame */
         startGame?: (tournament.ITournamentStartGameMessage|null);
+
+        /** TournamentServerMessage finished */
+        finished?: (tournament.ITournamentFinishedMessage|null);
     }
 
     /** Represents a TournamentServerMessage. */
@@ -5039,8 +5042,11 @@ export namespace tournament {
         /** TournamentServerMessage startGame. */
         public startGame?: (tournament.ITournamentStartGameMessage|null);
 
+        /** TournamentServerMessage finished. */
+        public finished?: (tournament.ITournamentFinishedMessage|null);
+
         /** TournamentServerMessage payload. */
-        public payload?: ("update"|"error"|"readyCheck"|"startGame");
+        public payload?: ("update"|"error"|"readyCheck"|"startGame"|"finished");
 
         /**
          * Creates a new TournamentServerMessage instance using the specified properties.

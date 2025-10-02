@@ -10991,6 +10991,7 @@ export const tournament = $root.tournament = (() => {
          * @property {tournament.ITournamentErrorMessage|null} [error] TournamentServerMessage error
          * @property {tournament.ITournamentReadyCheckMessage|null} [readyCheck] TournamentServerMessage readyCheck
          * @property {tournament.ITournamentStartGameMessage|null} [startGame] TournamentServerMessage startGame
+         * @property {tournament.ITournamentFinishedMessage|null} [finished] TournamentServerMessage finished
          */
 
         /**
@@ -11040,17 +11041,25 @@ export const tournament = $root.tournament = (() => {
          */
         TournamentServerMessage.prototype.startGame = null;
 
+        /**
+         * TournamentServerMessage finished.
+         * @member {tournament.ITournamentFinishedMessage|null|undefined} finished
+         * @memberof tournament.TournamentServerMessage
+         * @instance
+         */
+        TournamentServerMessage.prototype.finished = null;
+
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
 
         /**
          * TournamentServerMessage payload.
-         * @member {"update"|"error"|"readyCheck"|"startGame"|undefined} payload
+         * @member {"update"|"error"|"readyCheck"|"startGame"|"finished"|undefined} payload
          * @memberof tournament.TournamentServerMessage
          * @instance
          */
         Object.defineProperty(TournamentServerMessage.prototype, "payload", {
-            get: $util.oneOfGetter($oneOfFields = ["update", "error", "readyCheck", "startGame"]),
+            get: $util.oneOfGetter($oneOfFields = ["update", "error", "readyCheck", "startGame", "finished"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
@@ -11086,6 +11095,8 @@ export const tournament = $root.tournament = (() => {
                 $root.tournament.TournamentReadyCheckMessage.encode(message.readyCheck, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             if (message.startGame != null && Object.hasOwnProperty.call(message, "startGame"))
                 $root.tournament.TournamentStartGameMessage.encode(message.startGame, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+            if (message.finished != null && Object.hasOwnProperty.call(message, "finished"))
+                $root.tournament.TournamentFinishedMessage.encode(message.finished, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
             return writer;
         };
 
@@ -11136,6 +11147,10 @@ export const tournament = $root.tournament = (() => {
                     }
                 case 4: {
                         message.startGame = $root.tournament.TournamentStartGameMessage.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 5: {
+                        message.finished = $root.tournament.TournamentFinishedMessage.decode(reader, reader.uint32());
                         break;
                     }
                 default:
@@ -11212,6 +11227,16 @@ export const tournament = $root.tournament = (() => {
                         return "startGame." + error;
                 }
             }
+            if (message.finished != null && message.hasOwnProperty("finished")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.tournament.TournamentFinishedMessage.verify(message.finished);
+                    if (error)
+                        return "finished." + error;
+                }
+            }
             return null;
         };
 
@@ -11246,6 +11271,11 @@ export const tournament = $root.tournament = (() => {
                 if (typeof object.startGame !== "object")
                     throw TypeError(".tournament.TournamentServerMessage.startGame: object expected");
                 message.startGame = $root.tournament.TournamentStartGameMessage.fromObject(object.startGame);
+            }
+            if (object.finished != null) {
+                if (typeof object.finished !== "object")
+                    throw TypeError(".tournament.TournamentServerMessage.finished: object expected");
+                message.finished = $root.tournament.TournamentFinishedMessage.fromObject(object.finished);
             }
             return message;
         };
@@ -11282,6 +11312,11 @@ export const tournament = $root.tournament = (() => {
                 object.startGame = $root.tournament.TournamentStartGameMessage.toObject(message.startGame, options);
                 if (options.oneofs)
                     object.payload = "startGame";
+            }
+            if (message.finished != null && message.hasOwnProperty("finished")) {
+                object.finished = $root.tournament.TournamentFinishedMessage.toObject(message.finished, options);
+                if (options.oneofs)
+                    object.payload = "finished";
             }
             return object;
         };

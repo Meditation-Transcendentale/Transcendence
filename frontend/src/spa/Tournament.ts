@@ -30,6 +30,7 @@ type ServerMsg = {
   readyCheck?: { deadlineMs: number };
   startGame?: { gameId: string };
   error?: { message: string };
+  finished?: { };
 };
 
 export default class TournamentPage {
@@ -108,6 +109,10 @@ export default class TournamentPage {
           true
         );
         this.ws?.close();
+      }
+      if (payload?.finished)
+      {
+        console.log (`${this.tree?.winnerId} yep gg`);
       }
       this.render();
     };

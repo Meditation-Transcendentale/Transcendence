@@ -116,6 +116,13 @@ class Tournament {
 
       this.autoAdvanceWalkovers();
       this.sendUpdate();
+      if (!match.parent) {
+        const buf = encodeTournamentServerMessage ({
+          finished: {}
+        });
+        this.uwsApp.publish(this.id, buf, true);
+        return;
+      }
       this.maybeStartReadyCheck();
     });
 
@@ -137,18 +144,19 @@ class Tournament {
     for (const p of this.players) {
       if (!p.isEliminated) p.isReady = false;
     }
+    this.players.map((p) => { console.log (`${p.id}|ready?${p.isReady}|eliminated?${p.isEliminated}|connected?${p.isConnected}`) })
     setTimeout(() => {
-        this.readyActive = true;
-        this.readyDeadlineMs = Date.now() + 20_000;
-        if (this.readyTimer) clearTimeout(this.readyTimer);
-        this.readyTimer = setTimeout(() => this.handleReadyTimeout(), 20_000);
-    
-        console.log("sending ready check");
-        const buf = encodeTournamentServerMessage({
-          readyCheck: { deadlineMs: this.readyDeadlineMs },
-        });
-        this.uwsApp.publish(this.id, buf, true);
-    }, 2000)
+      this.readyActive = true;
+      this.readyDeadlineMs = Date.now() + 20_000;
+      if (this.readyTimer) clearTimeout(this.readyTimer);
+      this.readyTimer = setTimeout(() => this.handleReadyTimeout(), 20_000);
+
+      console.log("sending ready check");
+      const buf = encodeTournamentServerMessage({
+        readyCheck: { deadlineMs: this.readyDeadlineMs },
+      });
+      this.uwsApp.publish(this.id, buf, true);
+    }, 2000);
     this.sendUpdate();
   }
 
@@ -448,7 +456,13 @@ export default class tournamentService {
     if (!t) throw new Error("Tournament not found");
 
     const p = t.getPlayerByUuid(playerId);
-    if (!p || p.isEliminated) throw new Error("Player not eligible");
+    if (!p || p.isEliminated) {
+      const startBuf = encodeTournamentServerMessage({
+        startGame: { gameId: null },
+      });
+      this.uwsApp.publish(`user.${ws.uuid}`, startBuf, true);
+      return;
+    }
 
     p.isReady = true;
     t.sendUpdate();

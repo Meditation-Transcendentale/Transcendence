@@ -52,7 +52,7 @@ export function createUwsApp(path, tournamentService) {
                 const payload = decodeTournamentClientMessage(new Uint8Array(message));
 
                 if (payload.ready) {
-                    console.log("READY RECEIVED");
+                    console.log(`${ws.userId}|ready received`);
                     await tournamentService.ready(ws, ws.tournamentId, ws.userId);
                     return;
                 }
