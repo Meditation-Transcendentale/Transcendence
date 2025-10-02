@@ -1,5 +1,6 @@
 import { postRequest } from "../../networking/request";
 import { routeManager } from "../../route/RouteManager";
+import { sceneManager } from "../../scene/SceneManager";
 import { IPage } from "./IPages";
 
 interface authHtmlReference {
@@ -74,6 +75,7 @@ class Auth implements IPage {
 
 	public load() {
 		this.loaded = true;
+		sceneManager.load("auth");
 		this.ref.form.reset();
 		this.ref.tokenDiv.classList.add("hidden");
 		this.setTokenRequired(false);

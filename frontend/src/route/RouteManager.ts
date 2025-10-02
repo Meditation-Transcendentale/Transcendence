@@ -32,6 +32,13 @@ class RouteManager {
 		let url = new URL(this.location + path);
 
 		await gUser.check()
+			.then(() => {
+				if (url.pathname == "/auth" || (this.first && url.pathname == "/cajoue")) {
+					url.pathname = "/home";
+					url.search = "";
+				}
+				this.first = false;
+			})
 			.catch(() => {
 				if (url.pathname != "/auth") {
 					url.pathname = "/auth";
@@ -40,16 +47,8 @@ class RouteManager {
 						alert("not connected");
 					};
 					console.log("%c Not logged in redirected to /login", "color: white; background-color: red")
-					window.history.pushState("", "", url.pathname + url.search)
-					htmlManager.loadPage(url.pathname, this.routes.get(url.pathname) as string);
 				}
 			});
-
-		if (url.pathname == "/auth" || (this.first && url.pathname == "/cajoue")) {
-			url.pathname = "/home";
-			url.search = "";
-		}
-		this.first = false;
 
 		if (history)
 			window.history.pushState("", "", url.pathname + url.search)

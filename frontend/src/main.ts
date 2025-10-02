@@ -13,7 +13,10 @@ async function init() {
 	// createHtmlManager();
 	streamManager.connectBuilder();
 	routeManager.nav(window.location.href.substring(window.location.origin.length), false, true);
-	sceneManager.loadMandatory();
+	await sceneManager.loadMandatory();
+
+
+
 
 
 	// const ws = new WebSocket(`wss://${window.location.hostname}:7000/ws`);

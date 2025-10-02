@@ -248,9 +248,30 @@ const notifyPlugin = {
 // 	await Object(ctx).watch();
 // }
 // console.log("Watching")
+//
+const externalBabylonPlugin = {
+	name: 'external-babylon',
+	setup(build) {
+		build.onResolve({ filter: /babylon$/ }, args => {
+			return {
+				path: "/dist/babylon",
+				external: true
+			};
+		});
+	},
+};
+
 
 const mainctx = await esbuild.context({
-	entryPoints: ['src/main.ts'],
+	entryPoints: [
+		'src/main.ts',
+		'src/User.ts',
+		'src/scene/SceneManager.ts',
+		'src/route/RouteManager.ts',
+		'src/html/HtmlManager.ts',
+		'src/stream/StreamManager.ts',
+		'src/state/StateManager.ts',
+	],
 	bundle: true,
 	outdir: "./dist",
 	treeShaking: true,
@@ -262,9 +283,26 @@ const mainctx = await esbuild.context({
 	//minifyIdentifiers: true,
 	splitting: true,
 	resolveExtensions: ['.ts', '.js'],
+	plugins: [notifyPlugin, externalBabylonPlugin]
+})
+
+const babylonctx = await esbuild.context({
+	entryPoints: ['src/babylon.ts'],
+	bundle: true,
+	outfile: "./dist/babylon.js",
+	treeShaking: false,
+	legalComments: 'none',
+	format: "esm",
+	minify: true,
+	minifySyntax: true,
+	minifyWhitespace: true,
+	minifyIdentifiers: true,
+	splitting: false,
+	resolveExtensions: ['.ts', '.js'],
 	plugins: [notifyPlugin]
 })
 
+await babylonctx.watch();
 await mainctx.watch();
 
 console.log("Watching")

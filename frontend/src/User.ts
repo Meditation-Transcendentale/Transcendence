@@ -14,7 +14,7 @@ class User {
 		this.avatar = null;
 	}
 
-	public async check() {
+	public check(): Promise<boolean> {
 		// let json: any;
 		// try {
 		// 	json = await getRequest("info/me", "no-cache")
@@ -35,14 +35,29 @@ class User {
 		// 	this.avatar = json.userInfo.avatar_path;
 		// 	return;
 		// })
-		getRequest("info/me", "no-cache")
-			.then((json: any) => {
-				this.username = json.userInfo.username;
-				this.uuid = json.userInfo.uuid;
-				// this.twofa = json.userInfo.two_fa_enabled;
-				this.avatar = json.userInfo.avatar_path;
+		// getRequest("info/me", "no-cache")
+		// 	.then((json: any) => {
+		// 		this.username = json.userInfo.username;
+		// 		this.uuid = json.userInfo.uuid;
+		// 		// this.twofa = json.userInfo.two_fa_enabled;
+		// 		this.avatar = json.userInfo.avatar_path;
+		// 	})
+		return new Promise((resolve, reject) => {
+			getRequest("info/me", "no-cache")
+				.then((json: any) => {
+					this.username = json.userInfo.username;
+					this.uuid = json.userInfo.uuid;
+					// this.twofa = json.userInfo.two_fa_enabled;
+					this.avatar = json.userInfo.avatar_path;
+					resolve(true);
+				})
+				.catch((err) => {
+					reject(new Error("not authentifiated"));
+				})
 
-			})
+		})
+
+
 	}
 }
 
