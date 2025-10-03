@@ -19,11 +19,11 @@
   },
   "dependencies": {
     "nats": "^2.29.3",
-    "protobufjs": "^7.5.0",
-    "fastify": "^5.3.3",
-    "@fastify/cors": "^11.0.1",
-    "dotenv": "^16.0.3",
-    "uuid": "11.1.0",
+    "protobufjs": "^7.5.4",
+    "fastify": "^5.6.1",
+    "@fastify/cors": "^11.1.0",
+    "dotenv": "^17.2.3",
+    "uuid": "13.0.0",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.52.0"
   },
   "devDependencies": {

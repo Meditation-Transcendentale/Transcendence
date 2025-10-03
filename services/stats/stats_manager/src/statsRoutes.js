@@ -48,9 +48,10 @@ function calculateStats(playerStats, mode) {
 
 export default async function statsRoutes(app) {
 
-	app.get('/player/:uuid/:mode', handleErrors(async (req, res) => {
+	app.post('/player', handleErrors(async (req, res) => {
 
-		const { uuid, mode } = req.params;
+		const { uuid, mode } = req.body;
+		console.log("Fetching stats for UUID:", uuid, "in mode:", mode);
 
 		const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
@@ -99,7 +100,8 @@ export default async function statsRoutes(app) {
 			throw { status: result.status, code: result.code, message: result.message };
 		}
 		const brickBreakerStats = result.data;
-		
+
+		res.header('Cache-Control', 'no-store');
 		res.code(statusCode.SUCCESS).send({ brickBreakerStats });
 	}));
 

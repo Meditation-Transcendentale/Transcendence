@@ -2,7 +2,7 @@ import fastify from "fastify";
 import fs from "fs";
 import dotenv from "dotenv";
 import fastifyHttpProxy from "@fastify/http-proxy";
-import fastifyCookie from "fastify-cookie";
+import fastifyCookie from "@fastify/cookie";
 import fastifyCaching from "@fastify/caching";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyCompress from "@fastify/compress";
@@ -59,6 +59,7 @@ app.setErrorHandler((error, req, res) => {
 });
 
 const verifyJWT = async (req, res) => {
+	console.log(`Incoming request: ${req.raw.method} ${req.raw.url}`);
 	if (req.raw.url && req.raw.url.endsWith('/metrics') || req.raw.url.endsWith('/health')) {
 		if (req.raw.url.endsWith('/health')) {
 			return;
@@ -76,6 +77,7 @@ const verifyJWT = async (req, res) => {
 
 	const token = req.cookies.accessToken;
 	if (!token) {
+		console.log('No token provided');
 		return res.code(401).send({ message: 'No token provided' });
 	}
 
@@ -87,9 +89,11 @@ const verifyJWT = async (req, res) => {
 	const data = response.data;
 
 	if (!data.valid) {
+		console.log('Invalid token');
 		return res.code(401).send({ message: 'Invalid token' });
 	}
 	req.user = data.user;
+	console.log(`Authenticated user:`);
 };
 
 const addApiKeyHeader = (req, headers) => {
