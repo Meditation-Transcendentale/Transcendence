@@ -5,7 +5,6 @@ import {
   encodeTournamentClientMessage,
 } from "./proto/helper.js";
 import WebSocket from "ws";
-import { userinterface } from "./proto/message.js";
 
 export async function startGameTournament(user) {
   const url =
@@ -37,7 +36,7 @@ export async function startGameTournament(user) {
         user.setGameId(null);
         ws.close();
         clearInterval(intervalId);
-        console.log (`${user.uuid}|match finished`);
+        console.log(`${user.uuid}|match finished`);
         resolve();
       }
       if (payload.welcome) {
@@ -65,20 +64,39 @@ export async function settingUpTournament(user) {
   return new Promise((resolve) => {
     ws.onmessage = (msg) => {
       const buf = new Uint8Array(msg.data);
-      const payload = decodeTournamentServerMessage(new Uint8Array(buf));
+      try {
 
+        const payload = decodeTournamentServerMessage(new Uint8Array(buf));
+        
+        if (!payload.update && !payload.readyCheck)
+          console.log(
+        `${user.uuid} received:`,
+        Object.keys(payload).filter((k) => payload[k])
+      );
       if (payload.readyCheck) {
-          const readyBuf = encodeTournamentClientMessage({ ready: {} });
-          console.log (`${user.uuid} is sending ready. ${payload.readyCheck.deadlineMs}`);
+        const readyBuf = encodeTournamentClientMessage({ ready: {} });
+        console.log(
+          `${user.uuid} is sending ready. ${payload.readyCheck.deadlineMs}`
+        );
+        setTimeout(() => {
           ws.send(readyBuf);
+        }, 1000);
       }
       if (payload.startGame) {
         const gameId = payload.startGame.gameId;
+        if (gameId === "") {
+          console.log(`${user.uuid}|eliminated`);
+          ws.close();
+          resolve();
+        }
         user.setGameId(gameId);
         console.log(`${user.uuid}|GAME ID: ${user.gameId}`);
         ws.close();
         resolve();
       }
+    } catch (err) {
+      console.error("error:", err);
+    }
     };
   });
 }

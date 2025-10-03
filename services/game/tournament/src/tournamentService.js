@@ -117,13 +117,15 @@ class Tournament {
       this.autoAdvanceWalkovers();
       this.sendUpdate();
       if (!match.parent) {
-        const buf = encodeTournamentServerMessage ({
-          finished: {}
+        const buf = encodeTournamentServerMessage({
+          finished: {},
         });
         this.uwsApp.publish(this.id, buf, true);
         return;
       }
-      this.maybeStartReadyCheck();
+      setTimeout(() => {
+        this.maybeStartReadyCheck();
+      }, 1000);
     });
 
     natsClient.subscribe("games.tournament.*.score", (data, msg) => {
@@ -144,16 +146,16 @@ class Tournament {
     for (const p of this.players) {
       if (!p.isEliminated) p.isReady = false;
     }
-        this.readyActive = true;
-        this.readyDeadlineMs = Date.now() + 20_000;
-        if (this.readyTimer) clearTimeout(this.readyTimer);
-        this.readyTimer = setTimeout(() => this.handleReadyTimeout(), 20_000);
-    
-        console.log("sending ready check");
-        const buf = encodeTournamentServerMessage({
-          readyCheck: { deadlineMs: this.readyDeadlineMs },
-        });
-        this.uwsApp.publish(this.id, buf, true);
+    this.readyActive = true;
+    this.readyDeadlineMs = Date.now() + 20_000;
+    if (this.readyTimer) clearTimeout(this.readyTimer);
+    this.readyTimer = setTimeout(() => this.handleReadyTimeout(), 20_000);
+
+    console.log("sending ready check");
+    const buf = encodeTournamentServerMessage({
+      readyCheck: { deadlineMs: this.readyDeadlineMs },
+    });
+    this.uwsApp.publish(this.id, buf, true);
     this.sendUpdate();
   }
 
@@ -275,7 +277,7 @@ class Tournament {
         if (p1 && !p1.isEliminated) p1.isEliminated = true;
         if (p2 && !p2.isEliminated) p2.isEliminated = true;
         match.forfeitId = null;
-        match.score = [0,0];
+        match.score = [0, 0];
       }
     }
 
@@ -388,6 +390,12 @@ class Tournament {
     const p = this.getPlayerByUuid(userId);
     if (!p) throw new Error(`Player ${userId} not in this tournament`);
     p.isConnected = true;
+    if (this.readyActive) {
+      const buf = encodeTournamentServerMessage({
+        readyCheck: { deadlineMs: this.readyDeadlineMs },
+      });
+      this.uwsApp.publish(`user.${userId}`, buf, true);
+    }
     this.sendUpdate();
     this.maybeStartReadyCheck();
   }
@@ -401,12 +409,12 @@ class Tournament {
 
     const m = this.findMatchByPlayer(this.root, userId);
     if (m && !m.winnerId && m.player1Id && m.player2Id) {
-        const winnerId = (m.player1Id === userId) ? m.player2Id : m.player1Id;
-        m.setResult ({
-            winnerId,
-            score: [0, 0],
-            forfeitI: userId,
-        })
+      const winnerId = m.player1Id === userId ? m.player2Id : m.player1Id;
+      m.setResult({
+        winnerId,
+        score: [0, 0],
+        forfeitI: userId,
+      });
     }
 
     this.autoAdvanceWalkovers();
@@ -451,11 +459,17 @@ export default class tournamentService {
     if (!t) throw new Error("Tournament not found");
 
     const p = t.getPlayerByUuid(playerId);
-    if (!p || p.isEliminated) {
-      const startBuf = encodeTournamentServerMessage({
-        startGame: { gameId: null },
-      });
-      this.uwsApp.publish(`user.${ws.uuid}`, startBuf, true);
+    if (!p) return;
+    if (p.isEliminated) {
+      console.log("sending to eliminated:", playerId);
+      try {
+        const startBuf = encodeTournamentServerMessage({
+          startGame: { gameId: null },
+        });
+        t.uwsApp.publish(`user.${playerId}`, startBuf, true);
+      } catch (err) {
+        console.error("error:", err);
+      }
       return;
     }
 

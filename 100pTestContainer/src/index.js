@@ -119,11 +119,13 @@ async function main() {
     }
     await Promise.all(tournamentPromises);
 
+    console.log ("READY CHECK PASSED, STARTING GAMES");
     const gamePromises = [];
     for (let j = 0; j < users.length; j++) {
       gamePromises.push(startGameTournament(users[j]));
     }
     await Promise.all(gamePromises);
+    console.log ("GAMES FINISHED");
   }
   console.log("The end");
 }
