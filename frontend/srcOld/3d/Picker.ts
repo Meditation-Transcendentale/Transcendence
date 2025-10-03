@@ -193,7 +193,6 @@ export class Picker {
 			return;
 		}
 		if (!this.ballHit) {
-
 			this.meshBall.position.addInPlaceFromFloats(
 				(this.ballOrigin.x - this.mesh.position.x) * deltaTime * 1,
 				0,

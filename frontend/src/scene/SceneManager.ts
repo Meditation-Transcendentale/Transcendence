@@ -11,6 +11,8 @@ import { Fog } from "./Fog";
 import { Css3dRenderer } from "./css3dRenderer";
 import { LightManager } from "./LightsManager";
 import { Assets } from "./Assets";
+import { Picker } from "./Picker";
+import { BallGrass } from "./BallGrass";
 
 class SceneManager {
 	public engine: Engine;
@@ -32,6 +34,8 @@ class SceneManager {
 	private butterfly!: Butterfly;
 	private grass!: Grass;
 	private fog!: Fog;
+	private picker!: Picker;
+	private ballGrass!: BallGrass;
 
 	constructor() {
 		console.log("%c SCENE Manager", "color: white; background-color: red");
@@ -84,6 +88,7 @@ class SceneManager {
 		this.lightsManager.update();
 		this.tracker.update(this.time, this.scene.deltaTime * 0.001);
 
+		this.ballGrass.update(this.time, this.scene.deltaTime * 0.001);
 		this.css3dRenderer.update();
 		this.grass.update(this.time);
 		this.butterfly.update(this.time, this.scene.deltaTime * 0.001);
@@ -106,6 +111,8 @@ class SceneManager {
 		this.butterfly = new Butterfly(this.assets);
 		this.grass = new Grass(this.assets);
 		this.fog = new Fog(this.assets);
+		this.picker = new Picker(this.assets);
+		this.ballGrass = new BallGrass(this.assets);
 
 		this.initFogDepthTexture();
 
@@ -162,11 +169,13 @@ class SceneManager {
 			}
 			case "home": {
 				this.camera.attachControl();
+				this.picker.enable = true;
 				this.grass.enable = true;
 				this.assets.ballMesh.setEnabled(true);
 				this.assets.groundMesh.setEnabled(true);
 				this.butterfly.enable = true;
-				this.fog.enable = true;
+				this.ballGrass.enable = true;
+				// this.fog.enable = true;
 				break;
 			}
 		}

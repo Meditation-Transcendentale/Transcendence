@@ -1,4 +1,4 @@
-import { Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Mesh, MeshBuilder, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3 } from "../babylon";
+import { Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Mesh, MeshBuilder, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3, Vector4 } from "../babylon";
 import { stateManager } from "../state/StateManager";
 import { perlinWorley3D } from "./PerlinWorley";
 import { sceneManager } from "./SceneManager";
@@ -48,6 +48,8 @@ export class Assets {
 	public grassDepthMaterial!: ShaderMaterial;
 	public monolithDepthMaterial!: ShaderMaterial;
 
+	public ballPicker!: Vector3;
+
 	constructor(engine: Engine) {
 		this.engine = engine;
 		this.scene = new Scene(engine);
@@ -70,6 +72,8 @@ export class Assets {
 		this.loadUBOMandatory();
 		this.loadMaterialMandatory();
 		this.loadRootMandatory();
+
+		this.ballPicker = new Vector3();
 	}
 
 	public async loadAssetsAsync() {
@@ -209,14 +213,11 @@ export class Assets {
 	}
 
 	private loadMaterialMandatory() {
-		this.depthMaterial.onBindObservable.add(() => {
-			this.depthMaterial.setVector2("depthValues", new Vector2(this.camera.minZ, this.camera.maxZ));
-		})
-
 		this.ballMaterial = new ShaderMaterial("picker ball", this.scene, "oneColor", {
 			attributes: ["position"],
 			uniforms: ["world", "viewProjection", "color"]
 		})
+		this.ballMaterial.setVector4("color", new Vector4(this.ballLight.diffuse.r, this.ballLight.diffuse.g, this.ballLight.diffuse.b, 0.2));
 		this.ballMaterial.alphaMode = Engine.ALPHA_DISABLE;
 		this.ballMesh.material = this.ballMaterial;
 
@@ -224,6 +225,7 @@ export class Assets {
 			attributes: ["position"],
 			uniforms: ["world", "viewProjection", "color"]
 		})
+		this.cubeMaterial.setVector4("color", new Vector4(this.cubeLight.diffuse.r, this.cubeLight.diffuse.g, this.cubeLight.diffuse.b, 0.2));
 		this.cubeMaterial.alphaMode = Engine.ALPHA_DISABLE;
 		this.cubeMesh.material = this.cubeMaterial;
 
@@ -267,6 +269,7 @@ export class Assets {
 
 	public loadRootMandatory() {
 		this.ballRoot = new TransformNode("ballRoot", this.scene);
+		this.ballRoot.position.set(0, 1.5, 0);
 		this.ballMesh.parent = this.ballRoot;
 		this.ballLight.parent = this.ballRoot;
 
