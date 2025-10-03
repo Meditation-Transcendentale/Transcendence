@@ -234,25 +234,30 @@ export class PongBR {
 
 		let newLocalPaddleIndex = -1;
 
+		console.log(localPaddleId);
+		console.log(playerMapping);
 		if (localPaddleId !== null && localPaddleId !== undefined) {
 			if (eliminatedPlayerIds.has(localPaddleId)) {
+				console.log('❌ Local player is eliminated');
 				newLocalPaddleIndex = -1;
 			} else if (playerMapping && playerMapping[localPaddleId] !== undefined) {
 				newLocalPaddleIndex = playerMapping[localPaddleId];
+				console.log(`✅ Local player mapped: ${localPaddleId} → ${newLocalPaddleIndex}`);
 			} else {
 				if (activePlayers.has(localPaddleId)) {
 					newLocalPaddleIndex = localPaddleId;
+					console.log(`⚠️ No mapping, using playerId as index: ${localPaddleId}`);
 				} else {
 					newLocalPaddleIndex = -1;
+					console.log('❌ Local player not in active players');
 				}
 			}
 		}
-
 		this.baseMeshes.paddle.material.setUniform("paddleId", newLocalPaddleIndex);
 
 		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI, newLocalPaddleIndex);
 
-		this.networkingSystem.forceIndexRebuild();
+		// this.networkingSystem.forceIndexRebuild();
 	}
 
 
