@@ -75,6 +75,24 @@ export class Ball {
 		}
 	}
 
+	private updateScore(layers: number, layerIndex: number){
+		this.game.score += (layers - layerIndex) * this.speedScale * 10;
+		if (this.bricksLeft == 0)
+			this.game.score += layerIndex + 1 * this.speedScale * 10;
+		this.game.score = Math.round(this.game.score);
+		if (this.game.mode === "easy" && this.game.score > this.game.pbEasy){
+			this.game.pbEasy = this.game.score;
+			this.game.newHighScore = true;
+		} else if (this.game.mode === "normal" && this.game.score > this.game.pbNormal){
+			this.game.pbNormal = this.game.score;
+			this.game.newHighScore = true;
+		} else if (this.game.mode === "hard" && this.game.score > this.game.pbHard){
+			this.game.pbHard = this.game.score;
+			this.game.newHighScore = true;
+		}
+		this.game.gameUI.updateScore(this.game.score);
+	}
+
 	private hitBrick(radius: number, cols: number, layers: number, bricks: Mesh[][]) {
 		const dx = this.newposition.x;
 		const dz = this.newposition.z;
@@ -98,17 +116,7 @@ export class Ball {
 			const target = bricks[colIndex][layerIndex];
 			if (target && target.isEnabled()) {
 				if (this.touched) {
-					this.game.score += (layers - layerIndex) * this.speedScale * 10;
-					if (this.bricksLeft == 0)
-						this.game.score += layerIndex + 1 * this.speedScale * 10;
-					this.game.score = Math.round(this.game.score);
-					if (this.game.mode === "easy" && this.game.score > this.game.pbEasy)
-						this.game.pbEasy = this.game.score;
-					else if (this.game.mode === "normal" && this.game.score > this.game.pbNormal)
-						this.game.pbNormal = this.game.score;
-					else if (this.game.mode === "hard" && this.game.score > this.game.pbHard)
-						this.game.pbHard = this.game.score;
-					this.game.gameUI.updateScore(this.game.score);
+					this.updateScore(layers, layerIndex);
 					target.setEnabled(false);
 					this.bricksLeft--;
 					this.ball.material = this.matUntouched;
@@ -180,6 +188,7 @@ export class Ball {
 
 	private endGame() {
 		// end screen UI
+		this.game.gameUI.showEnd(0, 0, true, "local");
 		// this.game.dispose();
 	}
 

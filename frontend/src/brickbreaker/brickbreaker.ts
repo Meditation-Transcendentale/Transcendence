@@ -31,6 +31,7 @@ export class BrickBreaker {
 	public pbNormal: number = 0;
 	public pbHard: number = 0;
 	public mode: string = "normal";
+	public newHighScore: boolean = false;
 
 
 
@@ -79,15 +80,19 @@ export class BrickBreaker {
             .catch((err) => { console.log(err) });
 		this.reset();
 
+		console.log(this.pbEasy, this.pbNormal, this.pbHard);
 		if (mod === "easy"){
 			this.layers = 2;
 			this.cols = 4;
+			this.gameUI.updateHighScore(this.pbEasy);
 		} else if (mod === "normal"){
 			this.layers = 4;
 			this.cols = 5;
+			this.gameUI.updateHighScore(this.pbNormal);
 		} else if (mod === "hard"){
 			this.layers = 6;
 			this.cols = 6;
+			this.gameUI.updateHighScore(this.pbHard);
 		}
 		// this.layers = Math.ceil((Math.random() * 5) + 1);
 		// this.cols = Math.ceil((Math.random() * 5) + 1);
@@ -154,6 +159,7 @@ export class BrickBreaker {
 		}
 		this.score = 0;
 		this.gameUI.updateScore(0);
+		this.gameUI.hideEnd();
 		this.ball.reset();
 		this.player.reset();
 		this.lastTime = performance.now();
