@@ -6,6 +6,45 @@ import {
 	decodeClientMessage,
 	encodeStatusUpdate
 } from './proto/helper.js';
+import { parse } from 'path';
+import axios from 'axios';
+import https from 'https';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+function parseCookies(cookieHeader) {
+	let cookies = {};
+	if (!cookieHeader) return cookies;
+	cookies = cookieHeader
+		.split(';')
+		.map(cookie => cookie.trim())
+		.map(cookie => cookie.split('='))
+		.reduce((acc, [key, value]) => {
+			acc[key] = decodeURIComponent(value);
+			return acc;
+		}, {});
+	return cookies.accessToken || null;
+}
+
+async function verifyJWT(token) {
+
+	if (!token) {
+		throw new Error('No token provided');
+	}
+
+	const agent = new https.Agent({
+		rejectUnauthorized: false
+	});
+
+	const response = await axios.post('https://auth-service:4002/auth', { token }, { headers: { 'x-api-key': process.env.API_GATEWAY_KEY }, httpsAgent: agent });
+	const data = response.data;
+
+	if (!data.valid) {
+		console.log('Invalid token');
+		throw new Error(data.message || 'Invalid token');
+	}
+}
 
 export function startWsServer({ port, handlers }) {
 	const app = SSLApp({
@@ -16,6 +55,15 @@ export function startWsServer({ port, handlers }) {
 		maxBackpressure: 1024,
 
 		upgrade: (res, req, ctx) => {
+			(async () => {
+				try {
+					// await verifyJWT(parseCookies(req.getHeader('cookie')));
+					await verifyJWT(null);
+				} catch (e) {
+					console.log('WebSocket connection rejected:', e.message);
+					return ;
+				}
+			});
 			const params = new URLSearchParams(req.getQuery());
 			res.upgrade(
 				{

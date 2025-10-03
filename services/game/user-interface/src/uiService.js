@@ -28,6 +28,9 @@ export default class UIService {
 		this.nc = null;
 	}
 	async start() {
+
+		
+
 		// 0) Connect to NATS
 		const nc = await natsClient.connect(process.env.NATS_URL);
 		this.nc = nc;
