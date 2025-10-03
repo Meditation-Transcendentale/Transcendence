@@ -123,9 +123,6 @@ export class MonolithMaterial extends CustomMaterial {
 										   float displacement = length(worldPos.xyz - originalWorldPos.xyz);
 										   float maxDisplacement = 1.0;
 										   oclusion = 1.0 - smoothstep(0.0, maxDisplacement, displacement);
-
-
-
 `)
 
 		this.Vertex_MainEnd(`

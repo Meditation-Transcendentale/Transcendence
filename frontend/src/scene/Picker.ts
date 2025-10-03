@@ -37,7 +37,6 @@ export class Picker {
 	}
 
 	private clickEvent(ev: MouseEvent) {
-		console.log("down");
 		if (this.ballIsHit(ev.clientX, ev.clientY)) {
 			this.ballPicker.x = ev.clientX;
 			this.ballPicker.y = ev.clientY;
@@ -49,7 +48,6 @@ export class Picker {
 	}
 
 	private moveEvent(ev: MouseEvent) {
-		console.log("move");
 		if (this.ballPicker.z > 0) {
 			this.ballPicker.x = ev.clientX;
 			this.ballPicker.y = ev.clientY;
@@ -57,13 +55,11 @@ export class Picker {
 	}
 
 	private outEvent(ev: MouseEvent) {
-		console.log("out");
 		this.ballPicker.z = 0;
 		this.assets.camera.attachControl();
 	}
 
 	private upEvent(ev: MouseEvent) {
-		console.log("up");
 		this.ballPicker.z = 0;
 		this.assets.camera.attachControl();
 	}

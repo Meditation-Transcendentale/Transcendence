@@ -20,7 +20,7 @@ export class Fog {
 			engine: sceneManager.engine,
 			useShaderStore: true,
 			fragmentShader: "fog3D",
-			uniformBuffers: ["camera", "data", "lights"],
+			uniformBuffers: ["data"],
 			samplers: ["depthTexture", "densityTexture"],
 			uniforms: ["resolution", "time"],
 		});
@@ -29,7 +29,7 @@ export class Fog {
 		let binded = false;
 		this.fogEffect.onApplyObservable.add(() => {
 			if (!binded) {
-				this.assets.fogUBO.bindToEffect(this.fogEffect.effect, "fog");
+				this.assets.fogUBO.bindToEffect(this.fogEffect.effect, "data");
 				binded = true;
 			}
 			this.fogEffect.effect.setFloat("time", performance.now() * 0.001);

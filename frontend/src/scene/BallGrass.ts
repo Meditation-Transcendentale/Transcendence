@@ -43,8 +43,8 @@ export class BallGrass {
 			this.ballGrassEffect.effect.setFloat("attenuation", Math.pow(this.attenuation, this.assets.scene.deltaTime * 0.001));
 			this.ballGrassEffect.effect.setFloat("radius", this.assets.ballRoot.scalingDeterminant / this.maxDist);
 			this.ballGrassEffect.effect.setFloat2("origin",
-				(this.assets.ballMesh.position.x + this.assets.ballRoot.position.x) / this.maxDist + 0.5,
-				(this.assets.ballMesh.position.z + this.assets.ballRoot.position.z) / this.maxDist + 0.5
+				(this.assets.ballMesh.position.x + this.assets.ballRoot.position.x) * this.assets.ballRoot.scalingDeterminant / this.maxDist + 0.5,
+				(this.assets.ballMesh.position.z + this.assets.ballRoot.position.z) * this.assets.ballRoot.scalingDeterminant / this.maxDist + 0.5
 			);
 
 		})
@@ -56,8 +56,8 @@ export class BallGrass {
 		if (!this._enable)
 			return;
 		this.moveBall(deltaTime);
-		// this.swapRt();
-		// this.assets.effectRenderer.render(this.ballGrassEffect, this.assets.ballGrassTextureB);
+		this.swapRt();
+		this.assets.effectRenderer.render(this.ballGrassEffect, this.assets.ballGrassTextureB);
 	}
 
 
@@ -87,7 +87,7 @@ export class BallGrass {
 				(x - this.position.x),
 				(z - this.position.z)
 			)
-			this.assets.ballMesh.position.addInPlaceFromFloats(this.movement.x, 0, this.movement.y)
+			this.assets.ballMesh.position.addInPlaceFromFloats(this.movement.x / this.assets.ballRoot.scalingDeterminant, 0, this.movement.y / this.assets.ballRoot.scalingDeterminant)
 			this.position.set(x, 0, z);
 			// this.assets.ballMesh.position.set(x, 0, z);
 			// } else {
@@ -99,7 +99,7 @@ export class BallGrass {
 	}
 
 	private swapRt() {
-		const a = this.assets.ballGrassTextureA;
+		let a = this.assets.ballGrassTextureA;
 		this.assets.ballGrassTextureA = this.assets.ballGrassTextureB;
 		this.assets.ballGrassTextureB = a;
 	}

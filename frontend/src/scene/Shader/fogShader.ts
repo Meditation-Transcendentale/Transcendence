@@ -160,7 +160,13 @@ precision highp sampler2D;
 #define M_PI 3.1415926535897932384626433832795
 #define EPS	0.1
 
-layout(std140) uniform lights {
+layout(std140) uniform data {
+	float	cameraMaxZ;
+	float	noiseOffset;
+	float	stepSize;
+	float	maxDistance;
+	float	densityMultiplier;
+	float	lightScattering;
 	float	spotIntensity;
 	float	spotRange;
 	float	spotAngle;
@@ -169,6 +175,9 @@ layout(std140) uniform lights {
 	float	pointARange;
 	float	pointBIntensity;
 	float	pointBRange;
+	vec3	fogScale;
+	vec3	fogAbsorption;
+	vec3	cameraPosition;
 	vec3	spotColor;
 	vec3	spotPosition;
 	vec3	spotDirection;
@@ -176,26 +185,10 @@ layout(std140) uniform lights {
 	vec3	pointAPosition;
 	vec3	pointBColor;
 	vec3	pointBPosition;
-};
-
-layout(std140) uniform camera {
-	float	cameraMaxZ;
-	vec3	cameraPosition;
 	mat4	projection;
 	mat4	iprojection;
 	mat4	iview;
 	mat4	world;
-};
-
-layout(std140) uniform data {
-	float	noiseOffset;
-	float	stepSize;
-	float	maxDistance;
-	float	densityMultiplier;
-	float	lightScattering;
-	vec3	fogAbsorption;
-	vec3	fogScale;
-	mat4	dummyToTakePlace;
 };
 
 

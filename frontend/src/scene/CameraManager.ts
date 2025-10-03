@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core"
+import { BloomEffect, Engine, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Vector3 } from "@babylonjs/core"
 import { Assets } from "./Assets";
 
 interface ICameraVue {
@@ -10,6 +10,23 @@ export class CameraManager {
 	public assets: Assets;
 	private vues: Map<string, ICameraVue>;
 
+	private renderingPipeline: PostProcessRenderPipeline;
+
+	private fogPostProcess: PostProcess;
+	private colorCorrectionPostProcess: PostProcess;
+
+	private colorCorrectionEffect: PostProcessRenderEffect;
+	private fogEffect: PostProcessRenderEffect;
+	private bloomEffect: BloomEffect;
+
+
+	private fogAbsorption: Vector3;
+	private contrast: number;
+	private brightness: number;
+	private gamma: number;
+	private tonemapping: number;
+
+
 	constructor(assets: Assets) {
 		this.assets = assets;
 
@@ -18,6 +35,66 @@ export class CameraManager {
 			position: new Vector3(-2.7, 4.5, 22),
 			target: new Vector3(-2.7, 4.5, 22).addInPlaceFromFloats(0.075, 0.07, -0.99),
 		})
+
+		this.renderingPipeline = new PostProcessRenderPipeline(this.assets.engine, "pipeline");
+
+		this.fogPostProcess = new PostProcess("fogApply", "fogApply3D", {
+			uniforms: ["fogAbsorption"],
+			samplers: ["fogTexture"],
+			size: 1.,
+			camera: this.assets.camera,
+			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
+			textureType: Engine.TEXTURETYPE_HALF_FLOAT,
+			reusable: false
+		});
+
+		this.fogAbsorption = new Vector3(0.1, 0.1, 0.1);
+		this.fogPostProcess.onApply = (effect) => {
+			effect.setVector3("fogAbsorption", this.fogAbsorption)
+			effect.setTexture("fogTexture", this.assets.fogRenderTexture);
+		}
+
+
+		this.colorCorrectionPostProcess = new PostProcess("colorCorrection", "colorCorrection", {
+			uniforms: ["contrast", "brightness", "gamma", "tonemapping"],
+			size: 1.,
+			camera: this.assets.camera,
+			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
+			textureType: Engine.TEXTURETYPE_HALF_FLOAT,
+			reusable: false
+		})
+		this.contrast = 1.;
+		this.brightness = 0.;
+		this.gamma = 1;
+		this.tonemapping = 0;
+
+		this.colorCorrectionPostProcess.onApply = (effect) => {
+			effect.setFloat("contrast", this.contrast);
+			effect.setFloat("brightness", this.brightness);
+			effect.setFloat("gamma", this.gamma);
+			effect.setInt("tonemapping", this.tonemapping);
+		}
+		this.assets.camera.detachPostProcess(this.colorCorrectionPostProcess);
+		this.assets.camera.detachPostProcess(this.fogPostProcess);
+
+		this.fogEffect = new PostProcessRenderEffect(this.assets.engine, "fogEffect", () => {
+			return [this.fogPostProcess];
+		});
+		this.colorCorrectionEffect = new PostProcessRenderEffect(this.assets.engine, "colorCorrectionEffect", () => {
+			return [this.colorCorrectionPostProcess];
+		});
+		this.bloomEffect = new BloomEffect(this.assets.engine, 0.25, 0.8, 32., Engine.TEXTURETYPE_HALF_FLOAT);
+		//
+		this.renderingPipeline.addEffect(this.fogEffect);
+		this.renderingPipeline.addEffect(this.bloomEffect);
+		this.renderingPipeline.addEffect(this.colorCorrectionEffect);
+		// this.renderingPipeline.addEffect(this.fxaaEffect);
+
+		this.assets.scene.postProcessRenderPipelineManager.addPipeline(this.renderingPipeline);
+		this.assets.scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("pipeline", this.assets.camera);
+
+
+
 	}
 
 	public set vue(key: string) {

@@ -44,7 +44,7 @@ export class UBOManager {
 		this.assets.fogUBO.updateVector3("spotDirection", this.assets.flashLight.direction);
 		this.assets.fogUBO.updateColor3("pointAColor", this.assets.ballLight.diffuse);
 		this.assets.fogUBO.updateVector3("pointAPosition", this.assets.ballLight.position);
-		this.assets.fogUBO.updateColor3("pointBColor", this.assets.ballLight.diffuse);
+		this.assets.fogUBO.updateColor3("pointBColor", this.assets.cubeLight.diffuse);
 		this.assets.fogUBO.updateVector3("pointBPosition", this.assets.cubeLight.position);
 	}
 
@@ -55,8 +55,8 @@ export class UBOManager {
 
 		this.assets.fogUBO.updateVector3("spotPosition", this.assets.flashLight.position);
 		this.assets.fogUBO.updateVector3("spotDirection", this.assets.flashLight.direction);
-		this.assets.fogUBO.updateVector3("pointAPosition", this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.tempVector3));
-		this.assets.fogUBO.updateVector3("pointBPosition", this.assets.cubeMesh.position.addToRef(this.assets.monolithRoot.position, this.tempVector3));
+		this.assets.fogUBO.updateVector3("pointAPosition", this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.tempVector3).scaleInPlace(this.assets.ballRoot.scalingDeterminant));
+		this.assets.fogUBO.updateVector3("pointBPosition", this.assets.cubeMesh.position.addToRef(this.assets.monolithRoot.position, this.tempVector3).scaleInPlace(this.assets.monolithRoot.scalingDeterminant));
 
 		this.assets.fogUBO.update();
 	}

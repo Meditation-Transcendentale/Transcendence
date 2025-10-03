@@ -82,6 +82,7 @@ class SceneManager {
 	}
 
 	public update() {
+		this.fps.innerHTML = this.engine.getFps().toFixed();
 		for (let i of this.beforeRender) {
 			i();
 		}
@@ -92,7 +93,8 @@ class SceneManager {
 		this.css3dRenderer.update();
 		this.grass.update(this.time);
 		this.butterfly.update(this.time, this.scene.deltaTime * 0.001);
-		this.fps.innerHTML = this.engine.getFps().toFixed();
+
+		this.uboManager.update();
 		this.fog.render();
 	}
 
@@ -175,7 +177,7 @@ class SceneManager {
 				this.assets.groundMesh.setEnabled(true);
 				this.butterfly.enable = true;
 				this.ballGrass.enable = true;
-				// this.fog.enable = true;
+				this.fog.enable = true;
 				break;
 			}
 		}

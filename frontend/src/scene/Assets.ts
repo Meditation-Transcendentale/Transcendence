@@ -217,7 +217,10 @@ export class Assets {
 			attributes: ["position"],
 			uniforms: ["world", "viewProjection", "color"]
 		})
-		this.ballMaterial.setVector4("color", new Vector4(this.ballLight.diffuse.r, this.ballLight.diffuse.g, this.ballLight.diffuse.b, 0.2));
+		this.ballMaterial.setVector4("color", new Vector4(this.ballLight.diffuse.r * this.ballLight.intensity * 2.,
+			this.ballLight.diffuse.g * this.ballLight.intensity * 2.,
+			this.ballLight.diffuse.b * this.ballLight.intensity * 2.,
+			0.2));
 		this.ballMaterial.alphaMode = Engine.ALPHA_DISABLE;
 		this.ballMesh.material = this.ballMaterial;
 
@@ -225,7 +228,10 @@ export class Assets {
 			attributes: ["position"],
 			uniforms: ["world", "viewProjection", "color"]
 		})
-		this.cubeMaterial.setVector4("color", new Vector4(this.cubeLight.diffuse.r, this.cubeLight.diffuse.g, this.cubeLight.diffuse.b, 0.2));
+		this.cubeMaterial.setVector4("color", new Vector4(this.cubeLight.diffuse.r * this.cubeLight.intensity * 2.,
+			this.cubeLight.diffuse.g * this.cubeLight.intensity * 2.,
+			this.cubeLight.diffuse.b * this.cubeLight.intensity * 2.,
+			0.2));
 		this.cubeMaterial.alphaMode = Engine.ALPHA_DISABLE;
 		this.cubeMesh.material = this.cubeMaterial;
 
@@ -234,6 +240,16 @@ export class Assets {
 		this.butterflyMesh.material = this.butterflyMaterial;
 		this.monolithMaterial = new MonolithMaterial("monolith", this.scene);
 		// this.monolithMesh.material = this.monolithMaterial;
+		//
+		//
+		this.grassMaterial.onBindObservable.add(() => {
+			this.grassMaterial.setFloat("time", sceneManager.time);
+			this.grassMaterial.setFloat("ballRadius", this.ballLight.range)
+			this.grassMaterial.setVec3("ballPosition", this.ballMesh.getAbsolutePosition()) //Maybe compute it directly;
+			this.grassMaterial.setColor3("ballLightColor", this.ballLight.diffuse);
+			this.grassMaterial.setTexture("textureSampler", this.ballGrassTextureB);
+		})
+
 
 		const m = new StandardMaterial("ground", this.scene);
 		m.diffuseColor = Color3.Black();
@@ -261,15 +277,18 @@ export class Assets {
 		})
 		this.grassDepthMaterial.onBindObservable.add(() => {
 			this.grassDepthMaterial.setVector2("depthValues", new Vector2(this.camera.minZ, this.camera.maxZ));
+			this.grassDepthMaterial.setFloat("time", sceneManager.time);
+			this.grassDepthMaterial.setTexture("textureSampler", this.ballGrassTextureB);
 		})
 		this.monolithDepthMaterial.onBindObservable.add(() => {
 			this.monolithDepthMaterial.setVector2("depthValues", new Vector2(this.camera.minZ, this.camera.maxZ));
 		})
 	}
 
-	public loadRootMandatory() {
+	private loadRootMandatory() {
 		this.ballRoot = new TransformNode("ballRoot", this.scene);
-		this.ballRoot.position.set(0, 1.5, 0);
+		this.ballRoot.position.set(0, 0.75, 0);
+		this.ballRoot.scalingDeterminant = 1.5;
 		this.ballMesh.parent = this.ballRoot;
 		this.ballLight.parent = this.ballRoot;
 
@@ -281,7 +300,8 @@ export class Assets {
 		this.butterflyRoot.position = new Vector3(0, 1.5, 0);
 		this.butterflyRoot.scaling = new Vector3(0.5, 0.5, 0.5);
 		this.butterflyMesh.parent = this.butterflyRoot;
+	}
 
-
+	private setupMonolithMesh() {
 	}
 }
