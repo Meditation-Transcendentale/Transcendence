@@ -88,7 +88,7 @@ export class Assets {
 		this.monolithMovement = () => {
 			this.monolithRoot.position.set(
 				Math.sin(sceneManager.time * 0.8) * monolithOption.amplitude * 0.5,
-				Math.sin(sceneManager.time * 0.6) * monolithOption.amplitude,
+				Math.sin(sceneManager.time * 0.6) * monolithOption.amplitude + 1,
 				Math.cos(sceneManager.time * 0.4) * monolithOption.amplitude * 0.5
 			)
 		}
@@ -154,7 +154,7 @@ export class Assets {
 		const fogRatio = 0.5;
 		stateManager.set("fogMaxResolution", fogMaxResolution);
 		stateManager.set("fogRatio", fogRatio);
-		this.fogDepthTexture = new RenderTargetTexture("fogDepth", { width: fogMaxResolution * fogRatio * 2, height: fogMaxResolution * fogRatio * 2 * sceneManager.resolutionRatio }, this.scene, {
+		this.fogDepthTexture = new RenderTargetTexture("fogDepth", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * sceneManager.resolutionRatio }, this.scene, {
 			type: Engine.TEXTURETYPE_FLOAT,
 			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
 		});

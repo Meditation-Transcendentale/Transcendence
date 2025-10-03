@@ -11,7 +11,7 @@ async function init() {
 
 	// createUser();
 	// createHtmlManager();
-	streamManager.connectBuilder();
+	streamManager.builder.connect();
 	routeManager.nav(window.location.href.substring(window.location.origin.length), false, true);
 	await sceneManager.loadMandatory();
 

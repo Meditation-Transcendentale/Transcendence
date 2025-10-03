@@ -1,4 +1,4 @@
-import { BloomEffect, Engine, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Vector3 } from "../babylon"
+import { BloomEffect, Engine, FxaaPostProcess, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Vector3 } from "../babylon"
 import { Assets } from "./Assets";
 
 interface ICameraVue {
@@ -14,10 +14,12 @@ export class CameraManager {
 
 	private fogPostProcess: PostProcess;
 	private colorCorrectionPostProcess: PostProcess;
+	private fxaaPostProcess: FxaaPostProcess;
 
 	private colorCorrectionEffect: PostProcessRenderEffect;
 	private fogEffect: PostProcessRenderEffect;
 	private bloomEffect: BloomEffect;
+	private fxaaEffect: PostProcessRenderEffect;
 
 
 	private fogAbsorption: Vector3;
@@ -74,8 +76,18 @@ export class CameraManager {
 			effect.setFloat("gamma", this.gamma);
 			effect.setInt("tonemapping", this.tonemapping);
 		}
+
+		this.fxaaPostProcess = new FxaaPostProcess("fxaa", {
+			size: 1.,
+			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
+			textureType: Engine.TEXTURETYPE_HALF_FLOAT,
+			camera: this.assets.camera,
+			reusable: false
+		})
+
 		this.assets.camera.detachPostProcess(this.colorCorrectionPostProcess);
 		this.assets.camera.detachPostProcess(this.fogPostProcess);
+		this.assets.camera.detachPostProcess(this.fxaaPostProcess);
 
 		this.fogEffect = new PostProcessRenderEffect(this.assets.engine, "fogEffect", () => {
 			return [this.fogPostProcess];
@@ -84,11 +96,15 @@ export class CameraManager {
 			return [this.colorCorrectionPostProcess];
 		});
 		this.bloomEffect = new BloomEffect(this.assets.engine, 0.25, 0.8, 32., Engine.TEXTURETYPE_HALF_FLOAT);
-		//
+
+		this.fxaaEffect = new PostProcessRenderEffect(this.assets.engine, "fxaaEffect", () => {
+			return [this.fxaaPostProcess];
+		})
+
 		this.renderingPipeline.addEffect(this.fogEffect);
+		this.renderingPipeline.addEffect(this.fxaaEffect);
 		this.renderingPipeline.addEffect(this.bloomEffect);
 		this.renderingPipeline.addEffect(this.colorCorrectionEffect);
-		// this.renderingPipeline.addEffect(this.fxaaEffect);
 
 		this.assets.scene.postProcessRenderPipelineManager.addPipeline(this.renderingPipeline);
 		this.assets.scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("pipeline", this.assets.camera);
