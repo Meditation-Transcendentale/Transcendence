@@ -15,12 +15,13 @@ export default class brick {
 		this.div = div;
 		this.game = null;
 		this.gameUI = new GameUI(this.div, {
-			enabledModules: ['score', 'timer', 'buttons'],
+			enabledModules: ['score', 'timer', 'buttons', 'ending'],
 			theme: 'pong',
 			modulePositions: {
 				score: { x: 'left', y: 'top', offset: { x: 200, y: 0 }},
 				timer: { x: 'center', y: 'top', offset: { x: -100, y: 0 } },
-				buttons: { x: 'center', y: 'bottom' }
+				buttons: { x: 'center', y: 'bottom' },
+				ending: { x:'center', y: 'center'}
 			}
 		});
 	}

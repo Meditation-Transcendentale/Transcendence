@@ -126,7 +126,8 @@ export class NetworkingSystem extends System {
 
 			// === Game End ===
 			if (serverMsg.end) {
-				Router.comeback();
+				if (this.mode == "tournament")
+					Router.comeback();
 				
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
@@ -135,7 +136,7 @@ export class NetworkingSystem extends System {
 				if (this.myScore == 5)
 					win = true;
 
-				ui?.gameUI.showEnd(this.myScore, this.opponentScore, win, ui.gameMode);
+				ui?.gameUI.showEnd(ui.gameMode, win, this.myScore, this.opponentScore);
 				console.log("Received GameEndMessage");
 				// const scores = serverMsg.end.score as number[];
 				// const myScore = scores[localPaddleId] ?? 0;
