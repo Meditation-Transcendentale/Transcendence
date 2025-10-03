@@ -178,6 +178,8 @@ class SceneManager {
 				this.butterfly.enable = true;
 				this.ballGrass.enable = true;
 				this.fog.enable = true;
+				this.assets.monolithMesh.setEnabled(true);
+				this.beforeRender.add(this.assets.monolithMovement);
 				break;
 			}
 		}
@@ -192,6 +194,9 @@ class SceneManager {
 
 		this.assets.fogDepthTexture.renderList!.push(this.assets.cubeMesh);
 		this.assets.fogDepthTexture.setMaterialForRendering(this.assets.cubeMesh, this.assets.depthMaterial);
+
+		this.assets.fogDepthTexture.renderList!.push(this.assets.monolithMesh);
+		this.assets.fogDepthTexture.setMaterialForRendering(this.assets.monolithMesh, this.assets.monolithDepthMaterial)
 
 		for (let i = 0; i < this.grass.tiles.length; i++) {
 			const m = this.grass.tiles[i]._mesh;

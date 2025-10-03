@@ -1,4 +1,4 @@
-import { EffectWrapper, Vector2, Vector3 } from "@babylonjs/core";
+import { EffectWrapper, Vector2, Vector3 } from "../babylon";
 import { Assets } from "./Assets";
 
 export class BallGrass {

@@ -1,4 +1,4 @@
-import { BloomEffect, Engine, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Vector3 } from "@babylonjs/core"
+import { BloomEffect, Engine, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Vector3 } from "../babylon"
 import { Assets } from "./Assets";
 
 interface ICameraVue {

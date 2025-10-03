@@ -122,7 +122,6 @@ uniform float mouseInfluenceRadius;
 uniform vec3 origin;
 uniform vec3 oldOrigin;
 uniform float textGlow;
-uniform vec3 floatingOffset;
 
 varying	float	vDepthMetric;
 
@@ -142,10 +141,8 @@ void main(void) {
 	mat4 finalWorld = mat4(world0, world1, world2, world3);
 	finalWorld = world*finalWorld;
 	vec4 worldPos = finalWorld*vec4(positionUpdated, 1.0);
-	worldPos.xyz += floatingOffset;
 
 	vec3 worldPos2 = finalWorld[3].xyz;
-	worldPos2 += floatingOffset;
 
 	// Random per-voxel offset
 	vec3 animOffset = hash3(instanceID);

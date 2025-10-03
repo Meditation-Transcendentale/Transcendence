@@ -12,8 +12,9 @@ export class LightManager {
 	}
 
 	public update() {
-		if (this.assets.camera.hasMoved && this.assets.flashLight.isEnabled(true))
+		if (this.assets.camera.hasMoved && this.assets.flashLight.isEnabled(true)) {
 			this.assets.flashLight.direction.copyFrom(this.assets.camera.getForwardRay().direction);
+		}
 	}
 
 	public set enable(value: boolean) {

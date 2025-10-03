@@ -1,4 +1,4 @@
-import { Color3, Matrix, SpotLight, UniformBuffer, Vector3 } from "@babylonjs/core";
+import { Color3, Matrix, SpotLight, UniformBuffer, Vector3 } from "../babylon";
 import { sceneManager } from "./SceneManager";
 import { Assets } from "./Assets";
 

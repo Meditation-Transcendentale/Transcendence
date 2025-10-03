@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Vector2 } from "@babylonImport";
+import { Vector3, Quaternion, Vector2 } from "../babylon";
 
 // SDF Operation types
 export type SDFOperationType =
