@@ -1,18 +1,19 @@
 import { Matrix } from "../../babylon";
 import { routeManager } from "../../route/RouteManager";
 import { sceneManager } from "../../scene/SceneManager";
+import { IPage } from "./IPages";
 
 interface homeHtmlReference {
 	play: HTMLElement,
 };
 
-class Home {
+class Home implements IPage {
 	private div: HTMLDivElement;
 	private ref: homeHtmlReference;
 
 
-	constructor(div: HTMLDivElement) {
-		this.div = div;
+	constructor(div: HTMLElement) {
+		this.div = div as HTMLDivElement;
 
 		this.ref = {
 			play: div.querySelector("#home-play") as HTMLElement,

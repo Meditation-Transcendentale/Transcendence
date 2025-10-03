@@ -28,8 +28,6 @@ export class Butterfly {
 		this.assets = assets;
 
 		this.assets.butterflyMesh.scaling.setAll(0.4);
-		this.assets.butterflyMesh.alwaysSelectAsActiveMesh = true;
-		this.assets.butterflyMesh.doNotSyncBoundingInfo = true;
 
 
 		this.grid = new Grid2D({

@@ -1,4 +1,5 @@
 import { htmlManager } from "../html/HtmlManager";
+import { streamManager } from "../stream/StreamManager";
 import { gUser } from "../User";
 
 class RouteManager {
@@ -31,6 +32,11 @@ class RouteManager {
 	public async nav(path: string, restore: boolean = false, history: boolean = true) {
 		let url = new URL(this.location + path);
 
+		if (!this.routes.has(url.pathname)) {
+			url.pathname = "/home";
+			url.search = "";
+		}
+
 		await gUser.check()
 			.then(() => {
 				if (url.pathname == "/auth" || (this.first && url.pathname == "/cajoue")) {
@@ -55,9 +61,9 @@ class RouteManager {
 		htmlManager.loadPage(url.pathname, this.routes.get(url.pathname) as string);
 
 
-		// if (url.pathname !== "/auth" ) {
-		// 	this.loadAth();
-		// }
+		if (url.pathname !== "/auth") {
+			streamManager.notification.connect();
+		}
 	}
 }
 

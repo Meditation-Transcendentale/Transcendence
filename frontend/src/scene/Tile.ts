@@ -17,7 +17,7 @@ export class Tile {
 
 
 		this._mesh.freezeWorldMatrix();
-		this._mesh.doNotSyncBoundingInfo = false;
+		this._mesh.doNotSyncBoundingInfo = true;
 		this._mesh.buildBoundingInfo(
 			new Vector3(-width * 0.5, 1., -depth * 0.5),
 			new Vector3(width * 0.5, 1., depth * 0.5),

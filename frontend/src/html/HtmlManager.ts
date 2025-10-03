@@ -1,3 +1,4 @@
+import { NotificationHtml } from "./NotificationHtml";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 import { IPage } from "./pages/IPages";
@@ -7,10 +8,13 @@ class HtmlManager {
 	private pages: Map<string, IPage>;
 	private currentPage: IPage | null;
 
+	public notification: NotificationHtml;
+
 	constructor() {
 		console.log("%c HTML Manager", "color: white; background-color: red");
 		this.pages = new Map<string, IPage>;
 		this.currentPage = null;
+		this.notification = new NotificationHtml();
 	}
 
 	public async loadPage(page: string, html: string) {
@@ -51,17 +55,5 @@ class HtmlManager {
 		return div.firstChild as HTMLDivElement;
 	}
 }
-
-// let g_HtmlManager: HtmlManager | null = null;
-//
-// export function createHtmlManager(): HtmlManager {
-// 	if (g_HtmlManager === undefined || g_HtmlManager === null) {
-// 		g_HtmlManager = new HtmlManager();
-// 		//Object.freeze(g_HtmlManager) // Not sure if necessary or working
-// 	}
-// 	return g_HtmlManager;
-// }
-//
-// export default g_HtmlManager;
 
 export const htmlManager = new HtmlManager();

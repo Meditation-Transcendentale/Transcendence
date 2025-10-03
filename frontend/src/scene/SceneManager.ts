@@ -120,7 +120,6 @@ class SceneManager {
 
 
 		window.addEventListener("resize", () => { this.resize() })
-
 	}
 
 	public async loadAssetsAsync() { }
@@ -150,13 +149,13 @@ class SceneManager {
 		this.engine.resize(true);
 		const fogMaxResolution = stateManager.get("fogMaxResolution") as number;
 		const fogRatio = stateManager.get("fogRatio") as number;
-		this.assets.fogRenderTexture?.resize({
-			width: fogMaxResolution * fogRatio * this.resolutionRatio,
-			height: fogMaxResolution * fogRatio
+		this.assets.fogRenderTexture.resize({
+			width: fogMaxResolution * fogRatio,
+			height: fogMaxResolution * fogRatio * this.resolutionRatio
 		});
-		this.assets.fogDepthTexture?.resize({
-			width: fogMaxResolution * fogRatio * this.resolutionRatio,
-			height: fogMaxResolution * fogRatio
+		this.assets.fogDepthTexture.resize({
+			width: fogMaxResolution * fogRatio,
+			height: fogMaxResolution * fogRatio * this.resolutionRatio
 		});
 		this.uboManager?.resize();
 	}

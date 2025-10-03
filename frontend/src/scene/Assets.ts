@@ -113,19 +113,25 @@ export class Assets {
 		loaded.meshes[1].name = "butterfly";
 		loaded.meshes[1].setEnabled(false);
 		this.butterflyMesh = loaded.meshes[1] as Mesh;
+		this.butterflyMesh.doNotSyncBoundingInfo = true;
+		this.butterflyMesh.alwaysSelectAsActiveMesh = true;
 		this.scene.addMesh(loaded.meshes[1]);
 
 		this.ballMesh = MeshBuilder.CreateSphere("ball", { diameter: 1 }, this.scene);
 		this.ballMesh.setEnabled(false);
+		this.ballMesh.doNotSyncBoundingInfo = true;
 
 		this.groundMesh = MeshBuilder.CreateGround("ground", { width: 200, height: 200 }, this.scene);
 		this.groundMesh.setEnabled(false);
+		this.groundMesh.doNotSyncBoundingInfo = true;
 
 		this.cubeMesh = MeshBuilder.CreateBox("thecube", { size: 1 }, this.scene);
 		this.cubeMesh.position = new Vector3(0, 4.5, 0);
+		this.cubeMesh.doNotSyncBoundingInfo = true;
 
 		this.setupMonolithMesh();
 		this.monolithMesh.setEnabled(false);
+		this.monolithMesh.doNotSyncBoundingInfo = true;
 	}
 
 	private loadLightsMandatory() {
@@ -340,7 +346,7 @@ export class Assets {
 			tempMatrix.toArray(matrixes, i * 16);
 		}
 
-		this.monolithMesh.thinInstanceSetBuffer("matrix", matrixes, 16);
+		this.monolithMesh.thinInstanceSetBuffer("matrix", matrixes, 16, true);
 		this.monolithMesh.thinInstanceCount = positions.length;
 
 		// this.monolithMesh.freezeWorldMatrix();
