@@ -15,6 +15,7 @@ import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
 import { localPaddleId } from "../Pong";
 import Router from "../../spa/Router";
+import { tournament } from "../../spa/proto/message.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -126,8 +127,9 @@ export class NetworkingSystem extends System {
 
 			// === Game End ===
 			if (serverMsg.end) {
-				Router.comeback();
-				
+				if (this.mode == 'tournament')
+					Router.comeback();
+
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
 

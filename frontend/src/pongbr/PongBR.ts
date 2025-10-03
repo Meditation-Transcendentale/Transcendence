@@ -73,7 +73,7 @@ export class PongBR {
 		this.baseMeshes = createBaseMeshes(this.scene, this.rotatingContainer);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 		this.statue = initStatue(this.scene, this.pongRoot);
-		// createBlackHoleBackdrop(this.scene, this.statue.position, this.pongRoot);
+		createBlackHoleBackdrop(this.scene, this.statue.position, this.pongRoot);
 		this.spaceSkybox = new SpaceSkybox(this.scene);
 		this.spaceSkybox.applyPreset('Monochrome');
 
@@ -132,7 +132,7 @@ export class PongBR {
 			}
 		});
 
-		// this.spaceSkybox.onGameLoad();
+		this.spaceSkybox.onGameLoad();
 		this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, localPaddleId);
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
 		this.baseMeshes.paddle.material.setUniform("paddleId", localPaddleId);
@@ -143,10 +143,8 @@ export class PongBR {
 
 		this.inputManager.enable();
 		this.pongRoot.setEnabled(true);
-		this.statue.setEnabled(false);
 		this.stateManager.setter(true);
 		this.stateManager.update();
-		this.spaceSkybox.onGameUnload();
 	}
 	public stop(): void {
 
@@ -259,7 +257,7 @@ export class PongBR {
 
 		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI, newLocalPaddleIndex);
 
-		this.networkingSystem.forceIndexRebuild();
+		// this.networkingSystem.forceIndexRebuild();
 	}
 
 
