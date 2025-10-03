@@ -5,6 +5,7 @@ import { PaddleComponent } from "../components/PaddleComponent.js";
 import { localPaddleId } from "../PongBR.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { Vector3 } from "@babylonImport";
+import { InputComponent } from "../components/InputComponent.js";
 
 export class MovementSystem extends System {
 	update(entities: Entity[], deltaTime: number): void {
@@ -36,8 +37,9 @@ export class MovementSystem extends System {
 			}
 			if (entity.hasComponent(PaddleComponent)) {
 				const paddle = entity.getComponent(PaddleComponent)!;
+				const input = entity.getComponent(InputComponent)!;
 				const transform = entity.getComponent(TransformComponent) as TransformComponent;
-				if (paddle.id == localPaddleId) {
+				if (input.isLocal) {
 					const dist = Math.abs(paddle.offset - paddle.serverOffset);
 					if (dist > 0) {
 						if (dist >= 0.003) {

@@ -20,7 +20,9 @@ import { Entity } from "./ecs/Entity.js";
 import { createBlackHoleBackdrop } from "./templates/blackhole.js";
 import { SpaceSkybox } from "./templates/skybox.js";
 import GameUI from "../spa/GameUI.js";
-
+import { PaddleComponent } from "./components/PaddleComponent.js";
+import { GoalComponent } from "./components/GoalComponent.js";
+import { PillarComponent } from "./components/PillarComponent.js";
 
 export let localPaddleId: any = null;
 export class PongBR {
@@ -119,12 +121,14 @@ export class PongBR {
 
 		this.networkingSystem.resetPhaseState();
 
-		this.paddleBundles.forEach(b => {
-			this.ecs.removeEntity(b.paddle);
-			this.ecs.removeEntity(b.goal);
-			this.ecs.removeEntity(b.deathWall);
-			this.ecs.removeEntity(b.pillar);
-		});
+		if (this.paddleBundles) {
+			this.paddleBundles.forEach(b => {
+				this.ecs.removeEntity(b.paddle);
+				this.ecs.removeEntity(b.goal);
+				this.ecs.removeEntity(b.deathWall);
+				this.ecs.removeEntity(b.pillar);
+			});
+		}
 		const allEntities = this.ecs.getAllEntities();
 		allEntities.forEach(entity => {
 			if (entity.hasComponent(BallComponent)) {
@@ -178,42 +182,17 @@ export class PongBR {
 			this.camera
 		);
 		this.ecs.addSystem(this.thinInstanceSystem);
-		this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, localPaddleId);
+		// this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, localPaddleId);
 	}
-
-	public transitionToRound(nextCount: number, entities: Entity[], physicsState?: any, playerMapping?: Record<number, number>) {
-		const eliminatedPlayerIds = new Set<number>();
-		const activePlayers = new Set<number>();
-
-		if (physicsState && physicsState.paddles) {
-			physicsState.paddles.forEach((p: any) => {
-				if (p.dead) {
-					eliminatedPlayerIds.add(p.playerId);
-				} else {
-					activePlayers.add(p.playerId);
-				}
-			});
-		}
-
-		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
-
-		let scaleFactor: number;
-		switch (nextCount) {
-			case 100: scaleFactor = 2.; break;
-			case 50: scaleFactor = 4.; break;
-			case 25: scaleFactor = 8.; break;
-			case 12: scaleFactor = 10; break;
-			case 3: scaleFactor = 12.; break;
-			default: scaleFactor = 25 / nextCount;
-		}
-		this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-
+	public transitionToRound(nextCount: number, localPaddleIndex: number) {
+		console.log(`🎮 Transition: ${nextCount} players, local at index ${localPaddleIndex}`);
 		const allEntities = this.ecs.getAllEntities();
 		allEntities.forEach(entity => {
 			if (entity.hasComponent(BallComponent)) {
 				this.ecs.removeEntity(entity);
 			}
 		});
+		const entities = this.ecs.getAllEntities();
 
 		this.paddleBundles.forEach(b => {
 			this.ecs.removeEntity(b.paddle);
@@ -232,33 +211,126 @@ export class PongBR {
 			transform?.disable();
 		}
 
-		let newLocalPaddleIndex = -1;
+		// 1. Remove ALL game entities
+		// const toRemove = this.ecs.getAllEntities().filter(e =>
+		// 	e.hasComponent(BallComponent) ||
+		// 	e.hasComponent(PaddleComponent) ||
+		// 	e.hasComponent(GoalComponent) ||
+		// 	e.hasComponent(WallComponent) ||
+		// 	e.hasComponent(PillarComponent)
+		// );
+		// toRemove.forEach(e => this.ecs.removeEntity(e));
 
-		console.log(localPaddleId);
-		console.log(playerMapping);
-		if (localPaddleId !== null && localPaddleId !== undefined) {
-			if (eliminatedPlayerIds.has(localPaddleId)) {
-				console.log('❌ Local player is eliminated');
-				newLocalPaddleIndex = -1;
-			} else if (playerMapping && playerMapping[localPaddleId] !== undefined) {
-				newLocalPaddleIndex = playerMapping[localPaddleId];
-				console.log(`✅ Local player mapped: ${localPaddleId} → ${newLocalPaddleIndex}`);
-			} else {
-				if (activePlayers.has(localPaddleId)) {
-					newLocalPaddleIndex = localPaddleId;
-					console.log(`⚠️ No mapping, using playerId as index: ${localPaddleId}`);
-				} else {
-					newLocalPaddleIndex = -1;
-					console.log('❌ Local player not in active players');
-				}
-			}
+		// 2. Update ball scale
+		let scaleFactor: number;
+		switch (nextCount) {
+			case 100: scaleFactor = 2; break;
+			case 50: scaleFactor = 4; break;
+			case 25: scaleFactor = 8; break;
+			case 12: scaleFactor = 10; break;
+			case 3: scaleFactor = 12; break;
+			default: scaleFactor = 25 / nextCount;
 		}
-		this.baseMeshes.paddle.material.setUniform("paddleId", newLocalPaddleIndex);
+		this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 
-		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI, newLocalPaddleIndex);
+		// 3. Update shaders
+		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
+		this.baseMeshes.paddle.material.setUniform("paddleId", localPaddleIndex);
 
-		// this.networkingSystem.forceIndexRebuild();
+		// 4. Create new everything
+		this.paddleBundles = createGameTemplate(
+			this.ecs,
+			nextCount,
+			this.rotatingContainer,
+			this.gameUI,
+			localPaddleIndex
+		);
+
+		// 5. Force index rebuild
+		this.networkingSystem.forceIndexRebuild();
+
+		console.log(`✅ Transition complete`);
 	}
+
+
+	// public transitionToRound(nextCount: number, entities: Entity[], physicsState?: any, playerMapping?: Record<number, number>) {
+	// 	const eliminatedPlayerIds = new Set<number>();
+	// 	const activePlayers = new Set<number>();
+	//
+	// 	if (physicsState && physicsState.paddles) {
+	// 		physicsState.paddles.forEach((p: any) => {
+	// 			if (p.dead) {
+	// 				eliminatedPlayerIds.add(p.playerId);
+	// 			} else {
+	// 				activePlayers.add(p.playerId);
+	// 			}
+	// 		});
+	// 	}
+	//
+	// 	this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
+	//
+	// 	let scaleFactor: number;
+	// 	switch (nextCount) {
+	// 		case 100: scaleFactor = 2.; break;
+	// 		case 50: scaleFactor = 4.; break;
+	// 		case 25: scaleFactor = 8.; break;
+	// 		case 12: scaleFactor = 10; break;
+	// 		case 3: scaleFactor = 12.; break;
+	// 		default: scaleFactor = 25 / nextCount;
+	// 	}
+	// 	this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+	//
+	// 	const allEntities = this.ecs.getAllEntities();
+	// 	allEntities.forEach(entity => {
+	// 		if (entity.hasComponent(BallComponent)) {
+	// 			this.ecs.removeEntity(entity);
+	// 		}
+	// 	});
+	//
+	// 	this.paddleBundles.forEach(b => {
+	// 		this.ecs.removeEntity(b.paddle);
+	// 		this.ecs.removeEntity(b.goal);
+	// 		this.ecs.removeEntity(b.deathWall);
+	// 		this.ecs.removeEntity(b.pillar);
+	// 	});
+	// 	for (const entity of entities) {
+	// 		if (
+	// 			!entity.hasComponent(WallComponent) ||
+	// 			!entity.hasComponent(TransformComponent)
+	// 		) {
+	// 			continue;
+	// 		}
+	// 		const transform = entity.getComponent(TransformComponent);
+	// 		transform?.disable();
+	// 	}
+	//
+	// 	let newLocalPaddleIndex = -1;
+	//
+	// 	console.log(localPaddleId);
+	// 	console.log(playerMapping);
+	// 	if (localPaddleId !== null && localPaddleId !== undefined) {
+	// 		if (eliminatedPlayerIds.has(localPaddleId)) {
+	// 			console.log('❌ Local player is eliminated');
+	// 			newLocalPaddleIndex = -1;
+	// 		} else if (playerMapping && playerMapping[localPaddleId] !== undefined) {
+	// 			newLocalPaddleIndex = playerMapping[localPaddleId];
+	// 			console.log(`✅ Local player mapped: ${localPaddleId} → ${newLocalPaddleIndex}`);
+	// 		} else {
+	// 			if (activePlayers.has(localPaddleId)) {
+	// 				newLocalPaddleIndex = localPaddleId;
+	// 				console.log(`⚠️ No mapping, using playerId as index: ${localPaddleId}`);
+	// 			} else {
+	// 				newLocalPaddleIndex = -1;
+	// 				console.log('❌ Local player not in active players');
+	// 			}
+	// 		}
+	// 	}
+	// 	this.baseMeshes.paddle.material.setUniform("paddleId", newLocalPaddleIndex);
+	//
+	// 	this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI, newLocalPaddleIndex);
+	//
+	// 	this.networkingSystem.forceIndexRebuild();
+	// }
 
 
 	private waitForRegistration(): Promise<number> {
