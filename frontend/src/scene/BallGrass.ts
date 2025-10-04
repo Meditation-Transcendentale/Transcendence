@@ -105,6 +105,6 @@ export class BallGrass {
 	}
 
 	public set enable(value: boolean) {
-		this._enable = true;
+		this._enable = value;
 	}
 }

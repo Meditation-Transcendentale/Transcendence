@@ -1,5 +1,5 @@
 
-import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, FreeCamera } from "@babylonImport";
+import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, FreeCamera } from "../../babylon";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -12,19 +12,18 @@ import { getOrCreateUUID } from "./utils/getUUID.js";
 import { createGameTemplate, GameTemplateConfig, createPlayer } from "./templates/GameTemplate.js";
 import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
-import { createCamera, createBaseMeshes, createInstanceManagers } from "./utils/initGame.js";
+import { createBaseMeshes, createInstanceManagers } from "./utils/initGame.js";
 import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
-import Router from "../spa/Router";
 import type { userinterface } from './utils/proto/message.js';
 import { BallComponent } from "./components/BallComponent.js";
 import { Entity } from "./ecs/Entity.js";
-import { Ball } from "../brickbreaker/Ball.js";
-import GameUI from "../spa/GameUI.js";
+import { sceneManager } from "../../scene/SceneManager.js";
+import { stateManager } from "../../state/StateManager.js";
+import { htmlManager } from "../../html/HtmlManager.js";
+import GameUI from "../GameUI";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
-let engine: any;
-let resizeTimeout: NodeJS.Timeout;
 
 export class Pong {
 	private engine!: Engine;
@@ -70,6 +69,7 @@ export class Pong {
 			wallWidth: 1
 		};
 
+		this.cam = sceneManager.camera;
 	}
 
 	public async init() {
@@ -115,7 +115,6 @@ export class Pong {
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 
-		this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
 		this.cam.position.x = 0;
 		this.cam.position.y = 35;
 		this.cam.position.z = -2;

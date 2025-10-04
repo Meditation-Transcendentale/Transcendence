@@ -39,7 +39,6 @@ export class PlayModeHtml implements IHtml {
 			switch (submitter) {
 				case "local": {
 					stateManager.gameMode = "local";
-					console.log("AGKJZDAKJF");
 					routeManager.nav("/play/map");
 					break;
 				}
@@ -69,12 +68,12 @@ export class PlayModeHtml implements IHtml {
 					break;
 				}
 				case "medium": {
-					stateManager.gameMode = "medium";
+					stateManager.gameMode = "normal";
 					routeManager.nav("/brick");
 					break;
 				}
 				case "high": {
-					stateManager.gameMode = "high";
+					stateManager.gameMode = "hard";
 					routeManager.nav("/brick");
 					break;
 				}

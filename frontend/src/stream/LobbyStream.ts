@@ -80,7 +80,7 @@ export class LobbyStream implements IStream {
 			if (stateManager.gameMode === "br")
 				routeManager.nav("/test", false, true);
 			else
-				routeManager.nav("/cajoue", false, true);
+				routeManager.nav("/pong", false, true);
 			this.disconnect();
 		}
 

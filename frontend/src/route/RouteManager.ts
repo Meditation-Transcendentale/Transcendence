@@ -1,6 +1,7 @@
 import { streamManager } from "../stream/StreamManager";
 import { User } from "../User";
 import { AuthRoute } from "./AuthRoute";
+import { BrickRoute } from "./BrickRoute";
 import { HomeRoute } from "./HomeRoute";
 import { IRoute } from "./IRoute";
 import { LobbyRoute } from "./LobbyRoute";
@@ -8,6 +9,7 @@ import { PlayCreateRoute } from "./PlayCreateRoute";
 import { PlayMapRoute } from "./PlayMapRoute";
 import { PlayModeRoute } from "./PlayModeRoute";
 import { PlayRoute } from "./PlayRoute";
+import { PongRoute } from "./PongRoute";
 import { TournamentRoute } from "./TournamentRoute";
 
 class RouteManager {
@@ -31,6 +33,8 @@ class RouteManager {
 		this.routes.set("/play/mode", new PlayModeRoute());
 		this.routes.set("/play/map", new PlayMapRoute());
 		this.routes.set("/tournament", new TournamentRoute());
+		this.routes.set("/pong", new PongRoute());
+		this.routes.set("/brick", new BrickRoute());
 
 		this.comebackRoute = "/home";
 

@@ -1,5 +1,6 @@
 
 
+import { gameManager } from "./game/GameManager";
 import { routeManager } from "./route/RouteManager";
 import { sceneManager } from "./scene/SceneManager";
 import { streamManager } from "./stream/StreamManager";
@@ -14,6 +15,7 @@ async function init() {
 	streamManager.builder.connect();
 	await sceneManager.loadMandatory();
 	routeManager.nav(window.location.href.substring(window.location.origin.length), false, true);
+	await gameManager.init();
 
 
 
@@ -52,6 +54,14 @@ async function init() {
 	// 	//	postRequest("friends/add", { inputUsername: "Erwan"});
 	// 	//}
 	// })
+	//
+
+	window.addEventListener('keydown', (e) => {
+		if (e.key == 'Escape') {
+			routeManager.nav('/home', false, true)
+		}
+	})
+
 
 
 	loader!.remove();

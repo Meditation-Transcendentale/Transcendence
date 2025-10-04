@@ -92,6 +92,7 @@ export class CubeHtml {
 			document.body.appendChild(this.div);
 			sceneManager.beforeRender.add(() => { this.update() })
 		} else if (!state) {
+			console.log("DISABLE CUBE")
 			this.div.remove();
 			sceneManager.beforeRender.delete(() => { this.update() })
 		}

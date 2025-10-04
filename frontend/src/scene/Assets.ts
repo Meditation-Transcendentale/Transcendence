@@ -61,6 +61,11 @@ export class Assets {
 	public ballPicker!: Vector3;
 	public monolithMovement!: any;
 
+	public monolithVoxelPositions!: Array<Vector3>;
+	public monolithAnimationIntensity: number;
+	public monolithOrigin: Vector3;
+	public monolithOldOrigin: Vector3;
+
 	constructor(engine: Engine) {
 		this.engine = engine;
 		this.scene = new Scene(engine);
@@ -74,6 +79,10 @@ export class Assets {
 		this.camera.updateUpVectorFromRotation = true;
 
 		this.effectRenderer = new EffectRenderer(this.engine);
+
+		this.monolithAnimationIntensity = monolithOption.animationIntensity;
+		this.monolithOrigin = new Vector3(0, -10, 0);
+		this.monolithOldOrigin = new Vector3(0, -10, 0);
 	}
 
 	public async loadMandatory() {
@@ -128,10 +137,13 @@ export class Assets {
 		this.cubeMesh = MeshBuilder.CreateBox("thecube", { size: 1 }, this.scene);
 		this.cubeMesh.position = new Vector3(0, 4.5, 0);
 		this.cubeMesh.doNotSyncBoundingInfo = true;
+		this.cubeMesh.alwaysSelectAsActiveMesh = true;
 
 		this.setupMonolithMesh();
 		this.monolithMesh.setEnabled(false);
 		this.monolithMesh.doNotSyncBoundingInfo = true;
+		this.monolithMesh.alwaysSelectAsActiveMesh = true;
+		this.monolithMesh.refreshBoundingInfo();
 	}
 
 	private loadLightsMandatory() {
@@ -266,7 +278,12 @@ export class Assets {
 		})
 
 		this.monolithMaterial.onBindObservable.add(() => {
-			this.monolithMaterial.getEffect().setFloat("time", sceneManager.time);
+			const effect = this.monolithMaterial.getEffect();
+			effect.setFloat("time", sceneManager.time);
+			effect.setFloat("animationIntensity", this.monolithAnimationIntensity);
+			effect.setVector3("origin", this.monolithOrigin);
+			effect.setVector3("oldOrigin", this.monolithOldOrigin);
+
 		})
 
 
@@ -306,6 +323,10 @@ export class Assets {
 		})
 		this.monolithDepthMaterial.onBindObservable.add(() => {
 			this.monolithDepthMaterial.setVector2("depthValues", new Vector2(this.camera.minZ, this.camera.maxZ));
+			this.monolithDepthMaterial.setFloat("time", sceneManager.time);
+			this.monolithDepthMaterial.setFloat("animationIntensity", this.monolithAnimationIntensity);
+			this.monolithDepthMaterial.setVector3("origin", this.monolithOrigin);
+			this.monolithDepthMaterial.setVector3("oldOrigin", this.monolithOldOrigin);
 		})
 	}
 
@@ -328,10 +349,10 @@ export class Assets {
 	}
 
 	private setupMonolithMesh() {
-		const positions = templeMedium.positions.map(([x, y, z]) =>
+		this.monolithVoxelPositions = templeMedium.positions.map(([x, y, z]) =>
 			new Vector3(x, y, z))
 
-		const matrixes = new Float32Array(positions.length * 16);
+		const matrixes = new Float32Array(this.monolithVoxelPositions.length * 16);
 
 		this.monolithMesh = MeshBuilder.CreateBox('voxel', {
 			size: templeMedium.voxelSize,
@@ -340,17 +361,16 @@ export class Assets {
 
 		const tempMatrix = new Matrix();
 
-		for (let i = 0; i < positions.length; i++) {
-			const p = positions[i];
+		for (let i = 0; i < this.monolithVoxelPositions.length; i++) {
+			const p = this.monolithVoxelPositions[i];
 			Matrix.TranslationToRef(p.x, p.y, p.z, tempMatrix);
 			tempMatrix.toArray(matrixes, i * 16);
 		}
 
 		this.monolithMesh.thinInstanceSetBuffer("matrix", matrixes, 16, true);
-		this.monolithMesh.thinInstanceCount = positions.length;
+		this.monolithMesh.thinInstanceCount = this.monolithVoxelPositions.length;
 
 		// this.monolithMesh.freezeWorldMatrix();
-		this.monolithMesh.alwaysSelectAsActiveMesh = true;
 	}
 
 

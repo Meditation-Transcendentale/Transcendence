@@ -49,7 +49,22 @@ export class CameraManager {
 			position: new Vector3(-2.7, 4.5, 22),
 			target: new Vector3(-2.7, 4.5, 22).addInPlaceFromFloats(0.075, 0.07, -0.99),
 		})
-
+		this.vues.set("monolith", {
+			position: new Vector3(0, 50, 0),
+			target: new Vector3(0, 0, 0),
+		})
+		this.vues.set("grass", {
+			position: new Vector3(0, 50, 0),
+			target: new Vector3(0, 0, 0),
+		})
+		this.vues.set("void", {
+			position: new Vector3(0, 50, 0),
+			target: new Vector3(0, 0, 0),
+		})
+		this.vues.set("brick", {
+			position: new Vector3(0, 30, 0),
+			target: new Vector3(0, 0, 0)
+		})
 
 
 		this.renderingPipeline = new PostProcessRenderPipeline(this.assets.engine, "pipeline");
@@ -122,9 +137,13 @@ export class CameraManager {
 
 		this.assets.scene.postProcessRenderPipelineManager.addPipeline(this.renderingPipeline);
 		this.assets.scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("pipeline", this.assets.camera);
+	}
 
-
-
+	public set fogEnabled(value: boolean) {
+		if (value)
+			this.assets.scene.postProcessRenderPipelineManager.enableEffectInPipeline("pipeline", "fogEffect", this.assets.camera);
+		else
+			this.assets.scene.postProcessRenderPipelineManager.disableEffectInPipeline("pipeline", "fogEffect", this.assets.camera);
 	}
 
 	public set vue(key: string) {

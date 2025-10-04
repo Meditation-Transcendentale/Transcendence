@@ -1,4 +1,4 @@
-import { Matrix, Vector2, Vector3 } from "../babylon";
+import { Matrix, Vector3, GPUPicker, Vector2 } from "../babylon";
 import { sceneManager } from "./SceneManager";
 import { Assets } from "./Assets";
 import { stateManager } from "../state/StateManager";
@@ -13,12 +13,46 @@ export class Picker {
 
 	public tempVector3: Vector3 = new Vector3();
 	private mId = Matrix.Identity();
+
+	public gpuPicker: GPUPicker;
+
+	private moved: boolean;
+
+	private cursor: Vector2;
+
 	constructor(assets: Assets) {
 		this.assets = assets;
 
 		this.ballPicker = this.assets.ballPicker;
 
 		this._enabled = false;
+		this.moved = false;
+
+		this.gpuPicker = new GPUPicker();
+		this.gpuPicker.setPickingList([this.assets.monolithMesh]);
+
+		this.cursor = new Vector2();
+	}
+
+	public update(time: number) {
+		if (!this._enabled || !this.moved || this.gpuPicker.pickingInProgress)
+			return;
+
+		this.gpuPicker.pickAsync(this.cursor.x, this.cursor.y, false).then((pickInfo) => {
+			if (pickInfo && pickInfo.thinInstanceIndex != null) {
+				this.assets.monolithAnimationIntensity = 0.1;
+				if (pickInfo.thinInstanceIndex < this.assets.monolithVoxelPositions.length) {
+					const voxelPosition = this.assets.monolithVoxelPositions[pickInfo.thinInstanceIndex];
+					this.assets.monolithOldOrigin.copyFrom(this.assets.monolithOrigin);
+					this.assets.monolithOrigin.copyFrom(voxelPosition).addInPlace(this.assets.monolithRoot.position);
+				}
+			} else {
+				this.assets.monolithAnimationIntensity = 0.1;
+				this.assets.monolithOldOrigin.copyFrom(this.assets.monolithOrigin);
+				this.assets.monolithOrigin.set(0, -10, 0);
+			}
+		});
+		this.moved = false;
 	}
 
 	public set enable(value: boolean) {
@@ -52,6 +86,9 @@ export class Picker {
 			this.ballPicker.x = ev.clientX;
 			this.ballPicker.y = ev.clientY;
 		}
+		this.cursor.x = ev.clientX;
+		this.cursor.y = ev.clientY;
+		this.moved = true;
 	}
 
 	private outEvent(ev: MouseEvent) {
@@ -82,5 +119,4 @@ export class Picker {
 
 		return Math.sqrt(xx * xx + yy * yy) < px * 0.5;
 	}
-
 }

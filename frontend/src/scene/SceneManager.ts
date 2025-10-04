@@ -18,7 +18,7 @@ class SceneManager {
 	public engine: Engine;
 	public css3dRenderer!: Css3dRenderer;
 
-	private canvas: HTMLCanvasElement;
+	public canvas: HTMLCanvasElement;
 	private fps: HTMLElement;
 
 	public beforeRender: Set<any>;
@@ -76,19 +76,19 @@ class SceneManager {
 
 	public run() {
 		this.engine.runRenderLoop(() => {
-			this.time = performance.now() * 0.001;
 			this.scene.render();
 		})
 	}
 
 	public update() {
+		this.time = performance.now() * 0.001;
 		this.fps.innerHTML = this.engine.getFps().toFixed();
 		for (let i of this.beforeRender) {
 			i();
 		}
 		this.lightsManager.update();
-		this.tracker.update(this.time, this.scene.deltaTime * 0.001);
-
+		// this.tracker.update(this.time, this.scene.deltaTime * 0.001);
+		this.picker.update(this.time);
 		this.ballGrass.update(this.time, this.scene.deltaTime * 0.001);
 		this.css3dRenderer.update();
 		this.grass.update(this.time);
@@ -179,8 +179,65 @@ class SceneManager {
 				this.fog.enable = true;
 				this.assets.monolithMesh.setEnabled(true);
 				this.beforeRender.add(this.assets.monolithMovement);
+				this.cameraManager.fogEnabled = true;
 				break;
 			}
+			case "void": {
+				// this.camera.detachControl();
+				this.picker.enable = false;
+				this.grass.enable = false;
+				this.assets.ballMesh.setEnabled(false);
+				this.assets.groundMesh.setEnabled(false);
+				this.butterfly.enable = false;
+				this.ballGrass.enable = false;
+				this.fog.enable = false;
+				this.assets.monolithMesh.setEnabled(false);
+				this.beforeRender.delete(this.assets.monolithMovement);
+				this.cameraManager.fogEnabled = false;
+				break;
+			}
+			case "grass": {
+				// this.camera.detachControl();
+				this.picker.enable = false;
+				this.grass.enable = true;
+				this.assets.ballMesh.setEnabled(true);
+				this.assets.groundMesh.setEnabled(true);
+				this.butterfly.enable = true;
+				this.ballGrass.enable = true;
+				this.fog.enable = false;
+				this.assets.monolithMesh.setEnabled(false);
+				this.beforeRender.delete(this.assets.monolithMovement);
+				this.cameraManager.fogEnabled = false;
+				break;
+			}
+			case "monolith": {
+				// this.camera.detachControl();
+				this.picker.enable = false;
+				this.grass.enable = false;
+				this.assets.ballMesh.setEnabled(false);
+				this.assets.groundMesh.setEnabled(true);
+				this.butterfly.enable = false;
+				this.ballGrass.enable = false;
+				this.fog.enable = false;
+				this.assets.monolithMesh.setEnabled(true);
+				this.beforeRender.add(this.assets.monolithMovement);
+				this.cameraManager.fogEnabled = false;
+			}
+			case "brick": {
+				// this.camera.detachControl();
+				this.picker.enable = false;
+				this.grass.enable = false;
+				this.assets.ballMesh.setEnabled(false);
+				this.assets.groundMesh.setEnabled(false);
+				this.butterfly.enable = false;
+				this.ballGrass.enable = false;
+				this.fog.enable = false;
+				this.assets.monolithMesh.setEnabled(false);
+				this.beforeRender.delete(this.assets.monolithMovement);
+				this.cameraManager.fogEnabled = false;
+				break;
+			}
+
 		}
 	}
 
