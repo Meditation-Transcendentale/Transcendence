@@ -3,7 +3,7 @@ import { NotificationType } from "../html/NotificationHtml";
 import { decodeServerMessage, encodeClientMessage } from "../networking/helper";
 import { routeManager } from "../route/RouteManager";
 import { stateManager } from "../state/StateManager";
-import { gUser } from "../User";
+import { User } from "../User";
 import { IStream } from "./IStream";
 
 export class LobbyStream implements IStream {
@@ -22,7 +22,7 @@ export class LobbyStream implements IStream {
 			this.disconnect();
 		}
 
-		const url = `${this.url}${encodeURIComponent(gUser.uuid as string)}&lobbyId=${stateManager.get("lobbyId")}`;
+		const url = `${this.url}${encodeURIComponent(User.uuid as string)}&lobbyId=${stateManager.lobbyId}`;
 
 		this.ws = new WebSocket(url);
 		this.ws.binaryType = "arraybuffer";
@@ -31,7 +31,7 @@ export class LobbyStream implements IStream {
 			htmlManager.notification.add({ type: NotificationType.text, text: "Lobby joined successfully!" });
 		}
 
-		this.ws.onmessage = this.onMessage;
+		this.ws.onmessage = (msg) => { this.onMessage(msg) };
 
 		this.ws.onclose = () => {
 			this.disconnect();
@@ -52,7 +52,11 @@ export class LobbyStream implements IStream {
 	}
 
 	public ready() {
-		this.ws?.send(encodeClientMessage({ ready: { lobbyId: stateManager.get("lobbyId") } }));
+		this.ws?.send(encodeClientMessage({ ready: { lobbyId: stateManager.lobbyId } }));
+	}
+
+	public quit() {
+		this.ws?.send(encodeClientMessage({ quit: { lobbyId: stateManager.lobbyId, uuid: User.uuid } }));
 	}
 
 	private onMessage(msg: MessageEvent) {
@@ -65,15 +69,15 @@ export class LobbyStream implements IStream {
 		}
 
 		if (payload.update != null) {
-			stateManager.set("mode", payload.update.mode);
-			stateManager.set("map", payload.update.map);
-			// htmlManager.lobby.update(payload.update);
+			stateManager.gameMode = payload.update.mode as string;
+			stateManager.gameMap = payload.update.map as string;
+			htmlManager.lobby.update(payload.update);
 		}
 
 		if (payload.start != null) {
 			console.log("Everyone is ready");
-			stateManager.set("gameId", payload.start.gameId);
-			if (stateManager.get("mode") === "br")
+			stateManager.gameId = payload.start.gameId as string;
+			if (stateManager.gameMode === "br")
 				routeManager.nav("/test", false, true);
 			else
 				routeManager.nav("/cajoue", false, true);

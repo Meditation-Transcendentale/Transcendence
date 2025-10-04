@@ -37,6 +37,16 @@ export class CameraManager {
 			position: new Vector3(-2.7, 4.5, 22),
 			target: new Vector3(-2.7, 4.5, 22).addInPlaceFromFloats(0.075, 0.07, -0.99),
 		})
+		this.vues.set("create", {
+			position: new Vector3(-10, 3.5, -18),
+			target: new Vector3(-10, 3.5, -18).addInPlaceFromFloats(0.86, 0.14, 0.5),
+		})
+		this.vues.set("lobby", {
+			position: new Vector3(-1.88, 5.1, -4.96),
+			target: new Vector3(-1.88, 5.1, -4.96).addInPlaceFromFloats(0.75, 0.03, 0.65),
+
+		})
+
 
 		this.renderingPipeline = new PostProcessRenderPipeline(this.assets.engine, "pipeline");
 

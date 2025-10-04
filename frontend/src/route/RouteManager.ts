@@ -1,17 +1,34 @@
-import { htmlManager } from "../html/HtmlManager";
 import { streamManager } from "../stream/StreamManager";
-import { gUser } from "../User";
+import { User } from "../User";
+import { AuthRoute } from "./AuthRoute";
+import { HomeRoute } from "./HomeRoute";
+import { IRoute } from "./IRoute";
+import { LobbyRoute } from "./LobbyRoute";
+import { PlayCreateRoute } from "./PlayCreateRoute";
+import { PlayMapRoute } from "./PlayMapRoute";
+import { PlayModeRoute } from "./PlayModeRoute";
+import { PlayRoute } from "./PlayRoute";
 
 class RouteManager {
-	private routes: Map<string, string>;
+	private routes: Map<string, IRoute>;
 	private location: string;
 	private first: boolean;
 
+	private lastRoute: IRoute | null;
+
 	constructor() {
 		console.log("%c ROUTE Manager", "color: white; background-color: red");
-		this.routes = new Map<string, string>;
-		this.routes.set("/auth", "auth");
-		this.routes.set("/home", "home");
+
+		this.routes = new Map<string, IRoute>();
+		this.routes.set("/auth", new AuthRoute());
+		this.routes.set("/home", new HomeRoute());
+		this.routes.set("/lobby", new LobbyRoute());
+		this.routes.set("/play", new PlayRoute());
+		this.routes.set("/play/create", new PlayCreateRoute());
+		this.routes.set("/play/mode", new PlayModeRoute());
+		this.routes.set("/play/map", new PlayMapRoute());
+
+		this.lastRoute = null;
 		this.first = true;
 
 		this.location = `https://${window.location.hostname}:7000`;
@@ -35,9 +52,10 @@ class RouteManager {
 		if (!this.routes.has(url.pathname)) {
 			url.pathname = "/home";
 			url.search = "";
+			console.error("URL NOT FOUND");
 		}
 
-		await gUser.check()
+		await User.check()
 			.then(() => {
 				if (url.pathname == "/auth" || (this.first && url.pathname == "/cajoue")) {
 					url.pathname = "/home";
@@ -58,8 +76,9 @@ class RouteManager {
 
 		if (history)
 			window.history.pushState("", "", url.pathname + url.search)
-		htmlManager.loadPage(url.pathname, this.routes.get(url.pathname) as string);
-
+		this.lastRoute?.unload();
+		this.routes.get(url.pathname)?.load();
+		this.lastRoute = this.routes.get(url.pathname) as IRoute;
 
 		if (url.pathname !== "/auth") {
 			streamManager.notification.connect();

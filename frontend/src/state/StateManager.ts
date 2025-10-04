@@ -1,6 +1,14 @@
 class StateManager {
 	private states: Map<string, any>;
 
+	public lobbyId!: string;
+	public gameMode!: string;
+	public gameMap!: string;
+	public gameSubMode!: string;
+	public gameId!: string;
+
+	public playPath!: string;
+
 	constructor() {
 		this.states = new Map<string, any>;
 	}

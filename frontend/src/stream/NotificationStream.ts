@@ -1,7 +1,7 @@
 import { IStream } from "./IStream";
 import { decodeNotificationMessage } from "../networking/helper";
 import { notif } from "../networking/message";
-import { gUser } from "../User";
+import { User } from "../User";
 import { postRequest } from "../networking/request";
 import { htmlManager } from "../html/HtmlManager";
 
@@ -17,10 +17,9 @@ export class NotificationStream implements IStream {
 	}
 
 	public connect(): void {
-		if (this.connected) {
-			this.disconnect();
-		}
-		const url = `${this.path}${encodeURIComponent(gUser.uuid as string)}`;
+		if (this.connected)
+			return;
+		const url = `${this.path}${encodeURIComponent(User.uuid as string)}`;
 		this.ws = new WebSocket(url);
 		this.ws.binaryType = "arraybuffer";
 		this.ws.onopen = () => {
@@ -69,7 +68,7 @@ export class NotificationStream implements IStream {
 		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
 			.then((json: any) => {
 				// htmlManager.addNotification({type: "friend-request", uuid: notification.sender, username: json.data.username})
-				// gUser.addFriendRequest(notification.sender, json.data.username);
+				// User.addFriendRequest(notification.sender, json.data.username);
 			})
 			.catch((err) => {
 				console.error(err);
@@ -80,7 +79,7 @@ export class NotificationStream implements IStream {
 		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
 			.then((json: any) => {
 				// htmlManager.addNotification({type: "friend-accept", uuid: notification.sender, username: json.data.username});
-				// gUser.updateFriendlist();
+				// User.updateFriendlist();
 			})
 			.catch((err) => {
 				console.error(err);
@@ -98,6 +97,6 @@ export class NotificationStream implements IStream {
 	}
 
 	private onUpdateStatus(notification: notif.IStatusUpdate) {
-		// gUser.updateFriendStatus(notification.sender, notification.status);
+		// User.updateFriendStatus(notification.sender, notification.status);
 	}
 }

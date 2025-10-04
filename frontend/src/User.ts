@@ -1,6 +1,6 @@
 import { getRequest } from "./networking/request";
 
-class User {
+class UserC {
 	public username: string | null;
 	public uuid: string | null;
 	public status: string | null;
@@ -71,4 +71,4 @@ class User {
 // 	return g_User;
 // }
 
-export const gUser = new User();
+export const User = new UserC();
