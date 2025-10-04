@@ -63,6 +63,6 @@ export class ThinInstanceManager {
 		});
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16, true);
 		this.mesh.thinInstanceCount = count;
-		this.mesh.thinInstanceRefreshBoundingInfo(true);
+		// Removed: this.mesh.thinInstanceRefreshBoundingInfo(true); - expensive and unnecessary every frame
 	}
 }
