@@ -43,9 +43,9 @@ export class SpaceSkybox {
 		this.scene = scene;
 
 		this.settings = {
-			iterations: 20,
+			iterations: 12, // Reduced from 20 for performance
 			formuparam: 0.53,
-			volsteps: 10,
+			volsteps: 8, // Reduced from 10 for performance
 			stepsize: 0.15,
 			zoom: 0.200,
 			tile: 0.850,
@@ -61,7 +61,7 @@ export class SpaceSkybox {
 			gamma: 1.0,
 			autoRotate: true,
 			rotationSpeed: 0.05,
-			sphereSegments: 32,
+			sphereSegments: 24, // Reduced from 32
 			skyboxSize: 1000,
 			resolution: new Vector2(512, 512),
 			...options

@@ -9,51 +9,54 @@ import { InputComponent } from "../components/InputComponent.js";
 
 export class MovementSystem extends System {
 	update(entities: Entity[], deltaTime: number): void {
-		entities.forEach(entity => {
-			if (entity.hasComponent(BallComponent)) {
-				const ball = entity.getComponent(BallComponent)!;
-				let newPosX = ball.position.x + ball.velocity.x * (deltaTime);
-				let newPosZ = ball.position.z + ball.velocity.z * (deltaTime);
+		for (const entity of entities) {
+			if (!entity.hasComponent(BallComponent)) continue;
 
-				if (!ball.previousPosition) {
-					ball.previousPosition = ball.position.clone();
-				} else {
-					ball.previousPosition.set(ball.position.x, ball.position.y, ball.position.z);
-				}
+			const ball = entity.getComponent(BallComponent)!;
+			let newPosX = ball.position.x + ball.velocity.x * (deltaTime);
+			let newPosZ = ball.position.z + ball.velocity.z * (deltaTime);
 
-				ball.position.set(newPosX, ball.position.y, newPosZ);
-				const now = performance.now();
-				const age = now - ball.lastServerUpdate;
+			if (!ball.previousPosition) {
+				ball.previousPosition = ball.position.clone();
+			} else {
+				ball.previousPosition.set(ball.position.x, ball.position.y, ball.position.z);
+			}
 
-				if (age < 17) {
-					const dist = Vector3.Distance(ball.position, ball.serverPosition);
-					if (dist > 0 && dist < 1) {
-						const corrected = Vector3.Lerp(ball.position, ball.serverPosition, 0.1);
-						ball.position.copyFrom(corrected);
-					} else if (dist > 1) {
-						ball.position.copyFrom(ball.serverPosition);
-					}
+			ball.position.set(newPosX, ball.position.y, newPosZ);
+			const now = performance.now();
+			const age = now - ball.lastServerUpdate;
+
+			if (age < 17) {
+				const dist = Vector3.Distance(ball.position, ball.serverPosition);
+				if (dist > 0 && dist < 1) {
+					const corrected = Vector3.Lerp(ball.position, ball.serverPosition, 0.1);
+					ball.position.copyFrom(corrected);
+				} else if (dist > 1) {
+					ball.position.copyFrom(ball.serverPosition);
 				}
 			}
-			if (entity.hasComponent(PaddleComponent)) {
-				const paddle = entity.getComponent(PaddleComponent)!;
-				const input = entity.getComponent(InputComponent)!;
-				const transform = entity.getComponent(TransformComponent) as TransformComponent;
-				if (input.isLocal) {
-					const dist = Math.abs(paddle.offset - paddle.serverOffset);
-					if (dist > 0) {
-						if (dist >= 0.003) {
-							paddle.offset = paddle.serverOffset;
-						} else {
-							const smoothingFactor = 0.85;
-							paddle.offset = paddle.offset * (1 - smoothingFactor) + paddle.serverOffset * smoothingFactor;
-						}
-						transform.rotation.y = paddle.baseRotation - paddle.offset;
-					}
+		}
 
-					paddle.lastServerOffset = paddle.serverOffset;
+		for (const entity of entities) {
+			if (!entity.hasComponent(PaddleComponent)) continue;
+
+			const paddle = entity.getComponent(PaddleComponent)!;
+			const input = entity.getComponent(InputComponent)!;
+			const transform = entity.getComponent(TransformComponent) as TransformComponent;
+			if (input.isLocal) {
+				const dist = Math.abs(paddle.offset - paddle.serverOffset);
+				if (dist > 0) {
+					if (dist >= 0.003) {
+						paddle.offset = paddle.serverOffset;
+					} else {
+						const smoothingFactor = 0.85;
+						paddle.offset = paddle.offset * (1 - smoothingFactor) + paddle.serverOffset * smoothingFactor;
+					}
+					transform.rotation.y = paddle.baseRotation - paddle.offset;
 				}
+
+				paddle.lastServerOffset = paddle.serverOffset;
 			}
-		});
+		}
 	}
 }

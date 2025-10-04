@@ -25,8 +25,8 @@ export function createWallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	const wallMaterial = new StandardMaterial("wallMaterial", scene);
 	wallMaterial.diffuseColor.set(1, 0, 0);
 	wallMaterial.emissiveColor.set(1, 0, 1);
+	wallMaterial.freeze();
 	wallMesh.material = wallMaterial;
-	//wallMesh.setEnabled(true);
 	wallMesh.setPivotPoint(Vector3.Zero());
 
 	return wallMesh;
@@ -39,6 +39,7 @@ export function createBallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	ballMaterial.diffuseColor.set(1, 0, 0);
 	ballMaterial.emissiveColor.set(0.3, 0.3, 0.3);
 	ballMaterial.specularColor.set(0.5, 0.5, 0.5);
+	ballMaterial.freeze();
 	ballMesh.setEnabled(true);
 	ballMesh.setPivotPoint(Vector3.Zero());
 	ballMesh.position.y = 0.0;
@@ -88,6 +89,7 @@ export function createPillarMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	m.isVisible = true;
 	const mat = new StandardMaterial("pillarMat", scene);
 	mat.diffuseColor = Color3.Blue();
+	mat.freeze();
 	m.material = mat;
 	return m;
 }
@@ -101,6 +103,7 @@ export function createGoalMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	m.parent = pongRoot;
 	const mat = new StandardMaterial("goalMat", scene);
 	mat.diffuseColor.set(1, 0, 0);
+	mat.freeze();
 	m.material = mat;
 	m.setEnabled(false);
 	m.setPivotPoint(Vector3.Zero());
