@@ -1,6 +1,4 @@
-import { Matrix, Mesh, TransformNode, Vector3 } from "../babylon";
-import { ButterflyMaterial } from "./Shader/ButterflyMaterial";
-import { sceneManager } from "./SceneManager";
+import { Matrix, Vector3 } from "../babylon";
 import { Assets } from "./Assets";
 
 export class Butterfly {

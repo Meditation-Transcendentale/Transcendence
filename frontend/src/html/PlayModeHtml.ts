@@ -85,12 +85,12 @@ export class PlayModeHtml implements IHtml {
 	public load(): void {
 		if (stateManager.gameMode == "pong") {
 			this.title.textContent = "CHOOSE MODE";
-			this.brickForm.classList.add("hidden");
-			this.pongForm.classList.remove("hidden");
+			this.brickForm.hidden = true;
+			this.pongForm.hidden = false;
 		} else if (stateManager.gameMode == "brick") {
 			this.title.textContent = "CHOOSE DIFFICULTY";
-			this.brickForm.classList.remove("hidden");
-			this.pongForm.classList.add("hidden");
+			this.brickForm.hidden = false;
+			this.pongForm.hidden = true;
 		} else {
 			routeManager.nav("/play");
 			return;
