@@ -6,6 +6,7 @@ import { User } from "../User";
 import { BrickBreaker } from "./brickbreaker/brickbreaker";
 import GameUI from "./GameUI";
 import { Pong } from "./pong/Pong";
+import { PongBR } from "./pongbr/PongBR";
 
 export class GameManager {
 	private pongUI!: GameUI;
@@ -13,7 +14,7 @@ export class GameManager {
 	private brickUI!: GameUI;
 
 	private pong!: Pong;
-	// private br: 
+	private br!: PongBR;
 	private brick!: BrickBreaker;
 	//
 	private pongRunning: boolean;
@@ -45,6 +46,15 @@ export class GameManager {
 		this.brick.start(stateManager.gameMode);
 	}
 
+	public launchBr() {
+		this.brUI.load();
+		this.brUI.showButton('quit', 'Quit', () => {
+			routeManager.nav('/home', false, true);
+			console.log('Game quit');
+		});
+		this.br.start(stateManager.gameId, User.uuid);
+	}
+
 	public stopPong() {
 		if (!this.pongRunning)
 			return;
@@ -56,6 +66,11 @@ export class GameManager {
 	public stopBrick() {
 		this.brickUI.unload();
 		this.brick.stop();
+	}
+
+	public stopBr() {
+		this.brUI.unload();
+		this.br.stop();
 	}
 
 	public async init() {
@@ -96,6 +111,7 @@ export class GameManager {
 
 		this.pong = new Pong(sceneManager.canvas, stateManager.gameId, sceneManager.scene, this.pongUI);
 		this.brick = new BrickBreaker(sceneManager.canvas, sceneManager.scene, this.brickUI);
+		this.br = new PongBR(sceneManager.canvas, sceneManager.scene, this.brUI);
 	}
 }
 

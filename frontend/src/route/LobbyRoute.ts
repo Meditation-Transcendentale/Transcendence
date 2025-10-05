@@ -25,6 +25,7 @@ export class LobbyRoute implements IRoute {
 		streamManager.lobby.connect();
 		sceneManager.cameraManager.vue = "lobby";
 		sceneManager.load("home");
+		htmlManager.cube.enable = false;
 	}
 
 	public async unload(): Promise<void> {
