@@ -18,12 +18,14 @@ export class BrRoute implements IRoute {
 			return;
 		}
 		sceneManager.cameraManager.vue = "br";
+		sceneManager.assets.scene.activeCamera = sceneManager.assets.cameraBr;
 		sceneManager.load("br");
 		gameManager.launchBr();
 		htmlManager.cube.enable = false;
 	}
 
 	public async unload(): Promise<void> {
+		sceneManager.assets.scene.activeCamera = sceneManager.camera;
 		gameManager.stopBr();
 	}
 }

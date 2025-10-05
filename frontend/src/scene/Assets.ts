@@ -1,4 +1,5 @@
-import { Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3, Vector4 } from "../babylon";
+import { MorphTarget } from "@babylonjs/core";
+import { ArcRotateCamera, Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, PBRMaterial, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, ShadowGenerator, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3, Vector4 } from "../babylon";
 import { stateManager } from "../state/StateManager";
 import { perlinWorley3D } from "./PerlinWorley";
 import { sceneManager } from "./SceneManager";
@@ -22,6 +23,8 @@ export class Assets {
 	public camera: FreeCamera;
 	public effectRenderer: EffectRenderer;
 
+	public cameraBr!: ArcRotateCamera;
+
 	public grassLowMesh!: Mesh;
 	public grassHighMesh!: Mesh;
 	public ballMesh!: Mesh;
@@ -29,11 +32,17 @@ export class Assets {
 	public groundMesh!: Mesh;
 	public cubeMesh!: Mesh;
 	public monolithMesh!: Mesh;
+	public statusMesh!: Mesh; //
+	public eyeMesh!: Mesh; //
+	public brArenaMesh!: Mesh; //
 
 	public flashLight!: SpotLight;
 	public hemisphericLight!: HemisphericLight;
 	public cubeLight!: PointLight;
 	public ballLight!: PointLight;
+	public redLight!: SpotLight; //
+	public whiteLight!: SpotLight; //
+	public whiteLight2!: SpotLight; //
 
 	public fogDepthTexture!: RenderTargetTexture;
 	public fogDensityTexture!: RawTexture3D;
@@ -47,12 +56,17 @@ export class Assets {
 	public ballRoot!: TransformNode;
 	public monolithRoot!: TransformNode;
 	public butterflyRoot!: TransformNode;
+	public statusRoot!: TransformNode;
+	public brRoot!: TransformNode; //
 
 	public ballMaterial!: ShaderMaterial;
 	public cubeMaterial!: ShaderMaterial;
 	public butterflyMaterial!: ButterflyMaterial;
 	public grassMaterial!: GrassMaterial;
 	public monolithMaterial!: MonolithMaterial;
+	public statusMaterial!: PBRMaterial; //
+	public eyeMaterial!: StandardMaterial; //
+	public brArenaMaterial!: PBRMaterial; //
 
 	public depthMaterial!: ShaderMaterial;
 	public grassDepthMaterial!: ShaderMaterial;
@@ -65,6 +79,11 @@ export class Assets {
 	public monolithAnimationIntensity: number;
 	public monolithOrigin: Vector3;
 	public monolithOldOrigin: Vector3;
+
+	public redLightShadow!: ShadowGenerator; //
+	public whiteLightShadow!: ShadowGenerator; //
+
+	public smileTarget!: MorphTarget;
 
 	constructor(engine: Engine) {
 		this.engine = engine;
@@ -92,7 +111,10 @@ export class Assets {
 		this.loadUBOMandatory();
 		this.loadMaterialMandatory();
 		this.loadRootMandatory();
+		this.loadShadows();
 
+
+		this.cameraBr = new ArcRotateCamera('br', -Math.PI * 0.8, Math.PI * 0.4, 100, Vector3.Zero(), this.scene);
 		this.ballPicker = new Vector3();
 		this.monolithMovement = () => {
 			this.monolithRoot.position.set(
@@ -101,10 +123,11 @@ export class Assets {
 				Math.cos(sceneManager.time * 0.4) * monolithOption.amplitude * 0.5
 			)
 		}
-	}
 
-	public async loadAssetsAsync() {
-
+		if (this.statusMesh.morphTargetManager) {
+			this.smileTarget = this.statusMesh.morphTargetManager!.getTarget(0);
+			this.smileTarget.influence = 1.;
+		}
 	}
 
 	private async loadMeshMandatory() {
@@ -144,6 +167,21 @@ export class Assets {
 		this.monolithMesh.doNotSyncBoundingInfo = true;
 		this.monolithMesh.alwaysSelectAsActiveMesh = true;
 		this.monolithMesh.refreshBoundingInfo();
+
+		loaded = await LoadAssetContainerAsync("/assets/PongStatutTextured.glb", this.scene);
+		console.log(loaded.meshes);
+		this.statusRoot = loaded.meshes[0];
+		this.statusMesh = loaded.meshes.find(mesh => mesh.name === "Head.001") as Mesh;
+		this.eyeMesh = loaded.meshes.find(mesh => mesh.name === "Eyes.001") as Mesh;
+		this.statusMesh.doNotSyncBoundingInfo = true;
+		this.eyeMesh.doNotSyncBoundingInfo = true;
+		this.statusMesh.alwaysSelectAsActiveMesh = true;
+		this.eyeMesh.alwaysSelectAsActiveMesh = true;
+		this.scene.addMesh(this.statusMesh);
+		this.scene.addMesh(this.eyeMesh);
+		this.scene.addMesh(this.statusRoot as Mesh);
+
+		this.brArenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 5, tessellation: 128 }, this.scene);
 	}
 
 	private loadLightsMandatory() {
@@ -165,6 +203,21 @@ export class Assets {
 		this.cubeLight.range = 2;
 		this.cubeLight.diffuse = Color3.Purple();
 		this.cubeLight.intensity = 2;
+
+		this.redLight = new SpotLight("redlight", new Vector3(-1200, 200, 0), new Vector3(1, -1, 0), 160.8, 2, this.scene);
+		this.redLight.diffuse = Color3.Red();
+		this.redLight.intensity = 100;
+		this.redLight.shadowMinZ = 1;
+		this.redLight.shadowMaxZ = 80;
+
+		this.whiteLight = new SpotLight("whitelight", new Vector3(-500, 220, 0), new Vector3(-1, -1, 0), 2 * Math.PI, 2, this.scene);
+		this.whiteLight.intensity = 4;
+		this.whiteLight.shadowMinZ = 1.;
+		this.whiteLight.shadowMaxZ = 10;
+
+		this.whiteLight2 = new SpotLight("whitelight2", new Vector3(0, 400, 0), new Vector3(0, -1, 0), Math.PI, 2, this.scene);
+		this.whiteLight2.excludedMeshes.push(this.statusMesh);
+		this.whiteLight2.intensity = 1;
 	}
 
 	private loadTextureMandatory() {
@@ -286,11 +339,30 @@ export class Assets {
 
 		})
 
-
 		const m = new StandardMaterial("ground", this.scene);
 		m.diffuseColor = Color3.Black();
 		m.disableLighting = true;
 		this.groundMesh.material = m;
+
+		this.statusMaterial = this.statusMesh.material as PBRMaterial;
+		this.statusMaterial.usePhysicalLightFalloff = false;
+		this.statusMaterial.invertNormalMapX = true;
+		this.statusMaterial.invertNormalMapY = true;
+
+		this.eyeMaterial = new StandardMaterial('eyemat', this.scene);
+		this.eyeMaterial.diffuseColor = new Color3(1., 0, 0);
+		this.eyeMaterial.emissiveColor = new Color3(1, 1, 1);
+		this.eyeMesh.material = this.eyeMaterial;
+
+		this.brArenaMaterial = new PBRMaterial("gameplayArena", this.scene);
+		this.brArenaMaterial.albedoColor = new Color3(0.08, 0.10, 0.12);
+		this.brArenaMaterial.emissiveColor = new Color3(0.01, 0.03, 0.05);
+		this.brArenaMaterial.roughness = 0.95;
+		this.brArenaMaterial.metallic = 0.02;
+
+		/* ###################################
+		 * DEPTH #############################
+		 * ################################### */
 
 		this.depthMaterial = new ShaderMaterial("defaultDepth", this.scene, "defaultDepth", {
 			attributes: ['position'],
@@ -346,6 +418,27 @@ export class Assets {
 		this.butterflyRoot.position = new Vector3(0, 1.5, 0);
 		this.butterflyRoot.scaling = new Vector3(0.5, 0.5, 0.5);
 		this.butterflyMesh.parent = this.butterflyRoot;
+
+		this.brRoot = new TransformNode("pongbrRoot", this.scene);
+		this.brRoot.position.set(0, -100, 0);
+		this.brRoot.scaling.set(0.1, 0.1, 0.1);
+		this.brRoot.setEnabled(false);
+		this.brArenaMesh.parent = this.brRoot;
+		this.statusRoot.parent = this.brRoot;
+		// this.statusMesh.parent = this.brRoot;
+		// this.eyeMesh.parent = this.brRoot;
+		this.redLight.parent = this.brRoot;
+		this.whiteLight.parent = this.brRoot;
+		this.whiteLight2.parent = this.brRoot;
+	}
+
+	private loadShadows() {
+		this.redLightShadow = new ShadowGenerator(512, this.redLight);
+		this.whiteLightShadow = new ShadowGenerator(512, this.whiteLight);
+		this.redLightShadow.useBlurCloseExponentialShadowMap = true;
+		this.redLightShadow.addShadowCaster(this.statusMesh);
+		this.whiteLightShadow.useBlurCloseExponentialShadowMap = true;
+		this.whiteLightShadow.addShadowCaster(this.statusMesh);
 	}
 
 	private setupMonolithMesh() {
@@ -375,3 +468,4 @@ export class Assets {
 
 
 }
+

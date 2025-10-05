@@ -1,7 +1,6 @@
-import { Camera, Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, Light, LoadAssetContainerAsync, Mesh, MeshBuilder, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, SpotLight, StandardMaterial, Texture, UniformBuffer, Vector2, Vector3, Vector4 } from "../babylon";
+import { Engine, FreeCamera, Scene } from "../babylon";
 import { stateManager } from "../state/StateManager";
 import { CameraManager } from "./CameraManager";
-import { perlinWorley3D } from "./PerlinWorley";
 import { Tracker } from "./Tracker";
 import "./Shader/Shader.ts";
 import { UBOManager } from "./UBOManager";
@@ -180,6 +179,7 @@ class SceneManager {
 				this.assets.monolithMesh.setEnabled(true);
 				this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = true;
+				this.assets.brRoot.setEnabled(false);
 				break;
 			}
 			case "void": {
@@ -194,6 +194,7 @@ class SceneManager {
 				this.assets.monolithMesh.setEnabled(false);
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
+				this.assets.brRoot.setEnabled(false);
 				break;
 			}
 			case "grass": {
@@ -208,6 +209,7 @@ class SceneManager {
 				this.assets.monolithMesh.setEnabled(false);
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
+				this.assets.brRoot.setEnabled(false);
 				break;
 			}
 			case "monolith": {
@@ -222,6 +224,7 @@ class SceneManager {
 				this.assets.monolithMesh.setEnabled(true);
 				this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
+				this.assets.brRoot.setEnabled(false);
 			}
 			case "brick": {
 				// this.camera.detachControl();
@@ -235,8 +238,25 @@ class SceneManager {
 				this.assets.monolithMesh.setEnabled(false);
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
+				this.assets.brRoot.setEnabled(false);
 				break;
 			}
+			case "br": {
+				// this.camera.detachControl();
+				this.picker.enable = false;
+				this.grass.enable = false;
+				this.assets.ballMesh.setEnabled(false);
+				this.assets.groundMesh.setEnabled(false);
+				this.butterfly.enable = false;
+				this.ballGrass.enable = false;
+				this.fog.enable = false;
+				this.assets.monolithMesh.setEnabled(false);
+				this.beforeRender.delete(this.assets.monolithMovement);
+				this.cameraManager.fogEnabled = false;
+				this.assets.brRoot.setEnabled(true);
+				break;
+			}
+
 
 		}
 	}

@@ -78,7 +78,7 @@ export class LobbyStream implements IStream {
 			console.log("Everyone is ready");
 			stateManager.gameId = payload.start.gameId as string;
 			if (stateManager.gameMode === "br")
-				routeManager.nav("/test", false, true);
+				routeManager.nav("/br", false, true);
 			else
 				routeManager.nav("/pong", false, true);
 			this.disconnect();
