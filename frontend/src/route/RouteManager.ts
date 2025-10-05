@@ -7,6 +7,7 @@ import { HomeRoute } from "./HomeRoute";
 import { IRoute } from "./IRoute";
 import { LobbyRoute } from "./LobbyRoute";
 import { PlayCreateRoute } from "./PlayCreateRoute";
+import { PlayJoinRoute } from "./PlayJoinRoute";
 import { PlayMapRoute } from "./PlayMapRoute";
 import { PlayModeRoute } from "./PlayModeRoute";
 import { PlayRoute } from "./PlayRoute";
@@ -31,6 +32,7 @@ class RouteManager {
 		this.routes.set("/lobby", new LobbyRoute());
 		this.routes.set("/play", new PlayRoute());
 		this.routes.set("/play/create", new PlayCreateRoute());
+		this.routes.set("/play/join", new PlayJoinRoute());
 		this.routes.set("/play/mode", new PlayModeRoute());
 		this.routes.set("/play/map", new PlayMapRoute());
 		this.routes.set("/tournament", new TournamentRoute());

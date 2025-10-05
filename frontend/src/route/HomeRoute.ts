@@ -24,7 +24,7 @@ export class HomeRoute implements IRoute {
 		sceneManager.load("home");
 		htmlManager.cube.name = "PLAY";
 		htmlManager.cube.enable = true;
-		htmlManager.cube.clickEvent = () => routeManager.nav("/play");
+		htmlManager.cube.clickEvent = () => routeManager.nav("/play", false, false);
 
 	}
 

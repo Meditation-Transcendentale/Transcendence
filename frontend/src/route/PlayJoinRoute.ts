@@ -5,7 +5,7 @@ import { stateManager } from "../state/StateManager";
 import { IRoute } from "./IRoute";
 import { routeManager } from "./RouteManager";
 
-export class PlayCreateRoute implements IRoute {
+export class PlayJoinRoute implements IRoute {
 	public created: boolean;
 
 	constructor() {
@@ -13,25 +13,25 @@ export class PlayCreateRoute implements IRoute {
 	}
 
 	public async init(): Promise<void> {
-		const div = await fetchHTML("playCreate")
+		const div = await fetchHTML("playJoin")
 			.catch((err) => { alert("fecth html play error") });
-		htmlManager.playCreate.init(div);
+		htmlManager.playJoin.init(div);
 		this.created = true;
 	}
 
 	public async load(): Promise<void> {
 		if (!this.created)
 			await this.init();
-		stateManager.playPath = "/play/create";
-		htmlManager.playCreate.load();
+		stateManager.playPath = "/play/join";
+		htmlManager.playJoin.load();
 		sceneManager.load("home");
-		sceneManager.cameraManager.vue = "create";
-		htmlManager.cube.name = "JOIN";
-		htmlManager.cube.clickEvent = () => routeManager.nav("/play/join");
+		sceneManager.cameraManager.vue = "join";
+		htmlManager.cube.name = "CREATE";
+		htmlManager.cube.clickEvent = () => routeManager.nav("/play/create");
 		htmlManager.cube.enable = true;
 	}
 
 	public async unload(): Promise<void> {
-		htmlManager.playCreate.unload();
+		htmlManager.playJoin.unload();
 	}
 }

@@ -41,6 +41,10 @@ export class CameraManager {
 			position: new Vector3(-10, 3.5, -18),
 			target: new Vector3(-10, 3.5, -18).addInPlaceFromFloats(0.86, 0.14, 0.5),
 		})
+		this.vues.set("join", {
+			position: new Vector3(6.4, 3, 16.9),
+			target: new Vector3(6.4, 3, 16.9).addInPlaceFromFloats(-0.8, 0.2, -0.6)
+		})
 		this.vues.set("lobby", {
 			position: new Vector3(-1.88, 5.1, -4.96),
 			target: new Vector3(-1.88, 5.1, -4.96).addInPlaceFromFloats(0.75, 0.03, 0.65),
