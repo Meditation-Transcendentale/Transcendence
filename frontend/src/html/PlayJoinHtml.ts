@@ -4,6 +4,7 @@ import { routeManager } from "../route/RouteManager";
 import { sceneManager } from "../scene/SceneManager";
 import { stateManager } from "../state/StateManager";
 import { IHtml } from "./IHtml";
+import { Popup, PopupType } from "./Popup";
 
 
 type lobby = {
@@ -146,12 +147,14 @@ map: ${state.map}`;
 		btn.className = "window-content";
 		btn.type = "button";
 		btn.value = "JOIN";
+		const popup = Popup.add({ type: PopupType.custom, div: this.lobbyInfoWindow });
 		btn.addEventListener(("click"), () => {
 			stateManager.lobbyId = lobbyId;
 			routeManager.nav("/lobby", false, false);
-			// Popup.removePopup();
+			popup.remove();
 		})
 		join.appendChild(btn);
+		popup.show();
 		// Popup.addPopup(this.lobbyInfoWindow);
 	}
 }
