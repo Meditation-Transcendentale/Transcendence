@@ -56,63 +56,6 @@ export function startWsServer({ port, handlers }) {
 
 		upgrade: (res, req, ctx) => {
 
-			const upgradeAborted = {aborted: false};
-
-			/* You MUST copy data out of req here, as req is only valid within this immediate callback */
-			const url = req.getUrl();
-			const secWebSocketKey = req.getHeader('sec-websocket-key');
-			const secWebSocketProtocol = req.getHeader('sec-websocket-protocol');
-			const secWebSocketExtensions = req.getHeader('sec-websocket-extensions');
-
-			await verifyJWT(parseCookies(req.getHeader('cookie')));
-
-			/* Simulate doing "async" work before upgrading */
-			setTimeout(() => {
-				console.log("We are now done with our async task, let's upgrade the WebSocket!");
-
-				if (upgradeAborted.aborted) {
-					console.log("Ouch! Client disconnected before we could upgrade it!");
-					/* You must not upgrade now */
-					return;
-				}
-
-				/* Cork any async response including upgrade */
-				res.cork(() => {
-					/* This immediately calls open handler, you must not use res after this call */
-					res.upgrade(
-					{
-						uuid: params.get('uuid'),
-						role: params.get('role'),
-						gameId: params.get('gameId'),
-						isAlive: false
-					},
-						secWebSocketKey,
-						secWebSocketProtocol,
-						secWebSocketExtensions,
-						ctx
-					);
-				});
-			
-			}, 1000);
-
-			/* You MUST register an abort handler to know if the upgrade was aborted by peer */
-			res.onAborted(() => {
-			/* We can simply signal that we were aborted */
-				upgradeAborted.aborted = true;
-			});
-		},
-			// (async () => {
-			// 	try {
-			// 		await verifyJWT(parseCookies(req.getHeader('cookie')));
-			// 		// await verifyJWT(null);
-			// 	} catch (e) {
-			// 		console.log('WebSocket connection rejected:', e.message);
-			// 		// res.writeStatus('401 Unauthorized');
-			// 		// res.writeHeader('Content-Type', 'application/json');
-      		// 		// res.end(JSON.stringify({ error: 'Invalid or missing token' }));
-			// 		return ;
-			// 	}
-			// })();
 			const params = new URLSearchParams(req.getQuery());
 			res.upgrade(
 				{
