@@ -75,9 +75,8 @@
 	/*height: 16.5%;*/
 	top: 30%;
 	left: 20%;
-	max-height: 35%;
+	max-height: 30%;
 	overflow: hidden;
-
 }
 
 #create-window>.window-content {
@@ -85,7 +84,7 @@
 	align-self: space-around;
 	width: 100%;
 	overflow: hidden;
-	background-color: transparent;
+	background-color: white;
 	/*column-gap: 0.3%;*/
 }
 
@@ -141,20 +140,18 @@
 }
 
 #create-game>input {
-	margin-top: 10px;
-	/* padding-left: 1%; */
-	color: #e0aaff;
-	background-color: rgba(13,2,33,0.4);
+	margin-top: 5px;
+	padding-left: 1%;
+	color: var(--window-color);
+	background-color: var(--window-background);
 	font-size: 5vh;
 	font-weight: 100;
-	border: none;
-	/* box-shadow: 0 0 30px rgba(157, 78, 221, 0.6) */
 }
 
 #pong-map>input:hover,
 #create-game>input:hover {
-	color: black;
-	background-color: rgba(255, 152, 23, 0.8); 
+	color: var(--window-background);
+	background-color: var(--window-color)
 }
 #pong-map>input[on],
 #create-game>input[on] {

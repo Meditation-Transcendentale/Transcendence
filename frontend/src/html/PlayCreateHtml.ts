@@ -23,7 +23,7 @@ export class PlayCreateHtml implements IHtml {
 			html: this.window,
 			width: 1.,
 			height: 1.,
-			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.05).multiply(Matrix.Translation(-3, 3, -14)),
+			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.05).multiply(Matrix.Translation(-1, 6, -14)),
 			enable: false
 		})
 

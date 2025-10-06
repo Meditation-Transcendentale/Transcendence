@@ -55,7 +55,7 @@ body {
 	--text-background: #fff;
 
 	--window-color: #fff;
-	--window-background: #111;
+	--window-background: transparent;
 
 	--font-window-bar: bold small-caps 2vh de-valancia;
 	--font-window-content: de-valancia 2vh 100;
@@ -216,8 +216,8 @@ canvas {
 	z-index: 2;
 	background-color: var(--window-background);
 	color: var(--window-color);
-	border: 0.3vh white solid;
-	box-shadow: 1px 1px 1px white, -1px -1px 1px white;
+	border: none;
+	/* box-shadow: 1px 1px 1px white, -1px -1px 1px white; */
 	pointer-events: auto;
 }
 
