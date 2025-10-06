@@ -124,9 +124,7 @@ class Tournament {
         this.uwsApp.publish(this.id, buf, true);
         return;
       }
-      setTimeout(() => {
-        this.maybeStartReadyCheck();
-      }, 1000);
+      this.maybeStartReadyCheck();
     });
 
     natsClient.subscribe("games.tournament.*.score", (data, msg) => {
@@ -161,9 +159,6 @@ class Tournament {
   }
 
   sendUpdate() {
-    // this.players.map((p) => {
-    //   console.log(`${p.id}|${p.isReady}|${p.isConnected}|${p.isEliminated}`);
-    // });
     const buf = encodeTournamentServerMessage({
       update: {
         tournamentRoot: this.root,
@@ -494,15 +489,23 @@ export default class tournamentService {
   }
 
   cleanup() {
-    const now = Date.now();
-    for (const [id, t] of this.tournaments) {
-      if (
-        t.players.length === 0 ||
-        now - t.createdAt > config.HEARTBEAT_INTERVAL * 2
-      ) {
-        this.tournaments.delete(id);
-      }
-    }
+		const toDelete = []
+
+		for (const [id, tournament] of this.tournaments) {
+			if (tournament.isEmpty()) {
+				console.log(`Cleaning up empty tournament: ${id}`)
+				toDelete.push(id)
+			} else if (tournament.isStale()) {
+				console.log(`Cleaning up stale tournament: ${id} (created: ${new Date(tournament.createdAt)}})`)
+				toDelete.push(id)
+			}
+		}
+
+		toDelete.forEach(id => this.tournaments.delete(id))
+
+		if (toDelete.length > 0) {
+			console.log(`Cleaned up ${toDelete.length} tournaments`);
+		}
   }
 
   shutdown() {

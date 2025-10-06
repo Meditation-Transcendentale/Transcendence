@@ -6,6 +6,7 @@ import { IHtml } from "./IHtml";
 
 type PlayerState = {
 	uuid: string;
+	username: string;
 	ready: boolean;
 	connected: boolean;
 	eliminated: boolean;
@@ -29,9 +30,6 @@ type MatchNode = {
 
 export type TournamentServerUpdate = { tournamentRoot?: MatchNode | null; players?: PlayerState[] };
 export type TournamentServerReadyCheck = { deadlineMs: number };
-
-
-
 
 export type TournamentServerMessage = {
 	update?: TournamentServerUpdate;
@@ -215,11 +213,17 @@ export class TournamentHtml implements IHtml {
 		name.style.textOverflow = "ellipsis";
 
 		if (pid) {
-			postRequest("info/search", { identifier: pid, type: "uuid" }).then(
-				(json: any) => {
-					name.textContent = json.data.username;
-				}
-			);
+			const player = this.players.get(pid);
+			if (!player?.username)
+			{
+				postRequest("info/search", { identifier: pid, type: "uuid" }).then(
+					(json: any) => {
+						name.textContent = json.data.username;
+					}
+				);
+			}
+			else
+				name.textContent = player.username;
 		} else {
 			name.textContent = "TBD";
 			name.classList.add("tbd");
