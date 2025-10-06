@@ -75,7 +75,7 @@ export class BrickBreaker {
 		}
 
 		this.reset();
-		const pb = await getRequest("/stats/get/brickbreaker")
+		const pb = await getRequest("stats/get/brickbreaker")
 			.catch((err) => { console.log(err) });
 
 		this.handlePb(pb);
