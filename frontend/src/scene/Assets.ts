@@ -200,9 +200,9 @@ export class Assets {
 		this.ballLight.range = 3;
 
 		this.cubeLight = new PointLight("cube light", this.cubeMesh.position, this.scene);
-		this.cubeLight.range = 2;
+		this.cubeLight.range = 5;
 		this.cubeLight.diffuse = Color3.Purple();
-		this.cubeLight.intensity = 2;
+		this.cubeLight.intensity = 5;
 
 		this.redLight = new SpotLight("redlight", new Vector3(-1200, 200, 0), new Vector3(1, -1, 0), 160.8, 2, this.scene);
 		this.redLight.diffuse = Color3.Red();
