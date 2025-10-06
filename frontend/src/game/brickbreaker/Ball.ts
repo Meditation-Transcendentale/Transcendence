@@ -77,7 +77,6 @@ export class Ball {
 	}
 
 	private updateScore(layers: number, layerIndex: number) {
-		console.log("score calcul:", layers, layerIndex, this.speedScale);
 		this.game.score += (layers - layerIndex) * this.speedScale * 10;
 		if (this.bricksLeft == 0)
 			this.game.score += layerIndex + 1 * this.speedScale * 10;
@@ -190,7 +189,6 @@ export class Ball {
 
 	private endGame() {
 		// end screen UI
-		console.log("high score?", this.game.newHighScore);
 		this.game.gameUI.showEnd("brick", this.game.newHighScore, this.game.score);
 		// this.game.dispose();
 	}

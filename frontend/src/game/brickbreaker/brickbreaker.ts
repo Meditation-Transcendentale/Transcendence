@@ -66,8 +66,6 @@ export class BrickBreaker {
 		this.pbEasy = json.brickBreakerStats.easy_mode_hscore;
 		this.pbNormal = json.brickBreakerStats.normal_mode_hscore;
 		this.pbHard = json.brickBreakerStats.hard_mode_hscore;
-
-		console.log("JSON:", this.pbEasy, this.pbNormal, this.pbHard);
 	}
 
 	public async start(mod: string) {
@@ -170,7 +168,6 @@ export class BrickBreaker {
 		this.ball.reset();
 		this.player.reset();
 		this.lastTime = performance.now();
-		console.log("highScore", this.pbEasy, this.pbNormal, this.pbHard);
 	}
 
 	private createArena() {
