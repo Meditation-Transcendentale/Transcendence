@@ -40,17 +40,18 @@ export function createUwsApp(path, lobbyService) {
 			const { lobbyId } = ws;
 			sockets.set(lobbyId, sockets.get(lobbyId) || new Set());
 			sockets.get(lobbyId).add(ws);
-			console.log (`1:${lobbyId}`);
-			try {
-				console.log (`JOIN: ${lobbyId}|${ws.userId}`);
-				const state = lobbyService.join(lobbyId, ws.userId);
-				const buf = encodeServerMessage({ update: { lobbyId: state.lobbyId, players: state.players, status: state.status, mode: state.mode, map: state.map } });
-				ws.subscribe(lobbyId);
-				app.publish(lobbyId, buf, true);
-			} catch (err) {
-				const buf = encodeServerMessage({ error: { message: err.message } });
+			console.log(`1:${lobbyId}`);
+			console.log(`JOIN: ${lobbyId}|${ws.userId}`);
+			const state = lobbyService.join(lobbyId, ws.userId);
+			if (!state) {
+				const buf = encodeServerMessage({ error: { message: "Lobby not found" } });
 				ws.send(buf, true);
+				ws.close();
+				return;
 			}
+			const buf = encodeServerMessage({ update: { lobbyId: state.lobbyId, players: state.players, status: state.status, mode: state.mode, map: state.map } });
+			ws.subscribe(lobbyId);
+			app.publish(lobbyId, buf, true);
 		},
 
 		message: async (ws, message, isBinary) => {

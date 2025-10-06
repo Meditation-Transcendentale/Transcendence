@@ -66,21 +66,23 @@ export class BrickBreaker {
 		this.pbNormal = json.brickBreakerStats.normal_mode_hscore;
 		this.pbHard = json.brickBreakerStats.hard_mode_hscore;
 
-		console.log(this.pbEasy, this.pbNormal, this.pbHard);
+		console.log("JSON:", this.pbEasy, this.pbNormal, this.pbHard);
 	}
 
-	public start(mod: string): void {
+	public async start(mod: string) {
 		if (this.renderObserver) {
 			console.warn("BrickBreaker is already running");
 			return;
 		}
-
-		getRequest("/stats/get/brickbreaker")
-            .then((json) => { this.handlePb(json) })
-            .catch((err) => { console.log(err) });
+		
 		this.reset();
+		const pb = await getRequest("/stats/get/brickbreaker")
+			.catch((err) => { console.log(err) });
 
-		console.log(this.pbEasy, this.pbNormal, this.pbHard);
+		this.handlePb(pb);
+
+		this.mode = mod;
+
 		if (mod === "easy"){
 			this.layers = 2;
 			this.cols = 4;
@@ -98,14 +100,15 @@ export class BrickBreaker {
 		// this.cols = Math.ceil((Math.random() * 5) + 1);
 		this.ball.bricksLeft = this.layers * this.cols;
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
-
+	
 		this.camera.parent = this.root
 		this.lastTime = performance.now();
 		this.start1 = true;
 		this.update();
 		this.player.enableInput();
-
+	
 		console.log("BrickBreaker added to render loop");
+
 	}
 
 	public restart(): void {

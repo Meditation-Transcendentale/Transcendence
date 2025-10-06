@@ -101,7 +101,7 @@ app.post('/search', handleErrors(async (req, res) => {
 		throw { status: userReturn.USER_036.http, code: userReturn.USER_036.code, message: userReturn.USER_036.message };
 	}
 
-	console.log(`Searching for user by ${type}: ${identifier}`);
+	// console.log(`Searching for user by ${type}: ${identifier}`);
 	let responseData;
 	switch (type) {
 		case 'username':

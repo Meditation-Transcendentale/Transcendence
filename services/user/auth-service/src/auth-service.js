@@ -298,14 +298,10 @@ app.post('/auth', handleErrorsValid(async (req, res) => {
 	const { token } = req.body;
 
 	if (!token) {
-		return res.code(userReturn.USER_023.code).send({ valid: false, message: userReturn.USER_023.message });
+		throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message, valid: false };
 	}
-	try {
-		const decodedToken = jwt.verify(token, process.env.JWT_SECRETKEY);
-		return res.code(statusCode.SUCCESS).send({ valid: true, user: decodedToken });
-	} catch (error) {
-		return res.code(userReturn.USER_013.code).send({ valid: false, message: userReturn.USER_013.message });
-	}
+	const decodedToken = jwt.verify(token, process.env.JWT_SECRETKEY);
+	return res.code(statusCode.SUCCESS).send({ valid: true, user: decodedToken });
 }));
 
 app.post('/logout', handleErrors(async (req, res) => {

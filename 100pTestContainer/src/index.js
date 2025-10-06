@@ -114,7 +114,7 @@ async function main() {
 	await Promise.all(users.map((user) => lobbyConnectionInit(user)));
 	// setTimeout(() => {}, 100000);
 	if (mode == 'tr') {
-		for (let i = 0; i < Math.log2(nbuser); i++) {
+		for (let i = 0; i < Math.log2(8); i++) {
 			await Promise.all(
 				users.map(async (user) => {
 					await settingUpTournament(user);

@@ -13,11 +13,9 @@ export function createUwsApp(path, tournamentService) {
         idleTimeout: 120,
 
         upgrade: (res, req, context) => {
-            console.log("SALSALSALSS");
             try {
                 const tournamentId = req.getQuery('tournamentId');
                 const userId = req.getQuery('uuid');
-                console.log (tournamentId, userId);
                 res.upgrade(
                     { tournamentId, userId },
                     req.getHeader('sec-websocket-key'),
@@ -40,7 +38,7 @@ export function createUwsApp(path, tournamentService) {
                 set.add(ws);
                 ws.subscribe(ws.tournamentId);
                 ws.subscribe(`user.${ws.userId}`);
-                console.log(`new connection: ${ws}`);
+                console.log (`${ws.tournamentId}|${ws.userId}`);
                 tournamentService.join(ws.tournamentId, ws.userId);
             } catch (err) {
                 console.error(err);
@@ -53,13 +51,13 @@ export function createUwsApp(path, tournamentService) {
             try {
                 const payload = decodeTournamentClientMessage(new Uint8Array(message));
 
-                if (payload?.ready) {
-                    console.log("READY RECEIVED");
+                if (payload.ready) {
+                    console.log(`${ws.userId} sent ready`);
                     await tournamentService.ready(ws, ws.tournamentId, ws.userId);
                     return;
                 }
 
-                if (payload?.quit) {
+                if (payload.quit) {
                     console.log("QUIT RECEIVED");
                     tournamentService.quit(ws.tournamentId, ws.userId);
                     return;

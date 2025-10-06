@@ -122,15 +122,15 @@ export default class LobbyService {
 
 	join(lobbyId, userId) {
 		const lobby = this.lobbies.get(lobbyId)
-		if (!lobby) throw new Error('Lobby not found')
+		if (!lobby) return null;
 		lobby.addPlayer(userId)
-		console.log (`ADDED ${userId}`);
+		console.log(`ADDED ${userId}`);
 		return lobby.getState()
 	}
 
 	quit(lobbyId, userId) {
 		const lobby = this.lobbies.get(lobbyId)
-		if (!lobby) return null
+		if (!lobby) return null;
 		const isEmpty = lobby.removePlayer(userId)
 
 		if (isEmpty) {
@@ -149,7 +149,7 @@ export default class LobbyService {
 
 	async ready(lobbyId, userId) {
 		const lobby = this.lobbies.get(lobbyId)
-		if (!lobby) throw new Error('Lobby not found')
+		if (!lobby) return null;
 
 		lobby.markReady(userId)
 		const state = lobby.getState()
