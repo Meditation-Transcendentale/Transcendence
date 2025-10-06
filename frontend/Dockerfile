@@ -12,7 +12,7 @@ RUN npm install
 COPY esbuild.watch.mjs ./esbuild.watch.mjs
 
 
-COPY ./srcNew ./src
+COPY ./src ./src
 
 EXPOSE 7070
 # RUN npm run build

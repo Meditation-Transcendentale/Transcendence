@@ -20,7 +20,7 @@ services:
     ports:
       - "7070:7070"
     volumes:
-      - ./frontend/srcNew:/app/src:ro
+      - ./frontend/src:/app/src:ro
       - /app/node_modules
       - bomba:/app/dist
     networks:
