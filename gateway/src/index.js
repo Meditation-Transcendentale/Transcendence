@@ -59,7 +59,6 @@ app.setErrorHandler((error, req, res) => {
 });
 
 const verifyJWT = async (req, res) => {
-	console.log(`Incoming request: ${req.raw.method} ${req.raw.url}`);
 	if (req.raw.url && req.raw.url.endsWith('/metrics') || req.raw.url.endsWith('/health')) {
 		if (req.raw.url.endsWith('/health')) {
 			return;
