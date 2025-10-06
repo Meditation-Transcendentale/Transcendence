@@ -34,8 +34,8 @@ export class CameraManager {
 
 		this.vues = new Map<string, ICameraVue>;
 		this.vues.set("home", {
-			position: new Vector3(-2.7, 4.5, 22),
-			target: new Vector3(-2.7, 4.5, 22).addInPlaceFromFloats(0.075, 0.07, -0.99),
+			position: new Vector3(2.7, 4.5, -22),
+			target: new Vector3(2.7, 4.5, -22).addInPlaceFromFloats(-0.075, 0.07, 0.99),
 		})
 		this.vues.set("create", {
 			position: new Vector3(-10, 3.5, -18),

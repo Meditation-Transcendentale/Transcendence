@@ -6,6 +6,9 @@ import earcut from "earcut";
 import GameUI from "../GameUI";
 import { sceneManager } from "../../scene/SceneManager";
 
+let resizeTimeout: number;
+let engine: any;
+
 export class BrickBreaker {
 	private engine: Engine;
 	private scene: Scene;
@@ -55,6 +58,7 @@ export class BrickBreaker {
 		this.ball.updatePosition(0, 1);
 		this.ball.setVelocity(new Vector3(0, 0, 0));
 		this.lastTime = performance.now();
+
 	}
 
 	handlePb(json: any) {
@@ -63,21 +67,23 @@ export class BrickBreaker {
 		this.pbNormal = json.brickBreakerStats.normal_mode_hscore;
 		this.pbHard = json.brickBreakerStats.hard_mode_hscore;
 
-		console.log(this.pbEasy, this.pbNormal, this.pbHard);
+		console.log("JSON:", this.pbEasy, this.pbNormal, this.pbHard);
 	}
 
-	public start(mod: string): void {
+	public async start(mod: string) {
 		if (this.renderObserver) {
 			console.warn("BrickBreaker is already running");
 			return;
 		}
 
-		getRequest("/stats/get/brickbreaker")
-			.then((json) => { this.handlePb(json) })
-			.catch((err) => { console.log(err) });
 		this.reset();
+		const pb = await getRequest("/stats/get/brickbreaker")
+			.catch((err) => { console.log(err) });
 
-		console.log(this.pbEasy, this.pbNormal, this.pbHard);
+		this.handlePb(pb);
+
+		this.mode = mod;
+
 		if (mod === "easy") {
 			this.layers = 2;
 			this.cols = 4;
@@ -103,11 +109,12 @@ export class BrickBreaker {
 		this.player.enableInput();
 
 		console.log("BrickBreaker added to render loop");
+
 	}
 
 	public restart(): void {
 		this.reset();
-		document.querySelector("#canvas")?.focus();
+		sceneManager.canvas.focus();
 		this.ball.bricksLeft = this.layers * this.cols;
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
 	}
@@ -223,4 +230,43 @@ export class BrickBreaker {
 		}
 		return this.bricks;
 	}
+
+	// public dispose() {
+	// 	this.ball.ball.dispose();
+	// 	this.player.goal.dispose();
+	// 	this.player.shield.dispose();
+	// 	this.player.pointerSurface.dispose();
+	// 	this.arena.dispose();
+
+	// 	this.bricks.forEach(brickCol => {
+	// 		brickCol.forEach(brick => {
+	// 			brick.dispose();
+	// 		});
+	// 	});
+
+	// 	this.camera.dispose();
+	// 	this.light.dispose();
+	// 	this.engine.clear(new Color4(1, 1, 1, 1), true, true);
+	// 	this.engine.stopRenderLoop();
+
+	// 	this.scene?.dispose();
+	// 	this.engine?.dispose();
+
+	// 	clearTimeout(resizeTimeout);
+	// 	this.engine.dispose();
+	// 	// Router.nav(`/play`, false, false);
+	// }
+
+	private resizeGame() {
+		window.addEventListener("resize", () => {
+			clearTimeout(resizeTimeout);
+			resizeTimeout = setTimeout(() => {
+				if (engine)
+					engine.resize();
+			}, 100);
+		});
+	}
 }
+
+//const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
+//new Game(canvas);

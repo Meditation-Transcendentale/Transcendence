@@ -22,18 +22,23 @@ type MatchNode = {
 	left?: MatchNode | null;
 	right?: MatchNode | null;
 	winnerId?: string | null;
-	score?: Score | null;
+	score?: number[] | null;
+	forfeitId?: string | null;
 	gameId?: string | null;
 };
 
 export type TournamentServerUpdate = { tournamentRoot?: MatchNode | null; players?: PlayerState[] };
 export type TournamentServerReadyCheck = { deadlineMs: number };
 
+
+
+
 export type TournamentServerMessage = {
 	update?: TournamentServerUpdate;
 	readyCheck?: TournamentServerReadyCheck;
 	startGame?: { gameId: string };
 	error?: { message: string };
+	finished?: {};
 };
 export class TournamentHtml implements IHtml {
 	private css: HTMLLinkElement;
@@ -70,6 +75,7 @@ export class TournamentHtml implements IHtml {
 	}
 
 	public unload(): void {
+		this.readyActive = false;
 		this.css.remove();
 		this.div.remove();
 		this.stopReadyCountdown();
@@ -78,14 +84,21 @@ export class TournamentHtml implements IHtml {
 
 	public update(payload: TournamentServerUpdate) {
 		this.tree = payload.tournamentRoot ?? null;
-		if (Array.isArray(payload.players))
-			this.players = new Map(payload.players.map((p) => [p.uuid, p]));
+		if (Array.isArray(payload.players)) {
+			for (const p of payload.players) {
+				this.players.set(p.uuid, p);
+			}
+		}
 	}
 
 	public readyCheck(payload: TournamentServerReadyCheck) {
 		this.readyActive = true;
 		this.readyDeadline = payload.deadlineMs;
 		this.startReadyCountdown();
+	}
+
+	public finished() {
+		console.log(`${this.tree?.winnerId} yep gg`);
 	}
 
 	private initDOM() {
@@ -179,12 +192,11 @@ export class TournamentHtml implements IHtml {
 
 	private rowScore(node: MatchNode, pid: string | null): string | null {
 		if (!node.winnerId && !node.score) return null;
-		if (node.score?.forfeit) return pid && node.winnerId === pid ? "W/O" : "DQ";
-		if (node.winnerId) return pid && node.winnerId === pid ? "WIN" : "—";
-		if (node.score?.values?.length)
+		if (node.forfeitId) return pid && node.winnerId === pid ? "W/O" : "DQ";
+		if (node.score?.length)
 			return pid && node.player1Id === pid
-				? node.score.values[0].toString()
-				: node.score.values[1].toString();
+				? node.score[0].toString()
+				: node.score[1].toString();
 		return null;
 	}
 

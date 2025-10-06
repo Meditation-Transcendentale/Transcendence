@@ -1,5 +1,6 @@
-
-import { ArcRotateCamera, Color4, Engine, Scene, TransformNode, FreeCamera } from "../../babylon";
+import {
+	ArcRotateCamera, Color4, Engine, Scene, TransformNode, FreeCamera,
+} from "../../babylon";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
 import { MovementSystem } from "./systems/MovementSystem.js";
@@ -9,21 +10,27 @@ import { ThinInstanceSystem } from "./systems/ThinInstanceSystem.js";
 import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { getOrCreateUUID } from "./utils/getUUID.js";
-import { createGameTemplate, GameTemplateConfig, createPlayer } from "./templates/GameTemplate.js";
+import { createGameTemplate, GameTemplateConfig, createPlayer, } from "./templates/GameTemplate.js";
 import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
-import { createBaseMeshes, createInstanceManagers } from "./utils/initGame.js";
-import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.js';
-import type { userinterface } from './utils/proto/message.js';
+import {
+	createCamera, createBaseMeshes, createInstanceManagers,
+} from "./utils/initGame.js";
+import {
+	decodeServerMessage, encodeClientMessage,
+} from "./utils/proto/helper.js";
+import type { userinterface } from "./utils/proto/message.js";
 import { BallComponent } from "./components/BallComponent.js";
 import { Entity } from "./ecs/Entity.js";
+import { Ball } from "../brickbreaker/Ball.js";
+import { PaddleComponent } from "./components/PaddleComponent.js";
+import GameUI from "../GameUI.js";
 import { sceneManager } from "../../scene/SceneManager.js";
-import { stateManager } from "../../state/StateManager.js";
-import { htmlManager } from "../../html/HtmlManager.js";
-import GameUI from "../GameUI";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
+let engine: any;
+let resizeTimeout: NodeJS.Timeout;
 
 export class Pong {
 	private engine!: Engine;
@@ -66,14 +73,11 @@ export class Pong {
 			numberOfBalls: 1,
 			arenaSizeX: 30,
 			arenaSizeZ: 20,
-			wallWidth: 1
+			wallWidth: 1,
 		};
-
-		this.cam = sceneManager.camera;
 	}
 
 	public async init() {
-
 		this.pongRoot = new TransformNode("pongRoot", this.scene);
 		this.pongRoot.position.set(2000, -3500, -3500);
 		// this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
@@ -94,10 +98,14 @@ export class Pong {
 		this.initECS(this.config, this.instanceManagers, this.uuid);
 		this.stateManager = new StateManager(this.ecs);
 		this.inited = true;
-
 	}
 
-	public async start(gameId: string, uuid: string, gameMode: string, maps: string) {
+	public async start(
+		gameId: string,
+		uuid: string,
+		gameMode: string,
+		maps: string
+	) {
 		// const maps = 0;
 		this.gameMode = gameMode;
 		if (this.wsManager) {
@@ -106,15 +114,21 @@ export class Pong {
 			this.ecs.removeSystem(this.networkingSystem);
 			//delete player
 			//this.ecs.removeEntityById(7);
-			this.ecs.removeEntityById(6);
-			this.ecs.removeEntityById(5);
+			const allEntities = this.ecs.getAllEntities();
+			allEntities.forEach((entity) => {
+				if (entity.hasComponent(PaddleComponent)) {
+					this.ecs.removeEntity(entity);
+				}
+			});
 		}
-		console.log("UU", uuid)
-		const wsUrl = `wss://${window.location.hostname}:7000/game?` +
+		console.log("UU", uuid);
+		const wsUrl =
+			`wss://${window.location.hostname}:7000/game?` +
 			`uuid=${encodeURIComponent(uuid)}&` +
 			`gameId=${encodeURIComponent(gameId)}`;
 		this.wsManager = new WebSocketManager(wsUrl);
 
+		this.cam = sceneManager.camera;
 		this.cam.position.x = 0;
 		this.cam.position.y = 35;
 		this.cam.position.z = -2;
@@ -148,7 +162,13 @@ export class Pong {
 		this.ecs.addSystem(this.networkingSystem);
 
 		//add player
-		createPlayer(this.ecs, this.config, localPaddleId, this.gameMode, this.gameUI);
+		createPlayer(
+			this.ecs,
+			this.config,
+			localPaddleId,
+			this.gameMode,
+			this.gameUI
+		);
 
 		console.log("start");
 		//this.engine = new Engine(this.canvas, true);
@@ -161,18 +181,38 @@ export class Pong {
 		this.gameUI.updateScore(0, 0);
 
 		if (this.gameMode == "local") {
-			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: 70, y: -3 } });
-			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: 70, y: 15 } });
-			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
-			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
+			this.gameUI.showImage("up", "/assets/Up.png", "small", {
+				offset: { x: 70, y: -3 },
+			});
+			this.gameUI.showImage("down", "/assets/Down.png", "small", {
+				offset: { x: 70, y: 15 },
+			});
+			this.gameUI.showImage("w", "/assets/W.png", "small", {
+				offset: { x: -70, y: -3 },
+			});
+			this.gameUI.showImage("s", "/assets/S.png", "small", {
+				offset: { x: -70, y: 15 },
+			});
 		} else if (this.gameMode == "ai") {
-			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
-			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
+			this.gameUI.showImage("w", "/assets/W.png", "small", {
+				offset: { x: -70, y: -3 },
+			});
+			this.gameUI.showImage("s", "/assets/S.png", "small", {
+				offset: { x: -70, y: 15 },
+			});
 		} else if (this.gameMode == "online") {
-			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: -80, y: -3 } });
-			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: -80, y: 15 } });
-			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
-			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
+			this.gameUI.showImage("up", "/assets/Up.png", "small", {
+				offset: { x: -80, y: -3 },
+			});
+			this.gameUI.showImage("down", "/assets/Down.png", "small", {
+				offset: { x: -80, y: 15 },
+			});
+			this.gameUI.showImage("w", "/assets/W.png", "small", {
+				offset: { x: -70, y: -3 },
+			});
+			this.gameUI.showImage("s", "/assets/S.png", "small", {
+				offset: { x: -70, y: 15 },
+			});
 		}
 
 		this.stateManager.update();
@@ -185,7 +225,6 @@ export class Pong {
 		//});
 		//	//this.baseMeshes.portal.material.enableResolutionUniform();
 		//});
-
 	}
 	public stop(): void {
 		// if (this.uiSystem) {
@@ -201,10 +240,24 @@ export class Pong {
 		const payload: userinterface.IClientMessage = {
 			quit: {
 				uuid: this.uuid,
-				lobbyId: this.uuid
-			}
+				lobbyId: this.uuid,
+			},
 		};
 
+		if (this.gameMode == "local") {
+			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: 70, y: -3 } });
+			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: 70, y: 15 } });
+			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
+			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
+		} else if (this.gameMode == "ai") {
+			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
+			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
+		} else if (this.gameMode == "online") {
+			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: -80, y: -3 } });
+			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: -80, y: 15 } });
+			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
+			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
+		}
 		const buffer = encodeClientMessage(payload);
 
 		this.wsManager.socket.send(buffer);
@@ -212,18 +265,23 @@ export class Pong {
 		this.stateManager.setter(false);
 		this.cam.parent = null;
 
-
 		console.log("render loop stopped and game paused");
 	}
 
-	private initECS(config: GameTemplateConfig, instanceManagers: any, uuid: string) {
+	private initECS(
+		config: GameTemplateConfig,
+		instanceManagers: any,
+		uuid: string
+	) {
 		this.ecs = new ECSManager();
-		this.ecs.addSystem(new ThinInstanceSystem(
-			instanceManagers.ball,
-			instanceManagers.paddle,
-			instanceManagers.wall,
-			this.cam
-		));
+		this.ecs.addSystem(
+			new ThinInstanceSystem(
+				instanceManagers.ball,
+				instanceManagers.paddle,
+				instanceManagers.wall,
+				this.cam
+			)
+		);
 		this.ecs.addSystem(new MovementSystem());
 		this.visualEffectSystem = new VisualEffectSystem(this.scene);
 		this.ecs.addSystem(this.visualEffectSystem);
@@ -234,14 +292,13 @@ export class Pong {
 		createGameTemplate(this.ecs, config);
 	}
 
-
 	private waitForRegistration(): Promise<number> {
 		return new Promise((resolve, reject) => {
 			const socket = this.wsManager.socket;
 
 			const listener = (event: MessageEvent) => {
 				if (!(event.data instanceof ArrayBuffer)) {
-					console.warn('Non-binary message received, ignoring');
+					console.warn("Non-binary message received, ignoring");
 					return;
 				}
 
@@ -250,7 +307,7 @@ export class Pong {
 					const buf = new Uint8Array(event.data);
 					serverMsg = decodeServerMessage(buf);
 				} catch (err) {
-					console.error('Failed to decode protobuf message:', err);
+					console.error("Failed to decode protobuf message:", err);
 					return;
 				}
 
@@ -261,16 +318,16 @@ export class Pong {
 					const readyBuf = encodeClientMessage(readyPayload);
 					socket.send(readyBuf);
 
-					socket.removeEventListener('message', listener);
+					socket.removeEventListener("message", listener);
 					resolve(paddleId);
 				}
 			};
 
-			socket.addEventListener('message', listener);
+			socket.addEventListener("message", listener);
 
 			setTimeout(() => {
-				socket.removeEventListener('message', listener);
-				reject(new Error('Timed out waiting for WelcomeMessage'));
+				socket.removeEventListener("message", listener);
+				reject(new Error("Timed out waiting for WelcomeMessage"));
 			}, 5000);
 		});
 	}

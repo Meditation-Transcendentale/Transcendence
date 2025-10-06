@@ -32,7 +32,7 @@ export class TournamentStream implements IStream {
 
 		this.ws.onerror = () => { console.log("tournament stream error") };
 
-		this.ws.onclose = () => { this.connected = false; };
+		this.ws.onclose = () => { this.connected = false; htmlManager.tournament.close() };
 
 	}
 
@@ -60,9 +60,12 @@ export class TournamentStream implements IStream {
 		if (payload.startGame) {
 			console.log(`START GAME RECEIVED`);
 			routeManager.comebackRoute = "/tournament";
-			routeManager.nav("/cajoue");
+			routeManager.nav("/pong");
 			this.disconnect();
 		};
+		if (payload.finished) {
+			htmlManager.tournament.finished();
+		}
 		htmlManager.tournament.render();
 	}
 
