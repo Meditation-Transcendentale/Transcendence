@@ -9,19 +9,15 @@ message Player {
   bool eliminated = 4;
 }
 
-message Score {
-  repeated int32 values = 1;
-  bool forfeit = 2;
-}
-
 message MatchNode {
   string player1Id = 1;
   string player2Id = 2;
-  Score score      = 3;
+  repeated int32 score = 3;
   string gameId    = 4;
   MatchNode left   = 5;
   MatchNode right  = 6;
   string winnerId  = 7;
+  string forfeitId = 8;
 }
 
 message TournamentUpdateMessage {
@@ -63,9 +59,10 @@ message TournamentStartGameMessage {
 
 message TournamentServerMessage {
   oneof payload {
-    TournamentUpdateMessage update   = 1;
-    TournamentErrorMessage error     = 2;
+    TournamentUpdateMessage update = 1;
+    TournamentErrorMessage error = 2;
     TournamentReadyCheckMessage readyCheck = 3;
-    TournamentStartGameMessage startGame   = 4;
+    TournamentStartGameMessage startGame = 4;
+    TournamentFinishedMessage finished = 5;
   }
 }
