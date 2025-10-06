@@ -85,7 +85,7 @@ export const Physics = {
 			updateAABB(pos, collider);
 			tree.insert(entity, collider.aabb);
 		}
-		
+
 		for (let step = 0; step < subSteps; step++) {
 			if (game.start == false && Date.now() - game.now >= game.delay)
 				game.start = true;
@@ -264,10 +264,13 @@ export const Physics = {
 			else if (input.type === 'resetBall') {
 				game.resetBall();
 			}
-			else if (input.type === 'serve' ) {
+			else if (input.type === 'serve') {
 				game.launchBall();
 			}
 		}
+	},
+	getActiveGameCount() {
+		return this.games.size;
 	},
 
 	/**

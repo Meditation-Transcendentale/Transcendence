@@ -12,6 +12,10 @@ const SERVICE_NAME = process.env.SERVICE_NAME || 'pong-physics';
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 const endedGames = new Set();
 
+let ticksProcessed = 0;
+let totalProcessingTime = 0;
+let goalCount = 0;
+
 const handleEnd = async (sub) => {
 	for await (const msg of sub) {
 		const [, , gameId] = msg.subject.split('.');
@@ -23,14 +27,15 @@ const handleEnd = async (sub) => {
 
 const handlePhysicsRequest = async (sub) => {
 	for await (const msg of sub) {
-		const data = decodePhysicsRequest(msg.data);
 
+		const data = decodePhysicsRequest(msg.data);
 		if (endedGames.has(data.gameId)) {
 			console.log(`[${SERVICE_NAME}] Ignoring tick ${data.tick} for ended game ${data.gameId}`);
 			continue;
 		}
 
 		const { gameId, tick, balls, paddles, events } = Physics.processTick(data);
+
 		let scorerId = null;
 		let goalScored = false;
 		if (events && events.length) {
@@ -38,19 +43,51 @@ const handlePhysicsRequest = async (sub) => {
 				if (ev.type === 'goal') {
 					goalScored = true;
 					scorerId = ev.playerId;
+					goalCount++; // Track goals
 				}
 			}
 		}
+
 		let goal = null;
 		if (goalScored)
 			goal = { scorerId };
+
 		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal });
 		msg.respond(buffer);
+
 	}
 };
 
+// const handlePhysicsRequest = async (sub) => {
+// 	for await (const msg of sub) {
+// 		const data = decodePhysicsRequest(msg.data);
+//
+// 		if (endedGames.has(data.gameId)) {
+// 			console.log(`[${SERVICE_NAME}] Ignoring tick ${data.tick} for ended game ${data.gameId}`);
+// 			continue;
+// 		}
+//
+// 		const { gameId, tick, balls, paddles, events } = Physics.processTick(data);
+// 		let scorerId = null;
+// 		let goalScored = false;
+// 		if (events && events.length) {
+// 			for (const ev of events) {
+// 				if (ev.type === 'goal') {
+// 					goalScored = true;
+// 					scorerId = ev.playerId;
+// 				}
+// 			}
+// 		}
+// 		let goal = null;
+// 		if (goalScored)
+// 			goal = { scorerId };
+// 		const buffer = encodePhysicsResponse({ gameId, tick, balls, paddles, goal });
+// 		msg.respond(buffer);
+// 	}
+// };
+
 async function start() {
-	const nc = await connect({ 
+	const nc = await connect({
 		servers: NATS_URL,
 		token: process.env.NATS_GAME_TOKEN,
 		tls: { rejectUnauthorized: false }
