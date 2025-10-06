@@ -92,6 +92,18 @@ app.get('/me', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ userInfo: userInfo });
 }));
 
+const searchSchema = {
+	body: {
+		type: 'object',
+		required: ['identifier', 'type'],
+		additionalProperties: false,
+		properties: {
+			identifier: { type: 'string' },
+			type: { type: 'string', enum: ['username', 'uuid'] }
+		}
+	}
+};
+
 
 app.post('/search', handleErrors(async (req, res) => {
 
@@ -105,10 +117,10 @@ app.post('/search', handleErrors(async (req, res) => {
 	let responseData;
 	switch (type) {
 		case 'username':
-			// const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
-			// if (asker.username === identifier) {
-			// 	throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
-			// }
+			const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
+			if (asker.username === identifier) {
+				throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
+			}
 			responseData = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: identifier });
 			break;
 		case 'uuid':

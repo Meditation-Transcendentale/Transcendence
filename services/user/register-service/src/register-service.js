@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import { connect, JSONCodec } from 'nats';
 import { v4 as uuidv4 } from 'uuid';
+import validator from 'validator';
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
@@ -25,6 +26,7 @@ const registerSchema = {
 	body: {
 		type: 'object',
 		required: ['username', 'password'],
+		additionalProperties: false,
 		properties: {
 			username: { type: 'string' },
 			password: { type: 'string', format: 'password' }
@@ -101,9 +103,17 @@ const jc = JSONCodec();
 const USERNAME_REGEX = /^[a-zA-Z0-9]{3,20}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!?@#$%&*()_{};:|,.<>]{8,}$/;
 
+function sanitizeRegisterInput(input) {
+
+	return {
+		username: validator.escape(input.username),
+		password: validator.escape(input.password)
+	};
+}
+
 app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
 
-	const { username, password } = req.body;
+	const { username, password } = sanitizeRegisterInput(req.body);
 
 	if (USERNAME_REGEX.test(username) === false) {
 		throw { status: userReturn.USER_010.http, code: userReturn.USER_010.code, message: userReturn.USER_010.message };
