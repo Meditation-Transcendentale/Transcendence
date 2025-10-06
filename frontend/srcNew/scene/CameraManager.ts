@@ -69,6 +69,11 @@ export class CameraManager {
 			position: new Vector3(0, 30, 0),
 			target: new Vector3(0, 0, 0)
 		})
+		this.vues.set("tournament", {
+			position: new Vector3(-13, 4, -7),
+			target: new Vector3(20, 11, -8)
+		})
+
 
 
 		this.renderingPipeline = new PostProcessRenderPipeline(this.assets.engine, "pipeline");

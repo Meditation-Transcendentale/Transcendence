@@ -62,7 +62,8 @@ export class LobbyStream implements IStream {
 	private onMessage(msg: MessageEvent) {
 		const buf = new Uint8Array(msg.data as ArrayBuffer);
 		const payload = decodeServerMessage(buf);
-		// console.log('Decoded payload:', payload);
+
+		console.log('Decoded payload:', payload);
 		if (payload.error != null) {
 			this.disconnect();
 			routeManager.nav("/play");
@@ -85,7 +86,7 @@ export class LobbyStream implements IStream {
 		}
 
 		if (payload.startTournament != null) {
-			stateManager.set("tournamentId", payload.startTournament.tournamentId);
+			stateManager.tournamentId = payload.startTournament.tournamentId as string;
 			routeManager.nav("/tournament", false, true);
 			this.disconnect();
 		}
