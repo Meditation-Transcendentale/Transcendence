@@ -30,7 +30,7 @@ type ServerMsg = {
   readyCheck?: { deadlineMs: number };
   startGame?: { gameId: string };
   error?: { message: string };
-  finished?: { };
+  finished?: {};
 };
 
 export default class TournamentPage {
@@ -87,10 +87,11 @@ export default class TournamentPage {
         console.log(`UPDATE RECEIVED: ${payload.update.tournamentRoot}`);
         if (payload.update.tournamentRoot !== undefined)
           this.tree = payload.update.tournamentRoot ?? null;
-        if (Array.isArray(payload.update.players))
-          this.players = new Map(
-            payload.update.players.map((p) => [p.uuid, p])
-          );
+        if (Array.isArray(payload.update.players)) {
+          for (const p of payload.update.players) {
+            this.players.set(p.uuid, p);
+          }
+        }
       }
       if (payload.readyCheck) {
         console.log(`READY CHECK RECEIVED: ${payload.readyCheck.deadlineMs}`);
@@ -101,6 +102,7 @@ export default class TournamentPage {
       if (payload.startGame) {
         console.log(`START GAME RECEIVED`);
         Router.setComeback(encodeURI(`/tournament?id=${this.tournamentId}`));
+        this.readyActive = false;
         Router.nav(
           encodeURI(
             `/cajoue?id=${payload.startGame.gameId}&mod=tournament&map=void&tournamentId=${this.tournamentId}`
@@ -110,9 +112,8 @@ export default class TournamentPage {
         );
         this.ws?.close();
       }
-      if (payload?.finished)
-      {
-        console.log (`${this.tree?.winnerId} yep gg`);
+      if (payload?.finished) {
+        console.log(`${this.tree?.winnerId} yep gg`);
       }
       this.render();
     };
@@ -236,14 +237,12 @@ export default class TournamentPage {
   private rowScore(node: MatchNode, pid: string | null): string | null {
     if (!node.winnerId && !node.score) return null;
     if (node.forfeitId) return pid && node.winnerId === pid ? "W/O" : "DQ";
-    if (node.winnerId) return pid && node.winnerId === pid ? "WIN" : "—";
-    if (node.score?.values?.length)
+    if (node.score?.length)
       return pid && node.player1Id === pid
         ? node.score[0].toString()
         : node.score[1].toString();
     return null;
   }
-
 
   private renderRow(
     node: MatchNode,

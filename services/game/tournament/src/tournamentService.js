@@ -120,6 +120,7 @@ class Tournament {
         const buf = encodeTournamentServerMessage({
           finished: {},
         });
+        console.log ("FINAL FINISHED");
         this.uwsApp.publish(this.id, buf, true);
         return;
       }

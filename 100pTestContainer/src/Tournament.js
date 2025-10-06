@@ -60,7 +60,7 @@ export async function settingUpTournament(user) {
 
 	const ws = new WebSocket(url, { rejectUnauthorized: false });
 	ws.binaryType = "arraybuffer";
-
+  
   return new Promise((resolve) => {
     ws.onmessage = (msg) => {
       const buf = new Uint8Array(msg.data);
