@@ -97,9 +97,10 @@ app.post('/search', handleErrors(async (req, res) => {
 
 	const { identifier, type } = req.body;
 
-	if (!identifier || !type ) {
+	if (!identifier || !type) {
 		throw { status: userReturn.USER_036.http, code: userReturn.USER_036.code, message: userReturn.USER_036.message };
 	}
+	console.log("GET INFO", identifier, type);
 
 	// console.log(`Searching for user by ${type}: ${identifier}`);
 	let responseData;
