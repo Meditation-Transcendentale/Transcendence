@@ -4,13 +4,6 @@ import { Popup } from "./spa/Popup";
 import Router from "./spa/Router";
 import { postRequest } from "./spa/requests";
 
-//async function init() {
-//	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
-//
-//	Router.nav(window.location.href.substring(window.location.origin.length), false, false);
-//}
-//
-
 let loader;
 
 async function init() {
@@ -23,19 +16,11 @@ async function init() {
 		if (event.data === 'reload') window.location.reload();
 	};
 
-	//Router.AUTHENTIFICATION = false;
-	// let App3D = await import("./3d/App.ts").default();
-	// let	NotificationManager = await import("./spa/NotificationManager").default();
-	// let Popup = await import("./spa/Popup.ts").default();
-	// let Router = await import("./spa/Router.ts").default();
-	// let postRequest = await import("./spa/requests.ts").postRequest;
 
 
 	await App3D.init()
-	// .then(() => {
 	Router.nav(window.location.href.substring(window.location.origin.length), false, false);
 	App3D.run()
-	// })
 
 	window.onbeforeunload = () => {
 		App3D.dispose();
@@ -51,9 +36,6 @@ async function init() {
 		if (e.key == "p") {
 			NotificationManager.addText(`${performance.now()}`)
 		}
-		//if (e.key == "") {
-		//	postRequest("friends/add", { inputUsername: "Erwan"});
-		//}
 	})
 
 
