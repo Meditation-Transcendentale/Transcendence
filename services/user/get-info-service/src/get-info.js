@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import dotenv from "dotenv";
 import fs from "fs";
 import { connect, JSONCodec } from 'nats';
+import validator from 'validator';
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
@@ -104,10 +105,16 @@ const searchSchema = {
 	}
 };
 
+function sanitizeSearchInput(input) {
+	return {
+		identifier: validator.escape(input.identifier),
+		type: validator.escape(input.type)
+	}
+}
 
-app.post('/search', handleErrors(async (req, res) => {
+app.post('/search', { schema: searchSchema }, handleErrors(async (req, res) => {
 
-	const { identifier, type } = req.body;
+	const { identifier, type } = sanitizeSearchInput(req.body);
 
 	if (!identifier || !type ) {
 		throw { status: userReturn.USER_036.http, code: userReturn.USER_036.code, message: userReturn.USER_036.message };
