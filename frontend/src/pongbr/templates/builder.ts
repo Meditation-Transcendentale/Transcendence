@@ -13,6 +13,7 @@ import { TransformComponent } from "../components/TransformComponent";
 import { TransformNode, Vector3 } from "@babylonImport";
 import { ECSManager } from "../ecs/ECSManager";
 import GameUI from "../../spa/GameUI";
+import { localPaddleId } from "../PongBR";
 
 // ─── In-File Default Configuration ─────────────────────────────────────
 const DEFAULT_CONFIG = {
@@ -46,6 +47,7 @@ export function buildPaddles(
 	ecs: ECSManager,
 	playerCount: number,
 	pongRoot: TransformNode
+	, localPaddleIndex: number
 ): PaddleBundle[] {
 	const bundles: PaddleBundle[] = [];
 	const {
@@ -68,12 +70,13 @@ export function buildPaddles(
 	const maxOffset = halfUsableArc - halfArc;
 
 	for (let i = 0; i < playerCount; i++) {
+		const isLocal = (i === localPaddleIndex);
 		const sliceStart = i * angleStep;
 		const midAngle = sliceStart + pillarArc + halfUsableArc;
 		// const midAngle = sliceStart + pillarArc/ 2 + halfUsableArc;
 
 		const paddleRotY = - midAngle;  // Same as physics
-		console.log(`paddle  id = ${i} sliceStart = ${sliceStart}, paddleRotY = ${paddleRotY}`)
+		// console.log(`paddle  id = ${i} sliceStart = ${sliceStart}, paddleRotY = ${paddleRotY}`)
 
 
 		// const paddleRotY = -paddleAngle;  // Face inward
@@ -82,25 +85,21 @@ export function buildPaddles(
 		// ---- Paddle ----
 		const paddle = new Entity();
 		paddle.addComponent(
-			new PaddleComponent(i, Vector3.Zero(), 0, maxOffset, paddleRotY, playerCount / 4)
+			new PaddleComponent(i, 0, maxOffset, paddleRotY, playerCount / 4, isLocal)
 		);
-		if (i == 1)
-			console.log(`Frontend paddle 1: midAngle=${midAngle.toFixed(3)}, rotY=${paddleRotY.toFixed(3)}`);
-		if (i == 0) {
-			paddle.addComponent(new InputComponent(true));
+
+		paddle.addComponent(new InputComponent(isLocal));
+		paddle.addComponent(new TransformComponent(
+			Vector3.Zero(),
+			new Vector3(0, paddleRotY, 0),
+			Vector3.One(),
+			pongRoot
+		));
+
+		if (isLocal) {
 			pongRoot.rotation.y = -paddleRotY;
-			console.log(`Frontend paddle 0: midAngle=${midAngle.toFixed(3)}, rotY=${paddleRotY.toFixed(3)}`);
 		}
-		else
-			paddle.addComponent(new InputComponent(false));
-		paddle.addComponent(
-			new TransformComponent(
-				new Vector3(0, 0, 0),
-				new Vector3(0, paddleRotY, 0),
-				Vector3.One(),
-				pongRoot
-			)
-		);
+
 		ecs.addEntity(paddle);
 		// ---- Goal & Death Wall ----
 		const goalPos = new Vector3(
@@ -166,10 +165,11 @@ export function buildBall(ecs: any, pongRoot: TransformNode) {
 }
 
 // ─── 5. Assemble Game Template ─────────────────────────────────────
-export function createGameTemplate(ecs: ECSManager, playerCount: number, pongRoot: TransformNode, gameUI: GameUI): PaddleBundle[] {
+export function createGameTemplate(ecs: ECSManager, playerCount: number, pongRoot: TransformNode, gameUI: GameUI, paddleId: number): PaddleBundle[] {
+	console.log(`CREATE GAME TEMPLATE CALLED paddleId = ${paddleId}`)
 	const config = DEFAULT_CONFIG;
 	buildUI(ecs, gameUI);
-	const bundles = buildPaddles(ecs, playerCount, pongRoot);
+	const bundles = buildPaddles(ecs, playerCount, pongRoot, paddleId);
 	buildBall(ecs, pongRoot);
 	return bundles;
 }

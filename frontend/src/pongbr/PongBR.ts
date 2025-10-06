@@ -20,7 +20,10 @@ import { Entity } from "./ecs/Entity.js";
 import { createBlackHoleBackdrop } from "./templates/blackhole.js";
 import { SpaceSkybox } from "./templates/skybox.js";
 import GameUI from "../spa/GameUI.js";
-
+import { PaddleComponent } from "./components/PaddleComponent.js";
+import { GoalComponent } from "./components/GoalComponent.js";
+import { PillarComponent } from "./components/PillarComponent.js";
+import { PHASE_CAMERA_CONFIG, DEFAULT_CAMERA, LOADING_CAMERA } from "./config/CameraConfig.js";
 
 export let localPaddleId: any = null;
 export class PongBR {
@@ -45,6 +48,7 @@ export class PongBR {
 	private statue!: Mesh;
 	public currentBallScale: Vector3 = new Vector3(1, 1, 1);
 	private gameUI: GameUI;
+	private localPaddleIndex: number = 0;
 
 
 	constructor(canvas: any, scene: Scene, gameUI: GameUI) {
@@ -66,9 +70,10 @@ export class PongBR {
 		this.camera.parent = this.pongRoot;
 		this.camera.minZ = 0.2;
 
-		this.camera.alpha = 0;
-		this.camera.beta = Math.PI / 2.1;
-		this.camera.radius = 300;
+		this.camera.alpha = LOADING_CAMERA.alpha;
+		this.camera.beta = LOADING_CAMERA.beta;
+		this.camera.radius = LOADING_CAMERA.radius;
+
 
 		this.baseMeshes = createBaseMeshes(this.scene, this.rotatingContainer);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
@@ -83,6 +88,10 @@ export class PongBR {
 
 		this.stateManager = new StateManager(this.ecs);
 		this.inited = true;
+		this.scene.onBeforeCameraRenderObservable.add(() => {
+			this.baseMeshes.paddle.material.setUniform("time", performance.now() / 1000);
+		});
+
 
 
 	}
@@ -115,12 +124,14 @@ export class PongBR {
 
 		this.networkingSystem.resetPhaseState();
 
-		this.paddleBundles.forEach(b => {
-			this.ecs.removeEntity(b.paddle);
-			this.ecs.removeEntity(b.goal);
-			this.ecs.removeEntity(b.deathWall);
-			this.ecs.removeEntity(b.pillar);
-		});
+		if (this.paddleBundles) {
+			this.paddleBundles.forEach(b => {
+				this.ecs.removeEntity(b.paddle);
+				this.ecs.removeEntity(b.goal);
+				this.ecs.removeEntity(b.deathWall);
+				this.ecs.removeEntity(b.pillar);
+			});
+		}
 		const allEntities = this.ecs.getAllEntities();
 		allEntities.forEach(entity => {
 			if (entity.hasComponent(BallComponent)) {
@@ -129,10 +140,15 @@ export class PongBR {
 		});
 
 		this.spaceSkybox.onGameLoad();
-		this.paddleBundles = createGameTemplate(this.ecs, 100, this.pongRoot, this.gameUI);
+		this.localPaddleIndex = localPaddleId;
+		this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, this.localPaddleIndex);
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
+		this.baseMeshes.paddle.material.setUniform("paddleId", this.localPaddleIndex);
 
-		this.currentBallScale = new Vector3(1, 1, 1);
+		this.currentBallScale = new Vector3(2, 2, 2);
+
+		console.log('📹 Starting intro camera animation to Phase 1');
+		this.onPhaseChange('Phase 1', 3.0);
 
 		this.networkingSystem.forceIndexRebuild();
 
@@ -173,35 +189,12 @@ export class PongBR {
 			this.camera
 		);
 		this.ecs.addSystem(this.thinInstanceSystem);
-		this.paddleBundles = createGameTemplate(this.ecs, 100, pongRoot, this.gameUI);
+		// this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, localPaddleId);
 	}
+	public transitionToRound(nextCount: number, localPaddleIndex: number) {
+		console.log(`🎮 Transition: ${nextCount} players, local at index ${localPaddleIndex}`);
 
-	public transitionToRound(nextCount: number, entities: Entity[], physicsState?: any, playerMapping?: Record<number, number>) {
-		const eliminatedPlayerIds = new Set<number>();
-		const activePlayers = new Set<number>();
-
-		if (physicsState && physicsState.paddles) {
-			physicsState.paddles.forEach((p: any) => {
-				if (p.dead) {
-					eliminatedPlayerIds.add(p.playerId);
-				} else {
-					activePlayers.add(p.playerId);
-				}
-			});
-		}
-
-		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
-
-		let scaleFactor: number;
-		switch (nextCount) {
-			case 100: scaleFactor = 1; break;
-			case 50: scaleFactor = 1.5; break;
-			case 25: scaleFactor = 2; break;
-			case 12: scaleFactor = 2.5; break;
-			case 3: scaleFactor = 6.0; break;
-			default: scaleFactor = 25 / nextCount;
-		}
-		this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+		this.localPaddleIndex = localPaddleIndex;
 
 		const allEntities = this.ecs.getAllEntities();
 		allEntities.forEach(entity => {
@@ -209,6 +202,7 @@ export class PongBR {
 				this.ecs.removeEntity(entity);
 			}
 		});
+		const entities = this.ecs.getAllEntities();
 
 		this.paddleBundles.forEach(b => {
 			this.ecs.removeEntity(b.paddle);
@@ -227,11 +221,109 @@ export class PongBR {
 			transform?.disable();
 		}
 
-		this.paddleBundles = createGameTemplate(this.ecs, nextCount, this.rotatingContainer, this.gameUI);
+		// 1. Remove ALL game entities
+		// const toRemove = this.ecs.getAllEntities().filter(e =>
+		// 	e.hasComponent(BallComponent) ||
+		// 	e.hasComponent(PaddleComponent) ||
+		// 	e.hasComponent(GoalComponent) ||
+		// 	e.hasComponent(WallComponent) ||
+		// 	e.hasComponent(PillarComponent)
+		// );
+		// toRemove.forEach(e => this.ecs.removeEntity(e));
 
+		// 2. Update ball scale
+		let scaleFactor: number;
+		switch (nextCount) {
+			case 100: scaleFactor = 2; break;
+			case 50: scaleFactor = 4; break;
+			case 25: scaleFactor = 8; break;
+			case 12: scaleFactor = 10; break;
+			case 3: scaleFactor = 12; break;
+			default: scaleFactor = 25 / nextCount;
+		}
+		this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+		// 3. Update shaders
+		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
+		this.baseMeshes.paddle.material.setUniform("paddleId", localPaddleIndex);
+
+		// 4. Create new everything
+		this.paddleBundles = createGameTemplate(
+			this.ecs,
+			nextCount,
+			this.rotatingContainer,
+			this.gameUI,
+			localPaddleIndex
+		);
+
+		// 5. Force index rebuild
 		this.networkingSystem.forceIndexRebuild();
+
+		console.log(`✅ Transition complete`);
 	}
 
+
+	public getEntities(): Entity[] {
+		return this.ecs.getAllEntities();
+	}
+
+	public getLocalPaddleIndex(): number {
+		return this.localPaddleIndex;
+	}
+
+	public updateLocalPaddleIndex(newIndex: number): void {
+		console.log(`🔄 Updating local paddle index: ${this.localPaddleIndex} → ${newIndex}`);
+		this.localPaddleIndex = newIndex;
+
+		this.baseMeshes.paddle.material.setUniform("paddleId", newIndex);
+
+		if (newIndex >= 0 && this.paddleBundles) {
+			const bundle = this.paddleBundles.find(b => b.sliceIndex === newIndex);
+			if (bundle) {
+				const paddleComp = bundle.paddle.getComponent(PaddleComponent);
+				if (paddleComp) {
+					this.rotatingContainer.rotation.y = -paddleComp.baseRotation;
+				}
+			}
+		} else {
+			this.rotatingContainer.rotation.y = 0;
+		}
+	}
+
+	public onPhaseChange(phase: string, duration: number = 1.0): void {
+		console.log(`📹 Camera transition for phase: ${phase} (${duration}s)`);
+
+		const cameraConfig = PHASE_CAMERA_CONFIG[phase] || DEFAULT_CAMERA;
+
+		const frameRate = 60;
+
+		const alphaAnim = this.createCameraAnimation('alpha', cameraConfig.alpha, frameRate, duration);
+		const betaAnim = this.createCameraAnimation('beta', cameraConfig.beta, frameRate, duration);
+		const radiusAnim = this.createCameraAnimation('radius', cameraConfig.radius, frameRate, duration);
+
+		this.camera.animations = [alphaAnim, betaAnim, radiusAnim];
+		this.scene.beginAnimation(this.camera, 0, frameRate * duration, false);
+	}
+
+	private createCameraAnimation(property: string, targetValue: number, frameRate: number, duration: number): any {
+		const { Animation } = require('@babylonjs/core');
+
+		const animation = new Animation(
+			`camera_${property}`,
+			property,
+			frameRate,
+			Animation.ANIMATIONTYPE_FLOAT,
+			Animation.ANIMATIONLOOPMODE_CONSTANT
+		);
+
+		const keys = [
+			{ frame: 0, value: (this.camera as any)[property] },
+			{ frame: frameRate * duration, value: targetValue }
+		];
+
+		animation.setKeys(keys);
+		return animation;
+	}
 
 	private waitForRegistration(): Promise<number> {
 		return new Promise((resolve, reject) => {

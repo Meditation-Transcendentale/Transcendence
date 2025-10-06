@@ -130,7 +130,6 @@
 	grid-column: 5 / 10;
 	grid-row: 2/ 3;
 	width: 50%;
-
 }
 
 #stats-table>.window-content {
@@ -149,8 +148,6 @@
 	display: inline-block;
 	/*width: fit-content;*/
 }
-
-
 
 .player-stat>div:last-child {
 	position: relative;

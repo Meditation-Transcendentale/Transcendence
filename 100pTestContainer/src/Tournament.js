@@ -1,8 +1,8 @@
 import {
-  decodeUserInterfaceServerMessage,
-  encodeUserInterfaceClientMessage,
-  decodeTournamentServerMessage,
-  encodeTournamentClientMessage,
+	decodeUserInterfaceServerMessage,
+	encodeUserInterfaceClientMessage,
+	decodeTournamentServerMessage,
+	encodeTournamentClientMessage,
 } from "./proto/helper.js";
 import WebSocket from "ws";
 
@@ -53,13 +53,13 @@ export async function startGameTournament(user) {
 }
 
 export async function settingUpTournament(user) {
-  console.log(`${user.uuid}|${user.tournamentId}`);
-  const url = `wss://localhost:7000/sacrifice?uuid=${encodeURIComponent(
-    user.uuid
-  )}&tournamentId=${encodeURIComponent(user.tournamentId)}`;
+	console.log(`${user.uuid}|${user.tournamentId}`);
+	const url = `wss://localhost:7000/sacrifice?uuid=${encodeURIComponent(
+		user.uuid
+	)}&tournamentId=${encodeURIComponent(user.tournamentId)}`;
 
-  const ws = new WebSocket(url, { rejectUnauthorized: false });
-  ws.binaryType = "arraybuffer";
+	const ws = new WebSocket(url, { rejectUnauthorized: false });
+	ws.binaryType = "arraybuffer";
 
   return new Promise((resolve) => {
     ws.onmessage = (msg) => {

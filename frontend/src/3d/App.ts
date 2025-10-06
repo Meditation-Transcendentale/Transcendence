@@ -43,8 +43,11 @@ class app3d {
 		this.engine.setDepthBuffer(true);
 		// this.engine.setHardwareScalingLevel(2.0);
 		this.engine.getCaps().textureFloatRender = true;
+		this.updateResolution();
 
+		// const ro = this.scene.getEngine().getRenderHeight() / this.scene.getEngine().getRenderWidth();
 		window.addEventListener('resize', () => {
+			this.updateResolution();
 			this.engine.resize(true);
 			this.environment.resize();
 			this.cssRenderer.resize(window.innerWidth, window.innerHeight)
@@ -143,6 +146,14 @@ class app3d {
 
 	public setCube(name: string, clickEv?: any, hoverEv?: any) {
 		this.environment.setCube(name, clickEv, hoverEv);
+	}
+
+	public updateResolution() {
+		const scaleX = this.canvas.width / 1920;
+		const scaleY = this.canvas.height / 1080;
+		const scale = Math.max(scaleX, scaleY, 1);
+
+		this.engine.setHardwareScalingLevel(scale);
 	}
 }
 

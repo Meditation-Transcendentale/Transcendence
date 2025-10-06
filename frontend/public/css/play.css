@@ -213,6 +213,20 @@ opacity: 0.4;
 .window--play-enable{
 }
 
+#create-brick {
+	display:flex;
+	flex-direction: column;
+	width: 100%;
+	/*grid-column: 1 / 1;*/
+	/*height: fit-content;*/
+	/*grid-template-columns: 1 auto auto auto;*/
+	background-color: white;
+	/*row-gap: 0.3%;*/
+	overflow: hidden;
+}
+
+
+
 /*.window--play-disabled input {*/
 /*	display:none;*/
 /*pointer-events: none;*/

@@ -15,6 +15,7 @@ import { userinterface } from "../utils/proto/message.js";
 import { UIComponent } from "../components/UIComponent.js";
 import { localPaddleId } from "../Pong";
 import Router from "../../spa/Router";
+import { tournament } from "../../spa/proto/message.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -114,9 +115,9 @@ export class NetworkingSystem extends System {
 					this.opponentScore = score[otherId] ?? 0;
 					if (ui) {
 						if (localPaddleId != 0)
-							ui.gameUI.updateScore(this.opponentScore, this.myScore);
+							ui.gameUI.updateScoreVersus(this.opponentScore, this.myScore);
 						else
-							ui.gameUI.updateScore(this.myScore, this.opponentScore);
+							ui.gameUI.updateScoreVersus(this.myScore, this.opponentScore);
 					}
 					// if (ui && (myScore == 5 || theirScore == 5)){
 					// 	ui.gameUI.showEnd(myScore, theirScore, myScore == 5);
@@ -126,9 +127,8 @@ export class NetworkingSystem extends System {
 
 			// === Game End ===
 			if (serverMsg.end) {
-				if (this.mode == "tournament")
+				if (this.mode == 'tournament')
 					Router.comeback();
-				
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
 
@@ -136,7 +136,7 @@ export class NetworkingSystem extends System {
 				if (this.myScore == 5)
 					win = true;
 
-				ui?.gameUI.showEnd(this.myScore, this.opponentScore, win, ui.gameMode);
+				ui?.gameUI.showEnd(ui.gameMode, win, this.myScore, this.opponentScore);
 				console.log("Received GameEndMessage");
 				// const scores = serverMsg.end.score as number[];
 				// const myScore = scores[localPaddleId] ?? 0;

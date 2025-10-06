@@ -17,8 +17,8 @@ message Ball {
 }
 
 message Paddle {
-  int32 id = 1;
-  int32 playerId = 2;
+  int32 paddleId = 1;
+  int32 uuid = 2;
   int32 move = 3; // -1: left, 0: none, 1: right
   float offset = 4;
   bool dead = 5; // Used in battle‐royale mode, false otherwise

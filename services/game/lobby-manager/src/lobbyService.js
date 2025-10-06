@@ -10,7 +10,6 @@ import {
 	encodeStatusUpdate
 } from './proto/helper.js'
 
-// Simple Lobby model
 class Lobby {
 	constructor({ id, mode, map }) {
 		this.id = id;
@@ -18,7 +17,6 @@ class Lobby {
 		this.map = map;
 		console.log(mode);
 		this.maxPlayers = config.MAX_PLAYERS[mode] ?? 2;
-		// userId -> { isReady, lastSeen }
 		this.players = new Map();
 		this.createdAt = Date.now();
 		this.lastActivity = Date.now();
@@ -81,6 +79,13 @@ class Lobby {
 		)
 	}
 
+	allReadyBr() {
+		return (
+			this.mode == "br" &&
+			[...this.players.values()].every(p => p.isReady)
+		)
+	}
+
 	getState() {
 		const status = this.allReady() ? 'starting' : 'waiting'
 		return {
@@ -117,15 +122,15 @@ export default class LobbyService {
 
 	join(lobbyId, userId) {
 		const lobby = this.lobbies.get(lobbyId)
-		if (!lobby) throw new Error('Lobby not found')
+		if (!lobby) return null;
 		lobby.addPlayer(userId)
-		console.log (`ADDED ${userId}`);
+		console.log(`ADDED ${userId}`);
 		return lobby.getState()
 	}
 
 	quit(lobbyId, userId) {
 		const lobby = this.lobbies.get(lobbyId)
-		if (!lobby) return null
+		if (!lobby) return null;
 		const isEmpty = lobby.removePlayer(userId)
 
 		if (isEmpty) {
@@ -144,12 +149,12 @@ export default class LobbyService {
 
 	async ready(lobbyId, userId) {
 		const lobby = this.lobbies.get(lobbyId)
-		if (!lobby) throw new Error('Lobby not found')
+		if (!lobby) return null;
 
 		lobby.markReady(userId)
 		const state = lobby.getState()
 
-		if (lobby.allReady()) {
+		if (lobby.allReady() || lobby.allReadyBr()) {
 			if (lobby.mode == `tournament`) {
 				console.log(lobby.players.keys());
 				const reqBufTournament = encodeTournamentCreateRequest({

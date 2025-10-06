@@ -56,13 +56,7 @@ export class PhysicsEngine {
 		this.paddleData.inputStates = new Int8Array(numPlayers);
 		this.paddleData.dead = new Uint8Array(numPlayers);
 
-		// console.log(`Entity stats before creation:`, this.pd.getStats());
-
 		this.createPaddles(numPlayers);
-		// console.log(`Entity stats after paddles:`, this.pd.getStats());
-
-		// this.createBalls(numBalls);
-		// console.log(`Entity stats after balls:`, this.pd.getStats());
 
 		for (let pid = 0; pid < numPlayers; pid++) {
 			this.paddleData.dead[pid] = 0;
@@ -480,12 +474,16 @@ export class PhysicsEngine {
 	updatePaddleInputState(fixedPlayerId, moveInput) {
 		if (this.gameState.isRebuilding) return;
 
+		if (this.gameState.playerStates.eliminated.has(fixedPlayerId)) {
+			console.log("cant move you are dead");
+			return;
+		}
+
 		const paddleIndex = this.gameState.playerMapping[fixedPlayerId] ?? fixedPlayerId;
 
 		if (paddleIndex >= 0 && paddleIndex < this.paddleData.inputStates.length) {
-			if (!this.gameState.playerStates.eliminated.has(fixedPlayerId)) {
-				this.paddleData.inputStates[paddleIndex] = Math.max(-1, Math.min(1, moveInput));
-			}
+			console.log("can move");
+			this.paddleData.inputStates[paddleIndex] = Math.max(-1, Math.min(1, moveInput));
 		}
 	}
 

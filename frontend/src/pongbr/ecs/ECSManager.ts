@@ -6,66 +6,55 @@ import { System } from "./System.js";
  * Central manager for all entities and systems.
  * Allows querying by component and system-driven updates.
  */
+// ECSManager.ts
 export class ECSManager {
 	public entities: Entity[] = [];
 	private systems: System[] = [];
 
-	/**
-	 * Add an entity to the world.
-	 */
 	addEntity(entity: Entity): void {
 		this.entities.push(entity);
 	}
 
-	/**
-	 * Remove a specific entity instance from the world.
-	 */
 	removeEntity(entity: Entity): void {
-		this.entities = this.entities.filter(e => e.id !== entity.id);
+		const index = this.entities.findIndex(e => e.id === entity.id);
+		if (index !== -1) {
+			this.entities.splice(index, 1);  // Mutate in place
+		}
 	}
 
-	/**
-	 * Remove an entity by its ID.
-	 */
 	removeEntityById(id: number): void {
-		this.entities = this.entities.filter(e => e.id !== id);
+		const index = this.entities.findIndex(e => e.id === id);
+		if (index !== -1) {
+			this.entities.splice(index, 1);  // Mutate in place
+		}
 	}
 
-	/**
-	 * Return entities that have *all* of the given component classes.
-	 */
 	entitiesWith(...componentClasses: Function[]): Entity[] {
 		return this.entities.filter(ent =>
 			componentClasses.every(cls => ent.hasComponent(cls))
 		);
 	}
 
-	/**
-	 * Add a system to the update loop.
-	 */
 	addSystem(system: System): void {
 		this.systems.push(system);
 	}
 
 	removeSystem(system: System): void {
-		this.systems = this.systems.filter(s => s !== system);
-	}
-
-
-	/**
-	 * Call each system's update, passing this manager and the elapsed time.
-	 */
-	update(deltaTime: number): void {
-		for (const sys of this.systems) {
-			sys.update(this.entities, deltaTime);
+		const index = this.systems.indexOf(system);
+		if (index !== -1) {
+			this.systems.splice(index, 1);
 		}
 	}
 
-	/**
-	 * Get a shallow copy of all current entities.
-	 */
+	update(deltaTime: number): void {
+		// Make a copy for iteration to avoid issues if systems add/remove entities
+		const entitiesSnapshot = [...this.entities];
+		for (const sys of this.systems) {
+			sys.update(entitiesSnapshot, deltaTime);
+		}
+	}
+
 	getAllEntities(): Entity[] {
 		return [...this.entities];
 	}
 }
-

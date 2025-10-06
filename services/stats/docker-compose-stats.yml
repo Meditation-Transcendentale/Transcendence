@@ -1,6 +1,6 @@
 services:
   nats:
-    image: nats:latest
+    image: nats:2.12.0
     container_name: nats
     environment:
       - NATS_TOKEN=${NATS_TOKEN}

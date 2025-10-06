@@ -1,6 +1,6 @@
 import { Matrix } from "../babyImport";
 import { App3D } from "../3d/App";
-import { getRequest } from "./requests";
+import { getRequest, postRequest } from "./requests";
 import { createDivception, raiseStatus } from "./utils";
 
 type statsHtmlReference = {
@@ -30,7 +30,8 @@ type classicplayerMatch = {
  *	All null if played == 0
  * */
 
-const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded", "Averaged Goals Scored", "Average Goals Conceded"];
+// const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded", "Averaged Goals Scored", "Average Goals Conceded"];
+const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded"];
 
 type classicPlayerStats = {
 	div: HTMLDivElement,
@@ -41,23 +42,25 @@ type classicPlayerStats = {
 	bestStreak: HTMLDivElement,
 	scored: HTMLDivElement,
 	conceded: HTMLDivElement,
-	avgScored: HTMLDivElement,
-	avgConceded: HTMLDivElement,
+	// avgScored: HTMLDivElement,
+	// avgConceded: HTMLDivElement,
 }
 
-const brPlayerStatsName = ["Game Played", 'Wined', "Kills", "Win Rate", "Best Win Streak", "Beast Placement", "Best Kills", "Average Placement", "Average Kills"];
+// const brPlayerStatsName = ["Game Played", 'Wined', "Kills", "Win Rate", "Best Win Streak", "Beast Placement", "Best Kills", "Average Placement", "Average Kills"];
+const brPlayerStatsName = ["Game Played", 'Wined', "Win Rate", "Beast Placement", "Average Placement"];
+
 
 type brPlayerStats = {
 	div: HTMLDivElement,
 	played: HTMLDivElement,
 	wins: HTMLDivElement,
-	kills: HTMLDivElement,
 	winRate: HTMLDivElement,
-	bestStreak: HTMLDivElement,
 	bestPlacement: HTMLDivElement,
-	bestKills: HTMLDivElement,
 	avgPlacement: HTMLDivElement,
-	avgKills: HTMLDivElement
+	// bestStreak: HTMLDivElement,
+	// kills: HTMLDivElement,
+	// bestKills: HTMLDivElement,
+	// avgKills: HTMLDivElement
 }
 
 class Stats {
@@ -115,9 +118,8 @@ class Stats {
 			this.ref.swPong.toggleAttribute("down", false);
 			this.ref.swBR.toggleAttribute("down", true);
 
-			getRequest(`stats/player/${this.player}/classic`)
+			postRequest(`stats/player`, { uuid: this.player, mode: "classic" })
 				.then((json: any) => {
-					//console.log(json.playerStats);
 					this.classicResolve(json.playerStats);
 				})
 		})
@@ -133,12 +135,11 @@ class Stats {
 			this.ref.swPong.toggleAttribute("down", true);
 			this.ref.swBR.toggleAttribute("down", false);
 
-			getRequest(`stats/player/${this.player}/br`)
+			postRequest(`stats/player`, { uuid: this.player, mode: "br" })
 				.then((json: any) => {
-					//console.log(json.playerStats);
 					this.brResolve(json.playerStats);
 				})
-				.catch((resp) => { this.statsReject(resp) });
+
 		})
 	}
 
@@ -162,13 +163,13 @@ class Stats {
 			div: div,
 			played: div.children[0] as HTMLDivElement,
 			wins: div.children[1] as HTMLDivElement,
-			kills: div.children[2] as HTMLDivElement,
 			winRate: div.children[3] as HTMLDivElement,
-			bestStreak: div.children[4] as HTMLDivElement,
-			bestPlacement: div.children[5] as HTMLDivElement,
-			bestKills: div.children[6] as HTMLDivElement,
 			avgPlacement: div.children[7] as HTMLDivElement,
-			avgKills: div.children[8] as HTMLDivElement,
+			bestPlacement: div.children[5] as HTMLDivElement,
+			// bestStreak: div.children[4] as HTMLDivElement,
+			// kills: div.children[2] as HTMLDivElement,
+			// bestKills: div.children[6] as HTMLDivElement,
+			// avgKills: div.children[8] as HTMLDivElement,
 		}
 
 		//this.ref.stats.appendChild(this.brPlayerStats.div);
@@ -195,8 +196,8 @@ class Stats {
 			bestStreak: div.children[4] as HTMLDivElement,
 			scored: div.children[5] as HTMLDivElement,
 			conceded: div.children[6] as HTMLDivElement,
-			avgScored: div.children[7] as HTMLDivElement,
-			avgConceded: div.children[8] as HTMLDivElement,
+			// avgScored: div.children[7] as HTMLDivElement,
+			// avgConceded: div.children[8] as HTMLDivElement,
 		}
 
 		//this.ref.stats.appendChild(this.classicPlayerStats.div);
@@ -214,13 +215,13 @@ class Stats {
 		this.ref.stats.appendChild(this.classicPlayerStats!.div);
 		this.mode = 1;
 		this.ref.swBR.toggleAttribute("down", true);
-		getRequest(`stats/player/${this.player}/classic`)
+		
+		postRequest(`stats/player`, { uuid: this.player, mode: "classic" })
 			.then((json: any) => {
-				//console.log(json)
 				this.classicResolve(json.playerStats);
-				//		document.querySelector("#home-container")?.appendChild(this.div);
 			})
 			.catch((resp) => { this.statsReject(resp) });
+		
 	}
 
 	public async unload() {
@@ -252,8 +253,8 @@ class Stats {
 		(this.classicPlayerStats?.bestStreak.children[1] as HTMLDivElement).innerText = json.stats.best_win_streak;
 		(this.classicPlayerStats?.scored.children[1] as HTMLDivElement).innerText = json.stats.goals_scored;
 		(this.classicPlayerStats?.conceded.children[1] as HTMLDivElement).innerText = json.stats.goals_conceded;
-		(this.classicPlayerStats?.avgScored.children[1] as HTMLDivElement).innerText = json.stats.avg_goals_scored;
-		(this.classicPlayerStats?.avgConceded.children[1] as HTMLDivElement).innerText = json.stats.avg_goals_conceded;
+		// (this.classicPlayerStats?.avgScored.children[1] as HTMLDivElement).innerText = json.stats.avg_goals_scored;
+		// (this.classicPlayerStats?.avgConceded.children[1] as HTMLDivElement).innerText = json.stats.avg_goals_conceded;
 
 		this.currentHistory?.remove();
 		this.currentHistory = document.createElement("div");
@@ -293,12 +294,12 @@ class Stats {
 		(this.brPlayerStats?.played.children[1] as HTMLDivElement).innerText = json.stats.game_played;
 		(this.brPlayerStats?.wins.children[1] as HTMLDivElement).innerText = json.stats.wins;
 		(this.brPlayerStats?.winRate.children[1] as HTMLDivElement).innerText = json.stats.win_rate;
-		(this.brPlayerStats?.bestStreak.children[1] as HTMLDivElement).innerText = json.stats.best_win_streak;
 		(this.brPlayerStats?.bestPlacement.children[1] as HTMLDivElement).innerText = json.stats.best_placement;
-		(this.brPlayerStats?.bestKills.children[1] as HTMLDivElement).innerText = json.stats.best_kills;
-		(this.brPlayerStats?.kills.children[1] as HTMLDivElement).innerText = json.stats.kills;
 		(this.brPlayerStats?.avgPlacement.children[1] as HTMLDivElement).innerText = json.stats.avg_placement;
-		(this.brPlayerStats?.avgKills.children[1] as HTMLDivElement).innerText = json.stats.avg_kills;
+		// (this.brPlayerStats?.bestStreak.children[1] as HTMLDivElement).innerText = json.stats.best_win_streak;
+		// (this.brPlayerStats?.bestKills.children[1] as HTMLDivElement).innerText = json.stats.best_kills;
+		// (this.brPlayerStats?.kills.children[1] as HTMLDivElement).innerText = json.stats.kills;
+		// (this.brPlayerStats?.avgKills.children[1] as HTMLDivElement).innerText = json.stats.avg_kills;
 		console.log(json.stats.best_win_streak)
 
 
@@ -310,14 +311,14 @@ class Stats {
 			let match = json.history[m] as any;
 			const tr = document.createElement("tr");
 			const placement = document.createElement("td");
-			const kills = document.createElement("td");
+			// const kills = document.createElement("td");
 			const time = document.createElement("td");
 
 			placement.innerText = `${match.placement}`;
-			kills.innerText = `${match.kills}`;
+			// kills.innerText = `${match.kills}`;
 			time.innerText = `${match.created_at}`;
 			tr.appendChild(placement);
-			tr.appendChild(kills);
+			// tr.appendChild(kills);
 			tr.appendChild(time);
 			tr.setAttribute(match.is_winner == 1 ? "win" : "lose", "");
 			body.appendChild(tr);
