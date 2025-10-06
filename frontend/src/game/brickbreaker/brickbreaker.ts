@@ -143,10 +143,12 @@ export class BrickBreaker {
 		// const body = new FormData();
 		// body.append(this.mode, this.score.toString());
 		// console.log(body);
-		patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true)
-			.then(() => {
-				console.log("Score updated");
-			})
+		if (this.newHighScore){
+			patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true)
+				.then(() => {
+					console.log("Score updated");
+				})
+		}
 		this.camera.parent = null;
 		this.start1 = false;
 		this.player.disableInput();
@@ -164,9 +166,11 @@ export class BrickBreaker {
 		this.score = 0;
 		this.gameUI.updateScore(0);
 		this.gameUI.hideEnd();
+		this.newHighScore = false;
 		this.ball.reset();
 		this.player.reset();
 		this.lastTime = performance.now();
+		console.log("highScore", this.pbEasy, this.pbNormal, this.pbHard);
 	}
 
 	private createArena() {

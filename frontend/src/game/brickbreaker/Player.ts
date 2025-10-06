@@ -168,6 +168,7 @@ export class Player {
 		this.goal.visibility = 0;
 		this.shield.visibility = 0;
 		this.isAlive = false;
+		console.log("high score?", this.game.newHighScore);
 		this.game.gameUI.showEnd("brick", this.game.newHighScore, this.game.score);
 		//interface de fin de game
 		// this.game.dispose();

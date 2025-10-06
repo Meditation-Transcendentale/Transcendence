@@ -690,8 +690,10 @@ class EndingModule implements GameUIModule {
 			if (this.ref.scoreSolo)
 				this.ref.scoreSolo.textContent = score.toString();
 
-			if (result)
+			if (result === true)
 				this.ref.result.innerHTML = 'New High Score!';
+			else
+				this.ref.result.innerHTML = '';
 		} else {
 			this.ref.dualModeContainer.style.display = 'flex';
 			this.ref.soloModeContainer.style.display = 'none';

@@ -57,6 +57,7 @@ export class Ball {
 					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x, 0, this.newposition.z - playerGoalPos.z).normalize();
 					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
 					this.speedScale = Math.min(this.speedScale * 1.1, 5);
+					console.log("speed Scale update:", this.speedScale);
 					// if (this.launched == false){
 					// 	this.game.gameUI.startTimer();
 					// 	this.launched = true;
@@ -76,6 +77,7 @@ export class Ball {
 	}
 
 	private updateScore(layers: number, layerIndex: number) {
+		console.log("score calcul:", layers, layerIndex, this.speedScale);
 		this.game.score += (layers - layerIndex) * this.speedScale * 10;
 		if (this.bricksLeft == 0)
 			this.game.score += layerIndex + 1 * this.speedScale * 10;
@@ -188,7 +190,8 @@ export class Ball {
 
 	private endGame() {
 		// end screen UI
-		this.game.gameUI.showEnd(0, 0, true, "local");
+		console.log("high score?", this.game.newHighScore);
+		this.game.gameUI.showEnd("brick", this.game.newHighScore, this.game.score);
 		// this.game.dispose();
 	}
 
