@@ -164,7 +164,6 @@ export class Player {
 	}
 
 	die(): void {
-		console.log("player die");
 		this.goal.visibility = 0;
 		this.shield.visibility = 0;
 		this.isAlive = false;

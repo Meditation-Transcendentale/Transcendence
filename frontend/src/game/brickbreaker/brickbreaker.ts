@@ -66,8 +66,6 @@ export class BrickBreaker {
 		this.pbEasy = json.brickBreakerStats.easy_mode_hscore;
 		this.pbNormal = json.brickBreakerStats.normal_mode_hscore;
 		this.pbHard = json.brickBreakerStats.hard_mode_hscore;
-
-		console.log("JSON:", this.pbEasy, this.pbNormal, this.pbHard);
 	}
 
 	public async start(mod: string) {
@@ -143,10 +141,12 @@ export class BrickBreaker {
 		// const body = new FormData();
 		// body.append(this.mode, this.score.toString());
 		// console.log(body);
-		patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true)
-			.then(() => {
-				console.log("Score updated");
-			})
+		if (this.newHighScore){
+			patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true)
+				.then(() => {
+					console.log("Score updated");
+				})
+		}
 		this.camera.parent = null;
 		this.start1 = false;
 		this.player.disableInput();
@@ -164,6 +164,7 @@ export class BrickBreaker {
 		this.score = 0;
 		this.gameUI.updateScore(0);
 		this.gameUI.hideEnd();
+		this.newHighScore = false;
 		this.ball.reset();
 		this.player.reset();
 		this.lastTime = performance.now();
