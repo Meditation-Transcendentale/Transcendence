@@ -141,6 +141,7 @@ handleErrorsNats(async () => {
 		}),
 		handleNatsSubscription("stats.addBrickBreakerStats", async (msg) => {
 			const { playerId } = jc.decode(msg.data);
+			console.log (`Adding brickbreaker stats for playerId`);
 			statService.addBrickBreakerStats(playerId);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),

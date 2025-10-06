@@ -93,7 +93,6 @@ const verifyJWT = async (req, res) => {
 		return res.code(401).send({ message: 'Invalid token' });
 	}
 	req.user = data.user;
-	console.log(`Authenticated user:`);
 };
 
 const addApiKeyHeader = (req, headers) => {

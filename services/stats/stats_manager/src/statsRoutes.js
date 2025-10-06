@@ -119,7 +119,7 @@ export default async function statsRoutes(app) {
 			case (mode === 'easy'):
 				await nats.request(`stats.updateBrickBreakerEasyStats`, jc.encode({ playerId: userResult.data.id, score}), { timeout: 1000 });
 				break;
-			case (mode === 'medium'):
+			case (mode === 'normal'):
 				await nats.request(`stats.updateBrickBreakerNormalStats`, jc.encode({ playerId: userResult.data.id, score }), { timeout: 1000 });
 				break;
 			case (mode === 'hard'):
