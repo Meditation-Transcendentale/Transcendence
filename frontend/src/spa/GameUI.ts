@@ -359,8 +359,12 @@ class GameUI {
 		this.modules.timer?.stop();
 	}
 
-	public showEnd(score1: number, score2: number, result: boolean, mode: string) {
-		this.modules.ending?.setResult(score1, score2, result, mode);
+	public showEnd(mode: string, result: boolean, score1: number, score2?: number) {
+		this.modules.ending?.setResult(mode, result, score1, score2);
+	}
+
+	public hideEnd() {
+		this.modules.ending?.unload();
 	}
 
 	public showButton(id: string, text: string, callback: () => void, style?: string) {
@@ -649,6 +653,9 @@ class ButtonModule implements GameUIModule {
 interface EndingHtmlReference{
 	score1Value: HTMLSpanElement;
 	score2Value: HTMLSpanElement;
+	scoreSolo: HTMLSpanElement;
+	dualModeContainer: HTMLDivElement;
+	soloModeContainer: HTMLDivElement;
 	result: HTMLSpanElement;
 }
 
@@ -661,6 +668,9 @@ class EndingModule implements GameUIModule{
 		this.ref = {
 			score1Value: div.querySelector("#end-score1-value") as HTMLSpanElement,
 			score2Value: div.querySelector("#end-score2-value") as HTMLSpanElement,
+			scoreSolo: div.querySelector('#end-score-solo') as HTMLSpanElement,
+			dualModeContainer: div.querySelector('.dual-mode') as HTMLDivElement,
+			soloModeContainer: div.querySelector('.solo-mode') as HTMLDivElement,
 			result: div.querySelector("#result-label") as HTMLSpanElement
 		};
 	}
@@ -673,23 +683,37 @@ class EndingModule implements GameUIModule{
 		this.div.style.display = 'none';
 	}
 
-	setResult(score1: number, score2: number, result: boolean, mode: string) {
-		if (this.ref.score1Value && this.ref.score2Value) {
-			this.ref.score1Value.textContent = score1.toString();
-			this.ref.score2Value.textContent = score2.toString();
-		}
+	setResult(mode: string, result: boolean, score: number, score2?: number) {
 
-		
-		if (mode == "local"){
+		if (mode === "brick"){
+			this.ref.dualModeContainer.style.display = 'none';
+			this.ref.soloModeContainer.style.display = 'flex';
+			
+			if (this.ref.scoreSolo)
+				this.ref.scoreSolo.textContent = score.toString();
+			
 			if (result)
-				this.ref.result.innerHTML = 'Player 1 <span class="win">Win</span>';
-			else
-				this.ref.result.innerHTML = 'Player 2 <span class="win">Win</span>';
-		} else if (mode == "ai" || mode == "online"){
-			if (result)
-				this.ref.result.innerHTML = 'You <span class="win">Win</span>';
-			else
-				this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
+				this.ref.result.innerHTML = 'New High Score!';
+		} else {
+			this.ref.dualModeContainer.style.display = 'flex';
+			this.ref.soloModeContainer.style.display = 'none';
+			
+			if (this.ref.score1Value)
+				this.ref.score1Value.textContent = score.toString();
+			if (this.ref.score2Value && score2 !== undefined)
+				this.ref.score2Value.textContent = score2.toString();
+			
+			if (mode == "local"){
+				if (result)
+					this.ref.result.innerHTML = 'Player 1 <span class="win">Win</span>';
+				else
+					this.ref.result.innerHTML = 'Player 2 <span class="win">Win</span>';
+			} else if (mode == "ai" || mode == "online"){
+				if (result)
+					this.ref.result.innerHTML = 'You <span class="win">Win</span>';
+				else
+					this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
+			}
 		}
 
 		this.div.style.display = 'flex';

@@ -31,6 +31,7 @@ export class BrickBreaker {
 	public pbNormal: number = 0;
 	public pbHard: number = 0;
 	public mode: string = "normal";
+	public newHighScore: boolean = false;
 
 
 
@@ -81,6 +82,7 @@ export class BrickBreaker {
 		this.handlePb(pb);
 
 		this.mode = mod;
+
 		if (mod === "easy"){
 			this.layers = 2;
 			this.cols = 4;
@@ -160,6 +162,7 @@ export class BrickBreaker {
 		}
 		this.score = 0;
 		this.gameUI.updateScore(0);
+		this.gameUI.hideEnd();
 		this.ball.reset();
 		this.player.reset();
 		this.lastTime = performance.now();

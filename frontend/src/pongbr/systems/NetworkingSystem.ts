@@ -18,16 +18,16 @@ export class NetworkingSystem extends System {
 	private uuid: string;
 	private gameUI: GameUI;
 	private game: PongBR;
-	private phaseState: PhaseState;
 	private currentPhysicsState: any = null;
 
 	private ballIdToEntity = new Map<number, Entity>();
-	private paddleIdToEntity = new Map<number, Entity>();
-	private paddlePlayerIdToEntity = new Map<number, Entity>();
-	private wallPlayerIdToEntity = new Map<number, Entity>();
+	private paddleIndexToEntity = new Map<number, Entity>();
+	private wallIndexToEntity = new Map<number, Entity>();
 	private indexesDirty = true;
 
 	private spectateButtonOn: boolean = false;
+	private currentPlayerCount: number = 100;
+	private currentPhase: string = 'Phase 1';
 
 	constructor(wsManager: WebSocketManager, uuid: string, gameUI: GameUI, game: PongBR) {
 		super();
@@ -35,55 +35,6 @@ export class NetworkingSystem extends System {
 		this.uuid = uuid;
 		this.gameUI = gameUI;
 		this.game = game;
-		this.phaseState = new PhaseState();
-	}
-
-	resetPhaseState(): void {
-		this.phaseState.reset();
-		this.currentPhysicsState = null;
-		this.indexesDirty = true;
-		this.ballIdToEntity.clear();
-		this.paddleIdToEntity.clear();
-		this.paddlePlayerIdToEntity.clear();
-		this.wallPlayerIdToEntity.clear();
-	}
-
-	public forceIndexRebuild(): void {
-		this.indexesDirty = true;
-	}
-
-	private rebuildIndices(entities: Entity[]): void {
-		if (!this.indexesDirty) return;
-
-		this.ballIdToEntity.clear();
-		this.paddleIdToEntity.clear();
-		this.paddlePlayerIdToEntity.clear();
-		this.wallPlayerIdToEntity.clear();
-
-		let ballCount = 0, paddleCount = 0, wallCount = 0;
-
-		for (const entity of entities) {
-			if (entity.hasComponent(BallComponent)) {
-				const ball = entity.getComponent(BallComponent)!;
-				this.ballIdToEntity.set(ball.id, entity);
-				ballCount++;
-			}
-
-			if (entity.hasComponent(PaddleComponent)) {
-				const paddle = entity.getComponent(PaddleComponent)!;
-				this.paddleIdToEntity.set(paddle.paddleIndex, entity);
-				this.paddlePlayerIdToEntity.set(paddle.id, entity);
-				paddleCount++;
-			}
-
-			if (entity.hasComponent(WallComponent)) {
-				const wall = entity.getComponent(WallComponent)!;
-				this.wallPlayerIdToEntity.set(wall.id, entity);
-				wallCount++;
-			}
-		}
-
-		this.indexesDirty = false;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -106,123 +57,164 @@ export class NetworkingSystem extends System {
 				const state = serverMsg.state;
 				const balls = state.balls ?? [];
 				const paddles = state.paddles ?? [];
-				const stage = state.stage;
 				const events = state.events ?? [];
-				const gameState = state.gameState as GameStateInfo;
-
-				this.currentPhysicsState = { balls, paddles, stage, events, gameState };
-
-				if (gameState) {
-					this.phaseState.updateGameState(gameState);
-				}
 
 				events.forEach((event: any) => {
 					if (event.type === 'PHASE_TRANSITION') {
-						this.phaseState.handlePhaseTransition(event as PhaseTransitionEvent);
-					} else if (event.type === 'REBUILD_COMPLETE') {
-						const rebuildEvent = event as RebuildCompleteEvent;
-						const result = this.phaseState.handleRebuildComplete(rebuildEvent);
+						const newPhase = event.phase;
 
-						this.indexesDirty = true;
-						if (result.shouldTransition) {
-							this.game.transitionToRound(
-								result.playerCount,
-								entities,
-								this.currentPhysicsState,
-								rebuildEvent.playerMapping
-							);
+						if (newPhase !== this.currentPhase) {
+							console.log(`🎬 Phase changed: ${this.currentPhase} → ${newPhase}`);
+							this.currentPhase = newPhase;
+							this.game.onPhaseChange(newPhase);
 						}
+					}
 
-						if (rebuildEvent.playerMapping && Object.keys(rebuildEvent.playerMapping).length > 0) {
-							this.phaseState.remapPaddleEntities(entities, rebuildEvent.playerMapping);
+					if (event.type === 'REBUILD_COMPLETE') {
+						const mapping = event.playerMapping || {};
+						const newLocalIndex = mapping[localPaddleId] ?? -1;
+						const newPlayerCount = event.activePlayers.length;
+
+						const playerCountChanged = newPlayerCount !== this.currentPlayerCount;
+						const localIndexChanged = newLocalIndex !== this.game.getLocalPaddleIndex();
+
+						if (playerCountChanged) {
+							console.log(`🔄 Arena rebuild: ${this.currentPlayerCount} → ${newPlayerCount} players, local→${newLocalIndex}`);
+							this.game.transitionToRound(newPlayerCount, newLocalIndex);
+							this.currentPlayerCount = newPlayerCount;
 							this.indexesDirty = true;
+						} else if (localIndexChanged) {
+							console.log(`🎯 Local paddle remap: index ${this.game.getLocalPaddleIndex()} → ${newLocalIndex}`);
+							this.game.updateLocalPaddleIndex(newLocalIndex);
+						} else {
+							console.log(`⏭️ Skipping: already at ${newPlayerCount} players, index ${newLocalIndex}`);
 						}
 					}
 				});
 
-				if (stage && stage !== this.phaseState.currentStage && this.phaseState.isReadyForTransition()) {
-					const result = this.phaseState.shouldSyncToStage(stage as number);
-					if (result.shouldTransition) {
-						this.game.transitionToRound(result.playerCount, entities);
-						this.indexesDirty = true;
-					}
+				if (this.indexesDirty) {
+					const freshEntities = this.game.getEntities();
+					this.rebuildIndices(freshEntities);
 				}
 
 				balls.forEach(b => {
 					const e = this.ballIdToEntity.get(b.id as number);
 					if (!e) return;
-					const transform = e.getComponent(TransformComponent);
-					if (b.disabled == true)
-						transform?.disable();
-					else {
-						const ball = e.getComponent(BallComponent)!;
-						transform?.enable();
 
-						const scaleFactor = this.game.currentBallScale ? this.game.currentBallScale.x : 1.0;
-						const adjustedY = 3.0 + (scaleFactor - 1.0) * 0.1;
+					const transform = e.getComponent(TransformComponent);
+					const ball = e.getComponent(BallComponent);
+					if (!transform || !ball) return;
+
+					if (b.disabled) {
+						transform.disable();
+					} else {
+						transform.enable();
+
+						const scaleFactor = this.game.currentBallScale?.x ?? 1.0;
+						const ballRadius = 0.25 * scaleFactor;
+						const arenaTopY = 2.5;
+						const adjustedY = arenaTopY + ballRadius;
 
 						ball.serverPosition.set(b.x as number, adjustedY, b.y as number);
 						ball.lastServerUpdate = performance.now();
 						ball.velocity.set(b.vx as number, 0, b.vy as number);
 
-						if (transform && this.game.currentBallScale) {
-							transform.baseScale = this.game.currentBallScale.clone();
-							transform.scale = this.game.currentBallScale.clone();
+						if (this.game.currentBallScale) {
+							transform.baseScale.copyFrom(this.game.currentBallScale);
+							transform.scale.copyFrom(this.game.currentBallScale);
 						}
 					}
 				});
 
-				let playerCount = 0;
+				let activePaddleCount = 0;
 				paddles.forEach(p => {
-					let e = this.paddleIdToEntity.get(p.id as number);
-					if (!e) {
-						e = this.paddlePlayerIdToEntity.get(p.playerId as number);
-					}
-
+					const e = this.paddleIndexToEntity.get(p.id as number);
 					if (!e) return;
 
-					const playerId = e.getComponent(PaddleComponent)!.id;
-					const w = this.wallPlayerIdToEntity.get(playerId);
-
-					const paddle = e.getComponent(TransformComponent) as TransformComponent;
-					const wall = w?.getComponent(TransformComponent);
+					const paddleComp = e.getComponent(PaddleComponent);
+					const paddle = e.getComponent(TransformComponent);
+					if (!paddleComp || !paddle) return;
 
 					if (p.dead) {
-						if (!w) return;
-						const input = e.getComponent(InputComponent) as InputComponent;
-						if (input)
-							input.isLocal = false;
-						paddle?.disable();
-						wall?.enable();
-						if (playerId == localPaddleId && this.spectateButtonOn == false) {
+						paddle.disable();
+
+						const wallEntity = this.wallIndexToEntity.get(p.id as number);
+						if (wallEntity) {
+							const wallTransform = wallEntity.getComponent(TransformComponent);
+							if (wallTransform) {
+								wallTransform.enable();
+							}
+						}
+
+						if (paddleComp.isLocal && !this.spectateButtonOn) {
 							this.gameUI.showButton('spectate', 'Spectate', () => {
-								//what to do
-								console.log('spectate button');
+								console.log('Spectating...');
 							});
-							console.log("dead");
 							this.spectateButtonOn = true;
 						}
 					} else {
-						playerCount++;
-						const paddleComp = e.getComponent(PaddleComponent)!;
-						if (p.id != localPaddleId) {
+						activePaddleCount++;
+						paddle.enable();
+
+						const wallEntity = this.wallIndexToEntity.get(p.id as number);
+						if (wallEntity) {
+							const wallTransform = wallEntity.getComponent(TransformComponent);
+							if (wallTransform) {
+								wallTransform.disable();
+							}
+						}
+
+						if (paddleComp.isLocal) {
+							paddleComp.serverOffset = p.offset as number;
+						} else {
 							paddleComp.offset = p.offset as number;
 							paddle.rotation.y = paddleComp.baseRotation - paddleComp.offset;
 						}
-						else {
-							paddleComp.serverOffset = p.offset as number;
-						}
-
-						paddle?.enable();
-						wall?.disable();
 					}
 				});
-				this.gameUI.updatePlayerCount(playerCount);
-			}
 
-			if (serverMsg.end) {
-				console.log("Received GameEndMessage");
+				this.gameUI.updatePlayerCount(activePaddleCount);
 			}
 		});
+	}
+
+	private rebuildIndices(entities: Entity[]): void {
+		this.ballIdToEntity.clear();
+		this.paddleIndexToEntity.clear();
+		this.wallIndexToEntity.clear();
+
+		for (const entity of entities) {
+			if (entity.hasComponent(BallComponent)) {
+				const ball = entity.getComponent(BallComponent)!;
+				this.ballIdToEntity.set(ball.id, entity);
+			}
+
+			if (entity.hasComponent(PaddleComponent)) {
+				const paddle = entity.getComponent(PaddleComponent)!;
+				this.paddleIndexToEntity.set(paddle.paddleIndex, entity);
+			}
+
+			if (entity.hasComponent(WallComponent)) {
+				const wall = entity.getComponent(WallComponent)!;
+				this.wallIndexToEntity.set(wall.id, entity);
+			}
+		}
+
+		this.indexesDirty = false;
+		console.log(`✅ Indices: ${this.ballIdToEntity.size} balls, ${this.paddleIndexToEntity.size} paddles, ${this.wallIndexToEntity.size} walls`);
+	}
+
+	public forceIndexRebuild(): void {
+		this.indexesDirty = true;
+	}
+
+	resetPhaseState(): void {
+		this.indexesDirty = true;
+		this.ballIdToEntity.clear();
+		this.paddleIndexToEntity.clear();
+		this.wallIndexToEntity.clear();
+		this.spectateButtonOn = false;
+		this.currentPlayerCount = 100;
+		this.currentPhase = 'Phase 1';
 	}
 }

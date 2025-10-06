@@ -164,9 +164,11 @@ export class Player {
 	}
 
 	die(): void {
+		console.log("player die");
 		this.goal.visibility = 0;
 		this.shield.visibility = 0;
 		this.isAlive = false;
+		this.game.gameUI.showEnd("brick", this.game.newHighScore, this.game.score);
 		//interface de fin de game
 		// this.game.dispose();
 	}
