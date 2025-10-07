@@ -28,11 +28,12 @@ export class TournamentStream implements IStream {
 		this.ws = new WebSocket(url);
 		this.ws.binaryType = "arraybuffer";
 
+		this.connected = true;
 		this.ws.onmessage = (msg) => { this.onMessage(msg) };
 
 		this.ws.onerror = () => { console.log("tournament stream error") };
 
-		this.ws.onclose = () => { this.connected = false; htmlManager.tournament.close() };
+		this.ws.onclose = () => { this.connected = false; /*htmlManager.tournament.close()*/ };
 
 	}
 
@@ -59,6 +60,9 @@ export class TournamentStream implements IStream {
 		}
 		if (payload.startGame) {
 			console.log(`START GAME RECEIVED`);
+			stateManager.gameId = payload.startGame.gameId;
+			stateManager.gameMap = "void";
+			stateManager.gameMode = "tournament";
 			routeManager.comebackRoute = "/tournament";
 			routeManager.nav("/pong");
 			this.disconnect();
