@@ -32,7 +32,7 @@ export class NotificationStream implements IStream {
 		this.ws.onclose = () => {
 			console.log('WebSocket connection closed')
 		}
-		this.ws.onmessage = this.onMessage;
+		this.ws.onmessage = (msg) => { this.onMessage(msg) };
 		this.connected = true;
 	}
 
@@ -70,6 +70,7 @@ export class NotificationStream implements IStream {
 		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
 			.then((json: any) => {
 				htmlManager.notification.add({ type: NotificationType.friendRequest, uuid: notification.sender as string, username: json.data.username })
+				htmlManager.friendlist.addRequest(json.data);
 				// User.addFriendRequest(notification.sender, json.data.username);
 			})
 			.catch((err) => {
@@ -81,6 +82,7 @@ export class NotificationStream implements IStream {
 		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
 			.then((json: any) => {
 				htmlManager.notification.add({ type: NotificationType.text, text: `${json.data.username} accepted your friend request` });
+				User.addFriend(json.data);
 				// htmlManager.addNotification({type: "friend-accept", uuid: notification.sender, username: json.data.username});
 				// User.updateFriendlist();
 			})
@@ -104,6 +106,8 @@ export class NotificationStream implements IStream {
 		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
 			.then((json: any) => {
 				htmlManager.notification.add({ type: NotificationType.text, text: `${json.data.username} ${notification.status}` });
+				json.data.status = notification.status;
+				User.updateFriendStatus(json.data);
 				// htmlManager.addNotification({type: "game-invite", uuid: notification.sender, username: json.data.username, lobbyId: notification.lobbyid});
 			})
 			.catch((err) => {

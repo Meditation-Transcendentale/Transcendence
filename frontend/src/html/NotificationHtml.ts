@@ -99,10 +99,11 @@ export class NotificationHtml {
 				this.addGameInvite(notification as IGameInvite);
 				break;
 			}
-			case NotificationType.custom: {
+			case NotificationType.error: {
+				this.addError(notification as IErrorNotification)
 				break;
 			}
-			case NotificationType.error: {
+			case NotificationType.custom: {
 				break;
 			}
 		}
@@ -149,8 +150,7 @@ export class NotificationHtml {
 
 	private addText(option: ITextNotification) {
 		const div = this.default.cloneNode(true) as HTMLDivElement;
-		const label = document.createElement("label");
-		const sender = document.createElement("span");
+		const label = document.createElement("span");
 
 		label.className = "notification-text";
 
@@ -208,6 +208,28 @@ export class NotificationHtml {
 
 	}
 
+	private addError(option: IErrorNotification) {
+		const div = this.default.cloneNode(true) as HTMLDivElement;
+		const label = document.createElement("span");
+
+		// label.className = "notification-text";
+		div.classList.add("notification-error");
+
+		div.style.animationDuration = `${option.duration}ms`;
+
+		label.textContent = option.error;
+
+		div.appendChild(label);
+
+		this.container.prepend(div);
+		if (option.history) {
+			this.history.add(div);
+		}
+		setTimeout(() => { div.remove() }, option.duration);
+
+	}
+
+
 
 	private addFriendAccept(notification: IFriendAccept) {
 
@@ -224,7 +246,4 @@ export class NotificationHtml {
 
 	}
 
-	private addError(notification: IErrorNotification) {
-
-	}
 }

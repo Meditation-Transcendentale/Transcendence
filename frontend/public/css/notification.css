@@ -23,6 +23,11 @@
 	background-color: orange !important;
 }
 
+.notification-error {
+	background-color: blue !important;
+	color: white !important;
+}
+
 .notification-text {
 	background-color: inherit;
 	color: black;
