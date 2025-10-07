@@ -120,7 +120,7 @@ class Tournament {
         const buf = encodeTournamentServerMessage({
           finished: {},
         });
-        console.log ("FINAL FINISHED");
+        console.log("FINAL FINISHED");
         this.uwsApp.publish(this.id, buf, true);
         return;
       }
@@ -359,6 +359,7 @@ class Tournament {
           if (!resp || !resp.gameId)
             throw new Error("Invalid match.create response");
           match.gameId = resp.gameId;
+          match.score = [0, 0];
           console.log(
             `new game: ${match.gameId}|p1:${match.player1Id}|p2:${match.player2Id}`
           );
@@ -416,6 +417,21 @@ class Tournament {
     this.autoAdvanceWalkovers();
     this.sendUpdate();
     this.maybeStartReadyCheck();
+  }
+
+  isEmpty() {
+    return this.players.size === 0;
+  }
+
+  isStale() {
+    const now = Date.now();
+    const maxAge = 10 * 60 * 1000;
+    const inactivityTimeout = 5 * 60 * 1000;
+
+    return (
+      now - this.createdAt > maxAge ||
+      now - this.lastActivity > inactivityTimeout
+    );
   }
 }
 
@@ -489,23 +505,27 @@ export default class tournamentService {
   }
 
   cleanup() {
-		const toDelete = []
+    const toDelete = [];
 
-		for (const [id, tournament] of this.tournaments) {
-			if (tournament.isEmpty()) {
-				console.log(`Cleaning up empty tournament: ${id}`)
-				toDelete.push(id)
-			} else if (tournament.isStale()) {
-				console.log(`Cleaning up stale tournament: ${id} (created: ${new Date(tournament.createdAt)}})`)
-				toDelete.push(id)
-			}
-		}
+    for (const [id, tournament] of this.tournaments) {
+      if (tournament.isEmpty()) {
+        console.log(`Cleaning up empty tournament: ${id}`);
+        toDelete.push(id);
+      } else if (tournament.isStale()) {
+        console.log(
+          `Cleaning up stale tournament: ${id} (created: ${new Date(
+            tournament.createdAt
+          )}})`
+        );
+        toDelete.push(id);
+      }
+    }
 
-		toDelete.forEach(id => this.tournaments.delete(id))
+    toDelete.forEach((id) => this.tournaments.delete(id));
 
-		if (toDelete.length > 0) {
-			console.log(`Cleaned up ${toDelete.length} tournaments`);
-		}
+    if (toDelete.length > 0) {
+      console.log(`Cleaned up ${toDelete.length} tournaments`);
+    }
   }
 
   shutdown() {
