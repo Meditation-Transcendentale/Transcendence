@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 import bcrypt from "bcrypt";
 import { connect, JSONCodec } from 'nats';
+import validator from 'validator';
 
 import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrorsValid, handleErrors } from "../../shared/handleErrors.mjs";
@@ -50,8 +51,19 @@ function decrypt(text) {
 	return decrypted.toString();
 }
 
+const TFASchema = {
+	body: {
+		type: 'object',
+		required: ['password'],
+		additionalProperties: false,
+		properties: {
+			password: { type: 'string', format: 'password' }
+		}
+	}
+};
+
 const twoFARoutes = (app) => {
-	app.post('/enable-2fa', handleErrors(async (req, res) => {
+	app.post('/enable-2fa', { schema: TFASchema }, handleErrors(async (req, res) => {
 
 		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 			
@@ -62,7 +74,7 @@ const twoFARoutes = (app) => {
 			throw { status: userReturn.USER_029.http, code: userReturn.USER_029.code, message: userReturn.USER_029.message };
 		}
 
-		const password  = req.body.password;
+		const password = validator.escape(req.body.password);
 		if (!password) {
 			throw { status: userReturn.USER_005.http, code: userReturn.USER_005.code, message: userReturn.USER_005.message };
 		}
@@ -74,12 +86,9 @@ const twoFARoutes = (app) => {
 
 		const secret = generateSecret();
 
-		// console.log(secret, user.id);
-
 		await natsRequest(nats, jc, 'user.enable2FA', { secret, userId: user.id });
 
 		const qrCode = await generateQRCode(secret, user.username);
-			// console.log(qrCode);
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.TWO_FA_ENABLED, qrCode });
 	}));
@@ -110,7 +119,7 @@ const twoFARoutes = (app) => {
 
 	}));
 
-	app.delete('/disable-2fa', handleErrors(async (req, res) => {
+	app.delete('/disable-2fa', { schema: TFASchema }, handleErrors(async (req, res) => {
 
 		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
@@ -118,7 +127,7 @@ const twoFARoutes = (app) => {
 			throw { status: userReturn.USER_026.http, code: userReturn.USER_026.code, message: userReturn.USER_026.message };
 		}
 		
-		const password = req.body.password;
+		const password = validator.escape(req.body.password);
 		if (!password) {
 			throw { status: userReturn.USER_005.http, code: userReturn.USER_005.code, message: userReturn.USER_005.message };
 		}
