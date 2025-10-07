@@ -154,7 +154,7 @@
 #pong-map>input:hover,
 #create-game>input:hover {
 	color: black;
-	background-color: rgba(255, 152, 23, 0.8); 
+	background-color: #c77dff; 
 }
 #pong-map>input[on],
 #create-game>input[on] {

@@ -122,9 +122,10 @@ export class Monolith {
 
 		this.cube.position = new Vector3(0, 4.5, 0);
 		this.cubeLight = new PointLight("cube light", this.cube.position, this.scene);
-		this.cubeLight.range = 2;
+		this.cubeLight.range = 0;
 		this.cubeLight.diffuse = new Color3(0.45, 0.20, 0.75);
-		this.cubeLight.intensity = 2;
+		this.cubeLight.intensity = 0;
+		this.cubeLight.isEnabled(false);
 
 		this.initializeVector3Pool();
 	}
@@ -220,10 +221,10 @@ export class Monolith {
 		this.depthMaterial.setFloat("mouseInfluenceRadius", 1.);
 
 		const cubeMaterial = new CubeMaterial("cubeMaterial", this.scene);
-		cubeMaterial.emissiveColor = this.light.diffuse;
-		cubeMaterial.diffuseColor = new Color3(0.45, 0.20, 0.75);
-		cubeMaterial.specularColor = new Color3(0.65, 0.45, 0.95);
-		cubeMaterial.specularPower = 32;
+		// cubeMaterial.emissiveColor = this.light.diffuse;
+		// cubeMaterial.diffuseColor = new Color3(0.45, 0.20, 0.75);
+		// cubeMaterial.specularColor = new Color3(0.65, 0.45, 0.95);
+		// cubeMaterial.specularPower = 32;
 
 		this.cubeMaterial = cubeMaterial;
 
