@@ -17,25 +17,6 @@ void main(void) {
 }
 `;
 
-Effect.ShadersStore["fogApplyFragmentShader"] = `
-precision highp float;
-
-uniform sampler2D	textureSampler;
-uniform sampler2D	fogTexture;
-
-uniform vec3	fogAbsorption;
-
-varying vec2	vUV;
-
-void main(void) {
-	vec4	color = texture(textureSampler, vUV);
-	vec4	fog = texture(fogTexture, vUV);
-	
-	gl_FragColor.rgb = color.rgb * pow(exp(-fogAbsorption), vec3(fog.r * 100.) * color.a) + fog.gba;
-	gl_FragColor.a = 1.;
-}
-`;
-
 Effect.ShadersStore["fogApply3DFragmentShader"] = `
 precision highp float;
 
@@ -50,7 +31,7 @@ void main(void) {
 	vec4	color = texture(textureSampler, vUV);
 	vec4	fog = texture(fogTexture, vUV);
 	
-	gl_FragColor.rgb = color.rgb * pow(exp(-fogAbsorption), vec3(fog.a) * color.a) + fog.rgb;
+	gl_FragColor.rgb = color.rgb * pow(exp(-fogAbsorption), vec3(fog.a) * color.a) + fog.rgb ;
 	gl_FragColor.a = 1.;
 }
 `;

@@ -33,6 +33,7 @@
     - handle error request back
     - sanitize input
     - change goal position physics pong
+    - game tournament
 
 ### tweak
     - 3D tweak

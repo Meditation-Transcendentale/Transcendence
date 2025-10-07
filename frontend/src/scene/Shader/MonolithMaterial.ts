@@ -131,7 +131,7 @@ export class MonolithMaterial extends CustomMaterial {
 			gl_FragColor.rgb *= oclusion;
 			gl_FragColor.rgb += baseColor2;
 
-			gl_FragColor.a = 1.;
+			// gl_FragColor.a = 1.;
 		`)
 		const normalTex = new Texture("/assets/chunk_normal.jpg", scene);
 		this.bumpTexture = normalTex;

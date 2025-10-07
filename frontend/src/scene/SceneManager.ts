@@ -177,12 +177,7 @@ class SceneManager {
 				this.ballGrass.enable = true;
 				this.fog.enable = true;
 				this.assets.monolithMesh.setEnabled(true);
-				this.assets.monolithMesh.renderingGroupId = 3;
 
-				// NEW: Use layer mask to exclude from fog depth
-				this.assets.monolithMesh.layerMask = 0x20000000;
-				this.assets.fogDepthTexture.activeCamera!.layerMask = 0x0FFFFFFF;
-				this.assets.camera.layerMask = 0xFFFFFFFF;
 				this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = true;
 				this.assets.brRoot.setEnabled(false);
