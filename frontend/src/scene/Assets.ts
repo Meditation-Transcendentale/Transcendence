@@ -222,7 +222,7 @@ export class Assets {
 
 	private loadTextureMandatory() {
 		const fogMaxResolution = 1080;
-		const fogRatio = 0.5;
+		const fogRatio = 1.;
 		stateManager.set("fogMaxResolution", fogMaxResolution);
 		stateManager.set("fogRatio", fogRatio);
 		this.fogDepthTexture = new RenderTargetTexture("fogDepth", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * sceneManager.resolutionRatio }, this.scene, {

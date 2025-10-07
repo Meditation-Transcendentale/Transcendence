@@ -1,0 +1,12 @@
+@keyframes fade-out {
+
+	0%,
+	80% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+
+}
