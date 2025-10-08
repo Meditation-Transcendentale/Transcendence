@@ -1,4 +1,4 @@
-import { AdvancedDynamicTexture, Control, Rectangle, TextBlock, Vector2 } from "@babylonImport";
+import { AdvancedDynamicTexture, Control, Rectangle, TextBlock, Vector2 } from "../../../babylon";
 
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
