@@ -81,6 +81,20 @@ async function init() {
 				uuid: "17231823713123123"
 			})
 		}
+		if (e.key == "v") {
+			const p = new Popup({
+				type: PopupType.validation,
+				title: "validation",
+				input: "username",
+				submit: (password: string, token?: string, input?: string) => {
+					console.log(password, token, input);
+				},
+				abort: () => {
+					console.log("abort")
+				}
+			})
+			p.show();
+		}
 	})
 
 

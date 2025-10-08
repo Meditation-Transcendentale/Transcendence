@@ -25,11 +25,11 @@ interface IAcceptPopupOption extends IPopupOption {
 
 interface IValidationPopupOption extends IPopupOption {
 	input?: string;
-	submit: (password: string, token: string, input?: string) => void;
+	submit: (password: string, token?: string, input?: string) => void;
 	abort: () => void;
 }
 
-export type PopupOption = ICustomPopupOption | IAcceptPopupOption;
+export type PopupOption = ICustomPopupOption | IAcceptPopupOption | IValidationPopupOption;
 
 export class Popup {
 	private option: PopupOption;
@@ -62,6 +62,10 @@ export class Popup {
 			}
 			case PopupType.custom: {
 				this.generateCustomPopup(option as ICustomPopupOption);
+				break;
+			}
+			case PopupType.validation: {
+				this.generateValidationPopup(option as IValidationPopupOption);
 				break;
 			}
 		}
@@ -132,7 +136,31 @@ export class Popup {
 			this.form.appendChild(token);
 		}
 
+		const submit = document.createElement("button");
+		submit.type = "submit";
+		submit.textContent = "Submit";
+		const abort = document.createElement("button");
+		abort.textContent = "Abort";
 
+		const footer = document.createElement("footer");
+		this.form.appendChild(footer);
+
+		footer.appendChild(submit);
+		footer.appendChild(abort);
+
+		abort.addEventListener("click", () => {
+			option.abort();
+			this.close();
+		})
+
+		this.form.addEventListener("submit", (e) => {
+			e.preventDefault();
+			const data = new FormData(this.form);
+			const i = data.get("input") as string;
+			const p = data.get("password") as string;
+			const t = data.get("password") as string;
+			option.submit(p, t, i);
+		})
 	}
 
 	private generateCustomPopup(option: ICustomPopupOption) {
