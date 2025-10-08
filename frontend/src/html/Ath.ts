@@ -1,5 +1,5 @@
 import { User } from "../User";
-import { patchRequest, postRequest, deleteRequest } from "../networking/request";
+import { patchRequest, postRequest, deleteRequest, avatarRequest } from "../networking/request";
 import { Popup, PopupType } from "./Popup";
 
 export class Ath {
@@ -10,8 +10,9 @@ export class Ath {
 	private trigger!: HTMLSpanElement;
 	private dropdown!: HTMLDivElement;
 
-    private settings: athSettings;
-    
+	private settings: athSettings;
+	private profile: athProfile;
+		
 	private isOpen: boolean = false;
 
 	constructor() {
@@ -46,7 +47,8 @@ export class Ath {
 
 		this.setupEventListeners();
 
-        this.settings = new athSettings();
+		this.settings = new athSettings(this);
+		this.profile = new athProfile(this);
 
 	}
 
@@ -109,7 +111,7 @@ export class Ath {
 
 	private createMenuItems() {
 		const menuItems = [
-			{ text: "Profile", action: () => console.log(User) },
+			{ text: "Profile", action: () => this.profile.load() },
 			{ text: "Settings", action: () => this.settings.load() },
 			{ text: "Quit", action: () => this.quitFunction() }
 		];
@@ -182,6 +184,8 @@ export class Ath {
 	public updateProfileInfo() {
 		const currentUsername = User.username || "User";
 		const currentAvatar = User.avatar || "default_avatar.jpg";
+
+		console.log("Updating profile info:", currentUsername, currentAvatar);
 		
 		this.trigger.innerText = `${currentUsername}`;
 		this.profileImage.src = currentAvatar;
@@ -199,18 +203,18 @@ export class Ath {
 
 	private quitFunction() {
 
-        const quitPopup = new Popup({
-            type: PopupType.accept,
-            title: "Logout",
-            text: "Are you sure you want to logout?",
-            accept: () => {
-                postRequest("auth/logout", {})
-                        .then(() => { window.location.reload() })
-                        .catch(() => { window.location.reload() })
-            },
-            decline: () => { }
-        });
-        quitPopup.show();
+		const quitPopup = new Popup({
+			type: PopupType.accept,
+			title: "Logout",
+			text: "Are you sure you want to logout?",
+			accept: () => {
+				postRequest("auth/logout", {})
+						.then(() => { window.location.reload() })
+						.catch(() => { window.location.reload() })
+			},
+			decline: () => { }
+		});
+		quitPopup.show();
 	}
 }
 
@@ -221,172 +225,309 @@ export class Ath {
 
 class athSettings {
 
-    private settingsPopup: Popup;
-    private changeUsernamePopup!: Popup;
-    private changePasswordPopup!: Popup;
-    private updateTwoFAPopup!: Popup;
-    private twoFAQrCodePopup!: Popup;
+	private settingsPopup: Popup;
+	private changeUsernamePopup!: Popup;
+	private changePasswordPopup!: Popup;
+	private changeAvatarPopup!: Popup;
+	private updateTwoFAPopup!: Popup;
+	private twoFAQrCodePopup!: Popup;
 
-    private qrCodeSrc: string = "";
-    private twoFAEnabled: boolean = false;
+	private toggle2FABtn: HTMLButtonElement;
+	private qrCodeSrc: string = "";
+	private twoFAEnabled: boolean = false;
+	private athInstance: Ath;
 
-    constructor() { 
+	constructor(athInstance: Ath) { 
 
-        console.log("twofa:", this.twoFAEnabled);
-        this.settingsPopup = new Popup({
-            type: PopupType.custom,
-            title: "Settings",
-            text: "",
-            div: this.createSettingsDiv()
-        });
+		this.athInstance = athInstance;
+		console.log("twofa:", this.twoFAEnabled);
 
-        this.changeUsernamePopup = new Popup({
-            type: PopupType.validation,
-            title: "Change Username",
-            input: "username",
-            submit: (password: string, token?: string, input?: string) => {
-                patchRequest("update-info/username", { username: input, password: password, token: token })
-                    .then((json) => { User.check(), this.changeUsernamePopup.close() })
-                    .catch((err) => { })
-                console.log("Change Username to:", input, "with password:", password, "and token:", token);
-            },
-            abort: () => {
-                console.log("Change Username aborted");
-            }
-        });
+		this.toggle2FABtn = document.createElement("button");
 
-        this.changePasswordPopup = new Popup({
-            type: PopupType.validation,
-            title: "Change Password",
-            input: "password",
-            submit: (password: string, token?: string, input?: string) => {
-                patchRequest("update-info/password", { newPassword: input, password: password, token: token })
-                    .then((json) => { User.check(), this.changePasswordPopup.close() })
-                    .catch((err) => { })
-                console.log("Change Password to:", input, "with password:", password, "and token:", token);
-            },
-            abort: () => {
-                console.log("Change Password aborted");
-            }
-        });
+		this.settingsPopup = new Popup({
+			type: PopupType.custom,
+			title: "Settings",
+			text: "",
+			div: this.createSettingsDiv()
+		});
 
-        this.updateTwoFAPopup = new Popup({
-            type: PopupType.validation,
-            title: "Update 2FA",
-            submit: (password: string, token?: string, input?: string) => {
-                this.handle2FAToggle(password, token);
-                console.log("Update 2FA with password:", password, "and token:", token);
-            },
-            abort: () => {
-                console.log("Update 2FA aborted");
-            }
-        });
+		this.changeUsernamePopup = new Popup({
+			type: PopupType.validation,
+			title: "Change Username",
+			input: "username",
+			submit: (password: string, token?: string, input?: string) => {
+				patchRequest("update-info/username", { username: input, password: password, token: token })
+					.then(async (json) => { await User.check(), this.changeUsernamePopup.close() })
+					.catch((err) => { })
+				console.log("Change Username to:", input, "with password:", password, "and token:", token);
+			},
+			abort: () => {
+				console.log("Change Username aborted");
+			}
+		});
 
-        
-    }
-    
-    private handle2FAToggle(password: string, token?: string) {
+		this.changePasswordPopup = new Popup({
+			type: PopupType.validation,
+			title: "Change Password",
+			input: "password",
+			submit: (password: string, token?: string, input?: string) => {
+				patchRequest("update-info/password", { newPassword: input, password: password, token: token })
+					.then(async (json) => { await User.check(), this.changePasswordPopup.close() })
+					.catch((err) => { })
+				console.log("Change Password to:", input, "with password:", password, "and token:", token);
+			},
+			abort: () => {
+				console.log("Change Password aborted");
+			}
+		});
 
-        
-        
-        
-        if (this.twoFAEnabled) {
-            deleteRequest("update-info/disable-2fa", { password, token })
-            .then((json: any) => {User.check(), this.updateTwoFAPopup.close(), this.twoFAEnabled = false; })
-            .catch((err: any) => { err.json() })
-            
-        } else {
-            postRequest("update-info/enable-2fa", { password })
-            .then((json: any) => {
-                this.qrCodeSrc = json.qrCode,
-                this.twoFAQrCodePopup = new Popup({
-                    type: PopupType.custom,
-                    title: "Scan this QR code with your authenticator app.",
-                    div: this.createQrCodeDiv()
-                });
-                this.twoFAQrCodePopup.show(), 
-                User.check(), 
-                this.updateTwoFAPopup.close(), 
-                this.twoFAEnabled = true; })
-            .catch((err: any) => { err.json() })
-        }
-    }
+		this.changeAvatarPopup = new Popup({
+			type: PopupType.custom,
+			title: "Change Avatar",
+			div: this.createAvatarDiv()
+		});
 
-    private createQrCodeDiv(): HTMLDivElement {
-        const div = document.createElement("div");
-        div.style.display = "flex";
-        div.style.flexDirection = "column";
-        div.style.alignItems = "center";
-        div.style.gap = "10px";
+		this.updateTwoFAPopup = new Popup({
+			type: PopupType.validation,
+			title: "Update 2FA",
+			submit: (password: string, token?: string, input?: string) => {
+				this.handle2FAToggle(password, token);
+				console.log("Update 2FA with password:", password, "and token:", token);
+			},
+			abort: () => {
+				console.log("Update 2FA aborted");
+			}
+		});
+	}
+		
+	private createAvatarDiv(): HTMLDivElement {
+		const div = document.createElement("div");
+		div.style.display = "flex";
+		div.style.flexDirection = "column";
+		div.style.gap = "10px";
 
-        const img = document.createElement("img");
-        // const base64 = (this.qrCodeSrc as string).substring("data:image/png;base64,".length)
-		// this.qrCodeSrc = "data:image/png;base64," + base64;;        
-        img.src = this.qrCodeSrc;
-        img.alt = "2FA QR Code";
-        img.style.width = "150px";
-        img.style.height = "150px";
+		const fileInput = document.createElement("input");
+		fileInput.type = "file";
+		fileInput.accept = "image/*";
 
-        div.appendChild(img);
+		const previewImg = document.createElement("img");
+		previewImg.style.width = "100px";
+		previewImg.style.height = "100px";
+		previewImg.style.objectFit = "cover";
+		previewImg.style.borderRadius = "50%";
+		previewImg.style.marginBottom = "10px";
+		
+		fileInput.addEventListener("change", () => {
+			const file = fileInput.files ? fileInput.files[0] : null;
 
-        return div;
-    }
-    
-    private createSettingsDiv(): HTMLDivElement {
-        const div = document.createElement("div");
-        div.style.display = "flex";
-        div.style.flexDirection = "column";
-        div.style.gap = "10px";
+			const url = file ? URL.createObjectURL(file) : "default_avatar.jpg";
+			previewImg.src = url;
+			
+			div.appendChild(previewImg);
+		});
 
-        const changeUsernameBtn = document.createElement("button");
-        changeUsernameBtn.textContent = "Change Username";
+		const uploadBtn = document.createElement("button");
+		uploadBtn.textContent = "Upload";
 
-        const changePasswordBtn = document.createElement("button");
-        changePasswordBtn.textContent = "Change Password";
+		uploadBtn.addEventListener("click", () => {
+			const file = fileInput.files ? fileInput.files[0] : null;
+			if (file) {
+				const formData = new FormData();
+				formData.append("avatar", file);
 
-        const toggle2FABtn = document.createElement("button");
-        toggle2FABtn.textContent = "Enable/Disable 2FA";
+				avatarRequest("update-info/avatar", formData)
+					.then(async (json) => {
+						await User.check();
+						if (this.athInstance) {
+							this.athInstance.updateProfileInfo();
+						}
+						this.changeAvatarPopup.close();
+					})
+					.catch((err) => { })
+			}
+		});
 
-        const changeAvatarBtn = document.createElement("button");
-        changeAvatarBtn.textContent = "Change Avatar";
+		div.appendChild(fileInput);
+		div.appendChild(uploadBtn);
 
-        changeUsernameBtn.addEventListener("click", () => {
-            this.changeUsernamePopup.show();
-            console.log("Change Username Clicked");
-        });
+		return div;
+	}
 
-        changePasswordBtn.addEventListener("click", () => {
-            this.changePasswordPopup.show();
-            console.log("Change Password Clicked");
-        });
+	private handle2FAToggle(password: string, token?: string) {
 
-        changeAvatarBtn.addEventListener("click", () => {
-            console.log("Change Avatar Clicked");
-        });
+		if (this.twoFAEnabled) {
+			deleteRequest("update-info/disable-2fa", { password, token })
+			.then(async (json: any) => {
+				this.toggle2FABtn.textContent = "Enable 2FA",
+				await User.check(), 
+				this.updateTwoFAPopup.close(), 
+				this.twoFAEnabled = false; })
+			.catch((err: any) => { err.json() })
+			
+		} else {
+			postRequest("update-info/enable-2fa", { password })
+			.then(async (json: any) => {
+				this.qrCodeSrc = json.qrCode,
+				this.twoFAQrCodePopup = new Popup({
+					type: PopupType.custom,
+					title: "Scan this QR code with your authenticator app.",
+					div: this.createQrCodeDiv()
+				});
+				this.twoFAQrCodePopup.show(), 
+				await User.check(), 
+				this.toggle2FABtn.textContent = "Disable 2FA",
+				this.updateTwoFAPopup.close(), 
+				this.twoFAEnabled = true; })
+			.catch((err: any) => { err.json() })
+		}
 
-        toggle2FABtn.addEventListener("click", () => {
-            this.updateTwoFAPopup.show();
-            console.log("Toggle 2FA Clicked");
-        });
+	}
 
-        div.appendChild(changeUsernameBtn);
-        div.appendChild(changePasswordBtn);
-        div.appendChild(changeAvatarBtn);
-        div.appendChild(toggle2FABtn);
-        
-        return div;
-    }
-    
-    public load () {
-        this.twoFAEnabled = User.twofa === 1;
-        this.settingsPopup.show();
+	private createQrCodeDiv(): HTMLDivElement {
+		const div = document.createElement("div");
+		div.style.display = "flex";
+		div.style.flexDirection = "column";
+		div.style.alignItems = "center";
+		div.style.gap = "10px";
 
-    }
-    
-    public unload () {
-        console.log("unload ath settings");
-    }
+		const img = document.createElement("img");
+		img.src = this.qrCodeSrc;
+		img.alt = "2FA QR Code";
+		img.style.width = "150px";
+		img.style.height = "150px";
 
-    
+		div.appendChild(img);
 
+		return div;
+	}
+
+	private update2FAButton() {
+		if (this.twoFAEnabled)
+			this.toggle2FABtn.textContent = "Disable 2FA";
+		else
+			this.toggle2FABtn.textContent = "Enable 2FA";
+	}
+		
+	private createSettingsDiv(): HTMLDivElement {
+		const div = document.createElement("div");
+		div.style.display = "flex";
+		div.style.flexDirection = "column";
+		div.style.gap = "10px";
+
+		const changeUsernameBtn = document.createElement("button");
+		changeUsernameBtn.textContent = "Change Username";
+
+		const changePasswordBtn = document.createElement("button");
+		changePasswordBtn.textContent = "Change Password";
+
+		const changeAvatarBtn = document.createElement("button");
+		changeAvatarBtn.textContent = "Change Avatar";
+
+		changeUsernameBtn.addEventListener("click", () => {
+			this.changeUsernamePopup.show();
+			console.log("Change Username Clicked");
+		});
+
+		changePasswordBtn.addEventListener("click", () => {
+			this.changePasswordPopup.show();
+			console.log("Change Password Clicked");
+		});
+
+		changeAvatarBtn.addEventListener("click", () => {
+			this.changeAvatarPopup.show();
+			console.log("Change Avatar Clicked");
+		});
+
+		this.toggle2FABtn.addEventListener("click", () => {
+			this.updateTwoFAPopup.show();
+			console.log("Toggle 2FA Clicked");
+		});
+
+		div.appendChild(changeUsernameBtn);
+		div.appendChild(changePasswordBtn);
+		div.appendChild(changeAvatarBtn);
+		div.appendChild(this.toggle2FABtn);
+		
+		return div;
+	}
+		
+	public load () {
+		this.twoFAEnabled = User.twofa === 1;
+		this.update2FAButton();
+		this.settingsPopup.show();
+
+	}
+		
+	public unload () {
+		this.settingsPopup.close();
+		console.log("unload ath settings");
+	}
+}
+
+class athProfile {
+	private athInstance: Ath;
+
+
+	private div!: HTMLDivElement;
+	private profileImg!: HTMLImageElement;
+	private usernameElem!: HTMLHeadingElement;
+	private statusElem!: HTMLParagraphElement;
+	private profilePopup: Popup;
+
+
+	constructor(athInstance: Ath) {
+		this.athInstance = athInstance;
+		
+		this.createProfileDiv();
+
+		this.profilePopup = new Popup({
+			type: PopupType.custom,
+			title: "Profile",
+			div: this.div
+		});
+	}
+	
+	private createProfileDiv() {
+		this.div = document.createElement("div");
+		this.div.style.display = "flex";
+		this.div.style.flexDirection = "column";
+		this.div.style.alignItems = "center";
+		this.div.style.gap = "10px";
+
+		this.profileImg = document.createElement("img");
+		this.profileImg.alt = "Profile Image";
+		this.profileImg.style.width = "100px";
+		this.profileImg.style.height = "100px";
+		this.profileImg.style.objectFit = "cover";
+		this.profileImg.style.borderRadius = "50%";
+
+		this.usernameElem = document.createElement("h2");
+
+		this.statusElem = document.createElement("p");
+		this.statusElem.style.fontSize = "12px";
+
+		this.div.appendChild(this.profileImg);
+		this.div.appendChild(this.usernameElem);
+		this.div.appendChild(this.statusElem);
+
+	}
+
+	private updateProfileInfo() {
+		this.profileImg.src = User.avatar || "default_avatar.jpg";
+		this.usernameElem.textContent = User.username || "User";
+		this.statusElem.textContent = `Status: ${User.status || "offline"}`;
+		this.statusElem.style.color = User.status === "online" ? "green" : User.status === "offline" ? "orange" : "red";
+	}
+
+
+	public load() {
+		this.updateProfileInfo();
+		this.profilePopup.show();
+		console.log("load ath profile");
+	}
+
+	public unload() {
+		this.profilePopup.close();
+		console.log("unload ath profile");
+	}
 }

@@ -168,7 +168,7 @@ export class Popup {
 			const data = new FormData(this.form);
 			const i = data.get("input") as string;
 			const p = data.get("password") as string;
-			const t = data.get("password") as string;
+			const t = data.get("token") as string;
 			option.submit(p, t, i);
 		})
 	}
