@@ -78,4 +78,10 @@ export class TournamentStream implements IStream {
 		const buf = encodeTournamentClientMessage({ ready: {} });
 		this.ws?.send(buf);
 	}
+
+	public spectate() {
+		routeManager.comebackRoute = "/tournament";
+		routeManager.nav("/pong");
+		this.disconnect();
+	}
 }

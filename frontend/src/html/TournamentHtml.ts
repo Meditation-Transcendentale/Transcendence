@@ -151,6 +151,10 @@ export class TournamentHtml implements IHtml {
 		}
 	}
 
+	private sendSpectate() {
+		streamManager.tournament.spectate();
+	}
+
 	private sendQuit() {
 		streamManager.tournament.quit();
 		stateManager.tournamentId = "";
@@ -271,6 +275,13 @@ export class TournamentHtml implements IHtml {
 		return b;
 	}
 
+	private makeSpectateButton(): HTMLButtonElement {
+		const b = document.createElement("button");
+		b.textContent = "Spectate";
+		b.addEventListener("click", () => this.sendSpectate());
+		return b;
+	}
+
 	private statusBadge(p: PlayerState | null): HTMLElement | null {
 		if (!p) return null;
 		const s = document.createElement("span");
@@ -310,6 +321,7 @@ export class TournamentHtml implements IHtml {
 			side === "root" ? "right" : side
 		);
 
+		const spectateButton = 
 		if (node.winnerId && node.player1Id && node.winnerId === node.player1Id)
 			top.classList.add("winner");
 		if (node.winnerId && node.player2Id && node.winnerId === node.player2Id)
