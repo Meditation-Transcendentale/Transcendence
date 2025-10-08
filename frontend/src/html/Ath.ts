@@ -224,6 +224,7 @@ class athSettings {
     private settingsPopup: Popup;
     private changeUsernamePopup!: Popup;
     private changePasswordPopup!: Popup;
+    private updateTwoFAPopup!: Popup;
 
     constructor() { 
         this.settingsPopup = new Popup({
@@ -231,6 +232,42 @@ class athSettings {
             title: "Settings",
             text: "",
             div: this.createSettingsDiv()
+        });
+
+        this.changeUsernamePopup = new Popup({
+            type: PopupType.validation,
+            title: "Change Username",
+            input: "new username",
+            submit: (password: string, token?: string, input?: string) => {
+                console.log("Change Username to:", input, "with password:", password, "and token:", token);
+            },
+            abort: () => {
+                console.log("Change Username aborted");
+            }
+        });
+
+        this.changePasswordPopup = new Popup({
+            type: PopupType.validation,
+            title: "Change Password",
+            input: "new Password",
+            submit: (password: string, token?: string, input?: string) => {
+                console.log("Change Password to:", input, "with password:", password, "and token:", token);
+            },
+            abort: () => {
+                console.log("Change Password aborted");
+            }
+        });
+
+        this.updateTwoFAPopup = new Popup({
+            type: PopupType.validation,
+            title: "Update 2FA",
+            input: "2FA Token",
+            submit: (password: string, token?: string, input?: string) => {
+                console.log("Update 2FA with password:", password, "and token:", token);
+            },
+            abort: () => {
+                console.log("Update 2FA aborted");
+            }
         });
 
     }
@@ -254,10 +291,12 @@ class athSettings {
         changeAvatarBtn.textContent = "Change Avatar";
 
         changeUsernameBtn.addEventListener("click", () => {
+            this.changeUsernamePopup.show();
             console.log("Change Username Clicked");
         });
 
         changePasswordBtn.addEventListener("click", () => {
+            this.changePasswordPopup.show();
             console.log("Change Password Clicked");
         });
 
@@ -266,6 +305,7 @@ class athSettings {
         });
 
         toggle2FABtn.addEventListener("click", () => {
+            this.updateTwoFAPopup.show();
             console.log("Toggle 2FA Clicked");
         });
 

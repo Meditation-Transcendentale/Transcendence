@@ -165,6 +165,9 @@ export class Popup {
 
 	private generateCustomPopup(option: ICustomPopupOption) {
 		this.form.appendChild(option.div);
+		this.form.addEventListener("submit", (e) => {
+			e.preventDefault();
+				});
 	}
 
 	public show() {
