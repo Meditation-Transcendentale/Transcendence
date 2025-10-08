@@ -306,7 +306,7 @@ export class PongBR {
 	}
 
 	private createCameraAnimation(property: string, targetValue: number, frameRate: number, duration: number): any {
-		const { Animation } = require('@babylonjs/core');
+		const { Animation } = require('../../babylon');
 
 		const animation = new Animation(
 			`camera_${property}`,

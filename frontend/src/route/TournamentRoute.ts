@@ -9,7 +9,6 @@ export class TournamentRoute implements IRoute {
 	constructor() { }
 
 	public async load(): Promise<void> {
-		console.log("totbabna");
 		sceneManager.load("home");
 		sceneManager.cameraManager.vue = "tournament";
 		htmlManager.tournament.load();

@@ -2,6 +2,9 @@
 @import url("inputs.css");
 @import url("popup.css");
 @import url("loading.css");
+@import url("notification.css");
+@import url("class.css");
+@import url("friendlist.css");
 
 ::selection {
 	color: black !important;
@@ -421,42 +424,6 @@ input[on] {
 	z-index: 11;
 }
 
-#notification-container {
-	display: block;
-	position: absolute;
-	top: 0%;
-	right: 0%;
-	width: fit-content;
-	min-width: 10vh;
-	min-height: 10vh;
-	height: fit-content;
-	pointer-events: auto;
-	/*z-index: 39;*/
-}
-
-#notification-container:hover * {
-	opacity: 1;
-	animation: none;
-}
-
-.notification {
-	display: block;
-	position: relative;
-	right: 0%;
-	width: fit-content;
-	height: fit-content;
-	font: var(--font-speak);
-	font-size: 3vh;
-	color: black;
-	opacity: 0;
-	animation: fade-out var(--duration) linear;
-	/*z-index: 40;*/
-}
-
-.notification:hover {
-	color: white;
-}
-
 #friend-request {
 	position: absolute;
 	top: 50%;
@@ -508,18 +475,6 @@ input[on] {
 }
 
 
-@keyframes fade-out {
-
-	0%,
-	80% {
-		opacity: 1;
-	}
-
-	100% {
-		opacity: 0;
-	}
-
-}
 
 #utils-details {
 	position: absolute;

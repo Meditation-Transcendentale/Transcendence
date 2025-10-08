@@ -1,5 +1,4 @@
-import { MorphTarget } from "@babylonjs/core";
-import { ArcRotateCamera, Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, PBRMaterial, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, ShadowGenerator, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3, Vector4 } from "../babylon";
+import { ArcRotateCamera, Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, PBRMaterial, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, ShadowGenerator, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3, Vector4, MorphTarget } from "../babylon";
 import { stateManager } from "../state/StateManager";
 import { perlinWorley3D } from "./PerlinWorley";
 import { sceneManager } from "./SceneManager";
@@ -222,7 +221,7 @@ export class Assets {
 
 	private loadTextureMandatory() {
 		const fogMaxResolution = 1080;
-		const fogRatio = 0.5;
+		const fogRatio = 1.;
 		stateManager.set("fogMaxResolution", fogMaxResolution);
 		stateManager.set("fogRatio", fogRatio);
 		this.fogDepthTexture = new RenderTargetTexture("fogDepth", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * sceneManager.resolutionRatio }, this.scene, {

@@ -1,8 +1,15 @@
+import { routeManager } from "../route/RouteManager";
+import { stateManager } from "../state/StateManager";
 import { htmlManager } from "./HtmlManager";
+import { Popup, PopupType } from "./Popup";
 
 interface INotification {
 	type: NotificationType;
-	duration?: string;
+	/*
+	* duration in ms 
+	*/
+	duration?: number;
+	history?: boolean;
 }
 
 interface IFriendRequest extends INotification {
@@ -56,52 +63,53 @@ export class NotificationHtml {
 	private container: HTMLDivElement;
 	private default: HTMLDivElement;
 
-	private defaultDuration = "1s";
+	private defaultDuration = 3000;
 
 	constructor() {
 		this.history = new Set<HTMLElement>();
 
 		this.container = document.createElement("div");
 		this.container.className = "notification-container";
+		document.body.appendChild(this.container);
 
 		this.default = document.createElement("div");
 		this.default.className = "notification";
 		//Add close button
+	}
 
-
+	public load() {
+		document.body.appendChild(this.container);
 	}
 
 	public add(notification: Notification) {
-		if (!notification.duration) {
+		if (!notification.duration)
 			notification.duration = this.defaultDuration;
-		}
+		if (!notification.history)
+			notification.history = false;
 		switch (notification.type) {
 			case NotificationType.friendRequest: {
 				this.addFriendRequest(notification as IFriendRequest);
 				break;
 			}
-			case NotificationType.friendAccept: {
+			case NotificationType.text: {
+				this.addText(notification as ITextNotification);
 				break;
 			}
 			case NotificationType.gameInvite: {
+				this.addGameInvite(notification as IGameInvite);
 				break;
 			}
-			case NotificationType.statusUpdate: {
-				break;
-			}
-			case NotificationType.text: {
+			case NotificationType.error: {
+				this.addError(notification as IErrorNotification)
 				break;
 			}
 			case NotificationType.custom: {
 				break;
 			}
-			case NotificationType.error: {
-				break;
-			}
 		}
 	}
 
-	private addFriendRequest(notification: IFriendRequest) {
+	private addFriendRequest(option: IFriendRequest) {
 		const div = this.default.cloneNode(true) as HTMLDivElement;
 		const label = document.createElement("label");
 		const sender = document.createElement("span");
@@ -110,40 +118,132 @@ export class NotificationHtml {
 		label.className = "notification-text";
 		sender.className = "notification-username";
 
-		div.style.animationDuration = notification.duration as string;
+		div.style.animationDuration = `${option.duration}ms`;
 
 		label.textContent = "Friend request from ";
-		sender.textContent = notification.username;
+		sender.textContent = option.username;
 
 		div.appendChild(label);
 		div.appendChild(sender);
 
 		div.addEventListener("click", () => {
-			// htmlManager.popup.add({})
+			const p = new Popup({
+				type: PopupType.accept,
+				title: "New Frien Request",
+				text: `you received a friend request from ${option.username}`,
+				accept: () => {
+					console.log("friend request accept");
+				},
+				decline: () => {
+					console.log("friend request decline");
+				}
+			})
+			p.show();
 		})
+
+		this.container.prepend(div);
+		if (option.history) {
+			this.history.add(div);
+		}
+		setTimeout(() => { div.remove() }, option.duration);
 	}
+
+	private addText(option: ITextNotification) {
+		const div = this.default.cloneNode(true) as HTMLDivElement;
+		const label = document.createElement("span");
+
+		label.className = "notification-text";
+
+		div.style.animationDuration = `${option.duration}ms`;
+
+		label.textContent = option.text;
+
+		div.appendChild(label);
+
+		this.container.prepend(div);
+		if (option.history) {
+			this.history.add(div);
+		}
+		setTimeout(() => { div.remove() }, option.duration);
+
+	}
+
+	private addGameInvite(option: IGameInvite) {
+		const div = this.default.cloneNode(true) as HTMLDivElement;
+		const label = document.createElement("label");
+		const sender = document.createElement("span");
+
+		div.classList.add("notification-click");
+		label.className = "notification-text";
+		sender.className = "notification-username";
+
+		div.style.animationDuration = `${option.duration}ms`;
+
+		label.textContent = "invited you to a lobby";
+		sender.textContent = option.username;
+
+		div.appendChild(sender);
+		div.appendChild(label);
+
+		div.addEventListener("click", () => {
+			const p = new Popup({
+				type: PopupType.accept,
+				title: "Invitation",
+				text: `${option.username} invited you to join his lobby`,
+				accept: () => {
+					stateManager.lobbyId = option.lobbyId;
+					routeManager.nav("/lobby");
+				},
+				decline: () => {
+				}
+			})
+			p.show();
+		})
+
+		this.container.prepend(div);
+		if (option.history) {
+			this.history.add(div);
+		}
+		setTimeout(() => { div.remove() }, option.duration);
+
+	}
+
+	private addError(option: IErrorNotification) {
+		const div = this.default.cloneNode(true) as HTMLDivElement;
+		const label = document.createElement("span");
+
+		// label.className = "notification-text";
+		div.classList.add("notification-error");
+
+		div.style.animationDuration = `${option.duration}ms`;
+
+		label.textContent = option.error;
+
+		div.appendChild(label);
+
+		this.container.prepend(div);
+		if (option.history) {
+			this.history.add(div);
+		}
+		setTimeout(() => { div.remove() }, option.duration);
+
+	}
+
+
 
 	private addFriendAccept(notification: IFriendAccept) {
 
 	}
 
-	private addGameInvite(notification: IGameInvite) {
-
-	}
 
 	private addStatusUpdate(notification: IStatusUpdate) {
 
 	}
 
-	private addText(notification: ITextNotification) {
 
-	}
 
 	private addCustom(notification: ICustomNotification) {
 
 	}
 
-	private addError(notification: IErrorNotification) {
-
-	}
 }

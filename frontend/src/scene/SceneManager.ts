@@ -49,10 +49,12 @@ class SceneManager {
 			antialias: true,
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
+		this.updateResolution();
 		// this.engine.setHardwareScalingLevel(2.0);
 		this.engine.getCaps().textureFloatRender = true;
 
 		window.addEventListener('resize', () => {
+			this.updateResolution();
 			this.engine.resize(true);
 			// this.environment.resize();
 			// this.cssRenderer.resize(window.innerWidth, window.innerHeight)
@@ -279,6 +281,14 @@ class SceneManager {
 			this.assets.fogDepthTexture.renderList!.push(m);
 			this.assets.fogDepthTexture.setMaterialForRendering(m, this.assets.grassDepthMaterial);
 		}
+	}
+
+	private updateResolution() {
+		const scaleX = this.canvas.width / 1920;
+		const scaleY = this.canvas.height / 1080;
+		const scale = Math.max(scaleX, scaleY, 1);
+
+		this.engine.setHardwareScalingLevel(scale);
 	}
 }
 

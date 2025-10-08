@@ -8,6 +8,8 @@ class StateManager {
 	public gameId!: string;
 	public tournamentId!: string;
 
+	public popup: number;
+
 	public playPath!: string;
 
 	constructor() {
@@ -19,6 +21,8 @@ class StateManager {
 		this.gameId = "";
 		this.tournamentId = "";
 		this.playPath = "";
+
+		this.popup = 0;
 	}
 
 	public has(key: string): boolean {

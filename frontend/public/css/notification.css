@@ -1,0 +1,62 @@
+.notification-container {
+	position: absolute;
+	right: 0px;
+	top: 0;
+	width: fit-content;
+	height: fit-content;
+	display: grid;
+	grid-template-columns: 1;
+}
+
+.notification {
+	display: inline-block;
+	width: 200px;
+	background-color: ghostwhite;
+	border-color: black;
+	border-width: 2px;
+	animation-name: notification-fade-out;
+	animation-timing-function: linear;
+	opacity: 0;
+}
+
+.notification-click {
+	background-color: orange !important;
+}
+
+.notification-error {
+	background-color: blue !important;
+	color: white !important;
+}
+
+.notification-text {
+	background-color: inherit;
+	color: black;
+}
+
+.notification-username {
+	background-color: inherit;
+	color: blue;
+}
+
+
+.notification-click:hover {
+	background-color: red !important;
+}
+
+.notification-click:active {
+	background-color: white !important;
+}
+
+
+@keyframes notification-fade-out {
+
+	0%,
+	80% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+
+}
