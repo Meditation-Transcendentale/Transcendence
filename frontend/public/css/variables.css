@@ -3,39 +3,40 @@
    ==================================== */
 
 :root {
-  /* Colors - Purple Space Theme */
-  --color-space-deepest: #0d0221;
-  --color-space-deep: #240046;
-  --color-purple-dark: #3c096c;
-  --color-purple-medium: #5a189a;
-  --color-purple: #7209b7;
-  --color-purple-bright: #9d4edd;
-  --color-purple-light: #c77dff;
-  --color-lavender: #e0aaff;
-  
-  /* Legacy support */
-  --window-color: var(--color-lavender);
-  --window-background: var(--color-space-deepest);
-  
-  /* Spacing */
-  --border-width: 3px;
-  --spacing-xs: 0.2vh;
-  --spacing-sm: 0.3vh;
-  --spacing-md: 0.4vh;
-  --spacing-lg: 2vh;
-  --spacing-xl: 4vh;
-  
-  /* Typography */
-  --font-primary: 'spacegrotesk', sans-serif;
-  --font-size-base: 5vh;
-  --font-size-large: 6vh;
-  --font-size-small: 4vh;
-  --font-weight-light: 100;
-  --font-weight-normal: 300;
-  --font-weight-bold: 200;
-  
-  /* Transitions */
-  --transition-fast: 0.2s;
-  --transition-normal: 0.3s;
-  --transition-slow: 0.4s;
+	/* Colors - Purple Space Theme */
+	--color-space-deepest: #0d0221;
+	--color-space-deep: #240046;
+	--color-purple-dark: #3c096c;
+	--color-purple-medium: #5a189a;
+	--color-purple: #7209b7;
+	--color-purple-bright: #9d4edd;
+	--color-purple-light: #c77dff;
+	--color-lavender: #e0aaff;
+
+	/* Legacy support */
+	--window-color: var(--color-lavender);
+	--window-background: var(--color-space-deepest);
+
+	/* Spacing */
+	--border-width: 3px;
+	--spacing-xxs: 0.1vh;
+	--spacing-xs: 0.2vh;
+	--spacing-sm: 0.3vh;
+	--spacing-md: 0.4vh;
+	--spacing-lg: 2vh;
+	--spacing-xl: 4vh;
+
+	/* Typography */
+	--font-primary: 'spacegrotesk', sans-serif;
+	--font-size-base: 5vh;
+	--font-size-large: 6vh;
+	--font-size-small: 4vh;
+	--font-weight-light: 100;
+	--font-weight-normal: 300;
+	--font-weight-bold: 200;
+
+	/* Transitions */
+	--transition-fast: 0.2s;
+	--transition-normal: 0.3s;
+	--transition-slow: 0.4s;
 }

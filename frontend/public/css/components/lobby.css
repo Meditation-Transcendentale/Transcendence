@@ -4,40 +4,98 @@
 
 /* Lobby Info - #play-lobby-info */
 .lobby-info {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  height: fit-content;
-  width: fit-content;
-  transform: translate(-50%, -50%);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: fit-content;
+	width: fit-content;
+	transform: translate(-50%, -50%);
 }
 
 .lobby-info * {
-  font-size: var(--font-size-base);
+	font-size: var(--font-size-base);
 }
 
 /* Lobby Info Container - #lobby-info */
 .lobby-info__container {
-  display: grid;
-  height: 50vh;
+	display: grid;
+	height: 50vh;
 }
 
 /* Lobby Status - #lobby-status */
 .lobby-info__status {
-  grid-column: 1/1;
-  width: 40vh;
-  overflow: hidden;
+	grid-column: 1/1;
+	width: 40vh;
+	overflow: hidden;
 }
 
 /* Lobby Players List - #lobby-info > ul */
 .lobby-info__players {
-  grid-column: 2/2;
-  width: 40vh;
-  height: 30vh;
-  overflow: scroll;
+	grid-column: 2/2;
+	width: 40vh;
+	height: 30vh;
+	overflow: scroll;
 }
 
 /* Lobby Player Item - #lobby-info li */
 .lobby-info__player {
-  display: block;
+	display: block;
+}
+
+.lobby-players__title {
+	text-align: right;
+	color: white;
+	font-size: var(--font-size-small);
+}
+
+.lobby-players__container {
+	flex: auto;
+	/* width: 100% !important; */
+	height: 90% !important;
+	overflow: scroll !important;
+	pointer-events: all !important;
+	border: var(--spacing-xxs) white solid;
+	padding: var(--spacing-sm);
+	margin: var(--spacing-md);
+	background-color: lightgrey;
+	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	border-left-style: none;
+	border-right-style: none;
+	/* opacity: 0.2; */
+}
+
+.lobby-players__content {
+	display: flex;
+	/* width: 100%; */
+	flex: auto;
+	height: fit-content;
+	font-size: var(--font-size-small);
+	border: var(--spacing-xs) white solid;
+	/* padding: var(--spacing-sm); */
+	margin: var(--spacing-md);
+}
+
+
+.lobby-players__username {
+	flex: 2;
+	text-align: left;
+	color: white;
+	overflow: hidden;
+	background-color: rgba(255, 255, 255, 0.3);
+}
+
+.lobby-players__status {
+	flex: 1;
+	text-align: right;
+}
+
+.lobby-players__status[ready="true"] {
+	color: black;
+	background-color: rgba(125, 255, 125, 0.3);
+
+}
+
+.lobby-players__status[ready="false"] {
+	color: black;
+	background-color: rgba(255, 125, 125, 0.3);
 }

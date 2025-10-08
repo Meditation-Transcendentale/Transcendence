@@ -9,13 +9,15 @@ import { htmlManager } from "./HtmlManager";
 import { IHtml } from "./IHtml";
 
 interface IPlayer {
-	td: HTMLElement,
+	div: HTMLElement,
 	name: HTMLElement,
 	status: HTMLElement
 }
 
 export class LobbyHtml implements IHtml {
 	private css!: HTMLLinkElement;
+
+	// private playersWindow!: HTMLDivElement;
 
 	private playersWindow!: HTMLDivElement;
 	private infoWindow!: HTMLDivElement;
@@ -42,15 +44,17 @@ export class LobbyHtml implements IHtml {
 	public init(div: HTMLDivElement) {
 		this.css = div.querySelector("link") as HTMLLinkElement;
 
-		this.playersWindow = div.querySelector("#players-window") as HTMLDivElement;
+		// this.playersWindow = div.querySelector("#players-window") as HTMLDivElement;
 		this.infoWindow = div.querySelector("#info-window") as HTMLDivElement;
 		this.inviteWindow = div.querySelector("#invite-window") as HTMLDivElement;
-		this.playersList = div.querySelector("#players-list") as HTMLDivElement;
+		this.playersList = div.querySelector(".lobby-players__container") as HTMLDivElement;
 		this.lobbyMode = div.querySelector("#lobby-mode") as HTMLSpanElement;
 		this.lobbyMap = div.querySelector("#lobby-map") as HTMLSpanElement;
 		this.lobbyId = div.querySelector("#lobby-id-text") as HTMLSpanElement;
 		this.lobbyIdCopy = div.querySelector("#lobby-id-copy") as HTMLButtonElement;
 		this.inviteList = div.querySelector("#invite-list") as HTMLDivElement;
+
+		this.playersWindow = div.querySelector(".lobby-players-window") as HTMLDivElement;
 
 		sceneManager.css3dRenderer.addObject("lobby-info", {
 			html: this.infoWindow,
@@ -63,7 +67,7 @@ export class LobbyHtml implements IHtml {
 			html: this.playersWindow,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(-Math.PI * 0.3).multiply(Matrix.Translation(5, 5, 1)),
+			world: Matrix.RotationY(-Math.PI * 0.3).multiply(Matrix.Translation(5, 6.5, 1)),
 			enable: false
 		});
 		sceneManager.css3dRenderer.addObject("lobby-invite", {
@@ -77,11 +81,14 @@ export class LobbyHtml implements IHtml {
 		this.lobbyIdCopy.addEventListener("click", () => {
 			navigator.clipboard.writeText(stateManager.lobbyId);
 		})
+
+		this.playersList.addEventListener("wheel", () => { //ULTRA IMPORTANT SINON LE SCROLL MARCHE PAS????????????????????????
+		})
 	}
 
 	public load(): void {
 		this.needUpdateInvite = true;
-		this.playersList.innerHTML = "";
+		// this.playersList.innerHTML = "";
 		this.lobbyId.innerHTML = stateManager.lobbyId;
 		this.inviteList.innerHTML = "";
 
@@ -112,7 +119,9 @@ export class LobbyHtml implements IHtml {
 	private updatePlayers(players: lobby.IPlayer[]) {
 		for (let i = 0; i < players.length; i++) {
 			if (this.players.has(players[i].uuid as string)) {
-				this.players.get(players[i].uuid as string)!.status.innerText = (players[i].ready ? "yes" : "no");
+				const player = this.players.get(players[i].uuid as string) as IPlayer;
+				player.status.setAttribute("ready", players[i].ready ? "true" : "false");
+				player.status.textContent = (players[i].ready ? "ready" : "waiting");
 			} else {
 				this.createPlayerDiv(players[i]);
 			}
@@ -123,33 +132,31 @@ export class LobbyHtml implements IHtml {
 				checked = checked || (i == players[y].uuid as string);
 			}
 			if (!checked) {
-				this.players.get(i)!.td.remove();
+				this.players.get(i)!.div.remove();
 				this.players.delete(i);
 			}
 		}
 	}
 
 	private async createPlayerDiv(player: lobby.IPlayer) {
+		console.log("LOBYY CREATE PLAYER DIV");
 		const self = User.uuid == player.uuid;
-		const div = document.createElement('tr');
-		const name = document.createElement('td');
-		const status = document.createElement('td');
+		const div = document.createElement('div');
+		const name = document.createElement('span');
+		const status = document.createElement('span');
 
-		this.players.set(player.uuid as string, { td: div, name: name, status: status });
+		this.players.set(player.uuid as string, { div: div, name: name, status: status });
 
-		name.className = "username";
-		status.className = "status";
+		div.className = "lobby-players__content";
+		name.className = "lobby-players__username";
+		status.className = "lobby-players__status";
 
 		console.log(`POST UUID = ${player.uuid}`);
 		const rep = await postRequest("info/search", { identifier: player.uuid, type: "uuid" }).catch((err) => console.log(err)) as any;
-		name.innerText = rep.data.username; //NEED TO IMPLEMENT A ROUTE GET /userinfo/:uuid to get Username from uuid
-		status.innerText = (player.ready ? "yes" : "no");
-		if (self) {
-			status.addEventListener("click", () => {
-				streamManager.lobby.ready();
-			}, { once: true });
-			status.toggleAttribute("click");
-		}
+		name.textContent = rep.data.username; //NEED TO IMPLEMENT A ROUTE GET /userinfo/:uuid to get Username from uuid
+		status.setAttribute("ready", player.ready ? "true" : "false");
+		status.textContent = (player.ready ? "ready" : "waiting");
+
 		div.appendChild(name);
 		div.appendChild(status);
 		if (self) {
