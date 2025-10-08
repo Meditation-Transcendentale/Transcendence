@@ -18,16 +18,16 @@ export class PlayCreateHtml implements IHtml {
 	public init(div: HTMLElement) {
 		this.css = div.querySelector("link") as HTMLLinkElement;
 
-		this.window = div.querySelector(".window") as HTMLDivElement;
-		this.info = div.querySelector("#play-info") as HTMLDivElement;
-		this.description = div.querySelector("#play-description") as HTMLDivElement;
-		this.form = div.querySelector("form") as HTMLFormElement;
+		this.window = div.querySelector(".create-window") as HTMLDivElement;
+		this.info = div.querySelector("#create-info") as HTMLDivElement;
+		this.description = div.querySelector("#create-description") as HTMLDivElement;
+		this.form = div.querySelector("#create-form") as HTMLFormElement;
 
 		sceneManager.css3dRenderer.addObject("play-create", {
 			html: this.window,
 			width: 1.,
 			height: 1.,
-			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.05).multiply(Matrix.Translation(0, 6, -14)),
+			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.15).multiply(Matrix.Translation(-2, 5, -13.25)),
 			enable: false
 		})
 
@@ -35,7 +35,7 @@ export class PlayCreateHtml implements IHtml {
 			html: this.info,
 			width: 1.,
 			height: 1.,
-			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.3).multiply(Matrix.Translation(-4, 7, -10)),
+			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.15).multiply(Matrix.Translation(-2, 7.5, -13.25)),
 			enable: false
 		})
 
@@ -43,7 +43,7 @@ export class PlayCreateHtml implements IHtml {
 			html: this.description,
 			width: 1.,
 			height: 1.,
-			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.05).multiply(Matrix.Translation(0, 6, -5)),
+			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * -0.1).multiply(Matrix.Translation(-2, 5, -17.5)),
 			enable: false
 		})
 

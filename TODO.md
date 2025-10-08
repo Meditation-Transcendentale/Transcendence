@@ -18,7 +18,6 @@
 
  ### visual
     - full DA for the site + css implementation
-    - custom cursor ?
     - use cdn for assets
     - Animation system overall
     - statue teeth
