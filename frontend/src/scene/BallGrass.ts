@@ -12,6 +12,7 @@ export class BallGrass {
 
 	private needReset = true;
 	private _enable: boolean;
+	private _update: string;
 
 	private maxDist = 40;
 	private maxSpeed = 100;
@@ -50,12 +51,15 @@ export class BallGrass {
 		})
 
 		this._enable = false;
+		this._update = "home";
 	}
 
 	public update(time: number, deltaTime: number) {
-		if (!this._enable)
+		if (this._update == "none")
 			return;
-		this.moveBall(deltaTime);
+
+		if (this._update == "home")
+			this.moveBall(deltaTime);
 		this.swapRt();
 		this.assets.effectRenderer.render(this.ballGrassEffect, this.assets.ballGrassTextureB);
 	}
@@ -106,5 +110,9 @@ export class BallGrass {
 
 	public set enable(value: boolean) {
 		this._enable = value;
+	}
+
+	public set updateType(value: string) {
+		this._update = value;
 	}
 }

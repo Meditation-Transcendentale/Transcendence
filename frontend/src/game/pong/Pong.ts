@@ -78,8 +78,9 @@ export class Pong {
 	}
 
 	public async init() {
-		this.pongRoot = new TransformNode("pongRoot", this.scene);
-		this.pongRoot.position.set(2000, -3500, -3500);
+		this.pongRoot = sceneManager.assets.ballRoot;
+		// this.pongRoot = new TransformNode("pongRoot", this.scene);
+		// this.pongRoot.position.set(2000, -3500, -3500);
 		// this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
 		// this.cam.position.x = 0;
 		// this.cam.position.y = 40;
@@ -143,8 +144,9 @@ export class Pong {
 			this.pongRoot.position.set(0.1, 10, 0);
 			this.pongRoot.scalingDeterminant = 0.07;
 		} else if (maps == "grass") {
-			this.pongRoot.position.set(5, 10, 5);
-			this.pongRoot.scalingDeterminant = 0.25;
+			this.pongRoot.position.set(0, 0, 0);
+			this.pongRoot.scalingDeterminant = 2;
+			this.baseMeshes.arena.setEnabled(false);
 		} else if (maps == "void") {
 			this.pongRoot.position.set(100, 0, 100);
 			this.pongRoot.scalingDeterminant = 0.25;
@@ -261,7 +263,7 @@ export class Pong {
 		const buffer = encodeClientMessage(payload);
 
 		this.wsManager.socket.send(buffer);
-		this.pongRoot.setEnabled(false);
+		// this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
 		this.cam.parent = null;
 

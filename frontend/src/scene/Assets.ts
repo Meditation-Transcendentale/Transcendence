@@ -151,6 +151,7 @@ export class Assets {
 		this.ballMesh = MeshBuilder.CreateSphere("ball", { diameter: 1 }, this.scene);
 		this.ballMesh.setEnabled(false);
 		this.ballMesh.doNotSyncBoundingInfo = true;
+		this.ballMesh.position.y = 0.5;
 
 		this.groundMesh = MeshBuilder.CreateGround("ground", { width: 200, height: 200 }, this.scene);
 		this.groundMesh.setEnabled(false);
