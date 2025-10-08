@@ -9,6 +9,8 @@ export class Ath {
 	private profileImage!: HTMLImageElement;
 	private trigger!: HTMLSpanElement;
 	private dropdown!: HTMLDivElement;
+
+    private settings: athSettings;
     
 	private isOpen: boolean = false;
 
@@ -43,6 +45,8 @@ export class Ath {
 		this.container.appendChild(this.dropdown);
 
 		this.setupEventListeners();
+
+        this.settings = new athSettings();
 
 	}
 
@@ -106,7 +110,7 @@ export class Ath {
 	private createMenuItems() {
 		const menuItems = [
 			{ text: "Profile", action: () => console.log(User) },
-			{ text: "Settings", action: () => console.log(User.username) },
+			{ text: "Settings", action: () => this.settings.load() },
 			{ text: "Quit", action: () => this.quitFunction() }
 		];
 
@@ -184,6 +188,7 @@ export class Ath {
 	}
 
 	public load() {
+
 		document.body.appendChild(this.container);
 		this.updateProfileInfo();
 	}
@@ -216,10 +221,34 @@ export class Ath {
 
 class athSettings {
 
-    constructor() { 
-        console.log("ath settings");
-    }
+    private settingsPopup: Popup;
 
+    constructor() { 
+        this.settingsPopup = new Popup({
+            type: PopupType.custom,
+            title: "Settings",
+            text: "",
+            div: this.createSettingsDiv()
+        });
+    }
+    
+    private createSettingsDiv(): HTMLDivElement {
+        const div = document.createElement("div");
+        div.style.display = "flex";
+        div.style.flexDirection = "column";
+        div.style.gap = "10px";
+        
+        return div;
+    }
+    
+    public load () {
+        console.log("load ath settings");
+        this.settingsPopup.show();
+    }
+    
+    public unload () {
+        console.log("unload ath settings");
+    }
 
 
 }
