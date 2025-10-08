@@ -4,16 +4,17 @@ import { ThinInstanceManager } from "../rendering/ThinInstanceManager.js";
 import { sceneManager } from "../../../scene/SceneManager";
 
 function createWallMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
-	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: config.wallWidth, height: 1, depth: 20 }, scene);
-	const wallMaterial = new StandardMaterial("wallMaterial", scene);
-	wallMesh.parent = pongRoot;
-	wallMaterial.diffuseColor.set(0, 0, 0);
-	wallMaterial.emissiveColor.set(1, 1, 1);
-	wallMesh.material = wallMaterial;
-	wallMesh.setEnabled(true);
-	wallMesh.setPivotPoint(Vector3.Zero());
-
-	return wallMesh;
+	// const wallMesh = MeshBuilder.CreateBox("wallBase", { width: config.wallWidth, height: 1, depth: 20 }, scene);
+	// const wallMaterial = new StandardMaterial("wallMaterial", scene);
+	// wallMesh.parent = pongRoot;
+	// wallMaterial.diffuseColor.set(0, 0, 0);
+	// wallMaterial.emissiveColor.set(1, 1, 1);
+	// wallMesh.material = wallMaterial;
+	// wallMesh.setEnabled(true);
+	// wallMesh.setPivotPoint(Vector3.Zero());
+	//
+	// return wallMesh;
+	return sceneManager.assets.pongWallMesh;
 }
 
 function createArenaMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
@@ -45,19 +46,19 @@ function createBallMesh(scene: Scene, config: GameTemplateConfig, pongRoot: Tran
 }
 
 function createPaddleMesh(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): Mesh {
-	const paddleMesh = MeshBuilder.CreateBox("paddleBase", { width: 3, height: 0.4, depth: 0.4 }, scene);
-	const paddleMaterial = new StandardMaterial("paddleMaterial", scene);
-	paddleMesh.parent = pongRoot;
-	paddleMaterial.diffuseColor.set(0, 0, 0);
-	paddleMaterial.emissiveColor.set(1, 1, 1);
-	paddleMesh.material = paddleMaterial;
-	paddleMesh.setEnabled(true);
-	paddleMesh.setPivotPoint(Vector3.Zero());
+	// const paddleMesh = MeshBuilder.CreateBox("paddleBase", { width: 3, height: 0.4, depth: 0.4 }, scene);
+	// const paddleMaterial = new StandardMaterial("paddleMaterial", scene);
+	// paddleMesh.parent = pongRoot;
+	// paddleMaterial.diffuseColor.set(0, 0, 0);
+	// paddleMaterial.emissiveColor.set(1, 1, 1);
+	// paddleMesh.material = paddleMaterial;
+	// paddleMesh.setEnabled(true);
+	// paddleMesh.setPivotPoint(Vector3.Zero());
 
-	return paddleMesh;
+	return sceneManager.assets.pongPaddleMesh;
 }
 
-export function createBaseMeshes(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode) {
+export function createBaseMeshes(scene: Scene, config: GameTemplateConfig, pongRoot: TransformNode): { arena: Mesh, ball: Mesh, paddle: Mesh, wall: Mesh } {
 	return {
 		arena: createArenaMesh(scene, config, pongRoot),
 		ball: createBallMesh(scene, config, pongRoot),

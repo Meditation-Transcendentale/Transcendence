@@ -17,7 +17,7 @@ export class UBOManager {
 
 		const noiseOffsetDefault = 0.5;
 		const stepSizeDefault = 0.5;
-		const maxDistanceDefault = 50.;
+		const maxDistanceDefault = 100.;
 		const densityMultiplierDefault = 2.5;
 		const lightScatteringDefault = 0.2;
 		const fogAbsorptionDefault = new Vector3(0.1, 0.1, 0.1);
@@ -55,8 +55,10 @@ export class UBOManager {
 
 		this.assets.fogUBO.updateVector3("spotPosition", this.assets.flashLight.position);
 		this.assets.fogUBO.updateVector3("spotDirection", this.assets.flashLight.direction);
+		this.assets.fogUBO.updateFloat("spotRange", this.assets.flashLight.range);
 		this.assets.fogUBO.updateVector3("pointAPosition", this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.tempVector3).scaleInPlace(this.assets.ballRoot.scalingDeterminant));
 		this.assets.fogUBO.updateVector3("pointBPosition", this.assets.cubeMesh.position.addToRef(this.assets.monolithRoot.position, this.tempVector3).scaleInPlace(this.assets.monolithRoot.scalingDeterminant));
+		this.assets.fogUBO.updateFloat("pointBIntensity", this.assets.cubeLight.isEnabled() ? this.assets.cubeLight.intensity : 0);
 
 		this.assets.fogUBO.update();
 	}

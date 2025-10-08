@@ -171,9 +171,11 @@ class SceneManager {
 				break;
 			}
 			case "home": {
+				this.assets.grassRoot.scaling.y = 1;
 				this.camera.attachControl();
 				this.assets.ballRoot.setEnabled(true);
 				this.assets.ballRoot.position.set(0, 0.25, 0);
+				this.assets.flashLight.range = 30;
 				// this.assets.ballMesh.position.set(0, 0, 0);
 				this.assets.ballRoot.scalingDeterminant = 1.5;
 				this.picker.enable = true;
@@ -207,16 +209,20 @@ class SceneManager {
 			}
 			case "grass": {
 				// this.camera.detachControl();
+				this.assets.grassRoot.scaling.y = 0.8;
 				this.picker.enable = false;
+				this.assets.flashLight.intensity = 1;
+				this.assets.flashLight.range = 100;
+				this.assets.grassMaterial.specularColor.scaleInPlace(0.5)
 				this.grass.enable = true;
 				this.assets.ballMesh.setEnabled(true);
 				this.assets.groundMesh.setEnabled(true);
 				this.butterfly.enable = true;
 				this.ballGrass.updateType = "pong";
-				this.fog.enable = false;
+				this.fog.enable = true;
+				this.cameraManager.fogEnabled = true;
 				this.assets.monolithRoot.setEnabled(false);
 				this.beforeRender.delete(this.assets.monolithMovement);
-				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
 				break;
 			}

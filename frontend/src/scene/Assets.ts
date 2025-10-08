@@ -34,6 +34,8 @@ export class Assets {
 	public statusMesh!: Mesh; //
 	public eyeMesh!: Mesh; //
 	public brArenaMesh!: Mesh; //
+	public pongPaddleMesh!: Mesh;
+	public pongWallMesh!: Mesh;
 
 	public flashLight!: SpotLight;
 	public hemisphericLight!: HemisphericLight;
@@ -57,6 +59,7 @@ export class Assets {
 	public butterflyRoot!: TransformNode;
 	public statusRoot!: TransformNode;
 	public brRoot!: TransformNode; //
+	public grassRoot!: TransformNode;
 
 	public ballMaterial!: ShaderMaterial;
 	public cubeMaterial!: ShaderMaterial;
@@ -66,6 +69,8 @@ export class Assets {
 	public statusMaterial!: PBRMaterial; //
 	public eyeMaterial!: StandardMaterial; //
 	public brArenaMaterial!: PBRMaterial; //
+	public pongPaddleMaterial!: StandardMaterial;
+	public pongWallMaterial!: StandardMaterial;
 
 	public depthMaterial!: ShaderMaterial;
 	public grassDepthMaterial!: ShaderMaterial;
@@ -152,6 +157,7 @@ export class Assets {
 		this.ballMesh.setEnabled(false);
 		this.ballMesh.doNotSyncBoundingInfo = true;
 		this.ballMesh.position.y = 0.5;
+		this.ballMesh.alwaysSelectAsActiveMesh = true;
 
 		this.groundMesh = MeshBuilder.CreateGround("ground", { width: 200, height: 200 }, this.scene);
 		this.groundMesh.setEnabled(false);
@@ -182,6 +188,11 @@ export class Assets {
 		this.scene.addMesh(this.statusRoot as Mesh);
 
 		this.brArenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 5, tessellation: 128 }, this.scene);
+
+		this.pongPaddleMesh = MeshBuilder.CreateBox("paddleBase", { width: 3, height: 1.5, depth: 0.4 }, this.scene);
+		this.pongWallMesh = MeshBuilder.CreateBox("wallBase", { width: 1, height: 1, depth: 20 }, this.scene);
+		this.pongPaddleMesh.setEnabled(false);
+		this.pongWallMesh.setEnabled(false);
 	}
 
 	private loadLightsMandatory() {
@@ -322,6 +333,17 @@ export class Assets {
 		this.monolithMaterial = new MonolithMaterial("monolith", this.scene, monolithOption);
 		this.monolithMesh.material = this.monolithMaterial;
 
+		this.pongPaddleMaterial = new StandardMaterial("pongPaddle", this.scene);
+		this.pongPaddleMaterial.diffuseColor = new Color3(1., 1., 1.);
+		this.pongPaddleMaterial.emissiveColor = Color3.White();
+		this.pongPaddleMaterial.specularColor = Color3.Black();
+		this.pongPaddleMaterial.alpha = 0.05;
+		this.pongPaddleMaterial.alphaMode = Engine.ALPHA_DISABLE;
+		this.pongPaddleMesh.material = this.pongPaddleMaterial;
+
+		this.pongWallMaterial = this.pongPaddleMaterial.clone("pongWall");
+		this.pongWallMesh.material = this.pongWallMaterial;
+
 		this.grassMaterial.onBindObservable.add(() => {
 			this.grassMaterial.getEffect().setFloat("time", sceneManager.time);
 			this.grassMaterial.getEffect().setFloat("ballRadius", this.ballLight.range)
@@ -408,6 +430,8 @@ export class Assets {
 		this.ballRoot.scalingDeterminant = 1.5;
 		this.ballMesh.parent = this.ballRoot;
 		this.ballLight.parent = this.ballRoot;
+		this.pongPaddleMesh.parent = this.ballRoot;
+		this.pongWallMesh.parent = this.ballRoot;
 
 		this.monolithRoot = new TransformNode("monolithRoot", this.scene);
 		this.cubeMesh.parent = this.monolithRoot;
@@ -430,6 +454,11 @@ export class Assets {
 		this.redLight.parent = this.brRoot;
 		this.whiteLight.parent = this.brRoot;
 		this.whiteLight2.parent = this.brRoot;
+
+		this.grassRoot = new TransformNode("grassRoot", this.scene);
+		this.grassRoot.scaling.set(1, 1., 1);
+		this.grassHighMesh.parent = this.grassRoot;
+		this.grassLowMesh.parent = this.grassRoot;
 	}
 
 	private loadShadows() {

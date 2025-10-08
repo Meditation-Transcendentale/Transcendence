@@ -14,10 +14,10 @@ export class BallGrass {
 	private _enable: boolean;
 	private _update: string;
 
-	private maxDist = 40;
+	private maxDist = 60;
 	private maxSpeed = 100;
 	private deceleration = 0.9;
-	private attenuation = 0.3;
+	private attenuation = 0.1;
 
 
 	private tempVector3: Vector3;
@@ -42,7 +42,7 @@ export class BallGrass {
 		this.ballGrassEffect.onApplyObservable.add(() => {
 			this.ballGrassEffect.effect.setTexture("textureSampler", this.assets.ballGrassTextureA);
 			this.ballGrassEffect.effect.setFloat("attenuation", Math.pow(this.attenuation, this.assets.scene.deltaTime * 0.001));
-			this.ballGrassEffect.effect.setFloat("radius", this.assets.ballRoot.scalingDeterminant / this.maxDist);
+			this.ballGrassEffect.effect.setFloat("radius", this.assets.ballRoot.scalingDeterminant * 0.75 / this.maxDist);
 			this.ballGrassEffect.effect.setFloat2("origin",
 				(this.assets.ballMesh.position.x + this.assets.ballRoot.position.x) * this.assets.ballRoot.scalingDeterminant / this.maxDist + 0.5,
 				(this.assets.ballMesh.position.z + this.assets.ballRoot.position.z) * this.assets.ballRoot.scalingDeterminant / this.maxDist + 0.5

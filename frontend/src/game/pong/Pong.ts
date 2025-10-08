@@ -1,5 +1,6 @@
 import {
 	ArcRotateCamera, Color4, Engine, Scene, TransformNode, FreeCamera,
+	Mesh,
 } from "../../babylon";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
@@ -46,7 +47,7 @@ export class Pong {
 	// private uiSystem!: UISystem;
 
 	private uuid!: string;
-	private baseMeshes: any;
+	private baseMeshes!: { arena: Mesh, ball: Mesh, paddle: Mesh, wall: Mesh };
 	private instanceManagers: any;
 	public gameUI: GameUI;
 
@@ -138,7 +139,10 @@ export class Pong {
 		if (!this.inited) {
 			await this.init();
 		}
-		this.cam.parent = this.pongRoot;
+
+		this.baseMeshes.wall.setEnabled(true);
+		this.baseMeshes.paddle.setEnabled(true);
+		// this.cam.parent = this.pongRoot;
 		this.cam.minZ = 0.2;
 		if (maps == "monolith") {
 			this.pongRoot.position.set(0.1, 10, 0);
