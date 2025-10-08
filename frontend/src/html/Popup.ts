@@ -2,15 +2,16 @@ import { stateManager } from "../state/StateManager";
 
 export enum PopupType {
 	accept,
+	validation,
 	custom
 }
-
 
 interface IPopupOption {
 	type: PopupType,
 	title?: string
 	id?: string,
-	text?: string
+	text?: string,
+	div?: HTMLElement
 }
 
 interface ICustomPopupOption extends IPopupOption {
@@ -20,6 +21,11 @@ interface ICustomPopupOption extends IPopupOption {
 interface IAcceptPopupOption extends IPopupOption {
 	accept: () => void;
 	decline: () => void;
+}
+
+interface IValidationPopupOption extends IPopupOption {
+	submit: (password: string, token: string) => void;
+	abort: () => void;
 }
 
 export type PopupOption = ICustomPopupOption | IAcceptPopupOption;
@@ -54,7 +60,7 @@ export class Popup {
 				break;
 			}
 			case PopupType.custom: {
-				this.generateCustomPopup();
+				this.generateCustomPopup(option as ICustomPopupOption);
 				break;
 			}
 		}
@@ -88,7 +94,11 @@ export class Popup {
 		footer.appendChild(n);
 	}
 
-	private generateCustomPopup() {
+	private generateValidationPopup() {
+	}
+
+	private generateCustomPopup(option: ICustomPopupOption) {
+		this.form.appendChild(option.div);
 	}
 
 	public show() {
