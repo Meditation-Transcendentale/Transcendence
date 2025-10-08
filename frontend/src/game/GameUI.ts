@@ -345,6 +345,14 @@ class GameUI {
 		this.modules.scorevs?.updateScore(score1, score2);
 	}
 
+	public hideScore(){
+		this.modules.score?.unload();
+	}
+
+	public showScore(){
+		this.modules.score?.load();
+	}
+
 	public startCountdown(initialValue: number) {
 		this.modules.countdown?.start(initialValue);
 	}
@@ -363,6 +371,10 @@ class GameUI {
 
 	public hideEnd() {
 		this.modules.ending?.unload();
+	}
+
+	public setLeaderboard(data: any, mode: string) {
+		this.modules.ending?.setLeaderboard(data, mode);
 	}
 
 	public showButton(id: string, text: string, callback: () => void, style?: string) {
@@ -655,11 +667,18 @@ interface EndingHtmlReference {
 	dualModeContainer: HTMLDivElement;
 	soloModeContainer: HTMLDivElement;
 	result: HTMLSpanElement;
+	leaderboard: HTMLDivElement;
+}
+
+type Player = {
+	username: string,
+	highscore: number
 }
 
 class EndingModule implements GameUIModule {
 	private div: HTMLDivElement;
 	private ref: EndingHtmlReference;
+	private leaderboard: Player[] = [];
 
 	constructor(div: HTMLDivElement) {
 		this.div = div;
@@ -669,7 +688,8 @@ class EndingModule implements GameUIModule {
 			scoreSolo: div.querySelector('#end-score-solo') as HTMLSpanElement,
 			dualModeContainer: div.querySelector('.dual-mode') as HTMLDivElement,
 			soloModeContainer: div.querySelector('.solo-mode') as HTMLDivElement,
-			result: div.querySelector("#result-label") as HTMLSpanElement
+			result: div.querySelector("#result-label") as HTMLSpanElement,
+			leaderboard: div.querySelector("#players-list") as HTMLDivElement
 		};
 	}
 
@@ -694,6 +714,26 @@ class EndingModule implements GameUIModule {
 				this.ref.result.innerHTML = 'New High Score!';
 			else
 				this.ref.result.innerHTML = '';
+
+			this.ref.leaderboard.innerHTML = '';
+			
+			for (let i = 0; i < this.leaderboard.length; i++) {
+				const row = document.createElement('tr');
+				
+				const positionCell = document.createElement('td');
+				positionCell.textContent = (i + 1).toString();
+				row.appendChild(positionCell);
+				
+				const usernameCell = document.createElement('td');
+				usernameCell.textContent = this.leaderboard[i].username;
+				row.appendChild(usernameCell);
+				
+				const scoreCell = document.createElement('td');
+				scoreCell.textContent = this.leaderboard[i].highscore.toString();
+				row.appendChild(scoreCell);
+				
+				this.ref.leaderboard.appendChild(row);
+			}
 		} else {
 			this.ref.dualModeContainer.style.display = 'flex';
 			this.ref.soloModeContainer.style.display = 'none';
@@ -717,6 +757,29 @@ class EndingModule implements GameUIModule {
 		}
 
 		this.div.style.display = 'flex';
+	}
+
+	setLeaderboard(data: any, mode: string){
+		this.leaderboard = [];
+		for (let i = 0; i < data.length; i++){
+			let score = 0;
+			switch (mode){
+				case 'easy':
+					score = data[i].easy_mode_hscore;
+					break;
+				case 'normal':
+					score = data[i].normal_mode_hscore;
+					break;
+				case 'hard':
+					score = data[i].hard_mode_hscore;
+					break;
+			}
+
+			this.leaderboard.push({
+				username: data[i].username,
+				highscore: score
+			});
+		}
 	}
 }
 
