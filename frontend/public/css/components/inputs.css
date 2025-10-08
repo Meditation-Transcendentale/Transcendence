@@ -1,0 +1,121 @@
+/* ====================================
+   INPUTS - Input fields and text areas
+   ==================================== */
+
+/* Game Form Input */
+.game-form__input {
+  margin: 5px;
+  color: var(--color-lavender);
+  background-color: var(--color-space-deepest);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  border: none;
+  box-shadow: 1px 1px 1px black, -1px -1px 1px black;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -moz-osx-font-smoothing: grayscale;
+  will-change: transform;
+  transition: all var(--transition-slow) ease-in-out;
+  transform-origin: center center;
+  padding: 0.0em 0.1em;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.game-form__input:hover {
+  color: white;
+  transform: translate3d(0, 0, 0) scale(1.05);
+  box-shadow: 1px 1px 1px black, -1px -1px 1px black;
+  text-shadow: 
+    0 0 7px #fff,
+    0 0 10px #fff,
+    0 0 21px #fff,
+    0 0 42px #c77dff,
+    0 0 82px #c77dff,
+    0 0 92px #c77dff,
+    0 0 102px #c77dff,
+    0 0 151px #c77dff;
+}
+
+.game-form__input--active {
+  font-size: 5.6vh;
+}
+
+.game-form__input--active:hover {
+  background-color: #abc4eb !important;
+  font-size: 5.4vh;
+}
+
+/* Mod Form Input */
+.mod-form__input {
+  /* #create-mod > input */
+  display: inline-block;
+  line-height: 0vh;
+  padding-left: 2vh;
+  background-color: var(--window-background);
+  font-size: var(--font-size-base);
+  height: 6vh;
+  max-height: 7vh;
+  font-weight: var(--font-weight-light);
+  transition: font-size var(--transition-fast);
+  vertical-align: middle;
+}
+
+.mod-form__input:hover {
+  color: var(--window-background) !important;
+  background-color: var(--window-color) !important;
+  font-size: 5.2vh;
+}
+
+.mod-form__input--active {
+  font-size: 5.6vh;
+}
+
+.mod-form__input--active:hover {
+  background-color: #abc4eb !important;
+  font-size: 5.4vh;
+}
+
+/* Join Input Field - #join-id */
+.join-input__field {
+  position: relative;
+  text-align: center;
+  top: 20%;
+  left: 2vh;
+  width: 56vh;
+  font-size: var(--font-size-base);
+  transform: translateY(-50%);
+  color: white;
+  border-top: var(--spacing-md) white solid;
+  border-bottom: var(--spacing-md) white solid;
+  overflow: hidden;
+}
+
+.join-input__field::placeholder {
+  color: #999;
+}
+
+/* Join Input Indicator - #join-indic */
+.join-input__indicator {
+  position: relative;
+  top: 5%;
+  width: 100%;
+  text-align: center;
+  opacity: 0;
+}
+
+.join-input__indicator--active {
+  opacity: 1;
+  animation: blink 1.5s linear infinite;
+}
+
+/* Description - #description */
+.description {
+  padding-left: 1%;
+  width: 100%;
+  color: var(--window-color);
+  background-color: var(--window-background);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-light);
+}

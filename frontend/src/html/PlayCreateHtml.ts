@@ -9,6 +9,8 @@ export class PlayCreateHtml implements IHtml {
 	private css!: HTMLLinkElement;
 
 	private window!: HTMLDivElement;
+	private info!: HTMLDivElement;
+	private description!: HTMLDivElement;
 	private form!: HTMLFormElement;
 
 	constructor() { }
@@ -16,14 +18,32 @@ export class PlayCreateHtml implements IHtml {
 	public init(div: HTMLElement) {
 		this.css = div.querySelector("link") as HTMLLinkElement;
 
-		this.window = div.querySelector(".window") as HTMLDivElement;
-		this.form = div.querySelector("form") as HTMLFormElement;
+		this.window = div.querySelector(".create-window") as HTMLDivElement;
+		this.info = div.querySelector("#create-info") as HTMLDivElement;
+		this.description = div.querySelector("#create-description") as HTMLDivElement;
+		this.form = div.querySelector("#create-form") as HTMLFormElement;
 
 		sceneManager.css3dRenderer.addObject("play-create", {
 			html: this.window,
 			width: 1.,
 			height: 1.,
-			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.05).multiply(Matrix.Translation(-3, 3, -14)),
+			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.15).multiply(Matrix.Translation(-2, 5, -13.25)),
+			enable: false
+		})
+
+		sceneManager.css3dRenderer.addObject("play-info", {
+			html: this.info,
+			width: 1.,
+			height: 1.,
+			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * 0.15).multiply(Matrix.Translation(-2, 7.5, -13.25)),
+			enable: false
+		})
+
+		sceneManager.css3dRenderer.addObject("play-create-description", {
+			html: this.description,
+			width: 1.,
+			height: 1.,
+			world: Matrix.RotationY(-Math.PI * 0.5 + Math.PI * -0.1).multiply(Matrix.Translation(-2, 5, -17.5)),
 			enable: false
 		})
 
@@ -64,10 +84,14 @@ export class PlayCreateHtml implements IHtml {
 		stateManager.gameId = "";
 		document.head.appendChild(this.css);
 		sceneManager.css3dRenderer.setObjectEnable("play-create", true);
+		sceneManager.css3dRenderer.setObjectEnable("play-info", true);
+		sceneManager.css3dRenderer.setObjectEnable("play-create-description", true);
 	}
 
 	public unload(): void {
 		sceneManager.css3dRenderer.setObjectEnable("play-create", false);
+		sceneManager.css3dRenderer.setObjectEnable("play-info", false);
+		sceneManager.css3dRenderer.setObjectEnable("play-create-description", false);
 		this.css.remove();
 	}
 }

@@ -1,0 +1,21 @@
+/* ====================================
+   STATES - Disabled, active, hover states
+   ==================================== */
+
+/* Disabled State */
+.game-form--disabled,
+.window--play-disabled {
+  display: none;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.game-form--disabled .game-form__input,
+.window--play-disabled input {
+  display: none;
+}
+
+/* Enabled State */
+.window--play-enable {
+  /* Override styles if needed */
+}

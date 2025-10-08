@@ -69,3 +69,8 @@
 	font-family: ptolemy;
 	src: url('/assets/gotico-antiqua_Ptolemy/Ptolemy-Great-Primer18.woff2')
 }
+
+@font-face {
+	font-family: spacegrotesk;
+	src: url('/assets/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf')
+}

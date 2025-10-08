@@ -1,9 +1,16 @@
 /*######################CREATE#################*/
 #play-create,
+#play-info,
 #play-create-option,
 #play-join {
 	width: 200vh;
 	height: 200vh;
+	pointer-events: none;
+}
+
+#play-description{
+	width: 50vh;
+	height: 100vh;
 	pointer-events: none;
 }
 
@@ -48,6 +55,107 @@
 	justify-content: space-between;
 }
 
+#play-description{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 20%;
+	top: 50%;
+	left: 50%;
+	max-height: 12%;
+	/* overflow: hidden; */
+	color: #e0aaff;
+	background-color: rgba(13,2,33, 1.);
+}
+
+#play-info {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 20%;
+	top: 30%;
+	left: 20%;
+	max-height: 12%;
+	/* overflow: hidden; */
+	color: #e0aaff;
+	background-color: rgba(13,2,33, 1.);
+}
+
+.gradient-border {
+  --borderWidth: 3px;
+  background: #1D1F20;
+  position: relative;
+  border-radius: var(--borderWidth);
+}
+
+.gradient-border:after {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--borderWidth));
+  left: calc(-1 * var(--borderWidth));
+  height: calc(100% + var(--borderWidth) * 2);
+  width: calc(100% + var(--borderWidth)  * 2);
+  background: linear-gradient(
+  60deg, 
+  #0d0221,  /* Deep space purple-black */
+  #240046,  /* Dark violet */
+  #3c096c,  /* Deep purple */
+  #5a189a,  /* Medium purple */
+  #7209b7,  /* Purple */
+  #9d4edd,  /* Bright purple (center cube color) */
+  #c77dff,  /* Light purple */
+  #e0aaff   /* Lavender */
+);
+  border-radius: calc(2 * var(--borderWidth));
+  z-index: -1;
+  animation: animatedgradient 5s ease alternate infinite;
+  background-size: 300% 300%;
+}
+
+@keyframes syncedGlow {
+  0% {
+    box-shadow: 
+      0 0 15px rgba(13, 2, 33, 0.8),
+      0 0 30px rgba(90, 24, 154, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 25px rgba(157, 78, 221, 0.8),
+      0 0 50px rgba(157, 78, 221, 0.5),
+      0 0 75px rgba(199, 125, 255, 0.3);
+  }
+  100% {
+    box-shadow: 
+      0 0 15px rgba(13, 2, 33, 0.8),
+      0 0 30px rgba(90, 24, 154, 0.4);
+  }
+}
+
+@keyframes animatedgradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+#play-info>span {
+	display: flex;
+  /* justify-content: center; */
+  /* align-items: center; */
+	color: #e0aaff;
+	width: 75%;
+	background-color: rgba(13,2,33,0.9);
+	font-family: 'spacegrotesk', sans-serif;
+	font-size: 5vh;
+	font-weight: 300;
+	  animation: syncedGlow 5s ease alternate infinite;
+}
+
 .window-title {
 	flex: 1;
 	user-select: none;
@@ -71,20 +179,21 @@
 	display: flex;
 	flex-direction: column;
 	align-content: space-around;
-	width: 60%;
+	width: 40%;
 	/*height: 16.5%;*/
 	top: 30%;
 	left: 20%;
-	max-height: 30%;
+	max-height: 50%;
 	overflow: hidden;
+
 }
 
 #create-window>.window-content {
 
 	align-self: space-around;
-	width: 100%;
+	width: 70%;
 	overflow: hidden;
-	background-color: white;
+	background-color: transparent;
 	/*column-gap: 0.3%;*/
 }
 
@@ -121,7 +230,9 @@
 #create-game {
 	display:flex;
 	flex-direction: column;
-	width: 100%;
+	width: 50%;
+	/* padding: 10px; */
+	/* margin: 10px; */
 	/*grid-column: 1 / 1;*/
 	/*height: fit-content;*/
 	/*grid-template-columns: 1 auto auto auto;*/
@@ -140,18 +251,55 @@
 }
 
 #create-game>input {
-	padding-left: 1%;
-	color: var(--window-color);
-	background-color: var(--window-background);
+	margin: 5px;
+	/* padding: 1%; */
+	color: #e0aaff;
+	background-color: rgba(13,2,33,0.4);
+	font-family: 'spacegrotesk', sans-serif;
 	font-size: 5vh;
-	font-weight: 100;
+	font-weight: 300;
+	border: none;
+	/* border: 1px solid black; */
+	/* box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6) */
+	box-shadow: 1px 1px 1px black, -1px -1px 1px black;
+	transform: translateZ(0);
+    /* box-shadow: 0 0 1px rgba(0, 0, 0, 0); */
+    backface-visibility: hidden;
+    -moz-osx-font-smoothing: grayscale;
+	will-change: transform;
+	transition: all 0.4s ease-in-out;
+	transform-origin: center center;
+	padding: 0.0em 0.1em;
+	/* text-shadow:  */
+	/*    0 0 5px rgba(224, 170, 255, 1), */
+	/*    0 0 10px rgba(224, 170, 255, 1), */
+	/*    0 0 20px rgba(199, 125, 255, 0.9), */
+	/*    0 0 40px rgba(157, 78, 221, 0.8), */
+	/*    0 0 60px rgba(157, 78, 221, 0.6), */
+	/*    0 0 80px rgba(157, 78, 221, 0.4); */
+  
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 #pong-map>input:hover,
 #create-game>input:hover {
-	color: var(--window-background);
-	background-color: var(--window-color)
+	color: white;
+	/* background-color: #c77dff;  */
+	padding: 0.1em 0.2em;
+	transform: translate3d(0, 0, 0) scale(1.05);
+	box-shadow: 1px 1px 1px black, -1px -1px 1px black;
+ text-shadow: 
+    0 0 7px #fff,
+    0 0 10px #fff,
+    0 0 21px #fff,
+    0 0 42px #c77dff,
+    0 0 82px #c77dff,
+    0 0 92px #c77dff,
+    0 0 102px #c77dff,
+    0 0 151px #c77dff;
 }
+
 #pong-map>input[on],
 #create-game>input[on] {
 	font-size: 5.6vh;

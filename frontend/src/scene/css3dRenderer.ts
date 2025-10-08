@@ -32,6 +32,11 @@ export class Css3dRenderer {
 		this.cameraDiv = document.querySelector("#camera") as HTMLDivElement;
 		this.cameraDiv.style.width = `${this.width}px`;
 		this.cameraDiv.style.height = `${this.height}px`;
+		this.cameraDiv.style.backfaceVisibility = 'hidden';
+		this.cameraDiv.style.transform = 'translateZ(0)';
+
+		this.cameraDiv.style.willChange = 'transform';
+
 
 		this.perspective = this.height * 0.5 * this.camera.getProjectionMatrix().m[5];
 		document.body.style.perspective = `${this.perspective}px`;
@@ -40,6 +45,9 @@ export class Css3dRenderer {
 
 	public addObject(name: string, obj: ICss3dObject) {
 		this.objects.set(name, obj);
+		obj.html.style.backfaceVisibility = 'hidden';
+		obj.html.style.willChange = 'transform';
+		obj.html.style.transformStyle = 'preserve-3d';
 	}
 
 	public update() {

@@ -187,7 +187,9 @@ class SceneManager {
 				this.ballGrass.updateType = "home";
 				this.fog.enable = true;
 				this.assets.monolithMesh.setEnabled(true);
+
 				this.assets.monolithRoot.setEnabled(true);
+
 				this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = true;
 				this.assets.brRoot.setEnabled(false);

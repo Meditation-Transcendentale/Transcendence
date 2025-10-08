@@ -1,4 +1,5 @@
-import { ArcRotateCamera, Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, PBRMaterial, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, ShadowGenerator, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3, Vector4, MorphTarget } from "../babylon";
+
+import { ArcRotateCamera, Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, PBRMaterial, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, ShadowGenerator, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3, Vector4, MorphTarget, Material } from "../babylon";
 import { stateManager } from "../state/StateManager";
 import { perlinWorley3D } from "./PerlinWorley";
 import { sceneManager } from "./SceneManager";
@@ -126,6 +127,7 @@ export class Assets {
 				Math.sin(sceneManager.time * 0.6) * monolithOption.amplitude + 1,
 				Math.cos(sceneManager.time * 0.4) * monolithOption.amplitude * 0.5
 			)
+			this.monolithMesh.computeWorldMatrix(true);
 		}
 
 		if (this.statusMesh.morphTargetManager) {
@@ -211,9 +213,10 @@ export class Assets {
 		this.ballLight.range = 3;
 
 		this.cubeLight = new PointLight("cube light", this.cubeMesh.position, this.scene);
-		this.cubeLight.range = 5;
-		this.cubeLight.diffuse = Color3.Purple();
-		this.cubeLight.intensity = 5;
+		this.cubeLight.range = 8;
+		this.cubeLight.diffuse = new Color3(0.45, 0.20, 0.75);
+		this.cubeLight.specular = new Color3(0.55, 0.30, 0.85)
+		this.cubeLight.intensity = 4;
 
 		this.redLight = new SpotLight("redlight", new Vector3(-1200, 200, 0), new Vector3(1, -1, 0), 160.8, 2, this.scene);
 		this.redLight.diffuse = Color3.Red();
@@ -320,9 +323,9 @@ export class Assets {
 			attributes: ["position"],
 			uniforms: ["world", "viewProjection", "color"]
 		})
-		this.cubeMaterial.setVector4("color", new Vector4(this.cubeLight.diffuse.r * this.cubeLight.intensity * 2.,
-			this.cubeLight.diffuse.g * this.cubeLight.intensity * 2.,
-			this.cubeLight.diffuse.b * this.cubeLight.intensity * 2.,
+		this.cubeMaterial.setVector4("color", new Vector4(this.cubeLight.diffuse.r * this.cubeLight.intensity * 2.5,
+			this.cubeLight.diffuse.g * this.cubeLight.intensity * 2.5,
+			this.cubeLight.diffuse.b * this.cubeLight.intensity * 2.5,
 			0.2));
 		this.cubeMaterial.alphaMode = Engine.ALPHA_DISABLE;
 		this.cubeMesh.material = this.cubeMaterial;
@@ -352,6 +355,8 @@ export class Assets {
 			this.grassMaterial.getEffect().setTexture("textureSampler", this.ballGrassTextureB);
 		})
 
+		this.monolithMaterial.transparencyMode = Material.MATERIAL_ALPHATESTANDBLEND;
+		this.monolithMaterial.needDepthPrePass = true;
 		this.monolithMaterial.onBindObservable.add(() => {
 			const effect = this.monolithMaterial.getEffect();
 			effect.setFloat("time", sceneManager.time);

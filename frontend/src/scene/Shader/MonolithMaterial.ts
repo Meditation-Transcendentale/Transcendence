@@ -5,6 +5,7 @@ export class MonolithMaterial extends CustomMaterial {
 		super(name, scene);
 
 
+		this.AddAttribute('instanceID');
 		this.AddAttribute('uv');
 		this.AddAttribute('move');
 
@@ -25,6 +26,7 @@ export class MonolithMaterial extends CustomMaterial {
 
 			varying vec3 vOriginalWorldPos;
 			varying float oclusion;
+						attribute float instanceID;
 		`)
 
 		this.Vertex_Definitions(`
@@ -99,7 +101,7 @@ export class MonolithMaterial extends CustomMaterial {
 			}
 
 			// === COMBINE ANIMATIONS ===
-			vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) ;
+			vec3 totalDisplacement = ( (mouseAnimation * mouseInfluence)) ;
 			worldPos.xyz += totalDisplacement;
 			float displacement = length(worldPos.xyz - originalWorldPos.xyz);
 			float maxDisplacement = 1.0;
@@ -129,7 +131,7 @@ export class MonolithMaterial extends CustomMaterial {
 			gl_FragColor.rgb *= oclusion;
 			gl_FragColor.rgb += baseColor2;
 
-			gl_FragColor.a = 1.;
+			// gl_FragColor.a = 1.;
 		`)
 		const normalTex = new Texture("/assets/chunk_normal.jpg", scene);
 		this.bumpTexture = normalTex;
