@@ -12,6 +12,7 @@ class UserC {
 	public uuid!: string;
 	public status!: string;
 	public avatar!: string;
+	public twofa!: number;
 
 	public friendsOnline: Set<string>;
 	public friendsAway: Set<string>;
@@ -22,6 +23,7 @@ class UserC {
 		console.log("%c USER", "color: white; background-color: red");
 		this.friendsOnline = new Set<string>;
 		this.friendsAway = new Set<string>;
+		this.twofa = 0;
 	}
 
 	public check(): Promise<boolean> {
@@ -30,7 +32,7 @@ class UserC {
 				.then((json: any) => {
 					this.username = json.userInfo.username;
 					this.uuid = json.userInfo.uuid;
-					// this.twofa = json.userInfo.two_fa_enabled;
+					this.twofa = json.userInfo.two_fa_enabled;
 					this.avatar = json.userInfo.avatar_path;
 					if (this._once) {
 						this._once = false;
