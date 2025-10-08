@@ -1,5 +1,5 @@
 import { User } from "../User";
-import { postRequest } from "../networking/request";
+import { patchRequest, postRequest, deleteRequest } from "../networking/request";
 import { Popup, PopupType } from "./Popup";
 
 export class Ath {
@@ -225,8 +225,14 @@ class athSettings {
     private changeUsernamePopup!: Popup;
     private changePasswordPopup!: Popup;
     private updateTwoFAPopup!: Popup;
+    private twoFAQrCodePopup!: Popup;
+
+    private qrCodeSrc: string = "";
+    private twoFAEnabled: boolean = false;
 
     constructor() { 
+
+        console.log("twofa:", this.twoFAEnabled);
         this.settingsPopup = new Popup({
             type: PopupType.custom,
             title: "Settings",
@@ -237,8 +243,11 @@ class athSettings {
         this.changeUsernamePopup = new Popup({
             type: PopupType.validation,
             title: "Change Username",
-            input: "new username",
+            input: "username",
             submit: (password: string, token?: string, input?: string) => {
+                patchRequest("update-info/username", { username: input, password: password, token: token })
+                    .then((json) => { User.check(), this.changeUsernamePopup.close() })
+                    .catch((err) => { })
                 console.log("Change Username to:", input, "with password:", password, "and token:", token);
             },
             abort: () => {
@@ -249,8 +258,11 @@ class athSettings {
         this.changePasswordPopup = new Popup({
             type: PopupType.validation,
             title: "Change Password",
-            input: "new Password",
+            input: "password",
             submit: (password: string, token?: string, input?: string) => {
+                patchRequest("update-info/password", { newPassword: input, password: password, token: token })
+                    .then((json) => { User.check(), this.changePasswordPopup.close() })
+                    .catch((err) => { })
                 console.log("Change Password to:", input, "with password:", password, "and token:", token);
             },
             abort: () => {
@@ -261,8 +273,8 @@ class athSettings {
         this.updateTwoFAPopup = new Popup({
             type: PopupType.validation,
             title: "Update 2FA",
-            input: "2FA Token",
             submit: (password: string, token?: string, input?: string) => {
+                this.handle2FAToggle(password, token);
                 console.log("Update 2FA with password:", password, "and token:", token);
             },
             abort: () => {
@@ -270,6 +282,54 @@ class athSettings {
             }
         });
 
+        
+    }
+    
+    private handle2FAToggle(password: string, token?: string) {
+
+        
+        
+        
+        if (this.twoFAEnabled) {
+            deleteRequest("update-info/disable-2fa", { password, token })
+            .then((json: any) => {User.check(), this.updateTwoFAPopup.close(), this.twoFAEnabled = false; })
+            .catch((err: any) => { err.json() })
+            
+        } else {
+            postRequest("update-info/enable-2fa", { password })
+            .then((json: any) => {
+                this.qrCodeSrc = json.qrCode,
+                this.twoFAQrCodePopup = new Popup({
+                    type: PopupType.custom,
+                    title: "Scan this QR code with your authenticator app.",
+                    div: this.createQrCodeDiv()
+                });
+                this.twoFAQrCodePopup.show(), 
+                User.check(), 
+                this.updateTwoFAPopup.close(), 
+                this.twoFAEnabled = true; })
+            .catch((err: any) => { err.json() })
+        }
+    }
+
+    private createQrCodeDiv(): HTMLDivElement {
+        const div = document.createElement("div");
+        div.style.display = "flex";
+        div.style.flexDirection = "column";
+        div.style.alignItems = "center";
+        div.style.gap = "10px";
+
+        const img = document.createElement("img");
+        // const base64 = (this.qrCodeSrc as string).substring("data:image/png;base64,".length)
+		// this.qrCodeSrc = "data:image/png;base64," + base64;;        
+        img.src = this.qrCodeSrc;
+        img.alt = "2FA QR Code";
+        img.style.width = "150px";
+        img.style.height = "150px";
+
+        div.appendChild(img);
+
+        return div;
     }
     
     private createSettingsDiv(): HTMLDivElement {
@@ -318,7 +378,9 @@ class athSettings {
     }
     
     public load () {
+        this.twoFAEnabled = User.twofa === 1;
         this.settingsPopup.show();
+
     }
     
     public unload () {

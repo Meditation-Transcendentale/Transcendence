@@ -36,12 +36,23 @@ export class Popup {
 	private dialog: HTMLDialogElement;
 	private form: HTMLFormElement;
 
+	private token!: HTMLInputElement;
+
 	constructor(option: PopupOption) {
 		this.option = option;
 		this.dialog = document.createElement("dialog");
 		this.form = document.createElement("form");
 		this.form.method = "dialog";
+		this.form.autocomplete = "off";
 		this.dialog.appendChild(this.form);
+
+
+		const h = document.createElement("input");
+		h.type = "text";
+		h.name = "hidden";
+		h.style.display = "none";
+		h.autocomplete = "nope";
+		this.form.appendChild(h);
 
 		if (option.title) {
 			const head = document.createElement("header");
@@ -103,7 +114,7 @@ export class Popup {
 		// const form = document.createElement("form");
 		if (option.input) {
 			const input = document.createElement("input");
-			input.autocomplete = "off";
+			input.autocomplete = "new-password";
 			input.required = true;
 			input.name = "input";
 			switch (option.input) {
@@ -127,14 +138,13 @@ export class Popup {
 		password.name = "password";
 		this.form.appendChild(password);
 
-		if (User.twofa) {
-			const token = document.createElement("input");
-			token.type = "text";
-			token.placeholder = "token";
-			token.name = "token";
-			token.required = true;
-			this.form.appendChild(token);
-		}
+		const token = document.createElement("input");
+		token.type = "text";
+		token.placeholder = "token";
+		token.name = "token";
+		token.required = true;
+		this.form.appendChild(token);
+		this.token = token;
 
 		const submit = document.createElement("button");
 		submit.type = "submit";
@@ -167,10 +177,14 @@ export class Popup {
 		this.form.appendChild(option.div);
 		this.form.addEventListener("submit", (e) => {
 			e.preventDefault();
-				});
+		})
 	}
 
 	public show() {
+		if (this.option.type == PopupType.validation) {
+			this.token.hidden = User.twofa == 0;
+			this.token.required = User.twofa != 0;
+		}
 		document.body.appendChild(this.dialog);
 		// this.dialog.open = true;
 		this.dialog.showModal();
