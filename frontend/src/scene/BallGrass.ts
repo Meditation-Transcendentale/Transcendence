@@ -78,11 +78,12 @@ export class BallGrass {
 		} else {
 			if (this.needReset && this.assets.ballPicker.z > 0) {
 				// this.position.copyFrom(this.assets.ballRoot.position);
-				this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.position);
+				this.position.copyFrom(this.assets.ballMesh.absolutePosition);
+				// this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.position);
 				this.needReset = false;
 			}
 			const ray = this.assets.scene.createPickingRay(this.assets.ballPicker.x, this.assets.ballPicker.y).direction;
-			let delta = Math.abs(this.assets.camera.position.y - this.assets.ballRoot.position.y) / ray.y;
+			let delta = Math.abs(this.assets.camera.position.y - this.assets.ballRoot.scalingDeterminant) / ray.y;
 
 			let x = this.assets.camera.position.x - ray.x * delta;
 			let z = this.assets.camera.position.z - ray.z * delta;

@@ -102,7 +102,8 @@ export class Picker {
 	}
 
 	private ballIsHit(x: number, y: number): boolean {
-		this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.tempVector3);
+		// this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.tempVector3);
+		this.tempVector3.copyFrom(this.assets.ballMesh.absolutePosition)
 		const p = Vector3.Project(
 			this.tempVector3,
 			this.mId,
