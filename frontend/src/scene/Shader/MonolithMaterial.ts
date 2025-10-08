@@ -137,6 +137,7 @@ export class MonolithMaterial extends CustomMaterial {
 		this.bumpTexture = normalTex;
 
 		this.diffuseColor = new Color3(0.0, 0.0, 0.0);
+		// this.emissiveColor = Color3.Red();
 		this.specularColor = Color3.White().scale(0.5);
 		this.specularPower = 256;
 

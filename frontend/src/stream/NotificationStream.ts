@@ -4,6 +4,7 @@ import { notif } from "../networking/message";
 import { User } from "../User";
 import { postRequest } from "../networking/request";
 import { htmlManager } from "../html/HtmlManager";
+import { NotificationType } from "../html/NotificationHtml";
 
 export class NotificationStream implements IStream {
 	public ws: WebSocket | null;
@@ -31,7 +32,7 @@ export class NotificationStream implements IStream {
 		this.ws.onclose = () => {
 			console.log('WebSocket connection closed')
 		}
-		this.ws.onmessage = this.onMessage;
+		this.ws.onmessage = (msg) => { this.onMessage(msg) };
 		this.connected = true;
 	}
 
@@ -68,7 +69,8 @@ export class NotificationStream implements IStream {
 	private onFriendRequest(notification: notif.IFriendUpdate) {
 		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
 			.then((json: any) => {
-				// htmlManager.addNotification({type: "friend-request", uuid: notification.sender, username: json.data.username})
+				htmlManager.notification.add({ type: NotificationType.friendRequest, uuid: notification.sender as string, username: json.data.username })
+				htmlManager.friendlist.addRequest(json.data);
 				// User.addFriendRequest(notification.sender, json.data.username);
 			})
 			.catch((err) => {
@@ -79,6 +81,8 @@ export class NotificationStream implements IStream {
 	private onFriendAccept(notification: notif.IFriendUpdate) {
 		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
 			.then((json: any) => {
+				htmlManager.notification.add({ type: NotificationType.text, text: `${json.data.username} accepted your friend request` });
+				User.addFriend(json.data);
 				// htmlManager.addNotification({type: "friend-accept", uuid: notification.sender, username: json.data.username});
 				// User.updateFriendlist();
 			})
@@ -90,6 +94,7 @@ export class NotificationStream implements IStream {
 	private onGameInvite(notification: notif.IGameInvite) {
 		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
 			.then((json: any) => {
+				htmlManager.notification.add({ type: NotificationType.gameInvite, uuid: notification.sender as string, username: json.data.username, lobbyId: notification.lobbyid as string });
 				// htmlManager.addNotification({type: "game-invite", uuid: notification.sender, username: json.data.username, lobbyId: notification.lobbyid});
 			})
 			.catch((err) => {
@@ -98,6 +103,17 @@ export class NotificationStream implements IStream {
 	}
 
 	private onUpdateStatus(notification: notif.IStatusUpdate) {
+		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
+			.then((json: any) => {
+				htmlManager.notification.add({ type: NotificationType.text, text: `${json.data.username} ${notification.status}` });
+				json.data.status = notification.status;
+				User.updateFriendStatus(json.data);
+				// htmlManager.addNotification({type: "game-invite", uuid: notification.sender, username: json.data.username, lobbyId: notification.lobbyid});
+			})
+			.catch((err) => {
+				console.error(err);
+			})
+
 		// User.updateFriendStatus(notification.sender, notification.status);
 	}
 }

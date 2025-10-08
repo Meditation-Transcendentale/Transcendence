@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 import bcrypt from "bcrypt";
 import { connect, JSONCodec } from 'nats';
+import validator from 'validator';
 
 import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrorsValid, handleErrors } from "../../shared/handleErrors.mjs";
@@ -50,8 +51,20 @@ function decrypt(text) {
 	return decrypted.toString();
 }
 
+const TFASchema = {
+	body: {
+		type: 'object',
+		required: ['password'],
+		additionalProperties: false,
+		properties: {
+			password: { type: 'string', format: 'password' }, 
+			token: { type: ['string', 'integer'] }
+		}
+	}
+};
+
 const twoFARoutes = (app) => {
-	app.post('/enable-2fa', handleErrors(async (req, res) => {
+	app.post('/enable-2fa', { schema: TFASchema }, handleErrors(async (req, res) => {
 
 		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 			
@@ -62,7 +75,7 @@ const twoFARoutes = (app) => {
 			throw { status: userReturn.USER_029.http, code: userReturn.USER_029.code, message: userReturn.USER_029.message };
 		}
 
-		const password  = req.body.password;
+		const password = validator.escape(req.body.password);
 		if (!password) {
 			throw { status: userReturn.USER_005.http, code: userReturn.USER_005.code, message: userReturn.USER_005.message };
 		}
@@ -74,12 +87,9 @@ const twoFARoutes = (app) => {
 
 		const secret = generateSecret();
 
-		// console.log(secret, user.id);
-
 		await natsRequest(nats, jc, 'user.enable2FA', { secret, userId: user.id });
 
 		const qrCode = await generateQRCode(secret, user.username);
-			// console.log(qrCode);
 
 		res.code(statusCode.SUCCESS).send({ message: returnMessages.TWO_FA_ENABLED, qrCode });
 	}));
@@ -110,7 +120,7 @@ const twoFARoutes = (app) => {
 
 	}));
 
-	app.delete('/disable-2fa', handleErrors(async (req, res) => {
+	app.delete('/disable-2fa', { schema: TFASchema }, handleErrors(async (req, res) => {
 
 		const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
@@ -118,7 +128,7 @@ const twoFARoutes = (app) => {
 			throw { status: userReturn.USER_026.http, code: userReturn.USER_026.code, message: userReturn.USER_026.message };
 		}
 		
-		const password = req.body.password;
+		const password = validator.escape(req.body.password);
 		if (!password) {
 			throw { status: userReturn.USER_005.http, code: userReturn.USER_005.code, message: userReturn.USER_005.message };
 		}
@@ -126,6 +136,22 @@ const twoFARoutes = (app) => {
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 		if (!isPasswordValid) {
 			throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
+		}
+		
+		const token = req.body.token;
+		if (!token) {
+			throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
+		}
+		if (validator.isInt(token)) {
+				token = parseInt(token, 10);
+		}
+		try {
+			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ uuid: user.uuid }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
+			if (response.data.valid == false) {
+				throw { status: statusCode.UNAUTHORIZED, code: response.data.code, message: response.data.message };
+			}
+		} catch (error) {
+			throw { status: statusCode.UNAUTHORIZED, code: error.response.data.code, message: error.response.data.message };
 		}
 
 		await natsRequest(nats, jc, 'user.disable2FA', { userId: user.id });

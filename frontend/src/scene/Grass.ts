@@ -37,7 +37,7 @@ export class Grass {
 	public assets: Assets;
 	public tiles: Tile[];
 
-	private size: number;
+	private size = 20;
 
 	public COLOR_A = new Color3(0.1, 0.1, 0.1);
 	public COLOR_B = new Color3(0.9, 0.9, 0.9);
@@ -48,7 +48,6 @@ export class Grass {
 
 	constructor(assets: Assets) {
 		this.assets = assets;
-		this.size = 20;
 		this.tiles = [];
 
 		this._enable = false;
@@ -59,16 +58,17 @@ export class Grass {
 		this.assets.grassLowMesh.doNotSyncBoundingInfo = true;
 		// this.grassHigh.alwaysSelectAsActiveMesh = true;
 		// this.grassLow.alwaysSelectAsActiveMesh = true;
+		//
 
-		this.setThinInstances(this.assets.grassHighMesh, this.size, this.size, optionsHigh);
+		this.setThinInstances(this.assets.grassHighMesh, this.size * 1.5, this.size, optionsHigh);
 		this.setThinInstances(this.assets.grassLowMesh, this.size * 2, this.size * 2, optionsLow);
 
 		const o = new Vector3(0, -0.5, 0);
 		const size = this.size * 0.5
-		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(size, 0, size)), this.size, this.size));
-		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(-size, 0, size)), this.size, this.size));
-		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(size, 0, -size)), this.size, this.size));
-		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(-size, 0, -size)), this.size, this.size));
+		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(size * 1.5, 0, size)), this.size, this.size));
+		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(-size * 1.5, 0, size)), this.size, this.size));
+		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(size * 1.5, 0, -size)), this.size, this.size));
+		this.tiles.push(new Tile(this.assets.grassHighMesh, this.assets.grassMaterial, o.add(new Vector3(-size * 1.5, 0, -size)), this.size, this.size));
 
 		this.tiles.push(new Tile(this.assets.grassLowMesh, this.assets.grassMaterial, o.add(new Vector3(size * 4, 0, 0)), this.size * 2, this.size * 2));
 		this.tiles.push(new Tile(this.assets.grassLowMesh, this.assets.grassMaterial, o.add(new Vector3(-size * 4, 0, 0)), this.size * 2, this.size * 2));

@@ -9,6 +9,7 @@ import https from 'https';
 import axios from 'axios';
 import { connect, JSONCodec } from 'nats';
 import { v4 as uuidv4 } from 'uuid';
+import validator from 'validator';
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
@@ -41,9 +42,11 @@ const loginSchema = {
 	body: {
 		type: 'object',
 		required: ['username', 'password'],
+		additionalProperties: false,
 		properties: {
 			username: { type: 'string' },
-			password: { type: 'string', format: 'password' }
+			password: { type: 'string', format: 'password' },
+			token: { type: ['string', 'integer'] }
 		}
 	}
 };
@@ -105,9 +108,22 @@ app.get('/metrics', async (req, res) => {
 
 app.addHook('onRequest', verifyApiKey);
 
+function sanitizeLoginInput(input) {
+
+	if (input.token !== undefined && validator.isInt(input.token)) {
+		input.token = parseInt(input.token, 10);
+	}
+	
+	return {
+		username: validator.escape(input.username),
+		password: validator.escape(input.password),
+		token: input.token ? input.token : undefined
+	}
+}
+
 app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 
-	const { username, password, token } = req.body;
+	const { username, password, token } = sanitizeLoginInput(req.body);
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
 		
@@ -173,15 +189,13 @@ async function getAvatarCdnUrl(picture, uuid) {
 // https://developers.google.com/oauthplayground/
 
 app.post('/auth-google', handleErrors(async (req, res) => {
+	
 	const { token } = req.body;
 	let retCode = statusCode.SUCCESS, retMessage = returnMessages.LOGGED_IN;
 
 	if (!token) {
 		throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
 	}
-
-	// console.log("google token : ", token);
-	// console.log("google client id : ", process.env.GOOGLE_CLIENT_ID);
 
 	const ticket = await googleClient.verifyIdToken({
 		idToken: token,

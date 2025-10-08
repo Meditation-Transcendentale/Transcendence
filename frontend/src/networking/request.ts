@@ -1,3 +1,11 @@
+export interface ISearchRequestResponce {
+	username: string;
+	uuid: string,
+	status: string,
+	avatar_path: string
+}
+
+
 export async function getRequest(path: string, cache: string = "default"): Promise<JSON> {
 	const response = await fetch(`https://${window.location.hostname}:7000/api/${encodeURI(path)}`, {
 		method: 'GET',
@@ -39,6 +47,7 @@ export async function patchRequest(path: string, body: {}, stringify = true): Pr
 		method: 'PATCH',
 		headers: {
 			'Accept': 'application/json',
+			'Content-Type': 'application/json'
 		},
 		credentials: 'include',
 		body: stringify ? JSON.stringify(body) : body

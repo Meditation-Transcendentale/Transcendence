@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import dotenv from "dotenv";
 import fs from "fs";
 import { connect, JSONCodec } from 'nats';
+import validator from 'validator';
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
@@ -92,10 +93,28 @@ app.get('/me', handleErrors(async (req, res) => {
 	res.code(statusCode.SUCCESS).send({ userInfo: userInfo });
 }));
 
+const searchSchema = {
+	body: {
+		type: 'object',
+		required: ['identifier', 'type'],
+		additionalProperties: false,
+		properties: {
+			identifier: { type: 'string' },
+			type: { type: 'string', enum: ['username', 'uuid'] }
+		}
+	}
+};
 
-app.post('/search', handleErrors(async (req, res) => {
+function sanitizeSearchInput(input) {
+	return {
+		identifier: validator.escape(input.identifier),
+		type: validator.escape(input.type)
+	}
+}
 
-	const { identifier, type } = req.body;
+app.post('/search', { schema: searchSchema }, handleErrors(async (req, res) => {
+
+	const { identifier, type } = sanitizeSearchInput(req.body);
 
 	if (!identifier || !type) {
 		throw { status: userReturn.USER_036.http, code: userReturn.USER_036.code, message: userReturn.USER_036.message };
@@ -106,10 +125,10 @@ app.post('/search', handleErrors(async (req, res) => {
 	let responseData;
 	switch (type) {
 		case 'username':
-			// const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
-			// if (asker.username === identifier) {
-			// 	throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
-			// }
+			const asker = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
+			if (asker.username === identifier) {
+				throw { status: friendshipReturn.FRIEND_021.http, code: friendshipReturn.FRIEND_021.code, message: friendshipReturn.FRIEND_021.message };
+			}
 			responseData = await natsRequest(nats, jc, 'user.getUserForFriendResearch', { username: identifier });
 			break;
 		case 'uuid':

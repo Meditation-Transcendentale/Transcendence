@@ -7,6 +7,7 @@ import https from "https";
 import fastifyMultipart from '@fastify/multipart';
 import { fileTypeFromStream, fileTypeFromBuffer } from 'file-type';
 import { connect, JSONCodec } from "nats";
+import validator from 'validator';
 
 import { collectDefaultMetrics, Registry, Histogram, Counter } from 'prom-client';
 
@@ -15,6 +16,7 @@ import { statusRoutes } from "./status.js";
 import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from "../../shared/natsRequest.mjs";
+import { format } from "path";
 
 dotenv.config({ path: "../../../../.env" });
 
@@ -105,7 +107,11 @@ const agent = new https.Agent({
 const USERNAME_REGEX = /^[a-zA-Z0-9]{3,20}$/;
 
 async function checkPassword2FA(user, password, token) {
-
+	
+	const isPasswordValid = await bcrypt.compare(password, user.password);
+	if (!isPasswordValid) {
+		throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
+	}
 	if (user.two_fa_enabled == true) {
 		if (!token) {
 			throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
@@ -118,12 +124,6 @@ async function checkPassword2FA(user, password, token) {
 			}
 		} catch (error) {
 			throw { status: statusCode.UNAUTHORIZED, code: error.response.data.code, message: error.response.data.message };
-		}
-	} else {
-		console.log("password: ", password, " user.password: ", user.password);
-		const isPasswordValid = await bcrypt.compare(password, user.password);
-		if (!isPasswordValid) {
-			throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
 		}
 	}
 }
@@ -156,15 +156,40 @@ async function getAvatarCdnUrl(avatar, uuid) {
 	return `${process.env.CDN_URL}/${filename}`;
 }
 
+const usernameSchema = {
+	body: {
+		type: 'object',
+		required: ['username', 'password'],
+		additionalProperties: false,
+		properties: {
+			password: { type: 'string', format: 'password' },
+			username: { type: 'string' },
+			token: { type: ['string', 'integer'] }
+		}
+	}
+};
 
-app.patch('/username', handleErrors(async (req, res) => {
+function sanitizeUsernameInput(input) {
+
+	if (input.token !== undefined && validator.isInt(input.token)) {
+		input.token = parseInt(input.token, 10);
+	}
+
+	return {
+		username: validator.escape(input.username),
+		password: validator.escape(input.password),
+		token: input.token ? input.token : undefined
+	}
+}
+
+app.patch('/username', { schema: usernameSchema }, handleErrors(async (req, res) => {
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
 	if (!req.body) {
 		throw { status: userReturn.USER_021.http, code: userReturn.USER_021.code, message: userReturn.USER_021.message };
 	}
 
-	const { password, token, username } = JSON.parse(req.body);
+	const { password, token, username } = sanitizeUsernameInput(req.body);
 
 	if (username && USERNAME_REGEX.test(username) === false) {
 		throw { status: userReturn.USER_010.http, code: userReturn.USER_010.code, message: userReturn.USER_010.message };
@@ -195,9 +220,36 @@ app.patch('/avatar', handleErrors(async (req, res) => {
 
 }));
 
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!?@#$%&*()_{};:|,.<>]{8,}$/;
+// const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!?@#$%&*()_{};:|,.<>]{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!"#$%&'()*+,\\\-.\/:;<=>?@\[\]^_{|}~]{8,}$/;
 
-app.patch('/password', handleErrors(async (req, res) => {
+const passwordSchema = {
+	body: {
+		type: 'object',
+		required: ['newPassword', 'password'],
+		additionalProperties: false,
+		properties: {
+			password: { type: 'string', format: 'password' },
+			newPassword: { type: 'string', format: 'password' },
+			token: { type: ['string', 'integer'] }
+		}
+	}
+};
+
+function sanitizePasswordInput(input) {
+
+	if (input.token !== undefined && validator.isInt(input.token)) {
+		input.token = parseInt(input.token, 10);
+	}
+	
+	return {
+		newPassword: validator.escape(input.newPassword),
+		password: validator.escape(input.password),
+		token: input.token ? input.token : undefined
+	}
+}
+
+app.patch('/password', { schema: passwordSchema }, handleErrors(async (req, res) => {
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromHeader', { headers: req.headers });
 
@@ -205,7 +257,7 @@ app.patch('/password', handleErrors(async (req, res) => {
 		throw { status: userReturn.USER_021.http, code: userReturn.USER_021.code, message: userReturn.USER_021.message };
 	}
 
-	const { password, newPassword, token } = JSON.parse(req.body);
+	const { password, newPassword, token } = sanitizePasswordInput(req.body);
 
 	if (!password) {
 		throw { status: userReturn.USER_005.http, code: userReturn.USER_005.code, message: userReturn.USER_005.message };

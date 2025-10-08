@@ -107,7 +107,7 @@ export default async function statsRoutes(app) {
 
 	app.patch('/update/brickbreaker', handleErrors(async (req, res) => {
 
-		const { mode, score } = JSON.parse(req.body);
+		const { mode, score } = req.body;
 
 		const user = await nats.request('user.getUserFromHeader', jc.encode({ headers: req.headers }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
