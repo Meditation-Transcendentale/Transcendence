@@ -76,7 +76,7 @@ export class Ball {
 		}
 	}
 
-	private updateScore(layers: number, layerIndex: number) {
+	private async updateScore(layers: number, layerIndex: number) {
 		this.game.score += (layers - layerIndex) * this.speedScale * 10;
 		if (this.bricksLeft == 0)
 			this.game.score += layerIndex + 1 * this.speedScale * 10;
@@ -125,7 +125,7 @@ export class Ball {
 					this.isDirty = true;
 				}
 				if (this.bricksLeft == 0)
-					this.endGame();
+					this.game.end();
 				const normal = new Vector3(this.newposition.x, 0, this.newposition.z).normalize();
 				const dot = this.velocity.dot(normal);
 				const reflect = this.velocity.subtract(normal.scale(2 * dot));
@@ -187,11 +187,12 @@ export class Ball {
 		return distance <= ballRadius;
 	}
 
-	private endGame() {
-		// end screen UI
-		this.game.gameUI.showEnd("brick", this.game.newHighScore, this.game.score);
-		// this.game.dispose();
-	}
+	// private endGame() {
+	// 	// end screen UI
+		
+	// 	this.game.end();
+	// 	// this.game.dispose();
+	// }
 
 	reset(): void {
 		this.touched = false;

@@ -162,6 +162,7 @@ export class Pong {
 		this.ecs.addSystem(this.networkingSystem);
 
 		//add player
+		console.log("create player");
 		createPlayer(
 			this.ecs,
 			this.config,
@@ -177,8 +178,8 @@ export class Pong {
 		this.pongRoot.setEnabled(true);
 		// this.stateManager.set_ecs(this.ecs);
 		this.stateManager.setter(true);
-		this.gameUI.startCountdown(3);
-		this.gameUI.updateScore(0, 0);
+		// this.gameUI.startCountdown(3);
+		this.gameUI.updateScoreVersus(0, 0);
 
 		if (this.gameMode == "local") {
 			this.gameUI.showImage("up", "/assets/Up.png", "small", {
@@ -214,6 +215,10 @@ export class Pong {
 				offset: { x: -70, y: 15 },
 			});
 		}
+
+		const readyPayload: userinterface.IClientMessage = { ready: {} };
+		const readyBuf = encodeClientMessage(readyPayload);
+		this.wsManager.socket.send(readyBuf);
 
 		this.stateManager.update();
 
@@ -313,10 +318,6 @@ export class Pong {
 
 				if (serverMsg.welcome?.paddleId != null) {
 					const paddleId = serverMsg.welcome.paddleId;
-
-					const readyPayload: userinterface.IClientMessage = { ready: {} };
-					const readyBuf = encodeClientMessage(readyPayload);
-					socket.send(readyBuf);
 
 					socket.removeEventListener("message", listener);
 					resolve(paddleId);

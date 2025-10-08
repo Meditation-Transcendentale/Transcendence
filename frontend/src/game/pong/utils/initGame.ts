@@ -66,8 +66,8 @@ export function createBaseMeshes(scene: Scene, config: GameTemplateConfig, pongR
 
 export function createInstanceManagers(baseMeshes: any) {
 	return {
-		ball: new ThinInstanceManager(baseMeshes.ball, 1, 50, 100),
-		paddle: new ThinInstanceManager(baseMeshes.paddle, 4, 50, 100),
-		wall: new ThinInstanceManager(baseMeshes.wall, 4, 50, 100)
+		ball: new ThinInstanceManager(baseMeshes.ball, 1, 50, 100, false),
+		paddle: new ThinInstanceManager(baseMeshes.paddle, 4, 50, 100, true),
+		wall: new ThinInstanceManager(baseMeshes.wall, 4, 50, 100, false)
 	}
 }
