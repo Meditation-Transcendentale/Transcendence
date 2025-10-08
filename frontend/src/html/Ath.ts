@@ -1,14 +1,16 @@
 import { User } from "../User";
 import { postRequest } from "../networking/request";
+import { Popup, PopupType } from "./Popup";
 
 export class Ath {
 
-	container!: HTMLDivElement;
-	profileSection!: HTMLDivElement;
-	profileImage!: HTMLImageElement;
-	trigger!: HTMLSpanElement;
-	dropdown!: HTMLDivElement;
-	isOpen: boolean = false;
+	private container!: HTMLDivElement;
+	private profileSection!: HTMLDivElement;
+	private profileImage!: HTMLImageElement;
+	private trigger!: HTMLSpanElement;
+	private dropdown!: HTMLDivElement;
+    
+	private isOpen: boolean = false;
 
 	constructor() {
 
@@ -22,12 +24,12 @@ export class Ath {
 
 		this.profileImage = document.createElement("img");
 		this.profileImage.id = "ath-profile-image";
-		this.profileImage.src = User.avatar || "default_avatar.jpg";
+		this.profileImage.src =/*  User.avatar ||  */"default_avatar.jpg";
 		this.setupProfileImageStyles();
 
 		this.trigger = document.createElement("span");
 		this.trigger.id = "ath-trigger";
-		this.trigger.innerText = `${User.username || "User"}`;
+		this.trigger.innerText = /* `${User.username || "User"}`; */ "User";
 		this.setupTriggerStyles();
 
 		this.dropdown = document.createElement("div");
@@ -104,7 +106,7 @@ export class Ath {
 	private createMenuItems() {
 		const menuItems = [
 			{ text: "Profile", action: () => console.log(User) },
-			{ text: "Parameters", action: () => console.log(User.username) },
+			{ text: "Settings", action: () => console.log(User.username) },
 			{ text: "Quit", action: () => this.quitFunction() }
 		];
 
@@ -174,8 +176,8 @@ export class Ath {
 	}
 
 	public updateProfileInfo() {
-		const currentUsername = User.username || "User";
-		const currentAvatar = User.avatar || "default_avatar.jpg";
+		const currentUsername = /* User.username || */ "User";
+		const currentAvatar =/*  User.avatar ||  */"default_avatar.jpg";
 		
 		this.trigger.innerText = `${currentUsername}`;
 		this.profileImage.src = currentAvatar;
@@ -192,8 +194,29 @@ export class Ath {
 
 
 	private quitFunction() {
-		postRequest("auth/logout", {})
-				.then(() => { window.location.reload() })
-				.catch(() => { window.location.reload() })
+
+        const quitPopup = new Popup({
+            type: PopupType.accept,
+            title: "Logout",
+            text: "Are you sure you want to logout?",
+            accept: () => {
+                postRequest("auth/logout", {})
+                        .then(() => { window.location.reload() })
+                        .catch(() => { window.location.reload() })
+            },
+            decline: () => { }
+        });
+        quitPopup.show();
 	}
 }
+
+// changer de Username
+// Changer de mdp
+// changer d avatar
+// Activer 2fa || desactiver 2fa
+
+// class athSettings {
+
+
+
+// }
