@@ -131,9 +131,9 @@ export class Pong {
 		this.wsManager = new WebSocketManager(wsUrl);
 
 		this.cam = sceneManager.camera;
-		this.cam.position.x = 0;
-		this.cam.position.y = 35;
-		this.cam.position.z = -2;
+		// this.cam.position.x = 0;
+		// this.cam.position.y = 35;
+		// this.cam.position.z = -2;
 		this.cam.detachControl();
 
 		if (!this.inited) {
@@ -142,18 +142,23 @@ export class Pong {
 
 		this.baseMeshes.wall.setEnabled(true);
 		this.baseMeshes.paddle.setEnabled(true);
+		this.baseMeshes.arena.setEnabled(true);
+		this.baseMeshes.ball.setEnabled(true);
 		// this.cam.parent = this.pongRoot;
 		this.cam.minZ = 0.2;
 		if (maps == "monolith") {
-			this.pongRoot.position.set(0.1, 10, 0);
-			this.pongRoot.scalingDeterminant = 0.07;
+			this.pongRoot.position.set(0, 7, 0);
+			this.pongRoot.scalingDeterminant = 0.15;
+			this.cam.position.set(0, 15, 0);
 		} else if (maps == "grass") {
 			this.pongRoot.position.set(0, 0, 0);
 			this.pongRoot.scalingDeterminant = 2;
+			this.cam.position.set(0, 106, 0);
 			this.baseMeshes.arena.setEnabled(false);
 		} else if (maps == "void") {
-			this.pongRoot.position.set(100, 0, 100);
+			this.pongRoot.position.set(0, 0, 0);
 			this.pongRoot.scalingDeterminant = 0.25;
+			this.cam.position.set(0, 13.5, 0);
 		}
 		localPaddleId = await this.waitForRegistration();
 
@@ -270,6 +275,10 @@ export class Pong {
 		// this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
 		this.cam.parent = null;
+
+		this.baseMeshes.arena.setEnabled(false);
+		this.baseMeshes.wall.setEnabled(false);
+		this.baseMeshes.paddle.setEnabled(false);
 
 		console.log("render loop stopped and game paused");
 	}

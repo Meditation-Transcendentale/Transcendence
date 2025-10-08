@@ -15,8 +15,8 @@ vec3	getPick() {
 	float l = length(origin - vUV);
 
 	l = max(radius - l, 0.) * (1. / radius);
-	vec2 d = normalize(-vUV + origin) * float(l > 0.);
-	return vec3(d.x, d.y, l);
+	vec2 d = normalize(vUV - origin) * float(l > 0.);
+	return vec3(-d.x, d.y, l);
 }
 
 void main() {
