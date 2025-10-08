@@ -36,6 +36,8 @@ export class Popup {
 	private dialog: HTMLDialogElement;
 	private form: HTMLFormElement;
 
+	private token!: HTMLInputElement;
+
 	constructor(option: PopupOption) {
 		this.option = option;
 		this.dialog = document.createElement("dialog");
@@ -127,14 +129,13 @@ export class Popup {
 		password.name = "password";
 		this.form.appendChild(password);
 
-		if (User.twofa) {
-			const token = document.createElement("input");
-			token.type = "text";
-			token.placeholder = "token";
-			token.name = "token";
-			token.required = true;
-			this.form.appendChild(token);
-		}
+		const token = document.createElement("input");
+		token.type = "text";
+		token.placeholder = "token";
+		token.name = "token";
+		token.required = true;
+		this.form.appendChild(token);
+		this.token = token;
 
 		const submit = document.createElement("button");
 		submit.type = "submit";
@@ -165,9 +166,16 @@ export class Popup {
 
 	private generateCustomPopup(option: ICustomPopupOption) {
 		this.form.appendChild(option.div);
+		this.form.addEventListener("submit", (e) => {
+			e.preventDefault();
+		})
 	}
 
 	public show() {
+		if (this.option.type = PopupType.validation) {
+			this.token.hidden = User.twofa == 0;
+			this.token.required = User.twofa != 0;
+		}
 		document.body.appendChild(this.dialog);
 		// this.dialog.open = true;
 		this.dialog.showModal();
