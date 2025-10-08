@@ -222,6 +222,8 @@ export class Ath {
 class athSettings {
 
     private settingsPopup: Popup;
+    private changeUsernamePopup!: Popup;
+    private changePasswordPopup!: Popup;
 
     constructor() { 
         this.settingsPopup = new Popup({
@@ -230,6 +232,7 @@ class athSettings {
             text: "",
             div: this.createSettingsDiv()
         });
+
     }
     
     private createSettingsDiv(): HTMLDivElement {
@@ -237,12 +240,44 @@ class athSettings {
         div.style.display = "flex";
         div.style.flexDirection = "column";
         div.style.gap = "10px";
+
+        const changeUsernameBtn = document.createElement("button");
+        changeUsernameBtn.textContent = "Change Username";
+
+        const changePasswordBtn = document.createElement("button");
+        changePasswordBtn.textContent = "Change Password";
+
+        const toggle2FABtn = document.createElement("button");
+        toggle2FABtn.textContent = "Enable/Disable 2FA";
+
+        const changeAvatarBtn = document.createElement("button");
+        changeAvatarBtn.textContent = "Change Avatar";
+
+        changeUsernameBtn.addEventListener("click", () => {
+            console.log("Change Username Clicked");
+        });
+
+        changePasswordBtn.addEventListener("click", () => {
+            console.log("Change Password Clicked");
+        });
+
+        changeAvatarBtn.addEventListener("click", () => {
+            console.log("Change Avatar Clicked");
+        });
+
+        toggle2FABtn.addEventListener("click", () => {
+            console.log("Toggle 2FA Clicked");
+        });
+
+        div.appendChild(changeUsernameBtn);
+        div.appendChild(changePasswordBtn);
+        div.appendChild(changeAvatarBtn);
+        div.appendChild(toggle2FABtn);
         
         return div;
     }
     
     public load () {
-        console.log("load ath settings");
         this.settingsPopup.show();
     }
     
@@ -250,5 +285,6 @@ class athSettings {
         console.log("unload ath settings");
     }
 
+    
 
 }

@@ -141,7 +141,7 @@ export class Popup {
 
 	public show() {
 		document.body.appendChild(this.dialog);
-		this.dialog.open = true;
+		// this.dialog.open = true;
 		this.dialog.showModal();
 		stateManager.popup += 1;
 	}
