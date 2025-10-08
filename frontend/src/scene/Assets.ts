@@ -185,6 +185,7 @@ export class Assets {
 		this.eyeMesh.doNotSyncBoundingInfo = true;
 		this.statusMesh.alwaysSelectAsActiveMesh = true;
 		this.eyeMesh.alwaysSelectAsActiveMesh = true;
+		this.statusMesh.receiveShadows = true;
 		this.scene.addMesh(this.statusMesh);
 		this.scene.addMesh(this.eyeMesh);
 		this.scene.addMesh(this.statusRoot as Mesh);
@@ -223,15 +224,20 @@ export class Assets {
 		this.redLight.intensity = 100;
 		this.redLight.shadowMinZ = 1;
 		this.redLight.shadowMaxZ = 80;
+		this.redLight.excludedMeshes.push(this.brArenaMesh);
+		this.redLight.includedOnlyMeshes.push(this.statusMesh);
 
 		this.whiteLight = new SpotLight("whitelight", new Vector3(-500, 220, 0), new Vector3(-1, -1, 0), 2 * Math.PI, 2, this.scene);
 		this.whiteLight.intensity = 4;
 		this.whiteLight.shadowMinZ = 1.;
 		this.whiteLight.shadowMaxZ = 10;
+		this.whiteLight.excludedMeshes.push(this.brArenaMesh);
+		this.whiteLight.includedOnlyMeshes.push(this.statusMesh);
 
 		this.whiteLight2 = new SpotLight("whitelight2", new Vector3(0, 400, 0), new Vector3(0, -1, 0), Math.PI, 2, this.scene);
 		this.whiteLight2.excludedMeshes.push(this.statusMesh);
 		this.whiteLight2.intensity = 1;
+		this.whiteLight2.includedOnlyMeshes.push(this.brArenaMesh);
 	}
 
 	private loadTextureMandatory() {
@@ -375,6 +381,7 @@ export class Assets {
 		this.statusMaterial.usePhysicalLightFalloff = false;
 		this.statusMaterial.invertNormalMapX = true;
 		this.statusMaterial.invertNormalMapY = true;
+		this.statusMaterial.maxSimultaneousLights = 8;
 
 		this.eyeMaterial = new StandardMaterial('eyemat', this.scene);
 		this.eyeMaterial.diffuseColor = new Color3(1., 0, 0);

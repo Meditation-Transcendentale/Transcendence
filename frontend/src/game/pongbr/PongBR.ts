@@ -12,7 +12,7 @@ import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.j
 import type { userinterface } from './utils/proto/message.js';
 import { PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
-import { ArcRotateCamera, Scene, TransformNode, Vector3, Mesh, } from "../../babylon";
+import { ArcRotateCamera, Scene, TransformNode, Vector3, Mesh, Animation } from "../../babylon";
 import { BallComponent } from "./components/BallComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
 import { WallComponent } from "./components/WallComponent.js";
@@ -306,8 +306,6 @@ export class PongBR {
 	}
 
 	private createCameraAnimation(property: string, targetValue: number, frameRate: number, duration: number): any {
-		const { Animation } = require('../../babylon');
-
 		const animation = new Animation(
 			`camera_${property}`,
 			property,
