@@ -105,7 +105,6 @@ export class Ath {
 		const menuItems = [
 			{ text: "Profile", action: () => console.log(User) },
 			{ text: "Parameters", action: () => console.log(User.username) },
-			{ text: "Friendlist", action: () => console.log("Friendlist clicked") },
 			{ text: "Quit", action: () => this.quitFunction() }
 		];
 
