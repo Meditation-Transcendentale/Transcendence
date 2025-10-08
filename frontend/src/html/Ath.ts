@@ -24,12 +24,12 @@ export class Ath {
 
 		this.profileImage = document.createElement("img");
 		this.profileImage.id = "ath-profile-image";
-		this.profileImage.src =/*  User.avatar ||  */"default_avatar.jpg";
+		this.profileImage.src = "default_avatar.jpg";
 		this.setupProfileImageStyles();
 
 		this.trigger = document.createElement("span");
 		this.trigger.id = "ath-trigger";
-		this.trigger.innerText = /* `${User.username || "User"}`; */ "User";
+		this.trigger.innerText = "User";
 		this.setupTriggerStyles();
 
 		this.dropdown = document.createElement("div");
@@ -176,8 +176,8 @@ export class Ath {
 	}
 
 	public updateProfileInfo() {
-		const currentUsername = /* User.username || */ "User";
-		const currentAvatar =/*  User.avatar ||  */"default_avatar.jpg";
+		const currentUsername = User.username || "User";
+		const currentAvatar = User.avatar || "default_avatar.jpg";
 		
 		this.trigger.innerText = `${currentUsername}`;
 		this.profileImage.src = currentAvatar;
@@ -191,7 +191,6 @@ export class Ath {
 	public unload() {
 		this.container.remove();
 	}
-
 
 	private quitFunction() {
 
@@ -215,8 +214,12 @@ export class Ath {
 // changer d avatar
 // Activer 2fa || desactiver 2fa
 
-// class athSettings {
+class athSettings {
+
+    constructor() { 
+        console.log("ath settings");
+    }
 
 
 
-// }
+}
