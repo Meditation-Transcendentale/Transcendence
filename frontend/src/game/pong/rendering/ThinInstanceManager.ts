@@ -3,11 +3,13 @@ import { Entity } from "../ecs/Entity.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
 import { WallComponent } from "../components/WallComponent.js";
+import { BallComponent } from "../components/BallComponent";
+import { sceneManager } from "../../../scene/SceneManager";
 
 export class ThinInstanceManager {
 	private mesh: Mesh;
 	private capacity: number;
-	private instanceTransforms: Float32Array;
+	private instanceTransforms!: Float32Array;
 
 	// LOD/culling thresholds (world units)
 	private updateThreshold: number;
@@ -18,8 +20,10 @@ export class ThinInstanceManager {
 	constructor(mesh: Mesh, capacity: number, updateThreshold: number = 300, cullThreshold: number = 500) {
 		this.mesh = mesh;
 		this.capacity = capacity;
-		this.instanceTransforms = new Float32Array(capacity * 16);
-		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16);
+		if (mesh.name !== sceneManager.assets.ballMesh.name) {
+			this.instanceTransforms = new Float32Array(capacity * 16);
+			this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16);
+		}
 		this.updateThreshold = updateThreshold;
 		this.cullThreshold = cullThreshold;
 		// this.instanceColors = new Float32Array(capacity * 4);
@@ -64,6 +68,10 @@ export class ThinInstanceManager {
 
 	update(entities: Entity[], componentClass: any, camera: Camera, frameCount: number): void {
 		let count = 0;
+		if (this.mesh.name === sceneManager.assets.ballMesh.name) {
+			this.mesh.position.copyFrom((entities[0].getComponent(componentClass) as { position: Vector3 }).position);
+			return;
+		}
 		entities.forEach(entity => {
 			if (entity.hasComponent(componentClass)) {
 				let matrix: Matrix;

@@ -11,12 +11,13 @@ export class Tile {
 		this._mesh = mesh.clone(mesh.name + Tile.__id, null, false, false);
 		this._mesh.setEnabled(true);
 		this._mesh.layerMask = 0x01000000;
+		this._mesh.parent = mesh.parent;
 
 		this._mesh.position.copyFrom(position);
 		this._mesh.material = material;
 
 
-		this._mesh.freezeWorldMatrix();
+		// this._mesh.freezeWorldMatrix();
 		this._mesh.doNotSyncBoundingInfo = true;
 		this._mesh.buildBoundingInfo(
 			new Vector3(-width * 0.5, 1., -depth * 0.5),
