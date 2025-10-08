@@ -1,4 +1,5 @@
 import { stateManager } from "../state/StateManager";
+import { User } from "../User";
 
 export enum PopupType {
 	accept,
@@ -11,7 +12,6 @@ interface IPopupOption {
 	title?: string
 	id?: string,
 	text?: string,
-	div?: HTMLElement
 }
 
 interface ICustomPopupOption extends IPopupOption {
@@ -24,7 +24,8 @@ interface IAcceptPopupOption extends IPopupOption {
 }
 
 interface IValidationPopupOption extends IPopupOption {
-	submit: (password: string, token: string) => void;
+	input?: string;
+	submit: (password: string, token: string, input?: string) => void;
 	abort: () => void;
 }
 
@@ -94,7 +95,44 @@ export class Popup {
 		footer.appendChild(n);
 	}
 
-	private generateValidationPopup() {
+	private generateValidationPopup(option: IValidationPopupOption) {
+		// const form = document.createElement("form");
+		if (option.input) {
+			const input = document.createElement("input");
+			input.autocomplete = "off";
+			input.required = true;
+			input.name = "input";
+			switch (option.input) {
+				case "username": {
+					input.type = "text";
+					input.placeholder = "username";
+					break;
+				}
+				case "password": {
+					input.type = "password";
+					input.placeholder = "new password";
+					break;
+				}
+			}
+			this.form.appendChild(input);
+		}
+		const password = document.createElement("input");
+		password.type = "password";
+		password.placeholder = "password";
+		password.required = true;
+		password.name = "password";
+		this.form.appendChild(password);
+
+		if (User.twofa) {
+			const token = document.createElement("input");
+			token.type = "text";
+			token.placeholder = "token";
+			token.name = "token";
+			token.required = true;
+			this.form.appendChild(token);
+		}
+
+
 	}
 
 	private generateCustomPopup(option: ICustomPopupOption) {
@@ -103,12 +141,13 @@ export class Popup {
 
 	public show() {
 		document.body.appendChild(this.dialog);
+		this.dialog.open = true;
 		this.dialog.showModal();
 		stateManager.popup += 1;
 	}
 
 	public close() {
-		// this.dialog.close();
+		this.dialog.close();
 		this.dialog.remove();
 		stateManager.popup -= 1;
 	}
