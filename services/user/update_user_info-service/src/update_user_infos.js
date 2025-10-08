@@ -107,7 +107,11 @@ const agent = new https.Agent({
 const USERNAME_REGEX = /^[a-zA-Z0-9]{3,20}$/;
 
 async function checkPassword2FA(user, password, token) {
-
+	
+	const isPasswordValid = await bcrypt.compare(password, user.password);
+	if (!isPasswordValid) {
+		throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
+	}
 	if (user.two_fa_enabled == true) {
 		if (!token) {
 			throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
@@ -120,11 +124,6 @@ async function checkPassword2FA(user, password, token) {
 			}
 		} catch (error) {
 			throw { status: statusCode.UNAUTHORIZED, code: error.response.data.code, message: error.response.data.message };
-		}
-	} else {
-		const isPasswordValid = await bcrypt.compare(password, user.password);
-		if (!isPasswordValid) {
-			throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
 		}
 	}
 }

@@ -8,11 +8,13 @@ import { PlayJoinHtml } from "./PlayJoinHtml";
 import { PlayMapHtml } from "./PlayMapHtml";
 import { PlayModeHtml } from "./PlayModeHtml";
 import { TournamentHtml } from "./TournamentHtml";
+import { Ath } from "./Ath";
 
 
 class HtmlManager {
 	public notification: NotificationHtml;
 	public cube: CubeHtml;
+	public ath: Ath;
 	public friendlist: FriendlistHtml;
 
 	public auth: AuthHtml;
@@ -27,6 +29,7 @@ class HtmlManager {
 		console.log("%c HTML Manager", "color: white; background-color: red");
 		this.notification = new NotificationHtml();
 		this.cube = new CubeHtml();
+		this.ath = new Ath();
 		this.friendlist = new FriendlistHtml();
 
 		this.auth = new AuthHtml();

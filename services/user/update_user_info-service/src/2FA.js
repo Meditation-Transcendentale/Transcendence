@@ -57,7 +57,8 @@ const TFASchema = {
 		required: ['password'],
 		additionalProperties: false,
 		properties: {
-			password: { type: 'string', format: 'password' }
+			password: { type: 'string', format: 'password' }, 
+			token: { type: ['string', 'integer'] }
 		}
 	}
 };
@@ -135,6 +136,22 @@ const twoFARoutes = (app) => {
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 		if (!isPasswordValid) {
 			throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
+		}
+		
+		const token = req.body.token;
+		if (!token) {
+			throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
+		}
+		if (validator.isInt(token)) {
+				token = parseInt(token, 10);
+		}
+		try {
+			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ uuid: user.uuid }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
+			if (response.data.valid == false) {
+				throw { status: statusCode.UNAUTHORIZED, code: response.data.code, message: response.data.message };
+			}
+		} catch (error) {
+			throw { status: statusCode.UNAUTHORIZED, code: error.response.data.code, message: error.response.data.message };
 		}
 
 		await natsRequest(nats, jc, 'user.disable2FA', { userId: user.id });
