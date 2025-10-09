@@ -148,8 +148,8 @@ class SceneManager {
 
 	public resize() {
 		this.engine.resize(true);
-		const fogMaxResolution = stateManager.get("fogMaxResolution") as number;
-		const fogRatio = stateManager.get("fogRatio") as number;
+		const fogMaxResolution = Math.min(1080, this.resolution.width);
+		const fogRatio = stateManager.get("fogRatio");
 		this.assets.fogRenderTexture.resize({
 			width: fogMaxResolution * fogRatio,
 			height: fogMaxResolution * fogRatio * this.resolutionRatio
@@ -312,7 +312,8 @@ class SceneManager {
 		const scaleY = this.canvas.height / 1080;
 		const scale = Math.max(scaleX, scaleY, 1);
 
-		this.engine.setHardwareScalingLevel(scale);
+		if (scale > 1)
+			this.engine.setHardwareScalingLevel(scale);
 	}
 }
 

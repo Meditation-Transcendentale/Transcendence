@@ -64,6 +64,9 @@ async function init() {
 		if (e.key == 'Escape' && !stateManager.popup) {
 			routeManager.nav('/home', false, true)
 		}
+		if (e.key == "p") {
+			console.log(sceneManager.resolution);
+		}
 		// if (e.key == "p") {
 		// 	console.log(sceneManager.assets.ballMesh.position, sceneManager.assets.ballMesh.isEnabled(), sceneManager.assets.ballMesh.parent?.name, sceneManager.assets.ballRoot.position);
 		// 	// const p = new Popup({
