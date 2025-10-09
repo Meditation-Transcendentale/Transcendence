@@ -205,6 +205,7 @@ class SceneManager {
 				this.ballGrass.updateType = "none";
 				this.fog.enable = false;
 				this.assets.monolithRoot.setEnabled(false);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
@@ -226,6 +227,7 @@ class SceneManager {
 				this.fog.enable = false;
 				this.cameraManager.fogEnabled = false;
 				this.assets.monolithRoot.setEnabled(false);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.assets.brRoot.setEnabled(false);
 				break;
@@ -242,6 +244,7 @@ class SceneManager {
 				this.assets.monolithMesh.setEnabled(true);
 				this.assets.monolithRoot.setEnabled(true);
 				this.beforeRender.delete(this.assets.monolithMovement);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				// this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
@@ -258,6 +261,7 @@ class SceneManager {
 				this.fog.enable = false;
 				this.assets.monolithRoot.setEnabled(false);
 				this.beforeRender.delete(this.assets.monolithMovement);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
 				break;
@@ -273,6 +277,7 @@ class SceneManager {
 				this.fog.enable = false;
 				this.assets.monolithRoot.setEnabled(false);
 				this.beforeRender.delete(this.assets.monolithMovement);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(true);
 				break;
