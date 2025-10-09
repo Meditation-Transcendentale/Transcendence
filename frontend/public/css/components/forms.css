@@ -19,14 +19,18 @@
   /* #create-brick */
 }
 
-.game-form--map {
-  /* #pong-map */
-  width: 100%;
-}
-
 .game-form--create {
   /* #create-game */
   width: 50%;
+}
+
+.game-form--mode,
+.game-form--map {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  /* #create-game */
 }
 
 /* Mod Form - #create-mod */

@@ -13,7 +13,7 @@
   border: none;
   box-shadow: 1px 1px 1px black, -1px -1px 1px black;
   transform: translateZ(0);
-  backface-visibility: hidden;
+  /* backface-visibility: hidden; */
   -moz-osx-font-smoothing: grayscale;
   will-change: transform;
   transition: all var(--transition-slow) ease-in-out;
@@ -38,18 +38,49 @@
     0 0 151px #c77dff;
 }
 
+/* .game-form__input:disabled:hover { */
+/*   color: var(--color-lavender) !important; */
+/*   transform: translate3d(0, 0, 0) scale(1) !important; */
+/*   box-shadow: 1px 1px 1px black, -1px -1px 1px black !important; */
+/*   text-shadow: none !important; */
+/*   background-color: var(--color-space-deepest) !important; */
+/* } */
+
 .game-form__input--active {
-  font-size: 5.6vh;
+	color: white !important;
+	background-color: var(--color-lavender) !important;
+	transform: translate3d(0, 0, 0) scale(1.05) !important;
+	box-shadow: 0 0 10px var(--color-lavender) !important;
 }
 
-.game-form__input--active:hover {
-  background-color: #abc4eb !important;
-  font-size: 5.4vh;
+.game-form__input--disabled {
+	opacity: 0.5 !important;
+	cursor: not-allowed !important;
+	pointer-events: none !important;
 }
+
+.game-form__input--disabled:hover {
+	color: var(--color-lavender) !important;
+	transform: translate3d(0, 0, 0) scale(1) !important;
+	box-shadow: 1px 1px 1px black, -1px -1px 1px black !important;
+	text-shadow: none !important;
+	background-color: var(--color-space-deepest) !important;
+}
+
+.game-form__input--enabled {
+	opacity: 1 !important;
+	cursor: pointer !important;
+	pointer-events: auto !important;
+}
+
+.game-form--map__input,
+.game-form--mode__input {
+  font-size: var(--font-size-verysmall);
+}
+
 
 /* Mod Form Input */
 .mod-form__input {
-  /* #create-mod > input */
   display: inline-block;
   line-height: 0vh;
   padding-left: 2vh;
