@@ -504,6 +504,7 @@ export class Assets {
 		this.monolithMesh.thinInstanceSetBuffer("matrix", matrixes, 16, true);
 		this.monolithMesh.thinInstanceCount = this.monolithVoxelPositions.length;
 
+
 		// this.monolithMesh.freezeWorldMatrix();
 	}
 
