@@ -53,3 +53,65 @@ canvas {
 	width: 60px;
 	height: 20px;
 }
+
+.frame {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 5px solid var(--frame-color);
+	min-height: 10px;
+	min-width: 10px;
+	overflow: hidden;
+	/* transition: */
+	/* 	top 2s, */
+	/* 	left 2s, */
+	/* 	width 5s, 0.3s height 5s, 0.3s; */
+	z-index: 2;
+}
+
+.frame-new {
+	position: absolute;
+	pointer-events: auto;
+	width: 100px;
+	height: 100px;
+	overflow: hidden;
+	background-color: var(--frame-color);
+	z-index: 2;
+}
+
+.frame:hover {
+	mix-blend-mode: difference;
+	background-color: white;
+	border-color: black;
+}
+
+.frame:hover>.frame-text {
+	mix-blend-mode: difference;
+	background-color: black;
+	color: white;
+}
+
+.frame-text {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	color: var(--frame-text-color);
+	background-color: var(--frame-color);
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: 2vh;
+	pointer-events: none;
+}
+
+.frame-hover {
+	width: auto;
+	font-size: 1.5vh;
+	background-color: blue;
+	color: white;
+	pointer-events: none;
+	opacity: 0.7;
+	pointer-events: none;
+	animation: glitch 0.1s linear infinite;
+	animation-timing-function: step-start;
+}
