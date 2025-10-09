@@ -2,7 +2,7 @@
 	<link rel="stylesheet" type="text/css" href="/css/main.css">
 	<div class="create-window">
 		<div class="window__content window__content--transparent">
-			<form id="create-form" class="game-form game-form--mode-select">
+			<form id="create-form" class="game-form game-form--game">
 				<input class="game-form__input" name="pong" type="submit" value="PONG" />
 				<input class="game-form__input" name="tournament" type="submit" value="TOURNAMENT" />
 				<input class="game-form__input" name="brick" type="submit" value="BRICKBREAKER" />
@@ -11,9 +11,78 @@
 		</div>
 	</div>
 	<div id="create-info" class="info-box info-box--play">
-		<span class="info-box__text gradient-border">Chose Mode</span>
+		<span class="info-box__text gradient-border">Chose Game</span>
 	</div>
-	<div id="create-description" class="info-box info-box--description">
-		<span class="info-box__text info-box__text--create">Two paddles, one ball, don't miss.</span>
+
+	<!-- PONG -->
+	<div id="create-pong" class="info-box info-box--create">
+		<div class="info-box info-box--create__title">
+			<span class="info-box__text info-box--create__text">Two paddles, one ball, don't miss.</span>
+		</div>
+		<div class="info-box info-box--create__form">
+			<span class="create-mode__text">Mode</span>
+			<form class="game-form game-form--mode">
+				<input class="game-form__input game-form--mode__input" name="local" type="submit" value="Local" />
+				<input class="game-form__input game-form--mode__input" name="ai" type="submit" value="Ai" />
+				<input class="game-form__input game-form--mode__input" name="online" type="submit" value="Online" />
+			</form>
+		</div>
+		<div class="info-box info-box--create__form">
+			<span class="create-mode__text">Map</span>
+			<form class="game-form game-form--map">
+				<input class="game-form__input game-form--map__input" name="void" type="submit" value="void" />
+				<input class="game-form__input game-form--map__input" name="grass" type="submit" value="grass" />
+				<input class="game-form__input game-form--map__input" name="monolith" type="submit" value="monolith" />
+			</form>
+		</div>
+		<div class="info-box info-box--create__block">
+			<input class="game-form__input game-form__input--disabled" name="create" type="button" value="Create" />
+		</div>
+	</div>
+
+	<!-- TOURNAMENT -->
+	<div id="create-tournament" class="info-box info-box--create">
+		<div class="info-box info-box--create__title">
+			<span class="info-box__text info-box--create__text">Two paddles, one ball, but it's a tournament</span>
+		</div>
+		<div class="info-box info-box--create__form">
+			<span class="create-mode__text">Size</span>
+			<form id="size-form" class="game-form game-form--map">
+				<input class="game-form__input game-form--map__input" name="4" type="submit" value="4" />
+				<input class="game-form__input game-form--map__input" name="8" type="submit" value="8" />
+				<input class="game-form__input game-form--map__input" name="16" type="submit" value="16" />
+			</form>
+		</div>
+		<div class="info-box info-box--create__block">
+			<input class="game-form__input game-form__input--disabled" name="create" type="button" value="Create" />
+		</div>
+	</div>
+
+	<!-- BRICKBREAKER -->
+	<div id="create-brickbreaker" class="info-box info-box--create">
+		<div class="info-box info-box--create__title">
+			<span class="info-box__text info-box--create__text">One paddle, one ball, one shield, and a wall</span>
+		</div>
+		<div class="info-box info-box--create__form">
+			<span class="create-mode__text">Difficulty</span>
+			<form id="difficulty-form" class="game-form game-form--mode">
+				<input class="game-form__input game-form--mode__input" name="easy" type="submit" value="easy" />
+				<input class="game-form__input game-form--mode__input" name="normal" type="submit" value="normal" />
+				<input class="game-form__input game-form--mode__input" name="hard" type="submit" value="hard" />
+			</form>
+		</div>
+		<div class="info-box info-box--create__block">
+			<input class="game-form__input game-form__input--disabled" name="create" type="button" value="Create" />
+		</div>
+	</div>
+
+	<!-- BATTLE ROYAL -->
+	<div id="create-battleroyal" class="info-box info-box--create">
+		<div class="info-box info-box--create__title">
+			<span class="info-box__text info-box--create__text">100 paddle, 200 ball be the last to survive</span>
+		</div>
+		<div class="info-box info-box--create__block">
+			<input class="game-form__input game-form__input--disabled" name="create" type="button" value="Create" />
+		</div>
 	</div>
 </div>

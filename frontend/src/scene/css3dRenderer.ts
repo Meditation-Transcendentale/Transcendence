@@ -89,6 +89,13 @@ export class Css3dRenderer {
 		obj.enable = value;
 	}
 
+	public getObjectEnable(name: string): boolean {
+		if (!this.objects.has(name))
+			return false;
+		const obj = this.objects.get(name) as ICss3dObject;
+		return obj.enable;
+	}
+
 	public resize(width: number, height: number) {
 		this.width = width;
 		this.height = height;
