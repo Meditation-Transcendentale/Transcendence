@@ -442,6 +442,7 @@ class CountdownModule implements GameUIModule {
 			this.updateDisplay();
 
 			if (this.countdownNumber <= 0) {
+				this.ref.countdownValue.textContent = "";
 				this.unload();
 			}
 		}, this.delay);

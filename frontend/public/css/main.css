@@ -11,11 +11,13 @@
 @import 'components/info-boxes.css';
 @import 'components/tables.css';
 @import 'components/lobby.css';
+@import 'components/brackets.css';
+@import 'components/gameCard.css';
 
 @import 'utilities/effects.css';
 @import 'utilities/animations.css';
 @import 'utilities/states.css';
 
 
-@import 'pages/tournament.css';
+@import 'pages/tournamentPage.css';
 /* @import 'themes/purple-space.css'; */

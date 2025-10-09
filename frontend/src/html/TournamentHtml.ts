@@ -243,7 +243,7 @@ export class TournamentHtml implements IHtml {
       ) {
         inner.replaceChildren(this.makeReadyButton());
       } else {
-        const badge = this.statusBadge(ps);
+        const badge = this.statusBadge(ps, side);
         if (badge) inner.replaceChildren(badge);
       }
     }
@@ -266,12 +266,13 @@ export class TournamentHtml implements IHtml {
 
   private makeReadyButton(): HTMLButtonElement {
     const b = document.createElement("button");
+    // b.classList.add("ready-btn"); TO ADD WHEN STYLE IS THERE
     b.textContent = "Ready";
     b.addEventListener("click", () => this.sendReady());
     return b;
   }
 
-  private statusBadge(p: PlayerState | null): HTMLElement | null {
+  private statusBadge(p: PlayerState | null, side: "root" | "left" | "right"): HTMLElement | null {
     if (!p) return null;
     const s = document.createElement("span");
     s.className = "ready-checked";
@@ -284,7 +285,10 @@ export class TournamentHtml implements IHtml {
       s.classList.add("disconnected");
       return s;
     }
-    s.textContent = p.ready ? "Ready" : "Not ready";
+    if (side == "left")
+      s.textContent = p.ready ? "Ready ✓" : "Not Ready ⏳";
+    else if (side == "right")
+      s.textContent = p.ready ? "✓ Ready" : "⏳ Not ready";
     if (!p.ready) s.classList.add("notReady-checked");
     return s;
   }
