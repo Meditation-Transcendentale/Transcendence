@@ -128,7 +128,6 @@ export default async function statsRoutes(app) {
 			default:
 				throw { status: 400, code: 40031, message: 'No score provided' };
 		}
- 
 		res.code(statusCode.SUCCESS).send({ message: 'Stats updated' });
 
 	}));
@@ -141,6 +140,7 @@ export default async function statsRoutes(app) {
 			throw { status: leaderboards.status, code: leaderboards.code, message: leaderboards.message };
 		}
 
+		res.header('Cache-Control', 'no-store');
 		res.code(statusCode.SUCCESS).send({ leaderboards: leaderboards.data });
 	}));
 

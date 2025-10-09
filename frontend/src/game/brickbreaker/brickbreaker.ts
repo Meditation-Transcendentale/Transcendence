@@ -135,7 +135,7 @@ export class BrickBreaker {
 	public async end(){
 		if (this.newHighScore){
 			console.log("end new highscore:", this.score);
-			patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true);
+			await patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true);
 		}
 		const leaderboard = await getRequest("stats/get/leaderboard/brickbreaker")
 			.catch((err) => { console.log(err) });

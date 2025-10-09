@@ -218,11 +218,6 @@ export class Ath {
 	}
 }
 
-// changer de Username
-// Changer de mdp
-// changer d avatar
-// Activer 2fa || desactiver 2fa
-
 class athSettings {
 
 	private settingsPopup: Popup;
@@ -469,14 +464,22 @@ class athProfile {
 
 
 	private div!: HTMLDivElement;
+	private statsDiv!: HTMLDivElement;
 	private profileImg!: HTMLImageElement;
 	private usernameElem!: HTMLHeadingElement;
 	private statusElem!: HTMLParagraphElement;
 	private profilePopup: Popup;
 
+	private toggleStatsClassicBtn!: HTMLButtonElement;
+	private toggleStatsBrBtn!: HTMLButtonElement;
+
+	private stats: athStat;
+
 
 	constructor(athInstance: Ath) {
 		this.athInstance = athInstance;
+		
+		this.stats = new athStat(this.athInstance);
 		
 		this.createProfileDiv();
 
@@ -506,9 +509,58 @@ class athProfile {
 		this.statusElem = document.createElement("p");
 		this.statusElem.style.fontSize = "12px";
 
+		this.createStatDiv();
+
 		this.div.appendChild(this.profileImg);
 		this.div.appendChild(this.usernameElem);
 		this.div.appendChild(this.statusElem);
+		this.div.appendChild(this.statsDiv);
+	}
+
+	private createStatDiv() {
+		this.statsDiv = document.createElement("div");
+		this.statsDiv.id = "profile-stats";
+		this.statsDiv.style.display = "flex";
+		this.statsDiv.style.flexDirection = "column";
+		this.statsDiv.style.gap = "5px";
+		this.statsDiv.style.marginTop = "10px";
+
+		// Toggle Buttons
+		const toggleDiv = document.createElement("div");
+		toggleDiv.style.display = "flex";
+		toggleDiv.style.gap = "10px";
+		toggleDiv.style.marginBottom = "10px";
+
+		this.toggleStatsClassicBtn = document.createElement("button");
+		this.toggleStatsClassicBtn.textContent = "Classic Stats";
+		this.toggleStatsClassicBtn.style.background = "lightgray";
+		this.toggleStatsClassicBtn.style.flex = "1";
+
+		this.toggleStatsBrBtn = document.createElement("button");
+		this.toggleStatsBrBtn.textContent = "BR Stats";
+		this.toggleStatsBrBtn.style.background = "lightgray";
+		this.toggleStatsBrBtn.style.flex = "1";
+		
+		this.toggleStatsClassicBtn.addEventListener("click", () => {
+			this.loadClassicStats();
+			this.toggleStatsClassicBtn.disabled = true;
+			this.toggleStatsClassicBtn.style.background = "purple";
+			this.toggleStatsBrBtn.style.background = "lightgray";
+			this.toggleStatsBrBtn.disabled = false;
+		});
+
+		this.toggleStatsBrBtn.addEventListener("click", () => {
+			this.loadBrStats();
+			this.toggleStatsClassicBtn.disabled = false;
+			this.toggleStatsClassicBtn.style.background = "lightgray";
+			this.toggleStatsBrBtn.style.background = "purple";
+			this.toggleStatsBrBtn.disabled = true;
+		});
+		
+		toggleDiv.appendChild(this.toggleStatsClassicBtn);
+		toggleDiv.appendChild(this.toggleStatsBrBtn);
+		this.statsDiv.appendChild(toggleDiv);
+
 
 	}
 
@@ -531,3 +583,41 @@ class athProfile {
 		console.log("unload ath profile");
 	}
 }
+
+// class athStat {
+
+// 	private athInstance: Ath;
+
+// 	private div!: HTMLDivElement;
+
+// 	constructor( athInstance: Ath) {
+		
+// 		this.athInstance = athInstance;
+// 		this.createStatDiv();
+	
+// 	}
+
+// 	private createStatDiv() {
+// 		this.div = document.createElement("div");
+// 		this.div.style.display = "flex";
+// 		this.div.style.flexDirection = "column";
+// 		this.div.style.gap = "5px";
+// 		this.div.style.marginTop = "10px";
+		
+
+	
+// 	}
+
+
+// 	load() {
+
+// 	}
+	
+// 	unload() {
+// 	}
+
+// }
+
+
+// const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded"];
+// const brPlayerStatsName      = ["Game Played", 'Wined', "Win Rate", "Beast Placement", "Average Placement"];
