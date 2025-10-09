@@ -51,7 +51,7 @@
 @keyframes notification-fade-out {
 
 	0%,
-	80% {
+	50% {
 		opacity: 1;
 	}
 

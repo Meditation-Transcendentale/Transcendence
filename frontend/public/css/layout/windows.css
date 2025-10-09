@@ -92,3 +92,20 @@
 	height: 41vh;
 	padding: var(--spacing-lg);
 }
+
+.lobby-info-window {
+	width: 50vh;
+	height: fit-content;
+	padding: var(--spacing-xl);
+}
+
+.lobby-ready-window {
+	width: fit-content;
+	height: fit-content;
+	padding: var(--spacing-sm);
+}
+
+.lobby-invite-window {
+	width: 30vh;
+	height: 30vh;
+}
