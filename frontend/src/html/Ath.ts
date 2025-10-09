@@ -1,6 +1,81 @@
-import { User } from "../User";
-import { patchRequest, postRequest, deleteRequest, avatarRequest } from "../networking/request";
+import { get } from "http";
+import { patchRequest, postRequest, deleteRequest, avatarRequest, getRequest } from "../networking/request";
 import { Popup, PopupType } from "./Popup";
+
+class classicStatsC {
+
+	public gamesPlayed!: number;
+	public gamesWined!: number;
+	public gamesLoosed!: number;
+	public winRate!: number;
+	public bestWinStreak!: number;
+	public goalsScored!: number;
+	public goalsConceded!: number;
+
+	constructor() {
+		this.check();
+	}
+
+	public check(): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			console.log("check classic stats");
+			postRequest("stats/player", { uuid: User.uuid, mode: "classic" })
+				.then((json: any) => {
+					console.log("classicStats.ts -> postRequest stats/player", json);
+					this.gamesPlayed = json.playerStats.stats.game_played;
+					this.gamesWined = json.playerStats.stats.wins;
+					this.gamesLoosed = json.playerStats.stats.losses;
+					this.winRate = json.playerStats.stats.win_rate;
+					this.bestWinStreak = json.playerStats.stats.best_win_streak;
+					this.goalsScored = json.playerStats.stats.goals_scored;
+					this.goalsConceded = json.playerStats.stats.goals_conceded;
+					resolve(true);
+				})
+				.catch((err) => {
+					reject(new Error(err));
+				})
+		})
+	}
+}
+
+class UserC {
+	public username!: string;
+	public avatar!: string;
+	public status!: string;
+	public uuid!: string;
+	public twofa!: number;
+
+	public classicStats!: classicStatsC;
+	
+	constructor() {
+	}
+	
+	public async init() {
+		await this.check();
+		this.classicStats = new classicStatsC();
+	}
+	
+	public check(): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			console.log("check User");
+			getRequest("info/me", "no-cache")
+				.then((json: any) => {
+					console.log("User.ts -> getRequest info/me", json);
+					this.username = json.userInfo.username;
+					this.uuid = json.userInfo.uuid;
+					this.status = json.userInfo.status;
+					this.twofa = json.userInfo.two_fa_enabled;
+					this.avatar = json.userInfo.avatar_path;
+					resolve(true);
+				})
+				.catch((err) => {
+					reject(new Error("not authentifiated User"));
+				})
+			})
+	}
+}
+const User = new UserC();
+User.init();
 
 export class Ath {
 
@@ -159,6 +234,17 @@ export class Ath {
 			this.open();
 		}
 	}
+
+	// private getUserInfo() {
+	// 	getRequest("player/info", "no-cache")
+	// 		.then((json: any) => {
+	// 			User.username = json.data.username;
+	// 			User.avatar = json.data.avatar;
+	// 			User.status = json.data.status;
+	// 			User.uuid = json.data.uuid;
+	// 			User.twofa = json.data.twofa;
+	// 		})
+	// }
 
 	private open() {
 		this.isOpen = true;
@@ -469,23 +555,30 @@ class athProfile {
 	private usernameElem!: HTMLHeadingElement;
 	private statusElem!: HTMLParagraphElement;
 	private profilePopup: Popup;
-
-	private toggleStatsClassicBtn!: HTMLButtonElement;
-	private toggleStatsBrBtn!: HTMLButtonElement;
-
-	private stats: athStat;
-
-
+	
+	private classicTable!: HTMLTableElement;
+	
+	// private gamesPlayedClassicTd!: HTMLTableCellElement;
+	// private gamesWinedClassicTd!: HTMLTableCellElement;
+	// private gamesLoosedClassicTd!: HTMLTableCellElement;
+	// private winRateClassicTd!: HTMLTableCellElement;
+	// private bestWinStreakClassicTd!: HTMLTableCellElement;
+	// private goalsScoredClassicTd!: HTMLTableCellElement;
+	// private goalsConcededClassicTd!: HTMLTableCellElement;
+	
+	private classicTdElements!: { [key: string]: HTMLTableCellElement };
+	
+	
 	constructor(athInstance: Ath) {
 		this.athInstance = athInstance;
 		
-		this.stats = new athStat(this.athInstance);
+		this.classicTdElements = {};
 		
 		this.createProfileDiv();
 
 		this.profilePopup = new Popup({
 			type: PopupType.custom,
-			title: "Profile",
+			title: "",
 			div: this.div
 		});
 	}
@@ -510,14 +603,39 @@ class athProfile {
 		this.statusElem.style.fontSize = "12px";
 
 		this.createStatDiv();
+		// this.getPlayerClassicStats();
 
-		this.div.appendChild(this.profileImg);
 		this.div.appendChild(this.usernameElem);
+		this.div.appendChild(this.profileImg);
 		this.div.appendChild(this.statusElem);
 		this.div.appendChild(this.statsDiv);
 	}
 
+	private async getPlayerClassicStats() {
+
+		await User.classicStats.check()
+			.then(() => {this.updateClassicStatsTable(User.classicStats) })
+			.catch((err) => { });
+	}
+
+	private updateClassicStatsTable(stats: any) {
+
+		if (!stats) return;
+
+		this.classicTdElements["Game Played"].textContent = stats.gamesPlayed;
+		this.classicTdElements["Wined"].textContent = stats.gamesWined;
+		this.classicTdElements["Loosed"].textContent = stats.gamesLoosed;
+		this.classicTdElements["Win Rate"].textContent = stats.winRate + "%";
+		this.classicTdElements["Best Win Streak"].textContent = stats.bestWinStreak;
+		this.classicTdElements["Goals Scored"].textContent = stats.goalsScored;
+		this.classicTdElements["Goals Conceded"].textContent = stats.goalsConceded;
+	}
+
 	private createStatDiv() {
+		
+		const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded"];
+		const brPlayerStatsName = ["Game Played", 'Wined', "Win Rate", "Beast Placement", "Average Placement"];
+		
 		this.statsDiv = document.createElement("div");
 		this.statsDiv.id = "profile-stats";
 		this.statsDiv.style.display = "flex";
@@ -525,46 +643,37 @@ class athProfile {
 		this.statsDiv.style.gap = "5px";
 		this.statsDiv.style.marginTop = "10px";
 
-		// Toggle Buttons
-		const toggleDiv = document.createElement("div");
-		toggleDiv.style.display = "flex";
-		toggleDiv.style.gap = "10px";
-		toggleDiv.style.marginBottom = "10px";
+		this.classicTable = document.createElement("table");
+		this.classicTable.id = "classic-stats";
+		this.classicTable.style.width = "100%";
+		this.classicTable.style.borderCollapse = "collapse";
+		this.classicTable.style.marginTop = "10px";
 
-		this.toggleStatsClassicBtn = document.createElement("button");
-		this.toggleStatsClassicBtn.textContent = "Classic Stats";
-		this.toggleStatsClassicBtn.style.background = "lightgray";
-		this.toggleStatsClassicBtn.style.flex = "1";
+		const classicHeader = document.createElement("thead");
 
-		this.toggleStatsBrBtn = document.createElement("button");
-		this.toggleStatsBrBtn.textContent = "BR Stats";
-		this.toggleStatsBrBtn.style.background = "lightgray";
-		this.toggleStatsBrBtn.style.flex = "1";
-		
-		this.toggleStatsClassicBtn.addEventListener("click", () => {
-			this.loadClassicStats();
-			this.toggleStatsClassicBtn.disabled = true;
-			this.toggleStatsClassicBtn.style.background = "purple";
-			this.toggleStatsBrBtn.style.background = "lightgray";
-			this.toggleStatsBrBtn.disabled = false;
+		classicPlayerStatsName.forEach(statName => {
+			const classicHeaderCell = document.createElement("tr");
+			const classicValuesCell = document.createElement("tr");
+			this.classicTdElements[statName] = document.createElement("td");
+
+			classicValuesCell.appendChild(this.classicTdElements[statName]);
+			classicHeaderCell.textContent = statName;
+			classicHeaderCell.style.border = "1px solid black";
+			classicHeader.appendChild(classicHeaderCell);
+			classicHeader.appendChild(classicValuesCell);
 		});
 
-		this.toggleStatsBrBtn.addEventListener("click", () => {
-			this.loadBrStats();
-			this.toggleStatsClassicBtn.disabled = false;
-			this.toggleStatsClassicBtn.style.background = "lightgray";
-			this.toggleStatsBrBtn.style.background = "purple";
-			this.toggleStatsBrBtn.disabled = true;
-		});
-		
-		toggleDiv.appendChild(this.toggleStatsClassicBtn);
-		toggleDiv.appendChild(this.toggleStatsBrBtn);
-		this.statsDiv.appendChild(toggleDiv);
 
 
+
+
+
+		this.classicTable.appendChild(classicHeader);
+		this.statsDiv.appendChild(this.classicTable);
 	}
 
 	private updateProfileInfo() {
+		User.check();
 		this.profileImg.src = User.avatar || "https://localhost:3002/cdn/default_avatar.jpg";
 		this.usernameElem.textContent = User.username || "User";
 		this.statusElem.textContent = `Status: ${User.status || "offline"}`;
@@ -574,6 +683,7 @@ class athProfile {
 
 	public load() {
 		this.updateProfileInfo();
+		this.getPlayerClassicStats();
 		this.profilePopup.show();
 		console.log("load ath profile");
 	}
@@ -618,6 +728,3 @@ class athProfile {
 
 // }
 
-
-// const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded"];
-// const brPlayerStatsName      = ["Game Played", 'Wined', "Win Rate", "Beast Placement", "Average Placement"];
