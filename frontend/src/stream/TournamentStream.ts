@@ -27,6 +27,7 @@ export class TournamentStream implements IStream {
 
 		this.ws = new WebSocket(url);
 		this.ws.binaryType = "arraybuffer";
+		stateManager.gameId = "";
 
 		this.connected = true;
 		this.ws.onmessage = (msg) => { this.onMessage(msg) };
@@ -83,7 +84,10 @@ export class TournamentStream implements IStream {
 		this.ws?.send(buf);
 	}
 
-	public spectate() {
+	public spectate(gameId : string) {
+		stateManager.gameId = gameId;
+		stateManager.gameMap = "void";
+		stateManager.gameMode = "tournament";
 		routeManager.comebackRoute = "/tournament";
 		routeManager.nav("/pong");
 		this.disconnect();

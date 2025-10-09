@@ -2,13 +2,14 @@
   width: 100%;
   height: var(--card-h);
   box-sizing: border-box;
-  /* border: 5px solid var(--card-border); */
+  border: 3px solid var(--color-space-deepest);
   border-radius: var(--card-radius);
   color: var(--color-lavender);
   font-family: var(--font-primary);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-normal);
-  background: var(--color-space-deepest);
+  background: var(--color-space-deep);
+  opacity: 0.8;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
@@ -39,20 +40,21 @@
   white-space: nowrap;
 }
 
-.winner {
+/* .winner {
   background: #ecfdf5;
   border: 2px solid #34d399;
   border-radius: 10px;
-  font-weight: 600;
-}
+} */
+
 .eliminated {
   opacity: 0.6;
 }
-.disconnected {
+
+/* .disconnected {
   background: #fff7ed;
   border: 2px solid #fbbf24;
   border-radius: 10px;
-}
+} */
 .tbd {
   opacity: 0.55;
   font-style: italic;

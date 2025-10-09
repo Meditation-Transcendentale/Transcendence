@@ -125,7 +125,7 @@ export class TournamentHtml implements IHtml {
 			<div class="bracket-left"></div>
 			<div class="bracket-center"></div>
 			<div class="bracket-right"></div>
-			`;
+			`;``
 
     this.rootEl.append(this.toolbarEl, this.treeEl);
     this.div.appendChild(this.rootEl);
@@ -144,10 +144,6 @@ export class TournamentHtml implements IHtml {
       }
     }
   }
-
-	private sendSpectate() {
-		streamManager.tournament.spectate();
-	}
 
   private sendQuit() {
     streamManager.tournament.quit();
@@ -194,7 +190,7 @@ export class TournamentHtml implements IHtml {
 
   private rowScore(node: MatchNode, pid: string | null): string | null {
     if (!node.winnerId && !node.score) return null;
-    if (node.forfeitId) return pid && node.winnerId === pid ? "W/O" : "DQ";
+    if (node.forfeitId) return pid && node.winnerId === pid ? "Win" : "Disqualified";
     if (node.score?.length)
       return pid && node.player1Id === pid
         ? node.score[0].toString()
@@ -270,25 +266,17 @@ export class TournamentHtml implements IHtml {
 
   private makeReadyButton(): HTMLButtonElement {
     const b = document.createElement("button");
-    // b.classList.add("ready-btn"); TO ADD WHEN STYLE IS THERE
     b.textContent = "Ready";
     b.addEventListener("click", () => this.sendReady());
     return b;
   }
-
-	private makeSpectateButton(): HTMLButtonElement {
-		const b = document.createElement("button");
-		b.textContent = "Spectate";
-		b.addEventListener("click", () => this.sendSpectate());
-		return b;
-	}
 
   private statusBadge(p: PlayerState | null, side: "root" | "left" | "right"): HTMLElement | null {
     if (!p) return null;
     const s = document.createElement("span");
     s.className = "ready-checked";
     if (p.eliminated) {
-      s.textContent = "DQ";
+      s.textContent = "Disqualified";
       return s;
     }
     if (!p.connected) {
@@ -296,10 +284,14 @@ export class TournamentHtml implements IHtml {
       s.classList.add("disconnected");
       return s;
     }
+    if (!this.readyActive) {
+      s.textContent = side == "left" ? "Waiting ⏳" : "⏳ Waiting";
+      return s;
+    }
     if (side == "left")
-      s.textContent = p.ready ? "Ready ✓" : "Not Ready ⏳";
+      s.textContent = p.ready ? "Ready ✓" : "Ready ❔";
     else if (side == "right")
-      s.textContent = p.ready ? "✓ Ready" : "⏳ Not ready";
+      s.textContent = p.ready ? "✓ Ready" : "❔ Ready";
     if (!p.ready) s.classList.add("notReady-checked");
     return s;
   }
@@ -331,6 +323,8 @@ export class TournamentHtml implements IHtml {
       bot.classList.add("winner");
 
     card.append(top, bot);
+    if (node.gameId)
+      card.addEventListener("click", () => streamManager.tournament.spectate(node.gameId));
     li.appendChild(card);
     return li;
   }
