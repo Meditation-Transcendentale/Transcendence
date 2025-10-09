@@ -17,7 +17,7 @@ export class ThinInstanceManager {
 
 	// private instanceColors: Float32Array;
 
-	constructor(mesh: Mesh, capacity: number, updateThreshold: number = 300, cullThreshold: number = 500) {
+	constructor(mesh: Mesh, capacity: number, updateThreshold: number = 300, cullThreshold: number = 500, useCustomColor: boolean) {
 		this.mesh = mesh;
 		this.capacity = capacity;
 		if (mesh.name !== sceneManager.assets.ballMesh.name) {
@@ -27,20 +27,22 @@ export class ThinInstanceManager {
 		this.updateThreshold = updateThreshold;
 		this.cullThreshold = cullThreshold;
 		// this.instanceColors = new Float32Array(capacity * 4);
-		// for (let i = 0; i < capacity; i++) {
-		// 	if (i === 0 || i === 1) {
-		// 		this.instanceColors[i * 4 + 0] = 1; // rouge
-		// 		this.instanceColors[i * 4 + 1] = 1;
-		// 		this.instanceColors[i * 4 + 2] = 1;
-		// 		this.instanceColors[i * 4 + 3] = 1; // alpha
-		// 	} else {
-		// 		this.instanceColors[i * 4 + 0] = 1; // rouge
-		// 		this.instanceColors[i * 4 + 1] = 0;
-		// 		this.instanceColors[i * 4 + 2] = 0;
-		// 		this.instanceColors[i * 4 + 3] = 1; // alpha
+		// if (useCustomColor){
+		// 	for (let i = 0; i < capacity; i++) {
+		// 		if (i === 0) {
+		// 			this.instanceColors[i * 4 + 0] = 3.0; // rouge
+		// 			this.instanceColors[i * 4 + 1] = 0.4;
+		// 			this.instanceColors[i * 4 + 2] = 0;
+		// 			this.instanceColors[i * 4 + 3] = 1; // alpha
+		// 		} else {
+		// 			this.instanceColors[i * 4 + 0] = 1; // rouge
+		// 			this.instanceColors[i * 4 + 1] = 1;
+		// 			this.instanceColors[i * 4 + 2] = 1;
+		// 			this.instanceColors[i * 4 + 3] = 1; // alpha
+		// 		}
 		// 	}
+		// 	this.mesh.thinInstanceSetBuffer("instanceColor", this.instanceColors, 4);
 		// }
-		// this.mesh.thinInstanceSetBuffer("instanceColor", this.instanceColors, 4);
 	}
 
 	private computeWorldMatrix(entity: Entity, allEntities: Entity[]): Matrix {
