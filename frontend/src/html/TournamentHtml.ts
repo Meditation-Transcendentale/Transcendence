@@ -12,11 +12,6 @@ type PlayerState = {
   eliminated: boolean;
 };
 
-type Score = {
-  values?: number[];
-  forfeit?: boolean;
-};
-
 type MatchNode = {
   player1Id?: string | null;
   player2Id?: string | null;
@@ -60,7 +55,7 @@ export class TournamentHtml implements IHtml {
     this.css = document.createElement("link");
     this.css.rel = "stylesheet";
     this.css.type = "text/css";
-    this.css.href = "/css/tournament.css";
+    this.css.href = "/css/main.css";
 
     this.div = document.createElement("div");
 

@@ -1,0 +1,210 @@
+#tournament {
+  box-sizing: border-box;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  z-index: 15;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ready-countdown {
+  margin-right: auto;
+  font-variant-numeric: tabular-nums;
+  font-size: 600px;
+  opacity: 0.7;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: yellow;
+  /* box-shadow: 0 0 0 0 rgba(0, 0, 0, 1); */
+  animation: pulse 1s infinite;
+  z-index: 11;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    text-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    text-shadow: 0 0 60px rgba(255, 255, 0, 1),
+                 0 0 100px rgba(255, 255, 0, 0.8);
+    opacity: 1;
+  }
+}
+
+:root {
+  --round-gap: 56px;
+  --lane-gap: 80px;
+  --game-gap: 80px;
+
+  --card-w: 340px;
+  --card-h: 120px;
+  --card-radius: 14px;
+
+  --card-border: #1e293b;
+  --card-border-hover: #94a3b8;
+  --text: #1e293b;
+}
+
+.bracket {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  justify-content: center;
+  column-gap: var(--lane-gap);
+  padding: 32px;
+  min-height: 100vh;
+  overflow: auto;
+  background: transparent;
+}
+
+.bracket-left,
+.bracket-center,
+.bracket-right {
+  display: flex;
+  align-items: center;
+  gap: var(--round-gap);
+}
+
+.bracket-left {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+.bracket-right {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.bracket-center {
+  justify-content: center;
+}
+.round {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: var(--card-w);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.round .spacer {
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
+  transform: scale(1);
+  animation: pulse 2s infinite;
+  min-height: 32px;
+}
+
+.round .game-spacer {
+  display: none;
+}
+
+.round .game {
+  margin-bottom: var(--game-gap);
+}
+.round .game:last-child {
+  margin-bottom: 0;
+}
+
+.game .match-info {
+  width: 100%;
+  height: var(--card-h);
+  box-sizing: border-box;
+  border: 5px solid var(--card-border);
+  border-radius: var(--card-radius);
+  background: #fff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.bracket-left .round .game,
+.bracket-right .round .game {
+  padding: 0;
+}
+
+.game .match-info:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  border-color: var(--card-border-hover);
+}
+
+.game .match-info > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+}
+.game .match-info > div span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.winner {
+  background: #ecfdf5;
+  border: 2px solid #34d399;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.eliminated {
+  opacity: 0.6;
+}
+.disconnected {
+  background: #fff7ed;
+  border: 2px solid #fbbf24;
+  border-radius: 10px;
+}
+.tbd {
+  opacity: 0.55;
+  font-style: italic;
+}
+
+.bracket-center .game.final {
+  margin-top: -150px;
+}
+
+.bracket-center .game.final .match-info {
+  position: relative;
+  border: 2px solid #6366f1;
+  background: linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
+  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.28);
+}
+.bracket-center .game.final .match-info::after {
+  content: "🏆 Final";
+  position: absolute;
+  top: -14px;
+  left: 16px;
+  padding: 2px 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #fff;
+  background: #6366f1;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+body,
+#tournament {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 16px;
+  color: var(--text);
+}
