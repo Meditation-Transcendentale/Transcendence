@@ -33,7 +33,7 @@
 	margin: var(--spacing-md);
 	margin-top: var(--spacing-lg);
 	background-color: rgba(255, 255, 255, 0.2);
-	font-size: var(--font-size-tiny) !important;
+	font-size: var(--font-size-verysmall) !important;
 }
 
 
@@ -47,7 +47,7 @@
 }
 
 .lobby-info__button {
-	font-size: var(--font-size-tiny);
+	font-size: var(--font-size-verysmall);
 	flex: auto;
 	background-color: black;
 	color: white;
@@ -201,7 +201,7 @@
 	height: fit-content;
 	text-align: right;
 	color: white;
-	font-size: var(--font-size-tiny);
+	font-size: var(--font-size-small);
 }
 
 .lobby-invite__container {

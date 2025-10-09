@@ -248,3 +248,9 @@
 	font-weight: bold;
 	color: white;
 }
+
+table, th, td {
+    padding: 10px;
+    border: 2px solid white;
+    border-collapse: collapse;
+}

@@ -29,7 +29,7 @@
 
 
  ### fix
-    - handle error request back
+    - handle error request back (lobby empty mode)
     - sanitize input
     - change goal position physics pong
     - game tournament

@@ -40,6 +40,7 @@ export class Player {
 		this.goal.parent = game.root;
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
 		this.materialGoal.diffuseColor = new Color3(1, 1, 1);
+		this.materialGoal.emissiveColor = new Color3(0.5, 0.5, 0.5);
 		this.goal.material = this.materialGoal;
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);

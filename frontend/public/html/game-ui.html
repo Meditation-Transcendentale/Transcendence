@@ -35,7 +35,7 @@
 
 	<!-- Countdown Module -->
 	<div id="countdown-module" class="game-ui-countdown" style="display: none;">
-		<span id="countdown-value" class="countdown-value">0</span>
+		<span id="countdown-value" class="countdown-value"></span>
 	</div>
 
 	<!-- Ending Module -->
@@ -48,7 +48,7 @@
 			<div class="solo-mode">
 				<span id="end-score-solo" class ="score-value"></span>
 			</div>
-			<table id="leaderboard">
+			<table id="leaderboard" style="position: absolute; transform: translateX(25vw)">
 				<thead>	<tr><th>Rank</th><th>Player</th><th>Best Score</th></tr></thead>
 				<tbody id="players-list" class="list-body"></tbody>
 			</table>
