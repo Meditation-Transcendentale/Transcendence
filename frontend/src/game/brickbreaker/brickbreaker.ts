@@ -55,6 +55,7 @@ export class BrickBreaker {
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
 		ballMaterial.specularColor.set(0, 0, 0);
+		ballMaterial.disableLighting = false;
 		this.ball = new Ball(this.scene, ballMaterial, this.root, this);
 		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
 
@@ -134,12 +135,10 @@ export class BrickBreaker {
 
 	public async end(){
 		if (this.newHighScore){
-			console.log("end new highscore:", this.score);
-			patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true);
+			await patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true);
 		}
 		const leaderboard = await getRequest("stats/get/leaderboard/brickbreaker")
 			.catch((err) => { console.log(err) });
-		console.log("end leaderboard", leaderboard);
 		this.handleLeaderboard(leaderboard);
 		this.gameUI.hideScore();
 		this.gameUI.showEnd("brick", this.newHighScore, this.score);
@@ -193,7 +192,7 @@ export class BrickBreaker {
 		const mat = new StandardMaterial("arenaMat", this.scene);
 		mat.diffuseColor.set(0.75, 0.75, 0.75);
 		mat.emissiveColor.set(0.75, 0.75, 0.75);
-		mat.disableLighting = true;
+		// mat.disableLighting = true;
 		this.arena.material = mat;
 		this.arena.rotation.x = Math.PI / 2;
 		const radian = 2 * Math.PI;
@@ -209,6 +208,7 @@ export class BrickBreaker {
 		}
 		const builder = new PolygonMeshBuilder("brick", points, this.scene, earcut);
 		const mesh = builder.build(true, 0.5);
+		mesh.material = mat;
 		mesh.parent = this.root;
 		mesh.position.y += 0.45;
 	}
@@ -242,6 +242,10 @@ export class BrickBreaker {
 				const mesh = builder.build(true, width);
 				mesh.parent = this.root;
 				mesh.position.y += 0.4;
+				const mat = new StandardMaterial("arenaMat", this.scene);
+				mat.diffuseColor.set(0.75, 0.75, 0.75);
+				mat.emissiveColor.set(0.75, 0.75, 0.75);
+				mesh.material = mat;
 				bricksCols.push(mesh);
 			}
 			this.bricks.push(bricksCols);
