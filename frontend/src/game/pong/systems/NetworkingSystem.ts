@@ -125,6 +125,13 @@ export class NetworkingSystem extends System {
 				}
 			}
 
+			if (serverMsg.start) {
+				console.log("___________________________start MSG");
+				const e = entities.find(e => e.hasComponent(UIComponent));
+				let ui = e?.getComponent(UIComponent);
+				ui?.gameUI.startCountdown(3);
+			}
+
 			// === Game End ===
 			if (serverMsg.end) {
 				if (this.mode == 'tournament')

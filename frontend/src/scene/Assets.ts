@@ -1,4 +1,5 @@
-import { ArcRotateCamera, Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, PBRMaterial, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, ShadowGenerator, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3, Vector4, MorphTarget } from "../babylon";
+
+import { ArcRotateCamera, Color3, Color4, EffectRenderer, Engine, FreeCamera, HemisphericLight, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, PBRMaterial, PointLight, RawTexture3D, RenderTargetTexture, Scene, ShaderMaterial, ShadowGenerator, SpotLight, StandardMaterial, TransformNode, UniformBuffer, Vector2, Vector3, Vector4, MorphTarget, Material } from "../babylon";
 import { stateManager } from "../state/StateManager";
 import { perlinWorley3D } from "./PerlinWorley";
 import { sceneManager } from "./SceneManager";
@@ -34,6 +35,8 @@ export class Assets {
 	public statusMesh!: Mesh; //
 	public eyeMesh!: Mesh; //
 	public brArenaMesh!: Mesh; //
+	public pongPaddleMesh!: Mesh;
+	public pongWallMesh!: Mesh;
 
 	public flashLight!: SpotLight;
 	public hemisphericLight!: HemisphericLight;
@@ -57,6 +60,7 @@ export class Assets {
 	public butterflyRoot!: TransformNode;
 	public statusRoot!: TransformNode;
 	public brRoot!: TransformNode; //
+	public grassRoot!: TransformNode;
 
 	public ballMaterial!: ShaderMaterial;
 	public cubeMaterial!: ShaderMaterial;
@@ -66,6 +70,8 @@ export class Assets {
 	public statusMaterial!: PBRMaterial; //
 	public eyeMaterial!: StandardMaterial; //
 	public brArenaMaterial!: PBRMaterial; //
+	public pongPaddleMaterial!: StandardMaterial;
+	public pongWallMaterial!: StandardMaterial;
 
 	public depthMaterial!: ShaderMaterial;
 	public grassDepthMaterial!: ShaderMaterial;
@@ -121,6 +127,7 @@ export class Assets {
 				Math.sin(sceneManager.time * 0.6) * monolithOption.amplitude + 1,
 				Math.cos(sceneManager.time * 0.4) * monolithOption.amplitude * 0.5
 			)
+			this.monolithMesh.computeWorldMatrix(true);
 		}
 
 		if (this.statusMesh.morphTargetManager) {
@@ -151,6 +158,8 @@ export class Assets {
 		this.ballMesh = MeshBuilder.CreateSphere("ball", { diameter: 1 }, this.scene);
 		this.ballMesh.setEnabled(false);
 		this.ballMesh.doNotSyncBoundingInfo = true;
+		this.ballMesh.position.y = 0.5;
+		this.ballMesh.alwaysSelectAsActiveMesh = true;
 
 		this.groundMesh = MeshBuilder.CreateGround("ground", { width: 200, height: 200 }, this.scene);
 		this.groundMesh.setEnabled(false);
@@ -176,11 +185,17 @@ export class Assets {
 		this.eyeMesh.doNotSyncBoundingInfo = true;
 		this.statusMesh.alwaysSelectAsActiveMesh = true;
 		this.eyeMesh.alwaysSelectAsActiveMesh = true;
+		this.statusMesh.receiveShadows = true;
 		this.scene.addMesh(this.statusMesh);
 		this.scene.addMesh(this.eyeMesh);
 		this.scene.addMesh(this.statusRoot as Mesh);
 
 		this.brArenaMesh = MeshBuilder.CreateCylinder("arenaBox", { diameter: 400, height: 5, tessellation: 128 }, this.scene);
+
+		this.pongPaddleMesh = MeshBuilder.CreateBox("paddleBase", { width: 3, height: 1.5, depth: 0.4 }, this.scene);
+		this.pongWallMesh = MeshBuilder.CreateBox("wallBase", { width: 1, height: 1, depth: 20 }, this.scene);
+		this.pongPaddleMesh.setEnabled(false);
+		this.pongWallMesh.setEnabled(false);
 	}
 
 	private loadLightsMandatory() {
@@ -199,24 +214,30 @@ export class Assets {
 		this.ballLight.range = 3;
 
 		this.cubeLight = new PointLight("cube light", this.cubeMesh.position, this.scene);
-		this.cubeLight.range = 5;
-		this.cubeLight.diffuse = Color3.Purple();
-		this.cubeLight.intensity = 5;
+		this.cubeLight.range = 8;
+		this.cubeLight.diffuse = new Color3(0.45, 0.20, 0.75);
+		this.cubeLight.specular = new Color3(0.55, 0.30, 0.85)
+		this.cubeLight.intensity = 4;
 
 		this.redLight = new SpotLight("redlight", new Vector3(-1200, 200, 0), new Vector3(1, -1, 0), 160.8, 2, this.scene);
 		this.redLight.diffuse = Color3.Red();
 		this.redLight.intensity = 100;
 		this.redLight.shadowMinZ = 1;
 		this.redLight.shadowMaxZ = 80;
+		this.redLight.excludedMeshes.push(this.brArenaMesh);
+		this.redLight.includedOnlyMeshes.push(this.statusMesh);
 
 		this.whiteLight = new SpotLight("whitelight", new Vector3(-500, 220, 0), new Vector3(-1, -1, 0), 2 * Math.PI, 2, this.scene);
 		this.whiteLight.intensity = 4;
 		this.whiteLight.shadowMinZ = 1.;
 		this.whiteLight.shadowMaxZ = 10;
+		this.whiteLight.excludedMeshes.push(this.brArenaMesh);
+		this.whiteLight.includedOnlyMeshes.push(this.statusMesh);
 
 		this.whiteLight2 = new SpotLight("whitelight2", new Vector3(0, 400, 0), new Vector3(0, -1, 0), Math.PI, 2, this.scene);
 		this.whiteLight2.excludedMeshes.push(this.statusMesh);
 		this.whiteLight2.intensity = 1;
+		this.whiteLight2.includedOnlyMeshes.push(this.brArenaMesh);
 	}
 
 	private loadTextureMandatory() {
@@ -308,9 +329,9 @@ export class Assets {
 			attributes: ["position"],
 			uniforms: ["world", "viewProjection", "color"]
 		})
-		this.cubeMaterial.setVector4("color", new Vector4(this.cubeLight.diffuse.r * this.cubeLight.intensity * 2.,
-			this.cubeLight.diffuse.g * this.cubeLight.intensity * 2.,
-			this.cubeLight.diffuse.b * this.cubeLight.intensity * 2.,
+		this.cubeMaterial.setVector4("color", new Vector4(this.cubeLight.diffuse.r * this.cubeLight.intensity * 2.5,
+			this.cubeLight.diffuse.g * this.cubeLight.intensity * 2.5,
+			this.cubeLight.diffuse.b * this.cubeLight.intensity * 2.5,
 			0.2));
 		this.cubeMaterial.alphaMode = Engine.ALPHA_DISABLE;
 		this.cubeMesh.material = this.cubeMaterial;
@@ -321,6 +342,17 @@ export class Assets {
 		this.monolithMaterial = new MonolithMaterial("monolith", this.scene, monolithOption);
 		this.monolithMesh.material = this.monolithMaterial;
 
+		this.pongPaddleMaterial = new StandardMaterial("pongPaddle", this.scene);
+		this.pongPaddleMaterial.diffuseColor = new Color3(1., 1., 1.);
+		this.pongPaddleMaterial.emissiveColor = Color3.White();
+		this.pongPaddleMaterial.specularColor = Color3.Black();
+		this.pongPaddleMaterial.alpha = 0.05;
+		this.pongPaddleMaterial.alphaMode = Engine.ALPHA_DISABLE;
+		this.pongPaddleMesh.material = this.pongPaddleMaterial;
+
+		this.pongWallMaterial = this.pongPaddleMaterial.clone("pongWall");
+		this.pongWallMesh.material = this.pongWallMaterial;
+
 		this.grassMaterial.onBindObservable.add(() => {
 			this.grassMaterial.getEffect().setFloat("time", sceneManager.time);
 			this.grassMaterial.getEffect().setFloat("ballRadius", this.ballLight.range)
@@ -329,6 +361,8 @@ export class Assets {
 			this.grassMaterial.getEffect().setTexture("textureSampler", this.ballGrassTextureB);
 		})
 
+		this.monolithMaterial.transparencyMode = Material.MATERIAL_ALPHATESTANDBLEND;
+		this.monolithMaterial.needDepthPrePass = true;
 		this.monolithMaterial.onBindObservable.add(() => {
 			const effect = this.monolithMaterial.getEffect();
 			effect.setFloat("time", sceneManager.time);
@@ -347,6 +381,7 @@ export class Assets {
 		this.statusMaterial.usePhysicalLightFalloff = false;
 		this.statusMaterial.invertNormalMapX = true;
 		this.statusMaterial.invertNormalMapY = true;
+		this.statusMaterial.maxSimultaneousLights = 8;
 
 		this.eyeMaterial = new StandardMaterial('eyemat', this.scene);
 		this.eyeMaterial.diffuseColor = new Color3(1., 0, 0);
@@ -407,6 +442,8 @@ export class Assets {
 		this.ballRoot.scalingDeterminant = 1.5;
 		this.ballMesh.parent = this.ballRoot;
 		this.ballLight.parent = this.ballRoot;
+		this.pongPaddleMesh.parent = this.ballRoot;
+		this.pongWallMesh.parent = this.ballRoot;
 
 		this.monolithRoot = new TransformNode("monolithRoot", this.scene);
 		this.cubeMesh.parent = this.monolithRoot;
@@ -429,6 +466,11 @@ export class Assets {
 		this.redLight.parent = this.brRoot;
 		this.whiteLight.parent = this.brRoot;
 		this.whiteLight2.parent = this.brRoot;
+
+		this.grassRoot = new TransformNode("grassRoot", this.scene);
+		this.grassRoot.scaling.set(1, 1., 1);
+		this.grassHighMesh.parent = this.grassRoot;
+		this.grassLowMesh.parent = this.grassRoot;
 	}
 
 	private loadShadows() {

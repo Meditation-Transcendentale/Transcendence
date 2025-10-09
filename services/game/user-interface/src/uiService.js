@@ -201,9 +201,11 @@ export default class UIService {
 			catch (err) {
 				console.log(err);
 			}
-
-			const buf = encodeGameStartMessage({});
-			this.uwsApp.publish(gameId, buf, /* isBinary= */ true);
+			const startBuff = encodeServerMessage({
+				start: { }
+			});
+			// const buf = encodeGameStartMessage({});
+			this.uwsApp.publish(gameId, startBuff, /* isBinary= */ true);
 
 			this.readyPlayers.delete(gameId);
 		}
@@ -212,14 +214,14 @@ export default class UIService {
 	handleSpectate(ws) {
 		const { uuid } = ws;
 		const sess = this.sessions.get(uuid);
-
+		
 		// 1) Must already be registered
 		if (!sess) {
 			//const err = encodeErrorMessage({ message: 'Session not found' });
 			//ws.send(err, true);
 			return ws.close();
 		}
-
+		console.log("server receive spectating:", uuid);
 		// 2) Change role
 		sess.role = 'spectator';
 		delete sess.paddleId;

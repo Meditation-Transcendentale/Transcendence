@@ -1,0 +1,40 @@
+/* ====================================
+   3D PANELS - css3D block 
+   ==================================== */
+
+.play-panel {
+  width: 200vh;
+  height: 200vh;
+  pointer-events: all;
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.play-panel * {
+  pointer-events: auto;
+}
+
+/* Panel Types */
+.play-panel--create {
+  /* #play-create */
+  width: 50vh;
+  height: 50vh;
+}
+
+.play-panel--info {
+  /* #play-info */
+}
+
+.play-panel--create-option {
+  /* #play-create-option */
+}
+
+.play-panel--join {
+  /* #play-join */
+}
+
+.play-panel--description {
+  /* #play-description */
+  width: 50vh;
+  height: 100vh;
+}

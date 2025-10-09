@@ -1,0 +1,35 @@
+/* ====================================
+   EFFECTS - Visual effects
+   ==================================== */
+
+/* Gradient Border Effect */
+.gradient-border {
+  --borderWidth: var(--border-width);
+  /* background: #1D1F20; */
+  position: relative;
+  border-radius: var(--borderWidth);
+}
+
+.gradient-border::after {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--borderWidth));
+  left: calc(-1 * var(--borderWidth));
+  height: calc(100% + var(--borderWidth) * 2);
+  width: calc(100% + var(--borderWidth) * 2);
+  background: linear-gradient(
+    60deg, 
+    #0d0221,
+    #240046,
+    #3c096c,
+    #5a189a,
+    #7209b7,
+    #9d4edd,
+    #c77dff,
+    #e0aaff
+  );
+  border-radius: calc(2 * var(--borderWidth));
+  z-index: -1;
+  animation: animatedgradient 5s ease alternate infinite;
+  background-size: 300% 300%;
+}

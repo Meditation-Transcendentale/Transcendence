@@ -1,0 +1,46 @@
+/* ====================================
+   INFO BOXES - Display information
+   ==================================== */
+
+.info-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  width: 32vh;
+  max-height: 12%;
+  color: var(--color-lavender);
+  background-color: var(--color-space-deepest);
+  text-align:center;
+}
+
+.info-box--play {
+  /* #play-info */
+  /* top: 50%; */
+  /* left: 50%; */
+}
+
+.info-box--description {
+  /* #play-description */
+  /* top: 50%; */
+  /* left: 50%; */
+}
+
+.info-box__text {
+  color: var(--color-lavender);
+  width: 100%;
+  background-color: rgba(13, 2, 33, 0.9);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  animation: syncedGlow 5s ease alternate infinite;
+}
+
+.info-box__text--create {
+  color: var(--color-lavender);
+  width: 100%;
+  background-color: rgba(13, 2, 33, 0.9);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-normal);
+}

@@ -4,7 +4,7 @@ import { BallComponent } from "../components/BallComponent.js";
 import { PaddleComponent } from "../components/PaddleComponent.js";
 import { TransformComponent } from "../components/TransformComponent.js";
 import { WebSocketManager } from "../network/WebSocketManager.js";
-import { decodeServerMessage } from "../utils/proto/helper.js";
+import { decodeServerMessage, encodeClientMessage } from "../utils/proto/helper.js";
 import { userinterface } from "../utils/proto/message.js";
 import { WallComponent } from "../components/WallComponent.js";
 import { localPaddleId, PongBR } from "../PongBR.js";
@@ -149,6 +149,12 @@ export class NetworkingSystem extends System {
 						if (paddleComp.isLocal && !this.spectateButtonOn) {
 							this.gameUI.showButton('spectate', 'Spectate', () => {
 								console.log('Spectating...');
+								const payload: userinterface.IClientMessage = {
+									spectate: {}
+								};
+				
+								const buffer = encodeClientMessage(payload);
+								this.wsManager.socket.send(buffer);
 							});
 							this.spectateButtonOn = true;
 						}
