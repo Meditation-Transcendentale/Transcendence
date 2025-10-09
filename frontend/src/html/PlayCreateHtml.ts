@@ -17,12 +17,16 @@ export class PlayCreateHtml implements IHtml {
 	private form!: HTMLFormElement;
 	private mapForm!: HTMLFormElement;
 	private modeForm!: HTMLFormElement;
+	private sizeForm!: HTMLFormElement;
+	private difficultyForm!: HTMLFormElement;
 	private createButton!: HTMLInputElement;
 
 	private gameDescriptions = ["create-pong", "create-tournament", "create-brickbreaker", "create-battleroyal"];
 
 	private selectedMap: string = "";
 	private selectedMode: string = "";
+	private selectedSize: string = "";
+	private selectedDifficulty: string = "";
 
 	constructor() { }
 
@@ -38,7 +42,8 @@ export class PlayCreateHtml implements IHtml {
 		this.form = div.querySelector("#create-form") as HTMLFormElement;
 		this.mapForm = div.querySelector(".game-form--map") as HTMLFormElement;
 		this.modeForm = div.querySelector(".game-form--mode") as HTMLFormElement;
-		// this.sizeForm = div.querySelector("size-form") as HTMLFormElement;
+		this.sizeForm = div.querySelector("#size-form") as HTMLFormElement;
+		this.difficultyForm = div.querySelector("#difficulty-form") as HTMLFormElement;
 		this.createButton = div.querySelector('input[name="create"]') as HTMLInputElement;
 		this.createButton.disabled = true;
 		this.createButton.classList.add("game-form__input--disabled");
@@ -154,12 +159,74 @@ export class PlayCreateHtml implements IHtml {
 			this.checkCreateEnabled();
 		});
 
-		this.createButton.addEventListener("click", () => {
-			if (this.selectedMap && this.selectedMode) {
-				stateManager.gameMap = this.selectedMap;
-				stateManager.gameMode = this.selectedMode;
-				createGame();
+		this.difficultyForm.addEventListener("submit", (e) => {
+			e.preventDefault();
+			if (!e.submitter || !e.submitter.hasAttribute("name")) {
+				return;
 			}
+			const submitter = e.submitter as HTMLInputElement;
+			const difficulty = submitter.getAttribute("name") as string;
+
+			if (submitter.classList.contains("game-form__input--active")) {
+				submitter.classList.remove("game-form__input--active");
+				this.selectedDifficulty = "";
+			} else {
+				this.difficultyForm.querySelectorAll(".game-form__input").forEach(btn => {
+					btn.classList.remove("game-form__input--active");
+				});
+				submitter.classList.add("game-form__input--active");
+				this.selectedDifficulty = difficulty;
+			}
+
+			this.checkCreateEnabled();
+		});
+
+		this.sizeForm.addEventListener("submit", (e) => {
+			e.preventDefault();
+			if (!e.submitter || !e.submitter.hasAttribute("name")) {
+				return;
+			}
+			const submitter = e.submitter as HTMLInputElement;
+			const size = submitter.getAttribute("name") as string;
+
+			if (submitter.classList.contains("game-form__input--active")) {
+				submitter.classList.remove("game-form__input--active");
+				this.selectedSize = "";
+			} else {
+				this.sizeForm.querySelectorAll(".game-form__input").forEach(btn => {
+					btn.classList.remove("game-form__input--active");
+				});
+				submitter.classList.add("game-form__input--active");
+				this.selectedSize = size;
+			}
+
+			this.checkCreateEnabled();
+		});
+
+		const allCreateButtons = div.querySelectorAll('input[name="create"]') as NodeListOf<HTMLInputElement>;
+		allCreateButtons.forEach(button => {
+			button.addEventListener("click", () => {
+				console.log(`mode =${this.selectedMode}, map=${this.selectedMap}, diff=${this.selectedDifficulty}`);
+
+				if (this.selectedMode === "br") {
+					stateManager.gameMode = this.selectedMode;
+					createGame();
+				}
+				else if (this.selectedMap && this.selectedMode) {
+					stateManager.gameMap = this.selectedMap;
+					stateManager.gameMode = this.selectedMode;
+					createGame();
+				}
+				else if (this.selectedMode === "brick" && this.selectedDifficulty) {
+					stateManager.gameMode = this.selectedDifficulty;
+					routeManager.nav("/brick");
+				}
+				else if (this.selectedMode === "tournament" && this.selectedSize) {
+					stateManager.gameMap = "void";
+					stateManager.gameMode = this.selectedMode;
+					createGame();
+				}
+			});
 		});
 	}
 
@@ -175,19 +242,33 @@ export class PlayCreateHtml implements IHtml {
 			});
 			sceneManager.css3dRenderer.setObjectEnable(panelName, true);
 			this.resetSelections();
+			if (panelName === "create-battleroyal") {
+				this.selectedMode = "br";
+			}
+			if (panelName === "create-brickbreaker") {
+				this.selectedMode = "brick";
+			}
+			if (panelName === "create-tournament") {
+				this.selectedMode = "tournament";
+			}
 		}
+		this.updateCreateButton();
 	}
 
 
 	private checkCreateEnabled() {
-		if (this.selectedMap && this.selectedMode) {
-			this.createButton.disabled = false;
-			this.createButton.classList.remove("game-form__input--disabled");
-			this.createButton.classList.add("game-form__input--enabled");
+		const createButton = this.getActiveCreateButton();
+
+		if (!createButton) return;
+
+		if ((this.selectedMap && this.selectedMode) || this.selectedDifficulty || this.selectedSize) {
+			createButton.disabled = false;
+			createButton.classList.remove("game-form__input--disabled");
+			createButton.classList.add("game-form__input--enabled");
 		} else {
-			this.createButton.disabled = true;
-			this.createButton.classList.add("game-form__input--disabled");
-			this.createButton.classList.remove("game-form__input--enabled");
+			createButton.disabled = true;
+			createButton.classList.add("game-form__input--disabled");
+			createButton.classList.remove("game-form__input--enabled");
 		}
 	}
 
