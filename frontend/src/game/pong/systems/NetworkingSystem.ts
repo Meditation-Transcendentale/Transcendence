@@ -119,10 +119,14 @@ export class NetworkingSystem extends System {
 						else
 							ui.gameUI.updateScoreVersus(this.myScore, this.opponentScore);
 					}
-					// if (ui && (myScore == 5 || theirScore == 5)){
-					// 	ui.gameUI.showEnd(myScore, theirScore, myScore == 5);
-					// }
 				}
+			}
+
+			if (serverMsg.start) {
+				console.log("___________________________start MSG");
+				const e = entities.find(e => e.hasComponent(UIComponent));
+				let ui = e?.getComponent(UIComponent);
+				ui?.gameUI.startCountdown(3);
 			}
 
 			// === Game End ===

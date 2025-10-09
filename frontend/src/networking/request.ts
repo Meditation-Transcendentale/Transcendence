@@ -1,3 +1,11 @@
+export interface ISearchRequestResponce {
+	username: string;
+	uuid: string,
+	status: string,
+	avatar_path: string
+}
+
+
 export async function getRequest(path: string, cache: string = "default"): Promise<JSON> {
 	const response = await fetch(`https://${window.location.hostname}:7000/api/${encodeURI(path)}`, {
 		method: 'GET',

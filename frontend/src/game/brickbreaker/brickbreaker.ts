@@ -31,6 +31,9 @@ export class BrickBreaker {
 	public pbEasy: number = 0;
 	public pbNormal: number = 0;
 	public pbHard: number = 0;
+	public leaderEasy: any;
+	public leaderNormal: any;
+	public leaderHard: any;
 	public mode: string = "normal";
 	public newHighScore: boolean = false;
 
@@ -52,6 +55,7 @@ export class BrickBreaker {
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
 		ballMaterial.specularColor.set(0, 0, 0);
+		ballMaterial.disableLighting = false;
 		this.ball = new Ball(this.scene, ballMaterial, this.root, this);
 		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
 
@@ -68,6 +72,16 @@ export class BrickBreaker {
 		this.pbHard = json.brickBreakerStats.hard_mode_hscore;
 	}
 
+	public handleLeaderboard(json: any){
+		// console.log("leaderboard get", json);
+		if (this.mode == 'easy')
+			this.gameUI.setLeaderboard(json.leaderboards.easy, this.mode);
+		else if (this.mode == 'normal')
+			this.gameUI.setLeaderboard(json.leaderboards.normal, this.mode);
+		else if (this.mode == 'hard')
+			this.gameUI.setLeaderboard(json.leaderboards.hard, this.mode);
+	}
+
 	public async start(mod: string) {
 		if (this.renderObserver) {
 			console.warn("BrickBreaker is already running");
@@ -75,12 +89,14 @@ export class BrickBreaker {
 		}
 
 		this.reset();
+		this.mode = mod;
 		const pb = await getRequest("stats/get/brickbreaker")
+			.catch((err) => { console.log(err) });
+		const leaderboard = await getRequest("stats/get/leaderboard/brickbreaker")
 			.catch((err) => { console.log(err) });
 
 		this.handlePb(pb);
-
-		this.mode = mod;
+		this.handleLeaderboard(leaderboard);
 
 		if (mod === "easy") {
 			this.layers = 2;
@@ -117,6 +133,17 @@ export class BrickBreaker {
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
 	}
 
+	public async end(){
+		if (this.newHighScore){
+			await patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true);
+		}
+		const leaderboard = await getRequest("stats/get/leaderboard/brickbreaker")
+			.catch((err) => { console.log(err) });
+		this.handleLeaderboard(leaderboard);
+		this.gameUI.hideScore();
+		this.gameUI.showEnd("brick", this.newHighScore, this.score);
+	}
+
 	private update(): void {
 
 		const currentTime = performance.now();
@@ -133,24 +160,12 @@ export class BrickBreaker {
 	}
 
 	public stop(): void {
-		//if (this.renderObserver) {
-		//	this.scene.onBeforeRenderObservable.remove(this.renderObserver);
-		//	this.renderObserver = null;
-		//	console.log("BrickBreaker removed from render loop");
-		//}
-		// const body = new FormData();
-		// body.append(this.mode, this.score.toString());
-		// console.log(body);
 		if (this.newHighScore){
 			patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true)
-				.then(() => {
-					console.log("Score updated");
-				})
 		}
 		this.camera.parent = null;
 		this.start1 = false;
 		this.player.disableInput();
-		// this.reset();
 	}
 
 	public reset(): void {
@@ -164,6 +179,7 @@ export class BrickBreaker {
 		this.score = 0;
 		this.gameUI.updateScore(0);
 		this.gameUI.hideEnd();
+		this.gameUI.showScore();
 		this.newHighScore = false;
 		this.ball.reset();
 		this.player.reset();
@@ -176,7 +192,7 @@ export class BrickBreaker {
 		const mat = new StandardMaterial("arenaMat", this.scene);
 		mat.diffuseColor.set(0.75, 0.75, 0.75);
 		mat.emissiveColor.set(0.75, 0.75, 0.75);
-		mat.disableLighting = true;
+		// mat.disableLighting = true;
 		this.arena.material = mat;
 		this.arena.rotation.x = Math.PI / 2;
 		const radian = 2 * Math.PI;
@@ -192,6 +208,7 @@ export class BrickBreaker {
 		}
 		const builder = new PolygonMeshBuilder("brick", points, this.scene, earcut);
 		const mesh = builder.build(true, 0.5);
+		mesh.material = mat;
 		mesh.parent = this.root;
 		mesh.position.y += 0.45;
 	}
@@ -225,6 +242,10 @@ export class BrickBreaker {
 				const mesh = builder.build(true, width);
 				mesh.parent = this.root;
 				mesh.position.y += 0.4;
+				const mat = new StandardMaterial("arenaMat", this.scene);
+				mat.diffuseColor.set(0.75, 0.75, 0.75);
+				mat.emissiveColor.set(0.75, 0.75, 0.75);
+				mesh.material = mat;
 				bricksCols.push(mesh);
 			}
 			this.bricks.push(bricksCols);

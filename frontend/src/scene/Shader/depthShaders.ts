@@ -48,7 +48,7 @@ float simplexOctave(vec2 v) {
 }
 
 vec3	sampleWave(vec2 pos) {
-	vec2 uv = (pos / 40.) + 0.5;
+	vec2 uv = (pos / 60.) + 0.5;
 	vec3 wave = texture(textureSampler, uv).rgb;
 	wave.xy = wave.xy * 2. - 1.;
 	wave.z *= (uv.x < 1. && uv.x > 0. && uv.y > 0. && uv.y < 1. ? 1. : 0.);
@@ -145,7 +145,7 @@ void main(void) {
 	vec3 worldPos2 = finalWorld[3].xyz;
 
 	// Random per-voxel offset
-	vec3 animOffset = hash3(instanceID);
+	vec3 animOffset = hash3(float(gl_InstanceID));
 	float t = time * animationSpeed;
 
 	// === BASE WAVE ANIMATION (Always Active) ===
@@ -181,20 +181,20 @@ void main(void) {
 	vec3 originalWorldPos = worldPos.xyz;
 
 if(textGlow > 0.0) {
-            float phaseOffset = hash(instanceID) * 6.28;
+            float phaseOffset = hash(float(gl_InstanceID)) * 6.28;
             float phaseAmount = sin(time * 1.5 + phaseOffset) * 0.5 + 0.5;
             
             vec3 dimensionOffset = vec3(
-                sin(instanceID * 0.1) * 0.1,
-                cos(instanceID * 0.13) * 0.15,
-                sin(instanceID * 0.17) * 0.18
+                sin(float(gl_InstanceID) * 0.1) * 0.1,
+                cos(float(gl_InstanceID) * 0.13) * 0.15,
+                sin(float(gl_InstanceID) * 0.17) * 0.18
             );
             
             worldPos.xyz += dimensionOffset * phaseAmount;
 }
 
 	// === COMBINE ANIMATIONS ===
-	vec3 totalDisplacement = (baseWave + (mouseAnimation * mouseInfluence)) ;
+	vec3 totalDisplacement = ( (mouseAnimation * mouseInfluence)) ;
 	worldPos.xyz += totalDisplacement;
 
 

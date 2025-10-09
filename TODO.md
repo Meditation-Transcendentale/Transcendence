@@ -18,7 +18,6 @@
 
  ### visual
     - full DA for the site + css implementation
-    - custom cursor ?
     - use cdn for assets
     - Animation system overall
     - statue teeth
@@ -30,9 +29,10 @@
 
 
  ### fix
-    - handle error request back
+    - handle error request back (lobby empty mode)
     - sanitize input
     - change goal position physics pong
+    - game tournament
 
 ### tweak
     - 3D tweak

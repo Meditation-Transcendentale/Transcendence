@@ -22,6 +22,8 @@ export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localP
 	scoreUI.addComponent(new UIComponent(gameMode, gameUI));
 	ecs.addEntity(scoreUI);
 
+	console.log("local id:", localPaddleId);
+
 	// console.log("create player === ", gameMode);
 	for (let i = 0; i < 2; i++) {
 		const paddleEntity = new Entity();

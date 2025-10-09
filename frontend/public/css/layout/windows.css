@@ -1,0 +1,88 @@
+/* ====================================
+   WINDOWS - Floating boxes with title bars
+   These sit INSIDE the panels
+   ==================================== */
+
+/* Base Window */
+.window {
+  display: flex;
+  flex-direction: column;
+}
+
+.window__bar {
+  font-size: var(--font-size-base);
+  border-bottom: var(--spacing-md) #aaa solid;
+}
+
+.window__title {
+  flex: 1;
+  user-select: none;
+}
+
+.window__content {
+  width: 100%;
+  overflow: hidden;
+  background-color: white;
+}
+
+.window__content--transparent {
+  background-color: transparent;
+}
+
+.window__content--map {
+  display: flex;
+  flex-direction: row;
+}
+
+/* Create Window - #create-window */
+.create-window {
+  display: flex;
+  flex-direction: column;
+  align-content: space-around;
+  width: 50vh;
+  overflow: hidden;
+}
+
+.create-window__bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.create-window__content {
+  align-self: space-around;
+  width: 70%;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+/* Mod Window - #create-mod-window */
+.mod-window {
+  width: 40%;
+  top: 30%;
+  left: 80%;
+  z-index: 2;
+}
+
+.mod-window__content {
+  display: grid;
+  width: 100%;
+  overflow: hidden;
+  background-color: white;
+  column-gap: var(--spacing-sm);
+}
+
+/* Create Button Window - #create-btn-window */
+.create-btn-window {
+  display: none;
+  top: 47%;
+  left: 5%;
+  width: 80vh;
+  height: fit-content;
+  text-align: center;
+  z-index: 1;
+}
+
+.create-btn-window__bar {
+  text-align: left;
+}

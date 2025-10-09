@@ -1,0 +1,73 @@
+/* ====================================
+   BUTTONS
+   ==================================== */
+
+/* Base Button */
+.btn {
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-normal) ease;
+  border: none;
+  font-size: var(--font-size-large);
+}
+
+/* Create Button - #create-btn */
+.create-btn {
+  width: 90%;
+  height: 6.8vh;
+  text-align: center;
+  border: var(--spacing-md) white solid;
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 4vh;
+  line-height: 0;
+  font-size: var(--font-size-large);
+}
+
+.create-btn:hover {
+  color: var(--window-background);
+  background-color: var(--window-color);
+}
+
+.create-btn:active {
+  border-color: blue;
+}
+
+/* Return Button */
+.return-btn {
+  background-color: var(--window-color);
+  color: var(--window-background);
+}
+
+.return-btn:hover {
+  color: var(--window-color) !important;
+  background-color: var(--window-background);
+}
+
+.return-btn--disabled {
+  display: none;
+}
+
+/* Lobby Join Button */
+.lobby-join {
+  grid-column: 1/3;
+  bottom: 0%;
+  height: fit-content;
+}
+
+.lobby-join__button {
+  height: fit-content;
+  width: 90%;
+  margin-left: 5%;
+  font-size: var(--font-size-large);
+  text-align: center;
+  border: var(--spacing-md) white solid;
+  animation: blink 1.5s linear infinite;
+}
+
+.lobby-join__button:hover {
+  color: black;
+  background-color: white;
+  animation: none;
+}

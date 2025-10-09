@@ -1,5 +1,6 @@
 import {
 	ArcRotateCamera, Color4, Engine, Scene, TransformNode, FreeCamera,
+	Mesh,
 } from "../../babylon";
 import { ECSManager } from "./ecs/ECSManager.js";
 import { StateManager } from "./state/StateManager.js";
@@ -46,7 +47,7 @@ export class Pong {
 	// private uiSystem!: UISystem;
 
 	private uuid!: string;
-	private baseMeshes: any;
+	private baseMeshes!: { arena: Mesh, ball: Mesh, paddle: Mesh, wall: Mesh };
 	private instanceManagers: any;
 	public gameUI: GameUI;
 
@@ -78,8 +79,9 @@ export class Pong {
 	}
 
 	public async init() {
-		this.pongRoot = new TransformNode("pongRoot", this.scene);
-		this.pongRoot.position.set(2000, -3500, -3500);
+		this.pongRoot = sceneManager.assets.ballRoot;
+		// this.pongRoot = new TransformNode("pongRoot", this.scene);
+		// this.pongRoot.position.set(2000, -3500, -3500);
 		// this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
 		// this.cam.position.x = 0;
 		// this.cam.position.y = 40;
@@ -129,25 +131,34 @@ export class Pong {
 		this.wsManager = new WebSocketManager(wsUrl);
 
 		this.cam = sceneManager.camera;
-		this.cam.position.x = 0;
-		this.cam.position.y = 35;
-		this.cam.position.z = -2;
+		// this.cam.position.x = 0;
+		// this.cam.position.y = 35;
+		// this.cam.position.z = -2;
 		this.cam.detachControl();
 
 		if (!this.inited) {
 			await this.init();
 		}
-		this.cam.parent = this.pongRoot;
+
+		this.baseMeshes.wall.setEnabled(true);
+		this.baseMeshes.paddle.setEnabled(true);
+		this.baseMeshes.arena.setEnabled(true);
+		this.baseMeshes.ball.setEnabled(true);
+		// this.cam.parent = this.pongRoot;
 		this.cam.minZ = 0.2;
 		if (maps == "monolith") {
-			this.pongRoot.position.set(0.1, 10, 0);
-			this.pongRoot.scalingDeterminant = 0.07;
+			this.pongRoot.position.set(0, 7, 0);
+			this.pongRoot.scalingDeterminant = 0.15;
+			this.cam.position.set(0, 15, 0);
 		} else if (maps == "grass") {
-			this.pongRoot.position.set(5, 10, 5);
-			this.pongRoot.scalingDeterminant = 0.25;
+			this.pongRoot.position.set(0, 0, 0);
+			this.pongRoot.scalingDeterminant = 2;
+			this.cam.position.set(0, 106, 0);
+			this.baseMeshes.arena.setEnabled(false);
 		} else if (maps == "void") {
-			this.pongRoot.position.set(100, 0, 100);
+			this.pongRoot.position.set(0, 0, 0);
 			this.pongRoot.scalingDeterminant = 0.25;
+			this.cam.position.set(0, 13.5, 0);
 		}
 		localPaddleId = await this.waitForRegistration();
 
@@ -162,6 +173,7 @@ export class Pong {
 		this.ecs.addSystem(this.networkingSystem);
 
 		//add player
+		console.log("create player");
 		createPlayer(
 			this.ecs,
 			this.config,
@@ -177,8 +189,8 @@ export class Pong {
 		this.pongRoot.setEnabled(true);
 		// this.stateManager.set_ecs(this.ecs);
 		this.stateManager.setter(true);
-		this.gameUI.startCountdown(3);
-		this.gameUI.updateScore(0, 0);
+		// this.gameUI.startCountdown(3);
+		this.gameUI.updateScoreVersus(0, 0);
 
 		if (this.gameMode == "local") {
 			this.gameUI.showImage("up", "/assets/Up.png", "small", {
@@ -214,6 +226,10 @@ export class Pong {
 				offset: { x: -70, y: 15 },
 			});
 		}
+
+		const readyPayload: userinterface.IClientMessage = { ready: {} };
+		const readyBuf = encodeClientMessage(readyPayload);
+		this.wsManager.socket.send(readyBuf);
 
 		this.stateManager.update();
 
@@ -261,9 +277,13 @@ export class Pong {
 		const buffer = encodeClientMessage(payload);
 
 		this.wsManager.socket.send(buffer);
-		this.pongRoot.setEnabled(false);
+		// this.pongRoot.setEnabled(false);
 		this.stateManager.setter(false);
 		this.cam.parent = null;
+
+		this.baseMeshes.arena.setEnabled(false);
+		this.baseMeshes.wall.setEnabled(false);
+		this.baseMeshes.paddle.setEnabled(false);
 
 		console.log("render loop stopped and game paused");
 	}
@@ -313,10 +333,6 @@ export class Pong {
 
 				if (serverMsg.welcome?.paddleId != null) {
 					const paddleId = serverMsg.welcome.paddleId;
-
-					const readyPayload: userinterface.IClientMessage = { ready: {} };
-					const readyBuf = encodeClientMessage(readyPayload);
-					socket.send(readyBuf);
 
 					socket.removeEventListener("message", listener);
 					resolve(paddleId);

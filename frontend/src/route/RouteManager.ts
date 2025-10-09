@@ -1,3 +1,4 @@
+import { htmlManager } from "../html/HtmlManager";
 import { streamManager } from "../stream/StreamManager";
 import { User } from "../User";
 import { AuthRoute } from "./AuthRoute";
@@ -95,6 +96,7 @@ class RouteManager {
 		this.lastRoute = this.routes.get(url.pathname) as IRoute;
 
 		if (url.pathname !== "/auth") {
+			htmlManager.ath.load();
 			streamManager.notification.connect();
 		}
 	}

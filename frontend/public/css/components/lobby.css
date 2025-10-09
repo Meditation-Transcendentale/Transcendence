@@ -1,0 +1,43 @@
+/* ====================================
+   LOBBY - Lobby-specific components
+   ==================================== */
+
+/* Lobby Info - #play-lobby-info */
+.lobby-info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: fit-content;
+  width: fit-content;
+  transform: translate(-50%, -50%);
+}
+
+.lobby-info * {
+  font-size: var(--font-size-base);
+}
+
+/* Lobby Info Container - #lobby-info */
+.lobby-info__container {
+  display: grid;
+  height: 50vh;
+}
+
+/* Lobby Status - #lobby-status */
+.lobby-info__status {
+  grid-column: 1/1;
+  width: 40vh;
+  overflow: hidden;
+}
+
+/* Lobby Players List - #lobby-info > ul */
+.lobby-info__players {
+  grid-column: 2/2;
+  width: 40vh;
+  height: 30vh;
+  overflow: scroll;
+}
+
+/* Lobby Player Item - #lobby-info li */
+.lobby-info__player {
+  display: block;
+}

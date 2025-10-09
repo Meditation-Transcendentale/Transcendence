@@ -1,0 +1,55 @@
+/* ====================================
+   FORMS - Form containers and layouts
+   ==================================== */
+
+/* Game Form - #pong-map, #create-game, #create-pong, #create-brick */
+.game-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+.game-form--pong {
+  /* #create-pong */
+}
+
+.game-form--brick {
+  /* #create-brick */
+}
+
+.game-form--create {
+  /* #create-game */
+  width: 50%;
+}
+
+.game-form--mode,
+.game-form--map {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  /* #create-game */
+}
+
+/* Mod Form - #create-mod */
+.mod-form {
+  display: grid;
+  grid-column: 1 / 1;
+  grid-template-columns: 1 auto auto auto;
+  background-color: inherit-color;
+  row-gap: var(--spacing-xs);
+  overflow: hidden;
+  width: 40vh;
+}
+
+.mod-form__description {
+  /* #mod-description */
+  grid-column: 2 / 2;
+  width: 100%;
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-small);
+  color: var(--window-color);
+  background-color: var(--window-background);
+}

@@ -76,6 +76,7 @@ export { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 export { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 export { Curve3 } from "@babylonjs/core/Maths/math.path";
 export { RawTexture3D } from "@babylonjs/core/Materials/Textures/rawTexture3D";
-
+export { Animation } from "@babylonjs/core/Animations/animation";
+export { MorphTarget } from "@babylonjs/core/Morph/morphTarget";
 import "@babylonjs/core/Culling/ray";
 

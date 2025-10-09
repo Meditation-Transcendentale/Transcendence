@@ -1,67 +1,190 @@
+import { stateManager } from "../state/StateManager";
+import { User } from "../User";
 
 export enum PopupType {
+	accept,
+	validation,
 	custom
 }
 
-
 interface IPopupOption {
+	type: PopupType,
+	title?: string
 	id?: string,
-	type: PopupType
+	text?: string,
 }
 
 interface ICustomPopupOption extends IPopupOption {
 	div: HTMLElement;
 }
 
-export type PopupOption = ICustomPopupOption;
+interface IAcceptPopupOption extends IPopupOption {
+	accept: () => void;
+	decline: () => void;
+}
 
-export namespace Popup {
+interface IValidationPopupOption extends IPopupOption {
+	input?: string;
+	submit: (password: string, token?: string, input?: string) => void;
+	abort: () => void;
+}
 
-	export function add(option: PopupOption): PopupElement {
-		const dialog = document.createElement("dialog");
+export type PopupOption = ICustomPopupOption | IAcceptPopupOption | IValidationPopupOption;
+
+export class Popup {
+	private option: PopupOption;
+	private dialog: HTMLDialogElement;
+	private form: HTMLFormElement;
+
+	private token!: HTMLInputElement;
+
+	constructor(option: PopupOption) {
+		this.option = option;
+		this.dialog = document.createElement("dialog");
+		this.form = document.createElement("form");
+		this.form.method = "dialog";
+		this.dialog.appendChild(this.form);
+
+		if (option.title) {
+			const head = document.createElement("header");
+			head.textContent = option.title;
+			this.form.appendChild(head);
+		}
+
+		if (option.text) {
+			const span = document.createElement("span");
+			span.textContent = option.text;
+			this.form.appendChild(span);
+		}
+
 		switch (option.type) {
+			case PopupType.accept: {
+				this.generateAcceptPopup();
+				break;
+			}
 			case PopupType.custom: {
-				dialog.appendChild(option.div);
+				this.generateCustomPopup(option as ICustomPopupOption);
+				break;
+			}
+			case PopupType.validation: {
+				this.generateValidationPopup(option as IValidationPopupOption);
 				break;
 			}
 		}
-		return new PopupElement(option.div);
+
+		this.dialog.addEventListener('click', ({ target: dialog }) => {
+			if (dialog.nodeName === 'DIALOG') {
+				this.close();
+			}
+		});
+		this.dialog.addEventListener("close", () => { this.close() })
 	}
-}
 
-export class PopupElement {
-	// private dialog: HTMLDialogElement;
-	private container: HTMLDivElement;
+	private generateAcceptPopup() {
+		const footer = document.createElement("footer");
+		this.form.appendChild(footer);
 
-	constructor(div: HTMLDialogElement) {
-		this.container = document.createElement("div");
-		// this.container.style.opacity = "1";
-		this.container.style.width = "100%";
-		this.container.style.height = "100%";
-		this.container.style.pointerEvents = "all";
-		this.container.style.zIndex = "10";
+		const y = document.createElement("button");
+		const n = document.createElement("button");
+		y.textContent = "Accept";
+		n.textContent = "Decline";
 
-		// this.dialog = div;
-		// this.dialog.className = "popup";
-		// this.dialog.style.display = "block";
-		// this.dialog.style.top = "50%";
-		// this.dialog.style.opacity = "1";
+		y.addEventListener("click", () => {
+			(this.option as IAcceptPopupOption).accept();
+		})
 
-		this.container.appendChild(div);
-		div.style.zIndex = "11";
+		n.addEventListener("click", () => {
+			(this.option as IAcceptPopupOption).decline();
+		})
 
-		this.container.addEventListener("click", () => {
-			this.remove();
+		footer.appendChild(y);
+		footer.appendChild(n);
+	}
+
+	private generateValidationPopup(option: IValidationPopupOption) {
+		// const form = document.createElement("form");
+		if (option.input) {
+			const input = document.createElement("input");
+			input.autocomplete = "off";
+			input.required = true;
+			input.name = "input";
+			switch (option.input) {
+				case "username": {
+					input.type = "text";
+					input.placeholder = "username";
+					break;
+				}
+				case "password": {
+					input.type = "password";
+					input.placeholder = "new password";
+					break;
+				}
+			}
+			this.form.appendChild(input);
+		}
+		const password = document.createElement("input");
+		password.type = "password";
+		password.placeholder = "password";
+		password.required = true;
+		password.name = "password";
+		this.form.appendChild(password);
+
+		const token = document.createElement("input");
+		token.type = "text";
+		token.placeholder = "token";
+		token.name = "token";
+		token.required = true;
+		this.form.appendChild(token);
+		this.token = token;
+
+		const submit = document.createElement("button");
+		submit.type = "submit";
+		submit.textContent = "Submit";
+		const abort = document.createElement("button");
+		abort.textContent = "Abort";
+
+		const footer = document.createElement("footer");
+		this.form.appendChild(footer);
+
+		footer.appendChild(submit);
+		footer.appendChild(abort);
+
+		abort.addEventListener("click", () => {
+			option.abort();
+			this.close();
+		})
+
+		this.form.addEventListener("submit", (e) => {
+			e.preventDefault();
+			const data = new FormData(this.form);
+			const i = data.get("input") as string;
+			const p = data.get("password") as string;
+			const t = data.get("password") as string;
+			option.submit(p, t, i);
+		})
+	}
+
+	private generateCustomPopup(option: ICustomPopupOption) {
+		this.form.appendChild(option.div);
+		this.form.addEventListener("submit", (e) => {
+			e.preventDefault();
 		})
 	}
 
 	public show() {
-		document.body.appendChild(this.container);
+		if (this.option.type = PopupType.validation) {
+			this.token.hidden = User.twofa == 0;
+			this.token.required = User.twofa != 0;
+		}
+		document.body.appendChild(this.dialog);
 		// this.dialog.open = true;
-		// this.dialog.focus();
+		this.dialog.showModal();
+		stateManager.popup += 1;
 	}
 
-	public remove() {
-		this.container.remove();
+	public close() {
+		this.dialog.close();
+		this.dialog.remove();
+		stateManager.popup -= 1;
 	}
 }

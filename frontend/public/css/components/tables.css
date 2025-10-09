@@ -1,0 +1,78 @@
+/* ====================================
+   TABLES - Join list and data tables
+   ==================================== */
+
+/* Join Input Container - #join-input-container */
+.join-input {
+  height: 20vh;
+  top: 40%;
+  width: 60vh;
+}
+
+/* Join List Container - #join-list-container */
+.join-list-container {
+  display: inline-block;
+  top: 30%;
+  left: 30%;
+  height: 60vh;
+  width: fit-content;
+  overflow: scroll;
+  pointer-events: all;
+}
+
+.join-list-container > table {
+  display: inline-block;
+  border-collapse: collapse;
+  width: 100%;
+  height: 100%;
+  color: white;
+}
+
+/* Join List - #join-list */
+.join-list {
+  display: inline-block;
+  border-collapse: collapse;
+  font-weight: var(--font-weight-light);
+  letter-spacing: -0.8vh;
+  font-size: var(--font-size-small);
+  width: 100%;
+  height: 50%;
+  text-align: left;
+  color: white;
+}
+
+.join-list thead th {
+  position: sticky;
+  top: 5.2vh;
+  background-color: black;
+}
+
+/* Join List Header - #join-list th */
+.join-list__header {
+  padding-right: 4vh;
+  padding-left: 1vh;
+  text-align: left;
+  color: white;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 40vh;
+}
+
+/* Join List Row - .list-body > tr */
+.join-list__row:hover .join-list__cell {
+  color: black;
+  background-color: white;
+}
+
+/* Join List Cell - .list-body > tr > td */
+.join-list__cell {
+  text-align: left;
+  color: white;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 40vh;
+  padding-right: 4vh;
+  padding-left: 1vh;
+  text-overflow: "...";
+  border-top: 0.2vh solid #ccc;
+}

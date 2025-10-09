@@ -12,11 +12,12 @@ export class BallGrass {
 
 	private needReset = true;
 	private _enable: boolean;
+	private _update: string;
 
-	private maxDist = 40;
+	private maxDist = 60;
 	private maxSpeed = 100;
 	private deceleration = 0.9;
-	private attenuation = 0.3;
+	private attenuation = 0.1;
 
 
 	private tempVector3: Vector3;
@@ -41,7 +42,7 @@ export class BallGrass {
 		this.ballGrassEffect.onApplyObservable.add(() => {
 			this.ballGrassEffect.effect.setTexture("textureSampler", this.assets.ballGrassTextureA);
 			this.ballGrassEffect.effect.setFloat("attenuation", Math.pow(this.attenuation, this.assets.scene.deltaTime * 0.001));
-			this.ballGrassEffect.effect.setFloat("radius", this.assets.ballRoot.scalingDeterminant / this.maxDist);
+			this.ballGrassEffect.effect.setFloat("radius", this.assets.ballRoot.scalingDeterminant * 0.75 / this.maxDist);
 			this.ballGrassEffect.effect.setFloat2("origin",
 				(this.assets.ballMesh.position.x + this.assets.ballRoot.position.x) * this.assets.ballRoot.scalingDeterminant / this.maxDist + 0.5,
 				(this.assets.ballMesh.position.z + this.assets.ballRoot.position.z) * this.assets.ballRoot.scalingDeterminant / this.maxDist + 0.5
@@ -50,12 +51,15 @@ export class BallGrass {
 		})
 
 		this._enable = false;
+		this._update = "home";
 	}
 
 	public update(time: number, deltaTime: number) {
-		if (!this._enable)
+		if (this._update == "none")
 			return;
-		this.moveBall(deltaTime);
+
+		if (this._update == "home")
+			this.moveBall(deltaTime);
 		this.swapRt();
 		this.assets.effectRenderer.render(this.ballGrassEffect, this.assets.ballGrassTextureB);
 	}
@@ -74,11 +78,12 @@ export class BallGrass {
 		} else {
 			if (this.needReset && this.assets.ballPicker.z > 0) {
 				// this.position.copyFrom(this.assets.ballRoot.position);
-				this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.position);
+				this.position.copyFrom(this.assets.ballMesh.absolutePosition);
+				// this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.position);
 				this.needReset = false;
 			}
 			const ray = this.assets.scene.createPickingRay(this.assets.ballPicker.x, this.assets.ballPicker.y).direction;
-			let delta = Math.abs(this.assets.camera.position.y - this.assets.ballRoot.position.y) / ray.y;
+			let delta = Math.abs(this.assets.camera.position.y - this.assets.ballRoot.scalingDeterminant) / ray.y;
 
 			let x = this.assets.camera.position.x - ray.x * delta;
 			let z = this.assets.camera.position.z - ray.z * delta;
@@ -106,5 +111,9 @@ export class BallGrass {
 
 	public set enable(value: boolean) {
 		this._enable = value;
+	}
+
+	public set updateType(value: string) {
+		this._update = value;
 	}
 }

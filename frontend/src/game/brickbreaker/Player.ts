@@ -40,6 +40,7 @@ export class Player {
 		this.goal.parent = game.root;
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
 		this.materialGoal.diffuseColor = new Color3(1, 1, 1);
+		this.materialGoal.emissiveColor = new Color3(0.5, 0.5, 0.5);
 		this.goal.material = this.materialGoal;
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
@@ -167,9 +168,7 @@ export class Player {
 		this.goal.visibility = 0;
 		this.shield.visibility = 0;
 		this.isAlive = false;
-		this.game.gameUI.showEnd("brick", this.game.newHighScore, this.game.score);
-		//interface de fin de game
-		// this.game.dispose();
+		this.game.end();
 	}
 
 	reset(): void {
@@ -259,6 +258,7 @@ export class Player {
 		} else if (this.inputDown == true) {
 			this.inputDown = false;
 		}
+
 		this.inputPointer = this.pointer;
 		const ray = this.scene.createPickingRay(this.inputPointer.x, this.inputPointer.y, Matrix.Identity(), null);
 		const hit = this.scene.pickWithRay(ray);

@@ -2,6 +2,9 @@
 @import url("inputs.css");
 @import url("popup.css");
 @import url("loading.css");
+@import url("notification.css");
+@import url("class.css");
+@import url("friendlist.css");
 
 ::selection {
 	color: black !important;
@@ -55,10 +58,10 @@ body {
 	--text-background: #fff;
 
 	--window-color: #fff;
-	--window-background: #111;
+	--window-background: transparent;
 
 	--font-window-bar: bold small-caps 2vh de-valancia;
-	--font-window-content: de-valancia 2vh 100;
+	--font-window-content: spacegrotesk 2vh 100;
 	--font-readable: normal normal 2vh dotrice;
 	/*--font-speak: normal normal 3vh ydmyungjo;*/
 	--font-speak: normal normal 3vh ptolemy;
@@ -216,8 +219,8 @@ canvas {
 	z-index: 2;
 	background-color: var(--window-background);
 	color: var(--window-color);
-	border: 0.3vh white solid;
-	box-shadow: 1px 1px 1px white, -1px -1px 1px white;
+	border: none;
+	/* box-shadow: 1px 1px 1px white, -1px -1px 1px white; */
 	pointer-events: auto;
 }
 
@@ -421,42 +424,6 @@ input[on] {
 	z-index: 11;
 }
 
-#notification-container {
-	display: block;
-	position: absolute;
-	top: 0%;
-	right: 0%;
-	width: fit-content;
-	min-width: 10vh;
-	min-height: 10vh;
-	height: fit-content;
-	pointer-events: auto;
-	/*z-index: 39;*/
-}
-
-#notification-container:hover * {
-	opacity: 1;
-	animation: none;
-}
-
-.notification {
-	display: block;
-	position: relative;
-	right: 0%;
-	width: fit-content;
-	height: fit-content;
-	font: var(--font-speak);
-	font-size: 3vh;
-	color: black;
-	opacity: 0;
-	animation: fade-out var(--duration) linear;
-	/*z-index: 40;*/
-}
-
-.notification:hover {
-	color: white;
-}
-
 #friend-request {
 	position: absolute;
 	top: 50%;
@@ -508,18 +475,6 @@ input[on] {
 }
 
 
-@keyframes fade-out {
-
-	0%,
-	80% {
-		opacity: 1;
-	}
-
-	100% {
-		opacity: 0;
-	}
-
-}
 
 #utils-details {
 	position: absolute;
