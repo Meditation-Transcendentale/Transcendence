@@ -241,7 +241,7 @@ export class Assets {
 	}
 
 	private loadTextureMandatory() {
-		const fogMaxResolution = 1080;
+		const fogMaxResolution = Math.min(1080, sceneManager.resolution.width);
 		const fogRatio = 1.;
 		stateManager.set("fogMaxResolution", fogMaxResolution);
 		stateManager.set("fogRatio", fogRatio);

@@ -109,3 +109,19 @@
 	width: 30vh;
 	height: 30vh;
 }
+
+.join-lobby-window {
+	width: 50vh;
+	height: 70vh;
+}
+
+.join-info-window {
+	width: 30vh;
+	height: 30vh;
+}
+
+.join-input-window {
+	width: fit-content;
+	height: 11vh;
+
+}
