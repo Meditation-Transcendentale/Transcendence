@@ -1,4 +1,3 @@
-import { get } from "http";
 import { patchRequest, postRequest, deleteRequest, avatarRequest, getRequest } from "../networking/request";
 import { Popup, PopupType } from "./Popup";
 
@@ -21,7 +20,7 @@ class classicStatsC {
 			console.log("check classic stats");
 			postRequest("stats/player", { uuid: User.uuid, mode: "classic" })
 				.then((json: any) => {
-					console.log("classicStats.ts -> postRequest stats/player", json);
+					console.log("classicStats -> postRequest stats/player", json);
 					this.gamesPlayed = json.playerStats.stats.game_played;
 					this.gamesWined = json.playerStats.stats.wins;
 					this.gamesLoosed = json.playerStats.stats.losses;
@@ -38,6 +37,66 @@ class classicStatsC {
 	}
 }
 
+class brStatsC {
+	
+	public gamesPlayed!: number
+	public gamesWined!: number
+	public winRate!: number
+	public bestPlacement!: number
+	public averagePlacement!: number
+	
+	constructor() {
+		this.check();
+	}
+
+	public check(): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			console.log("check br stats");
+			postRequest("stats/player", { uuid: User.uuid, mode: "br" })
+				.then((json: any) => {
+					console.log("brStats -> postRequest stats/player", json);
+					this.gamesPlayed = json.playerStats.stats.game_played;
+					this.gamesWined = json.playerStats.stats.wins;
+					this.winRate = json.playerStats.stats.win_rate;
+					this.averagePlacement = json.playerStats.stats.avg_placement;
+					if (json.playerStats.stats.game_played == 0 ) {
+						this.bestPlacement = 0; }
+					else {
+						this.bestPlacement = json.playerStats.stats.best_placement; }
+					resolve(true);
+				})
+				.catch((err) => {
+					reject(new Error(err));
+				})
+		})
+	}
+}
+
+class matchHistoryC {
+
+	public history!: any[];
+
+	constructor() {
+		this.getHistory();
+	}
+
+	public getHistory(): Promise<any> {
+		return new Promise((resolve, reject) => {
+			console.log("check match history");
+			postRequest("stats/get/history", { uuid: User.uuid })
+				.then((json: any) => {
+					console.log("matchHistoryC -> postRequest stats/get/history", json);
+					this.history = json.playerHistory;
+					resolve(true);
+				})
+				.catch((err) => {
+					reject(new Error(err));
+				})
+		})
+	}
+
+}
+
 class UserC {
 	public username!: string;
 	public avatar!: string;
@@ -46,6 +105,8 @@ class UserC {
 	public twofa!: number;
 
 	public classicStats!: classicStatsC;
+	public brStats!: brStatsC;
+	public matchHistory!: matchHistoryC;
 	
 	constructor() {
 	}
@@ -53,6 +114,8 @@ class UserC {
 	public async init() {
 		await this.check();
 		this.classicStats = new classicStatsC();
+		this.brStats = new brStatsC();
+		this.matchHistory = new matchHistoryC();
 	}
 	
 	public check(): Promise<boolean> {
@@ -551,28 +614,32 @@ class athProfile {
 
 	private div!: HTMLDivElement;
 	private statsDiv!: HTMLDivElement;
+	private classicStatsDiv!: HTMLDivElement;
+	private brStatsDiv!: HTMLDivElement;
+	private matchHistoryDiv!: HTMLDivElement;
 	private profileImg!: HTMLImageElement;
 	private usernameElem!: HTMLHeadingElement;
 	private statusElem!: HTMLParagraphElement;
+	
 	private profilePopup: Popup;
 	
 	private classicTable!: HTMLTableElement;
-	
-	// private gamesPlayedClassicTd!: HTMLTableCellElement;
-	// private gamesWinedClassicTd!: HTMLTableCellElement;
-	// private gamesLoosedClassicTd!: HTMLTableCellElement;
-	// private winRateClassicTd!: HTMLTableCellElement;
-	// private bestWinStreakClassicTd!: HTMLTableCellElement;
-	// private goalsScoredClassicTd!: HTMLTableCellElement;
-	// private goalsConcededClassicTd!: HTMLTableCellElement;
+	private brTable!: HTMLTableElement;
 	
 	private classicTdElements!: { [key: string]: HTMLTableCellElement };
+	private brTdElements: { [key: string]: HTMLTableCellElement };
+
+	private matchHistoryRow!:{ [key: number ]: HTMLTableRowElement };
+	private matchHistoryTdElements!: { [key: number]: { [id: number]: HTMLTableCellElement } };
 	
 	
 	constructor(athInstance: Ath) {
 		this.athInstance = athInstance;
 		
 		this.classicTdElements = {};
+		this.brTdElements = {};
+		this.matchHistoryTdElements = {};
+		this.matchHistoryRow = {};
 		
 		this.createProfileDiv();
 
@@ -581,14 +648,25 @@ class athProfile {
 			title: "",
 			div: this.div
 		});
+
+
 	}
 	
 	private createProfileDiv() {
 		this.div = document.createElement("div");
 		this.div.style.display = "flex";
-		this.div.style.flexDirection = "column";
 		this.div.style.alignItems = "center";
 		this.div.style.gap = "10px";
+		this.div.style.backgroundColor = "transparent";
+
+		const profileDiv = document.createElement("div");
+		profileDiv.style.display = "flex";
+		profileDiv.style.flexDirection = "column";
+		profileDiv.style.alignItems = "center";
+		profileDiv.style.gap = "5px";
+		profileDiv.style.marginBottom = "10px";
+		profileDiv.style.border = "1px solid black";
+
 
 		this.profileImg = document.createElement("img");
 		this.profileImg.alt = "Profile Image";
@@ -603,19 +681,85 @@ class athProfile {
 		this.statusElem.style.fontSize = "12px";
 
 		this.createStatDiv();
-		// this.getPlayerClassicStats();
+		this.createMatchHistoryDiv();
 
-		this.div.appendChild(this.usernameElem);
-		this.div.appendChild(this.profileImg);
-		this.div.appendChild(this.statusElem);
+		profileDiv.appendChild(this.usernameElem);
+		profileDiv.appendChild(this.profileImg);
+		profileDiv.appendChild(this.statusElem);
+		this.div.appendChild(profileDiv);
 		this.div.appendChild(this.statsDiv);
+		this.div.appendChild(this.matchHistoryDiv);
 	}
 
-	private async getPlayerClassicStats() {
+	private async getPlayerStats() {
 
 		await User.classicStats.check()
 			.then(() => {this.updateClassicStatsTable(User.classicStats) })
 			.catch((err) => { });
+
+		await User.brStats.check()
+			.then(() => {this.updateBrStatsTable(User.brStats) })
+			.catch((err) => { });
+	}
+
+	private updateBrStatsTable(stats: any) {
+		if (!stats) return;
+
+		this.brTdElements["Game Played"].textContent = stats.gamesPlayed;
+		this.brTdElements["Wined"].textContent = stats.gamesWined;
+		this.brTdElements["Win Rate"].textContent = stats.winRate + "%";
+		this.brTdElements["Best Placement"].textContent = stats.bestPlacement;
+		this.brTdElements["Average Placement"].textContent = stats.averagePlacement;
+	}
+
+	private async getMatchHistory() {
+
+		console.log("Fetching match history...");
+		await User.matchHistory.getHistory()
+			.then(() => {
+				this.updateMatchHistoryTable(User.matchHistory.history);
+			})
+			.catch((err) => { });
+	}
+
+	private handleMatchResult(data: any): string {
+
+		let result!: string
+
+		switch (data.game_mode) {
+			case "classic":
+				if (data.is_winner)
+					result = `${data.goals_scored} - ${data.goals_conceded}`;
+				else
+					result = `${data.goals_conceded} - ${data.goals_scored}`;
+				return result;
+			case "br":
+				result = `${data.placement}`;
+				return result;
+			default:
+				return "Unknown";
+		}
+	}
+
+	private updateMatchHistoryTable(data: any) {
+
+		console.log("Updating match history table with data:", data);
+		if (!data) return;
+
+		const history = data;
+		console.log("Updating match history with data:", history);
+
+		for (let i = 0; i < history.length; i++) {
+			if ( history[i].is_winner)
+				this.matchHistoryRow[i].style.backgroundColor = "rgba(144, 238, 144, 0.5)";
+			else
+				this.matchHistoryRow[i].style.backgroundColor = "rgba(226, 50, 77, 0.5)";
+			this.matchHistoryRow[i].style.border = "1px solid black";
+			this.matchHistoryTdElements[i][1].style.border = "1px solid black";
+			this.matchHistoryTdElements[i][0].textContent = history[i].game_mode;
+			this.matchHistoryTdElements[i][1].textContent = this.handleMatchResult(history[i]);
+			this.matchHistoryTdElements[i][2].textContent = history[i].created_at;
+		}
 	}
 
 	private updateClassicStatsTable(stats: any) {
@@ -631,45 +775,132 @@ class athProfile {
 		this.classicTdElements["Goals Conceded"].textContent = stats.goalsConceded;
 	}
 
+	private createMatchHistoryDiv() {
+
+		this.matchHistoryDiv = document.createElement("div");
+		this.matchHistoryDiv.id = "profile-match-history";
+		this.matchHistoryDiv.style.display = "flex";
+		this.matchHistoryDiv.style.flexDirection = "column";
+		this.matchHistoryDiv.style.gap = "5px";
+		this.matchHistoryDiv.style.marginTop = "10px";
+		this.matchHistoryDiv.style.border = "1px solid black";
+
+		const title = document.createElement("h4");
+		title.textContent = "Match History";
+		title.style.textAlign = "center";
+		this.matchHistoryDiv.appendChild(title);
+
+
+		const table = document.createElement("table");
+		table.id = "match-history-table";
+		table.style.width = "100%";
+		table.style.borderCollapse = "collapse";
+
+		const tbody = document.createElement("tbody");
+
+		for (let i = 0; i < 10; i++) {
+
+			this.matchHistoryRow[i] = document.createElement("tr");
+
+			for (let j = 0; j < 3; j++) {
+
+				this.matchHistoryTdElements[i] = this.matchHistoryTdElements[i] || {};
+				this.matchHistoryTdElements[i][j] = document.createElement("td");
+
+				this.matchHistoryRow[i].appendChild(this.matchHistoryTdElements[i][j]);
+			}
+
+			tbody.appendChild(this.matchHistoryRow[i]);
+		}
+
+		table.appendChild(tbody);
+		this.matchHistoryDiv.appendChild(table);
+	}
+
 	private createStatDiv() {
 		
 		const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded"];
-		const brPlayerStatsName = ["Game Played", 'Wined', "Win Rate", "Beast Placement", "Average Placement"];
+		const brPlayerStatsName = ["Game Played", 'Wined', "Win Rate", "Best Placement", "Average Placement"];
 		
 		this.statsDiv = document.createElement("div");
 		this.statsDiv.id = "profile-stats";
 		this.statsDiv.style.display = "flex";
-		this.statsDiv.style.flexDirection = "column";
+		this.statsDiv.style.flexDirection = "row";
 		this.statsDiv.style.gap = "5px";
 		this.statsDiv.style.marginTop = "10px";
 
+		this.classicStatsDiv = document.createElement("div");
+		this.classicStatsDiv.id = "classic-stats-div";
+		this.classicStatsDiv.style.flex = "1";
+		this.classicStatsDiv.style.border = "1px solid black";
+
+		const classicTitle = document.createElement("h4");
+		classicTitle.textContent = "Classic Stats";
+		classicTitle.style.textAlign = "center";
+		this.classicStatsDiv.appendChild(classicTitle);
+
+		this.brStatsDiv = document.createElement("div");
+		this.brStatsDiv.id = "br-stats-div";
+		this.brStatsDiv.style.flex = "1";
+		this.brStatsDiv.style.border = "1px solid black";
+		
+		const brTitle = document.createElement("h4");
+		brTitle.textContent = "Battle Royale Stats";
+		brTitle.style.textAlign = "center";
+		this.brStatsDiv.appendChild(brTitle);
+		
 		this.classicTable = document.createElement("table");
 		this.classicTable.id = "classic-stats";
 		this.classicTable.style.width = "100%";
 		this.classicTable.style.borderCollapse = "collapse";
 		this.classicTable.style.marginTop = "10px";
 
+		this.brTable = document.createElement("table");
+		this.brTable.id = "br-stats";
+		this.brTable.style.width = "100%";
+		this.brTable.style.borderCollapse = "collapse";
+		this.brTable.style.marginTop = "10px";
+
 		const classicHeader = document.createElement("thead");
 
 		classicPlayerStatsName.forEach(statName => {
-			const classicHeaderCell = document.createElement("tr");
-			const classicValuesCell = document.createElement("tr");
+			const classicRow = document.createElement("tr");
+			const classicTitlesCell = document.createElement("th");
 			this.classicTdElements[statName] = document.createElement("td");
+			
+			classicRow.style.border = "1px solid black";
+			classicTitlesCell.style.border = "1px solid black";
 
-			classicValuesCell.appendChild(this.classicTdElements[statName]);
-			classicHeaderCell.textContent = statName;
-			classicHeaderCell.style.border = "1px solid black";
-			classicHeader.appendChild(classicHeaderCell);
-			classicHeader.appendChild(classicValuesCell);
+			classicTitlesCell.textContent = statName;
+
+			classicRow.appendChild(classicTitlesCell);
+			classicRow.appendChild(this.classicTdElements[statName]);
+			classicHeader.appendChild(classicRow);
 		});
 
+		const brHeader = document.createElement("thead");
 
+		brPlayerStatsName.forEach(statName => {
+			const brRow = document.createElement("tr");
+			const brTitlesCell = document.createElement("th");
+			this.brTdElements[statName] = document.createElement("td");
 
+			brRow.style.border = "1px solid black";
+			brTitlesCell.style.border = "1px solid black";
 
+			brTitlesCell.textContent = statName;
 
+			brRow.appendChild(brTitlesCell);
+			brRow.appendChild(this.brTdElements[statName]);
+			brHeader.appendChild(brRow);
+		});
 
+		this.brTable.appendChild(brHeader);
 		this.classicTable.appendChild(classicHeader);
-		this.statsDiv.appendChild(this.classicTable);
+		this.brStatsDiv.appendChild(this.brTable);
+		this.classicStatsDiv.appendChild(this.classicTable);
+		this.statsDiv.appendChild(this.classicStatsDiv);
+		this.statsDiv.appendChild(this.brStatsDiv);
 	}
 
 	private updateProfileInfo() {
@@ -681,9 +912,10 @@ class athProfile {
 	}
 
 
-	public load() {
+	public async load() {
 		this.updateProfileInfo();
-		this.getPlayerClassicStats();
+		await this.getPlayerStats();
+		await this.getMatchHistory();
 		this.profilePopup.show();
 		console.log("load ath profile");
 	}
@@ -693,38 +925,4 @@ class athProfile {
 		console.log("unload ath profile");
 	}
 }
-
-// class athStat {
-
-// 	private athInstance: Ath;
-
-// 	private div!: HTMLDivElement;
-
-// 	constructor( athInstance: Ath) {
-		
-// 		this.athInstance = athInstance;
-// 		this.createStatDiv();
-	
-// 	}
-
-// 	private createStatDiv() {
-// 		this.div = document.createElement("div");
-// 		this.div.style.display = "flex";
-// 		this.div.style.flexDirection = "column";
-// 		this.div.style.gap = "5px";
-// 		this.div.style.marginTop = "10px";
-		
-
-	
-// 	}
-
-
-// 	load() {
-
-// 	}
-	
-// 	unload() {
-// 	}
-
-// }
 

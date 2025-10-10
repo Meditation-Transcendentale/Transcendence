@@ -43,6 +43,12 @@ handleErrorsNats(async () => {
 			const playerStats = statService.getPlayerStatsBRMode(playerId);
 			nats.publish(msg.reply, jc.encode({ success: true, data: playerStats }));
 		}),
+		handleNatsSubscription("stats.getPlayerHistory", async (msg) => {
+			const playerId = jc.decode(msg.data);
+			statService.isUserIdExisting(playerId);
+			const playerHistory = statService.getPlayerHistory(playerId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: playerHistory }));
+		}),
 		handleNatsSubscription("stats.addBRMatchStatsInfos", async (msg) => {
 			const matchInfos = jc.decode(msg.data);
 
