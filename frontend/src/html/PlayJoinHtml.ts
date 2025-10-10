@@ -72,7 +72,7 @@ export class PlayJoinHtml implements IHtml {
 			html: this.lobbyWindow,
 			width: 1.5,
 			height: 1.5,
-			world: Matrix.RotationY(Math.PI * 0.7).multiply(Matrix.Translation(-1, 4.5, 10)),
+			world: Matrix.RotationX(Math.PI * 0.3).multiply(Matrix.RotationZ(Math.PI * 0.2)).multiply(Matrix.RotationY(Math.PI * 0.7)).multiply(Matrix.Translation(-1, 4.5, 10)),
 			enable: false
 		})
 
