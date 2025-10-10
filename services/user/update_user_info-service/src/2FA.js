@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import bcrypt from "bcrypt";
 import { connect, JSONCodec } from 'nats';
 import validator from 'validator';
+import axios from 'axios';
+import https from 'https';
 
 import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrorsValid, handleErrors } from "../../shared/handleErrors.mjs";
@@ -138,15 +140,23 @@ const twoFARoutes = (app) => {
 			throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
 		}
 		
-		const token = req.body.token;
+		let token = req.body.token;
 		if (!token) {
 			throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message };
 		}
 		if (validator.isInt(token)) {
 				token = parseInt(token, 10);
 		}
+		console.log("Token:", token);
+		console.log("Password:", password);
 		try {
+
+			const agent = new https.Agent({
+				rejectUnauthorized: false
+			});
+
 			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ uuid: user.uuid }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
+			
 			if (response.data.valid == false) {
 				throw { status: statusCode.UNAUTHORIZED, code: response.data.code, message: response.data.message };
 			}

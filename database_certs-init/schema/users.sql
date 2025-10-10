@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
 	google_id TEXT NULL UNIQUE,
 	username TEXT NOT NULL UNIQUE,
 	password TEXT NULL,
-	avatar_path TEXT,
+	avatar_path TEXT DEFAULT 'https://localhost:3002/cdn/default_avatar.jpg',
 	role TEXT NOT NULL CHECK (role IN ('user', 'admin')) DEFAULT 'user',
 	two_fa_enabled BOOLEAN DEFAULT FALSE,
 	two_fa_secret TEXT,

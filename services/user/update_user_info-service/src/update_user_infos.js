@@ -212,6 +212,7 @@ app.patch('/avatar', handleErrors(async (req, res) => {
 	}
 
 	const cdnPath = await getAvatarCdnUrl(avatar, user.uuid);
+	console.log(`Avatar uploaded: ${cdnPath}`);
 
 	await natsRequest(nats, jc, 'user.updateAvatar', { avatar: cdnPath, userId: user.id });
 

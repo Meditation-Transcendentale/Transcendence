@@ -90,6 +90,7 @@ app.get('/me', handleErrors(async (req, res) => {
 
 	const userInfo = await natsRequest(nats, jc, 'user.getUserInfo', { userId: user.id });
 
+	res.header('Cache-Control', 'no-store');
 	res.code(statusCode.SUCCESS).send({ userInfo: userInfo });
 }));
 

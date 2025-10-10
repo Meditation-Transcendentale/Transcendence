@@ -1,19 +1,149 @@
-import { User } from "../User";
-import { postRequest } from "../networking/request";
+import { patchRequest, postRequest, deleteRequest, avatarRequest, getRequest } from "../networking/request";
 import { Popup, PopupType } from "./Popup";
 
-export class Ath {
+class classicStatsC {
 
+	public gamesPlayed!: number;
+	public gamesWined!: number;
+	public gamesLoosed!: number;
+	public winRate!: number;
+	public bestWinStreak!: number;
+	public goalsScored!: number;
+	public goalsConceded!: number;
+
+	constructor() {
+	}
+
+	public check(): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			postRequest("stats/player", { uuid: User.uuid, mode: "classic" })
+				.then((json: any) => {
+					this.gamesPlayed = json.playerStats.stats.game_played;
+					this.gamesWined = json.playerStats.stats.wins;
+					this.gamesLoosed = json.playerStats.stats.losses;
+					this.winRate = json.playerStats.stats.win_rate;
+					this.bestWinStreak = json.playerStats.stats.best_win_streak;
+					this.goalsScored = json.playerStats.stats.goals_scored;
+					this.goalsConceded = json.playerStats.stats.goals_conceded;
+					resolve(true);
+				})
+				.catch((err) => {
+					reject(new Error(err));
+				})
+		})
+	}
+}
+
+class brStatsC {
+	
+	public gamesPlayed!: number
+	public gamesWined!: number
+	public winRate!: number
+	public bestPlacement!: number
+	public averagePlacement!: number
+	
+	constructor() {
+	}
+
+	public check(): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			postRequest("stats/player", { uuid: User.uuid, mode: "br" })
+				.then((json: any) => {
+					this.gamesPlayed = json.playerStats.stats.game_played;
+					this.gamesWined = json.playerStats.stats.wins;
+					this.winRate = json.playerStats.stats.win_rate;
+					this.averagePlacement = json.playerStats.stats.avg_placement;
+					if (json.playerStats.stats.game_played == 0 ) {
+						this.bestPlacement = 0; }
+					else {
+						this.bestPlacement = json.playerStats.stats.best_placement; }
+					resolve(true);
+				})
+				.catch((err) => {
+					reject(new Error(err));
+				})
+		})
+	}
+}
+
+class matchHistoryC {
+
+	public history!: any[];
+
+	constructor() {
+	}
+
+	public getHistory(): Promise<any> {
+		return new Promise((resolve, reject) => {
+			postRequest("stats/get/history", { uuid: User.uuid })
+				.then((json: any) => {
+					this.history = json.playerHistory;
+					resolve(true);
+				})
+				.catch((err) => {
+					reject(new Error(err));
+				})
+		})
+	}
+
+}
+
+class UserC {
+	public username!: string;
+	public avatar!: string;
+	public status!: string;
+	public uuid!: string;
+	public twofa!: number;
+
+	public classicStats!: classicStatsC;
+	public brStats!: brStatsC;
+	public matchHistory!: matchHistoryC;
+	
+	constructor() {
+	}
+	
+	public async init() {
+		await this.check();
+		this.classicStats = new classicStatsC();
+		this.brStats = new brStatsC();
+		this.matchHistory = new matchHistoryC();
+	}
+	
+	public check(): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			getRequest("info/me", "no-cache")
+				.then((json: any) => {
+					this.username = json.userInfo.username;
+					this.uuid = json.userInfo.uuid;
+					this.status = json.userInfo.status;
+					this.twofa = json.userInfo.two_fa_enabled;
+					this.avatar = json.userInfo.avatar_path;
+					resolve(true);
+				})
+				.catch((err) => {
+					reject(new Error("not authentifiated User"));
+				})
+			})
+	}
+}
+
+let User!: UserC;
+
+export class Ath {
+	
 	private container!: HTMLDivElement;
 	private profileSection!: HTMLDivElement;
 	private profileImage!: HTMLImageElement;
 	private trigger!: HTMLSpanElement;
 	private dropdown!: HTMLDivElement;
-    
+	
+	private settings: athSettings;
+	private profile: athProfile;
+	
 	private isOpen: boolean = false;
-
+	
 	constructor() {
-
+		
 		this.container = document.createElement("div");
 		this.container.id = "ath-container";
 		this.setupContainerStyles();
@@ -24,12 +154,12 @@ export class Ath {
 
 		this.profileImage = document.createElement("img");
 		this.profileImage.id = "ath-profile-image";
-		this.profileImage.src =/*  User.avatar ||  */"default_avatar.jpg";
+		this.profileImage.src = "https://localhost:3002/cdn/default_avatar.jpg";
 		this.setupProfileImageStyles();
 
 		this.trigger = document.createElement("span");
 		this.trigger.id = "ath-trigger";
-		this.trigger.innerText = /* `${User.username || "User"}`; */ "User";
+		this.trigger.innerText = "User";
 		this.setupTriggerStyles();
 
 		this.dropdown = document.createElement("div");
@@ -43,6 +173,9 @@ export class Ath {
 		this.container.appendChild(this.dropdown);
 
 		this.setupEventListeners();
+
+		this.settings = new athSettings(this);
+		this.profile = new athProfile(this);
 
 	}
 
@@ -105,8 +238,8 @@ export class Ath {
 
 	private createMenuItems() {
 		const menuItems = [
-			{ text: "Profile", action: () => console.log(User) },
-			{ text: "Settings", action: () => console.log(User.username) },
+			{ text: "Profile", action: () => this.profile.load() },
+			{ text: "Settings", action: () => this.settings.load() },
 			{ text: "Quit", action: () => this.quitFunction() }
 		];
 
@@ -156,7 +289,6 @@ export class Ath {
 
 	private open() {
 		this.isOpen = true;
-		this.trigger.innerText = `${User.username || "User"}`;
 		this.profileSection.style.backgroundColor = "rgba(255, 192, 203, 1)";
 		
 		this.dropdown.style.visibility = "visible";
@@ -166,7 +298,6 @@ export class Ath {
 
 	private close() {
 		this.isOpen = false;
-		this.trigger.innerText = `${User.username || "User"}`;
 		this.profileSection.style.backgroundColor = "rgba(255, 192, 203, 0.8)";
 		this.profileSection.style.transform = "scale(1)";
 		
@@ -176,47 +307,589 @@ export class Ath {
 	}
 
 	public updateProfileInfo() {
-		const currentUsername = /* User.username || */ "User";
-		const currentAvatar =/*  User.avatar ||  */"default_avatar.jpg";
-		
-		this.trigger.innerText = `${currentUsername}`;
-		this.profileImage.src = currentAvatar;
+		this.trigger.innerText = User.username;
+		this.profileImage.src = User.avatar;
+	}
+	
+	private async initProfile() {
+		User = new UserC();
+		await User.init();
+		this.trigger.innerText = User.username;
+		this.profileImage.src = User.avatar;
 	}
 
 	public load() {
+		this.initProfile();
 		document.body.appendChild(this.container);
-		this.updateProfileInfo();
 	}
 
 	public unload() {
 		this.container.remove();
 	}
 
-
 	private quitFunction() {
 
-        const quitPopup = new Popup({
-            type: PopupType.accept,
-            title: "Logout",
-            text: "Are you sure you want to logout?",
-            accept: () => {
-                postRequest("auth/logout", {})
-                        .then(() => { window.location.reload() })
-                        .catch(() => { window.location.reload() })
-            },
-            decline: () => { }
-        });
-        quitPopup.show();
+		const quitPopup = new Popup({
+			type: PopupType.accept,
+			title: "Logout",
+			text: "Are you sure you want to logout ?",
+			accept: () => {
+				postRequest("auth/logout", {})
+						.then(() => { window.location.reload() })
+						.catch(() => { window.location.reload() })
+			},
+			decline: () => { }
+		});
+		quitPopup.show();
 	}
 }
 
-// changer de Username
-// Changer de mdp
-// changer d avatar
-// Activer 2fa || desactiver 2fa
+class athSettings {
 
-// class athSettings {
+	private settingsPopup: Popup;
+	private changeUsernamePopup!: Popup;
+	private changePasswordPopup!: Popup;
+	private changeAvatarPopup!: Popup;
+	private updateTwoFAPopup!: Popup;
+	private twoFAQrCodePopup!: Popup;
+
+	private toggle2FABtn: HTMLButtonElement;
+	private qrCodeSrc: string = "";
+	private twoFAEnabled: boolean = false;
+	private athInstance: Ath;
+
+	constructor(athInstance: Ath) { 
+
+		this.athInstance = athInstance;
+
+		this.toggle2FABtn = document.createElement("button");
+
+		this.settingsPopup = new Popup({
+			type: PopupType.custom,
+			title: "Settings",
+			text: "",
+			div: this.createSettingsDiv()
+		});
+
+		this.changeUsernamePopup = new Popup({
+			type: PopupType.validation,
+			title: "Change Username",
+			input: "username",
+			submit: (password: string, token?: string, input?: string) => {
+				patchRequest("update-info/username", { username: input, password: password, token: token })
+					.then(async (json) => { 
+						await User.check(),
+						this.athInstance.updateProfileInfo(),
+						this.changeUsernamePopup.close() })
+					.catch((err) => { })
+			},
+			abort: () => {
+			}
+		});
+
+		this.changePasswordPopup = new Popup({
+			type: PopupType.validation,
+			title: "Change Password",
+			input: "password",
+			submit: (password: string, token?: string, input?: string) => {
+				patchRequest("update-info/password", { newPassword: input, password: password, token: token })
+					.then(async (json) => { 
+						await User.check(),
+						this.changePasswordPopup.close() })
+					.catch((err) => { })
+			},
+			abort: () => {
+			}
+		});
+
+		this.changeAvatarPopup = new Popup({
+			type: PopupType.custom,
+			title: "Change Avatar",
+			div: this.createAvatarDiv()
+		});
+
+		this.updateTwoFAPopup = new Popup({
+			type: PopupType.validation,
+			title: "Update 2FA",
+			submit: (password: string, token?: string, input?: string) => {
+				this.handle2FAToggle(password, token);
+			},
+			abort: () => {
+			}
+		});
+	}
+		
+	private createAvatarDiv(): HTMLDivElement {
+		const div = document.createElement("div");
+		div.style.display = "flex";
+		div.style.flexDirection = "column";
+		div.style.gap = "10px";
+
+		const fileInput = document.createElement("input");
+		fileInput.type = "file";
+		fileInput.accept = "image/*";
+
+		const previewImg = document.createElement("img");
+		previewImg.style.width = "100px";
+		previewImg.style.height = "100px";
+		previewImg.style.objectFit = "cover";
+		previewImg.style.borderRadius = "50%";
+		previewImg.style.marginBottom = "10px";
+		
+		fileInput.addEventListener("change", () => {
+			const file = fileInput.files ? fileInput.files[0] : null;
+
+			const url = file ? URL.createObjectURL(file) : "https://localhost:3002/cdn/default_avatar.jpg";
+			previewImg.src = url;
+			
+			div.appendChild(previewImg);
+		});
+
+		const uploadBtn = document.createElement("button");
+		uploadBtn.textContent = "Upload";
+
+		uploadBtn.addEventListener("click", () => {
+			const file = fileInput.files ? fileInput.files[0] : null;
+			if (file) {
+				const formData = new FormData();
+				formData.append("avatar", file);
+
+				avatarRequest("update-info/avatar", formData)
+					.then(async (json) => {
+						await User.check();
+						if (this.athInstance) {
+							this.athInstance.updateProfileInfo();
+						}
+						this.changeAvatarPopup.close();
+					})
+					.catch((err) => { })
+			}
+		});
+
+		div.appendChild(fileInput);
+		div.appendChild(uploadBtn);
+
+		return div;
+	}
+
+	private handle2FAToggle(password: string, token?: string) {
+
+		if (this.twoFAEnabled) {
+			deleteRequest("update-info/disable-2fa", { password, token })
+				.then(async (json: any) => {
+					this.toggle2FABtn.textContent = "Enable 2FA",
+					await User.check(), 
+					this.updateTwoFAPopup.close(), 
+					this.settingsPopup.close(),
+					this.twoFAEnabled = User.twofa === 1; })
+				.catch((err: any) => { err.json() })
+			
+		} else {
+			postRequest("update-info/enable-2fa", { password })
+				.then(async (json: any) => {
+					this.qrCodeSrc = json.qrCode,
+					this.twoFAQrCodePopup = new Popup({
+						type: PopupType.custom,
+						title: "Scan this QR code with your authenticator app.",
+						div: this.createQrCodeDiv()
+					});
+					this.twoFAQrCodePopup.show(), 
+					await User.check(), 
+					this.toggle2FABtn.textContent = "Disable 2FA",
+					this.updateTwoFAPopup.close(),
+					this.settingsPopup.close(),
+					this.twoFAEnabled = User.twofa === 1; })
+				.catch((err: any) => { err.json() })
+		}
+
+	}
+
+	private createQrCodeDiv(): HTMLDivElement {
+		const div = document.createElement("div");
+		div.style.display = "flex";
+		div.style.flexDirection = "column";
+		div.style.alignItems = "center";
+		div.style.gap = "10px";
+
+		const img = document.createElement("img");
+		img.src = this.qrCodeSrc;
+		img.alt = "2FA QR Code";
+		img.style.width = "150px";
+		img.style.height = "150px";
+
+		div.appendChild(img);
+
+		return div;
+	}
+
+	private update2FAButton() {
+		if (this.twoFAEnabled)
+			this.toggle2FABtn.textContent = "Disable 2FA";
+		else
+			this.toggle2FABtn.textContent = "Enable 2FA";
+	}
+		
+	private createSettingsDiv(): HTMLDivElement {
+		const div = document.createElement("div");
+		div.style.display = "flex";
+		div.style.flexDirection = "column";
+		div.style.gap = "10px";
+
+		const changeUsernameBtn = document.createElement("button");
+		changeUsernameBtn.textContent = "Change Username";
+
+		const changePasswordBtn = document.createElement("button");
+		changePasswordBtn.textContent = "Change Password";
+
+		const changeAvatarBtn = document.createElement("button");
+		changeAvatarBtn.textContent = "Change Avatar";
+
+		changeUsernameBtn.addEventListener("click", () => {
+			this.changeUsernamePopup.show();
+		});
+
+		changePasswordBtn.addEventListener("click", () => {
+			this.changePasswordPopup.show();
+		});
+
+		changeAvatarBtn.addEventListener("click", () => {
+			this.changeAvatarPopup.show();
+		});
+
+		this.toggle2FABtn.addEventListener("click", () => {
+			this.updateTwoFAPopup.show();
+		});
+
+		div.appendChild(changeUsernameBtn);
+		div.appendChild(changePasswordBtn);
+		div.appendChild(changeAvatarBtn);
+		div.appendChild(this.toggle2FABtn);
+		
+		return div;
+	}
+		
+	public load () {
+		this.twoFAEnabled = User.twofa === 1;
+		this.update2FAButton();
+		this.settingsPopup.show();
+
+	}
+		
+	public unload () {
+		this.settingsPopup.close();
+	}
+}
+
+class athProfile {
+	private athInstance: Ath;
 
 
+	private div!: HTMLDivElement;
+	private statsDiv!: HTMLDivElement;
+	private classicStatsDiv!: HTMLDivElement;
+	private brStatsDiv!: HTMLDivElement;
+	private matchHistoryDiv!: HTMLDivElement;
+	private profileImg!: HTMLImageElement;
+	private usernameElem!: HTMLHeadingElement;
+	private statusElem!: HTMLParagraphElement;
+	
+	private profilePopup: Popup;
+	
+	private classicTable!: HTMLTableElement;
+	private brTable!: HTMLTableElement;
+	
+	private classicTdElements!: { [key: string]: HTMLTableCellElement };
+	private brTdElements: { [key: string]: HTMLTableCellElement };
 
-// }
+	private matchHistoryRow!:{ [key: number ]: HTMLTableRowElement };
+	private matchHistoryTdElements!: { [key: number]: { [id: number]: HTMLTableCellElement } };
+	
+	
+	constructor(athInstance: Ath) {
+		this.athInstance = athInstance;
+		
+		this.classicTdElements = {};
+		this.brTdElements = {};
+		this.matchHistoryTdElements = {};
+		this.matchHistoryRow = {};
+		
+		this.createProfileDiv();
+
+		this.profilePopup = new Popup({
+			type: PopupType.custom,
+			title: "",
+			div: this.div
+		});
+
+
+	}
+	
+	private createProfileDiv() {
+		this.div = document.createElement("div");
+		this.div.style.display = "flex";
+		this.div.style.alignItems = "center";
+		this.div.style.gap = "10px";
+		this.div.style.backgroundColor = "transparent";
+
+		const profileDiv = document.createElement("div");
+		profileDiv.style.display = "flex";
+		profileDiv.style.flexDirection = "column";
+		profileDiv.style.alignItems = "center";
+		profileDiv.style.gap = "5px";
+		profileDiv.style.marginBottom = "10px";
+		profileDiv.style.border = "1px solid black";
+
+
+		this.profileImg = document.createElement("img");
+		this.profileImg.alt = "Profile Image";
+		this.profileImg.style.width = "100px";
+		this.profileImg.style.height = "100px";
+		this.profileImg.style.objectFit = "cover";
+		this.profileImg.style.borderRadius = "50%";
+
+		this.usernameElem = document.createElement("h2");
+
+		this.statusElem = document.createElement("p");
+		this.statusElem.style.fontSize = "12px";
+
+		this.createStatDiv();
+		this.createMatchHistoryDiv();
+
+		profileDiv.appendChild(this.usernameElem);
+		profileDiv.appendChild(this.profileImg);
+		profileDiv.appendChild(this.statusElem);
+		this.div.appendChild(profileDiv);
+		this.div.appendChild(this.statsDiv);
+		this.div.appendChild(this.matchHistoryDiv);
+	}
+
+	private async getPlayerStats() {
+
+		await User.classicStats.check()
+			.then(() => {this.updateClassicStatsTable(User.classicStats) })
+			.catch((err) => { });
+
+		await User.brStats.check()
+			.then(() => {this.updateBrStatsTable(User.brStats) })
+			.catch((err) => { });
+	}
+
+	private updateBrStatsTable(stats: any) {
+		if (!stats) return;
+
+		this.brTdElements["Game Played"].textContent = stats.gamesPlayed;
+		this.brTdElements["Wined"].textContent = stats.gamesWined;
+		this.brTdElements["Win Rate"].textContent = Math.round(stats.winRate * 100) + "%";
+		this.brTdElements["Best Placement"].textContent = stats.bestPlacement;
+		this.brTdElements["Average Placement"].textContent = stats.averagePlacement;
+	}
+
+	private async getMatchHistory() {
+
+
+		await User.matchHistory.getHistory()
+			.then(() => {
+				this.updateMatchHistoryTable(User.matchHistory.history);
+			})
+			.catch((err) => { });
+	}
+
+	private handleMatchResult(data: any): string {
+
+		let result!: string
+
+		switch (data.game_mode) {
+			case "classic":
+				if (data.is_winner)
+					result = `${data.goals_scored} - ${data.goals_conceded}`;
+				else
+					result = `${data.goals_conceded} - ${data.goals_scored}`;
+				return result;
+			case "br":
+				result = `${data.placement}`;
+				return result;
+			default:
+				return "Unknown";
+		}
+	}
+
+	private updateMatchHistoryTable(data: any) {
+
+		if (!data) return;
+
+		const history = data;
+
+		for (let i = 0; i < history.length; i++) {
+			if ( history[i].is_winner)
+				this.matchHistoryRow[i].style.backgroundColor = "rgba(144, 238, 144, 0.5)";
+			else
+				this.matchHistoryRow[i].style.backgroundColor = "rgba(226, 50, 77, 0.5)";
+			this.matchHistoryRow[i].style.border = "1px solid black";
+			this.matchHistoryTdElements[i][1].style.border = "1px solid black";
+			this.matchHistoryTdElements[i][0].textContent = history[i].game_mode;
+			this.matchHistoryTdElements[i][1].textContent = this.handleMatchResult(history[i]);
+			this.matchHistoryTdElements[i][2].textContent = history[i].created_at;
+		}
+	}
+
+	private updateClassicStatsTable(stats: any) {
+
+		if (!stats) return;
+
+		this.classicTdElements["Game Played"].textContent = stats.gamesPlayed;
+		this.classicTdElements["Wined"].textContent = stats.gamesWined;
+		this.classicTdElements["Loosed"].textContent = stats.gamesLoosed;
+		this.classicTdElements["Win Rate"].textContent = Math.round(stats.winRate * 100) + "%";
+		this.classicTdElements["Best Win Streak"].textContent = stats.bestWinStreak;
+		this.classicTdElements["Goals Scored"].textContent = stats.goalsScored;
+		this.classicTdElements["Goals Conceded"].textContent = stats.goalsConceded;
+	}
+
+	private createMatchHistoryDiv() {
+
+		this.matchHistoryDiv = document.createElement("div");
+		this.matchHistoryDiv.id = "profile-match-history";
+		this.matchHistoryDiv.style.display = "flex";
+		this.matchHistoryDiv.style.flexDirection = "column";
+		this.matchHistoryDiv.style.gap = "5px";
+		this.matchHistoryDiv.style.marginTop = "10px";
+		this.matchHistoryDiv.style.border = "1px solid black";
+
+		const title = document.createElement("h4");
+		title.textContent = "Match History";
+		title.style.textAlign = "center";
+		this.matchHistoryDiv.appendChild(title);
+
+
+		const table = document.createElement("table");
+		table.id = "match-history-table";
+		table.style.width = "100%";
+		table.style.borderCollapse = "collapse";
+
+		const tbody = document.createElement("tbody");
+
+		for (let i = 0; i < 10; i++) {
+
+			this.matchHistoryRow[i] = document.createElement("tr");
+
+			for (let j = 0; j < 3; j++) {
+
+				this.matchHistoryTdElements[i] = this.matchHistoryTdElements[i] || {};
+				this.matchHistoryTdElements[i][j] = document.createElement("td");
+
+				this.matchHistoryRow[i].appendChild(this.matchHistoryTdElements[i][j]);
+			}
+
+			tbody.appendChild(this.matchHistoryRow[i]);
+		}
+
+		table.appendChild(tbody);
+		this.matchHistoryDiv.appendChild(table);
+	}
+
+	private createStatDiv() {
+		
+		const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded"];
+		const brPlayerStatsName = ["Game Played", 'Wined', "Win Rate", "Best Placement", "Average Placement"];
+		
+		this.statsDiv = document.createElement("div");
+		this.statsDiv.id = "profile-stats";
+		this.statsDiv.style.display = "flex";
+		this.statsDiv.style.flexDirection = "row";
+		this.statsDiv.style.gap = "5px";
+		this.statsDiv.style.marginTop = "10px";
+
+		this.classicStatsDiv = document.createElement("div");
+		this.classicStatsDiv.id = "classic-stats-div";
+		this.classicStatsDiv.style.flex = "1";
+		this.classicStatsDiv.style.border = "1px solid black";
+
+		const classicTitle = document.createElement("h4");
+		classicTitle.textContent = "Classic Stats";
+		classicTitle.style.textAlign = "center";
+		this.classicStatsDiv.appendChild(classicTitle);
+
+		this.brStatsDiv = document.createElement("div");
+		this.brStatsDiv.id = "br-stats-div";
+		this.brStatsDiv.style.flex = "1";
+		this.brStatsDiv.style.border = "1px solid black";
+		
+		const brTitle = document.createElement("h4");
+		brTitle.textContent = "Battle Royale Stats";
+		brTitle.style.textAlign = "center";
+		this.brStatsDiv.appendChild(brTitle);
+		
+		this.classicTable = document.createElement("table");
+		this.classicTable.id = "classic-stats";
+		this.classicTable.style.width = "100%";
+		this.classicTable.style.borderCollapse = "collapse";
+		this.classicTable.style.marginTop = "10px";
+
+		this.brTable = document.createElement("table");
+		this.brTable.id = "br-stats";
+		this.brTable.style.width = "100%";
+		this.brTable.style.borderCollapse = "collapse";
+		this.brTable.style.marginTop = "10px";
+
+		const classicHeader = document.createElement("thead");
+
+		classicPlayerStatsName.forEach(statName => {
+			const classicRow = document.createElement("tr");
+			const classicTitlesCell = document.createElement("th");
+			this.classicTdElements[statName] = document.createElement("td");
+			
+			classicRow.style.border = "1px solid black";
+			classicTitlesCell.style.border = "1px solid black";
+
+			classicTitlesCell.textContent = statName;
+
+			classicRow.appendChild(classicTitlesCell);
+			classicRow.appendChild(this.classicTdElements[statName]);
+			classicHeader.appendChild(classicRow);
+		});
+
+		const brHeader = document.createElement("thead");
+
+		brPlayerStatsName.forEach(statName => {
+			const brRow = document.createElement("tr");
+			const brTitlesCell = document.createElement("th");
+			this.brTdElements[statName] = document.createElement("td");
+
+			brRow.style.border = "1px solid black";
+			brTitlesCell.style.border = "1px solid black";
+
+			brTitlesCell.textContent = statName;
+
+			brRow.appendChild(brTitlesCell);
+			brRow.appendChild(this.brTdElements[statName]);
+			brHeader.appendChild(brRow);
+		});
+
+		this.brTable.appendChild(brHeader);
+		this.classicTable.appendChild(classicHeader);
+		this.brStatsDiv.appendChild(this.brTable);
+		this.classicStatsDiv.appendChild(this.classicTable);
+		this.statsDiv.appendChild(this.classicStatsDiv);
+		this.statsDiv.appendChild(this.brStatsDiv);
+	}
+
+	private async updateProfileInfo() {
+		await User.check();
+		this.profileImg.src = User.avatar || "https://localhost:3002/cdn/default_avatar.jpg";
+		this.usernameElem.textContent = User.username || "User";
+		this.statusElem.textContent = `Status: ${User.status || "offline"}`;
+		this.statusElem.style.color = User.status === "online" ? "green" : User.status === "offline" ? "orange" : "red";
+	}
+
+	public async load() {
+		this.updateProfileInfo();
+		await this.getPlayerStats();
+		await this.getMatchHistory();
+		this.profilePopup.show();
+	}
+
+	public unload() {
+		this.profilePopup.close();
+	}
+}
+
