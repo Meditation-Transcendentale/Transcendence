@@ -17,7 +17,7 @@ export class StateManager {
 		const now = performance.now();
 		const deltaTime = now - this.lastUpdate;
 		this.lastUpdate = now;
-		this.ecs.update(this.timestep / 1000);
+		this.ecs.update(deltaTime);
 		this.id = requestAnimationFrame(() => this.update());
 		if (!this.start) {
 			console.log("Cancel Animation Fram :", this.id);
