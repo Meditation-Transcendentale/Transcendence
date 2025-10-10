@@ -679,7 +679,7 @@ class athProfile {
 
 		this.brTdElements["Game Played"].textContent = stats.gamesPlayed;
 		this.brTdElements["Wined"].textContent = stats.gamesWined;
-		this.brTdElements["Win Rate"].textContent = (stats.winRate * 100) + "%";
+		this.brTdElements["Win Rate"].textContent = Math.round(stats.winRate * 100) + "%";
 		this.brTdElements["Best Placement"].textContent = stats.bestPlacement;
 		this.brTdElements["Average Placement"].textContent = stats.averagePlacement;
 	}
@@ -739,7 +739,7 @@ class athProfile {
 		this.classicTdElements["Game Played"].textContent = stats.gamesPlayed;
 		this.classicTdElements["Wined"].textContent = stats.gamesWined;
 		this.classicTdElements["Loosed"].textContent = stats.gamesLoosed;
-		this.classicTdElements["Win Rate"].textContent = (stats.winRate * 100) + "%";
+		this.classicTdElements["Win Rate"].textContent = Math.round(stats.winRate * 100) + "%";
 		this.classicTdElements["Best Win Streak"].textContent = stats.bestWinStreak;
 		this.classicTdElements["Goals Scored"].textContent = stats.goalsScored;
 		this.classicTdElements["Goals Conceded"].textContent = stats.goalsConceded;
