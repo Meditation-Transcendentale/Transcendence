@@ -700,14 +700,23 @@ class athProfile {
 
 		switch (data.game_mode) {
 			case "classic":
-				if (data.is_winner)
 					result = `${data.goals_scored} - ${data.goals_conceded}`;
-				else
-					result = `${data.goals_conceded} - ${data.goals_scored}`;
 				return result;
 			case "br":
-				result = `${data.placement}`;
-				return result;
+				switch (data.placement) {
+					case 1:
+						result = `${data.placement}st`;
+						return result;
+					case 2:
+						result = `${data.placement}nd`;
+						return result;
+					case 3:
+						result = `${data.placement}rd`;
+						return result;
+					default:
+						result = `${data.placement}th`;
+						return result;
+				}
 			default:
 				return "Unknown";
 		}
