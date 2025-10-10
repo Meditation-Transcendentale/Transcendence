@@ -12,15 +12,12 @@ class classicStatsC {
 	public goalsConceded!: number;
 
 	constructor() {
-		this.check();
 	}
 
 	public check(): Promise<boolean> {
 		return new Promise((resolve, reject) => {
-			console.log("check classic stats");
 			postRequest("stats/player", { uuid: User.uuid, mode: "classic" })
 				.then((json: any) => {
-					console.log("classicStats -> postRequest stats/player", json);
 					this.gamesPlayed = json.playerStats.stats.game_played;
 					this.gamesWined = json.playerStats.stats.wins;
 					this.gamesLoosed = json.playerStats.stats.losses;
@@ -46,15 +43,12 @@ class brStatsC {
 	public averagePlacement!: number
 	
 	constructor() {
-		this.check();
 	}
 
 	public check(): Promise<boolean> {
 		return new Promise((resolve, reject) => {
-			console.log("check br stats");
 			postRequest("stats/player", { uuid: User.uuid, mode: "br" })
 				.then((json: any) => {
-					console.log("brStats -> postRequest stats/player", json);
 					this.gamesPlayed = json.playerStats.stats.game_played;
 					this.gamesWined = json.playerStats.stats.wins;
 					this.winRate = json.playerStats.stats.win_rate;
@@ -77,15 +71,12 @@ class matchHistoryC {
 	public history!: any[];
 
 	constructor() {
-		this.getHistory();
 	}
 
 	public getHistory(): Promise<any> {
 		return new Promise((resolve, reject) => {
-			console.log("check match history");
 			postRequest("stats/get/history", { uuid: User.uuid })
 				.then((json: any) => {
-					console.log("matchHistoryC -> postRequest stats/get/history", json);
 					this.history = json.playerHistory;
 					resolve(true);
 				})
@@ -120,10 +111,8 @@ class UserC {
 	
 	public check(): Promise<boolean> {
 		return new Promise((resolve, reject) => {
-			console.log("check User");
 			getRequest("info/me", "no-cache")
 				.then((json: any) => {
-					console.log("User.ts -> getRequest info/me", json);
 					this.username = json.userInfo.username;
 					this.uuid = json.userInfo.uuid;
 					this.status = json.userInfo.status;
@@ -137,24 +126,24 @@ class UserC {
 			})
 	}
 }
-const User = new UserC();
-User.init();
+
+let User!: UserC;
 
 export class Ath {
-
+	
 	private container!: HTMLDivElement;
 	private profileSection!: HTMLDivElement;
 	private profileImage!: HTMLImageElement;
 	private trigger!: HTMLSpanElement;
 	private dropdown!: HTMLDivElement;
-
+	
 	private settings: athSettings;
 	private profile: athProfile;
-		
+	
 	private isOpen: boolean = false;
-
+	
 	constructor() {
-
+		
 		this.container = document.createElement("div");
 		this.container.id = "ath-container";
 		this.setupContainerStyles();
@@ -298,20 +287,8 @@ export class Ath {
 		}
 	}
 
-	// private getUserInfo() {
-	// 	getRequest("player/info", "no-cache")
-	// 		.then((json: any) => {
-	// 			User.username = json.data.username;
-	// 			User.avatar = json.data.avatar;
-	// 			User.status = json.data.status;
-	// 			User.uuid = json.data.uuid;
-	// 			User.twofa = json.data.twofa;
-	// 		})
-	// }
-
 	private open() {
 		this.isOpen = true;
-		this.trigger.innerText = `${User.username || "User"}`;
 		this.profileSection.style.backgroundColor = "rgba(255, 192, 203, 1)";
 		
 		this.dropdown.style.visibility = "visible";
@@ -321,7 +298,6 @@ export class Ath {
 
 	private close() {
 		this.isOpen = false;
-		this.trigger.innerText = `${User.username || "User"}`;
 		this.profileSection.style.backgroundColor = "rgba(255, 192, 203, 0.8)";
 		this.profileSection.style.transform = "scale(1)";
 		
@@ -331,19 +307,20 @@ export class Ath {
 	}
 
 	public updateProfileInfo() {
-		const currentUsername = User.username || "User";
-		const currentAvatar = User.avatar || "https://localhost:3002/cdn/default_avatar.jpg";
-
-		console.log("Updating profile info:", currentUsername, currentAvatar);
-		
-		this.trigger.innerText = `${currentUsername}`;
-		this.profileImage.src = currentAvatar;
+		this.trigger.innerText = User.username;
+		this.profileImage.src = User.avatar;
+	}
+	
+	private async initProfile() {
+		User = new UserC();
+		await User.init();
+		this.trigger.innerText = User.username;
+		this.profileImage.src = User.avatar;
 	}
 
 	public load() {
-
+		this.initProfile();
 		document.body.appendChild(this.container);
-		this.updateProfileInfo();
 	}
 
 	public unload() {
@@ -355,7 +332,7 @@ export class Ath {
 		const quitPopup = new Popup({
 			type: PopupType.accept,
 			title: "Logout",
-			text: "Are you sure you want to logout?",
+			text: "Are you sure you want to logout ?",
 			accept: () => {
 				postRequest("auth/logout", {})
 						.then(() => { window.location.reload() })
@@ -384,7 +361,6 @@ class athSettings {
 	constructor(athInstance: Ath) { 
 
 		this.athInstance = athInstance;
-		console.log("twofa:", this.twoFAEnabled);
 
 		this.toggle2FABtn = document.createElement("button");
 
@@ -401,12 +377,13 @@ class athSettings {
 			input: "username",
 			submit: (password: string, token?: string, input?: string) => {
 				patchRequest("update-info/username", { username: input, password: password, token: token })
-					.then(async (json) => { await User.check(), this.changeUsernamePopup.close() })
+					.then(async (json) => { 
+						await User.check(),
+						this.athInstance.updateProfileInfo(),
+						this.changeUsernamePopup.close() })
 					.catch((err) => { })
-				console.log("Change Username to:", input, "with password:", password, "and token:", token);
 			},
 			abort: () => {
-				console.log("Change Username aborted");
 			}
 		});
 
@@ -416,12 +393,12 @@ class athSettings {
 			input: "password",
 			submit: (password: string, token?: string, input?: string) => {
 				patchRequest("update-info/password", { newPassword: input, password: password, token: token })
-					.then(async (json) => { await User.check(), this.changePasswordPopup.close() })
+					.then(async (json) => { 
+						await User.check(),
+						this.changePasswordPopup.close() })
 					.catch((err) => { })
-				console.log("Change Password to:", input, "with password:", password, "and token:", token);
 			},
 			abort: () => {
-				console.log("Change Password aborted");
 			}
 		});
 
@@ -436,10 +413,8 @@ class athSettings {
 			title: "Update 2FA",
 			submit: (password: string, token?: string, input?: string) => {
 				this.handle2FAToggle(password, token);
-				console.log("Update 2FA with password:", password, "and token:", token);
 			},
 			abort: () => {
-				console.log("Update 2FA aborted");
 			}
 		});
 	}
@@ -501,28 +476,30 @@ class athSettings {
 
 		if (this.twoFAEnabled) {
 			deleteRequest("update-info/disable-2fa", { password, token })
-			.then(async (json: any) => {
-				this.toggle2FABtn.textContent = "Enable 2FA",
-				await User.check(), 
-				this.updateTwoFAPopup.close(), 
-				this.twoFAEnabled = false; })
-			.catch((err: any) => { err.json() })
+				.then(async (json: any) => {
+					this.toggle2FABtn.textContent = "Enable 2FA",
+					await User.check(), 
+					this.updateTwoFAPopup.close(), 
+					this.settingsPopup.close(),
+					this.twoFAEnabled = User.twofa === 1; })
+				.catch((err: any) => { err.json() })
 			
 		} else {
 			postRequest("update-info/enable-2fa", { password })
-			.then(async (json: any) => {
-				this.qrCodeSrc = json.qrCode,
-				this.twoFAQrCodePopup = new Popup({
-					type: PopupType.custom,
-					title: "Scan this QR code with your authenticator app.",
-					div: this.createQrCodeDiv()
-				});
-				this.twoFAQrCodePopup.show(), 
-				await User.check(), 
-				this.toggle2FABtn.textContent = "Disable 2FA",
-				this.updateTwoFAPopup.close(), 
-				this.twoFAEnabled = true; })
-			.catch((err: any) => { err.json() })
+				.then(async (json: any) => {
+					this.qrCodeSrc = json.qrCode,
+					this.twoFAQrCodePopup = new Popup({
+						type: PopupType.custom,
+						title: "Scan this QR code with your authenticator app.",
+						div: this.createQrCodeDiv()
+					});
+					this.twoFAQrCodePopup.show(), 
+					await User.check(), 
+					this.toggle2FABtn.textContent = "Disable 2FA",
+					this.updateTwoFAPopup.close(),
+					this.settingsPopup.close(),
+					this.twoFAEnabled = User.twofa === 1; })
+				.catch((err: any) => { err.json() })
 		}
 
 	}
@@ -569,22 +546,18 @@ class athSettings {
 
 		changeUsernameBtn.addEventListener("click", () => {
 			this.changeUsernamePopup.show();
-			console.log("Change Username Clicked");
 		});
 
 		changePasswordBtn.addEventListener("click", () => {
 			this.changePasswordPopup.show();
-			console.log("Change Password Clicked");
 		});
 
 		changeAvatarBtn.addEventListener("click", () => {
 			this.changeAvatarPopup.show();
-			console.log("Change Avatar Clicked");
 		});
 
 		this.toggle2FABtn.addEventListener("click", () => {
 			this.updateTwoFAPopup.show();
-			console.log("Toggle 2FA Clicked");
 		});
 
 		div.appendChild(changeUsernameBtn);
@@ -604,7 +577,6 @@ class athSettings {
 		
 	public unload () {
 		this.settingsPopup.close();
-		console.log("unload ath settings");
 	}
 }
 
@@ -707,14 +679,14 @@ class athProfile {
 
 		this.brTdElements["Game Played"].textContent = stats.gamesPlayed;
 		this.brTdElements["Wined"].textContent = stats.gamesWined;
-		this.brTdElements["Win Rate"].textContent = stats.winRate + "%";
+		this.brTdElements["Win Rate"].textContent = (stats.winRate * 100) + "%";
 		this.brTdElements["Best Placement"].textContent = stats.bestPlacement;
 		this.brTdElements["Average Placement"].textContent = stats.averagePlacement;
 	}
 
 	private async getMatchHistory() {
 
-		console.log("Fetching match history...");
+
 		await User.matchHistory.getHistory()
 			.then(() => {
 				this.updateMatchHistoryTable(User.matchHistory.history);
@@ -743,11 +715,9 @@ class athProfile {
 
 	private updateMatchHistoryTable(data: any) {
 
-		console.log("Updating match history table with data:", data);
 		if (!data) return;
 
 		const history = data;
-		console.log("Updating match history with data:", history);
 
 		for (let i = 0; i < history.length; i++) {
 			if ( history[i].is_winner)
@@ -769,7 +739,7 @@ class athProfile {
 		this.classicTdElements["Game Played"].textContent = stats.gamesPlayed;
 		this.classicTdElements["Wined"].textContent = stats.gamesWined;
 		this.classicTdElements["Loosed"].textContent = stats.gamesLoosed;
-		this.classicTdElements["Win Rate"].textContent = stats.winRate + "%";
+		this.classicTdElements["Win Rate"].textContent = (stats.winRate * 100) + "%";
 		this.classicTdElements["Best Win Streak"].textContent = stats.bestWinStreak;
 		this.classicTdElements["Goals Scored"].textContent = stats.goalsScored;
 		this.classicTdElements["Goals Conceded"].textContent = stats.goalsConceded;
@@ -903,26 +873,23 @@ class athProfile {
 		this.statsDiv.appendChild(this.brStatsDiv);
 	}
 
-	private updateProfileInfo() {
-		User.check();
+	private async updateProfileInfo() {
+		await User.check();
 		this.profileImg.src = User.avatar || "https://localhost:3002/cdn/default_avatar.jpg";
 		this.usernameElem.textContent = User.username || "User";
 		this.statusElem.textContent = `Status: ${User.status || "offline"}`;
 		this.statusElem.style.color = User.status === "online" ? "green" : User.status === "offline" ? "orange" : "red";
 	}
 
-
 	public async load() {
 		this.updateProfileInfo();
 		await this.getPlayerStats();
 		await this.getMatchHistory();
 		this.profilePopup.show();
-		console.log("load ath profile");
 	}
 
 	public unload() {
 		this.profilePopup.close();
-		console.log("unload ath profile");
 	}
 }
 

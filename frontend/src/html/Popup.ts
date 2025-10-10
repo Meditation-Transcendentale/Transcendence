@@ -181,6 +181,7 @@ export class Popup {
 	}
 
 	public show() {
+		User.check()
 		if (this.option.type == PopupType.validation) {
 			this.token.hidden = User.twofa == 0;
 			this.token.required = User.twofa != 0;
