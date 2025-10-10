@@ -119,9 +119,6 @@ export class NetworkingSystem extends System {
 						else
 							ui.gameUI.updateScoreVersus(this.myScore, this.opponentScore);
 					}
-					// if (ui && (myScore == 5 || theirScore == 5)){
-					// 	ui.gameUI.showEnd(myScore, theirScore, myScore == 5);
-					// }
 				}
 			}
 

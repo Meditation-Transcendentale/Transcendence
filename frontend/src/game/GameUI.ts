@@ -442,6 +442,7 @@ class CountdownModule implements GameUIModule {
 			this.updateDisplay();
 
 			if (this.countdownNumber <= 0) {
+				this.ref.countdownValue.textContent = "";
 				this.unload();
 			}
 		}, this.delay);
@@ -668,6 +669,7 @@ interface EndingHtmlReference {
 	soloModeContainer: HTMLDivElement;
 	result: HTMLSpanElement;
 	leaderboard: HTMLDivElement;
+	players: HTMLDivElement;
 }
 
 type Player = {
@@ -689,7 +691,8 @@ class EndingModule implements GameUIModule {
 			dualModeContainer: div.querySelector('.dual-mode') as HTMLDivElement,
 			soloModeContainer: div.querySelector('.solo-mode') as HTMLDivElement,
 			result: div.querySelector("#result-label") as HTMLSpanElement,
-			leaderboard: div.querySelector("#players-list") as HTMLDivElement
+			leaderboard: div.querySelector("#leaderboard") as HTMLDivElement,
+			players: div.querySelector("#players-list") as HTMLDivElement
 		};
 	}
 
@@ -715,7 +718,8 @@ class EndingModule implements GameUIModule {
 			else
 				this.ref.result.innerHTML = '';
 
-			this.ref.leaderboard.innerHTML = '';
+			// this.ref.leaderboard.style.display = 'flex';
+			this.ref.players.innerHTML = '';
 			
 			for (let i = 0; i < this.leaderboard.length; i++) {
 				const row = document.createElement('tr');
@@ -732,9 +736,10 @@ class EndingModule implements GameUIModule {
 				scoreCell.textContent = this.leaderboard[i].highscore.toString();
 				row.appendChild(scoreCell);
 				
-				this.ref.leaderboard.appendChild(row);
+				this.ref.players.appendChild(row);
 			}
 		} else {
+			this.ref.leaderboard.style.display = 'none';
 			this.ref.dualModeContainer.style.display = 'flex';
 			this.ref.soloModeContainer.style.display = 'none';
 

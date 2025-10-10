@@ -9,34 +9,34 @@
 
  ### Feature
 
-    - brickBreaker leaderboard
     - leaderboard br
-    - spectate
-    - Camera Animation system with babylonjs
-    - lobby ready button
-    - breaknreaker tutorial
+    - (spectate)
+    - breaknreaker tutorial create button
 
  ### visual
     - full DA for the site + css implementation
-    - use cdn for assets
-    - Animation system overall
     - statue teeth
-    - finish map
-    - finish games visuals
+    - finish map (zoom, tweak light)
+    - finish games visuals (br state change, )
     - br wall and phase change visual
     - smile statue
-    - color paddle pong
+    - make button disapeer
 
 
  ### fix
-    - handle error request back
+    - handle error request back (lobby empty mode)
     - sanitize input
     - change goal position physics pong
-    - game tournament
+    - game end pong not working
+    - check websocket url
+    - br check loop inside engine
+    - fx pong
 
 ### tweak
     - 3D tweak
     - light tweak
-    - websocket stream pong and pongbr
 
+
+    - clean log
+    - clean files
     -faire des tests

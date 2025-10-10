@@ -303,7 +303,7 @@ export class Pong {
 			)
 		);
 		this.ecs.addSystem(new MovementSystem());
-		this.visualEffectSystem = new VisualEffectSystem(this.scene);
+		this.visualEffectSystem = new VisualEffectSystem(this.scene, this.baseMeshes.ball);
 		this.ecs.addSystem(this.visualEffectSystem);
 		// this.uiSystem = new UISystem(this);
 		// this.scoreUI = this.uiSystem.scoreUI;
