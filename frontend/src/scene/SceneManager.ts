@@ -159,6 +159,7 @@ class SceneManager {
 			height: fogMaxResolution * fogRatio * this.resolutionRatio
 		});
 		this.uboManager?.resize();
+		this.css3dRenderer.resize();
 	}
 
 	public load(key: string) {
