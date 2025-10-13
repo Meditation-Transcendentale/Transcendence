@@ -91,13 +91,25 @@ export default async function statsRoutes(app) {
 		}
 		const playerId = userResult.data.id;
 
+		console.log("Fetching history for playerId:", playerId);
 		const response = await nats.request(`stats.getPlayerHistory`, jc.encode(playerId), { timeout: 1000 });
 
 		const result = jc.decode(response.data);
 		if (!result.success) {
 			throw { status: result.status, code: result.code, message: result.message };
 		}
-		const playerHistory = result.data;	
+		const playerHistory = result.data;
+
+		for (const match of playerHistory) {
+			if (match.game_mode === 'classic') {
+				const opponentResponse = await nats.request(`stats.getOpponentUsername`, jc.encode({ matchId: match.match_id, playerId }), { timeout: 1000 });
+				const opponentResult = jc.decode(opponentResponse.data);
+				if (!opponentResult.success) {
+					throw { status: opponentResult.status, code: opponentResult.code, message: opponentResult.message };
+				}
+				match.opponent_username = opponentResult.data.username;
+			}
+		}
 
 		res.header('Cache-Control', 'no-store');
 		res.code(statusCode.SUCCESS).send({ playerHistory });

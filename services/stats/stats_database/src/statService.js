@@ -5,26 +5,40 @@ const database = new Database(process.env.DATABASE_URL, {fileMustExist: true });
 database.pragma("journal_mode=WAL");
 
 const getPlayerStatsClassicModeStmt = database.prepare(`
-	SELECT is_winner, goals_scored, goals_conceded, created_at
-	FROM match
-	JOIN match_stats ON match.match_id = match_stats.match_id
-	WHERE match_stats.user_id = ? AND match.game_mode = 'classic'
-	ORDER BY created_at
+	SELECT ms.is_winner, ms.goals_scored, ms.goals_conceded, m.created_at
+	FROM match m
+	JOIN match_stats ms ON m.match_id = ms.match_id
+	WHERE ms.user_id = ? AND m.game_mode = 'classic'
+	ORDER BY m.created_at
 `);
 const getPlayerStatsBRModeStmt = database.prepare(`
-	SELECT is_winner, placement, created_at
-	FROM match
-	JOIN match_stats ON match.match_id = match_stats.match_id
-	WHERE match_stats.user_id = ? AND match.game_mode = ?
-	ORDER BY created_at
+	SELECT ms.is_winner, ms.placement, m.created_at
+	FROM match m
+	JOIN match_stats ms ON m.match_id = ms.match_id
+	WHERE ms.user_id = ? AND m.game_mode = ?
+	ORDER BY m.created_at
 `);
 const getPlayerHistoryStmt = database.prepare(`
-	SELECT match.game_mode, match_stats.is_winner, match_stats.goals_scored, match_stats.goals_conceded, match_stats.placement, match.created_at
-	FROM match
-	JOIN match_stats ON match.match_id = match_stats.match_id
-	WHERE match_stats.user_id = ?
-	ORDER BY match.created_at DESC
+  	SELECT
+		m.match_id,
+		m.game_mode,
+		ms.is_winner,
+		ms.goals_scored,
+		ms.goals_conceded,
+		ms.placement,
+		m.created_at
+	FROM match m
+	JOIN match_stats ms ON m.match_id = ms.match_id
+	WHERE ms.user_id = ?
+	ORDER BY m.created_at DESC
 	LIMIT 10
+`);
+const getOpponentUsernameStmt = database.prepare(`
+	SELECT u.username
+	FROM users u
+	JOIN match_stats ms ON u.id = ms.user_id
+	JOIN match m ON ms.match_id = m.match_id
+	WHERE ms.match_id = ? AND ms.user_id != ? AND m.game_mode = 'classic'
 `);
 const getBrickBreakerStatsStmt = database.prepare(`
 	SELECT easy_mode_hscore, normal_mode_hscore, hard_mode_hscore
@@ -76,6 +90,10 @@ const statService = {
 	getPlayerHistory: (playerId) => {
 		const history = getPlayerHistoryStmt.all(playerId);
 		return history;
+	},
+	getOpponentUsername: (matchId, playerId) => {
+		const opponent = getOpponentUsernameStmt.get(matchId, playerId);
+		return opponent
 	},
 	isUserIdExisting: (playerId) => {
 		const player = isUserIdExistingStmt.get(playerId);
