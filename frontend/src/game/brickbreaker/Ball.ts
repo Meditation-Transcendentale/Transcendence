@@ -30,12 +30,12 @@ export class Ball {
 
 		this.matTouched = new StandardMaterial("touchedMat", this.scene);
 		this.matTouched.diffuseColor.set(0, 0, 1);
-		this.matTouched.emissiveColor.set(0, 0, 1);
+		// this.matTouched.emissiveColor.set(0, 0, 1);
 		// this.matTouched.disableLighting = true;
 		this.matUntouched = new StandardMaterial("untouchedMat", this.scene);
 		this.matUntouched.diffuseColor.set(1, 0, 0);
 		// this.matTouched.maxSimultaneousLights = 16;
-		this.matUntouched.emissiveColor.set(1, 0, 0);
+		// this.matUntouched.emissiveColor.set(1, 0, 0);
 		// this.matUntouched.disableLighting = true;
 	}
 
