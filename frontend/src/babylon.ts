@@ -78,5 +78,6 @@ export { Curve3 } from "@babylonjs/core/Maths/math.path";
 export { RawTexture3D } from "@babylonjs/core/Materials/Textures/rawTexture3D";
 export { Animation } from "@babylonjs/core/Animations/animation";
 export { MorphTarget } from "@babylonjs/core/Morph/morphTarget";
+export { Constants } from "@babylonjs/core/Engines/constants";
 import "@babylonjs/core/Culling/ray";
 

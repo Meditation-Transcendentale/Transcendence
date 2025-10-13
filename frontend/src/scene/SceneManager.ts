@@ -104,8 +104,8 @@ class SceneManager {
 
 
 	public async loadMandatory() {
-		await this.assets.loadMandatory()
 
+		await this.assets.loadMandatory()
 		this.cameraManager = new CameraManager(this.assets);
 		this.css3dRenderer = new Css3dRenderer(this.assets);
 		this.uboManager = new UBOManager(this.assets);

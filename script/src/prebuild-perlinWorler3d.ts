@@ -2,6 +2,10 @@
  *	Translated from https://www.shadertoy.com/view/3dVXDc by piyushslayer
  * */
 
+
+const fs = require('fs');
+const path = require('path');
+
 const UI0 = 1597334673;
 const UI1 = 3812015801;
 const UIA = 2798796415;
@@ -233,7 +237,7 @@ function perlinWorley(uvw: Float32Array, freq: number, octave: number) {
 }
 
 
-export function perlinWorley3D(size: number, freq: number = 4., octave: number = 7.): Float32Array {
+function perlinWorley3D(size: number, freq: number = 4., octave: number = 7.): Float32Array {
 	const final = new Float32Array(size * size * size);
 
 	const tfvec3 = new Float32Array(3);
@@ -249,3 +253,31 @@ export function perlinWorley3D(size: number, freq: number = 4., octave: number =
 	}
 	return final;
 }
+async function saveAsTypeScript(noise, outputPath) {
+	const dir = path.dirname(outputPath);
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir, { recursive: true });
+	}
+
+	// const noiseData = "[" + noise.map(p =>
+	// 	`[${p.x.toFixed(4)},${p.y.toFixed(4)},${p.z.toFixed(4)}]`
+	// ).join(',');
+	let noiseData = "[";
+	noise.array.forEach(element => {
+		noiseData += `${element},`;
+	});
+	noiseData += "]";
+
+	const tsContent = `export const noise = ${noiseData};`;
+
+	fs.writeFileSync(outputPath, tsContent);
+	console.log(`Saved TS: ${outputPath}`);
+}
+
+async function main() {
+	const noise = perlinWorley3D(64);
+
+	await saveAsTypeScript(noise, `../frontend/src/3d/temple-perlinWorley3d.ts`)
+}
+
+main().catch((err) => console.log(err));

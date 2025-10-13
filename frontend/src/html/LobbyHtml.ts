@@ -90,7 +90,7 @@ export class LobbyHtml implements IHtml {
 			html: this.readyWindow,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(-Math.PI * 0.3).multiply(Matrix.Translation(5, 3.9, 1)),
+			world: Matrix.RotationX(-Math.PI * 0.2).multiply(Matrix.RotationY(-Math.PI * 0.3)).multiply(Matrix.Translation(5, 3.9, 1)),
 			enable: false
 		});
 

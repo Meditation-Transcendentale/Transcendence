@@ -1,5 +1,4 @@
-import { Effect, Material, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, Texture, TransformNode, Vector3 } from "../../../babylon";
-import { Constants, RenderTargetTexture } from "@babylonjs/core";
+import { Effect, Material, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, Texture, TransformNode, Vector3, RenderTargetTexture, Constants } from "../../../babylon";
 
 Effect.ShadersStore["blackholeVertexShader"] = `
     precision highp float;

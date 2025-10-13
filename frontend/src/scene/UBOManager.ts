@@ -15,7 +15,7 @@ export class UBOManager {
 		this.assets.fogUBO.updateMatrix("iprojection", this.assets.camera.getProjectionMatrix().invertToRef(this.tempMatrix));
 
 
-		const noiseOffsetDefault = 0.5;
+		const noiseOffsetDefault = 1.5;
 		// const stepSizeDefault = 0.5;
 		// const maxDistanceDefault = 100.;
 		const stepSizeDefault = 1.5;

@@ -253,6 +253,7 @@ export class Assets {
 
 		this.fogDepthTexture.renderList = [];
 		this.fogDepthTexture.clearColor = new Color4(1., 0., 0., 1.);
+		const t = performance.now() * 0.001;
 		this.fogDensityTexture = new RawTexture3D(
 			perlinWorley3D(64),
 			64, 64, 64,
@@ -263,6 +264,7 @@ export class Assets {
 			Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
 			Engine.TEXTURETYPE_FLOAT
 		);
+		console.log("asset time", performance.now() * 0.001 - t);
 
 		this.fogRenderTexture = new RenderTargetTexture("fog", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * sceneManager.resolutionRatio }, this.scene, {
 			format: Engine.TEXTUREFORMAT_RGBA,

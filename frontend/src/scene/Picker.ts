@@ -32,6 +32,11 @@ export class Picker {
 		this.gpuPicker.setPickingList([this.assets.monolithMesh]);
 
 		this.cursor = new Vector2();
+		window.addEventListener("pointerdown", (ev) => { this.clickEvent(ev) });
+		window.addEventListener("pointermove", (ev) => { this.moveEvent(ev) });
+		window.addEventListener("pointerout", (ev) => { this.outEvent(ev) });
+		window.addEventListener("pointerup", (ev) => { this.upEvent(ev) })
+
 	}
 
 	public update(time: number) {
@@ -53,24 +58,27 @@ export class Picker {
 			}
 		});
 		this.moved = false;
+
 	}
 
 	public set enable(value: boolean) {
-		if (!this._enabled && value) {
-			window.addEventListener("pointerdown", (ev) => this.clickEvent(ev));
-			window.addEventListener("pointermove", (ev) => this.moveEvent(ev));
-			window.addEventListener("pointerout", (ev) => this.outEvent(ev));
-			window.addEventListener("pointerup", (ev) => this.upEvent(ev))
-		} else if (this._enabled && !value) {
-			window.removeEventListener("pointerdown", (ev) => this.clickEvent(ev));
-			window.removeEventListener("pointermove", (ev) => this.moveEvent(ev));
-			window.removeEventListener("pointerout", (ev) => this.outEvent(ev));
-			window.removeEventListener("pointerup", (ev) => this.upEvent(ev))
-		}
+		// if (!this._enabled && value) {
+		// 	window.addEventListener("pointerdown", (ev) => this.clickEvent(ev));
+		// 	window.addEventListener("pointermove", (ev) => this.moveEvent(ev));
+		// 	window.addEventListener("pointerout", (ev) => this.outEvent(ev));
+		// 	window.addEventListener("pointerup", (ev) => this.upEvent(ev))
+		// } else if (this._enabled && !value) {
+		// 	window.removeEventListener("pointerdown", (ev) => this.clickEvent(ev));
+		// 	window.removeEventListener("pointermove", (ev) => this.moveEvent(ev));
+		// 	window.removeEventListener("pointerout", (ev) => this.outEvent(ev));
+		// 	window.removeEventListener("pointerup", (ev) => this.upEvent(ev))
+		// }
 		this._enabled = value;
 	}
 
 	private clickEvent(ev: MouseEvent) {
+		if (!this._enabled)
+			return;
 		if (this.ballIsHit(ev.clientX, ev.clientY)) {
 			this.ballPicker.x = ev.clientX;
 			this.ballPicker.y = ev.clientY;
@@ -82,6 +90,8 @@ export class Picker {
 	}
 
 	private moveEvent(ev: MouseEvent) {
+		if (!this._enabled)
+			return;
 		if (this.ballPicker.z > 0) {
 			this.ballPicker.x = ev.clientX;
 			this.ballPicker.y = ev.clientY;
@@ -92,11 +102,15 @@ export class Picker {
 	}
 
 	private outEvent(ev: MouseEvent) {
+		if (!this._enabled)
+			return;
 		this.ballPicker.z = 0;
 		this.assets.camera.attachControl();
 	}
 
 	private upEvent(ev: MouseEvent) {
+		if (!this._enabled)
+			return;
 		console.log("UP");
 		this.ballPicker.z = 0;
 		this.assets.camera.attachControl();
