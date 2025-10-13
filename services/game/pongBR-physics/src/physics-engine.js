@@ -174,8 +174,8 @@ export class PhysicsEngine {
 	spawnSingleBall() {
 		const cfg = this.cfg;
 		const pd = this.pd;
-		const playerCount = this.gameState.playerStates.activePlayers.size;
-		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(playerCount);
+		const phaseConfig = getPhaseConfig(this.gameState.currentPhase);
+		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(phaseConfig.playerCount);
 
 		const ballEnt = pd.create(ENTITY_MASKS.BALL);
 		this.entities.balls.push(ballEnt);
@@ -208,8 +208,8 @@ export class PhysicsEngine {
 	createBalls(numBalls) {
 		const cfg = this.cfg;
 		const pd = this.pd;
-		const playerCount = this.gameState.playerStates.activePlayers.size;
-		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(playerCount);
+		const phaseConfig = getPhaseConfig(this.gameState.currentPhase);
+		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(phaseConfig.playerCount);
 
 		for (let b = 0; b < numBalls; b++) {
 			const ballEnt = pd.create(ENTITY_MASKS.BALL);
@@ -456,8 +456,8 @@ export class PhysicsEngine {
 	updateExistingBallRadii() {
 		const pd = this.pd;
 		const cfg = this.cfg;
-		const playerCount = this.gameState.playerStates.activePlayers.size;
-		const newBallRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(playerCount);
+		const phaseConfig = getPhaseConfig(this.gameState.currentPhase);
+		const newBallRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(phaseConfig.playerCount);
 
 		for (const ballEnt of this.entities.balls) {
 			if (ballEnt !== undefined && pd.isActive(ballEnt)) {

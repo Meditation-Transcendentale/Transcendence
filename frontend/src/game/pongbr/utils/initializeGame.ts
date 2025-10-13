@@ -1,6 +1,7 @@
 import { Color3, Effect, Mesh, MeshBuilder, PBRMaterial, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "../../../babylon";
 import { PaddleMaterial } from './PaddleMaterial';
 import { WallMaterial } from "./WallMaterial";
+import { BallMaterial } from "./BallMaterial";
 
 Effect.ShadersRepository = "";
 
@@ -44,20 +45,19 @@ export function createWallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	mat.setUniform("fillFraction", 1.);
 	mat.setUniform("paddleId", -1.);
 	wall.material = mat;
-	mat.diffuseColor = Color3.Purple();
+	mat.diffuseColor = new Color3(0.2, 0.08, 0.08);
 	wall.isVisible = true;
 	mat.forceDepthWrite = true;
 	return wall;
 }
 
 export function createBallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
+	const light = scene.getLightByName("whitelight2");
 	const ballMesh = MeshBuilder.CreateSphere("ballBase", { diameter: 0.5 }, scene);
 	ballMesh.parent = pongRoot;
-	const ballMaterial = new StandardMaterial("ballMaterial", scene);
-	ballMaterial.diffuseColor.set(1, 0, 0);
-	ballMaterial.emissiveColor.set(0.3, 0.3, 0.3);
-	ballMaterial.specularColor.set(0.5, 0.5, 0.5);
-	ballMaterial.freeze();
+	const ballMaterial = new BallMaterial("ballMaterial", scene);
+	light?.includedOnlyMeshes.push(ballMesh);
+
 	ballMesh.setEnabled(true);
 	ballMesh.setPivotPoint(Vector3.Zero());
 	ballMesh.position.y = 0.0;
@@ -89,7 +89,7 @@ export function createPaddleMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	mat.setUniform("fillFraction", 0.25);
 	mat.setUniform("paddleId", -1.);
 	paddle.material = mat;
-	mat.diffuseColor = Color3.Red();
+	mat.diffuseColor = new Color3(0.6, 0.3, 0.8);
 	paddle.isVisible = true;
 	mat.forceDepthWrite = true;
 	return paddle;
@@ -106,7 +106,8 @@ export function createPillarMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	m.parent = pongRoot;
 	m.isVisible = true;
 	const mat = new StandardMaterial("pillarMat", scene);
-	mat.diffuseColor = Color3.Blue();
+	mat.diffuseColor = new Color3(0.15, 0.1, 0.1);
+	mat.emissiveColor = new Color3(0.08, 0.03, 0.03);
 	mat.freeze();
 	m.material = mat;
 	return m;

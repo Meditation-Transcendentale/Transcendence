@@ -54,14 +54,14 @@ vPaddleId = float(gl_InstanceID);
 		`);
 
 		this.Fragment_MainEnd(`
-							   float isLocalPaddle = step(abs(vPaddleId - paddleId), 0.5);
-
-							   vec3 normalColor = vec3(1.0, 0.0, 0.0); 
-							   vec3 localColor = vec3(0.0, 1.0, 0.0);  
-
-							     vec3 finalColor = mix(normalColor, localColor, isLocalPaddle);
-
-							     gl_FragColor = vec4(finalColor, 1.0);
+							   // float isLocalPaddle = step(abs(vPaddleId - paddleId), 0.5);
+							   //
+							   // vec3 normalColor = vec3(1.0, 0.0, 0.0); 
+							   // vec3 localColor = vec3(0.0, 1.0, 0.0);  
+							   //
+							   //   vec3 finalColor = mix(normalColor, localColor, isLocalPaddle);
+							   //
+							   //   gl_FragColor = vec4(finalColor, 1.0);
 		`)
 
 

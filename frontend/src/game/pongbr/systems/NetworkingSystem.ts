@@ -105,6 +105,11 @@ export class NetworkingSystem extends System {
 					const ball = e.getComponent(BallComponent);
 					if (!transform || !ball) return;
 
+					if (this.game.isInTransition()) {
+						transform.disable();
+						return;
+					}
+
 					if (b.disabled) {
 						transform.disable();
 					} else {

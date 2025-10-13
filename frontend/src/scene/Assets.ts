@@ -236,7 +236,7 @@ export class Assets {
 
 		this.whiteLight2 = new SpotLight("whitelight2", new Vector3(0, 400, 0), new Vector3(0, -1, 0), Math.PI, 2, this.scene);
 		this.whiteLight2.excludedMeshes.push(this.statusMesh);
-		this.whiteLight2.intensity = 1;
+		this.whiteLight2.intensity = 0.5;
 		this.whiteLight2.includedOnlyMeshes.push(this.brArenaMesh);
 	}
 
