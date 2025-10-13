@@ -74,10 +74,34 @@ export default async function statsRoutes(app) {
 
 		res.code(statusCode.SUCCESS).send({
 			playerStats: {
-				['stats']: calculateStats(playerStats, mode),
-				[`history`]: playerStats
+				['stats']: calculateStats(playerStats, mode)
+				// [`history`]: playerStats
 			}
 		});
+	}));
+
+	app.post('/get/history', handleErrors(async (req, res) => {
+
+		const { uuid } = req.body;
+
+		const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid }), { timeout: 1000 });
+		const userResult = jc.decode(user.data);
+		if (!userResult.success) {
+			throw { status: userResult.status, code: userResult.code, message: userResult.message };
+		}
+		const playerId = userResult.data.id;
+
+		const response = await nats.request(`stats.getPlayerHistory`, jc.encode(playerId), { timeout: 1000 });
+
+		const result = jc.decode(response.data);
+		if (!result.success) {
+			throw { status: result.status, code: result.code, message: result.message };
+		}
+		const playerHistory = result.data;	
+
+		res.header('Cache-Control', 'no-store');
+		res.code(statusCode.SUCCESS).send({ playerHistory });
+
 	}));
 
 	app.get('/get/brickbreaker', handleErrors(async (req, res) => {
@@ -128,7 +152,6 @@ export default async function statsRoutes(app) {
 			default:
 				throw { status: 400, code: 40031, message: 'No score provided' };
 		}
- 
 		res.code(statusCode.SUCCESS).send({ message: 'Stats updated' });
 
 	}));
@@ -141,6 +164,7 @@ export default async function statsRoutes(app) {
 			throw { status: leaderboards.status, code: leaderboards.code, message: leaderboards.message };
 		}
 
+		res.header('Cache-Control', 'no-store');
 		res.code(statusCode.SUCCESS).send({ leaderboards: leaderboards.data });
 	}));
 

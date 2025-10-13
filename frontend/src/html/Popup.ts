@@ -43,7 +43,16 @@ export class Popup {
 		this.dialog = document.createElement("dialog");
 		this.form = document.createElement("form");
 		this.form.method = "dialog";
+		this.form.autocomplete = "off";
 		this.dialog.appendChild(this.form);
+
+
+		const h = document.createElement("input");
+		h.type = "text";
+		h.name = "hidden";
+		h.style.display = "none";
+		h.autocomplete = "nope";
+		this.form.appendChild(h);
 
 		if (option.title) {
 			const head = document.createElement("header");
@@ -105,7 +114,7 @@ export class Popup {
 		// const form = document.createElement("form");
 		if (option.input) {
 			const input = document.createElement("input");
-			input.autocomplete = "off";
+			input.autocomplete = "new-password";
 			input.required = true;
 			input.name = "input";
 			switch (option.input) {
@@ -159,7 +168,7 @@ export class Popup {
 			const data = new FormData(this.form);
 			const i = data.get("input") as string;
 			const p = data.get("password") as string;
-			const t = data.get("password") as string;
+			const t = data.get("token") as string;
 			option.submit(p, t, i);
 		})
 	}
@@ -172,7 +181,8 @@ export class Popup {
 	}
 
 	public show() {
-		if (this.option.type = PopupType.validation) {
+		User.check()
+		if (this.option.type == PopupType.validation) {
 			this.token.hidden = User.twofa == 0;
 			this.token.required = User.twofa != 0;
 		}

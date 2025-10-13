@@ -24,8 +24,8 @@ export class Css3dRenderer {
 
 	constructor(assets: Assets) {
 		this.camera = assets.camera;
-		this.width = sceneManager.resolution.width;
-		this.height = sceneManager.resolution.height;
+		this.width = window.innerWidth;
+		this.height = window.innerHeight;
 
 		this.objects = new Map<string, ICss3dObject>();
 
@@ -34,6 +34,8 @@ export class Css3dRenderer {
 		this.cameraDiv.style.height = `${this.height}px`;
 		this.cameraDiv.style.backfaceVisibility = 'hidden';
 		this.cameraDiv.style.transform = 'translateZ(0)';
+
+		this.resize()
 
 		this.cameraDiv.style.willChange = 'transform';
 
@@ -73,7 +75,7 @@ export class Css3dRenderer {
 		const scaleX = 0.01 / obj.height;
 		const scaleY = 0.01 / obj.width;
 
-		obj.html.style.transform = `translate(-50%, -50%) matrix3d(${m[0] * scaleX}, ${m[1]}, ${m[2] * scaleX}, ${m[3]}, ${-m[4]}, ${-m[5] * scaleY}, ${-m[6]}, ${-m[7]}, ${m[8]}, ${m[9]}, ${m[10]}, ${m[11]}, ${-world[12] + m[12]}, ${-world[13] + m[13]}, ${world[14] - m[14]}, ${world[15] * 0.00001})`;
+		obj.html.style.transform = `translate(-50%, -50%) matrix3d(${m[0] * scaleX}, ${m[1] * scaleX}, ${m[2] * scaleX}, ${m[3]}, ${-m[4] * scaleY}, ${-m[5] * scaleY}, ${-m[6] * scaleY}, ${-m[7]}, ${m[8]}, ${m[9]}, ${m[10]}, ${m[11]}, ${-world[12] + m[12]}, ${-world[13] + m[13]}, ${world[14] - m[14]}, ${world[15] * 0.00001})`;
 	}
 
 	public setObjectEnable(name: string, value: boolean) {
@@ -96,11 +98,13 @@ export class Css3dRenderer {
 		return obj.enable;
 	}
 
-	public resize(width: number, height: number) {
-		this.width = width;
-		this.height = height;
+	public resize() {
+		this.width = sceneManager.resolution.width;
+		this.height = sceneManager.resolution.height;
 		this.perspective = this.height * 0.5 * this.camera.getProjectionMatrix().m[5];
 		document.body.style.perspective = `${this.perspective}px`;
 		this.dirty = true;
+		this.cameraDiv.style.width = `${this.width}px`;
+		this.cameraDiv.style.height = `${this.height}px`;
 	}
 }

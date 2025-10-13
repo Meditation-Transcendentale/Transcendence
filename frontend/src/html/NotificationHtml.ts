@@ -145,10 +145,11 @@ export class NotificationHtml {
 		if (option.history) {
 			this.history.add(div);
 		}
-		setTimeout(() => { div.remove() }, option.duration);
+		setTimeout(() => { div.remove() }, option.duration + 100);
 	}
 
 	private addText(option: ITextNotification) {
+		console.log("text");
 		const div = this.default.cloneNode(true) as HTMLDivElement;
 		const label = document.createElement("span");
 
@@ -164,7 +165,7 @@ export class NotificationHtml {
 		if (option.history) {
 			this.history.add(div);
 		}
-		setTimeout(() => { div.remove() }, option.duration);
+		setTimeout(() => { div.remove() }, option.duration + 100);
 
 	}
 
@@ -204,7 +205,7 @@ export class NotificationHtml {
 		if (option.history) {
 			this.history.add(div);
 		}
-		setTimeout(() => { div.remove() }, option.duration);
+		setTimeout(() => { div.remove() }, option.duration + 100);
 
 	}
 
@@ -225,7 +226,7 @@ export class NotificationHtml {
 		if (option.history) {
 			this.history.add(div);
 		}
-		setTimeout(() => { div.remove() }, option.duration);
+		setTimeout(() => { div.remove() }, option.duration + 100);
 
 	}
 

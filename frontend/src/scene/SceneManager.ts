@@ -148,8 +148,8 @@ class SceneManager {
 
 	public resize() {
 		this.engine.resize(true);
-		const fogMaxResolution = stateManager.get("fogMaxResolution") as number;
-		const fogRatio = stateManager.get("fogRatio") as number;
+		const fogMaxResolution = Math.min(1080, this.resolution.width);
+		const fogRatio = stateManager.get("fogRatio");
 		this.assets.fogRenderTexture.resize({
 			width: fogMaxResolution * fogRatio,
 			height: fogMaxResolution * fogRatio * this.resolutionRatio
@@ -159,6 +159,7 @@ class SceneManager {
 			height: fogMaxResolution * fogRatio * this.resolutionRatio
 		});
 		this.uboManager?.resize();
+		this.css3dRenderer.resize();
 	}
 
 	public load(key: string) {
@@ -205,6 +206,7 @@ class SceneManager {
 				this.ballGrass.updateType = "none";
 				this.fog.enable = false;
 				this.assets.monolithRoot.setEnabled(false);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
@@ -226,6 +228,7 @@ class SceneManager {
 				this.fog.enable = false;
 				this.cameraManager.fogEnabled = false;
 				this.assets.monolithRoot.setEnabled(false);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.assets.brRoot.setEnabled(false);
 				break;
@@ -242,6 +245,7 @@ class SceneManager {
 				this.assets.monolithMesh.setEnabled(true);
 				this.assets.monolithRoot.setEnabled(true);
 				this.beforeRender.delete(this.assets.monolithMovement);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				// this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
@@ -258,6 +262,7 @@ class SceneManager {
 				this.fog.enable = false;
 				this.assets.monolithRoot.setEnabled(false);
 				this.beforeRender.delete(this.assets.monolithMovement);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
 				break;
@@ -273,6 +278,7 @@ class SceneManager {
 				this.fog.enable = false;
 				this.assets.monolithRoot.setEnabled(false);
 				this.beforeRender.delete(this.assets.monolithMovement);
+				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(true);
 				break;
@@ -307,7 +313,8 @@ class SceneManager {
 		const scaleY = this.canvas.height / 1080;
 		const scale = Math.max(scaleX, scaleY, 1);
 
-		this.engine.setHardwareScalingLevel(scale);
+		if (scale > 1)
+			this.engine.setHardwareScalingLevel(scale);
 	}
 }
 

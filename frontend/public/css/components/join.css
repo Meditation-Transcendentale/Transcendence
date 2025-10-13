@@ -1,0 +1,238 @@
+/* <div class="window join-lobby-window"> */
+/* 		<header class="window__title join-lobby__title">List of Lobby</header> */
+/* 		<div class="join-lobby__container"> */
+/* 			<div class="join-lobby__lobby"> */
+/* 				<span class="join-lobby__id">ewfewfewfewf</span> */
+/* 				<span class="join-lobby__mode">pong</span> */
+/* 				<span class="join-lobby__count">1/10</span> */
+/* 			</div> */
+/* 		</div> */
+/* 	</div> */
+
+/* ====================================
+   JOIN - join-lobby components
+   ==================================== */
+.join-lobby__title {
+	text-align: right;
+	color: white;
+	font-size: var(--font-size-small);
+}
+
+.join-lobby__container {
+	flex: 10;
+	overflow: scroll !important;
+	pointer-events: all !important;
+	border: var(--spacing-sm) white solid;
+	padding: var(--spacing-sm);
+	margin: var(--spacing-md);
+	background-color: lightgrey;
+	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	border-left-style: none;
+	border-right-style: none;
+}
+
+.join-lobby__content {
+	display: flex;
+	flex: auto;
+	height: fit-content;
+	font-size: var(--font-size-tiny);
+	/* border: var(--spacing-sm) white solid; */
+	margin: var(--spacing-md);
+	background-color: rgba(255, 255, 255, 0.3);
+	color: white;
+}
+
+.join-lobby__content:hover {
+	background-color: rgba(255, 255, 255, 0.7);
+	color: black;
+}
+
+.join-lobby__content:active {
+	background-color: rgba(255, 255, 255, 0.3);
+	color: white;
+
+}
+
+.join-lobby__id {
+	flex: 3;
+	overflow: hidden;
+	text-overflow: "...";
+}
+
+.join-lobby__mode {
+	flex: 1;
+	text-align: center;
+}
+
+.join-lobby__count {
+	flex: 1;
+	text-align: center;
+}
+
+
+/* <div class="window join-info-window"> */
+/* 		<header class="window__title join-info__title">Lobby info</header> */
+/* 		<div class="join-info__container"> */
+/* 			<div class="join-info--left"> */
+/* 				<span class="join-info-mode"></span> */
+/* 				<span class="join-info-map"></span> */
+/* 			</div> */
+/* 			<div class="join-info--right"> */
+/* 				<div class="join-info__players"></div> */
+/* 			</div> */
+/* 			<button clas="join-info__button">JOIN LOBBY</button> */
+/* 		</div> */
+/* 	</div> */
+
+/* ====================================
+   JOIN - join-lobby components
+   ==================================== */
+.join-info__title {
+	text-align: right;
+	color: white;
+	font-size: var(--font-size-small);
+}
+
+.join-info__container {
+	flex: 10;
+	display: grid;
+	overflow: scroll !important;
+	pointer-events: all !important;
+	border: var(--spacing-sm) white solid;
+	padding: var(--spacing-sm);
+	margin: var(--spacing-md);
+	background-color: lightgrey;
+	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	border-left-style: none;
+	border-right-style: none;
+	color: white;
+}
+
+.join-info__id {
+	grid-column: 1 / 5;
+	grid-row: 1 / 2;
+	margin: var(--spacing-sm);
+	padding: var(--spacing-sm);
+	background-color: rgba(255, 255, 255, 0.1);
+	text-align: center;
+	font-size: var(--font-size-tiny);
+	height: fit-content;
+
+}
+
+.join-info--left {
+	grid-column: 0 / 2;
+	grid-row: 2 / 3;
+	display: block;
+	font-size: var(--font-size-verysmall);
+	/* background-color: red; */
+	border: var(--spacing-xs) white solid;
+	margin: var(--spacing-sm);
+	padding: var(--spacing-sm);
+	margin-top: var(--spacing-lg);
+	margin-top: var(--spacing-md);
+	background-color: rgba(255, 255, 255, 0.3);
+
+
+}
+
+.join-info--left>span {
+	display: block;
+	width: 100%;
+}
+
+.join-info--right {
+	grid-column: 2 / 5;
+	grid-row: 2 / 3;
+	display: block;
+	min-height: 10vh;
+	font-size: var(--font-size-verysmall);
+	border: var(--spacing-xs) white solid;
+	margin: var(--spacing-sm);
+	padding: var(--spacing-sm);
+	margin-top: var(--spacing-lg);
+	margin-top: var(--spacing-md);
+	background-color: rgba(255, 255, 255, 0.3);
+	overflow-y: scroll;
+	overflow-x: hidden;
+
+
+}
+
+.join-info__button {
+	grid-column: 1 / 5;
+	grid-row: 3/ 4;
+	font-size: var(--font-size-small);
+	margin-bottom: var(--spacing-md);
+	margin: var(--spacing-md);
+	/* align-self: center; */
+	background-color: white;
+	color: black;
+	border: none;
+}
+
+.join-info__button:hover {
+	background-color: black;
+	color: white;
+}
+
+.join-info__button:active {
+	background-color: white;
+	color: black;
+}
+
+.join-info__button:disabled {
+	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	color: rgba(255, 255, 255, 0.2);
+	pointer-events: none;
+}
+
+
+.join-info__players {
+	overflow: hidden;
+}
+
+.join-info__players>span {
+	display: block;
+	width: 100%;
+	text-align: center;
+	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	margin: var(--spacing-sm);
+}
+
+/* ====================================
+   JOIN - join-input components
+   ==================================== */
+.join-input__title {
+	text-align: right;
+	color: white;
+	font-size: var(--font-size-small);
+}
+
+.join-input__container {
+	flex: 10;
+	display: block;
+	pointer-events: all !important;
+	border: var(--spacing-sm) white solid;
+	padding: var(--spacing-sm);
+	margin: var(--spacing-md);
+	background-color: lightgrey;
+	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	border-left-style: none;
+	border-right-style: none;
+	color: white;
+	overflow: hidden;
+	height: fit-content;
+}
+
+.join-input__input {
+	all: unset;
+	display: block;
+	height: fit-content;
+	background-color: rgba(255, 255, 255, 0.2);
+	color: black;
+	font-size: var(--font-size-small);
+	overflow: hidden;
+	text-align: center;
+
+}

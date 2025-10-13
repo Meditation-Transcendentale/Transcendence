@@ -18,6 +18,14 @@ const getPlayerStatsBRModeStmt = database.prepare(`
 	WHERE match_stats.user_id = ? AND match.game_mode = ?
 	ORDER BY created_at
 `);
+const getPlayerHistoryStmt = database.prepare(`
+	SELECT match.game_mode, match_stats.is_winner, match_stats.goals_scored, match_stats.goals_conceded, match_stats.placement, match.created_at
+	FROM match
+	JOIN match_stats ON match.match_id = match_stats.match_id
+	WHERE match_stats.user_id = ?
+	ORDER BY match.created_at DESC
+	LIMIT 10
+`);
 const getBrickBreakerStatsStmt = database.prepare(`
 	SELECT easy_mode_hscore, normal_mode_hscore, hard_mode_hscore
 	FROM brickbreaker_stats
@@ -64,6 +72,10 @@ const statService = {
 	getPlayerStatsBRMode: (playerId) => {
 		const playerStatsBR = getPlayerStatsBRModeStmt.all(playerId, 'br');
 		return playerStatsBR;
+	},
+	getPlayerHistory: (playerId) => {
+		const history = getPlayerHistoryStmt.all(playerId);
+		return history;
 	},
 	isUserIdExisting: (playerId) => {
 		const player = isUserIdExistingStmt.get(playerId);

@@ -1,4 +1,4 @@
-import { Vector3, ParticleSystem, Texture, Scene, Color4 } from "../../../babylon";
+import { Vector3, ParticleSystem, Texture, Scene, Color4, TransformNode, Mesh } from "../../../babylon";
 import { System } from "../ecs/System.js";
 import { Entity } from "../ecs/Entity.js";
 import { BallComponent } from "../components/BallComponent.js";
@@ -9,10 +9,12 @@ export class VisualEffectSystem extends System {
 	private particlePool: ParticleSystem[] = [];
 	private maxParticle: number = 5;
 	private texture: Texture;
+	private ballMesh: Mesh;
 
-	constructor(scene: Scene) {
+	constructor(scene: Scene, ballMesh: Mesh) {
 		super();
 		this.scene = scene;
+		this.ballMesh = ballMesh;
 		this.texture = new Texture("textures/Shard_Alpha.png", this.scene);
 		for (let i = 0; i < this.maxParticle; i++) {
 			this.particlePool.push(this.createParticleSystem());
@@ -34,7 +36,8 @@ export class VisualEffectSystem extends System {
 
 			if ((transform.position.x >= 14 || transform.position.x <= -14) /*&& ball.destroy === false*/) {
 				const direction = ball.velocity.clone();
-				const position = transform.position.clone().add(ball.velocity.scale(4 * deltaTime / 1000));
+				const ballpos = this.ballMesh.getAbsolutePosition();
+				const position = (ballpos.clone().add(ball.velocity.scale(4 * deltaTime / 1000)));
 				position.y = 0.5;
 
 				this.emitParticles(position, direction);
