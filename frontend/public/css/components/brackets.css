@@ -7,8 +7,13 @@
   padding: 32px;
   min-height: 100vh;
   overflow: auto;
-  background: transparent;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--color-space-deepest),
+    var(--color-space-deep)
+  );
 }
+
 
 .bracket-left,
 .bracket-center,
@@ -70,15 +75,21 @@
 
 .bracket-center .game.final .match-info {
   position: relative;
-  border: 2px solid #6366f1;
-  background: linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
-  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.28);
+  border: 2px solid var(--color-purple-bright);
+  background: linear-gradient(
+    180deg,
+    var(--color-space-deep) 0%,
+    var(--color-purple-medium) 100%
+  );
+  z-index: 15;
+  box-shadow: 0 0 30px var(--color-purple-bright);
 }
 .bracket-center .game.final .match-info::after {
   content: "🏆 Final";
   position: absolute;
   top: -14px;
   left: 16px;
+  z-index: 15;
   padding: 2px 8px;
   font-size: 12px;
   line-height: 1.6;

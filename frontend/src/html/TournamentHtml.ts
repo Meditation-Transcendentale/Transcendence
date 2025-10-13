@@ -76,12 +76,69 @@ export class TournamentHtml implements IHtml {
     streamManager.tournament.disconnect();
   }
 
-  public update(payload: TournamentServerUpdate) {
-    this.tree = payload.tournamentRoot ?? null;
-    if (Array.isArray(payload.players)) {
-      for (const p of payload.players) {
+public update(payload: TournamentServerUpdate) {
+  if (payload.tournamentRoot) {
+    this.updateTree(this.tree, payload.tournamentRoot);
+  }
+
+  if (Array.isArray(payload.players)) {
+    for (const p of payload.players) {
+      const existingPlayer = this.players.get(p.uuid);
+      if (existingPlayer) {
+        existingPlayer.ready = p.ready;
+        existingPlayer.connected = p.connected;
+        existingPlayer.eliminated = p.eliminated;
+      } else {
         this.players.set(p.uuid, p);
       }
+    }
+  }
+}
+
+  private updateTree(
+    existingTree: MatchNode | null,
+    newTree: MatchNode | null
+  ) {
+    if (!existingTree && newTree) {
+      this.tree = newTree;
+      return;
+    }
+
+    if (!existingTree || !newTree) return;
+
+    if (existingTree.player1Id !== newTree.player1Id) {
+      existingTree.player1Id = newTree.player1Id;
+    }
+    if (existingTree.player2Id !== newTree.player2Id) {
+      existingTree.player2Id = newTree.player2Id;
+    }
+
+    if (existingTree.score && newTree.score) {
+      existingTree.score = [...newTree.score];
+    }
+
+    if (existingTree.gameId !== newTree.gameId) {
+      existingTree.gameId = newTree.gameId;
+    }
+
+    if (existingTree.winnerId !== newTree.winnerId) {
+      existingTree.winnerId = newTree.winnerId;
+    }
+
+    if (existingTree.forfeitId !== newTree.forfeitId) {
+      existingTree.forfeitId = newTree.forfeitId;
+    }
+
+    if (existingTree.left && newTree.left) {
+      this.updateTree(existingTree.left, newTree.left);
+    } else if (newTree.left) {
+      existingTree.left = newTree.left;
+    }
+
+    if (existingTree.right && newTree.right) {
+      this.updateTree(existingTree.right, newTree.right);
+    } else if (newTree.right) {
+      existingTree.right = newTree.right;
     }
   }
 
@@ -125,7 +182,8 @@ export class TournamentHtml implements IHtml {
 			<div class="bracket-left"></div>
 			<div class="bracket-center"></div>
 			<div class="bracket-right"></div>
-			`;``
+			`;
+    ``;
 
     this.rootEl.append(this.toolbarEl, this.treeEl);
     this.div.appendChild(this.rootEl);
@@ -175,8 +233,7 @@ export class TournamentHtml implements IHtml {
       const badge = this.toolbarEl.querySelector(
         ".ready-countdown"
       ) as HTMLSpanElement | null;
-	  if (badge)
-		badge.textContent = "";
+      if (badge) badge.textContent = "";
       clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
@@ -190,7 +247,8 @@ export class TournamentHtml implements IHtml {
 
   private rowScore(node: MatchNode, pid: string | null): string | null {
     if (!node.winnerId && !node.score) return null;
-    if (node.forfeitId) return pid && node.winnerId === pid ? "Win" : "Disqualified";
+    if (node.forfeitId)
+      return pid && node.winnerId === pid ? "Win" : "Disqualified";
     if (node.score?.length)
       return pid && node.player1Id === pid
         ? node.score[0].toString()
@@ -271,7 +329,10 @@ export class TournamentHtml implements IHtml {
     return b;
   }
 
-  private statusBadge(p: PlayerState | null, side: "root" | "left" | "right"): HTMLElement | null {
+  private statusBadge(
+    p: PlayerState | null,
+    side: "root" | "left" | "right"
+  ): HTMLElement | null {
     if (!p) return null;
     const s = document.createElement("span");
     s.className = "ready-checked";
@@ -288,10 +349,8 @@ export class TournamentHtml implements IHtml {
       s.textContent = side == "left" ? "Waiting ⏳" : "⏳ Waiting";
       return s;
     }
-    if (side == "left")
-      s.textContent = p.ready ? "Ready ✓" : "Ready ❔";
-    else if (side == "right")
-      s.textContent = p.ready ? "✓ Ready" : "❔ Ready";
+    if (side == "left") s.textContent = p.ready ? "Ready ✓" : "Ready ❔";
+    else if (side == "right") s.textContent = p.ready ? "✓ Ready" : "❔ Ready";
     if (!p.ready) s.classList.add("notReady-checked");
     return s;
   }
@@ -305,6 +364,22 @@ export class TournamentHtml implements IHtml {
 
     const card = document.createElement("div");
     card.className = "match-info";
+
+    if (this.isPlaying(node)) {
+      li.classList.add("playing");
+      const bar = document.createElement("div");
+      bar.className = "playing-bar";
+      card.appendChild(bar);
+
+      const live = document.createElement("div");
+      live.className = "live-pill";
+      live.textContent = "LIVE";
+      card.appendChild(live);
+    }
+
+    if (this.isMyCurrentNode(node)) {
+      li.classList.add("my-match");
+    }
 
     const top = this.renderRow(
       node,
@@ -323,8 +398,10 @@ export class TournamentHtml implements IHtml {
       bot.classList.add("winner");
 
     card.append(top, bot);
-    if (node.gameId)
-      card.addEventListener("click", () => streamManager.tournament.spectate(node.gameId));
+    if (node.gameId && !node.winnerId)
+      card.addEventListener("click", () =>
+        streamManager.tournament.spectate(node.gameId)
+      );
     li.appendChild(card);
     return li;
   }
@@ -398,6 +475,24 @@ export class TournamentHtml implements IHtml {
     return ul;
   }
 
+  private computePlayerCount(): number {
+    if (this.players.size > 0) return this.players.size;
+
+    const ids = new Set<string>();
+    const visit = (n: MatchNode | null) => {
+      if (!n) return;
+      if (!n.left && !n.right) {
+        if (n.player1Id) ids.add(n.player1Id);
+        if (n.player2Id) ids.add(n.player2Id);
+      } else {
+        visit(n.left ?? null);
+        visit(n.right ?? null);
+      }
+    };
+    visit(this.tree);
+    return ids.size;
+  }
+
   public render() {
     const leftLane = this.treeEl.querySelector(".bracket-left") as HTMLElement;
     const ctrLane = this.treeEl.querySelector(".bracket-center") as HTMLElement;
@@ -445,5 +540,22 @@ export class TournamentHtml implements IHtml {
       );
       rightLane.appendChild(col);
     }
+    const count = this.computePlayerCount();
+    let bucket = 4;
+    if (count > 4 && count <= 8) bucket = 8;
+    else if (count > 8) bucket = 16;
+
+    this.treeEl.id = `tournament-tree-${bucket}`;
+  }
+
+  private isPlaying(node: MatchNode): boolean {
+    return !!node.gameId && !node.winnerId;
+  }
+
+  private isMyCurrentNode(node: MatchNode): boolean {
+    const uid = User.uuid || null;
+    if (!uid) return false;
+    const amIn = node.player1Id === uid || node.player2Id === uid;
+    return amIn && !node.winnerId;
   }
 }
