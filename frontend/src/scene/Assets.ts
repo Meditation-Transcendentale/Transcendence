@@ -7,6 +7,7 @@ import { ButterflyMaterial } from "./Shader/ButterflyMaterial";
 import { GrassMaterial } from "./Shader/GrassMaterial";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
 import { voxelData as templeMedium } from './temple-medium';
+import { prebuildPerlinWorley3d } from "./prebuild-perlinWorley3d";
 
 const monolithOption = {
 	animationSpeed: 1.0,
@@ -254,8 +255,11 @@ export class Assets {
 		this.fogDepthTexture.renderList = [];
 		this.fogDepthTexture.clearColor = new Color4(1., 0., 0., 1.);
 		const t = performance.now() * 0.001;
+		const n = new Float32Array(64 * 64 * 64);
+		for (let i = 0; i < n.length; i++)
+			n[i] = prebuildPerlinWorley3d[i];
 		this.fogDensityTexture = new RawTexture3D(
-			perlinWorley3D(64),
+			n,
 			64, 64, 64,
 			Engine.TEXTUREFORMAT_R,
 			this.scene,
