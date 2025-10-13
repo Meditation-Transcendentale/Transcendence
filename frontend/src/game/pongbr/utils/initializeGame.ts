@@ -1,5 +1,6 @@
 import { Color3, Effect, Mesh, MeshBuilder, PBRMaterial, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "../../../babylon";
 import { PaddleMaterial } from './PaddleMaterial';
+import { WallMaterial } from "./WallMaterial";
 
 Effect.ShadersRepository = "";
 
@@ -20,16 +21,33 @@ export function initStatue(scene: Scene, pongRoot: TransformNode): Mesh {
 }
 
 export function createWallMesh(scene: Scene, pongRoot: TransformNode): Mesh {
-	const wallMesh = MeshBuilder.CreateBox("wallBase", { width: 1, height: 1, depth: 1 }, scene);
-	wallMesh.parent = pongRoot;
-	const wallMaterial = new StandardMaterial("wallMaterial", scene);
-	wallMaterial.diffuseColor.set(1, 0, 0);
-	wallMaterial.emissiveColor.set(1, 0, 1);
-	wallMaterial.freeze();
-	wallMesh.material = wallMaterial;
-	wallMesh.setPivotPoint(Vector3.Zero());
+	const
+		arenaRadius = 200.,
+		paddleWidth = 1,
+		paddleHeight = 1,
+		paddleDepth = 0.5
+		;
 
-	return wallMesh;
+	const wall = MeshBuilder.CreateTiledBox("wallBase", {
+		width: paddleWidth,
+		height: paddleHeight,
+		depth: paddleDepth,
+		tileSize: 0.1,
+		tileWidth: 0.1,
+		tileHeight: 0.1
+	}, scene);
+	wall.parent = pongRoot;
+	const mat = new WallMaterial('wallMaterial', scene);
+
+	mat.setUniform("arenaRadius", arenaRadius);
+	mat.setUniform("playerCount", 100.);
+	mat.setUniform("fillFraction", 1.);
+	mat.setUniform("paddleId", -1.);
+	wall.material = mat;
+	mat.diffuseColor = Color3.Purple();
+	wall.isVisible = true;
+	mat.forceDepthWrite = true;
+	return wall;
 }
 
 export function createBallMesh(scene: Scene, pongRoot: TransformNode): Mesh {

@@ -21,8 +21,6 @@ import { createBlackHoleBackdrop } from "./templates/blackhole.js";
 import { SpaceSkybox } from "./templates/skybox.js";
 import GameUI from "../GameUI.js";
 import { PaddleComponent } from "./components/PaddleComponent.js";
-import { GoalComponent } from "./components/GoalComponent.js";
-import { PillarComponent } from "./components/PillarComponent.js";
 import { PHASE_CAMERA_CONFIG, DEFAULT_CAMERA, LOADING_CAMERA } from "./config/CameraConfig.js";
 
 export let localPaddleId: any = null;
@@ -257,16 +255,6 @@ export class PongBR {
 			transform?.disable();
 		}
 
-		// 1. Remove ALL game entities
-		// const toRemove = this.ecs.getAllEntities().filter(e =>
-		// 	e.hasComponent(BallComponent) ||
-		// 	e.hasComponent(PaddleComponent) ||
-		// 	e.hasComponent(GoalComponent) ||
-		// 	e.hasComponent(WallComponent) ||
-		// 	e.hasComponent(PillarComponent)
-		// );
-		// toRemove.forEach(e => this.ecs.removeEntity(e));
-
 		if (BALL_SCALES[nextCount]) {
 			this.currentBallScale = BALL_SCALES[nextCount];
 		} else {
@@ -276,6 +264,8 @@ export class PongBR {
 
 		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
 		this.baseMeshes.paddle.material.setUniform("paddleId", localPaddleIndex);
+		this.baseMeshes.wall.material.setUniform("playerCount", nextCount);
+		this.baseMeshes.wall.material.setUniform("paddleId", localPaddleIndex);
 		this.paddleBundles = createGameTemplate(
 			this.ecs,
 			nextCount,
@@ -318,7 +308,6 @@ export class PongBR {
 	}
 
 	public onPhaseChange(phase: string, duration: number = 1.0): void {
-		console.log(`📹 Camera transition for phase: ${phase} (${duration}s)`);
 
 		const cameraConfig = PHASE_CAMERA_CONFIG[phase] || DEFAULT_CAMERA;
 

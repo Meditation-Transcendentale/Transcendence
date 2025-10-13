@@ -29,7 +29,6 @@
     - change goal position physics pong
     - game end pong not working
     - check websocket url
-    - br check loop inside engine
     - fx pong
 
 ### tweak
