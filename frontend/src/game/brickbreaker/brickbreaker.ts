@@ -45,7 +45,7 @@ export class BrickBreaker {
 		this.gameUI = gameUI;
 		this.engine = scene.getEngine() as Engine;
 		this.root = new TransformNode("pongbrRoot", this.scene);
-		this.root.position.set(200, 500, 500);
+		// this.root.position.set(200, 500, 500);
 		this.root.scaling.set(1, 1, 1);
 
 		this.createArena();
@@ -55,7 +55,6 @@ export class BrickBreaker {
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
 		ballMaterial.specularColor.set(0, 0, 0);
-		ballMaterial.disableLighting = false;
 		this.ball = new Ball(this.scene, ballMaterial, this.root, this);
 		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
 
@@ -66,14 +65,12 @@ export class BrickBreaker {
 	}
 
 	handlePb(json: any) {
-		// console.log("pb___________",json.brickBreakerStats);
 		this.pbEasy = json.brickBreakerStats.easy_mode_hscore;
 		this.pbNormal = json.brickBreakerStats.normal_mode_hscore;
 		this.pbHard = json.brickBreakerStats.hard_mode_hscore;
 	}
 
 	public handleLeaderboard(json: any){
-		// console.log("leaderboard get", json);
 		if (this.mode == 'easy')
 			this.gameUI.setLeaderboard(json.leaderboards.easy, this.mode);
 		else if (this.mode == 'normal')
@@ -82,14 +79,14 @@ export class BrickBreaker {
 			this.gameUI.setLeaderboard(json.leaderboards.hard, this.mode);
 	}
 
-	public async start(mod: string) {
+	public async start(mode: string) {
 		if (this.renderObserver) {
 			console.warn("BrickBreaker is already running");
 			return;
 		}
 
 		this.reset();
-		this.mode = mod;
+		this.mode = mode;
 		const pb = await getRequest("stats/get/brickbreaker")
 			.catch((err) => { console.log(err) });
 		const leaderboard = await getRequest("stats/get/leaderboard/brickbreaker")
@@ -100,23 +97,21 @@ export class BrickBreaker {
 
 		if (mod === "easy") {
 			this.layers = 2;
-			this.cols = 4;
+			this.cols = 3;
 			this.gameUI.updateHighScore(this.pbEasy);
 		} else if (mod === "normal") {
 			this.layers = 4;
-			this.cols = 5;
+			this.cols = 4;
 			this.gameUI.updateHighScore(this.pbNormal);
 		} else if (mod === "hard") {
 			this.layers = 6;
-			this.cols = 6;
+			this.cols = 5;
 			this.gameUI.updateHighScore(this.pbHard);
 		}
-		// this.layers = Math.ceil((Math.random() * 5) + 1);
-		// this.cols = Math.ceil((Math.random() * 5) + 1);
 		this.ball.bricksLeft = this.layers * this.cols;
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
 
-		this.camera.parent = this.root
+		this.camera.parent = this.root;
 		this.lastTime = performance.now();
 		this.start1 = true;
 		this.update();
