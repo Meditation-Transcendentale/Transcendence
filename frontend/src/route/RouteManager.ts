@@ -96,9 +96,13 @@ class RouteManager {
 		this.lastRoute = this.routes.get(url.pathname) as IRoute;
 
 		if (url.pathname !== "/auth") {
-			htmlManager.ath.load();
 			streamManager.notification.connect();
 		}
+		
+		if (url.pathname !== "/auth" && url.pathname !== "/br" && url.pathname !== "/pong" && url.pathname !== "/brick") {
+			htmlManager.ath.load(); }
+		else {
+			htmlManager.ath.unload(); }
 	}
 
 	public comeback() {

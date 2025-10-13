@@ -49,6 +49,11 @@ handleErrorsNats(async () => {
 			const playerHistory = statService.getPlayerHistory(playerId);
 			nats.publish(msg.reply, jc.encode({ success: true, data: playerHistory }));
 		}),
+		handleNatsSubscription("stats.getOpponentUsername", async (msg) => {
+			const { matchId, playerId } = jc.decode(msg.data);
+			const opponent = statService.getOpponentUsername(matchId, playerId);
+			nats.publish(msg.reply, jc.encode({ success: true, data: opponent }));
+		}),
 		handleNatsSubscription("stats.addBRMatchStatsInfos", async (msg) => {
 			const matchInfos = jc.decode(msg.data);
 

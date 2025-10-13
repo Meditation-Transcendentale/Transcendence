@@ -24,6 +24,8 @@ export class NetworkingSystem extends System {
 	private myScore: number;
 	private opponentScore: number;
 	private mode: string;
+	private scoreLeft: number;
+	private scoreRight: number;
 	// private endUI = globalEndUI;
 
 
@@ -31,6 +33,8 @@ export class NetworkingSystem extends System {
 		super();
 		this.wsManager = wsManager;
 		this.uuid = uuid;
+		this.scoreLeft = 0;
+		this.scoreRight = 0;
 		this.myScore = 0;
 		this.opponentScore = 0;
 		this.oldVelX = 0;
@@ -108,22 +112,25 @@ export class NetworkingSystem extends System {
 				if (score) {
 					const e = entities.find(e => e.hasComponent(UIComponent));
 					let ui = e?.getComponent(UIComponent);
-					this.myScore = score[localPaddleId] ?? 0;
-					const otherId = score
-						.map((_, i) => i)
-						.find(i => i !== localPaddleId)!;
-					this.opponentScore = score[otherId] ?? 0;
+					this.scoreLeft = score[0];
+					this.scoreRight = score[1];
+					// this.myScore = score[localPaddleId] ?? 0;
+					// const otherId = score
+					// 	.map((_, i) => i)
+					// 	.find(i => i !== localPaddleId)!;
+					// this.opponentScore = score[otherId] ?? 0;
+					console.log("localPaddleId:", localPaddleId);
 					if (ui) {
-						if (localPaddleId != 0)
-							ui.gameUI.updateScoreVersus(this.opponentScore, this.myScore);
-						else
-							ui.gameUI.updateScoreVersus(this.myScore, this.opponentScore);
+						ui.gameUI.updateScoreVersus(this.scoreLeft, this.scoreRight);
+						// if (localPaddleId != 0)
+						// 	ui.gameUI.updateScoreVersus(this.opponentScore, this.myScore);
+						// else
+						// 	ui.gameUI.updateScoreVersus(this.myScore, this.opponentScore);
 					}
 				}
 			}
 
 			if (serverMsg.start) {
-				console.log("___________________________start MSG");
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
 				ui?.gameUI.startCountdown(3);
@@ -140,7 +147,7 @@ export class NetworkingSystem extends System {
 				if (this.myScore == 5)
 					win = true;
 
-				ui?.gameUI.showEnd(ui.gameMode, win, this.myScore, this.opponentScore);
+				ui?.gameUI.showEnd(ui.gameMode, win, this.scoreLeft, this.scoreRight);
 				console.log("Received GameEndMessage");
 				// const scores = serverMsg.end.score as number[];
 				// const myScore = scores[localPaddleId] ?? 0;

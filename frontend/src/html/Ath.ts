@@ -603,6 +603,8 @@ class athProfile {
 
 	private matchHistoryRow!:{ [key: number ]: HTMLTableRowElement };
 	private matchHistoryTdElements!: { [key: number]: { [id: number]: HTMLTableCellElement } };
+	private matchHistoryBtns!: { [key: number]: HTMLButtonElement };
+	private toggleMatchHistory!: { [key: number]: boolean };
 	
 	
 	constructor(athInstance: Ath) {
@@ -612,6 +614,9 @@ class athProfile {
 		this.brTdElements = {};
 		this.matchHistoryTdElements = {};
 		this.matchHistoryRow = {};
+
+		this.matchHistoryBtns = {};
+		this.toggleMatchHistory = {};
 		
 		this.createProfileDiv();
 
@@ -694,33 +699,64 @@ class athProfile {
 			.catch((err) => { });
 	}
 
-	private handleMatchResult(data: any): string {
+	private handleMatchResult(data: any, index: number) {
 
 		let result!: string
+		console.log(data.opponent_username);
 
 		switch (data.game_mode) {
 			case "classic":
-					result = `${data.goals_scored} - ${data.goals_conceded}`;
-				return result;
+				this.matchHistoryBtns[index].disabled = false;
+				result = `${data.goals_scored} - ${data.goals_conceded}`;
+				this.matchHistoryBtns[index].textContent = result;
+				this.matchHistoryBtns[index].onclick = () => {
+					if (this.toggleMatchHistory[index] === false) {
+						this.matchHistoryBtns[index].textContent = result;
+						this.toggleMatchHistory[index] = true;
+					} else {
+						this.matchHistoryBtns[index].textContent = data.opponent_username;
+						this.toggleMatchHistory[index] = false;
+					}
+				};
+				break;
 			case "br":
+				this.matchHistoryBtns[index].disabled = true;
 				switch (data.placement) {
 					case 1:
 						result = `${data.placement}st`;
-						return result;
+						break
 					case 2:
 						result = `${data.placement}nd`;
-						return result;
+						break
 					case 3:
 						result = `${data.placement}rd`;
-						return result;
+						break
 					default:
 						result = `${data.placement}th`;
-						return result;
+						break
 				}
+				this.matchHistoryBtns[index].textContent = result;
+				break;
 			default:
-				return "Unknown";
+				result = "Unknown";
 		}
+		
 	}
+
+	private handleDate(dateString: string): string {
+
+		let finalDate = dateString.substring(5, 16);
+
+		finalDate = finalDate.replace("-", "/").replace(":", "h");
+
+		const [date, time] = finalDate.split(" ");
+		const [month, day] = date.split("/");
+
+		finalDate = `${day}/${month} ${time}`;
+
+		return finalDate;
+	}
+
 
 	private updateMatchHistoryTable(data: any) {
 
@@ -728,7 +764,10 @@ class athProfile {
 
 		const history = data;
 
+		console.log("history length: ", history.length);
+		console.log("history: ", history);
 		for (let i = 0; i < history.length; i++) {
+			console.log("history length i: ", i);
 			if ( history[i].is_winner)
 				this.matchHistoryRow[i].style.backgroundColor = "rgba(144, 238, 144, 0.5)";
 			else
@@ -736,8 +775,8 @@ class athProfile {
 			this.matchHistoryRow[i].style.border = "1px solid black";
 			this.matchHistoryTdElements[i][1].style.border = "1px solid black";
 			this.matchHistoryTdElements[i][0].textContent = history[i].game_mode;
-			this.matchHistoryTdElements[i][1].textContent = this.handleMatchResult(history[i]);
-			this.matchHistoryTdElements[i][2].textContent = history[i].created_at;
+			this.handleMatchResult(history[i], i);
+			this.matchHistoryTdElements[i][2].textContent = this.handleDate(history[i].created_at);
 		}
 	}
 
@@ -785,10 +824,16 @@ class athProfile {
 
 				this.matchHistoryTdElements[i] = this.matchHistoryTdElements[i] || {};
 				this.matchHistoryTdElements[i][j] = document.createElement("td");
-
+				
+				
 				this.matchHistoryRow[i].appendChild(this.matchHistoryTdElements[i][j]);
 			}
-
+			
+			this.matchHistoryBtns[i] = document.createElement("button");
+			this.matchHistoryBtns[i].style.backgroundColor = "transparent";
+			this.matchHistoryBtns[i].style.border = "none";
+			this.matchHistoryTdElements[i][1].appendChild(this.matchHistoryBtns[i]);
+			this.matchHistoryBtns[i].disabled = true;
 			tbody.appendChild(this.matchHistoryRow[i]);
 		}
 
