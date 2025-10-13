@@ -24,7 +24,12 @@ export class LobbyStream implements IStream {
 
 		const url = `${this.url}${encodeURIComponent(User.uuid as string)}&lobbyId=${stateManager.lobbyId}`;
 
-		this.ws = new WebSocket(url);
+		try {
+			this.ws = new WebSocket(url);
+		} catch (err) {
+			console.log("wefewfewf");
+			return;
+		}
 		this.ws.binaryType = "arraybuffer";
 
 		this.ws.onopen = () => {
@@ -38,7 +43,7 @@ export class LobbyStream implements IStream {
 		}
 
 		this.ws.onerror = (err) => {
-			console.warn(err);
+			// console.warn(err);
 			this.disconnect();
 			routeManager.nav("/play");
 		}
