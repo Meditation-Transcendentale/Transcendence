@@ -12,6 +12,8 @@ import { PhaseState, PhaseTransitionEvent, RebuildCompleteEvent, GameStateInfo }
 import { Vector3 } from "../../../babylon";
 import GameUI from "../../GameUI";
 import { InputComponent } from "../components/InputComponent.js";
+import { htmlManager } from "../../../html/HtmlManager.js";
+import { NotificationType } from "../../../html/NotificationHtml.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -28,6 +30,8 @@ export class NetworkingSystem extends System {
 	private spectateButtonOn: boolean = false;
 	private currentPlayerCount: number = 100;
 	private currentPhase: string = 'Phase 1';
+	private usernamesFetched: boolean = false;
+	private eliminatedPlayers: Set<string> = new Set();
 
 	constructor(wsManager: WebSocketManager, uuid: string, gameUI: GameUI, game: PongBR) {
 		super();
@@ -58,6 +62,25 @@ export class NetworkingSystem extends System {
 				const balls = state.balls ?? [];
 				const paddles = state.paddles ?? [];
 				const events = state.events ?? [];
+
+				// Fetch usernames on first state message with paddle UUIDs
+				if (!this.usernamesFetched && paddles.length > 0) {
+					console.log(`🔍 First paddles data:`, paddles.slice(0, 3));
+					const playerUUIDs = paddles
+						.map((p: any) => p.uuid)
+						.filter((uuid: any) => uuid && typeof uuid === 'string');
+
+					console.log(`🔍 Extracted UUIDs:`, playerUUIDs.slice(0, 3));
+
+					if (playerUUIDs.length > 0) {
+						this.usernamesFetched = true;
+						this.game.fetchPlayerUsernames(playerUUIDs).catch((err) => {
+							console.error('Failed to fetch player usernames:', err);
+						});
+					} else {
+						console.warn('⚠️ No valid UUIDs found in paddle data');
+					}
+				}
 
 				events.forEach((event: any) => {
 					if (event.type === 'PHASE_TRANSITION') {
@@ -141,6 +164,10 @@ export class NetworkingSystem extends System {
 					if (!paddleComp || !paddle) return;
 
 					if (p.dead) {
+						// Check if this is a new death (paddle was alive before)
+						const wasAlive = paddle.enabled;
+
+
 						paddle.disable();
 
 						const wallEntity = this.wallIndexToEntity.get(p.id as number);
@@ -151,13 +178,26 @@ export class NetworkingSystem extends System {
 							}
 						}
 
+						if (wasAlive) {
+							let uuid = p.uuid;
+							let username;
+							if (!uuid)
+								username = `Player ${p.paddleId}`;
+							else
+								username = this.game.getUsername(uuid);
+							htmlManager.notification.add({
+								type: NotificationType.text,
+								text: `${username} was eliminated!`,
+								duration: 1000
+							});
+						}
 						if (paddleComp.isLocal && !this.spectateButtonOn) {
 							this.gameUI.showButton('spectate', 'Spectate', () => {
 								console.log('Spectating...');
 								const payload: userinterface.IClientMessage = {
 									spectate: {}
 								};
-				
+
 								const buffer = encodeClientMessage(payload);
 								this.wsManager.socket.send(buffer);
 							});
@@ -228,5 +268,6 @@ export class NetworkingSystem extends System {
 		this.spectateButtonOn = false;
 		this.currentPlayerCount = 100;
 		this.currentPhase = 'Phase 1';
+		this.usernamesFetched = false;
 	}
 }

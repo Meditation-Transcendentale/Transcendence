@@ -90,7 +90,7 @@ export class GameManager {
 		})
 		this.brUI = new GameUI(div.cloneNode(true) as HTMLDivElement, {
 			enabledModules: ['buttons', 'ending', 'images', 'playercounter'],
-			theme: 'br',
+			theme: 'berserk',
 			modulePositions: {
 				buttons: { x: 'right', y: 'bottom' },
 				ending: { x: 'center', y: 'center' },

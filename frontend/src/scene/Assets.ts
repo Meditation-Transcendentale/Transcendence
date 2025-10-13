@@ -176,7 +176,7 @@ export class Assets {
 		this.monolithMesh.alwaysSelectAsActiveMesh = true;
 		this.monolithMesh.refreshBoundingInfo();
 
-		loaded = await LoadAssetContainerAsync("/assets/PongStatutTextured.glb", this.scene);
+		loaded = await LoadAssetContainerAsync("/assets/PongStatueTextured_Teeth.glb", this.scene);
 		console.log(loaded.meshes);
 		this.statusRoot = loaded.meshes[0];
 		this.statusMesh = loaded.meshes.find(mesh => mesh.name === "Head.001") as Mesh;

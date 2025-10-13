@@ -276,7 +276,15 @@ export class GameManager {
 			const newState = lastState;
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
-			newState.paddles = resp.paddles;
+			newState.paddles = resp.paddles.map(paddle => {
+				const playerIndex = paddle.paddleId !== undefined ? paddle.paddleId : paddle.playerId;
+				const uuid = match.instance.players[playerIndex] || '';
+				return {
+					...paddle,
+					paddleId: playerIndex,
+					uuid: uuid
+				};
+			});
 			newState.stage = resp.stage;
 			newState.ranks = resp.ranks;
 			newState.events = resp.events || []; // ADD THIS
@@ -286,7 +294,7 @@ export class GameManager {
 					(newState.score[resp.goal.scorerId] || 0) + 1;
 
 				if (match.mode === "tournament") {
-					console.log (`${newState.score}|${newState.score[0]}|${newState.score[1]}|${resp.goal.scorerId}`);
+					console.log(`${newState.score}|${newState.score[0]}|${newState.score[1]}|${resp.goal.scorerId}`);
 					const scoreBuf = encodeMatchScoreUpdate({ score: newState.score });
 					this.nc.publish(`games.tournament.${gameId}.score`, scoreBuf);
 				}

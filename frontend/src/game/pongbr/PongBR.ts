@@ -22,6 +22,7 @@ import { SpaceSkybox } from "./templates/skybox.js";
 import GameUI from "../GameUI.js";
 import { PaddleComponent } from "./components/PaddleComponent.js";
 import { PHASE_CAMERA_CONFIG, DEFAULT_CAMERA, LOADING_CAMERA } from "./config/CameraConfig.js";
+import { postRequest } from "../../networking/request.js";
 
 export let localPaddleId: any = null;
 
@@ -62,6 +63,7 @@ export class PongBR {
 	private phaseAnimationStartTime: number = 0;
 	private isPhaseAnimating: boolean = false;
 	private isTransitioning: boolean = false;
+	private uuidToUsername: Map<string, string> = new Map();
 
 
 	constructor(canvas: any, scene: Scene, gameUI: GameUI) {
@@ -577,6 +579,38 @@ export class PongBR {
 				reject(new Error('Timed out waiting for WelcomeMessage'));
 			}, 5000);
 		});
+	}
+
+	public async fetchPlayerUsernames(playerUUIDs: string[]): Promise<void> {
+		this.uuidToUsername.clear();
+
+		const fetchPromises = playerUUIDs.map(async (uuid) => {
+			try {
+				const response: any = await postRequest("info/search", {
+					identifier: uuid,
+					type: "uuid"
+				});
+
+				if (response.data && response.data.username) {
+					this.uuidToUsername.set(uuid, response.data.username);
+					console.log(`Fetched username for ${uuid}: ${response.data.username}`);
+				}
+			} catch (error) {
+				console.error(`Failed to fetch username for UUID ${uuid}:`, error);
+				this.uuidToUsername.set(uuid, uuid.substring(0, 8));
+			}
+		});
+
+		await Promise.all(fetchPromises);
+		console.log(`✅ Loaded ${this.uuidToUsername.size} player usernames`);
+	}
+
+	public getUsername(uuid: string): string {
+		return this.uuidToUsername.get(uuid) || uuid.substring(0, 8);
+	}
+
+	public getUsernameMap(): Map<string, string> {
+		return this.uuidToUsername;
 	}
 
 }

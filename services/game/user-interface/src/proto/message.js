@@ -344,7 +344,8 @@ export const shared = $root.shared = (() => {
          * @memberof shared
          * @interface IPaddle
          * @property {number|null} [id] Paddle id
-         * @property {number|null} [playerId] Paddle playerId
+         * @property {number|null} [paddleId] Paddle paddleId
+         * @property {string|null} [uuid] Paddle uuid
          * @property {number|null} [move] Paddle move
          * @property {number|null} [offset] Paddle offset
          * @property {boolean|null} [dead] Paddle dead
@@ -374,12 +375,20 @@ export const shared = $root.shared = (() => {
         Paddle.prototype.id = 0;
 
         /**
-         * Paddle playerId.
-         * @member {number} playerId
+         * Paddle paddleId.
+         * @member {number} paddleId
          * @memberof shared.Paddle
          * @instance
          */
-        Paddle.prototype.playerId = 0;
+        Paddle.prototype.paddleId = 0;
+
+        /**
+         * Paddle uuid.
+         * @member {string} uuid
+         * @memberof shared.Paddle
+         * @instance
+         */
+        Paddle.prototype.uuid = "";
 
         /**
          * Paddle move.
@@ -431,14 +440,16 @@ export const shared = $root.shared = (() => {
                 writer = $Writer.create();
             if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
-            if (message.playerId != null && Object.hasOwnProperty.call(message, "playerId"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.playerId);
+            if (message.paddleId != null && Object.hasOwnProperty.call(message, "paddleId"))
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.paddleId);
+            if (message.uuid != null && Object.hasOwnProperty.call(message, "uuid"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.uuid);
             if (message.move != null && Object.hasOwnProperty.call(message, "move"))
-                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.move);
+                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.move);
             if (message.offset != null && Object.hasOwnProperty.call(message, "offset"))
-                writer.uint32(/* id 4, wireType 5 =*/37).float(message.offset);
+                writer.uint32(/* id 5, wireType 5 =*/45).float(message.offset);
             if (message.dead != null && Object.hasOwnProperty.call(message, "dead"))
-                writer.uint32(/* id 5, wireType 0 =*/40).bool(message.dead);
+                writer.uint32(/* id 6, wireType 0 =*/48).bool(message.dead);
             return writer;
         };
 
@@ -480,18 +491,22 @@ export const shared = $root.shared = (() => {
                         break;
                     }
                 case 2: {
-                        message.playerId = reader.int32();
+                        message.paddleId = reader.int32();
                         break;
                     }
                 case 3: {
-                        message.move = reader.int32();
+                        message.uuid = reader.string();
                         break;
                     }
                 case 4: {
-                        message.offset = reader.float();
+                        message.move = reader.int32();
                         break;
                     }
                 case 5: {
+                        message.offset = reader.float();
+                        break;
+                    }
+                case 6: {
                         message.dead = reader.bool();
                         break;
                     }
@@ -533,9 +548,12 @@ export const shared = $root.shared = (() => {
             if (message.id != null && message.hasOwnProperty("id"))
                 if (!$util.isInteger(message.id))
                     return "id: integer expected";
-            if (message.playerId != null && message.hasOwnProperty("playerId"))
-                if (!$util.isInteger(message.playerId))
-                    return "playerId: integer expected";
+            if (message.paddleId != null && message.hasOwnProperty("paddleId"))
+                if (!$util.isInteger(message.paddleId))
+                    return "paddleId: integer expected";
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                if (!$util.isString(message.uuid))
+                    return "uuid: string expected";
             if (message.move != null && message.hasOwnProperty("move"))
                 if (!$util.isInteger(message.move))
                     return "move: integer expected";
@@ -562,8 +580,10 @@ export const shared = $root.shared = (() => {
             let message = new $root.shared.Paddle();
             if (object.id != null)
                 message.id = object.id | 0;
-            if (object.playerId != null)
-                message.playerId = object.playerId | 0;
+            if (object.paddleId != null)
+                message.paddleId = object.paddleId | 0;
+            if (object.uuid != null)
+                message.uuid = String(object.uuid);
             if (object.move != null)
                 message.move = object.move | 0;
             if (object.offset != null)
@@ -588,15 +608,18 @@ export const shared = $root.shared = (() => {
             let object = {};
             if (options.defaults) {
                 object.id = 0;
-                object.playerId = 0;
+                object.paddleId = 0;
+                object.uuid = "";
                 object.move = 0;
                 object.offset = 0;
                 object.dead = false;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
-            if (message.playerId != null && message.hasOwnProperty("playerId"))
-                object.playerId = message.playerId;
+            if (message.paddleId != null && message.hasOwnProperty("paddleId"))
+                object.paddleId = message.paddleId;
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                object.uuid = message.uuid;
             if (message.move != null && message.hasOwnProperty("move"))
                 object.move = message.move;
             if (message.offset != null && message.hasOwnProperty("offset"))
