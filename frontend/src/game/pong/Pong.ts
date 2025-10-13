@@ -149,16 +149,16 @@ export class Pong {
 		if (maps == "monolith") {
 			this.pongRoot.position.set(0, 7, 0);
 			this.pongRoot.scalingDeterminant = 0.15;
-			this.cam.position.set(0, 15, 0);
+			this.cam.position.set(0, 13, 0);
 		} else if (maps == "grass") {
 			this.pongRoot.position.set(0, 0, 0);
 			this.pongRoot.scalingDeterminant = 2;
-			this.cam.position.set(0, 106, 0);
+			this.cam.position.set(0, 80, 0);
 			this.baseMeshes.arena.setEnabled(false);
 		} else if (maps == "void") {
 			this.pongRoot.position.set(0, 0, 0);
 			this.pongRoot.scalingDeterminant = 0.25;
-			this.cam.position.set(0, 13.5, 0);
+			this.cam.position.set(0, 10, 0);
 		}
 		localPaddleId = await this.waitForRegistration();
 

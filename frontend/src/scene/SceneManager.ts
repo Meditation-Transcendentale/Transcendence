@@ -219,7 +219,7 @@ class SceneManager {
 				this.assets.flashLight.intensity = 1;
 				this.assets.hemisphericLight.intensity = 1.5;
 				this.assets.flashLight.range = 100;
-				this.assets.grassMaterial.specularColor.scaleInPlace(0.5)
+				this.assets.grassMaterial.specularColor.scaleInPlace(0.5);
 				this.grass.enable = true;
 				this.assets.ballMesh.setEnabled(true);
 				this.assets.groundMesh.setEnabled(true);
