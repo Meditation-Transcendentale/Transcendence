@@ -1,76 +1,45 @@
-/* .friendlist-container { */
-/* 	position: absolute; */
-/* 	display: block; */
-/* 	bottom: 100px; */
-/* 	right: 200px; */
-/* 	color: white; */
-/* 	background-color: transparent; */
-/* } */
-/**/
-/* .friendlist-form { */
-/* 	background-color: transparent; */
-/* 	width: 100%; */
-/* } */
-/**/
-/* .friendlist-form>button { */
-/* 	background-color: var(--color-purple-medium); */
-/* 	border-color: transparent; */
-/* 	border-top-left-radius: var(--spacing-md); */
-/* 	border-top-right-radius: var(--spacing-md); */
-/* } */
-/**/
-/* .friendlist-form>button:hover { */
-/* 	background-color: var(--color-purple-bright); */
-/* } */
-/**/
-/* .friendlist-form>button:active { */
-/* 	background-color: var(--color-purple-medium); */
-/* } */
-/**/
-/* .friendlist-form>button[click] { */
-/* 	background-color: var(--color-lavender); */
-/* } */
-/**/
-/* .friendlist-content { */
-/* 	color: white; */
-/* 	background-color: rgb(90 24 154 / 0.4); */
-/* 	width: 100%; */
-/* 	height: 20vh; */
-/* 	padding: var(--spacing-md); */
-/* 	border: var(--spacing-m) solid var(--color-lavender); */
-/* 	border-top-right-radius: var(--spacing-m); */
-/* 	border-bottom-right-radius: var(--spacing-m); */
-/* 	border-bottom-left-radius: var(--spacing-m); */
-/* } */
-/**/
-/* .friendlist-user { */
-/* 	display: flex; */
-/* 	width: 100; */
-/* 	background-color: var(--color-purple-medium); */
-/* } */
-/**/
-/* .friendlist-user>img { */
-/* 	flex: 1; */
-/* 	width: var(--font-size-tiny); */
-/* 	height: var(--font-size-tiny); */
-/* } */
-/**/
-/* .friendlist-user>span { */
-/* 	flex: 3; */
-/* } */
-/**/
-/* .friendlist-status { */
-/* 	flex: 2 !important; */
-/* } */
-/**/
-/* .friendlist-user>button { */
-/* 	flex: 1; */
-/* } */
+.friendlist-toggle {
+	background-color: var(--color-purple);
+	color: white;
+	font-family: var(--font-primary);
+	font-size: var(--font-size-tiny);
+	padding: var(--spacing-sm) var(--spacing-md);
+	border: none;
+	border-radius: var(--font-size-tiny);
+	cursor: pointer;
+	box-shadow: 0 3px 6px rgba(114, 9, 183, 0.6);
+	transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+	user-select: none;
+	/* line-height: var(--font-size-tiny); */
+	/* align-items: center; */
+	display: inline-flex;
+	overflow: hidden;
+	/* or flex */
+	/* vertical-align: middle; */
+}
 
+.friendlist-toggle:hover {
+	background-color: var(--color-purple-bright);
+	box-shadow: 0 4px 12px rgba(157, 78, 221, 0.8);
+}
+
+.friendlist-toggle:active {
+	background-color: var(--color-purple-dark);
+	box-shadow: 0 2px 4px rgba(92, 24, 154, 0.9);
+}
+
+.friendlist-toggle:focus {
+	outline: 2px solid var(--color-lavender);
+	outline-offset: 2px;
+}
+
+/*
+ * //////////////////////////////////////////////
+ * */
 .friendlist-container {
 	position: absolute;
-	bottom: 100px;
-	right: 200px;
+	bottom: var(--font-size-base);
+	right: 0px;
 	font-family: var(--font-primary);
 	color: var(--color-lavender);
 	background-color: transparent;
@@ -82,8 +51,8 @@
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-md);
-	font-size: var(--font-size-tiny);
+	/* gap: var(--spacing-md); */
+	font-size: var(--font-size-verysmall);
 }
 
 .friendlist-form {
@@ -99,7 +68,7 @@
 	border: none;
 	border-radius: var(--spacing-sm) var(--spacing-sm) 0 0;
 	color: var(--color-lavender);
-	font-weight: var(--font-weight-bold);
+	font-weight: var(--font-weight-normal);
 	cursor: pointer;
 	padding: var(--spacing-xs) 0;
 	transition: background-color var(--transition-fast);
@@ -137,7 +106,7 @@
 	border-bottom-left-radius: var(--spacing-m);
 	overflow-y: auto;
 	box-sizing: border-box;
-	font-size: var(--font-size-tiny);
+	font-size: var(--font-size-verysmall);
 	display: flex;
 	flex-direction: column;
 	gap: var(--spacing-xs);
@@ -162,13 +131,13 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	font-size: var(--font-size-tiny);
+	font-size: var(--font-size-verysmall);
 }
 
 .friendlist-user>img {
-	flex: 0 0 var(--font-size-tiny);
-	width: var(--font-size-tiny);
-	height: var(--font-size-tiny);
+	flex: 0 0 var(--font-size-verysmall);
+	width: var(--font-size-verysmall);
+	height: var(--font-size-verysmall);
 	border-radius: 50%;
 	object-fit: cover;
 	user-select: none;
@@ -191,7 +160,7 @@
 	font-weight: var(--font-weight-normal);
 	cursor: default;
 	user-select: none;
-	font-size: var(--font-size-tiny);
+	font-size: var(--font-size-verysmall);
 	font-style: italic;
 	color: var(--color-purple-bright);
 }
@@ -237,7 +206,7 @@
 	display: flex;
 	gap: var(--spacing-xs);
 	margin-bottom: var(--spacing-md);
-	font-size: var(--font-size-tiny);
+	font-size: var(--font-size-verysmall);
 }
 
 .friendlist-search-form input[type="search"] {
@@ -283,7 +252,7 @@
 .friendlist-search-results {
 	max-height: 160px;
 	overflow-y: auto;
-	font-size: var(--font-size-tiny);
+	font-size: var(--font-size-verysmall);
 	color: var(--color-lavender);
 }
 

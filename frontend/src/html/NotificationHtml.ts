@@ -132,10 +132,10 @@ export class NotificationHtml {
 				title: "New Frien Request",
 				text: `you received a friend request from ${option.username}`,
 				accept: () => {
-					console.log("friend request accept");
+					htmlManager.friendlist.requestChoice(option.uuid, true);
 				},
 				decline: () => {
-					console.log("friend request decline");
+					htmlManager.friendlist.requestChoice(option.uuid, false);
 				}
 			})
 			p.show();

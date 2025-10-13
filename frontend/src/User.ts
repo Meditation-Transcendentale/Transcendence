@@ -67,7 +67,7 @@ class UserC {
 			this.friendsAway.add(user.uuid);
 	}
 
-	private requestFriends() {
+	public requestFriends() {
 		getRequest("friends/get/friendlist")
 			.then((json: any) => {
 				console.log(json);
