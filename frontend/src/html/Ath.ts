@@ -130,7 +130,9 @@ class UserC {
 let User!: UserC;
 
 export class Ath {
-	
+
+	private css!: HTMLLinkElement;
+
 	private container!: HTMLDivElement;
 	private profileSection!: HTMLDivElement;
 	private profileImage!: HTMLImageElement;
@@ -143,70 +145,42 @@ export class Ath {
 	private isOpen: boolean = false;
 	
 	constructor() {
-		
+
 		this.container = document.createElement("div");
 		this.container.id = "ath-container";
-		this.setupContainerStyles();
-
+		
 		this.profileSection = document.createElement("div");
 		this.profileSection.id = "ath-profile-section";
-		this.setupProfileSectionStyles();
-
+		
 		this.profileImage = document.createElement("img");
 		this.profileImage.id = "ath-profile-image";
 		this.profileImage.src = "https://localhost:3002/cdn/default_avatar.jpg";
-		this.setupProfileImageStyles();
-
+		// this.setupProfileImageStyles();
+		
 		this.trigger = document.createElement("span");
 		this.trigger.id = "ath-trigger";
 		this.trigger.innerText = "User";
-		this.setupTriggerStyles();
-
+		// this.setupTriggerStyles();
+		
 		this.dropdown = document.createElement("div");
 		this.dropdown.id = "ath-dropdown";
-		this.setupDropdownStyles();
+		// this.setupDropdownStyles();
 		this.createMenuItems();
 		
 		this.profileSection.appendChild(this.trigger);
 		this.profileSection.appendChild(this.profileImage);
 		this.container.appendChild(this.profileSection);
 		this.container.appendChild(this.dropdown);
-
+		
 		this.setupEventListeners();
-
+		
 		this.settings = new athSettings(this);
 		this.profile = new athProfile(this);
-
-	}
-
-	private setupContainerStyles() {
-		this.container.style.position = "fixed";
-		this.container.style.top = "10px";
-		this.container.style.right = "10px";
-		this.container.style.zIndex = "1000";
-		this.container.style.fontFamily = "Arial, sans-serif";
-	}
-
-	private setupProfileSectionStyles() {
-		this.profileSection.style.display = "flex";
-		this.profileSection.style.alignItems = "center";
-		this.profileSection.style.gap = "8px";
-		this.profileSection.style.backgroundColor = "rgba(255, 192, 203, 0.8)";
-		this.profileSection.style.padding = "6px";
-		this.profileSection.style.borderRadius = "25px";
-		this.profileSection.style.cursor = "pointer";
-		this.profileSection.style.transition = "all 0.2s ease";
-		this.profileSection.style.border = "1px solid rgba(255, 255, 255, 0.3)";
-	}
-
-	private setupProfileImageStyles() {
-		this.profileImage.style.width = "32px";
-		this.profileImage.style.height = "32px";
-		this.profileImage.style.borderRadius = "50%";
-		this.profileImage.style.objectFit = "cover";
-		this.profileImage.style.border = "2px solid rgba(255, 255, 255, 0.5)";
-		this.profileImage.style.flexShrink = "0";
-		this.profileImage.style.pointerEvents = "none";
+		
+		this.css = document.createElement("link");
+		this.css.rel = "stylesheet";
+		this.css.href = "../../css/ath2.css";
+		document.head.appendChild(this.css);
 	}
 
 	private setupTriggerStyles() {
@@ -243,14 +217,13 @@ export class Ath {
 			{ text: "Quit", action: () => this.quitFunction() }
 		];
 
-		menuItems.forEach((item, index) => {
+		menuItems.forEach((item) => {
 			const menuItem = document.createElement("div");
 			menuItem.textContent = item.text;
 			menuItem.style.padding = "10px 15px";
-			menuItem.style.fontSize = "13px";
-			menuItem.style.color = "#333";
+			menuItem.style.fontSize = "14px";
+			menuItem.style.color = "#dda8fc";
 			menuItem.style.cursor = "pointer";
-			menuItem.style.borderBottom = index < menuItems.length - 1 ? "1px solid rgba(0, 0, 0, 0.1)" : "none";
 			menuItem.style.transition = "background-color 0.2s ease";
 
 			menuItem.addEventListener("click", () => {
@@ -289,8 +262,6 @@ export class Ath {
 
 	private open() {
 		this.isOpen = true;
-		this.profileSection.style.backgroundColor = "rgba(255, 192, 203, 1)";
-		
 		this.dropdown.style.visibility = "visible";
 		this.dropdown.style.opacity = "1";
 		this.dropdown.style.transform = "translateY(0)";
@@ -298,9 +269,7 @@ export class Ath {
 
 	private close() {
 		this.isOpen = false;
-		this.profileSection.style.backgroundColor = "rgba(255, 192, 203, 0.8)";
 		this.profileSection.style.transform = "scale(1)";
-		
 		this.dropdown.style.visibility = "hidden";
 		this.dropdown.style.opacity = "0";
 		this.dropdown.style.transform = "translateY(-10px)";
@@ -363,6 +332,7 @@ class athSettings {
 		this.athInstance = athInstance;
 
 		this.toggle2FABtn = document.createElement("button");
+		this.toggle2FABtn.id = "toggle-2fa-btn";
 
 		this.settingsPopup = new Popup({
 			type: PopupType.custom,
@@ -531,17 +501,21 @@ class athSettings {
 		
 	private createSettingsDiv(): HTMLDivElement {
 		const div = document.createElement("div");
-		div.style.display = "flex";
-		div.style.flexDirection = "column";
-		div.style.gap = "10px";
+		div.id = "settings-div";
+		// div.style.display = "flex";
+		// div.style.flexDirection = "column";
+		// div.style.gap = "10px";
 
 		const changeUsernameBtn = document.createElement("button");
+		changeUsernameBtn.id = "change-username-btn";
 		changeUsernameBtn.textContent = "Change Username";
 
 		const changePasswordBtn = document.createElement("button");
+		changePasswordBtn.id = "change-password-btn";
 		changePasswordBtn.textContent = "Change Password";
 
 		const changeAvatarBtn = document.createElement("button");
+		changeAvatarBtn.id = "change-avatar-btn";
 		changeAvatarBtn.textContent = "Change Avatar";
 
 		changeUsernameBtn.addEventListener("click", () => {

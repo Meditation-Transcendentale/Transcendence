@@ -1,0 +1,74 @@
+#ath-container {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	z-index: 1000;
+	font-family: Andale Mono, monospace;
+}
+
+#ath-profile-section {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #0d0221;
+	padding: 6px;
+	border-radius: 20px;
+	cursor: pointer;
+	color: #dda8fc;
+	border: 2px solid #dda8fc;
+}
+
+#ath-profile-section img {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	border: 1px solid #dda8fc;
+	object-fit: cover;
+}
+
+#ath-trigger {
+	font-size: 17px;
+	color: #dda8fc;
+	cursor: pointer;
+	user-select: none;
+}
+
+#ath-dropdown { 
+	position: absolute;
+	top: 100%;
+	right: 0;
+	left: 0;
+	background-color: #0d0221;
+	border: 2px solid #dda8fc;
+	border-radius: 20px;
+	margin-top: 5px;
+	min-width: auto;
+	visibility: hidden;
+	overflow: hidden;
+	transition: all 0.3s ease;
+	transform: translateY(-10px);
+}
+
+#settings-div {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	background-color: #0d0221;
+	border-radius: 12px;
+}
+
+#change-username-btn, #change-password-btn, #change-avatar-btn, #toggle-2fa-btn {
+	background-color: #0d0221;
+	color: #dda8fc;
+	border: 1px solid #dda8fc;
+	font-family: Andale Mono, monospace;
+	padding: 8px;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: background-color 0.3s ease;
+}
+
+
+
