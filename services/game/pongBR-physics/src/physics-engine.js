@@ -453,6 +453,19 @@ export class PhysicsEngine {
 
 	}
 
+	updateExistingBallRadii() {
+		const pd = this.pd;
+		const cfg = this.cfg;
+		const playerCount = this.gameState.playerStates.activePlayers.size;
+		const newBallRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(playerCount);
+
+		for (const ballEnt of this.entities.balls) {
+			if (ballEnt !== undefined && pd.isActive(ballEnt)) {
+				pd.radius[ballEnt] = newBallRadius;
+			}
+		}
+	}
+
 	resetBallsForNewPhase() {
 		const pd = this.pd;
 		const cfg = this.cfg;
@@ -666,7 +679,7 @@ export class PhysicsEngine {
 
 	completeArenaRebuild() {
 		this.verifyEntityIntegrity();
-
+		this.updateExistingBallRadii();
 		this.redistributeSurvivingPlayers();
 		this.resetBallsForNewPhase();
 		this.gameState.completeArenaRebuild();

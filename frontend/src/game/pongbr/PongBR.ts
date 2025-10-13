@@ -26,6 +26,14 @@ import { PillarComponent } from "./components/PillarComponent.js";
 import { PHASE_CAMERA_CONFIG, DEFAULT_CAMERA, LOADING_CAMERA } from "./config/CameraConfig.js";
 
 export let localPaddleId: any = null;
+
+const BALL_SCALES = {
+	100: new Vector3(2, 2, 2),
+	50: new Vector3(4, 4, 4),
+	25: new Vector3(8, 8, 8),
+	12: new Vector3(10, 10, 10),
+	3: new Vector3(12, 12, 12)
+};
 export class PongBR {
 	private scene!: Scene;
 	private ecs!: ECSManager;
@@ -49,6 +57,8 @@ export class PongBR {
 	public currentBallScale: Vector3 = new Vector3(1, 1, 1);
 	private gameUI: GameUI;
 	private localPaddleIndex: number = 0;
+	private paddleMaterialObserver: any = null;
+	private blackholeObserver: any = null;
 
 
 	constructor(canvas: any, scene: Scene, gameUI: GameUI) {
@@ -78,7 +88,8 @@ export class PongBR {
 		this.baseMeshes = createBaseMeshes(this.scene, this.rotatingContainer);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 		this.statue = initStatue(this.scene, this.pongRoot);
-		createBlackHoleBackdrop(this.scene, this.statue.position, this.pongRoot);
+		const blackholeResult = createBlackHoleBackdrop(this.scene, this.statue.position, this.pongRoot);
+		this.blackholeObserver = blackholeResult.observer;
 		this.spaceSkybox = new SpaceSkybox(this.scene);
 		this.spaceSkybox.applyPreset('Monochrome');
 
@@ -86,9 +97,10 @@ export class PongBR {
 		localPaddleId = 0;
 		this.initECS(this.instanceManagers, this.rotatingContainer);
 
-		this.stateManager = new StateManager(this.ecs);
+		this.stateManager = new StateManager(this.ecs, this.scene);
 		this.inited = true;
-		this.scene.onBeforeCameraRenderObservable.add(() => {
+
+		this.paddleMaterialObserver = this.scene.onBeforeCameraRenderObservable.add(() => {
 			this.baseMeshes.paddle.material.setUniform("time", performance.now() / 1000);
 		});
 
@@ -145,7 +157,7 @@ export class PongBR {
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
 		this.baseMeshes.paddle.material.setUniform("paddleId", this.localPaddleIndex);
 
-		this.currentBallScale = new Vector3(2, 2, 2);
+		this.currentBallScale = BALL_SCALES[100];
 
 		console.log('📹 Starting intro camera animation to Phase 1');
 		this.onPhaseChange('Phase 1', 3.0);
@@ -154,17 +166,41 @@ export class PongBR {
 
 		this.inputManager.enable();
 		this.pongRoot.setEnabled(true);
-		this.stateManager.setter(true);
-		this.stateManager.update();
+		this.stateManager.start();
 	}
 	public stop(): void {
-
+		this.stateManager.stop();
 		this.spaceSkybox.onGameUnload();
 		this.inputManager.disable();
 		this.pongRoot.setEnabled(false);
-		this.stateManager.setter(false);
 
 		console.log("game paused");
+	}
+
+	public dispose(): void {
+		console.log("PongBR: Disposing resources");
+
+		this.stateManager.stop();
+
+		if (this.paddleMaterialObserver) {
+			this.scene.onBeforeCameraRenderObservable.remove(this.paddleMaterialObserver);
+			this.paddleMaterialObserver = null;
+		}
+
+		if (this.blackholeObserver) {
+			this.scene.onBeforeRenderObservable.remove(this.blackholeObserver);
+			this.blackholeObserver = null;
+		}
+
+		if (this.spaceSkybox) {
+			this.spaceSkybox.onGameUnload();
+		}
+
+		if (this.wsManager) {
+			this.wsManager.socket.close();
+		}
+
+		console.log("PongBR: Disposal complete");
 	}
 
 	private createInstanceManagers(baseMeshes: any) {
@@ -231,23 +267,15 @@ export class PongBR {
 		// );
 		// toRemove.forEach(e => this.ecs.removeEntity(e));
 
-		// 2. Update ball scale
-		let scaleFactor: number;
-		switch (nextCount) {
-			case 100: scaleFactor = 2; break;
-			case 50: scaleFactor = 4; break;
-			case 25: scaleFactor = 8; break;
-			case 12: scaleFactor = 10; break;
-			case 3: scaleFactor = 12; break;
-			default: scaleFactor = 25 / nextCount;
+		if (BALL_SCALES[nextCount]) {
+			this.currentBallScale = BALL_SCALES[nextCount];
+		} else {
+			const scaleFactor = 25 / nextCount;
+			this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 		}
-		this.currentBallScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 
-		// 3. Update shaders
 		this.baseMeshes.paddle.material.setUniform("playerCount", nextCount);
 		this.baseMeshes.paddle.material.setUniform("paddleId", localPaddleIndex);
-
-		// 4. Create new everything
 		this.paddleBundles = createGameTemplate(
 			this.ecs,
 			nextCount,
@@ -256,7 +284,6 @@ export class PongBR {
 			localPaddleIndex
 		);
 
-		// 5. Force index rebuild
 		this.networkingSystem.forceIndexRebuild();
 
 		console.log(`✅ Transition complete`);

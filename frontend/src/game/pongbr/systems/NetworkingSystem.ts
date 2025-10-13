@@ -175,6 +175,7 @@ export class NetworkingSystem extends System {
 						} else {
 							paddleComp.offset = p.offset as number;
 							paddle.rotation.y = paddleComp.baseRotation - paddleComp.offset;
+							paddle.markDirty();
 						}
 					}
 				});
