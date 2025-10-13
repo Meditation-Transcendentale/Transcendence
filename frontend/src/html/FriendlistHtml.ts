@@ -44,9 +44,12 @@ export class FriendlistHtml {
 			this.div.remove();
 		} else {
 			this.form.reset();
-			this.friendContainer.classList.remove("hidden");
-			this.requestContainer.classList.add("hidden");
-			this.searchContainer.classList.add("hidden");
+			// this.form.querySelector("[name=friend]")?.toggleAttribute("click", true)
+			// this.form.querySelector("[name=request]")?.toggleAttribute("click", false)
+			// this.form.querySelector("[name=search]")?.toggleAttribute("click", false)
+			// this.friendContainer.classList.remove("hidden");
+			// this.requestContainer.classList.add("hidden");
+			// this.searchContainer.classList.add("hidden");
 			document.body.appendChild(this.div);
 		}
 		return;
@@ -77,25 +80,35 @@ export class FriendlistHtml {
 					this.friendContainer.classList.remove("hidden");
 					this.requestContainer.classList.add("hidden");
 					this.searchContainer.classList.add("hidden");
-					console.log("friendlist friend");
+					friend.toggleAttribute("click", true)
+					request.toggleAttribute("click", false)
+					search.toggleAttribute("click", false)
+					// console.log("friendlist friend");
 					break;
 				}
 				case "request": {
 					this.friendContainer.classList.add("hidden");
 					this.requestContainer.classList.remove("hidden");
 					this.searchContainer.classList.add("hidden");
-					console.log("friendlist request");
+					friend.toggleAttribute("click", false)
+					request.toggleAttribute("click", true)
+					search.toggleAttribute("click", false)
+					// console.log("friendlist request");
 					break;
 				}
 				case "search": {
 					this.friendContainer.classList.add("hidden");
 					this.requestContainer.classList.add("hidden");
 					this.searchContainer.classList.remove("hidden");
-					console.log("friendlist search");
+					friend.toggleAttribute("click", false)
+					request.toggleAttribute("click", false)
+					search.toggleAttribute("click", true)
+					// console.log("friendlist search");
 					break;
 				}
 			}
 		})
+		friend.toggleAttribute("click", true)
 		this.form.appendChild(friend);
 		this.form.appendChild(request);
 		this.form.appendChild(search);
@@ -115,6 +128,7 @@ export class FriendlistHtml {
 		this.friendContainer.appendChild(this.friendOnlinesContainer);
 		this.friendContainer.appendChild(this.friendAwayContainer);
 
+		this.friendContainer.classList.remove("hidden");
 		this.div.appendChild(this.friendContainer);
 		this.div.appendChild(this.requestContainer);
 		this.div.appendChild(this.searchContainer);
@@ -133,7 +147,7 @@ export class FriendlistHtml {
 		text.autocomplete = "off";
 
 		form.appendChild(text);
-		form.appendChild(submit);
+		// form.appendChild(submit);
 
 		form.addEventListener("submit", (e) => {
 			e.preventDefault();
@@ -193,6 +207,7 @@ export class FriendlistHtml {
 		if (change)
 			friend.div.remove();
 		friend.status.textContent = status;
+		friend.status.setAttribute("status", status);
 		if (change)
 			if (status !== "offline")
 				this.friendOnlinesContainer.appendChild(friend.div);
@@ -210,6 +225,8 @@ export class FriendlistHtml {
 		const status = document.createElement("button");
 		const btn = document.createElement("button");
 
+		status.classList.add("friendlist-status");
+		btn.classList.add("friendlist-button");
 		div.appendChild(avatar);
 		div.appendChild(username);
 		div.appendChild(status);
@@ -242,10 +259,11 @@ export class FriendlistHtml {
 		username.textContent = user.username;
 		avatar.src = `${user.avatar_path}`;
 		status.textContent = user.status;
+		status.setAttribute("status", user.status);
 
 		switch (type) {
 			case "friend": {
-				btn.textContent = "remove";
+				btn.textContent = "x";
 				btn.addEventListener("click", () => {
 					div.remove();
 					this.friend.delete(uuid);
@@ -259,8 +277,8 @@ export class FriendlistHtml {
 				break;
 			}
 			case "request": {
-				btn.textContent = "accept";
-				btn2.textContent = "decline";
+				btn.textContent = "+";
+				btn2.textContent = "x";
 				status.remove();
 				div.appendChild(btn2);
 				btn.addEventListener("click", () => {
@@ -284,7 +302,7 @@ export class FriendlistHtml {
 				break;
 			}
 			case "search": {
-				btn.textContent = "accept";
+				btn.textContent = "+";
 				btn.addEventListener("click", () => {
 					postRequest(`friends/add`, { inputUuid: uuid })
 						.catch((err) => { htmlManager.notification.add({ type: NotificationType.error, error: "friend send request" }) });
@@ -304,6 +322,8 @@ export class FriendlistHtml {
 		const status = document.createElement("button");
 		const btn = document.createElement("button");
 
+		status.classList.add("friendlist-status");
+		btn.classList.add("friendlist-button");
 		div.appendChild(avatar);
 		div.appendChild(username);
 		div.appendChild(status);
@@ -338,10 +358,11 @@ export class FriendlistHtml {
 		username.textContent = json.data.username;
 		avatar.src = `${json.data.avatar_path}`;
 		status.textContent = json.data.status;
+		status.setAttribute("status", json.data.status);
 
 		switch (type) {
 			case "friend": {
-				btn.textContent = "remove";
+				btn.textContent = "x";
 				btn.addEventListener("click", () => {
 					div.remove();
 					this.friend.delete(uuid);
@@ -355,15 +376,15 @@ export class FriendlistHtml {
 				break;
 			}
 			case "request": {
-				btn.textContent = "accept";
-				btn2.textContent = "decline";
+				btn.textContent = "+";
+				btn2.textContent = "x";
 				status.remove();
 				div.appendChild(btn2);
 				btn.addEventListener("click", () => {
 					postRequest("friends/accept", { inputUuid: uuid })
 						.then(() => {
 							div.remove();
-							this.createUserElement(uuid, "friend");
+							this.createUserElementAsync(uuid, "friend");
 						})
 						.catch((err) => { htmlManager.notification.add({ type: NotificationType.error, error: "friend accept request" }) });
 				})
@@ -380,7 +401,7 @@ export class FriendlistHtml {
 				break;
 			}
 			case "search": {
-				btn.textContent = "accept";
+				btn.textContent = "+";
 				btn.addEventListener("click", () => {
 					postRequest(`friends/add`, { inputUuid: uuid })
 						.catch((err) => { htmlManager.notification.add({ type: NotificationType.error, error: "friend send request" }) });
