@@ -41,6 +41,7 @@ export class TournamentHtml implements IHtml {
   private div: HTMLDivElement;
 
   private tree: MatchNode | null = null;
+  private oldTree: MatchNode | null = null;
   private players: Map<string, PlayerState>;
 
   private readyActive = false;
@@ -76,69 +77,19 @@ export class TournamentHtml implements IHtml {
     streamManager.tournament.disconnect();
   }
 
-public update(payload: TournamentServerUpdate) {
-  if (payload.tournamentRoot) {
-    this.updateTree(this.tree, payload.tournamentRoot);
-  }
-
-  if (Array.isArray(payload.players)) {
-    for (const p of payload.players) {
-      const existingPlayer = this.players.get(p.uuid);
-      if (existingPlayer) {
-        existingPlayer.ready = p.ready;
-        existingPlayer.connected = p.connected;
-        existingPlayer.eliminated = p.eliminated;
-      } else {
-        this.players.set(p.uuid, p);
+  public update(payload: TournamentServerUpdate) {
+    this.tree = payload.tournamentRoot ?? null;
+    if (Array.isArray(payload.players)) {
+      for (const p of payload.players) {
+        const existingPlayer = this.players.get(p.uuid);
+        if (existingPlayer) {
+          existingPlayer.ready = p.ready;
+          existingPlayer.connected = p.connected;
+          existingPlayer.eliminated = p.eliminated;
+        } else {
+          this.players.set(p.uuid, p);
+        }
       }
-    }
-  }
-}
-
-  private updateTree(
-    existingTree: MatchNode | null,
-    newTree: MatchNode | null
-  ) {
-    if (!existingTree && newTree) {
-      this.tree = newTree;
-      return;
-    }
-
-    if (!existingTree || !newTree) return;
-
-    if (existingTree.player1Id !== newTree.player1Id) {
-      existingTree.player1Id = newTree.player1Id;
-    }
-    if (existingTree.player2Id !== newTree.player2Id) {
-      existingTree.player2Id = newTree.player2Id;
-    }
-
-    if (existingTree.score && newTree.score) {
-      existingTree.score = [...newTree.score];
-    }
-
-    if (existingTree.gameId !== newTree.gameId) {
-      existingTree.gameId = newTree.gameId;
-    }
-
-    if (existingTree.winnerId !== newTree.winnerId) {
-      existingTree.winnerId = newTree.winnerId;
-    }
-
-    if (existingTree.forfeitId !== newTree.forfeitId) {
-      existingTree.forfeitId = newTree.forfeitId;
-    }
-
-    if (existingTree.left && newTree.left) {
-      this.updateTree(existingTree.left, newTree.left);
-    } else if (newTree.left) {
-      existingTree.left = newTree.left;
-    }
-
-    if (existingTree.right && newTree.right) {
-      this.updateTree(existingTree.right, newTree.right);
-    } else if (newTree.right) {
-      existingTree.right = newTree.right;
     }
   }
 
@@ -475,24 +426,6 @@ public update(payload: TournamentServerUpdate) {
     return ul;
   }
 
-  private computePlayerCount(): number {
-    if (this.players.size > 0) return this.players.size;
-
-    const ids = new Set<string>();
-    const visit = (n: MatchNode | null) => {
-      if (!n) return;
-      if (!n.left && !n.right) {
-        if (n.player1Id) ids.add(n.player1Id);
-        if (n.player2Id) ids.add(n.player2Id);
-      } else {
-        visit(n.left ?? null);
-        visit(n.right ?? null);
-      }
-    };
-    visit(this.tree);
-    return ids.size;
-  }
-
   public render() {
     const leftLane = this.treeEl.querySelector(".bracket-left") as HTMLElement;
     const ctrLane = this.treeEl.querySelector(".bracket-center") as HTMLElement;
@@ -540,12 +473,6 @@ public update(payload: TournamentServerUpdate) {
       );
       rightLane.appendChild(col);
     }
-    const count = this.computePlayerCount();
-    let bucket = 4;
-    if (count > 4 && count <= 8) bucket = 8;
-    else if (count > 8) bucket = 16;
-
-    this.treeEl.id = `tournament-tree-${bucket}`;
   }
 
   private isPlaying(node: MatchNode): boolean {
