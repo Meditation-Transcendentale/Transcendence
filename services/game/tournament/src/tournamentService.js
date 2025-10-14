@@ -239,7 +239,7 @@ class Tournament {
 
   maybeStartReadyCheck() {
     if (this.readyActive) return;
-    if (!this.allConnected()) return;
+    if (!this.allConnected() || this.root.winnerId) return;
     console.log("1");
     if (!this.hasAnyActiveMatch()) this.sendReadyCheck();
     console.log("2");

@@ -41,6 +41,7 @@ export class TournamentHtml implements IHtml {
   private div: HTMLDivElement;
 
   private tree: MatchNode | null = null;
+  private oldTree: MatchNode | null = null;
   private players: Map<string, PlayerState>;
 
   private readyActive = false;
@@ -80,7 +81,14 @@ export class TournamentHtml implements IHtml {
     this.tree = payload.tournamentRoot ?? null;
     if (Array.isArray(payload.players)) {
       for (const p of payload.players) {
-        this.players.set(p.uuid, p);
+        const existingPlayer = this.players.get(p.uuid);
+        if (existingPlayer) {
+          existingPlayer.ready = p.ready;
+          existingPlayer.connected = p.connected;
+          existingPlayer.eliminated = p.eliminated;
+        } else {
+          this.players.set(p.uuid, p);
+        }
       }
     }
   }
@@ -126,6 +134,7 @@ export class TournamentHtml implements IHtml {
 			<div class="bracket-center"></div>
 			<div class="bracket-right"></div>
 			`;
+    ``;
 
     this.rootEl.append(this.toolbarEl, this.treeEl);
     this.div.appendChild(this.rootEl);
@@ -175,8 +184,7 @@ export class TournamentHtml implements IHtml {
       const badge = this.toolbarEl.querySelector(
         ".ready-countdown"
       ) as HTMLSpanElement | null;
-	  if (badge)
-		badge.textContent = "";
+      if (badge) badge.textContent = "";
       clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
@@ -190,7 +198,8 @@ export class TournamentHtml implements IHtml {
 
   private rowScore(node: MatchNode, pid: string | null): string | null {
     if (!node.winnerId && !node.score) return null;
-    if (node.forfeitId) return pid && node.winnerId === pid ? "W/O" : "DQ";
+    if (node.forfeitId)
+      return pid && node.winnerId === pid ? "Win" : "Disqualified";
     if (node.score?.length)
       return pid && node.player1Id === pid
         ? node.score[0].toString()
@@ -266,18 +275,20 @@ export class TournamentHtml implements IHtml {
 
   private makeReadyButton(): HTMLButtonElement {
     const b = document.createElement("button");
-    // b.classList.add("ready-btn"); TO ADD WHEN STYLE IS THERE
     b.textContent = "Ready";
     b.addEventListener("click", () => this.sendReady());
     return b;
   }
 
-  private statusBadge(p: PlayerState | null, side: "root" | "left" | "right"): HTMLElement | null {
+  private statusBadge(
+    p: PlayerState | null,
+    side: "root" | "left" | "right"
+  ): HTMLElement | null {
     if (!p) return null;
     const s = document.createElement("span");
     s.className = "ready-checked";
     if (p.eliminated) {
-      s.textContent = "DQ";
+      s.textContent = "Disqualified";
       return s;
     }
     if (!p.connected) {
@@ -285,10 +296,12 @@ export class TournamentHtml implements IHtml {
       s.classList.add("disconnected");
       return s;
     }
-    if (side == "left")
-      s.textContent = p.ready ? "Ready ✓" : "Not Ready ⏳";
-    else if (side == "right")
-      s.textContent = p.ready ? "✓ Ready" : "⏳ Not ready";
+    if (!this.readyActive) {
+      s.textContent = side == "left" ? "Waiting ⏳" : "⏳ Waiting";
+      return s;
+    }
+    if (side == "left") s.textContent = p.ready ? "Ready ✓" : "Ready ❔";
+    else if (side == "right") s.textContent = p.ready ? "✓ Ready" : "❔ Ready";
     if (!p.ready) s.classList.add("notReady-checked");
     return s;
   }
@@ -302,6 +315,22 @@ export class TournamentHtml implements IHtml {
 
     const card = document.createElement("div");
     card.className = "match-info";
+
+    if (this.isPlaying(node)) {
+      li.classList.add("playing");
+      const bar = document.createElement("div");
+      bar.className = "playing-bar";
+      card.appendChild(bar);
+
+      const live = document.createElement("div");
+      live.className = "live-pill";
+      live.textContent = "LIVE";
+      card.appendChild(live);
+    }
+
+    if (this.isMyCurrentNode(node)) {
+      li.classList.add("my-match");
+    }
 
     const top = this.renderRow(
       node,
@@ -320,6 +349,10 @@ export class TournamentHtml implements IHtml {
       bot.classList.add("winner");
 
     card.append(top, bot);
+    if (node.gameId && !node.winnerId)
+      card.addEventListener("click", () =>
+        streamManager.tournament.spectate(node.gameId)
+      );
     li.appendChild(card);
     return li;
   }
@@ -440,5 +473,16 @@ export class TournamentHtml implements IHtml {
       );
       rightLane.appendChild(col);
     }
+  }
+
+  private isPlaying(node: MatchNode): boolean {
+    return !!node.gameId && !node.winnerId;
+  }
+
+  private isMyCurrentNode(node: MatchNode): boolean {
+    const uid = User.uuid || null;
+    if (!uid) return false;
+    const amIn = node.player1Id === uid || node.player2Id === uid;
+    return amIn && !node.winnerId;
   }
 }
