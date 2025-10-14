@@ -42,7 +42,7 @@ class HtmlManager {
 
 		const b = document.createElement("button");
 		b.className = "friendlist-toggle";
-		b.textContent = "👥";
+		b.textContent = "❖";
 		b.style.position = "absolute";
 		b.style.bottom = "0";
 		b.style.right = "0";

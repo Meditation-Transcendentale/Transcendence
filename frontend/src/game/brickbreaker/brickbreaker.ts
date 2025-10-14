@@ -1,4 +1,4 @@
-import { Engine, Scene, Vector3, Vector2, ArcRotateCamera, HemisphericLight, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Color4, Observer, TransformNode, FreeCamera } from "../../babylon";
+import { Engine, Scene, Vector3, Vector2, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Observer, TransformNode, FreeCamera, PointLight } from "../../babylon";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
 import { getRequest, patchRequest } from "../../networking/request";
@@ -18,7 +18,6 @@ export class BrickBreaker {
 	private player: Player;
 	private ball: Ball;
 	private arena: Mesh;
-	private light: HemisphericLight;
 	private renderObserver: Observer<Scene> | null = null;
 	private lastTime: number = 0;
 	private cols: number;
@@ -45,16 +44,20 @@ export class BrickBreaker {
 		this.gameUI = gameUI;
 		this.engine = scene.getEngine() as Engine;
 		this.root = new TransformNode("pongbrRoot", this.scene);
-		// this.root.position.set(200, 500, 500);
+		this.root.position.set(20, 50, 50);
 		this.root.scaling.set(1, 1, 1);
+
+		this.camera = sceneManager.camera;
+		const light = new PointLight("pointBrick", new Vector3(0, 200, 0), this.scene);
+		light.intensity = 0.5;
+		light.parent = this.root;
 
 		this.createArena();
 
-		this.camera = sceneManager.camera;
 
 		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
 		ballMaterial.diffuseColor.set(1, 0, 0);
-		ballMaterial.specularColor.set(0, 0, 0);
+		ballMaterial.specularColor.set(0.5, 0, 0);
 		this.ball = new Ball(this.scene, ballMaterial, this.root, this);
 		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
 
@@ -70,7 +73,7 @@ export class BrickBreaker {
 		this.pbHard = json.brickBreakerStats.hard_mode_hscore;
 	}
 
-	public handleLeaderboard(json: any){
+	public handleLeaderboard(json: any) {
 		if (this.mode == 'easy')
 			this.gameUI.setLeaderboard(json.leaderboards.easy, this.mode);
 		else if (this.mode == 'normal')
@@ -95,15 +98,15 @@ export class BrickBreaker {
 		this.handlePb(pb);
 		this.handleLeaderboard(leaderboard);
 
-		if (mod === "easy") {
+		if (mode === "easy") {
 			this.layers = 2;
 			this.cols = 3;
 			this.gameUI.updateHighScore(this.pbEasy);
-		} else if (mod === "normal") {
+		} else if (mode === "normal") {
 			this.layers = 4;
 			this.cols = 4;
 			this.gameUI.updateHighScore(this.pbNormal);
-		} else if (mod === "hard") {
+		} else if (mode === "hard") {
 			this.layers = 6;
 			this.cols = 5;
 			this.gameUI.updateHighScore(this.pbHard);
@@ -112,6 +115,8 @@ export class BrickBreaker {
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
 
 		this.camera.parent = this.root;
+		this.camera.position.set(0, 30, 0);
+		// console.log("start:", this.camera.position);
 		this.lastTime = performance.now();
 		this.start1 = true;
 		this.update();
@@ -128,8 +133,8 @@ export class BrickBreaker {
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
 	}
 
-	public async end(){
-		if (this.newHighScore){
+	public async end() {
+		if (this.newHighScore) {
 			await patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true);
 		}
 		const leaderboard = await getRequest("stats/get/leaderboard/brickbreaker")
@@ -147,6 +152,9 @@ export class BrickBreaker {
 
 		this.player.update();
 		this.ball.update(delta, this.player, this.cols, this.layers, this.bricks);
+		console.log("came pos:", this.camera.position);
+		// console.log("light pos:", this.light.position);
+		// console.log("sphere pos:", this.sphere.position);
 
 		this.id = requestAnimationFrame(() => this.update());
 		if (!this.start1) {
@@ -155,7 +163,7 @@ export class BrickBreaker {
 	}
 
 	public stop(): void {
-		if (this.newHighScore){
+		if (this.newHighScore) {
 			patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true)
 		}
 		this.camera.parent = null;
@@ -185,9 +193,8 @@ export class BrickBreaker {
 		this.arena = MeshBuilder.CreateDisc("arena", { radius: 5, tessellation: 128 }, this.scene);
 		this.arena.parent = this.root;
 		const mat = new StandardMaterial("arenaMat", this.scene);
-		mat.diffuseColor.set(0.75, 0.75, 0.75);
-		mat.emissiveColor.set(0.75, 0.75, 0.75);
-		// mat.disableLighting = true;
+		mat.diffuseColor.set(1, 1, 1);
+		mat.specularColor.set(0.5, 0.5, 0.5);
 		this.arena.material = mat;
 		this.arena.rotation.x = Math.PI / 2;
 		const radian = 2 * Math.PI;
@@ -238,8 +245,8 @@ export class BrickBreaker {
 				mesh.parent = this.root;
 				mesh.position.y += 0.4;
 				const mat = new StandardMaterial("arenaMat", this.scene);
-				mat.diffuseColor.set(0.75, 0.75, 0.75);
-				mat.emissiveColor.set(0.75, 0.75, 0.75);
+				mat.diffuseColor.set(1, 1, 1);
+				mat.specularColor.set(0.5, 0.5, 0.5);
 				mesh.material = mat;
 				bricksCols.push(mesh);
 			}

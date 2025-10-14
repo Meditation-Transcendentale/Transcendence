@@ -9,6 +9,7 @@ class StateManager {
 	public tournamentId!: string;
 
 	public popup: number;
+	public friendlist!: boolean;
 
 	public playPath!: string;
 
@@ -21,6 +22,7 @@ class StateManager {
 		this.gameId = "";
 		this.tournamentId = "";
 		this.playPath = "";
+		this.friendlist = false;
 
 		this.popup = 0;
 	}
