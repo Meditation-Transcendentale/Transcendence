@@ -154,7 +154,7 @@ export class Ath {
 		
 		this.profileImage = document.createElement("img");
 		this.profileImage.id = "ath-profile-image";
-		this.profileImage.src = "https://localhost:3002/cdn/default_avatar.jpg";
+		this.profileImage.src = "/cdn/default_avatar.jpg";
 		// this.setupProfileImageStyles();
 		
 		this.trigger = document.createElement("span");
@@ -415,7 +415,7 @@ class athSettings {
 		fileInput.addEventListener("change", () => {
 			const file = fileInput.files ? fileInput.files[0] : null;
 
-			const url = file ? URL.createObjectURL(file) : "https://localhost:3002/cdn/default_avatar.jpg";
+			const url = file ? URL.createObjectURL(file) : "/cdn/default_avatar.jpg";
 			previewImg.src = url;
 			
 			div.appendChild(previewImg);
@@ -909,7 +909,7 @@ class athProfile {
 
 	private async updateProfileInfo() {
 		await User.check();
-		this.profileImg.src = User.avatar || "https://localhost:3002/cdn/default_avatar.jpg";
+		this.profileImg.src = User.avatar || "/cdn/default_avatar.jpg";
 		this.usernameElem.textContent = User.username || "User";
 		this.statusElem.textContent = `Status: ${User.status || "offline"}`;
 		this.statusElem.style.color = User.status === "online" ? "green" : User.status === "offline" ? "orange" : "red";

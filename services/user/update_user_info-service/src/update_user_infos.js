@@ -153,7 +153,7 @@ async function getAvatarCdnUrl(avatar, uuid) {
 	const fullPath = `/app/cdn_data/${filename}`;
 	fs.writeFileSync(fullPath, buffer);
 
-	return `${process.env.CDN_URL}/${filename}`;
+	return `/cdn/${filename}`;
 }
 
 const usernameSchema = {

@@ -196,7 +196,9 @@ handleErrorsNats(async () => {
 		}),
 		handleNatsSubscription("status.updateUserStatus", async (msg) => {
 			const { userId, status, lobby_gameId } = jc.decode(msg.data);
-			userService.updateStatus(userId, status, lobby_gameId);
+			console.log("Updating status for user:", userId, "to status:", status, "and lobby_gameId:", lobby_gameId);
+			const user_id = userService.getUserFromUUID(userId).id;
+			userService.updateStatus(user_id, status, lobby_gameId);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("user.getAvatarFromUsername", async (msg) => {
