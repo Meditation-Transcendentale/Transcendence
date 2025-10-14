@@ -1,16 +1,296 @@
-.friendlist-container {
-	position: absolute;
-	display: block;
-	bottom: 100px;
-	right: 200px;
+.friendlist-toggle {
+	/* background-color: var(--color-purple); */
+	background-color: #0d022180;
 	color: white;
-	background-color: black;
+	font-family: var(--font-primary);
+	font-size: var(--font-size-tiny);
+	padding: var(--spacing-sm) var(--spacing-md);
+	border: none;
+	border-radius: var(--font-size-tiny);
+	cursor: pointer;
+	box-shadow: 0 3px 6px rgba(114, 9, 183, 0.6);
+	transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+	user-select: none;
+	/* line-height: var(--font-size-tiny); */
+	/* align-items: center; */
+	display: inline-flex;
+	overflow: hidden;
+	/* or flex */
+	/* vertical-align: middle; */
+	outline: 2px solid var(--color-lavender);
 }
 
+.friendlist-toggle:hover {
+	background-color: var(--color-purple-bright);
+	box-shadow: 0 4px 12px rgba(157, 78, 221, 0.8);
+}
 
-.friendlist-content {
-	color: white;
-	background-color: black;
+.friendlist-toggle:active {
+	/* background-color: var(--color-purple-dark); */
+	background-color: #0d022180;
+	box-shadow: 0 2px 4px rgba(92, 24, 154, 0.9);
+}
+
+.friendlist-toggle:focus {
+	outline: 2px solid var(--color-lavender);
+	outline-offset: 2px;
+}
+
+/*
+ * //////////////////////////////////////////////
+ * */
+.friendlist-container {
+	position: absolute;
+	bottom: var(--font-size-base);
+	right: 0px;
+	font-family: var(--font-primary);
+	color: var(--color-lavender);
+	background-color: transparent;
+	width: 360px;
+	/* fixed width for consistency */
+	min-height: 360px;
+	/* coherent min height for friend requests & search */
+	user-select: none;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	/* gap: var(--spacing-md); */
+	font-size: var(--font-size-verysmall);
+}
+
+.friendlist-form {
+	background-color: transparent;
 	width: 100%;
-	height: 500px;
+	display: flex;
+	gap: var(--spacing-xs);
+}
+
+.friendlist-form>button {
+	flex: 1;
+	/* background-color: var(--color-purple-medium); */
+	background-color: #0d0221;
+	border: none;
+	border-radius: var(--spacing-xs) var(--spacing-sm) 0 0;
+	color: var(--color-lavender);
+	font-weight: var(--font-weight-normal);
+	cursor: pointer;
+	padding: var(--spacing-xs) 0;
+	transition: background-color var(--transition-fast);
+	user-select: none;
+	font-size: var(--font-size-button);
+	line-height: 1.2;
+}
+
+.friendlist-form>button:hover {
+	background-color: var(--color-purple-bright);
+}
+
+.friendlist-form>button:active {
+	background-color: var(--color-purple-medium);
+}
+
+.friendlist-form>button[click] {
+	background-color: var(--color-lavender);
+	color: var(--color-purple-dark);
+	cursor: default;
+}
+
+.friendlist-content,
+.request-container,
+.searchContainer {
+	color: var(--color-lavender);
+	/* background-color: rgba(90, 24, 154, 0.4); */
+	background-color: #0d022180;
+	width: 100%;
+	flex-grow: 1;
+	min-height: 140px;
+	padding: var(--spacing-md);
+	border: var(--spacing-sm) solid var(--color-lavender);
+	/* border-top-right-radius: var(--spacing-m); */
+	border-bottom-right-radius: var(--spacing-m);
+	border-bottom-left-radius: var(--spacing-m);
+	overflow-y: auto;
+	box-sizing: border-box;
+	font-size: var(--font-size-verysmall);
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
+}
+
+.friendlist-online-content,
+.friendlist-away-content {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
+}
+
+.friendlist-user {
+	display: flex;
+	align-items: center;
+	background-color: var(--color-purple-medium);
+	border-radius: var(--spacing-xs);
+	padding: var(--spacing-xs) var(--spacing-sm);
+	gap: var(--spacing-xs);
+	box-sizing: border-box;
+	width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: var(--font-size-verysmall);
+}
+
+.friendlist-user>img {
+	flex: 0 0 var(--font-size-verysmall);
+	width: var(--font-size-verysmall);
+	height: var(--font-size-verysmall);
+	border-radius: 50%;
+	object-fit: cover;
+	user-select: none;
+}
+
+.friendlist-user>span {
+	flex: 1 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--color-lavender);
+	font-weight: var(--font-weight-bold);
+	user-select: text;
+}
+
+.friendlist-status {
+	flex: 0 0 60px !important;
+	background-color: transparent;
+	border: none;
+	font-weight: var(--font-weight-normal);
+	cursor: default;
+	user-select: none;
+	font-size: var(--font-size-verysmall);
+	font-style: italic;
+	color: var(--color-purple-bright);
+}
+
+.friendlist-status:not([status="offline"]) {
+	color: var(--color-lavender);
+}
+
+.friendlist-button {
+	flex: 0 0 40px;
+	background-color: var(--color-purple-bright);
+	border: none;
+	border-radius: var(--spacing-xs);
+	color: var(--color-lavender);
+	cursor: pointer;
+	font-weight: var(--font-weight-bold);
+	transition: background-color var(--transition-fast);
+	user-select: none;
+	font-size: var(--font-size-button);
+	line-height: 1;
+}
+
+.friendlist-button:hover {
+	background-color: var(--color-purple-light);
+}
+
+.friendlist-button:active {
+	background-color: var(--color-purple-bright);
+}
+
+/* Special handling for last button on request */
+.friendlist-button:nth-last-child(1) {
+	margin-left: var(--spacing-xs);
+	background-color: var(--color-purple-dark);
+}
+
+.friendlist-button:nth-last-child(1):hover {
+	background-color: var(--color-purple-medium);
+}
+
+/* Search container form */
+.friendlist-search-form {
+	display: flex;
+	gap: var(--spacing-xs);
+	margin-bottom: var(--spacing-md);
+	font-size: var(--font-size-verysmall);
+}
+
+.friendlist-search-form input[type="search"] {
+	flex: 1;
+	width: 100%;
+	padding: var(--spacing-xs) var(--spacing-sm);
+	border-radius: var(--spacing-xs);
+	border: 1px solid var(--color-lavender);
+	background-color: var(--color-space-deep);
+	color: var(--color-lavender);
+	font-size: var(--font-size-input);
+	outline: none;
+	user-select: text;
+	box-sizing: border-box;
+}
+
+.friendlist-search-form input[type="search"]::placeholder {
+	color: var(--color-purple-light);
+}
+
+.friendlist-search-form button[type="submit"] {
+	background-color: var(--color-purple-medium);
+	border: none;
+	border-radius: var(--spacing-xs);
+	color: var(--color-lavender);
+	font-weight: var(--font-weight-bold);
+	cursor: pointer;
+	padding: var(--spacing-xs) var(--spacing-sm);
+	transition: background-color var(--transition-fast);
+	user-select: none;
+	font-size: var(--font-size-button);
+	line-height: 1;
+}
+
+.friendlist-search-form button[type="submit"]:hover {
+	background-color: var(--color-purple-bright);
+}
+
+.friendlist-search-form button[type="submit"]:active {
+	background-color: var(--color-purple-medium);
+}
+
+.friendlist-search-results {
+	max-height: 160px;
+	overflow-y: auto;
+	font-size: var(--font-size-verysmall);
+	color: var(--color-lavender);
+}
+
+/* Scrollbar styling */
+.friendlist-content::-webkit-scrollbar,
+.request-container::-webkit-scrollbar,
+.searchContainer::-webkit-scrollbar,
+.friendlist-search-results::-webkit-scrollbar {
+	width: 8px;
+}
+
+.friendlist-content::-webkit-scrollbar-thumb,
+.request-container::-webkit-scrollbar-thumb,
+.searchContainer::-webkit-scrollbar-thumb,
+.friendlist-search-results::-webkit-scrollbar-thumb {
+	background-color: var(--color-purple-bright);
+	border-radius: 4px;
+}
+
+.friendlist-content::-webkit-scrollbar-track,
+.request-container::-webkit-scrollbar-track,
+.searchContainer::-webkit-scrollbar-track,
+.friendlist-search-results::-webkit-scrollbar-track {
+	background-color: var(--color-space-deep);
+}
+
+/* Responsive tweak */
+@media (max-width: 500px) {
+	.friendlist-container {
+		right: 10px;
+		bottom: 10px;
+		width: 90vw;
+		min-height: auto;
+		font-size: 2.2vh;
+	}
 }

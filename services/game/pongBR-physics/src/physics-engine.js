@@ -106,7 +106,6 @@ export class PhysicsEngine {
 
 			const pillarAngle = sliceStart + pillarArc / 2;
 
-			console.log(`Pillar angle = ${pillarAngle}`);
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
@@ -136,7 +135,6 @@ export class PhysicsEngine {
 		this.spawnState.targetBallCount = ballConfig.maxBalls;
 		this.spawnState.spawnedThisPhase = 0;
 
-		// console.log(`Started spawning for ${phase}: target ${ballConfig.maxBalls} balls`);
 	}
 
 	updateBallSpawning(currentTime) {
@@ -174,8 +172,8 @@ export class PhysicsEngine {
 	spawnSingleBall() {
 		const cfg = this.cfg;
 		const pd = this.pd;
-		const playerCount = this.gameState.playerStates.activePlayers.size;
-		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(playerCount);
+		const phaseConfig = getPhaseConfig(this.gameState.currentPhase);
+		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(phaseConfig.playerCount);
 
 		const ballEnt = pd.create(ENTITY_MASKS.BALL);
 		this.entities.balls.push(ballEnt);
@@ -197,19 +195,17 @@ export class PhysicsEngine {
 		pd.velX[ballEnt] = Math.cos(dir) * speed;
 		pd.velY[ballEnt] = Math.sin(dir) * speed;
 
-		// console.log(`Spawned ball ${this.spawnState.spawnedThisPhase + 1}, next in ${this.spawnState.currentSpawnInterval.toFixed(0)}ms`);
 	}
 
 	stopBallSpawning() {
 		this.spawnState.enabled = false;
-		// console.log(`Ball spawning stopped. Spawned ${this.spawnState.spawnedThisPhase} balls this phase.`);
 	}
 
 	createBalls(numBalls) {
 		const cfg = this.cfg;
 		const pd = this.pd;
-		const playerCount = this.gameState.playerStates.activePlayers.size;
-		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(playerCount);
+		const phaseConfig = getPhaseConfig(this.gameState.currentPhase);
+		const ballRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(phaseConfig.playerCount);
 
 		for (let b = 0; b < numBalls; b++) {
 			const ballEnt = pd.create(ENTITY_MASKS.BALL);
@@ -386,7 +382,6 @@ export class PhysicsEngine {
 			}
 		});
 
-		console.log(numActivePlayers);
 		const newAngleStep = (2 * Math.PI) / numActivePlayers;
 		const paddleArc = newAngleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
@@ -441,7 +436,6 @@ export class PhysicsEngine {
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
 			pd.posY[pillarEnt] = Math.sin(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
 			pd.rot[pillarEnt] = pillarAngle;
-			console.log(`Pillar angle = ${pillarAngle}`);
 			pd.halfW[pillarEnt] = pd.halfH[pillarEnt] = pd.radius[pillarEnt] = pillarSize / 2;
 		});
 
@@ -451,6 +445,19 @@ export class PhysicsEngine {
 
 		this.gameState.updatePlayerMapping(activePlayers);
 
+	}
+
+	updateExistingBallRadii() {
+		const pd = this.pd;
+		const cfg = this.cfg;
+		const phaseConfig = getPhaseConfig(this.gameState.currentPhase);
+		const newBallRadius = cfg.BALL_RADIUS * getBallScaleForPlayerCount(phaseConfig.playerCount);
+
+		for (const ballEnt of this.entities.balls) {
+			if (ballEnt !== undefined && pd.isActive(ballEnt)) {
+				pd.radius[ballEnt] = newBallRadius;
+			}
+		}
 	}
 
 	resetBallsForNewPhase() {
@@ -475,14 +482,12 @@ export class PhysicsEngine {
 		if (this.gameState.isRebuilding) return;
 
 		if (this.gameState.playerStates.eliminated.has(fixedPlayerId)) {
-			console.log("cant move you are dead");
 			return;
 		}
 
 		const paddleIndex = this.gameState.playerMapping[fixedPlayerId] ?? fixedPlayerId;
 
 		if (paddleIndex >= 0 && paddleIndex < this.paddleData.inputStates.length) {
-			console.log("can move");
 			this.paddleData.inputStates[paddleIndex] = Math.max(-1, Math.min(1, moveInput));
 		}
 	}
@@ -600,7 +605,7 @@ export class PhysicsEngine {
 
 				return {
 					id: currentPaddleIndex,
-					playerId: fixedPlayerId,
+					paddleId: fixedPlayerId,  // Changed from playerId to match proto field name
 					move: this.paddleData.inputStates[currentPaddleIndex] || 0,
 					offset: this.paddleData.offsets[currentPaddleIndex] || 0,
 					dead: this.paddleData.dead[fixedPlayerId] === 1
@@ -666,7 +671,7 @@ export class PhysicsEngine {
 
 	completeArenaRebuild() {
 		this.verifyEntityIntegrity();
-
+		this.updateExistingBallRadii();
 		this.redistributeSurvivingPlayers();
 		this.resetBallsForNewPhase();
 		this.gameState.completeArenaRebuild();

@@ -24,7 +24,12 @@ export class LobbyStream implements IStream {
 
 		const url = `${this.url}${encodeURIComponent(User.uuid as string)}&lobbyId=${stateManager.lobbyId}`;
 
-		this.ws = new WebSocket(url);
+		try {
+			this.ws = new WebSocket(url);
+		} catch (err) {
+			console.log("wefewfewf");
+			return;
+		}
 		this.ws.binaryType = "arraybuffer";
 
 		this.ws.onopen = () => {
@@ -38,11 +43,14 @@ export class LobbyStream implements IStream {
 		}
 
 		this.ws.onerror = (err) => {
-			console.warn(err);
+			htmlManager.notification.add({ type: NotificationType.error, error: `cant connect to lobby` });
+			// console.log(err);
+			// console.warn(err);
 			this.disconnect();
 			routeManager.nav("/play");
 		}
 		this.connected = true;
+
 	}
 
 	public disconnect(): void {
@@ -88,6 +96,12 @@ export class LobbyStream implements IStream {
 		if (payload.startTournament != null) {
 			stateManager.tournamentId = payload.startTournament.tournamentId as string;
 			routeManager.nav("/tournament", false, true);
+			this.disconnect();
+		}
+
+		if (payload.error != null) {
+			htmlManager.notification.add({ type: NotificationType.error, text: `${payload.error.message}` });
+			routeManager.comeback();
 			this.disconnect();
 		}
 	}

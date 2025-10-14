@@ -136,8 +136,11 @@ export namespace shared {
         /** Paddle id */
         id?: (number|null);
 
-        /** Paddle playerId */
-        playerId?: (number|null);
+        /** Paddle paddleId */
+        paddleId?: (number|null);
+
+        /** Paddle uuid */
+        uuid?: (string|null);
 
         /** Paddle move */
         move?: (number|null);
@@ -161,8 +164,11 @@ export namespace shared {
         /** Paddle id. */
         public id: number;
 
-        /** Paddle playerId. */
-        public playerId: number;
+        /** Paddle paddleId. */
+        public paddleId: number;
+
+        /** Paddle uuid. */
+        public uuid: string;
 
         /** Paddle move. */
         public move: number;
@@ -1555,6 +1561,12 @@ export namespace shared {
 
         /** MatchEnd forfeitId */
         forfeitId?: (string|null);
+
+        /** MatchEnd ranks */
+        ranks?: (number[]|null);
+
+        /** MatchEnd playerIds */
+        playerIds?: (string[]|null);
     }
 
     /** Represents a MatchEnd. */
@@ -1577,6 +1589,12 @@ export namespace shared {
 
         /** MatchEnd forfeitId. */
         public forfeitId: string;
+
+        /** MatchEnd ranks. */
+        public ranks: number[];
+
+        /** MatchEnd playerIds. */
+        public playerIds: string[];
 
         /**
          * Creates a new MatchEnd instance using the specified properties.
@@ -1659,8 +1677,8 @@ export namespace shared {
     /** Properties of a MatchEndBr. */
     interface IMatchEndBr {
 
-        /** MatchEndBr rank */
-        rank?: (string[]|null);
+        /** MatchEndBr playerIds */
+        playerIds?: (string[]|null);
     }
 
     /** Represents a MatchEndBr. */
@@ -1672,8 +1690,8 @@ export namespace shared {
          */
         constructor(properties?: shared.IMatchEndBr);
 
-        /** MatchEndBr rank. */
-        public rank: string[];
+        /** MatchEndBr playerIds. */
+        public playerIds: string[];
 
         /**
          * Creates a new MatchEndBr instance using the specified properties.

@@ -104,8 +104,8 @@ class SceneManager {
 
 
 	public async loadMandatory() {
-		await this.assets.loadMandatory()
 
+		await this.assets.loadMandatory()
 		this.cameraManager = new CameraManager(this.assets);
 		this.css3dRenderer = new Css3dRenderer(this.assets);
 		this.uboManager = new UBOManager(this.assets);
@@ -176,6 +176,7 @@ class SceneManager {
 				this.camera.attachControl();
 				this.assets.ballRoot.setEnabled(true);
 				this.assets.ballRoot.position.set(0, 0.25, 0);
+				this.assets.hemisphericLight.setEnabled(true);
 				this.assets.flashLight.range = 30;
 				this.assets.hemisphericLight.intensity = 0.1;
 				// this.assets.ballMesh.position.set(0, 0, 0);
@@ -200,6 +201,7 @@ class SceneManager {
 				// this.camera.detachControl();
 				this.picker.enable = false;
 				this.grass.enable = false;
+				this.assets.hemisphericLight.setEnabled(true);
 				this.assets.ballMesh.setEnabled(true);
 				this.assets.groundMesh.setEnabled(false);
 				this.butterfly.enable = false;
@@ -219,7 +221,8 @@ class SceneManager {
 				this.assets.flashLight.intensity = 1;
 				this.assets.hemisphericLight.intensity = 1.5;
 				this.assets.flashLight.range = 100;
-				this.assets.grassMaterial.specularColor.scaleInPlace(0.5);
+				this.assets.hemisphericLight.setEnabled(true);
+				this.assets.grassMaterial.specularColor.scaleInPlace(0.5)
 				this.grass.enable = true;
 				this.assets.ballMesh.setEnabled(true);
 				this.assets.groundMesh.setEnabled(true);
@@ -246,6 +249,7 @@ class SceneManager {
 				this.assets.monolithRoot.setEnabled(true);
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.assets.monolithRoot.position.set(0, 0, 0);
+				this.assets.hemisphericLight.setEnabled(true);
 				// this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
@@ -254,6 +258,7 @@ class SceneManager {
 			case "brick": {
 				// this.camera.detachControl();
 				this.picker.enable = false;
+				this.assets.hemisphericLight.setEnabled(true);
 				this.grass.enable = false;
 				this.assets.ballMesh.setEnabled(false);
 				this.assets.groundMesh.setEnabled(false);
@@ -273,6 +278,7 @@ class SceneManager {
 				this.grass.enable = false;
 				this.assets.ballMesh.setEnabled(false);
 				this.assets.groundMesh.setEnabled(false);
+				this.assets.hemisphericLight.setEnabled(false);
 				this.butterfly.enable = false;
 				this.ballGrass.updateType = "none";
 				this.fog.enable = false;

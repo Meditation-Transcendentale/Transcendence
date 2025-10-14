@@ -41,7 +41,7 @@ for svc in "${SERVICES[@]}"; do
   # 5. Determine output directory based on service type
   case "$svc" in
     frontend-pong)
-      OUT_DIR="../../frontend/src/pong/utils/proto"
+      OUT_DIR="../../frontend/src/game/pong/utils/proto"
       ;;
     100ptest)
       OUT_DIR="../../100pTestContainer/src/proto"
@@ -50,7 +50,7 @@ for svc in "${SERVICES[@]}"; do
       OUT_DIR="../../services/notifications/notifications-manager/src/proto"
       ;;
     frontend-pongbr)
-      OUT_DIR="../../frontend/src/pongbr/utils/proto"
+      OUT_DIR="../../frontend/src/game/pongbr/utils/proto"
       ;;
     friends-service)
       OUT_DIR="../../services/user/friends-service/src/proto"

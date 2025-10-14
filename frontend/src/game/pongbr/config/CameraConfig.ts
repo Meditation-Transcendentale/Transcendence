@@ -33,28 +33,21 @@ export const PHASE_CAMERA_CONFIG: Record<string, CameraPosition> = {
 		beta: 1.473,
 		radius: 392
 	},
-	'Final Phase': {
+	'Phase 5': {
 		alpha: -0.017,
-		beta: 1.003,    // More elevated view for final phase
+		beta: 1.003,
 		radius: 496
 	}
 };
 
-// Default camera position
 export const DEFAULT_CAMERA: CameraPosition = {
 	alpha: 0,
 	beta: Math.PI / 2.1,
 	radius: 300
 };
 
-// Loading/intro camera position (zoomed out, high angle)
 export const LOADING_CAMERA: CameraPosition = {
 	alpha: 0,
-	beta: 1.290,  // More elevated view
-	radius: 1000         // Zoomed out
+	beta: 1.290,
+	radius: 1000
 };
-//amera - alpha: -0.002, beta: 1.518, radius: 261.
-//📹 Camera - alpha: -0.006, beta: 1.480, radius: 309.9
-//Camera - alpha: -0.004, beta: 1.473, radius: 392.0
-//alpha: -0.017, beta: 1.003, radius: 496.0
-

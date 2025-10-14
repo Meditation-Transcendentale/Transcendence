@@ -15,9 +15,11 @@ export class UBOManager {
 		this.assets.fogUBO.updateMatrix("iprojection", this.assets.camera.getProjectionMatrix().invertToRef(this.tempMatrix));
 
 
-		const noiseOffsetDefault = 0.5;
-		const stepSizeDefault = 0.5;
-		const maxDistanceDefault = 100.;
+		const noiseOffsetDefault = 1.5;
+		// const stepSizeDefault = 0.5;
+		// const maxDistanceDefault = 100.;
+		const stepSizeDefault = 1.5;
+		const maxDistanceDefault = 50.;
 		const densityMultiplierDefault = 2.5;
 		const lightScatteringDefault = 0.2;
 		const fogAbsorptionDefault = new Vector3(0.1, 0.1, 0.1);

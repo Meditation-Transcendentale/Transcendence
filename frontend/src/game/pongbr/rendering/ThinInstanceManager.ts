@@ -7,6 +7,7 @@ export class ThinInstanceManager {
 	private mesh: Mesh;
 	private capacity: number;
 	private instanceTransforms: Float32Array;
+	private cachedMatrices: Map<number, Matrix>;
 
 	// LOD/culling thresholds (world units)
 	private updateThreshold: number;
@@ -16,6 +17,7 @@ export class ThinInstanceManager {
 		this.mesh = mesh;
 		this.capacity = capacity;
 		this.instanceTransforms = new Float32Array(capacity * 16);
+		this.cachedMatrices = new Map();
 		this.mesh.thinInstanceSetBuffer("matrix", this.instanceTransforms, 16);
 		//this.mesh.doNotSyncBoundingInfo = true;
 		this.updateThreshold = updateThreshold;
@@ -52,7 +54,18 @@ export class ThinInstanceManager {
 			if (entity.hasComponent(componentClass)) {
 				let matrix: Matrix;
 				if (entity.hasComponent(TransformComponent)) {
-					matrix = this.computeWorldMatrix(entity, entities);
+					const transform = entity.getComponent(TransformComponent);
+					// Use cached matrix if transform hasn't changed
+					if (transform && !transform.dirty && this.cachedMatrices.has(entity.id)) {
+						matrix = this.cachedMatrices.get(entity.id)!;
+					} else {
+						matrix = this.computeWorldMatrix(entity, entities);
+						// Cache the matrix and clear dirty flag
+						this.cachedMatrices.set(entity.id, matrix);
+						if (transform) {
+							transform.clearDirty();
+						}
+					}
 				} else {
 					const comp = entity.getComponent(componentClass) as { position: Vector3 };
 					matrix = Matrix.Translation(comp.position.x, comp.position.y, comp.position.z);

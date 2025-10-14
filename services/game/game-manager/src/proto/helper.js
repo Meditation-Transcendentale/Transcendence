@@ -106,4 +106,19 @@ export function encodeMatchScoreUpdate(payload) {
   ).finish();
 }
 
+/**
+ * MatchEndBr (BR mode end game with rankings)
+ */
+export function encodeMatchEndBr(payload) {
+  const err = Proto.shared.MatchEndBr.verify(payload);
+  if (err) throw new Error(err);
+  return Proto.shared.MatchEndBr.encode(
+    Proto.shared.MatchEndBr.create(payload)
+  ).finish();
+}
+
+export function decodeMatchEndBr(buffer) {
+  return Proto.shared.MatchEndBr.decode(buffer);
+}
+
 

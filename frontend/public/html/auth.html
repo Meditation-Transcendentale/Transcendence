@@ -5,76 +5,149 @@
 		<div id="boot-content" class="boot-terminal hidden">
 		</div>
 		<div id="login-content" class="login-page">
+			<div class="cosmic-overlay"></div>
+			<div class="void-particles"></div>
+			<div class="energy-web"></div>
+
 			<div class="login-container">
-				<div class="login-header">
-					<div class="system-info">[SYSTEM] Eclipse Quantum Network v2.4.7</div>
-					<div class="ascii-banner">
-						<pre>
- ▀▀▀██▀▀▀                                                                              ██                                         
-    ██      ██▄████   ▄█████▄  ██▄████▄  ▄▄█████▄   ▄█████▄   ▄████▄   ██▄████▄   ▄███▄██   ▄████▄   ██▄████▄   ▄█████▄   ▄████▄  
-    ██      ██▀       ▀ ▄▄▄██  ██▀   ██  ██▄▄▄▄ ▀  ██▀    ▀  ██▄▄▄▄██  ██▀   ██  ██▀  ▀██  ██▄▄▄▄██  ██▀   ██  ██▀    ▀  ██▄▄▄▄██ 
-    ██      ██       ▄██▀▀▀██  ██    ██   ▀▀▀▀██▄  ██        ██▀▀▀▀▀▀  ██    ██  ██    ██  ██▀▀▀▀▀▀  ██    ██  ██        ██▀▀▀▀▀▀ 
-    ██      ██       ██▄▄▄███  ██    ██  █▄▄▄▄▄██  ▀██▄▄▄▄█  ▀██▄▄▄▄█  ██    ██  ▀██▄▄███  ▀██▄▄▄▄█  ██    ██  ▀██▄▄▄▄█  ▀██▄▄▄▄█ 
-    ▀▀      ▀▀        ▀▀▀▀ ▀▀  ▀▀    ▀▀   ▀▀▀▀▀▀     ▀▀▀▀▀     ▀▀▀▀▀   ▀▀    ▀▀    ▀▀▀ ▀▀    ▀▀▀▀▀   ▀▀    ▀▀    ▀▀▀▀▀     ▀▀▀▀▀
-						</pre>
+				<!-- Floating runes around container -->
+				<div class="floating-rune rune-1">◈</div>
+				<div class="floating-rune rune-2">◉</div>
+				<div class="floating-rune rune-3">◊</div>
+				<div class="floating-rune rune-4">✧</div>
+				<div class="floating-rune rune-5">⬡</div>
+				<div class="floating-rune rune-6">◐</div>
+
+				<!-- Central emblem -->
+				<div class="cosmic-emblem">
+					<div class="emblem-ring ring-outer"></div>
+					<div class="emblem-ring ring-middle"></div>
+					<div class="emblem-ring ring-inner"></div>
+					<div class="emblem-core">
+						<span class="core-symbol">◈</span>
+						<span class="core-pulse"></span>
 					</div>
-					<div class="eclipse-banner">ECLIPSE PROTOCOL ACTIVE</div>
-					<div class="access-prompt">// RESTRICTED ACCESS - AUTHENTICATION REQUIRED</div>
 				</div>
-				
+
+				<div class="login-header">
+					<h1 class="cosmic-title">
+						<span class="glitch-text" data-text="TRANSCENDENCE">TRANSCENDENCE</span>
+					</h1>
+					<div class="ancient-divider">
+						<span class="divider-orb">◉</span>
+						<span class="divider-line"></span>
+						<span class="divider-star">✦</span>
+						<span class="divider-line"></span>
+						<span class="divider-orb">◉</span>
+					</div>
+					<p class="void-whisper">◈ ENTER THE ETERNAL REALM ◈</p>
+				</div>
+
 				<form class="login-form" id="loginForm">
-					<div class="input-line">
-						<span class="input-prompt">username</span>
-						<input type="text" id="username" name="username" class="terminal-input" placeholder="enter_username" required>
+					<div class="ritual-input">
+						<label class="ancient-label">
+							<span class="label-rune">◊</span>
+							IDENTITY
+							<span class="label-shimmer"></span>
+						</label>
+						<input type="text" id="username" name="username" class="cosmic-input" required>
+						<div class="input-aura"></div>
 					</div>
-					
-					<div class="input-line">
-						<span class="input-prompt">password</span>
-						<input type="password" id="password" name="password" class="terminal-input" placeholder="•••••••••••••••••" required>
+
+					<div class="ritual-input">
+						<label class="ancient-label">
+							<span class="label-rune">◊</span>
+							PASSWORD
+							<span class="label-shimmer"></span>
+						</label>
+						<input type="password" id="password" name="password" class="cosmic-input" required>
+						<div class="input-aura"></div>
 					</div>
-					
-					<div class="login-execute">
-						<div class="execute-line">
-							<span class="execute-prompt">eclipse@quantum:~$</span>
-							<button type="submit" class="terminal-btn disabledable" name="login" >./authenticate --init</button>
-							<button type="submit" class="terminal-btn disabledable" name="register">./register --init</button>
-						</div>
+
+					<div class="ritual-actions">
+						<button type="submit" class="cosmic-btn disabledable" name="login">
+							<span class="btn-icon">▸</span>
+							LOGIN
+							<span class="btn-energy"></span>
+						</button>
+						<button type="submit" class="cosmic-btn cosmic-btn--alt disabledable" name="register">
+							<span class="btn-icon">✧</span>
+							REGISTER
+							<span class="btn-energy"></span>
+						</button>
 					</div>
-					<div id="login-error" class="login-error hidden">
-						OUAI GROSS ERRURE
+
+					<div id="login-error" class="cosmic-error hidden">
+						<span class="error-icon">⚠</span>
+						ACCESS DENIED
+						<span class="error-icon">⚠</span>
 					</div>
+
 					<div id="twofa-container" class="hidden">
-						<div id="token-input-container">
-							<input class="token-number terminal-input" name="twofa1" pattern="[0-9]" maxlength="1" required/>
-							<input class="token-number terminal-input" name="twofa2" pattern="[0-9]" maxlength="1" required/>
-							<input class="token-number terminal-input" name="twofa3" pattern="[0-9]" maxlength="1" required/>
-							<input class="token-number terminal-input" name="twofa4" pattern="[0-9]" maxlength="1" required/>
-							<input class="token-number terminal-input" name="twofa5" pattern="[0-9]" maxlength="1" required/>
-							<input class="token-number terminal-input" name="twofa6" pattern="[0-9]" maxlength="1" required/>
-						</div>
-						<div id="twofa-button-container" class="execute-line">
-							<button type="submit" class="terminal-btn" name="token" >./authenticate --init --token</button>
-							<button id="token-reset" type="submit" class="terminal-btn" name="dismiss">./authenticate --reset</button>
+						<div class="ancient-seal">
+							<div class="seal-mandala">
+								<div class="mandala-ring"></div>
+								<div class="mandala-ring"></div>
+								<div class="mandala-ring"></div>
+							</div>
+							<p class="seal-text">
+								<span class="seal-eye">◉</span>
+								SACRED CODE
+								<span class="seal-eye">◉</span>
+							</p>
+							<div id="token-input-container" class="rune-inputs">
+								<input class="rune-input" name="twofa1" pattern="[0-9]" maxlength="1" />
+								<input class="rune-input" name="twofa2" pattern="[0-9]" maxlength="1" />
+								<input class="rune-input" name="twofa3" pattern="[0-9]" maxlength="1" />
+								<input class="rune-input" name="twofa4" pattern="[0-9]" maxlength="1" />
+								<input class="rune-input" name="twofa5" pattern="[0-9]" maxlength="1" />
+								<input class="rune-input" name="twofa6" pattern="[0-9]" maxlength="1" />
+							</div>
+							<div class="ritual-actions">
+								<button type="submit" class="cosmic-btn" name="token">
+									<span class="btn-icon">✓</span>
+									VERIFY
+									<span class="btn-energy"></span>
+								</button>
+								<button id="token-reset" type="submit" class="cosmic-btn cosmic-btn--alt" name="dismiss">
+									<span class="btn-icon">✕</span>
+									DISMISS
+									<span class="btn-energy"></span>
+								</button>
+							</div>
 						</div>
 					</div>
 				</form>
-				<div class="execute-line">
-					<span class="execute-prompt">Google@external:~$</span>
-					<button id="google-input"  class="terminal-btn">./authenticate --Google</button>
-				</div>
-				<div class="execute-line">
-					<span class="execute-prompt">42Intra@external:~$</span>
-					<button id="FTIntra-input" class="terminal-btn">./authenticate --42Intra</button>
-				</div>
-				<div class="login-footer">
-					<div class="status-display">
-						<span class="status-item active">NETWORK: CONNECTED</span>
-						<span class="status-item warning">SECURITY: HIGH</span>
-						<span class="status-item">STATUS: AWAITING_AUTH</span>
+
+				<div class="cosmic-separator">
+					<div class="separator-chaos">
+						<span class="chaos-rune">◈</span>
+						<span class="chaos-rune">◉</span>
+						<span class="chaos-rune">◊</span>
+						<span class="chaos-rune">✧</span>
 					</div>
-					<!--<div class="command-line">authentication_required</div>-->
+				</div>
+
+				<div class="divine-portals">
+					<button id="google-input" class="portal-btn">
+						<span class="portal-vortex"></span>
+						<span class="portal-icon">◐</span>
+						<span class="portal-text">GOOGLE</span>
+					</button>
+					<button id="FTIntra-input" class="portal-btn">
+						<span class="portal-vortex"></span>
+						<span class="portal-icon">◑</span>
+						<span class="portal-text">42</span>
+					</button>
+				</div>
+
+				<!-- Bottom mystical text -->
+				<div class="void-footer">
+					<span class="footer-symbol">◉</span>
+					GATEWAY RESONANCE ACTIVE
+					<span class="footer-symbol">◉</span>
 				</div>
 			</div>
 		</div>
-	</div> <!-- This closing tag was missing! -->
+	</div>
 </div>

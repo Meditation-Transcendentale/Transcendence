@@ -22,6 +22,29 @@ const handleEnd = async (sub) => {
 	}
 }
 
+const handlePlayerEliminate = async (sub) => {
+	for await (const msg of sub) {
+		const [, , gameId] = msg.subject.split('.');
+		const { uuid } = JSON.parse(new TextDecoder().decode(msg.data));
+
+		if (endedGames.has(gameId)) {
+			console.log(`[${SERVICE_NAME}] Ignoring elimination for ended game ${gameId}`);
+			continue;
+		}
+
+		const gameEngine = Physics.games.get(gameId);
+		if (gameEngine) {
+			// Find player by checking the players array from game manager
+			// Since we don't have direct access here, we'll need to find by paddle index
+			// For now, we'll eliminate by player ID directly
+			const playerId = parseInt(uuid); // Assuming uuid maps to player ID
+			console.log(`[${SERVICE_NAME}] Manually eliminating player ${playerId} from game ${gameId}`);
+			gameEngine.gameState.eliminatePlayer(playerId, -1); // -1 indicates manual elimination
+			gameEngine.convertPaddleToWall(playerId);
+		}
+	}
+}
+
 const handlePhysicsRequest = async (sub) => {
 	for await (const msg of sub) {
 		const data = decodePhysicsRequest(msg.data);
@@ -48,6 +71,9 @@ async function start() {
 
 	const endBr = nc.subscribe('games.br.*.match.end');
 	handleEnd(endBr);
+
+	const eliminateBr = nc.subscribe('games.br.*.player.eliminate');
+	handlePlayerEliminate(eliminateBr);
 
 	const subBr = nc.subscribe("games.br.*.physics.request");
 

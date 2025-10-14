@@ -50,19 +50,26 @@ vPaddleId = float(gl_InstanceID);
 		`)
 
 		this.Fragment_Before_Lights(`
-			
+
 		`);
 
-		this.Fragment_MainEnd(`
-							   float isLocalPaddle = step(abs(vPaddleId - paddleId), 0.5);
+		this.Fragment_Before_FragColor(`
+			float isLocalPaddle = step(abs(vPaddleId - paddleId), 0.5);
 
-							   vec3 normalColor = vec3(1.0, 0.0, 0.0); 
-							   vec3 localColor = vec3(0.0, 1.0, 0.0);  
+			// Paddle colors
+			vec3 normalColor = vec3(0.6, 0.15, 0.15);
+			vec3 localColor = vec3(0.7, 0.6, 0.5);
 
-							     vec3 finalColor = mix(normalColor, localColor, isLocalPaddle);
+			// Emissive glow
+			vec3 emissiveGlow = vec3(0.5, 0.12, 0.12);
+			vec3 localEmissive = vec3(0.08, 0.06, 0.05);
 
-							     gl_FragColor = vec4(finalColor, 1.0);
-		`)
+			// Combine lit color with paddle color and emissive
+			vec3 paddleColor = mix(normalColor, localColor, isLocalPaddle);
+			vec3 paddleEmissive = mix(emissiveGlow, localEmissive, isLocalPaddle);
+
+			color.rgb = color.rgb * 0.4 + paddleColor * 1.2 + paddleEmissive;
+		`);
 
 
 	}

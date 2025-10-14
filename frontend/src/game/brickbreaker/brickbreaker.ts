@@ -73,7 +73,7 @@ export class BrickBreaker {
 		this.pbHard = json.brickBreakerStats.hard_mode_hscore;
 	}
 
-	public handleLeaderboard(json: any){
+	public handleLeaderboard(json: any) {
 		if (this.mode == 'easy')
 			this.gameUI.setLeaderboard(json.leaderboards.easy, this.mode);
 		else if (this.mode == 'normal')
@@ -133,8 +133,8 @@ export class BrickBreaker {
 		this.bricks = this.generateBricks(10, this.layers, this.cols);
 	}
 
-	public async end(){
-		if (this.newHighScore){
+	public async end() {
+		if (this.newHighScore) {
 			await patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true);
 		}
 		const leaderboard = await getRequest("stats/get/leaderboard/brickbreaker")
@@ -163,7 +163,7 @@ export class BrickBreaker {
 	}
 
 	public stop(): void {
-		if (this.newHighScore){
+		if (this.newHighScore) {
 			patchRequest("stats/update/brickbreaker", { mode: this.mode, score: this.score }, true)
 		}
 		this.camera.parent = null;

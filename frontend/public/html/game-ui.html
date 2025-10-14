@@ -1,6 +1,6 @@
 <div id="game-ui-container" class="game-ui-container" style="display: none;">
-	<link rel="stylesheet" href="/css/game-ui.css">
-	
+	<link rel="stylesheet" href="/css/game-ui.css?v=4">
+
 	<!-- Score Versus Module -->
 	<div id="scorevs-module" class="game-ui-scorevs" style="display: none;">
 		<div class="scorevs-container">
@@ -41,15 +41,21 @@
 	<!-- Ending Module -->
 	<div id="ending-module" class="game-ui-ending" style="display: none;">
 		<div class="ending-container">
-			<div class = "dual-mode">
+			<div class="dual-mode">
 				<span id="end-score1-value" class="score-value"></span>
 				<span id="end-score2-value" class="score-value"></span>
 			</div>
 			<div class="solo-mode">
-				<span id="end-score-solo" class ="score-value"></span>
+				<span id="end-score-solo" class="score-value"></span>
 			</div>
 			<table id="leaderboard" style="position: absolute; transform: translateX(25vw)">
-				<thead>	<tr><th>Rank</th><th>Player</th><th>Best Score</th></tr></thead>
+				<thead>
+					<tr>
+						<th>Rank</th>
+						<th>Player</th>
+						<th>Best Score</th>
+					</tr>
+				</thead>
 				<tbody id="players-list" class="list-body"></tbody>
 			</table>
 			<span id="result-label" class="result-label"></span>
@@ -66,7 +72,7 @@
 	<div id="playercounter-module" class="game-ui-playercounter" style="display: none;">
 		<div class="playercounter-container">
 			<div class="label">
-				<span id="playercounter-label" class="playercounter-label">Player alive</span>
+				<span id="playercounter-label" class="playercounter-label">Players alive</span>
 			</div>
 			<span id="playercounter-value" class="playercounter-value">0</span>
 		</div>
