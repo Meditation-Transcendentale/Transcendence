@@ -12,7 +12,8 @@ import {
   decodeNotificationMessage,
   decodeFriendUpdate,
   decodeStatusUpdate,
-  decodeGameInvite
+  decodeGameInvite,
+  encodeGameInvite
 } from './proto/helper.js';
 
 dotenv.config({ path: "../../../../.env" })
@@ -85,7 +86,13 @@ async function start() {
       )
     },
 
-    message: (ws, message, isBinary) => { //debug purpose, nothing coming from the client
+    message: (ws, message, isBinary) => {
+      const payload = decodeNotificationMessage(new Uint8Array(message));
+      if (payload.gameInvite)
+      {
+        const data = encodeGameInvite({ sender: ws.uuid, lobbyid: payload.gameInvite.lobbyid });
+        nc.publish(`notification.${payload.gameInvite.sender}.gameInvite`, data);
+      }
     },
 
     close: (ws, code, message) => {

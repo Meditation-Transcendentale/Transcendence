@@ -1,5 +1,5 @@
 import { IStream } from "./IStream";
-import { decodeNotificationMessage } from "../networking/helper";
+import { decodeNotificationMessage, encodeClientMessage, encodeNotificationMessage } from "../networking/helper";
 import { notif } from "../networking/message";
 import { User } from "../User";
 import { postRequest } from "../networking/request";
@@ -94,7 +94,7 @@ export class NotificationStream implements IStream {
 	private onGameInvite(notification: notif.IGameInvite) {
 		postRequest("info/search", { identifier: notification.sender, type: "uuid" }) //data.username
 			.then((json: any) => {
-				htmlManager.notification.add({ type: NotificationType.gameInvite, uuid: notification.sender as string, username: json.data.username, lobbyId: notification.lobbyid as string });
+				htmlManager.notification.add({ type: NotificationType.gameInvite, uuid: notification.sender as string, username: json.data.username, lobbyid: notification.lobbyid as string });
 				// htmlManager.addNotification({type: "game-invite", uuid: notification.sender, username: json.data.username, lobbyId: notification.lobbyid});
 			})
 			.catch((err) => {
@@ -115,5 +115,10 @@ export class NotificationStream implements IStream {
 			})
 
 		// User.updateFriendStatus(notification.sender, notification.status);
+	}
+
+	public sendGameInvite(uuid: string, lobbyId: string) {
+		const buf = encodeNotificationMessage({gameInvite: { sender: uuid, lobbyid: lobbyId}});
+		this.ws?.send(buf);
 	}
 }

@@ -25,7 +25,7 @@ interface IFriendAccept extends INotification {
 interface IGameInvite extends INotification {
 	uuid: string,
 	username: string,
-	lobbyId: string
+	lobbyid: string
 }
 
 interface IStatusUpdate extends INotification {
@@ -190,9 +190,9 @@ export class NotificationHtml {
 			const p = new Popup({
 				type: PopupType.accept,
 				title: "Invitation",
-				text: `${option.username} invited you to join his lobby`,
+				text: `${option.username} invited you to join his lobby: ${option.lobbyid}`,
 				accept: () => {
-					stateManager.lobbyId = option.lobbyId;
+					stateManager.lobbyId = option.lobbyid;
 					routeManager.nav("/lobby");
 				},
 				decline: () => {

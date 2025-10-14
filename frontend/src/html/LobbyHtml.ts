@@ -240,7 +240,7 @@ export class LobbyHtml implements IHtml {
 				i.className = "lobby-invite__button";
 				i.textContent = "+";
 				i.addEventListener("click", () => {
-					alert("need a way to invite");
+					streamManager.notification.sendGameInvite(uuid, stateManager.lobbyId);
 				})
 				d.appendChild(u);
 				d.appendChild(i);
