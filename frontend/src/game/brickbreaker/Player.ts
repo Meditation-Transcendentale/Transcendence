@@ -39,8 +39,8 @@ export class Player {
 		this.goal = MeshBuilder.CreateCylinder("goal", { height: 0.5, diameter: 1, subdivisions: 16 }, this.scene);
 		this.goal.parent = game.root;
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
-		this.materialGoal.diffuseColor = new Color3(1, 1, 1);
-		// this.materialGoal.emissiveColor = new Color3(0.5, 0.5, 0.5);
+		this.materialGoal.diffuseColor = new Color3(0, 0, 1);
+		this.materialGoal.specularColor = new Color3(0, 0, 0.5);
 		this.goal.material = this.materialGoal;
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
