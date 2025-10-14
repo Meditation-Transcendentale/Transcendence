@@ -7,7 +7,7 @@
    ==================================== */
 .lobby-info__title {
 	text-align: right;
-	color: white;
+	color: var(--color-lavender);
 	font-size: var(--font-size-small);
 }
 
@@ -15,53 +15,51 @@
 	flex: auto;
 	overflow: scroll !important;
 	pointer-events: all !important;
-	border: var(--spacing-md) white solid;
+	border: var(--spacing-md) var(--color-purple-light) solid;
 	padding: var(--spacing-sm);
 	margin: var(--spacing-md);
-	background-color: lightgrey;
-	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	background-color: rgba(93, 64, 112, 0.2);
 	border-left-style: none;
 	border-right-style: none;
-	color: white !important;
+	color: var(--color-lavender) !important;
 	font-size: var(--font-size-small) !important;
 }
 
 .lobby-info__footer {
 	flex: auto;
 	display: flex;
-	border: var(--spacing-xs) white solid;
+	border: var(--spacing-xs) var(--color-purple-light) solid;
 	margin: var(--spacing-md);
 	margin-top: var(--spacing-lg);
-	background-color: rgba(255, 255, 255, 0.2);
+	background-color: rgba(157, 78, 221, 0.2);
 	font-size: var(--font-size-verysmall) !important;
 }
-
 
 .lobby-info__content {
 	flex: auto;
 	height: fit-content;
 	font-size: var(--font-size-small);
-	border: var(--spacing-xs) white solid;
+	border: var(--spacing-xs) var(--color-purple-light) solid;
 	margin: var(--spacing-md);
-	background-color: rgba(255, 255, 255, 0.2);
+	background-color: rgba(157, 78, 221, 0.2);
 }
 
 .lobby-info__button {
 	font-size: var(--font-size-verysmall);
 	flex: auto;
-	background-color: black;
-	color: white;
+	background-color: var(--color-space-deepest);
+	color: var(--color-lavender);
 	border: none;
 }
 
 .lobby-info__button:hover {
-	background-color: white;
-	color: black;
+	background-color: var(--color-lavender);
+	color: var(--color-space-deepest);
 }
 
 .lobby-info__button:active {
-	background-color: black;
-	color: white;
+	background-color: var(--color-space-deepest);
+	color: var(--color-lavender);
 }
 
 
@@ -71,7 +69,7 @@
 
 .lobby-players__title {
 	text-align: right;
-	color: white;
+	color: var(--color-lavender);
 	font-size: var(--font-size-small);
 }
 
@@ -80,11 +78,10 @@
 	height: 90% !important;
 	overflow: scroll !important;
 	pointer-events: all !important;
-	border: var(--spacing-xxs) white solid;
+	border: var(--spacing-xxs) var(--color-purple-light) solid;
 	padding: var(--spacing-sm);
 	margin: var(--spacing-md);
-	background-color: lightgrey;
-	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	background-color: rgba(93, 64, 112, 0.2);
 	border-left-style: none;
 	border-right-style: none;
 }
@@ -94,17 +91,17 @@
 	flex: auto;
 	height: fit-content;
 	font-size: var(--font-size-small);
-	border: var(--spacing-xs) white solid;
+	border: var(--spacing-xs) var(--color-purple-light) solid;
 	margin: var(--spacing-md);
 }
-
 
 .lobby-players__username {
 	flex: 2;
 	text-align: left;
-	color: white;
+	color: var(--color-lavender);
 	overflow: hidden;
-	background-color: rgba(255, 255, 255, 0.3);
+	/* background-color: rgba(224, 170, 255, 0.3); */
+	background-color: var(--color-space-deepest);
 }
 
 .lobby-players__status {
@@ -113,13 +110,12 @@
 }
 
 .lobby-players__status[ready="true"] {
-	color: black;
+	color: var(--color-space-deepest);
 	background-color: rgba(125, 255, 125, 0.3);
-
 }
 
 .lobby-players__status[ready="false"] {
-	color: black;
+	color: var(--color-space-deepest);
 	background-color: rgba(255, 125, 125, 0.3);
 }
 
@@ -138,7 +134,7 @@
 	position: absolute;
 	width: var(--spacing-lg);
 	height: var(--spacing-lg);
-	border-color: white;
+	border-color: var(--color-purple-light);
 	border-style: solid;
 	content: ' ';
 }
@@ -170,37 +166,30 @@
 .lobby-ready__button {
 	pointer-events: all !important;
 	font-size: var(--font-size-base);
-	background-color: rgba(255, 255, 255, 0.2);
-	color: black;
+	background-color: rgba(157, 78, 221, 0.2);
+	color: var(--color-space-deepest);
 	border: none;
 }
 
 .lobby-ready__button:hover {
-	background-color: rgba(0.7, 0.7, 0.7, 0.2);
-	color: white;
+	/* background-color: rgba(93, 64, 112, 0.2); */
+	background-color: var(--color-space-deepest);
+	color: var(--color-lavender);
 }
 
 .lobby-ready__button:active {
-	background-color: rgba(255, 255, 255, 0.2);
-	color: black;
+	background-color: rgba(157, 78, 221, 0.2);
+	color: var(--color-space-deepest);
 }
 
 /* ====================================
    LOBBY - Lobby-invite
    ==================================== */
 
-/* <header class="window__title lobby-invite__title">Invite a friend</header> */
-/* 	<div class="window__content window__content--transparent lobby-invite__container"> */
-/* 		<div> */
-/* 			<span class="lobby-invite__username">Anna</span> */
-/* 			<button class="lobby-invite__button">+</button> */
-/* 		</div> */
-/* 	</div> */
-
 .lobby-invite__title {
 	height: fit-content;
 	text-align: right;
-	color: white;
+	color: var(--color-lavender);
 	font-size: var(--font-size-small);
 }
 
@@ -208,50 +197,47 @@
 	flex: 5;
 	overflow: scroll !important;
 	pointer-events: all !important;
-	border: var(--spacing-sm) white solid;
+	border: var(--spacing-sm) var(--color-purple-light) solid;
 	padding: var(--spacing-sm);
 	margin: var(--spacing-md);
-	background-color: lightgrey;
-	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	background-color: rgba(93, 64, 112, 0.2);
 	border-left-style: none;
 	border-right-style: none;
-	color: white !important;
+	color: var(--color-lavender) !important;
 	font-size: var(--font-size-small) !important;
 }
-
 
 .lobby-invite__container>div {
 	display: flex;
 	flex: auto;
 	height: fit-content;
 	font-size: var(--font-size-small);
-	/* border: var(--spacing-xs) white solid; */
 	margin: var(--spacing-md);
 }
 
 .lobby-invite__username {
 	flex: 4;
 	text-align: left;
-	color: white;
+	color: var(--color-lavender);
 	overflow: hidden;
-	background-color: rgba(255, 255, 255, 0.3);
+	background-color: rgba(224, 170, 255, 0.3);
 	padding-left: var(--spacing-lg);
 }
 
 .lobby-invite__button {
 	font-size: var(--font-size-small);
 	flex: 1;
-	background-color: black;
-	color: white;
+	background-color: var(--color-space-deepest);
+	color: var(--color-lavender);
 	border: none;
 }
 
 .lobby-invite__button:hover {
-	background-color: white;
-	color: black;
+	background-color: var(--color-lavender);
+	color: var(--color-space-deepest);
 }
 
 .lobby-invite__button:active {
-	background-color: black;
-	color: white;
+	background-color: var(--color-space-deepest);
+	color: var(--color-lavender);
 }

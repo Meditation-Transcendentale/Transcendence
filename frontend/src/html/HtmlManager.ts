@@ -31,6 +31,9 @@ class HtmlManager {
 
 	public settings!: Settings;
 
+
+	public friendbtn!: HTMLButtonElement;
+
 	private _once = true;
 
 	constructor() {
@@ -50,13 +53,12 @@ class HtmlManager {
 		this.playJoin = new PlayJoinHtml();
 
 
-		const b = document.createElement("button");
-		b.className = "friendlist-toggle";
-		b.textContent = "❖";
-		b.addEventListener("click", () => {
+		this.friendbtn = document.createElement("button");
+		this.friendbtn.className = "friendlist-toggle";
+		this.friendbtn.textContent = "❖";
+		this.friendbtn.addEventListener("click", () => {
 			this.friendlist.toogle();
 		})
-		document.body.appendChild(b);
 	}
 
 	public init() {
@@ -65,7 +67,15 @@ class HtmlManager {
 		this.settings = new Settings();
 		User.status = "online";
 		this._once = true;
+	}
 
+	public addFriendbtn() {
+		if (!document.body.contains(this.friendbtn))
+			document.body.appendChild(this.friendbtn);
+	}
+
+	public removeFriendbtn() {
+		this.friendbtn.remove();
 	}
 }
 

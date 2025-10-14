@@ -84,7 +84,7 @@ class RouteManager {
 					url.pathname = "/auth";
 					url.search = "";
 					if (!this.first) {
-						alert("not connected");
+						window.location.reload();
 					};
 					console.log("%c Not logged in redirected to /login", "color: white; background-color: red")
 				}
@@ -92,8 +92,11 @@ class RouteManager {
 
 		if (history)
 			window.history.pushState("", "", url.pathname + url.search)
-		this.lastRoute?.unload();
-		this.routes.get(url.pathname)?.load();
+		// if (this.lastRoute != this.routes.get(url.pathname))
+		await this.lastRoute?.unload();
+		// else
+		// 	console.log("DEJA VUU");
+		await this.routes.get(url.pathname)?.load();
 		this.lastRoute = this.routes.get(url.pathname) as IRoute;
 
 		if (url.pathname !== "/auth") {
@@ -102,9 +105,11 @@ class RouteManager {
 
 		if (url.pathname !== "/auth" && url.pathname !== "/br" && url.pathname !== "/pong" && url.pathname !== "/brick") {
 			htmlManager.ath.load();
+			htmlManager.addFriendbtn();
 		}
 		else {
 			htmlManager.ath.unload();
+			htmlManager.removeFriendbtn();
 		}
 	}
 

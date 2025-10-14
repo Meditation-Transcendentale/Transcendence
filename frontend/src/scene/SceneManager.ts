@@ -34,7 +34,7 @@ class SceneManager {
 	private grass!: Grass;
 	private fog!: Fog;
 	private picker!: Picker;
-	private ballGrass!: BallGrass;
+	public ballGrass!: BallGrass;
 
 	constructor() {
 		console.log("%c SCENE Manager", "color: white; background-color: red");

@@ -35,7 +35,8 @@ async function init() {
 				routeManager.comeback();
 		}
 		if (e.key == "p") {
-			console.log(sceneManager.resolution);
+			console.log(sceneManager.camera.position, sceneManager.camera.getForwardRay().direction)
+			// console.log(sceneManager.assets.ballMesh.absolutePosition);
 		}
 	})
 
