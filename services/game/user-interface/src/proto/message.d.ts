@@ -3734,6 +3734,9 @@ export namespace notif {
 
         /** NotificationMessage statusUpdate */
         statusUpdate?: (notif.IStatusUpdate|null);
+
+        /** NotificationMessage friendRemove */
+        friendRemove?: (notif.IFriendUpdate|null);
     }
 
     /** Represents a NotificationMessage. */
@@ -3757,8 +3760,11 @@ export namespace notif {
         /** NotificationMessage statusUpdate. */
         public statusUpdate?: (notif.IStatusUpdate|null);
 
+        /** NotificationMessage friendRemove. */
+        public friendRemove?: (notif.IFriendUpdate|null);
+
         /** NotificationMessage payload. */
-        public payload?: ("friendRequest"|"friendAccept"|"gameInvite"|"statusUpdate");
+        public payload?: ("friendRequest"|"friendAccept"|"gameInvite"|"statusUpdate"|"friendRemove");
 
         /**
          * Creates a new NotificationMessage instance using the specified properties.

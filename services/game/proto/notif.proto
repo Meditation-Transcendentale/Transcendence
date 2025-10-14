@@ -23,5 +23,6 @@ message NotificationMessage {
     FriendUpdate friendAccept = 2;
     GameInvite gameInvite = 3;
     StatusUpdate statusUpdate = 4;
+    FriendUpdate friendRemove = 5;
   }
 }

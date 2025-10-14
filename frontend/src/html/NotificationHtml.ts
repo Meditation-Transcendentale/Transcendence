@@ -34,6 +34,11 @@ interface IStatusUpdate extends INotification {
 	status: string
 }
 
+interface IFriendRemove extends INotification {
+	uuid: string,
+	username: string
+}
+
 interface ITextNotification extends INotification {
 	text: string
 }
@@ -51,12 +56,13 @@ export enum NotificationType {
 	friendAccept,
 	gameInvite,
 	statusUpdate,
+	friendRemove,
 	text,
 	custom,
 	error
 };
 
-type Notification = IFriendAccept | IFriendRequest | IGameInvite | IStatusUpdate | ITextNotification | ICustomNotification | IErrorNotification;
+type Notification = IFriendAccept | IFriendRequest | IGameInvite | IStatusUpdate | IFriendRemove| ITextNotification | ICustomNotification | IErrorNotification;
 
 export class NotificationHtml {
 	private history: Set<HTMLElement>;
