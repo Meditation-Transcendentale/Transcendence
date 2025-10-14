@@ -13,7 +13,7 @@
 	gap: 8px;
 	background-color: #0d0221;
 	padding: 6px;
-	border-radius: 20px;
+	border-radius: 0px;
 	cursor: pointer;
 	color: #dda8fc;
 	border: 2px solid #dda8fc;
@@ -41,7 +41,6 @@
 	left: 0;
 	background-color: #0d0221;
 	border: 2px solid #dda8fc;
-	border-radius: 20px;
 	margin-top: 5px;
 	min-width: auto;
 	visibility: hidden;
@@ -54,8 +53,6 @@
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
-	background-color: #0d0221;
-	border-radius: 12px;
 }
 
 #change-username-btn, #change-password-btn, #change-avatar-btn, #toggle-2fa-btn {
@@ -64,11 +61,45 @@
 	border: 1px solid #dda8fc;
 	font-family: Andale Mono, monospace;
 	padding: 8px;
-	border-radius: 10px;
+	/* border-radius: 10px; */
 	cursor: pointer;
 	font-size: 14px;
 	transition: background-color 0.3s ease;
 }
 
+#change-username-btn:hover, #change-password-btn:hover, #change-avatar-btn:hover, #toggle-2fa-btn:hover, #ath-menu-item-profile:hover, #ath-menu-item-settings:hover, #ath-menu-item-logout:hover {
+	color: white;
+	transform: translate3d(0, 0, 0) scale(1.05);
+	box-shadow: 1px 1px 1px black, -1px -1px 1px black;
+	text-shadow: 
+		0 0 7px #fff,
+		0 0 10px #fff,
+		0 0 21px #fff,
+		0 0 42px #c77dff,
+		0 0 82px #c77dff,
+		0 0 92px #c77dff,
+		0 0 102px #c77dff,
+		0 0 151px #c77dff;
+}
 
+#change-username-btn:focus, #change-password-btn:focus, #change-avatar-btn:focus, #toggle-2fa-btn:focus {
+	outline: none;
+}
+
+#settings-popup {
+	background-color: #0d022180;
+	color: #dda8fc;
+	border: 1px solid #dda8fc;
+	font-family: Andale Mono, monospace;
+	padding: 15px;
+	padding-top: 10px;
+	border-radius: 1px;
+	cursor: pointer;
+	font-size: 18px;
+}
+
+#settings-popup header {
+	margin-bottom: 10px;
+	text-align: center;
+}
 

@@ -214,17 +214,19 @@ export class Ath {
 		const menuItems = [
 			{ text: "Profile", action: () => this.profile.load() },
 			{ text: "Settings", action: () => this.settings.load() },
-			{ text: "Quit", action: () => this.quitFunction() }
+			{ text: "Logout", action: () => this.quitFunction() }
 		];
 
 		menuItems.forEach((item) => {
 			const menuItem = document.createElement("div");
+			menuItem.id = `ath-menu-item-${item.text.toLowerCase()}`;
 			menuItem.textContent = item.text;
 			menuItem.style.padding = "10px 15px";
 			menuItem.style.fontSize = "14px";
 			menuItem.style.color = "#dda8fc";
 			menuItem.style.cursor = "pointer";
 			menuItem.style.transition = "background-color 0.2s ease";
+			
 
 			menuItem.addEventListener("click", () => {
 				item.action();
@@ -337,9 +339,11 @@ class athSettings {
 		this.settingsPopup = new Popup({
 			type: PopupType.custom,
 			title: "Settings",
+			id: "settings-popup",
 			text: "",
 			div: this.createSettingsDiv()
 		});
+		
 
 		this.changeUsernamePopup = new Popup({
 			type: PopupType.validation,
