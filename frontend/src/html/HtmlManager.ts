@@ -1,3 +1,5 @@
+import { User } from "../User";
+import { Ath } from "./AthHtml";
 import { AuthHtml } from "./AuthHtml";
 import { CubeHtml } from "./CubeHtml";
 import { FriendlistHtml } from "./FriendlistHtml";
@@ -7,8 +9,9 @@ import { PlayCreateHtml } from "./PlayCreateHtml";
 import { PlayJoinHtml } from "./PlayJoinHtml";
 import { PlayMapHtml } from "./PlayMapHtml";
 import { PlayModeHtml } from "./PlayModeHtml";
+import { Profile } from "./Profile";
+import { Settings } from "./Settings";
 import { TournamentHtml } from "./TournamentHtml";
-import { Ath } from "./Ath";
 
 
 class HtmlManager {
@@ -16,6 +19,7 @@ class HtmlManager {
 	public cube: CubeHtml;
 	public ath: Ath;
 	public friendlist: FriendlistHtml;
+	public profile: Profile;
 
 	public auth: AuthHtml;
 	public lobby: LobbyHtml;
@@ -25,12 +29,17 @@ class HtmlManager {
 	public playMap: PlayMapHtml;
 	public tournament: TournamentHtml;
 
+	public settings!: Settings;
+
+	private _once = true;
+
 	constructor() {
 		console.log("%c HTML Manager", "color: white; background-color: red");
 		this.notification = new NotificationHtml();
 		this.cube = new CubeHtml();
 		this.ath = new Ath();
 		this.friendlist = new FriendlistHtml();
+		this.profile = new Profile();
 
 		this.auth = new AuthHtml();
 		this.lobby = new LobbyHtml();
@@ -39,6 +48,7 @@ class HtmlManager {
 		this.playMap = new PlayMapHtml();
 		this.tournament = new TournamentHtml();
 		this.playJoin = new PlayJoinHtml();
+
 
 		const b = document.createElement("button");
 		b.className = "friendlist-toggle";
@@ -50,6 +60,15 @@ class HtmlManager {
 			this.friendlist.toogle();
 		})
 		document.body.appendChild(b);
+	}
+
+	public init() {
+		if (!this._once)
+			return;
+		this.settings = new Settings();
+		User.status = "online";
+		this._once = true;
+
 	}
 }
 

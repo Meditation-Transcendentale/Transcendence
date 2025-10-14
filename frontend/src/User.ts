@@ -34,6 +34,7 @@ class UserC {
 					this.uuid = json.userInfo.uuid;
 					this.twofa = json.userInfo.two_fa_enabled;
 					this.avatar = json.userInfo.avatar_path;
+					this.status = json.userInfo.status;
 					if (this._once) {
 						this._once = false;
 						this.requestFriends();

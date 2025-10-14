@@ -72,6 +72,7 @@ class RouteManager {
 
 		await User.check()
 			.then(() => {
+				htmlManager.init();
 				if (url.pathname == "/auth" || (this.first && url.pathname == "/cajoue")) {
 					url.pathname = "/home";
 					url.search = "";
@@ -98,11 +99,13 @@ class RouteManager {
 		if (url.pathname !== "/auth") {
 			streamManager.notification.connect();
 		}
-		
+
 		if (url.pathname !== "/auth" && url.pathname !== "/br" && url.pathname !== "/pong" && url.pathname !== "/brick") {
-			htmlManager.ath.load(); }
+			htmlManager.ath.load();
+		}
 		else {
-			htmlManager.ath.unload(); }
+			htmlManager.ath.unload();
+		}
 	}
 
 	public comeback() {

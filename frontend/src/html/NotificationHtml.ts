@@ -253,4 +253,14 @@ export class NotificationHtml {
 
 	}
 
+	public error(err: any) {
+		try {
+			err.json()
+				.then((json: any) => {
+					this.add({ type: NotificationType.error, error: json.message })
+				});
+		} catch (err) {
+			this.add({ type: NotificationType.error, error: "error" })
+		}
+	}
 }
