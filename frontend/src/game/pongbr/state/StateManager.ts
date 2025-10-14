@@ -1,35 +1,62 @@
 import { ECSManager } from "../ecs/ECSManager.js";
+import { Scene } from "../../../babylon";
 
 export class StateManager {
 	private ecs: ECSManager;
+	private scene: Scene;
 	private lastUpdate: number = performance.now();
-	private accumulatedTime: number = 0;
-	private readonly timestep: number = 16.67; // ~60 updates per second
-	private start: boolean;
-	private id: number = 0;
+	private renderObserver: any = null;
+	private isRunning: boolean = false;
 
-	constructor(ecs: ECSManager) {
+	constructor(ecs: ECSManager, scene: Scene) {
 		this.ecs = ecs;
-		this.start = true;
+		this.scene = scene;
 	}
 
-	update(): void {
+	private onBeforeRender = (): void => {
+		if (!this.isRunning) return;
+
 		const now = performance.now();
-		const deltaTime = now - this.lastUpdate;
+		const deltaTime = (now - this.lastUpdate) / 1000;
 		this.lastUpdate = now;
-		this.ecs.update(this.timestep / 1000);
-		this.id = requestAnimationFrame(() => this.update());
-		if (!this.start) {
-			console.log("Cancel Animation Fram :", this.id);
-			cancelAnimationFrame(this.id);
-			return;
+
+		this.ecs.update(deltaTime);
+	}
+
+	start(): void {
+		if (this.isRunning) return;
+
+		console.log("StateManager: Starting ECS updates");
+		this.isRunning = true;
+		this.lastUpdate = performance.now();
+
+		this.renderObserver = this.scene.onBeforeRenderObservable.add(this.onBeforeRender);
+	}
+
+	stop(): void {
+		if (!this.isRunning) return;
+
+		console.log("StateManager: Stopping ECS updates");
+		this.isRunning = false;
+
+		if (this.renderObserver) {
+			this.scene.onBeforeRenderObservable.remove(this.renderObserver);
+			this.renderObserver = null;
 		}
 	}
 
 	setter(value: boolean): void {
-		console.log("change start");
-		this.start = value;
+		if (value) {
+			this.start();
+		} else {
+			this.stop();
+		}
 	}
+
+	update(): void {
+		this.start();
+	}
+
 	set_ecs(ecs: ECSManager) {
 		this.ecs = ecs;
 	}

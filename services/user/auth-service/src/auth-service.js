@@ -182,7 +182,7 @@ async function getAvatarCdnUrl(picture, uuid) {
 
 	fs.writeFileSync(fullPath, buffer);
 	
-	return `${process.env.CDN_URL}/${filename}`;
+	return `/cdn/${filename}`;
 
 }
 

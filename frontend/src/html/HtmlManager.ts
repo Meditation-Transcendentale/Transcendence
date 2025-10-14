@@ -41,7 +41,8 @@ class HtmlManager {
 		this.playJoin = new PlayJoinHtml();
 
 		const b = document.createElement("button");
-		b.textContent = "SOCIAL";
+		b.className = "friendlist-toggle";
+		b.textContent = "❖";
 		b.style.position = "absolute";
 		b.style.bottom = "0";
 		b.style.right = "0";

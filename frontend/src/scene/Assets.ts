@@ -7,6 +7,7 @@ import { ButterflyMaterial } from "./Shader/ButterflyMaterial";
 import { GrassMaterial } from "./Shader/GrassMaterial";
 import { MonolithMaterial } from "./Shader/MonolithMaterial";
 import { voxelData as templeMedium } from './temple-medium';
+import { prebuildPerlinWorley3d } from "./prebuild-perlinWorley3d";
 
 const monolithOption = {
 	animationSpeed: 1.0,
@@ -176,7 +177,7 @@ export class Assets {
 		this.monolithMesh.alwaysSelectAsActiveMesh = true;
 		this.monolithMesh.refreshBoundingInfo();
 
-		loaded = await LoadAssetContainerAsync("/assets/PongStatutTextured.glb", this.scene);
+		loaded = await LoadAssetContainerAsync("/assets/PongStatueTextured_Teeth.glb", this.scene);
 		console.log(loaded.meshes);
 		this.statusRoot = loaded.meshes[0];
 		this.statusMesh = loaded.meshes.find(mesh => mesh.name === "Head.001") as Mesh;
@@ -236,7 +237,7 @@ export class Assets {
 
 		this.whiteLight2 = new SpotLight("whitelight2", new Vector3(0, 400, 0), new Vector3(0, -1, 0), Math.PI, 2, this.scene);
 		this.whiteLight2.excludedMeshes.push(this.statusMesh);
-		this.whiteLight2.intensity = 1;
+		this.whiteLight2.intensity = 0.5;
 		this.whiteLight2.includedOnlyMeshes.push(this.brArenaMesh);
 	}
 
@@ -253,8 +254,12 @@ export class Assets {
 
 		this.fogDepthTexture.renderList = [];
 		this.fogDepthTexture.clearColor = new Color4(1., 0., 0., 1.);
+		const t = performance.now() * 0.001;
+		const n = new Float32Array(64 * 64 * 64);
+		for (let i = 0; i < n.length; i++)
+			n[i] = prebuildPerlinWorley3d[i];
 		this.fogDensityTexture = new RawTexture3D(
-			perlinWorley3D(64),
+			n,
 			64, 64, 64,
 			Engine.TEXTUREFORMAT_R,
 			this.scene,
@@ -263,6 +268,7 @@ export class Assets {
 			Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
 			Engine.TEXTURETYPE_FLOAT
 		);
+		console.log("asset time", performance.now() * 0.001 - t);
 
 		this.fogRenderTexture = new RenderTargetTexture("fog", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * sceneManager.resolutionRatio }, this.scene, {
 			format: Engine.TEXTUREFORMAT_RGBA,

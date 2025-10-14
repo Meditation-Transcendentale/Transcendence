@@ -13,12 +13,14 @@ import {
 	decodeStateUpdate,
 	decodeMatchQuit,
 	encodeMatchEnd,
+	encodeMatchEndBr,
 } from "./proto/helper.js";
 
 export class GameManager {
 	constructor(nc) {
 		this.nc = nc;
 		this.games = new Map(); // gameId -> { type, state, inputs, tick, interval }
+		this.botStates = new Map(); // gameId -> Map<botId, { lastMove, moveChangeTime, currentDirection }>
 	}
 
 	start() {
@@ -77,7 +79,21 @@ export class GameManager {
 			error = "";
 		const request = decodeMatchCreateRequest(msg.data);
 		try {
-			const players = request.players;
+			let players = request.players;
+
+			if (mode === 'br') {
+				const targetPlayers = 100;
+				const realPlayers = players.length;
+
+				if (realPlayers < targetPlayers) {
+					console.log(`[GameManager] Filling BR game with ${targetPlayers - realPlayers} bots (${realPlayers} real players)`);
+
+					for (let i = realPlayers; i < targetPlayers; i++) {
+						players.push(`bot-${i}`);
+					}
+				}
+			}
+
 			gameId = this.createMatch({
 				mode,
 				players: players,
@@ -200,14 +216,46 @@ export class GameManager {
 			});
 			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		} else {
-			this.nc.publish(
-				`games.${match.mode}.${gameId}.match.end`,
-				new Uint8Array()
-			);
+			const ranks = match.state.ranks || [];
+			const playerUUIDs = match.instance.players || [];
+
+			const playerRankings = playerUUIDs.map((uuid, playerId) => ({
+				playerId,
+				uuid,
+				rank: ranks[playerId] || 99  // Default rank 99 if not found
+			}));
+
+			playerRankings.sort((a, b) => a.rank - b.rank);
+
+			const orderedPlayerIds = playerRankings.map(p => p.uuid);
+
+			const buf = encodeMatchEndBr({
+				playerIds: orderedPlayerIds
+			});
+			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		}
 		this.games.delete(gameId);
+		this.botStates.delete(gameId);
 
 		console.log(`[GameManager] Ended match ${gameId}`);
+		return true;
+	}
+
+	eliminatePlayerBR(gameId, uuid) {
+		const match = this.games.get(gameId);
+		if (!match || match.mode !== 'br') return false;
+
+		const playerId = match.instance.players.indexOf(uuid);
+		if (playerId === -1) {
+			console.warn(`[GameManager] Player ${uuid} not found in game ${gameId}`);
+			return false;
+		}
+
+		console.log(`[GameManager] Eliminating BR player ${uuid} (id: ${playerId}) from match ${gameId}`);
+
+		const eliminationData = JSON.stringify({ uuid: playerId.toString() });
+		this.nc.publish(`games.br.${gameId}.player.eliminate`, new TextEncoder().encode(eliminationData));
+
 		return true;
 	}
 
@@ -215,6 +263,20 @@ export class GameManager {
 		const match = this.games.get(gameId);
 
 		if (!match) return false;
+
+		if (match.mode === 'br') {
+			const activePlayers = match.state.gameState?.activePlayers || [];
+
+			const playerId = match.instance.players.indexOf(uuid);
+			const isActivePlayer = activePlayers.includes(playerId);
+
+			console.log(`[GameManager] BR player ${uuid} (id: ${playerId}) quit. Active players: ${activePlayers.length}`);
+
+			if (isActivePlayer && activePlayers.length > 1) {
+				this.eliminatePlayerBR(gameId, uuid);
+				return true;
+			}
+		}
 
 		if (match.interval) {
 			clearInterval(match.interval);
@@ -235,13 +297,26 @@ export class GameManager {
 			});
 			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		} else {
-			this.nc.publish(
-				`games.${match.mode}.${gameId}.match.end`,
-				new Uint8Array()
-			);
-			// this.nc.request('stats.endgame', jc.encode(), { timeout: 1000 });
+			const ranks = match.state.ranks || [];
+			const playerUUIDs = match.instance.players || [];
+
+			const playerRankings = playerUUIDs.map((uuid, playerId) => ({
+				playerId,
+				uuid,
+				rank: ranks[playerId] || 99  // Default rank 99 if not found
+			}));
+
+			playerRankings.sort((a, b) => a.rank - b.rank);
+
+			const orderedPlayerIds = playerRankings.map(p => p.uuid);
+
+			const buf = encodeMatchEndBr({
+				playerIds: orderedPlayerIds
+			});
+			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		}
 		this.games.delete(gameId);
+		this.botStates.delete(gameId);
 
 		console.log(`[GameManager] Ended match ${gameId}`);
 		return true;
@@ -258,6 +333,63 @@ export class GameManager {
 
 		const inputs = match.inputs[match.tick] || [];
 		const lastState = match.state;
+
+		if (match.mode === 'br') {
+			const activePlayers = lastState.gameState?.activePlayers || [];
+
+			if (!this.botStates.has(gameId)) {
+				this.botStates.set(gameId, new Map());
+			}
+			const gameBotStates = this.botStates.get(gameId);
+
+			match.instance.players.forEach((uuid, paddleId) => {
+				if (uuid.startsWith('bot-') && activePlayers.includes(paddleId)) {
+					const hasInput = inputs.some(input => input.id === paddleId);
+
+					if (!hasInput) {
+						if (!gameBotStates.has(paddleId)) {
+							gameBotStates.set(paddleId, {
+								lastMove: 0,
+								moveChangeTime: match.tick,
+								currentDirection: 0
+							});
+						}
+
+						const botState = gameBotStates.get(paddleId);
+						const ticksSinceLastChange = match.tick - botState.moveChangeTime;
+
+						const minTicksBeforeChange = 20;
+						const maxTicksBeforeChange = 40;
+						const shouldChangeDirection = ticksSinceLastChange >= minTicksBeforeChange &&
+							(ticksSinceLastChange >= maxTicksBeforeChange || Math.random() < 0.05);
+
+						let move = botState.currentDirection;
+
+						if (shouldChangeDirection) {
+							const rand = Math.random();
+							if (rand < 0.4) {
+								move = -1;
+							} else if (rand < 0.8) {
+								move = 1;
+							} else {
+								move = 0;
+							}
+
+							botState.currentDirection = move;
+							botState.moveChangeTime = match.tick;
+						}
+
+						if (move !== botState.lastMove) {
+							inputs.push({
+								id: paddleId,
+								move: move
+							});
+							botState.lastMove = move;
+						}
+					}
+				}
+			});
+		}
 
 		try {
 			// Send PhysicsRequest over NATS req/rep
@@ -276,17 +408,25 @@ export class GameManager {
 			const newState = lastState;
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
-			newState.paddles = resp.paddles;
+			newState.paddles = resp.paddles.map(paddle => {
+				const playerIndex = paddle.paddleId !== undefined ? paddle.paddleId : paddle.playerId;
+				const uuid = match.instance.players[playerIndex] || '';
+				return {
+					...paddle,
+					paddleId: playerIndex,
+					uuid: uuid
+				};
+			});
 			newState.stage = resp.stage;
 			newState.ranks = resp.ranks;
-			newState.events = resp.events || []; // ADD THIS
+			newState.events = resp.events || [];
 			newState.gameState = resp.gameState || {};
 			if (resp.goal) {
 				newState.score[resp.goal.scorerId] =
 					(newState.score[resp.goal.scorerId] || 0) + 1;
 
 				if (match.mode === "tournament") {
-					console.log (`${newState.score}|${newState.score[0]}|${newState.score[1]}|${resp.goal.scorerId}`);
+					console.log(`${newState.score}|${newState.score[0]}|${newState.score[1]}|${resp.goal.scorerId}`);
 					const scoreBuf = encodeMatchScoreUpdate({ score: newState.score });
 					this.nc.publish(`games.tournament.${gameId}.score`, scoreBuf);
 				}

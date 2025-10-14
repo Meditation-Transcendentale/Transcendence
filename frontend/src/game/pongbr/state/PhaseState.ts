@@ -46,7 +46,7 @@ export class PhaseState {
 		'Phase 2': { stage: 2, playerCount: 50 },
 		'Phase 3': { stage: 3, playerCount: 25 },
 		'Phase 4': { stage: 4, playerCount: 12 },
-		'Final Phase': { stage: 5, playerCount: 3 }
+		'Phase 5': { stage: 5, playerCount: 3 }
 	};
 
 	updateGameState(gameState: GameStateInfo): void {

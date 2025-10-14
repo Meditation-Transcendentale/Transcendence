@@ -42,16 +42,24 @@ export function createUwsApp(path, lobbyService) {
 			sockets.get(lobbyId).add(ws);
 			console.log(`1:${lobbyId}`);
 			console.log(`JOIN: ${lobbyId}|${ws.userId}`);
-			const state = lobbyService.join(lobbyId, ws.userId);
-			if (!state) {
-				const buf = encodeServerMessage({ error: { message: "Lobby not found" } });
+
+			try {
+				const state = lobbyService.join(lobbyId, ws.userId);
+				if (!state) {
+					const buf = encodeServerMessage({ error: { message: "Lobby not found" } });
+					ws.send(buf, true);
+					ws.close();
+					return;
+				}
+				const buf = encodeServerMessage({ update: state });
+				ws.subscribe(lobbyId);
+				app.publish(lobbyId, buf, true);
+			} catch (err) {
+				console.error(`Error joining lobby: ${err.message}`);
+				const buf = encodeServerMessage({ error: { message: err.message } });
 				ws.send(buf, true);
 				ws.close();
-				return;
 			}
-			const buf = encodeServerMessage({ update: { lobbyId: state.lobbyId, players: state.players, status: state.status, mode: state.mode, map: state.map } });
-			ws.subscribe(lobbyId);
-			app.publish(lobbyId, buf, true);
 		},
 
 		message: async (ws, message, isBinary) => {
@@ -59,46 +67,56 @@ export function createUwsApp(path, lobbyService) {
 			const payload = decodeClientMessage(buf);
 			let newState;
 
-			if (payload.quit) {
-				newState = lobbyService.quit(payload.quit.lobbyId, payload.quit.uuid);
-			}
-			else if (payload.ready) {
-				newState = await lobbyService.ready(ws.lobbyId, ws.userId);
-				console.log(newState);
-
-				if (newState.gameId) {
-					const startBuf = encodeServerMessage({
-						start: {
-							lobbyId: newState.lobbyId,
-							gameId: newState.gameId,
-							map: newState.map
-						}
-					});
-					app.publish(ws.lobbyId, startBuf, true);
-					return;
+			try {
+				if (payload.quit) {
+					newState = lobbyService.quit(payload.quit.lobbyId, payload.quit.uuid);
 				}
-				if (newState.tournamentId) {
-					const startTournamentBuf = encodeServerMessage({
-						startTournament: {
-							lobbyId: newState.lobbyId,
-							tournamentId: newState.tournamentId,
-							map: newState.map
-						}
-					});
-					app.publish(ws.lobbyId, startTournamentBuf, true);
-					return;
-				}
-			}
+				else if (payload.ready) {
+					newState = await lobbyService.ready(ws.lobbyId, ws.userId);
+					console.log(newState);
 
-			if (newState) {
-				const updateBuf = encodeServerMessage({ update: newState });
-				app.publish(ws.lobbyId, updateBuf, true);
+					if (newState.gameId) {
+						const startBuf = encodeServerMessage({
+							start: {
+								lobbyId: newState.lobbyId,
+								gameId: newState.gameId,
+								map: newState.map
+							}
+						});
+						app.publish(ws.lobbyId, startBuf, true);
+						return;
+					}
+					if (newState.tournamentId) {
+						const startTournamentBuf = encodeServerMessage({
+							startTournament: {
+								lobbyId: newState.lobbyId,
+								tournamentId: newState.tournamentId,
+								map: newState.map
+							}
+						});
+						app.publish(ws.lobbyId, startTournamentBuf, true);
+						return;
+					}
+				}
+
+				if (newState) {
+					const updateBuf = encodeServerMessage({ update: newState });
+					app.publish(ws.lobbyId, updateBuf, true);
+				}
+			} catch (err) {
+				console.error(`Error handling message: ${err.message}`);
+				const errorBuf = encodeServerMessage({ error: { message: err.message } });
+				ws.send(errorBuf, true);
 			}
 		},
 
 		close: (ws) => {
-			sockets.get(ws.lobbyId)?.delete(ws);
-			lobbyService.quit(ws.lobbyId, ws.userId);
+			try {
+				sockets.get(ws.lobbyId)?.delete(ws);
+				lobbyService.quit(ws.lobbyId, ws.userId);
+			} catch (err) {
+				console.error(`Error during close: ${err.message}`);
+			}
 		}
 	});
 

@@ -1,30 +1,35 @@
 <div id="lobby" class="sub-container">
 	<link rel="stylesheet" type="text/css" href="/css/lobby.css">
 	<div id="players-window" class="window">
-			<div class="window-bar">PLAYERS LIST</div>
-			<table class="window-content">
-				<thead>	<tr><th>Username</th><th>Ready</th></tr></thead>
-				<tbody id="players-list" class="list-body"></tbody>
-			</table>
+		<div class="window-bar">PLAYERS LIST</div>
+		<table class="window-content">
+			<thead>
+				<tr>
+					<th>Username</th>
+					<th>Ready</th>
+				</tr>
+			</thead>
+			<tbody id="players-list" class="list-body"></tbody>
+		</table>
 	</div>
 	<div id="info-window" class="window">
-			<div class="window-bar">
-				<span >LOBBY INFO</span>
-			</div>
-			<div class="window-content">
-				<span id="lobby-mode" class="window-line">MODE: PONG</span>
-				<span id="lobby-map" class="window-line">MAP: GRASS</span>
-			</div>
-			<div class="window-footer">
-				<span id="lobby-id" class="window-line">
-					LOBBYID: <span id="lobby-id-text" ></span>
-					<button id="lobby-id-copy" class="button">COPY</button>
-				</span>
-			</div>
+		<div class="window-bar">
+			<span>LOBBY INFO</span>
+		</div>
+		<div class="window-content">
+			<span id="lobby-mode" class="window-line">MODE: PONG</span>
+			<span id="lobby-map" class="window-line">MAP: GRASS</span>
+		</div>
+		<div class="window-footer">
+			<span id="lobby-id" class="window-line">
+				LOBBYID: <span id="lobby-id-text"></span>
+				<button id="lobby-id-copy" class="button">COPY</button>
+			</span>
+		</div>
 	</div>
 	<div id="invite-window" class="window">
-			<div class="window-bar">INVITE</div>
-			<div id="invite-list" class="window-content"></div>
+		<div class="window-bar">INVITE</div>
+		<div id="invite-list" class="window-content"></div>
 	</div>
 
 	<div class="lobby-info-window window">
@@ -32,7 +37,7 @@
 		<div class="window__content window__content--transparent lobby-info__container">
 			<div class="lobby-info__content">
 				<label>Mode: </label>
-				<span id="lobby-info-mode">Online</span><br/>
+				<span id="lobby-info-mode">Online</span><br />
 				<label>Map: </label>
 				<span id="lobby-info-map">Grass</span>
 			</div>
@@ -51,7 +56,9 @@
 	</div>
 
 	<div class="lobby-players-window window">
-		<header class="window__title lobby-players__title">Players in lobby</header>
+		<header class="window__title lobby-players__title">
+			<span id="lobby-players-count"></span> Players in lobby
+		</header>
 		<div class="window__content window__content--transparent lobby-players__container">
 		</div>
 	</div>

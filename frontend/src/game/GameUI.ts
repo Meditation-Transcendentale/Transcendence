@@ -27,19 +27,19 @@ interface ModulePosition {
 }
 
 interface GameUIConfig {
-  enabledModules: (keyof GameUIModules)[];
-  theme?: "pong" | "br" | "brick";
-  globalPosition?: "top" | "bottom" | "overlay";
-  modulePositions?: {
-    scorevs?: ModulePosition;
-    score?: ModulePosition;
-    timer?: ModulePosition;
-    buttons?: ModulePosition;
-    countdown?: ModulePosition;
-    ending?: ModulePosition;
-    images?: ModulePosition;
-    playercounter?: ModulePosition;
-  };
+	enabledModules: (keyof GameUIModules)[];
+	theme?: 'pong' | 'br' | 'brick' | 'berserk';
+	globalPosition?: 'top' | 'bottom' | 'overlay';
+	modulePositions?: {
+		scorevs?: ModulePosition;
+		score?: ModulePosition;
+		timer?: ModulePosition;
+		buttons?: ModulePosition;
+		countdown?: ModulePosition;
+		ending?: ModulePosition;
+		images?: ModulePosition;
+		playercounter?: ModulePosition;
+	};
 }
 
 interface GameUIHtmlReference {
@@ -954,8 +954,9 @@ interface PlayerCounterHtmlReference {
 }
 
 class PlayerCounterModule implements GameUIModule {
-  private div: HTMLDivElement;
-  private ref: PlayerCounterHtmlReference;
+	private div: HTMLDivElement;
+	private ref: PlayerCounterHtmlReference;
+	private lastPlayerCount: number = -1;
 
   constructor(div: HTMLDivElement) {
     this.div = div;
@@ -974,9 +975,20 @@ class PlayerCounterModule implements GameUIModule {
     this.div.style.display = "none";
   }
 
-  update(playerLeft: number) {
-    this.ref.playerCounterValue.textContent = playerLeft.toString();
-  }
+	update(playerLeft: number) {
+		if (this.lastPlayerCount !== -1 && playerLeft !== this.lastPlayerCount) {
+			this.ref.playerCounterValue.classList.remove('player-count-change');
+			void this.ref.playerCounterValue.offsetWidth;
+			this.ref.playerCounterValue.classList.add('player-count-change');
+
+			setTimeout(() => {
+				this.ref.playerCounterValue.classList.remove('player-count-change');
+			}, 600);
+		}
+
+		this.lastPlayerCount = playerLeft;
+		this.ref.playerCounterValue.textContent = playerLeft.toString();
+	}
 }
 
 // interface SpectateHtmlReference{

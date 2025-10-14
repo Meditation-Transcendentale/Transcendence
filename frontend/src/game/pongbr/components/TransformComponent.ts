@@ -9,6 +9,7 @@ export class TransformComponent implements Component {
 	public baseScale: Vector3;
 	public parent: TransformNode;
 	public enabled: boolean = true;
+	public dirty: boolean = true;
 	public static key = "TransformComponent";
 
 	constructor(
@@ -23,16 +24,27 @@ export class TransformComponent implements Component {
 		this.scale = scale || new Vector3(1, 1, 1);
 		this.baseScale = this.scale.clone();
 		this.parent = parent;
+		this.dirty = true;
+	}
+
+	markDirty(): void {
+		this.dirty = true;
+	}
+
+	clearDirty(): void {
+		this.dirty = false;
 	}
 
 	enable() {
 		this.enabled = true;
 		this.scale = this.baseScale.clone();
+		this.markDirty();
 	}
 
 	disable() {
 		this.enabled = false;
 		this.scale = Vector3.Zero();
+		this.markDirty();
 	}
 
 	setEnabled(enabled: boolean) {

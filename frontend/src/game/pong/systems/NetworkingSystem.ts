@@ -119,7 +119,7 @@ export class NetworkingSystem extends System {
 					// 	.map((_, i) => i)
 					// 	.find(i => i !== localPaddleId)!;
 					// this.opponentScore = score[otherId] ?? 0;
-					console.log("localPaddleId:", localPaddleId);
+					// console.log("localPaddleId:", localPaddleId);
 					if (ui) {
 						ui.gameUI.updateScoreVersus(this.scoreLeft, this.scoreRight);
 						// if (localPaddleId != 0)

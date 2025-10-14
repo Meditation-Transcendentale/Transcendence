@@ -21,23 +21,24 @@ export class UBOManager {
     );
 
     const noiseOffsetDefault = 0.5;
-    const stepSizeDefault = 1.5;
+    // const stepSizeDefault = 1.5;
 
-    const maxDistanceDefault = 50;
-    const densityMultiplierDefault = 2.5;
-    const lightScatteringDefault = 0.2;
-    const fogAbsorptionDefault = new Vector3(0.1, 0.1, 0.1);
-    const fogScaleDefault = new Vector3(40, 40, 40);
-    this.assets.fogUBO.updateFloat("noiseOffset", noiseOffsetDefault);
-    this.assets.fogUBO.updateFloat("stepSize", stepSizeDefault);
-    this.assets.fogUBO.updateFloat("maxDistance", maxDistanceDefault);
-    this.assets.fogUBO.updateFloat(
-      "densityMultiplier",
-      densityMultiplierDefault
-    );
-    this.assets.fogUBO.updateFloat("lightScattering", lightScatteringDefault);
-    this.assets.fogUBO.updateVector3("fogAbsorption", fogAbsorptionDefault);
-    this.assets.fogUBO.updateVector3("fogScale", fogScaleDefault);
+		// const noiseOffsetDefault = 1.5;
+		const stepSizeDefault = 0.5;
+		// const maxDistanceDefault = 100.;
+		// const stepSizeDefault = 1.5;
+		const maxDistanceDefault = 50.;
+		const densityMultiplierDefault = 2.5;
+		const lightScatteringDefault = 0.2;
+		const fogAbsorptionDefault = new Vector3(0.1, 0.1, 0.1);
+		const fogScaleDefault = new Vector3(40, 40, 40);
+		this.assets.fogUBO.updateFloat("noiseOffset", noiseOffsetDefault);
+		this.assets.fogUBO.updateFloat("stepSize", stepSizeDefault);
+		this.assets.fogUBO.updateFloat("maxDistance", maxDistanceDefault);
+		this.assets.fogUBO.updateFloat("densityMultiplier", densityMultiplierDefault);
+		this.assets.fogUBO.updateFloat("lightScattering", lightScatteringDefault);
+		this.assets.fogUBO.updateVector3("fogAbsorption", fogAbsorptionDefault);
+		this.assets.fogUBO.updateVector3("fogScale", fogScaleDefault);
 
     this.assets.fogUBO.updateFloat(
       "spotIntensity",

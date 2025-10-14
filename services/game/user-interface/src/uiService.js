@@ -3,21 +3,22 @@ import "dotenv/config";
 import natsClient from "./natsClient.js";
 import { startWsServer } from "./uwsServer.js";
 import {
-  // NATS ↔ UI lifecycle
-  decodeMatchSetup,
-  encodeMatchStart,
-  encodeMatchInput,
-  encodeMatchQuit,
-  decodeMatchEnd,
-  // WS → client messages
-  encodeWelcomeMessage,
-  encodeGameStartMessage,
-  encodeGameEndMessage,
-  encodeServerMessage,
-  decodeStateMessage,
-  encodeErrorMessage,
-  // WS ← NATS state update
-} from "./proto/helper.js";
+	// NATS ↔ UI lifecycle
+	decodeMatchSetup,
+	encodeMatchStart,
+	encodeMatchInput,
+	encodeMatchQuit,
+	decodeMatchEnd,
+	decodeMatchEndBr,
+	// WS → client messages
+	encodeWelcomeMessage,
+	encodeGameStartMessage,
+	encodeGameEndMessage,
+	encodeServerMessage,
+	decodeStateMessage,
+	encodeErrorMessage,
+	// WS ← NATS state update
+} from './proto/helper.js';
 
 export default class UIService {
   constructor() {
@@ -73,14 +74,21 @@ export default class UIService {
       })();
     }
 
-    // 4) MatchEnd → broadcast GameEndMessage & cleanup
-    {
-      const sub = nc.subscribe("games.*.*.match.end");
-      (async () => {
-        for await (const m of sub) {
-          const [, , gameId] = m.subject.split(".");
-          // const { winnerId } = decodeMatchEnd(m.data);
-          const buf = encodeServerMessage({ end: m.data });
+		// 4) MatchEnd → broadcast GameEndMessage & cleanup
+		{
+			const sub = nc.subscribe('games.*.*.match.end');
+			(async () => {
+				for await (const m of sub) {
+					const [, mode, gameId] = m.subject.split('.');
+
+					let buf;
+					if (mode === 'br') {
+						const endData = decodeMatchEndBr(m.data);
+						buf = encodeServerMessage({ endBr: endData });
+					} else {
+						const endData = decodeMatchEnd(m.data);
+						buf = encodeServerMessage({ end: endData });
+					}
 
           for (const sid of this.games.get(gameId) || []) {
             const s = this.sessions.get(sid);
@@ -179,12 +187,15 @@ export default class UIService {
     //ws.close();
   }
 
-  handleReady(ws) {
-    const { uuid, mode, gameId } = ws;
-    const setup = this.allowedByGame.get(gameId);
-    if (!setup) {
-      return;
-    }
+	handleReady(ws) {
+		const { uuid, mode, gameId } = ws;
+		const setup = this.allowedByGame.get(gameId);
+		if (!setup) {
+			console.log(`[UI] Ready handler: setup not found for gameId ${gameId}`);
+			return;
+		}
+
+		console.log(`[UI] Ready handler: uuid=${uuid}, mode=${mode}, gameId=${gameId}`);
 
     // 1) Mark this player as ready
     let readySet = this.readyPlayers.get(gameId);
@@ -194,21 +205,33 @@ export default class UIService {
     }
     readySet.add(uuid);
 
-    const { players } = setup;
+		const { players, mode: setupMode } = setup;
 
-    // 2) if all players are ready
-    if (readySet.size === players.length) {
-      const topic = `games.${mode}.${gameId}.match.start`;
-      try {
-        natsClient.publish(topic, encodeMatchStart({ gameId: gameId }));
-      } catch (err) {
-        console.log(err);
-      }
-      const startBuff = encodeServerMessage({
-        start: {},
-      });
-      // const buf = encodeGameStartMessage({});
-      this.uwsApp.publish(gameId, startBuff, /* isBinary= */ true);
+		const gameMode = mode || setupMode;
+
+		let requiredPlayers = players.length;
+		if (gameMode === 'br') {
+			const realPlayers = players.filter(p => !p.startsWith('bot-'));
+			requiredPlayers = realPlayers.length;
+			console.log(`[UI] BR ready check: ${readySet.size}/${requiredPlayers} real players ready (${players.length} total including bots)`);
+		}
+
+		console.log(`[UI] Ready check: ${readySet.size}/${requiredPlayers} players ready (mode: ${gameMode})`);
+
+		// 2) if all required players are ready
+		if (readySet.size === requiredPlayers) {
+			console.log(`[UI] All players ready! Starting game ${gameId}`);
+			const topic = `games.${gameMode}.${gameId}.match.start`;
+			try {
+				natsClient.publish(topic, encodeMatchStart({ gameId: gameId }));
+			}
+			catch (err) {
+				console.log(err);
+			}
+			const startBuff = encodeServerMessage({
+				start: {}
+			});
+			this.uwsApp.publish(gameId, startBuff, /* isBinary= */ true);
 
       this.readyPlayers.delete(gameId);
     }
@@ -230,4 +253,19 @@ export default class UIService {
     sess.role = "spectator";
     delete sess.paddleId;
   }
+	handleSpectate(ws) {
+		const { uuid } = ws;
+		const sess = this.sessions.get(uuid);
+
+		// 1) Must already be registered
+		if (!sess) {
+			//const err = encodeErrorMessage({ message: 'Session not found' });
+			//ws.send(err, true);
+			return ws.close();
+		}
+		console.log("server receive spectating:", uuid);
+		// 2) Change role
+		sess.role = 'spectator';
+		delete sess.paddleId;
+	}
 }

@@ -102,7 +102,11 @@ export function encodeMatchStart(payload) {
 }
 
 export function decodeMatchEnd(buffer) {
-	return Proto.userinterface.MatchEnd.decode(buffer);
+	return Proto.shared.MatchEnd.decode(buffer);
+}
+
+export function decodeMatchEndBr(buffer) {
+	return Proto.shared.MatchEndBr.decode(buffer);
 }
 
 export function encodeErrorMessage(payload) {

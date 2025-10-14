@@ -22,6 +22,7 @@ export class PlayJoinRoute implements IRoute {
 	public async load(): Promise<void> {
 		if (!this.created)
 			await this.init();
+		routeManager.comebackRoute = "/home";
 		stateManager.playPath = "/play/join";
 		htmlManager.playJoin.load();
 		sceneManager.load("home");

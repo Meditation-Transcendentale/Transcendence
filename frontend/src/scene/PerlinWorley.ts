@@ -24,12 +24,24 @@ const ivec3 = new Int32Array(3);
 const uint = new Uint32Array(1);
 const int = new Int32Array(1);
 
+const worleyH = new Float32Array(3);
+
+const ga = new Float32Array(3);
+const gb = new Float32Array(3);
+const gc = new Float32Array(3);
+const gd = new Float32Array(3);
+const ge = new Float32Array(3);
+const gf = new Float32Array(3);
+const gg = new Float32Array(3);
+const gh = new Float32Array(3);
+
+
 function dot(u: Float32Array, v: Float32Array): number {
 	return (u[0] * v[0]) + (u[1] * v[1]) + (u[2] * v[2]);
 }
 
 
-function hash33(vec3: Float32Array): Float32Array {
+function hash33(vec3: Float32Array, final: Float32Array): Float32Array {
 	ivec3[0] = vec3[0];
 	ivec3[1] = vec3[1];
 	ivec3[2] = vec3[2];
@@ -41,12 +53,11 @@ function hash33(vec3: Float32Array): Float32Array {
 	uvec3[1] = uint[0] * UI3[1];
 	uvec3[2] = uint[0] * UI3[2];
 
-	const ret = new Float32Array(3);
-	ret[0] = -1. + 2. * uvec3[0] * UIF;
-	ret[1] = -1. + 2. * uvec3[1] * UIF;
-	ret[2] = -1. + 2. * uvec3[2] * UIF;
+	final[0] = -1. + 2. * uvec3[0] * UIF;
+	final[1] = -1. + 2. * uvec3[1] * UIF;
+	final[2] = -1. + 2. * uvec3[2] * UIF;
 
-	return ret;
+	return final;
 }
 
 function remap(x: number, a: number, b: number, c: number, d: number): number {
@@ -71,35 +82,35 @@ function gradientNoise(x: Float32Array, freq: number): number {
 	fvec3[0] = mod(p[0] + 0, freq);
 	fvec3[1] = mod(p[1] + 0, freq);
 	fvec3[2] = mod(p[2] + 0, freq);
-	const ga = hash33(fvec3);
+	hash33(fvec3, ga);
 	fvec3[0] = mod(p[0] + 1, freq);
 	fvec3[1] = mod(p[1] + 0, freq);
 	fvec3[2] = mod(p[2] + 0, freq);
-	const gb = hash33(fvec3);
+	hash33(fvec3, gb);
 	fvec3[0] = mod(p[0] + 0, freq);
 	fvec3[1] = mod(p[1] + 1, freq);
 	fvec3[2] = mod(p[2] + 0, freq);
-	const gc = hash33(fvec3);
+	hash33(fvec3, gc);
 	fvec3[0] = mod(p[0] + 1, freq);
 	fvec3[1] = mod(p[1] + 1, freq);
 	fvec3[2] = mod(p[2] + 0, freq);
-	const gd = hash33(fvec3);
+	hash33(fvec3, gd);
 	fvec3[0] = mod(p[0] + 0, freq);
 	fvec3[1] = mod(p[1] + 0, freq);
 	fvec3[2] = mod(p[2] + 1, freq);
-	const ge = hash33(fvec3);
+	hash33(fvec3, ge);
 	fvec3[0] = mod(p[0] + 1, freq);
 	fvec3[1] = mod(p[1] + 0, freq);
 	fvec3[2] = mod(p[2] + 1, freq);
-	const gf = hash33(fvec3);
+	hash33(fvec3, gf);
 	fvec3[0] = mod(p[0] + 0, freq);
 	fvec3[1] = mod(p[1] + 1, freq);
 	fvec3[2] = mod(p[2] + 1, freq);
-	const gg = hash33(fvec3);
+	hash33(fvec3, gg);
 	fvec3[0] = mod(p[0] + 1, freq);
 	fvec3[1] = mod(p[1] + 1, freq);
 	fvec3[2] = mod(p[2] + 1, freq);
-	const gh = hash33(fvec3);
+	hash33(fvec3, gh);
 
 	fvec3[0] = w[0] - 0;
 	fvec3[1] = w[1] - 0;
@@ -159,13 +170,13 @@ function worleyNoise(uv: Float32Array, freq: number): number {
 				fvec3b[0] = mod(id[0] + fvec3[0], freq);
 				fvec3b[1] = mod(id[1] + fvec3[1], freq);
 				fvec3b[2] = mod(id[2] + fvec3[2], freq);
-				const h = hash33(fvec3b);
-				h[0] = (h[0] * 0.5 + 0.5) + fvec3[0];
-				h[1] = (h[1] * 0.5 + 0.5) + fvec3[1];
-				h[2] = (h[2] * 0.5 + 0.5) + fvec3[2];
-				fvec3[0] = p[0] - h[0];
-				fvec3[1] = p[1] - h[1];
-				fvec3[2] = p[2] - h[2];
+				hash33(fvec3b, worleyH);
+				worleyH[0] = (worleyH[0] * 0.5 + 0.5) + fvec3[0];
+				worleyH[1] = (worleyH[1] * 0.5 + 0.5) + fvec3[1];
+				worleyH[2] = (worleyH[2] * 0.5 + 0.5) + fvec3[2];
+				fvec3[0] = p[0] - worleyH[0];
+				fvec3[1] = p[1] - worleyH[1];
+				fvec3[2] = p[2] - worleyH[2];
 				minDist = Math.min(minDist, dot(fvec3, fvec3));
 			}
 		}

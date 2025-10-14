@@ -166,7 +166,7 @@ export class AuthHtml implements IHtml {
 	}
 
 	private initToken() {
-		const tokens = this.tokenContainer.querySelectorAll(".token-number") as NodeListOf<HTMLInputElement>;
+		const tokens = this.tokenContainer.querySelectorAll(".rune-input") as NodeListOf<HTMLInputElement>;
 		tokens.forEach((e, i) => {
 			e.required = false;
 			e.addEventListener("input", () => {

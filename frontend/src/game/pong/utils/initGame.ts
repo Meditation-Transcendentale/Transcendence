@@ -23,7 +23,6 @@ function createArenaMesh(scene: Scene, config: GameTemplateConfig, pongRoot: Tra
 	arenaMesh.parent = pongRoot;
 	material.diffuseColor.set(0, 0, 0);
 	material.specularColor.set(0, 0, 0);
-	material.emissiveColor.set(0.2, 0.2, 0.2980392156862745);
 	arenaMesh.rotation.x = Math.PI / 2;
 	arenaMesh.position.y = -0.5;
 	arenaMesh.material = material;

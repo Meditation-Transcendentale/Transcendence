@@ -389,7 +389,7 @@ export class SpaceSkybox {
 		console.log("SpaceSkybox enabled");
 	}
 
-	private disable(): void {
+	public disable(): void {
 		this.skybox.setEnabled(false);
 		this.skybox.isVisible = false;
 

@@ -99,6 +99,8 @@ class Lobby {
 			mode: this.mode,
 			gameId: this.gameId,
 			tournamentId: this.tournamentId,
+			currentPlayers: this.players.size,
+			maxPlayers: this.maxPlayers,
 		}
 	}
 }
