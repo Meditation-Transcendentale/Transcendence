@@ -82,14 +82,10 @@ export default class UIService {
 					const [, mode, gameId] = m.subject.split('.');
 
 					let buf;
-					// Decode based on game mode
 					if (mode === 'br') {
-						// BR mode: decode MatchEndBr
 						const endData = decodeMatchEndBr(m.data);
 						buf = encodeServerMessage({ endBr: endData });
-						console.log(`[UI] BR game ${gameId} ended. Final rankings:`, endData.playerIds);
 					} else {
-						// Regular mode: decode MatchEnd
 						const endData = decodeMatchEnd(m.data);
 						buf = encodeServerMessage({ end: endData });
 					}
@@ -208,10 +204,8 @@ export default class UIService {
 
 		const { players, mode: setupMode } = setup;
 
-		// Use mode from setup if not available on ws
 		const gameMode = mode || setupMode;
 
-		// For BR mode: only wait for real players (non-bots) to be ready
 		let requiredPlayers = players.length;
 		if (gameMode === 'br') {
 			const realPlayers = players.filter(p => !p.startsWith('bot-'));
@@ -234,7 +228,6 @@ export default class UIService {
 			const startBuff = encodeServerMessage({
 				start: {}
 			});
-			// const buf = encodeGameStartMessage({});
 			this.uwsApp.publish(gameId, startBuff, /* isBinary= */ true);
 
 			this.readyPlayers.delete(gameId);

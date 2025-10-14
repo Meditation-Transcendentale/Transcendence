@@ -6737,6 +6737,10 @@ export const lobby = $root.lobby = (() => {
          * @property {string|null} [status] UpdateMessage status
          * @property {string|null} [mode] UpdateMessage mode
          * @property {string|null} [map] UpdateMessage map
+         * @property {string|null} [gameId] UpdateMessage gameId
+         * @property {string|null} [tournamentId] UpdateMessage tournamentId
+         * @property {number|null} [currentPlayers] UpdateMessage currentPlayers
+         * @property {number|null} [maxPlayers] UpdateMessage maxPlayers
          */
 
         /**
@@ -6796,6 +6800,38 @@ export const lobby = $root.lobby = (() => {
         UpdateMessage.prototype.map = "";
 
         /**
+         * UpdateMessage gameId.
+         * @member {string} gameId
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.gameId = "";
+
+        /**
+         * UpdateMessage tournamentId.
+         * @member {string} tournamentId
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.tournamentId = "";
+
+        /**
+         * UpdateMessage currentPlayers.
+         * @member {number} currentPlayers
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.currentPlayers = 0;
+
+        /**
+         * UpdateMessage maxPlayers.
+         * @member {number} maxPlayers
+         * @memberof lobby.UpdateMessage
+         * @instance
+         */
+        UpdateMessage.prototype.maxPlayers = 0;
+
+        /**
          * Creates a new UpdateMessage instance using the specified properties.
          * @function create
          * @memberof lobby.UpdateMessage
@@ -6830,6 +6866,14 @@ export const lobby = $root.lobby = (() => {
                 writer.uint32(/* id 4, wireType 2 =*/34).string(message.mode);
             if (message.map != null && Object.hasOwnProperty.call(message, "map"))
                 writer.uint32(/* id 5, wireType 2 =*/42).string(message.map);
+            if (message.gameId != null && Object.hasOwnProperty.call(message, "gameId"))
+                writer.uint32(/* id 6, wireType 2 =*/50).string(message.gameId);
+            if (message.tournamentId != null && Object.hasOwnProperty.call(message, "tournamentId"))
+                writer.uint32(/* id 7, wireType 2 =*/58).string(message.tournamentId);
+            if (message.currentPlayers != null && Object.hasOwnProperty.call(message, "currentPlayers"))
+                writer.uint32(/* id 8, wireType 0 =*/64).int32(message.currentPlayers);
+            if (message.maxPlayers != null && Object.hasOwnProperty.call(message, "maxPlayers"))
+                writer.uint32(/* id 9, wireType 0 =*/72).int32(message.maxPlayers);
             return writer;
         };
 
@@ -6888,6 +6932,22 @@ export const lobby = $root.lobby = (() => {
                         message.map = reader.string();
                         break;
                     }
+                case 6: {
+                        message.gameId = reader.string();
+                        break;
+                    }
+                case 7: {
+                        message.tournamentId = reader.string();
+                        break;
+                    }
+                case 8: {
+                        message.currentPlayers = reader.int32();
+                        break;
+                    }
+                case 9: {
+                        message.maxPlayers = reader.int32();
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -6944,6 +7004,18 @@ export const lobby = $root.lobby = (() => {
             if (message.map != null && message.hasOwnProperty("map"))
                 if (!$util.isString(message.map))
                     return "map: string expected";
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                if (!$util.isString(message.gameId))
+                    return "gameId: string expected";
+            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
+                if (!$util.isString(message.tournamentId))
+                    return "tournamentId: string expected";
+            if (message.currentPlayers != null && message.hasOwnProperty("currentPlayers"))
+                if (!$util.isInteger(message.currentPlayers))
+                    return "currentPlayers: integer expected";
+            if (message.maxPlayers != null && message.hasOwnProperty("maxPlayers"))
+                if (!$util.isInteger(message.maxPlayers))
+                    return "maxPlayers: integer expected";
             return null;
         };
 
@@ -6977,6 +7049,14 @@ export const lobby = $root.lobby = (() => {
                 message.mode = String(object.mode);
             if (object.map != null)
                 message.map = String(object.map);
+            if (object.gameId != null)
+                message.gameId = String(object.gameId);
+            if (object.tournamentId != null)
+                message.tournamentId = String(object.tournamentId);
+            if (object.currentPlayers != null)
+                message.currentPlayers = object.currentPlayers | 0;
+            if (object.maxPlayers != null)
+                message.maxPlayers = object.maxPlayers | 0;
             return message;
         };
 
@@ -7000,6 +7080,10 @@ export const lobby = $root.lobby = (() => {
                 object.status = "";
                 object.mode = "";
                 object.map = "";
+                object.gameId = "";
+                object.tournamentId = "";
+                object.currentPlayers = 0;
+                object.maxPlayers = 0;
             }
             if (message.lobbyId != null && message.hasOwnProperty("lobbyId"))
                 object.lobbyId = message.lobbyId;
@@ -7014,6 +7098,14 @@ export const lobby = $root.lobby = (() => {
                 object.mode = message.mode;
             if (message.map != null && message.hasOwnProperty("map"))
                 object.map = message.map;
+            if (message.gameId != null && message.hasOwnProperty("gameId"))
+                object.gameId = message.gameId;
+            if (message.tournamentId != null && message.hasOwnProperty("tournamentId"))
+                object.tournamentId = message.tournamentId;
+            if (message.currentPlayers != null && message.hasOwnProperty("currentPlayers"))
+                object.currentPlayers = message.currentPlayers;
+            if (message.maxPlayers != null && message.hasOwnProperty("maxPlayers"))
+                object.maxPlayers = message.maxPlayers;
             return object;
         };
 

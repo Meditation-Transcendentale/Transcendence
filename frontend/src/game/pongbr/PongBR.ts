@@ -591,7 +591,6 @@ export class PongBR {
 	public async fetchPlayerUsernames(playerUUIDs: string[]): Promise<void> {
 		this.uuidToUsername.clear();
 
-		// Filter out bot UUIDs - we don't need to fetch usernames for them
 		const realPlayerUUIDs = playerUUIDs.filter(uuid => !uuid.startsWith('bot-'));
 
 		const fetchPromises = realPlayerUUIDs.map(async (uuid) => {
@@ -616,7 +615,6 @@ export class PongBR {
 	}
 
 	public getUsername(uuid: string): string {
-		// Check if this is a bot UUID
 		if (uuid.startsWith('bot-')) {
 			return `Bot ${uuid.substring(4)}`;
 		}

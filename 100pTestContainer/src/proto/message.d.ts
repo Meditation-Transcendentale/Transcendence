@@ -2733,6 +2733,18 @@ export namespace lobby {
 
         /** UpdateMessage map */
         map?: (string|null);
+
+        /** UpdateMessage gameId */
+        gameId?: (string|null);
+
+        /** UpdateMessage tournamentId */
+        tournamentId?: (string|null);
+
+        /** UpdateMessage currentPlayers */
+        currentPlayers?: (number|null);
+
+        /** UpdateMessage maxPlayers */
+        maxPlayers?: (number|null);
     }
 
     /** Represents an UpdateMessage. */
@@ -2758,6 +2770,18 @@ export namespace lobby {
 
         /** UpdateMessage map. */
         public map: string;
+
+        /** UpdateMessage gameId. */
+        public gameId: string;
+
+        /** UpdateMessage tournamentId. */
+        public tournamentId: string;
+
+        /** UpdateMessage currentPlayers. */
+        public currentPlayers: number;
+
+        /** UpdateMessage maxPlayers. */
+        public maxPlayers: number;
 
         /**
          * Creates a new UpdateMessage instance using the specified properties.
