@@ -91,15 +91,17 @@ message MatchScoreUpdate {
   repeated int32 score = 1;
 }
 
-message MatchEnd { 
+message MatchEnd {
   string winnerId = 1;
   string loserId = 2;
   repeated int32 score = 3;
   string forfeitId = 4;
+  repeated int32 ranks = 5;        // BR mode: final ranks (index = playerId, value = rank)
+  repeated string playerIds = 6;   // BR mode: player UUIDs in order
 }
 
-message MatchEndBr { 
-  repeated string rank = 1;
+message MatchEndBr {
+  repeated string playerIds = 1;   // Player UUIDs ordered by rank (winner first, last place last)
 }
 
 message PhysicsRequest {

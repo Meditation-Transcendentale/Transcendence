@@ -3980,6 +3980,8 @@ export const shared = $root.shared = (() => {
          * @property {string|null} [loserId] MatchEnd loserId
          * @property {Array.<number>|null} [score] MatchEnd score
          * @property {string|null} [forfeitId] MatchEnd forfeitId
+         * @property {Array.<number>|null} [ranks] MatchEnd ranks
+         * @property {Array.<string>|null} [playerIds] MatchEnd playerIds
          */
 
         /**
@@ -3992,6 +3994,8 @@ export const shared = $root.shared = (() => {
          */
         function MatchEnd(properties) {
             this.score = [];
+            this.ranks = [];
+            this.playerIds = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -4031,6 +4035,22 @@ export const shared = $root.shared = (() => {
         MatchEnd.prototype.forfeitId = "";
 
         /**
+         * MatchEnd ranks.
+         * @member {Array.<number>} ranks
+         * @memberof shared.MatchEnd
+         * @instance
+         */
+        MatchEnd.prototype.ranks = $util.emptyArray;
+
+        /**
+         * MatchEnd playerIds.
+         * @member {Array.<string>} playerIds
+         * @memberof shared.MatchEnd
+         * @instance
+         */
+        MatchEnd.prototype.playerIds = $util.emptyArray;
+
+        /**
          * Creates a new MatchEnd instance using the specified properties.
          * @function create
          * @memberof shared.MatchEnd
@@ -4066,6 +4086,15 @@ export const shared = $root.shared = (() => {
             }
             if (message.forfeitId != null && Object.hasOwnProperty.call(message, "forfeitId"))
                 writer.uint32(/* id 4, wireType 2 =*/34).string(message.forfeitId);
+            if (message.ranks != null && message.ranks.length) {
+                writer.uint32(/* id 5, wireType 2 =*/42).fork();
+                for (let i = 0; i < message.ranks.length; ++i)
+                    writer.int32(message.ranks[i]);
+                writer.ldelim();
+            }
+            if (message.playerIds != null && message.playerIds.length)
+                for (let i = 0; i < message.playerIds.length; ++i)
+                    writer.uint32(/* id 6, wireType 2 =*/50).string(message.playerIds[i]);
             return writer;
         };
 
@@ -4125,6 +4154,23 @@ export const shared = $root.shared = (() => {
                         message.forfeitId = reader.string();
                         break;
                     }
+                case 5: {
+                        if (!(message.ranks && message.ranks.length))
+                            message.ranks = [];
+                        if ((tag & 7) === 2) {
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.ranks.push(reader.int32());
+                        } else
+                            message.ranks.push(reader.int32());
+                        break;
+                    }
+                case 6: {
+                        if (!(message.playerIds && message.playerIds.length))
+                            message.playerIds = [];
+                        message.playerIds.push(reader.string());
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -4176,6 +4222,20 @@ export const shared = $root.shared = (() => {
             if (message.forfeitId != null && message.hasOwnProperty("forfeitId"))
                 if (!$util.isString(message.forfeitId))
                     return "forfeitId: string expected";
+            if (message.ranks != null && message.hasOwnProperty("ranks")) {
+                if (!Array.isArray(message.ranks))
+                    return "ranks: array expected";
+                for (let i = 0; i < message.ranks.length; ++i)
+                    if (!$util.isInteger(message.ranks[i]))
+                        return "ranks: integer[] expected";
+            }
+            if (message.playerIds != null && message.hasOwnProperty("playerIds")) {
+                if (!Array.isArray(message.playerIds))
+                    return "playerIds: array expected";
+                for (let i = 0; i < message.playerIds.length; ++i)
+                    if (!$util.isString(message.playerIds[i]))
+                        return "playerIds: string[] expected";
+            }
             return null;
         };
 
@@ -4204,6 +4264,20 @@ export const shared = $root.shared = (() => {
             }
             if (object.forfeitId != null)
                 message.forfeitId = String(object.forfeitId);
+            if (object.ranks) {
+                if (!Array.isArray(object.ranks))
+                    throw TypeError(".shared.MatchEnd.ranks: array expected");
+                message.ranks = [];
+                for (let i = 0; i < object.ranks.length; ++i)
+                    message.ranks[i] = object.ranks[i] | 0;
+            }
+            if (object.playerIds) {
+                if (!Array.isArray(object.playerIds))
+                    throw TypeError(".shared.MatchEnd.playerIds: array expected");
+                message.playerIds = [];
+                for (let i = 0; i < object.playerIds.length; ++i)
+                    message.playerIds[i] = String(object.playerIds[i]);
+            }
             return message;
         };
 
@@ -4220,8 +4294,11 @@ export const shared = $root.shared = (() => {
             if (!options)
                 options = {};
             let object = {};
-            if (options.arrays || options.defaults)
+            if (options.arrays || options.defaults) {
                 object.score = [];
+                object.ranks = [];
+                object.playerIds = [];
+            }
             if (options.defaults) {
                 object.winnerId = "";
                 object.loserId = "";
@@ -4238,6 +4315,16 @@ export const shared = $root.shared = (() => {
             }
             if (message.forfeitId != null && message.hasOwnProperty("forfeitId"))
                 object.forfeitId = message.forfeitId;
+            if (message.ranks && message.ranks.length) {
+                object.ranks = [];
+                for (let j = 0; j < message.ranks.length; ++j)
+                    object.ranks[j] = message.ranks[j];
+            }
+            if (message.playerIds && message.playerIds.length) {
+                object.playerIds = [];
+                for (let j = 0; j < message.playerIds.length; ++j)
+                    object.playerIds[j] = message.playerIds[j];
+            }
             return object;
         };
 
@@ -4276,7 +4363,7 @@ export const shared = $root.shared = (() => {
          * Properties of a MatchEndBr.
          * @memberof shared
          * @interface IMatchEndBr
-         * @property {Array.<string>|null} [rank] MatchEndBr rank
+         * @property {Array.<string>|null} [playerIds] MatchEndBr playerIds
          */
 
         /**
@@ -4288,7 +4375,7 @@ export const shared = $root.shared = (() => {
          * @param {shared.IMatchEndBr=} [properties] Properties to set
          */
         function MatchEndBr(properties) {
-            this.rank = [];
+            this.playerIds = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -4296,12 +4383,12 @@ export const shared = $root.shared = (() => {
         }
 
         /**
-         * MatchEndBr rank.
-         * @member {Array.<string>} rank
+         * MatchEndBr playerIds.
+         * @member {Array.<string>} playerIds
          * @memberof shared.MatchEndBr
          * @instance
          */
-        MatchEndBr.prototype.rank = $util.emptyArray;
+        MatchEndBr.prototype.playerIds = $util.emptyArray;
 
         /**
          * Creates a new MatchEndBr instance using the specified properties.
@@ -4327,9 +4414,9 @@ export const shared = $root.shared = (() => {
         MatchEndBr.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.rank != null && message.rank.length)
-                for (let i = 0; i < message.rank.length; ++i)
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.rank[i]);
+            if (message.playerIds != null && message.playerIds.length)
+                for (let i = 0; i < message.playerIds.length; ++i)
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.playerIds[i]);
             return writer;
         };
 
@@ -4367,9 +4454,9 @@ export const shared = $root.shared = (() => {
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        if (!(message.rank && message.rank.length))
-                            message.rank = [];
-                        message.rank.push(reader.string());
+                        if (!(message.playerIds && message.playerIds.length))
+                            message.playerIds = [];
+                        message.playerIds.push(reader.string());
                         break;
                     }
                 default:
@@ -4407,12 +4494,12 @@ export const shared = $root.shared = (() => {
         MatchEndBr.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.rank != null && message.hasOwnProperty("rank")) {
-                if (!Array.isArray(message.rank))
-                    return "rank: array expected";
-                for (let i = 0; i < message.rank.length; ++i)
-                    if (!$util.isString(message.rank[i]))
-                        return "rank: string[] expected";
+            if (message.playerIds != null && message.hasOwnProperty("playerIds")) {
+                if (!Array.isArray(message.playerIds))
+                    return "playerIds: array expected";
+                for (let i = 0; i < message.playerIds.length; ++i)
+                    if (!$util.isString(message.playerIds[i]))
+                        return "playerIds: string[] expected";
             }
             return null;
         };
@@ -4429,12 +4516,12 @@ export const shared = $root.shared = (() => {
             if (object instanceof $root.shared.MatchEndBr)
                 return object;
             let message = new $root.shared.MatchEndBr();
-            if (object.rank) {
-                if (!Array.isArray(object.rank))
-                    throw TypeError(".shared.MatchEndBr.rank: array expected");
-                message.rank = [];
-                for (let i = 0; i < object.rank.length; ++i)
-                    message.rank[i] = String(object.rank[i]);
+            if (object.playerIds) {
+                if (!Array.isArray(object.playerIds))
+                    throw TypeError(".shared.MatchEndBr.playerIds: array expected");
+                message.playerIds = [];
+                for (let i = 0; i < object.playerIds.length; ++i)
+                    message.playerIds[i] = String(object.playerIds[i]);
             }
             return message;
         };
@@ -4453,11 +4540,11 @@ export const shared = $root.shared = (() => {
                 options = {};
             let object = {};
             if (options.arrays || options.defaults)
-                object.rank = [];
-            if (message.rank && message.rank.length) {
-                object.rank = [];
-                for (let j = 0; j < message.rank.length; ++j)
-                    object.rank[j] = message.rank[j];
+                object.playerIds = [];
+            if (message.playerIds && message.playerIds.length) {
+                object.playerIds = [];
+                for (let j = 0; j < message.playerIds.length; ++j)
+                    object.playerIds[j] = message.playerIds[j];
             }
             return object;
         };
@@ -6787,6 +6874,7 @@ export const userinterface = $root.userinterface = (() => {
          * @property {userinterface.IGameStartMessage|null} [start] ServerMessage start
          * @property {shared.IMatchState|null} [state] ServerMessage state
          * @property {shared.IMatchEnd|null} [end] ServerMessage end
+         * @property {shared.IMatchEndBr|null} [endBr] ServerMessage endBr
          */
 
         /**
@@ -6844,17 +6932,25 @@ export const userinterface = $root.userinterface = (() => {
          */
         ServerMessage.prototype.end = null;
 
+        /**
+         * ServerMessage endBr.
+         * @member {shared.IMatchEndBr|null|undefined} endBr
+         * @memberof userinterface.ServerMessage
+         * @instance
+         */
+        ServerMessage.prototype.endBr = null;
+
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
 
         /**
          * ServerMessage payload.
-         * @member {"error"|"welcome"|"start"|"state"|"end"|undefined} payload
+         * @member {"error"|"welcome"|"start"|"state"|"end"|"endBr"|undefined} payload
          * @memberof userinterface.ServerMessage
          * @instance
          */
         Object.defineProperty(ServerMessage.prototype, "payload", {
-            get: $util.oneOfGetter($oneOfFields = ["error", "welcome", "start", "state", "end"]),
+            get: $util.oneOfGetter($oneOfFields = ["error", "welcome", "start", "state", "end", "endBr"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
@@ -6892,6 +6988,8 @@ export const userinterface = $root.userinterface = (() => {
                 $root.shared.MatchState.encode(message.state, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             if (message.end != null && Object.hasOwnProperty.call(message, "end"))
                 $root.shared.MatchEnd.encode(message.end, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+            if (message.endBr != null && Object.hasOwnProperty.call(message, "endBr"))
+                $root.shared.MatchEndBr.encode(message.endBr, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
             return writer;
         };
 
@@ -6946,6 +7044,10 @@ export const userinterface = $root.userinterface = (() => {
                     }
                 case 5: {
                         message.end = $root.shared.MatchEnd.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 6: {
+                        message.endBr = $root.shared.MatchEndBr.decode(reader, reader.uint32());
                         break;
                     }
                 default:
@@ -7032,6 +7134,16 @@ export const userinterface = $root.userinterface = (() => {
                         return "end." + error;
                 }
             }
+            if (message.endBr != null && message.hasOwnProperty("endBr")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.shared.MatchEndBr.verify(message.endBr);
+                    if (error)
+                        return "endBr." + error;
+                }
+            }
             return null;
         };
 
@@ -7071,6 +7183,11 @@ export const userinterface = $root.userinterface = (() => {
                 if (typeof object.end !== "object")
                     throw TypeError(".userinterface.ServerMessage.end: object expected");
                 message.end = $root.shared.MatchEnd.fromObject(object.end);
+            }
+            if (object.endBr != null) {
+                if (typeof object.endBr !== "object")
+                    throw TypeError(".userinterface.ServerMessage.endBr: object expected");
+                message.endBr = $root.shared.MatchEndBr.fromObject(object.endBr);
             }
             return message;
         };
@@ -7112,6 +7229,11 @@ export const userinterface = $root.userinterface = (() => {
                 object.end = $root.shared.MatchEnd.toObject(message.end, options);
                 if (options.oneofs)
                     object.payload = "end";
+            }
+            if (message.endBr != null && message.hasOwnProperty("endBr")) {
+                object.endBr = $root.shared.MatchEndBr.toObject(message.endBr, options);
+                if (options.oneofs)
+                    object.payload = "endBr";
             }
             return object;
         };

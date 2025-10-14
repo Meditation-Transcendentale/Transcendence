@@ -94,6 +94,7 @@ export class PongBR {
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
 		this.statue = initStatue(this.scene, this.pongRoot);
 		const blackholeResult = createBlackHoleBackdrop(this.scene, this.statue.position, this.pongRoot);
+		blackholeResult.backdrop.setEnabled(false);
 		this.blackholeObserver = blackholeResult.observer;
 		this.spaceSkybox = new SpaceSkybox(this.scene);
 		this.spaceSkybox.applyPreset('Monochrome');
@@ -123,8 +124,6 @@ export class PongBR {
 			[this.camera]
 		);
 
-		// Note: MSAA causes issues with CustomMaterial + thin instances
-		// Using enhanced FXAA instead
 		this.pipeline.samples = 1;
 
 		this.pipeline.bloomEnabled = true;
@@ -148,7 +147,6 @@ export class PongBR {
 		this.pipeline.imageProcessing.toneMappingEnabled = true;
 		this.pipeline.imageProcessing.toneMappingType = 1;
 
-		// FXAA for anti-aliasing (MSAA doesn't work with CustomMaterial)
 		this.pipeline.fxaaEnabled = true;
 
 	}
@@ -213,11 +211,20 @@ export class PongBR {
 		this.inputManager.enable();
 		this.pongRoot.setEnabled(true);
 		this.stateManager.start();
+		this.spaceSkybox.disable();
 	}
 	public stop(): void {
 		this.stateManager.stop();
 		this.spaceSkybox.onGameUnload();
 		this.inputManager.disable();
+		const payload: userinterface.IClientMessage = {
+			quit: {
+				uuid: this.uuid,
+				lobbyId: this.uuid,
+			},
+		};
+		const buffer = encodeClientMessage(payload);
+		this.wsManager.socket.send(buffer);
 		this.pongRoot.setEnabled(false);
 
 		console.log("game paused");
@@ -584,7 +591,9 @@ export class PongBR {
 	public async fetchPlayerUsernames(playerUUIDs: string[]): Promise<void> {
 		this.uuidToUsername.clear();
 
-		const fetchPromises = playerUUIDs.map(async (uuid) => {
+		const realPlayerUUIDs = playerUUIDs.filter(uuid => !uuid.startsWith('bot-'));
+
+		const fetchPromises = realPlayerUUIDs.map(async (uuid) => {
 			try {
 				const response: any = await postRequest("info/search", {
 					identifier: uuid,
@@ -602,10 +611,13 @@ export class PongBR {
 		});
 
 		await Promise.all(fetchPromises);
-		console.log(`✅ Loaded ${this.uuidToUsername.size} player usernames`);
+		console.log(`✅ Loaded ${this.uuidToUsername.size} real player usernames (${playerUUIDs.length - realPlayerUUIDs.length} bots skipped)`);
 	}
 
 	public getUsername(uuid: string): string {
+		if (uuid.startsWith('bot-')) {
+			return `Bot ${uuid.substring(4)}`;
+		}
 		return this.uuidToUsername.get(uuid) || uuid.substring(0, 8);
 	}
 

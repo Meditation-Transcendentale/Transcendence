@@ -1561,6 +1561,12 @@ export namespace shared {
 
         /** MatchEnd forfeitId */
         forfeitId?: (string|null);
+
+        /** MatchEnd ranks */
+        ranks?: (number[]|null);
+
+        /** MatchEnd playerIds */
+        playerIds?: (string[]|null);
     }
 
     /** Represents a MatchEnd. */
@@ -1583,6 +1589,12 @@ export namespace shared {
 
         /** MatchEnd forfeitId. */
         public forfeitId: string;
+
+        /** MatchEnd ranks. */
+        public ranks: number[];
+
+        /** MatchEnd playerIds. */
+        public playerIds: string[];
 
         /**
          * Creates a new MatchEnd instance using the specified properties.
@@ -1665,8 +1677,8 @@ export namespace shared {
     /** Properties of a MatchEndBr. */
     interface IMatchEndBr {
 
-        /** MatchEndBr rank */
-        rank?: (string[]|null);
+        /** MatchEndBr playerIds */
+        playerIds?: (string[]|null);
     }
 
     /** Represents a MatchEndBr. */
@@ -1678,8 +1690,8 @@ export namespace shared {
          */
         constructor(properties?: shared.IMatchEndBr);
 
-        /** MatchEndBr rank. */
-        public rank: string[];
+        /** MatchEndBr playerIds. */
+        public playerIds: string[];
 
         /**
          * Creates a new MatchEndBr instance using the specified properties.
@@ -2721,6 +2733,18 @@ export namespace lobby {
 
         /** UpdateMessage map */
         map?: (string|null);
+
+        /** UpdateMessage gameId */
+        gameId?: (string|null);
+
+        /** UpdateMessage tournamentId */
+        tournamentId?: (string|null);
+
+        /** UpdateMessage currentPlayers */
+        currentPlayers?: (number|null);
+
+        /** UpdateMessage maxPlayers */
+        maxPlayers?: (number|null);
     }
 
     /** Represents an UpdateMessage. */
@@ -2746,6 +2770,18 @@ export namespace lobby {
 
         /** UpdateMessage map. */
         public map: string;
+
+        /** UpdateMessage gameId. */
+        public gameId: string;
+
+        /** UpdateMessage tournamentId. */
+        public tournamentId: string;
+
+        /** UpdateMessage currentPlayers. */
+        public currentPlayers: number;
+
+        /** UpdateMessage maxPlayers. */
+        public maxPlayers: number;
 
         /**
          * Creates a new UpdateMessage instance using the specified properties.

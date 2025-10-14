@@ -16,16 +16,15 @@
  ### visual
     - full DA for the site + css implementation
     - finish map (zoom, tweak light)
-    - finish games visuals (br state change, )
     - make button disapeer
 
 
  ### fix
-    - handle error request back (lobby empty mode)
     - sanitize input
     - change goal position physics pong
     - check websocket url
     - fx pong to delete
+    - add tournament create number
 
 ### tweak
     - 3D tweak

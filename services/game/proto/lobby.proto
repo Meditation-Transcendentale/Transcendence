@@ -53,6 +53,10 @@ message UpdateMessage {
   string status = 3;
   string mode = 4;
   string map = 5;
+  string gameId = 6;
+  string tournamentId = 7;
+  int32 currentPlayers = 8;
+  int32 maxPlayers = 9;
 }
 
 // Envelope for *all* client→server messages

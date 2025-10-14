@@ -61,7 +61,8 @@ message ServerMessage {
     WelcomeMessage     welcome = 2;
     GameStartMessage   start   = 3;
     shared.MatchState  state   = 4;
-    shared.MatchEnd     end     = 5;
+    shared.MatchEnd    end     = 5;
+    shared.MatchEndBr  endBr   = 6;
   }
 }
 
