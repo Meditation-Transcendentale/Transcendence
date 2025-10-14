@@ -54,6 +54,9 @@ export class Popup {
 		h.autocomplete = "nope";
 		this.form.appendChild(h);
 
+		if (option.id)
+			this.dialog.id = option.id;
+
 		if (option.title) {
 			const head = document.createElement("header");
 			head.textContent = option.title;
