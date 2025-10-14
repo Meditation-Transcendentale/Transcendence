@@ -62,7 +62,7 @@ export enum NotificationType {
 	error
 };
 
-type Notification = IFriendAccept | IFriendRequest | IGameInvite | IStatusUpdate | IFriendRemove| ITextNotification | ICustomNotification | IErrorNotification;
+type Notification = IFriendAccept | IFriendRequest | IGameInvite | IStatusUpdate | IFriendRemove | ITextNotification | ICustomNotification | IErrorNotification;
 
 export class NotificationHtml {
 	private history: Set<HTMLElement>;
@@ -186,7 +186,7 @@ export class NotificationHtml {
 
 		div.style.animationDuration = `${option.duration}ms`;
 
-		label.textContent = "invited you to a lobby";
+		label.textContent = " invited you to a lobby";
 		sender.textContent = option.username;
 
 		div.appendChild(sender);

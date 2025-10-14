@@ -228,7 +228,7 @@ class SceneManager {
 				this.grass.enable = true;
 				this.assets.ballMesh.setEnabled(true);
 				this.assets.groundMesh.setEnabled(true);
-				this.butterfly.enable = true;
+				this.butterfly.enable = false;
 				this.ballGrass.updateType = "pong";
 				this.fog.enable = false;
 				this.cameraManager.fogEnabled = false;

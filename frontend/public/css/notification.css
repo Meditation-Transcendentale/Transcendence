@@ -1,71 +1,8 @@
-/* .notification-container { */
-/* 	position: absolute; */
-/* 	right: 0px; */
-/* 	top: 0; */
-/* 	width: fit-content; */
-/* 	height: fit-content; */
-/* 	display: grid; */
-/* 	grid-template-columns: 1; */
-/* } */
-/**/
-/* .notification { */
-/* 	display: inline-block; */
-/* 	width: 200px; */
-/* 	background-color: ghostwhite; */
-/* 	border-color: black; */
-/* 	border-width: 2px; */
-/* 	animation-name: notification-fade-out; */
-/* 	animation-timing-function: linear; */
-/* 	opacity: 0; */
-/* } */
-/**/
-/* .notification-click { */
-/* 	background-color: orange !important; */
-/* } */
-/**/
-/* .notification-error { */
-/* 	background-color: blue !important; */
-/* 	color: white !important; */
-/* } */
-/**/
-/* .notification-text { */
-/* 	background-color: inherit; */
-/* 	color: black; */
-/* } */
-/**/
-/* .notification-username { */
-/* 	background-color: inherit; */
-/* 	color: blue; */
-/* } */
-/**/
-/**/
-/* .notification-click:hover { */
-/* 	background-color: red !important; */
-/* } */
-/**/
-/* .notification-click:active { */
-/* 	background-color: white !important; */
-/* } */
-/**/
-/**/
-/* @keyframes notification-fade-out { */
-/**/
-/* 	0%, */
-/* 	50% { */
-/* 		opacity: 1; */
-/* 	} */
-/**/
-/* 	100% { */
-/* 		opacity: 0; */
-/* 	} */
-/**/
-/* } */
-
 .notification-container {
 	position: absolute;
 	right: var(--spacing-md);
 	top: var(--spacing-md);
-	width: 220px;
+	width: 270px;
 	display: flex;
 	flex-direction: column;
 	gap: var(--spacing-xs);
@@ -74,20 +11,26 @@
 
 .notification {
 	display: block;
-	width: 200px;
-	background-color: var(--window-color);
-	border: var(--border-width) solid var(--color-purple-medium);
-	border-radius: var(--card-radius);
+	width: 250px;
+	background-color: #111;
+	/* very dark background */
+	border: 1px solid #444;
+	/* dark grey border */
+	border-radius: 0;
+	/* no rounding */
 	padding: var(--spacing-sm);
 	font-family: var(--font-primary);
 	font-size: var(--font-size-verysmall);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+	/* subtle shadow */
 	cursor: default;
 	opacity: 1;
 	animation-name: notification-fade-out;
 	animation-timing-function: linear;
 	animation-fill-mode: forwards;
-	transition: background-color var(--transition-fast);
+	transition: background-color var(--transition-fast), color var(--transition-fast);
+	color: #eee;
+	/* off-white text */
 }
 
 .notification-click {
@@ -95,18 +38,25 @@
 }
 
 .notification-click:hover {
-	background-color: var(--color-purple-bright);
-	color: white;
+	background-color: #333;
+	/* lighter dark background on hover */
+	color: #fff;
+	/* pure white text */
 }
 
 .notification-click:active {
-	background-color: var(--color-purple-dark);
-	color: white;
+	background-color: #000;
+	/* black on active */
+	color: #fff;
 }
 
 .notification-error {
-	background-color: var(--color-purple-dark);
-	color: white;
+	background-color: #440000;
+	/* very dark red background */
+	color: #ff6666;
+	/* light red text */
+	border-color: #ff4444;
+	/* red border */
 }
 
 .notification-text,
@@ -115,9 +65,12 @@
 }
 
 .notification-username {
-	color: #CF01E0;
+	color: cornflowerblue;
+	/* lighter grey username */
+	font-weight: 600;
 }
 
+/* Fade out animation unchanged */
 @keyframes notification-fade-out {
 
 	0%,

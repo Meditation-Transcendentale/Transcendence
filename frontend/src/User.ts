@@ -92,6 +92,12 @@ class UserC {
 		}
 	}
 
+	public removeFriend(uuid: string) {
+		this.friendsOnline.delete(uuid);
+		this.friendsAway.delete(uuid);
+		htmlManager.friendlist.removeFriend(uuid);
+	}
+
 }
 
 export const User = new UserC();

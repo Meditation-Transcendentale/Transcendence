@@ -208,6 +208,11 @@ export class FriendlistHtml {
 			this.createUserElement(user, "request");
 	}
 
+	public removeFriend(uuid: string) {
+		this.friend.get(uuid)?.div.remove();
+		this.friend.delete(uuid);
+	}
+
 	public requestChoice(uuid: string, choice: boolean) {
 		if (this.friend.has(uuid))
 			return;
@@ -249,13 +254,20 @@ export class FriendlistHtml {
 		const avatar = document.createElement("img");
 		const status = document.createElement("button");
 		const btn = document.createElement("button");
+		const profile = document.createElement("div");
 
 		status.classList.add("friendlist-status");
 		btn.classList.add("friendlist-button");
-		div.appendChild(avatar);
-		div.appendChild(username);
+
+		profile.classList.add("friendlist-profile");
+
+		profile.appendChild(avatar);
+		profile.appendChild(username);
+		div.appendChild(profile);
 		div.appendChild(status);
 		div.appendChild(btn);
+
+		profile.addEventListener("click", () => htmlManager.profile.load(user.uuid));
 
 		//// need to add decline button for request;
 
@@ -349,15 +361,20 @@ export class FriendlistHtml {
 		const avatar = document.createElement("img");
 		const status = document.createElement("button");
 		const btn = document.createElement("button");
+		const profile = document.createElement("div");
 
 		status.classList.add("friendlist-status");
 		btn.classList.add("friendlist-button");
-		div.appendChild(avatar);
-		div.appendChild(username);
+
+		profile.classList.add("friendlist-profile");
+
+		profile.appendChild(avatar);
+		profile.appendChild(username);
+		div.appendChild(profile);
 		div.appendChild(status);
 		div.appendChild(btn);
 
-		//// need to add decline button for request;
+		profile.addEventListener("click", () => htmlManager.profile.load(uuid));
 
 		let btn2 = btn.cloneNode() as HTMLButtonElement;
 
