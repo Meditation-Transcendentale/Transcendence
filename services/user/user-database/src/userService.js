@@ -25,7 +25,6 @@ const updateUsernameStmt = database.prepare("UPDATE users SET username = ? WHERE
 const updateAvatarStmt = database.prepare("UPDATE users SET avatar_path = ? WHERE id = ?");
 const updatePasswordStmt = database.prepare("UPDATE users SET password = ? WHERE id = ?");
 const enable2FAStmt = database.prepare("UPDATE users SET two_fa_secret = ?, two_fa_enabled = ? WHERE id = ?");
-const getUserInfoStmt = database.prepare("SELECT uuid, username, avatar_path, two_fa_enabled FROM users WHERE id = ?");
 const getAvatarFromUsernameStmt = database.prepare("SELECT avatar_path FROM users WHERE username = ?");
 const getAvatarFromUUIDStmt = database.prepare("SELECT avatar_path FROM users WHERE uuid = ?");
 const getAllUsersStmt = database.prepare("SELECT * FROM users");
@@ -33,6 +32,11 @@ const getUserStatusStmt = database.prepare("SELECT status, lobby_gameId FROM act
 const addUserStatusStmt = database.prepare("INSERT INTO active_user (user_id, status) VALUES (?, ?)");
 const updateStatusStmt = database.prepare("UPDATE active_user SET status = ?, lobby_gameId = ? WHERE user_id = ?");
 const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
+const getUserInfoStmt = database.prepare(`
+	SELECT u.uuid, u.username, u.avatar_path, u.two_fa_enabled, au.status
+	FROM users u
+	JOIN active_user au ON u.id = au.user_id
+	WHERE u.id = ?`);
 const getUserForFriendResearchStmt  = database.prepare(`
 	SELECT u.uuid, u.username, u.avatar_path, au.status 
 	FROM users u
@@ -239,9 +243,13 @@ const userService = {
 		addUserStatusStmt.run(userId, status);
 	},
 	updateStatus: (userId, status, lobby_gameId) => {
+		console.log("updateStatus called with:", userId, status, lobby_gameId);
 		const validStatuses = ['online', 'offline', 'in_lobby', 'in_game', 'in_tournament'];
 		if (status && !validStatuses.includes(status)) {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
+		}
+		if (lobby_gameId === undefined) {
+			lobby_gameId = null;
 		}
 		updateStatusStmt.run(status, lobby_gameId, userId);
 	},

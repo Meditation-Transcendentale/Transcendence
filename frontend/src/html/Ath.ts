@@ -156,7 +156,7 @@ export class Ath {
 
 		this.profileImage = document.createElement("img");
 		this.profileImage.id = "ath-profile-image";
-		this.profileImage.src = "https://localhost:3002/cdn/default_avatar.jpg";
+		this.profileImage.src = "/cdn/default_avatar.jpg";
 		// this.setupProfileImageStyles();
 
 		this.trigger = document.createElement("span");
@@ -351,6 +351,7 @@ class athSettings {
 		this.changeUsernamePopup = new Popup({
 			type: PopupType.validation,
 			title: "Change Username",
+			id: "change-username-popup",
 			input: "username",
 			submit: (password: string, token?: string, input?: string) => {
 				patchRequest("update-info/username", { username: input, password: password, token: token })
@@ -368,6 +369,7 @@ class athSettings {
 		this.changePasswordPopup = new Popup({
 			type: PopupType.validation,
 			title: "Change Password",
+			id: "change-password-popup",
 			input: "password",
 			submit: (password: string, token?: string, input?: string) => {
 				patchRequest("update-info/password", { newPassword: input, password: password, token: token })
@@ -384,12 +386,14 @@ class athSettings {
 		this.changeAvatarPopup = new Popup({
 			type: PopupType.custom,
 			title: "Change Avatar",
+			id: "change-avatar-popup",
 			div: this.createAvatarDiv()
 		});
 
 		this.updateTwoFAPopup = new Popup({
 			type: PopupType.validation,
 			title: "Update 2FA",
+			id: "update-2fa-popup",
 			submit: (password: string, token?: string, input?: string) => {
 				this.handle2FAToggle(password, token);
 			},
@@ -400,6 +404,7 @@ class athSettings {
 
 	private createAvatarDiv(): HTMLDivElement {
 		const div = document.createElement("div");
+		div.id = "change-avatar-div";
 		div.style.display = "flex";
 		div.style.flexDirection = "column";
 		div.style.gap = "10px";
@@ -409,16 +414,12 @@ class athSettings {
 		fileInput.accept = "image/*";
 
 		const previewImg = document.createElement("img");
-		previewImg.style.width = "100px";
-		previewImg.style.height = "100px";
-		previewImg.style.objectFit = "cover";
-		previewImg.style.borderRadius = "50%";
-		previewImg.style.marginBottom = "10px";
-
+		previewImg.id = "avatar-preview-img";
+		
 		fileInput.addEventListener("change", () => {
 			const file = fileInput.files ? fileInput.files[0] : null;
 
-			const url = file ? URL.createObjectURL(file) : "https://localhost:3002/cdn/default_avatar.jpg";
+			const url = file ? URL.createObjectURL(file) : "/cdn/default_avatar.jpg";
 			previewImg.src = url;
 
 			div.appendChild(previewImg);
@@ -914,7 +915,7 @@ class athProfile {
 
 	private async updateProfileInfo() {
 		await User.check();
-		this.profileImg.src = User.avatar || "https://localhost:3002/cdn/default_avatar.jpg";
+		this.profileImg.src = User.avatar || "/cdn/default_avatar.jpg";
 		this.usernameElem.textContent = User.username || "User";
 		this.statusElem.textContent = `Status: ${User.status || "offline"}`;
 		this.statusElem.style.color = User.status === "online" ? "green" : User.status === "offline" ? "orange" : "red";

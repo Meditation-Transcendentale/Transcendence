@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: "../../../.env" });
 
-import { decodeMatchEnd } from "./proto/helper.js";
+import { decodeMatchEnd, decodeMatchEndBr } from "./proto/helper.js";
 
 
 const jc = JSONCodec();
@@ -55,7 +55,11 @@ handleErrorsNats(async () => {
 			nats.publish(msg.reply, jc.encode({ success: true, data: opponent }));
 		}),
 		handleNatsSubscription("stats.addBRMatchStatsInfos", async (msg) => {
-			const matchInfos = jc.decode(msg.data);
+
+
+			const matchInfos = decodeMatchEndBr(msg.data);
+			console.log(matchInfos);
+			// const matchInfos = jc.decode(msg.data);
 
 			let winner_uuid;
 			for (const info of matchInfos) {
