@@ -1,4 +1,5 @@
 import { postRequest } from "../networking/request";
+import { routeManager } from "../route/RouteManager";
 import { User } from "../User";
 import { htmlManager } from "./HtmlManager";
 import { Popup, PopupType } from "./Popup";
@@ -13,6 +14,9 @@ export class Ath {
 	private trigger!: HTMLSpanElement;
 	private dropdown!: HTMLDivElement;
 
+	private containerUP: HTMLDivElement;
+	private home: HTMLButtonElement;
+
 
 	private isOpen: boolean = false;
 
@@ -20,8 +24,21 @@ export class Ath {
 
 	constructor() {
 
+		this.containerUP = document.createElement("div");
+		this.containerUP.id = "ath-layout";
+
+		this.home = document.createElement("button");
+		this.home.id = "ath-home";
+		this.home.textContent = "⌂";
+		this.containerUP.appendChild(this.home);
+
+		this.home.addEventListener("click", () => routeManager.nav("/home"))
+
+
 		this.container = document.createElement("div");
 		this.container.id = "ath-container";
+
+		this.containerUP.appendChild(this.container)
 
 		this.profileSection = document.createElement("div");
 		this.profileSection.id = "ath-profile-section";
@@ -138,12 +155,12 @@ export class Ath {
 		if (this._loaded)
 			return;
 		this._loaded = true;
-		document.body.appendChild(this.container);
+		document.body.appendChild(this.containerUP);
 	}
 
 	public unload() {
 		this._loaded = false;
-		this.container.remove();
+		this.containerUP.remove();
 	}
 
 	private quitFunction() {

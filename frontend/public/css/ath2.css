@@ -1,9 +1,27 @@
-#ath-container {
+#ath-layout {
 	position: fixed;
 	top: 10px;
-	right: 10px;
+	left: 10px;
 	z-index: 1000;
 	font-family: Andale Mono, monospace;
+	display: flex;
+	flex-direction: row;
+}
+
+#ath-home {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #0d0221;
+	padding: 6px;
+	border-radius: 0px;
+	cursor: pointer;
+	color: #dda8fc;
+	border: 2px solid #dda8fc;
+	font-size: var(--font-size-base);
+	line-height: 0;
+	margin-right: var(--spacing-lg);
 }
 
 #ath-profile-section {
@@ -74,6 +92,7 @@
 	transition: background-color 0.3s ease;
 }
 
+#ath-home:hover,
 #ath-profile-section:hover span,
 #change-username-btn:hover,
 #change-password-btn:hover,

@@ -28,12 +28,14 @@ export class LobbyRoute implements IRoute {
 		sceneManager.cameraManager.vue = "lobby";
 		sceneManager.load("home");
 		htmlManager.cube.enable = false;
+		console.log("ayayaya");
 	}
 
 	public async unload(): Promise<void> {
 		htmlManager.lobby.unload();
 		streamManager.lobby.quit();
 		streamManager.lobby.disconnect();
+		console.log("ayayay");
 
 	}
 }

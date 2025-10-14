@@ -18,12 +18,32 @@
 	/* or flex */
 	/* vertical-align: middle; */
 	outline: 2px solid var(--color-lavender);
+	position: absolute;
+	bottom: var(--spacing-sm);
+	right: var(--spacing-sm);
+
 }
 
 .friendlist-toggle:hover {
-	background-color: var(--color-purple-bright);
-	box-shadow: 0 4px 12px rgba(157, 78, 221, 0.8);
+	color: white;
+	transform: translate3d(0, 0, 0) scale(1.05);
+	box-shadow: 1px 1px 1px black, -1px -1px 1px black;
+	text-shadow:
+		0 0 7px #fff,
+		0 0 10px #fff,
+		0 0 21px #fff,
+		0 0 42px #c77dff,
+		0 0 82px #c77dff,
+		0 0 92px #c77dff,
+		0 0 102px #c77dff,
+		0 0 151px #c77dff;
 }
+
+
+/* .friendlist-toggle:hover { */
+/* 	background-color: var(--color-purple-bright); */
+/* 	box-shadow: 0 4px 12px rgba(157, 78, 221, 0.8); */
+/* } */
 
 .friendlist-toggle:active {
 	/* background-color: var(--color-purple-dark); */
@@ -139,7 +159,7 @@
 	font-size: var(--font-size-verysmall);
 }
 
-.friendlist-user>img {
+.friendlist-profile>img {
 	flex: 0 0 var(--font-size-verysmall);
 	width: var(--font-size-verysmall);
 	height: var(--font-size-verysmall);
@@ -148,7 +168,7 @@
 	user-select: none;
 }
 
-.friendlist-user>span {
+.friendlist-profile>span {
 	flex: 1 1 auto;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -293,4 +313,22 @@
 		min-height: auto;
 		font-size: 2.2vh;
 	}
+}
+
+.friendlist-profile {
+	cursor: pointer;
+	flex: 3;
+}
+
+.friendlist-profile:hover {
+	color: white;
+	text-shadow:
+		0 0 7px #fff,
+		0 0 10px #fff,
+		0 0 21px #fff,
+		0 0 42px #c77dff,
+		0 0 82px #c77dff,
+		0 0 92px #c77dff,
+		0 0 102px #c77dff,
+		0 0 151px #c77dff;
 }
