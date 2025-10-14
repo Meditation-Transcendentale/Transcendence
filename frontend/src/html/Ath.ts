@@ -303,6 +303,7 @@ export class Ath {
 		const quitPopup = new Popup({
 			type: PopupType.accept,
 			title: "Logout",
+			id: "logout-popup",
 			text: "Are you sure you want to logout ?",
 			accept: () => {
 				postRequest("auth/logout", {})
