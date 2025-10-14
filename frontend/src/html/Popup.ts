@@ -111,6 +111,7 @@ export class Popup {
 
 		footer.appendChild(y);
 		footer.appendChild(n);
+		this.dialog.classList.add("popup-accept");
 	}
 
 	private generateValidationPopup(option: IValidationPopupOption) {

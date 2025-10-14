@@ -1,5 +1,6 @@
 .friendlist-toggle {
-	background-color: var(--color-purple);
+	/* background-color: var(--color-purple); */
+	background-color: #0d022180;
 	color: white;
 	font-family: var(--font-primary);
 	font-size: var(--font-size-tiny);
@@ -16,6 +17,7 @@
 	overflow: hidden;
 	/* or flex */
 	/* vertical-align: middle; */
+	outline: 2px solid var(--color-lavender);
 }
 
 .friendlist-toggle:hover {
@@ -24,7 +26,8 @@
 }
 
 .friendlist-toggle:active {
-	background-color: var(--color-purple-dark);
+	/* background-color: var(--color-purple-dark); */
+	background-color: #0d022180;
 	box-shadow: 0 2px 4px rgba(92, 24, 154, 0.9);
 }
 
@@ -64,9 +67,10 @@
 
 .friendlist-form>button {
 	flex: 1;
-	background-color: var(--color-purple-medium);
+	/* background-color: var(--color-purple-medium); */
+	background-color: #0d0221;
 	border: none;
-	border-radius: var(--spacing-sm) var(--spacing-sm) 0 0;
+	border-radius: var(--spacing-xs) var(--spacing-sm) 0 0;
 	color: var(--color-lavender);
 	font-weight: var(--font-weight-normal);
 	cursor: pointer;
@@ -95,13 +99,14 @@
 .request-container,
 .searchContainer {
 	color: var(--color-lavender);
-	background-color: rgba(90, 24, 154, 0.4);
+	/* background-color: rgba(90, 24, 154, 0.4); */
+	background-color: #0d022180;
 	width: 100%;
 	flex-grow: 1;
 	min-height: 140px;
 	padding: var(--spacing-md);
-	border: var(--spacing-m) solid var(--color-lavender);
-	border-top-right-radius: var(--spacing-m);
+	border: var(--spacing-sm) solid var(--color-lavender);
+	/* border-top-right-radius: var(--spacing-m); */
 	border-bottom-right-radius: var(--spacing-m);
 	border-bottom-left-radius: var(--spacing-m);
 	overflow-y: auto;

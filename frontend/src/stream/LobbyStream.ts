@@ -43,11 +43,14 @@ export class LobbyStream implements IStream {
 		}
 
 		this.ws.onerror = (err) => {
+			htmlManager.notification.add({ type: NotificationType.error, error: `cant connect to lobby` });
+			// console.log(err);
 			// console.warn(err);
 			this.disconnect();
 			routeManager.nav("/play");
 		}
 		this.connected = true;
+
 	}
 
 	public disconnect(): void {
@@ -93,6 +96,12 @@ export class LobbyStream implements IStream {
 		if (payload.startTournament != null) {
 			stateManager.tournamentId = payload.startTournament.tournamentId as string;
 			routeManager.nav("/tournament", false, true);
+			this.disconnect();
+		}
+
+		if (payload.error != null) {
+			htmlManager.notification.add({ type: NotificationType.error, text: `${payload.error.message}` });
+			routeManager.comeback();
 			this.disconnect();
 		}
 	}

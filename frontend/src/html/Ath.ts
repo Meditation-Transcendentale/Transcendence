@@ -35,13 +35,13 @@ class classicStatsC {
 }
 
 class brStatsC {
-	
+
 	public gamesPlayed!: number
 	public gamesWined!: number
 	public winRate!: number
 	public bestPlacement!: number
 	public averagePlacement!: number
-	
+
 	constructor() {
 	}
 
@@ -53,10 +53,12 @@ class brStatsC {
 					this.gamesWined = json.playerStats.stats.wins;
 					this.winRate = json.playerStats.stats.win_rate;
 					this.averagePlacement = json.playerStats.stats.avg_placement;
-					if (json.playerStats.stats.game_played == 0 ) {
-						this.bestPlacement = 0; }
+					if (json.playerStats.stats.game_played == 0) {
+						this.bestPlacement = 0;
+					}
 					else {
-						this.bestPlacement = json.playerStats.stats.best_placement; }
+						this.bestPlacement = json.playerStats.stats.best_placement;
+					}
 					resolve(true);
 				})
 				.catch((err) => {
@@ -98,17 +100,17 @@ class UserC {
 	public classicStats!: classicStatsC;
 	public brStats!: brStatsC;
 	public matchHistory!: matchHistoryC;
-	
+
 	constructor() {
 	}
-	
+
 	public async init() {
 		await this.check();
 		this.classicStats = new classicStatsC();
 		this.brStats = new brStatsC();
 		this.matchHistory = new matchHistoryC();
 	}
-	
+
 	public check(): Promise<boolean> {
 		return new Promise((resolve, reject) => {
 			getRequest("info/me", "no-cache")
@@ -123,7 +125,7 @@ class UserC {
 				.catch((err) => {
 					reject(new Error("not authentifiated User"));
 				})
-			})
+		})
 	}
 }
 
@@ -138,45 +140,45 @@ export class Ath {
 	private profileImage!: HTMLImageElement;
 	private trigger!: HTMLSpanElement;
 	private dropdown!: HTMLDivElement;
-	
+
 	private settings: athSettings;
 	private profile: athProfile;
-	
+
 	private isOpen: boolean = false;
-	
+
 	constructor() {
 
 		this.container = document.createElement("div");
 		this.container.id = "ath-container";
-		
+
 		this.profileSection = document.createElement("div");
 		this.profileSection.id = "ath-profile-section";
-		
+
 		this.profileImage = document.createElement("img");
 		this.profileImage.id = "ath-profile-image";
 		this.profileImage.src = "https://localhost:3002/cdn/default_avatar.jpg";
 		// this.setupProfileImageStyles();
-		
+
 		this.trigger = document.createElement("span");
 		this.trigger.id = "ath-trigger";
 		this.trigger.innerText = "User";
 		// this.setupTriggerStyles();
-		
+
 		this.dropdown = document.createElement("div");
 		this.dropdown.id = "ath-dropdown";
 		// this.setupDropdownStyles();
 		this.createMenuItems();
-		
+
 		this.profileSection.appendChild(this.trigger);
 		this.profileSection.appendChild(this.profileImage);
 		this.container.appendChild(this.profileSection);
 		this.container.appendChild(this.dropdown);
-		
+
 		this.setupEventListeners();
-		
+
 		this.settings = new athSettings(this);
 		this.profile = new athProfile(this);
-		
+
 		this.css = document.createElement("link");
 		this.css.rel = "stylesheet";
 		this.css.href = "../../css/ath2.css";
@@ -208,7 +210,7 @@ export class Ath {
 		this.dropdown.style.transition = "all 0.3s ease";
 		this.dropdown.style.marginTop = "5px";
 	}
-		
+
 
 	private createMenuItems() {
 		const menuItems = [
@@ -226,7 +228,7 @@ export class Ath {
 			menuItem.style.color = "#dda8fc";
 			menuItem.style.cursor = "pointer";
 			menuItem.style.transition = "background-color 0.2s ease";
-			
+
 
 			menuItem.addEventListener("click", () => {
 				item.action();
@@ -244,7 +246,7 @@ export class Ath {
 		});
 
 		document.addEventListener("click", (e) => {
-				this.close();
+			this.close();
 		});
 
 		document.addEventListener("keydown", (e) => {
@@ -281,7 +283,7 @@ export class Ath {
 		this.trigger.innerText = User.username;
 		this.profileImage.src = User.avatar;
 	}
-	
+
 	private async initProfile() {
 		User = new UserC();
 		await User.init();
@@ -307,8 +309,8 @@ export class Ath {
 			text: "Are you sure you want to logout ?",
 			accept: () => {
 				postRequest("auth/logout", {})
-						.then(() => { window.location.reload() })
-						.catch(() => { window.location.reload() })
+					.then(() => { window.location.reload() })
+					.catch(() => { window.location.reload() })
 			},
 			decline: () => { }
 		});
@@ -330,7 +332,7 @@ class athSettings {
 	private twoFAEnabled: boolean = false;
 	private athInstance: Ath;
 
-	constructor(athInstance: Ath) { 
+	constructor(athInstance: Ath) {
 
 		this.athInstance = athInstance;
 
@@ -344,7 +346,7 @@ class athSettings {
 			text: "",
 			div: this.createSettingsDiv()
 		});
-		
+
 
 		this.changeUsernamePopup = new Popup({
 			type: PopupType.validation,
@@ -352,10 +354,11 @@ class athSettings {
 			input: "username",
 			submit: (password: string, token?: string, input?: string) => {
 				patchRequest("update-info/username", { username: input, password: password, token: token })
-					.then(async (json) => { 
+					.then(async (json) => {
 						await User.check(),
-						this.athInstance.updateProfileInfo(),
-						this.changeUsernamePopup.close() })
+							this.athInstance.updateProfileInfo(),
+							this.changeUsernamePopup.close()
+					})
 					.catch((err) => { })
 			},
 			abort: () => {
@@ -368,9 +371,10 @@ class athSettings {
 			input: "password",
 			submit: (password: string, token?: string, input?: string) => {
 				patchRequest("update-info/password", { newPassword: input, password: password, token: token })
-					.then(async (json) => { 
+					.then(async (json) => {
 						await User.check(),
-						this.changePasswordPopup.close() })
+							this.changePasswordPopup.close()
+					})
 					.catch((err) => { })
 			},
 			abort: () => {
@@ -393,7 +397,7 @@ class athSettings {
 			}
 		});
 	}
-		
+
 	private createAvatarDiv(): HTMLDivElement {
 		const div = document.createElement("div");
 		div.style.display = "flex";
@@ -410,13 +414,13 @@ class athSettings {
 		previewImg.style.objectFit = "cover";
 		previewImg.style.borderRadius = "50%";
 		previewImg.style.marginBottom = "10px";
-		
+
 		fileInput.addEventListener("change", () => {
 			const file = fileInput.files ? fileInput.files[0] : null;
 
 			const url = file ? URL.createObjectURL(file) : "https://localhost:3002/cdn/default_avatar.jpg";
 			previewImg.src = url;
-			
+
 			div.appendChild(previewImg);
 		});
 
@@ -453,27 +457,29 @@ class athSettings {
 			deleteRequest("update-info/disable-2fa", { password, token })
 				.then(async (json: any) => {
 					this.toggle2FABtn.textContent = "Enable 2FA",
-					await User.check(), 
-					this.updateTwoFAPopup.close(), 
-					this.settingsPopup.close(),
-					this.twoFAEnabled = User.twofa === 1; })
+						await User.check(),
+						this.updateTwoFAPopup.close(),
+						this.settingsPopup.close(),
+						this.twoFAEnabled = User.twofa === 1;
+				})
 				.catch((err: any) => { err.json() })
-			
+
 		} else {
 			postRequest("update-info/enable-2fa", { password })
 				.then(async (json: any) => {
 					this.qrCodeSrc = json.qrCode,
-					this.twoFAQrCodePopup = new Popup({
-						type: PopupType.custom,
-						title: "Scan this QR code with your authenticator app.",
-						div: this.createQrCodeDiv()
-					});
-					this.twoFAQrCodePopup.show(), 
-					await User.check(), 
-					this.toggle2FABtn.textContent = "Disable 2FA",
-					this.updateTwoFAPopup.close(),
-					this.settingsPopup.close(),
-					this.twoFAEnabled = User.twofa === 1; })
+						this.twoFAQrCodePopup = new Popup({
+							type: PopupType.custom,
+							title: "Scan this QR code with your authenticator app.",
+							div: this.createQrCodeDiv()
+						});
+					this.twoFAQrCodePopup.show(),
+						await User.check(),
+						this.toggle2FABtn.textContent = "Disable 2FA",
+						this.updateTwoFAPopup.close(),
+						this.settingsPopup.close(),
+						this.twoFAEnabled = User.twofa === 1;
+				})
 				.catch((err: any) => { err.json() })
 		}
 
@@ -503,7 +509,7 @@ class athSettings {
 		else
 			this.toggle2FABtn.textContent = "Enable 2FA";
 	}
-		
+
 	private createSettingsDiv(): HTMLDivElement {
 		const div = document.createElement("div");
 		div.id = "settings-div";
@@ -543,18 +549,18 @@ class athSettings {
 		div.appendChild(changePasswordBtn);
 		div.appendChild(changeAvatarBtn);
 		div.appendChild(this.toggle2FABtn);
-		
+
 		return div;
 	}
-		
-	public load () {
+
+	public load() {
 		this.twoFAEnabled = User.twofa === 1;
 		this.update2FAButton();
 		this.settingsPopup.show();
 
 	}
-		
-	public unload () {
+
+	public unload() {
 		this.settingsPopup.close();
 	}
 }
@@ -571,24 +577,24 @@ class athProfile {
 	private profileImg!: HTMLImageElement;
 	private usernameElem!: HTMLHeadingElement;
 	private statusElem!: HTMLParagraphElement;
-	
+
 	private profilePopup: Popup;
-	
+
 	private classicTable!: HTMLTableElement;
 	private brTable!: HTMLTableElement;
-	
+
 	private classicTdElements!: { [key: string]: HTMLTableCellElement };
 	private brTdElements: { [key: string]: HTMLTableCellElement };
 
-	private matchHistoryRow!:{ [key: number ]: HTMLTableRowElement };
+	private matchHistoryRow!: { [key: number]: HTMLTableRowElement };
 	private matchHistoryTdElements!: { [key: number]: { [id: number]: HTMLTableCellElement } };
 	private matchHistoryBtns!: { [key: number]: HTMLButtonElement };
 	private toggleMatchHistory!: { [key: number]: boolean };
-	
-	
+
+
 	constructor(athInstance: Ath) {
 		this.athInstance = athInstance;
-		
+
 		this.classicTdElements = {};
 		this.brTdElements = {};
 		this.matchHistoryTdElements = {};
@@ -596,7 +602,7 @@ class athProfile {
 
 		this.matchHistoryBtns = {};
 		this.toggleMatchHistory = {};
-		
+
 		this.createProfileDiv();
 
 		this.profilePopup = new Popup({
@@ -607,7 +613,7 @@ class athProfile {
 
 
 	}
-	
+
 	private createProfileDiv() {
 		this.div = document.createElement("div");
 		this.div.style.display = "flex";
@@ -650,11 +656,11 @@ class athProfile {
 	private async getPlayerStats() {
 
 		await User.classicStats.check()
-			.then(() => {this.updateClassicStatsTable(User.classicStats) })
+			.then(() => { this.updateClassicStatsTable(User.classicStats) })
 			.catch((err) => { });
 
 		await User.brStats.check()
-			.then(() => {this.updateBrStatsTable(User.brStats) })
+			.then(() => { this.updateBrStatsTable(User.brStats) })
 			.catch((err) => { });
 	}
 
@@ -719,7 +725,7 @@ class athProfile {
 			default:
 				result = "Unknown";
 		}
-		
+
 	}
 
 	private handleDate(dateString: string): string {
@@ -747,7 +753,7 @@ class athProfile {
 		console.log("history: ", history);
 		for (let i = 0; i < history.length; i++) {
 			console.log("history length i: ", i);
-			if ( history[i].is_winner)
+			if (history[i].is_winner)
 				this.matchHistoryRow[i].style.backgroundColor = "rgba(144, 238, 144, 0.5)";
 			else
 				this.matchHistoryRow[i].style.backgroundColor = "rgba(226, 50, 77, 0.5)";
@@ -803,11 +809,11 @@ class athProfile {
 
 				this.matchHistoryTdElements[i] = this.matchHistoryTdElements[i] || {};
 				this.matchHistoryTdElements[i][j] = document.createElement("td");
-				
-				
+
+
 				this.matchHistoryRow[i].appendChild(this.matchHistoryTdElements[i][j]);
 			}
-			
+
 			this.matchHistoryBtns[i] = document.createElement("button");
 			this.matchHistoryBtns[i].style.backgroundColor = "transparent";
 			this.matchHistoryBtns[i].style.border = "none";
@@ -821,10 +827,10 @@ class athProfile {
 	}
 
 	private createStatDiv() {
-		
+
 		const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded"];
 		const brPlayerStatsName = ["Game Played", 'Wined', "Win Rate", "Best Placement", "Average Placement"];
-		
+
 		this.statsDiv = document.createElement("div");
 		this.statsDiv.id = "profile-stats";
 		this.statsDiv.style.display = "flex";
@@ -846,12 +852,12 @@ class athProfile {
 		this.brStatsDiv.id = "br-stats-div";
 		this.brStatsDiv.style.flex = "1";
 		this.brStatsDiv.style.border = "1px solid black";
-		
+
 		const brTitle = document.createElement("h4");
 		brTitle.textContent = "Battle Royale Stats";
 		brTitle.style.textAlign = "center";
 		this.brStatsDiv.appendChild(brTitle);
-		
+
 		this.classicTable = document.createElement("table");
 		this.classicTable.id = "classic-stats";
 		this.classicTable.style.width = "100%";
@@ -870,7 +876,7 @@ class athProfile {
 			const classicRow = document.createElement("tr");
 			const classicTitlesCell = document.createElement("th");
 			this.classicTdElements[statName] = document.createElement("td");
-			
+
 			classicRow.style.border = "1px solid black";
 			classicTitlesCell.style.border = "1px solid black";
 
