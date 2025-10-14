@@ -116,7 +116,7 @@ export function buildPaddles(
 
 		const deathWall = new Entity();
 		deathWall.addComponent(new WallComponent(i, goalPos));
-		deathWall.addComponent(new TransformComponent(goalPos, new Vector3(0, paddleRotY, 0), new Vector3(goalSize.z, 1, 2 * Math.PI * 200 / playerCount), pongRoot));
+		deathWall.addComponent(new TransformComponent(Vector3.Zero(), new Vector3(0, paddleRotY, 0), Vector3.One(), pongRoot));
 		const transform = deathWall.getComponent(TransformComponent);
 		transform?.disable();
 		ecs.addEntity(deathWall);

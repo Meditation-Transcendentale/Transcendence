@@ -62,7 +62,7 @@ async function init() {
 
 	window.addEventListener('keydown', (e) => {
 		if (e.key == 'Escape' && !stateManager.popup) {
-			routeManager.nav('/home', false, true)
+			routeManager.comeback();
 		}
 		if (e.key == "p") {
 			console.log(sceneManager.resolution);

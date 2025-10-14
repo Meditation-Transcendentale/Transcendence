@@ -26,10 +26,12 @@ export class MovementSystem extends System {
 			const now = performance.now();
 			const age = now - ball.lastServerUpdate;
 
-			if (age < 17) {
+			if (age < 100) {
 				const dist = Vector3.Distance(ball.position, ball.serverPosition);
 				if (dist > 0 && dist < 1) {
-					const corrected = Vector3.Lerp(ball.position, ball.serverPosition, 0.1);
+					const smoothness = 6.3;
+					const lerpFactor = 1.0 - Math.exp(-smoothness * deltaTime);
+					const corrected = Vector3.Lerp(ball.position, ball.serverPosition, lerpFactor);
 					ball.position.copyFrom(corrected);
 				} else if (dist > 1) {
 					ball.position.copyFrom(ball.serverPosition);
@@ -49,10 +51,12 @@ export class MovementSystem extends System {
 					if (dist >= 0.003) {
 						paddle.offset = paddle.serverOffset;
 					} else {
-						const smoothingFactor = 0.85;
+						const smoothness = 113.0;
+						const smoothingFactor = 1.0 - Math.exp(-smoothness * deltaTime);
 						paddle.offset = paddle.offset * (1 - smoothingFactor) + paddle.serverOffset * smoothingFactor;
 					}
 					transform.rotation.y = paddle.baseRotation - paddle.offset;
+					transform.markDirty();
 				}
 
 				paddle.lastServerOffset = paddle.serverOffset;

@@ -39,7 +39,9 @@ canvas {
 	z-index: 0;
 }
 
-
+body * {
+	font-family: var(--font-primary);
+}
 
 #fps {
 	position: absolute;
@@ -58,7 +60,7 @@ canvas {
 	position: absolute;
 	top: 0;
 	left: 0;
-	border: 5px solid var(--frame-color);
+	border: 2px solid var(--color-space-deep);
 	min-height: 10px;
 	min-width: 10px;
 	overflow: hidden;
@@ -106,12 +108,15 @@ canvas {
 
 .frame-hover {
 	width: auto;
-	font-size: 1.5vh;
-	background-color: blue;
-	color: white;
+	font-size: var(--font-size-verysmall);
+	background-color: var(--color-space-deep);
+	color: #DE01E0;
 	pointer-events: none;
-	opacity: 0.7;
+	opacity: 1;
 	pointer-events: none;
-	animation: glitch 0.1s linear infinite;
-	animation-timing-function: step-start;
+	/* animation: glitch 0.1s linear infinite; */
+	/* animation-timing-function: step-start; */
+	text-align: right;
+	font-family: var(--font-primary);
+	font-weight: 500;
 }

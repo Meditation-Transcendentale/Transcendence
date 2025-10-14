@@ -11,6 +11,7 @@ export class PlayRoute implements IRoute {
 	}
 
 	public async load(): Promise<void> {
+		routeManager.comebackRoute = "/home";
 		routeManager.nav(stateManager.playPath);
 	}
 

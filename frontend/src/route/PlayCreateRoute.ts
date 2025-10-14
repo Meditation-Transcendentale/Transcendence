@@ -22,6 +22,7 @@ export class PlayCreateRoute implements IRoute {
 	public async load(): Promise<void> {
 		if (!this.created)
 			await this.init();
+		routeManager.comebackRoute = "/home";
 		stateManager.playPath = "/play/create";
 		htmlManager.playCreate.load();
 		sceneManager.load("home");

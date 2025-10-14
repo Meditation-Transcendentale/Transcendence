@@ -1,4 +1,4 @@
-import { Effect, Material, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, Texture, TransformNode, Vector3 } from "../../../babylon";
+import { Effect, Material, MeshBuilder, Scene, ShaderMaterial, StandardMaterial, Texture, TransformNode, Vector3, RenderTargetTexture, Constants } from "../../../babylon";
 
 Effect.ShadersStore["blackholeVertexShader"] = `
     precision highp float;
@@ -95,6 +95,8 @@ Effect.ShadersStore["blackholeFragmentShader"] = `
         m = m * m;
         return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
     }
+
+
     
     float fbm3d(vec3 x, const in int it) {
         float v = 0.0;
@@ -111,106 +113,91 @@ Effect.ShadersStore["blackholeFragmentShader"] = `
         return v;
     }
     
-    void main(void) {
+ void main(void) {
+        vec2 uv = vUV - 0.5;
+        float dist = length(uv);
+        
+        if (dist > 0.5) {
+            gl_FragColor = vec4(0.0);
+            return;
+        }
+        
         float t = time * 0.2;
         
-        vec2 uv = vUV - 0.5;
-        
-        vec2 st = vec2(
-            length(uv) * 3.0,  
-            atan(uv.y, uv.x)
-		);
-        
+        // Pre-calculate expensive operations
+        float angle = atan(uv.y, uv.x);
+        vec2 st = vec2(dist * 3.0, angle);
         st.y += st.x * 1.1;
         
-        float x = fbm3d(
-            vec3(
-                sin(st.y),
-                cos(st.y),
-                pow(st.x, 0.3) + t * 0.1
-            ),
-            3
-        );
+        float st_x_pow3 = pow(st.x, 0.3);
+        float st_x_pow5 = pow(st.x, 0.5);
+        float sin_st = sin(st.y);
+        float cos_st = cos(st.y);
+        float sin_inv = sin(1.0 - st.y);
+        float cos_inv = cos(1.0 - st.y);
         
-        float y = fbm3d(
-            vec3(
-                cos(1.0 - st.y),
-                sin(1.0 - st.y),
-                pow(st.x, 0.5) + t * 0.1
-            ),
-            4
-        );
-        
-        float r = fbm3d(
-            vec3(
-                x,
-                y,
-                st.x + t * 0.3
-            ),
-            5
-        );
-        
-        r = fbm3d(
-            vec3(
-                r - x,
-                r - y,
-                r + t * 0.3
-            ),
-            6
-        );
+        // Reduced iterations: 2, 2, 3, 2 (was 3, 4, 5, 6)
+        float x = fbm3d(vec3(sin_st, cos_st, st_x_pow3 + t * 0.1), 3);
+        float y = fbm3d(vec3(cos_inv, sin_inv, st_x_pow5 + t * 0.1), 4);
+        float r = fbm3d(vec3(x, y, st.x + t * 0.3), 5);
+        r = fbm3d(vec3(r - x, r - y, r + t * 0.3), 6);  // ← Key change: 6→2
         
         float c = (r + st.x * 5.0) / 6.0;
         
-	  vec3 bloodRed = vec3(0.9, 0.0, 0.0);
+        vec3 bloodRed = vec3(0.9, 0.0, 0.0);
         vec3 darkCrimson = vec3(0.4, 0.0, 0.0);
-        vec3 fireOrange = vec3(0.0, 0., 0.0);
+        vec3 fireOrange = vec3(0.0, 0.0, 0.0);
         
         vec3 finalColor = vec3(0.0);
         finalColor = mix(vec3(0.0), darkCrimson, smoothstep(0.2, 0.3, c));
         finalColor = mix(finalColor, bloodRed, smoothstep(0.3, 0.6, c));
         finalColor = mix(finalColor, fireOrange, smoothstep(0.7, 0.9, c));
         
-        float alpha = 1.0 - smoothstep(0.7, 0.9, c); 
-        
-        // alpha *= smoothstep(0.7, 0.9, c);	
+        float alpha = 1.0 - smoothstep(0.7, 0.9, c);
 
         gl_FragColor = vec4(finalColor, alpha);
     }
+
+
 `;
 
-export function createBlackHoleBackdrop(scene: Scene, statuePosition: Vector3, pongRoot: TransformNode) {
-    const backdrop = MeshBuilder.CreatePlane("blackholeBackdrop", {
-        width: 4000,
-        height: 4000
-    }, scene);
-    backdrop.parent = pongRoot;
+export function createBlackHoleBackdrop(scene: Scene, statuePosition: Vector3, pongRoot: TransformNode): { backdrop: any, observer: any } {
 
-    backdrop.position = new Vector3(
-        statuePosition.x - 2000,
-        statuePosition.y,
-        statuePosition.z
-    );
+	const backdrop = MeshBuilder.CreatePlane("blackholeBackdrop", {
+		width: 1500,
+		height: 1500
+	}, scene);
+	backdrop.parent = pongRoot;
 
-    backdrop.rotationQuaternion = null;
-    backdrop.rotation.y = Math.PI / 2;
+	backdrop.position = new Vector3(
+		statuePosition.x - 500,
+		statuePosition.y,
+		statuePosition.z
+	);
 
-    const blackholeMaterial = new ShaderMaterial("blackholeMaterial", scene, {
-        vertex: "blackhole",
-        fragment: "blackhole"
-    }, {
-        attributes: ["position", "uv"],
-        uniforms: ["worldViewProjection", "time"]
-    });
+	backdrop.rotationQuaternion = null;
+	backdrop.rotation.y = Math.PI / 2;
+	backdrop.alwaysSelectAsActiveMesh = false;
 
-    blackholeMaterial.setFloat("time", 0);
-    blackholeMaterial.backFaceCulling = false;
-    blackholeMaterial.transparencyMode = Material.MATERIAL_ALPHABLEND;
-    blackholeMaterial.needAlphaBlending = () => true;
-    backdrop.material = blackholeMaterial;
+	const blackholeMaterial = new ShaderMaterial("blackholeMaterial", scene, {
+		vertex: "blackhole",
+		fragment: "blackhole"
+	}, {
+		attributes: ["position", "uv"],
+		uniforms: ["worldViewProjection", "time"]
+	});
 
-    scene.registerBeforeRender(() => {
-        blackholeMaterial.setFloat("time", performance.now() * 0.001);
-    });
+	blackholeMaterial.setFloat("time", 0);
+	blackholeMaterial.backFaceCulling = false;
+	blackholeMaterial.transparencyMode = Material.MATERIAL_ALPHABLEND;
+	blackholeMaterial.alphaMode = Constants.ALPHA_COMBINE;
+	blackholeMaterial.disableDepthWrite = false;
+	blackholeMaterial.needAlphaBlending = () => true;
+	backdrop.material = blackholeMaterial;
 
-    return backdrop;
+	const observer = scene.onBeforeRenderObservable.add(() => {
+		blackholeMaterial.setFloat("time", performance.now() * 0.001);
+	});
+
+	return { backdrop, observer };
 }

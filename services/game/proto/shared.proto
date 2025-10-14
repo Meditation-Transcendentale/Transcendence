@@ -17,11 +17,12 @@ message Ball {
 }
 
 message Paddle {
-  int32 paddleId = 1;
-  int32 uuid = 2;
-  int32 move = 3; // -1: left, 0: none, 1: right
-  float offset = 4;
-  bool dead = 5; // Used in battle‐royale mode, false otherwise
+  int32 id = 1;
+  int32 paddleId = 2;
+  string uuid = 3;
+  int32 move = 4; // -1: left, 0: none, 1: right
+  float offset = 5;
+  bool dead = 6; // Used in battle‐royale mode, false otherwise
 }
 
 message PaddleInput {
@@ -90,15 +91,17 @@ message MatchScoreUpdate {
   repeated int32 score = 1;
 }
 
-message MatchEnd { 
+message MatchEnd {
   string winnerId = 1;
   string loserId = 2;
   repeated int32 score = 3;
   string forfeitId = 4;
+  repeated int32 ranks = 5;        // BR mode: final ranks (index = playerId, value = rank)
+  repeated string playerIds = 6;   // BR mode: player UUIDs in order
 }
 
-message MatchEndBr { 
-  repeated string rank = 1;
+message MatchEndBr {
+  repeated string playerIds = 1;   // Player UUIDs ordered by rank (winner first, last place last)
 }
 
 message PhysicsRequest {

@@ -1,4 +1,5 @@
 import { deleteRequest, ISearchRequestResponce, postRequest } from "../networking/request";
+import { User } from "../User";
 import { htmlManager } from "./HtmlManager";
 import { NotificationType } from "./NotificationHtml";
 
@@ -44,9 +45,12 @@ export class FriendlistHtml {
 			this.div.remove();
 		} else {
 			this.form.reset();
-			this.friendContainer.classList.remove("hidden");
-			this.requestContainer.classList.add("hidden");
-			this.searchContainer.classList.add("hidden");
+			// this.form.querySelector("[name=friend]")?.toggleAttribute("click", true)
+			// this.form.querySelector("[name=request]")?.toggleAttribute("click", false)
+			// this.form.querySelector("[name=search]")?.toggleAttribute("click", false)
+			// this.friendContainer.classList.remove("hidden");
+			// this.requestContainer.classList.add("hidden");
+			// this.searchContainer.classList.add("hidden");
 			document.body.appendChild(this.div);
 		}
 		return;
@@ -77,25 +81,35 @@ export class FriendlistHtml {
 					this.friendContainer.classList.remove("hidden");
 					this.requestContainer.classList.add("hidden");
 					this.searchContainer.classList.add("hidden");
-					console.log("friendlist friend");
+					friend.toggleAttribute("click", true)
+					request.toggleAttribute("click", false)
+					search.toggleAttribute("click", false)
+					// console.log("friendlist friend");
 					break;
 				}
 				case "request": {
 					this.friendContainer.classList.add("hidden");
 					this.requestContainer.classList.remove("hidden");
 					this.searchContainer.classList.add("hidden");
-					console.log("friendlist request");
+					friend.toggleAttribute("click", false)
+					request.toggleAttribute("click", true)
+					search.toggleAttribute("click", false)
+					// console.log("friendlist request");
 					break;
 				}
 				case "search": {
 					this.friendContainer.classList.add("hidden");
 					this.requestContainer.classList.add("hidden");
 					this.searchContainer.classList.remove("hidden");
-					console.log("friendlist search");
+					friend.toggleAttribute("click", false)
+					request.toggleAttribute("click", false)
+					search.toggleAttribute("click", true)
+					// console.log("friendlist search");
 					break;
 				}
 			}
 		})
+		friend.toggleAttribute("click", true)
 		this.form.appendChild(friend);
 		this.form.appendChild(request);
 		this.form.appendChild(search);
@@ -115,6 +129,7 @@ export class FriendlistHtml {
 		this.friendContainer.appendChild(this.friendOnlinesContainer);
 		this.friendContainer.appendChild(this.friendAwayContainer);
 
+		this.friendContainer.classList.remove("hidden");
 		this.div.appendChild(this.friendContainer);
 		this.div.appendChild(this.requestContainer);
 		this.div.appendChild(this.searchContainer);
@@ -133,7 +148,7 @@ export class FriendlistHtml {
 		text.autocomplete = "off";
 
 		form.appendChild(text);
-		form.appendChild(submit);
+		// form.appendChild(submit);
 
 		form.addEventListener("submit", (e) => {
 			e.preventDefault();
@@ -144,9 +159,13 @@ export class FriendlistHtml {
 				.then((json: any) => {
 					this.createUserElement(json.data, "search");
 				})
-				.catch(() => {
-					this.searchResult.innerText = "User not found";
-					htmlManager.notification.add({ type: NotificationType.error, error: "friend search" })
+				.catch((err) => {
+					try {
+						err.json()
+							.then((json: any) => { this.searchResult.innerText = json.message; })
+					} catch (e) {
+						notifError(err);
+					}
 				})
 		})
 
@@ -186,6 +205,20 @@ export class FriendlistHtml {
 			this.createUserElement(user, "request");
 	}
 
+	public requestChoice(uuid: string, choice: boolean) {
+		if (this.friend.has(uuid))
+			return;
+		if (choice) {
+			postRequest("friends/accept", { inputUuid: uuid })
+				.then(() => {
+					this.createUserElementAsync(uuid, "friend");
+				})
+				.catch((err) => notifError(err));
+		}
+		this.request.get(uuid)?.div.remove();
+		this.request.delete(uuid);
+	}
+
 	public updateStatus(uuid: string, status: string, change: boolean) {
 		if (!this.friend.has(uuid))
 			return;
@@ -193,6 +226,7 @@ export class FriendlistHtml {
 		if (change)
 			friend.div.remove();
 		friend.status.textContent = status;
+		friend.status.setAttribute("status", status);
 		if (change)
 			if (status !== "offline")
 				this.friendOnlinesContainer.appendChild(friend.div);
@@ -210,6 +244,8 @@ export class FriendlistHtml {
 		const status = document.createElement("button");
 		const btn = document.createElement("button");
 
+		status.classList.add("friendlist-status");
+		btn.classList.add("friendlist-button");
 		div.appendChild(avatar);
 		div.appendChild(username);
 		div.appendChild(status);
@@ -242,15 +278,16 @@ export class FriendlistHtml {
 		username.textContent = user.username;
 		avatar.src = `${user.avatar_path}`;
 		status.textContent = user.status;
+		status.setAttribute("status", user.status);
 
 		switch (type) {
 			case "friend": {
-				btn.textContent = "remove";
+				btn.textContent = "❌";
 				btn.addEventListener("click", () => {
 					div.remove();
 					this.friend.delete(uuid);
 					deleteRequest("friends/delete", { inputUuid: uuid })
-						.catch(() => { htmlManager.notification.add({ type: NotificationType.error, error: "friend delete request" }) });
+						.catch((err) => notifError(err));
 				})
 				if (user.status != "offline")
 					this.friendOnlinesContainer.appendChild(div);
@@ -259,17 +296,20 @@ export class FriendlistHtml {
 				break;
 			}
 			case "request": {
-				btn.textContent = "accept";
-				btn2.textContent = "decline";
+				btn.textContent = "✔️";
+				btn2.textContent = "❌";
 				status.remove();
 				div.appendChild(btn2);
+				this.friend.get(uuid)?.div.remove();
+				this.friend.delete(uuid);
 				btn.addEventListener("click", () => {
 					postRequest("friends/accept", { inputUuid: uuid })
 						.then(() => {
 							div.remove();
+							this.request.delete(uuid);
 							this.createUserElementAsync(uuid, "friend");
 						})
-						.catch((err) => { htmlManager.notification.add({ type: NotificationType.error, error: "friend accept request" }) });
+						.catch((err) => notifError(err));
 				})
 				btn2.addEventListener("click", () => {
 					deleteRequest("friends/decline", { inputUuid: uuid })
@@ -277,17 +317,17 @@ export class FriendlistHtml {
 							div.remove();
 							this.request.delete(uuid);
 						})
-						.catch((err) => { htmlManager.notification.add({ type: NotificationType.error, error: "friend decline request" }) });
+						.catch((err) => notifError(err));
 
 				})
 				this.requestContainer.appendChild(div);
 				break;
 			}
 			case "search": {
-				btn.textContent = "accept";
+				btn.textContent = "➕";
 				btn.addEventListener("click", () => {
 					postRequest(`friends/add`, { inputUuid: uuid })
-						.catch((err) => { htmlManager.notification.add({ type: NotificationType.error, error: "friend send request" }) });
+						.catch((err) => notifError(err));
 				})
 				this.searchResult.appendChild(div);
 				break;
@@ -304,6 +344,8 @@ export class FriendlistHtml {
 		const status = document.createElement("button");
 		const btn = document.createElement("button");
 
+		status.classList.add("friendlist-status");
+		btn.classList.add("friendlist-button");
 		div.appendChild(avatar);
 		div.appendChild(username);
 		div.appendChild(status);
@@ -338,15 +380,16 @@ export class FriendlistHtml {
 		username.textContent = json.data.username;
 		avatar.src = `${json.data.avatar_path}`;
 		status.textContent = json.data.status;
+		status.setAttribute("status", json.data.status);
 
 		switch (type) {
 			case "friend": {
-				btn.textContent = "remove";
+				btn.textContent = "❌";
 				btn.addEventListener("click", () => {
 					div.remove();
 					this.friend.delete(uuid);
 					deleteRequest("friends/delete", { inputUuid: uuid })
-						.catch(() => { htmlManager.notification.add({ type: NotificationType.error, error: "friend delete request" }) });
+						.catch((err) => notifError(err));
 				})
 				if (json.data.status != "offline")
 					this.friendOnlinesContainer.appendChild(div);
@@ -355,17 +398,20 @@ export class FriendlistHtml {
 				break;
 			}
 			case "request": {
-				btn.textContent = "accept";
-				btn2.textContent = "decline";
+				btn.textContent = "✔️";
+				btn2.textContent = "❌";
 				status.remove();
+				this.friend.get(uuid)?.div.remove();
+				this.friend.delete(uuid);
 				div.appendChild(btn2);
 				btn.addEventListener("click", () => {
 					postRequest("friends/accept", { inputUuid: uuid })
 						.then(() => {
 							div.remove();
-							this.createUserElement(uuid, "friend");
+							this.request.delete(uuid);
+							this.createUserElementAsync(uuid, "friend");
 						})
-						.catch((err) => { htmlManager.notification.add({ type: NotificationType.error, error: "friend accept request" }) });
+						.catch((err) => notifError(err));
 				})
 				btn2.addEventListener("click", () => {
 					deleteRequest("friends/decline", { inputUuid: uuid })
@@ -373,21 +419,32 @@ export class FriendlistHtml {
 							div.remove();
 							this.request.delete(uuid);
 						})
-						.catch((err) => { htmlManager.notification.add({ type: NotificationType.error, error: "friend decline request" }) });
+						.catch((err) => notifError(err));
 
 				})
 				this.requestContainer.appendChild(div);
 				break;
 			}
 			case "search": {
-				btn.textContent = "accept";
+				btn.textContent = "➕";
 				btn.addEventListener("click", () => {
 					postRequest(`friends/add`, { inputUuid: uuid })
-						.catch((err) => { htmlManager.notification.add({ type: NotificationType.error, error: "friend send request" }) });
+						.catch((err) => notifError(err));
 				})
 				this.searchResult.appendChild(div);
 				break;
 			}
 		}
+	}
+}
+
+function notifError(err: any) {
+	try {
+		err.json()
+			.then((json: any) => {
+				htmlManager.notification.add({ type: NotificationType.error, error: json.message })
+			});
+	} catch (err) {
+		htmlManager.notification.add({ type: NotificationType.error, error: "error" })
 	}
 }

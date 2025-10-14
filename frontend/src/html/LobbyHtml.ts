@@ -29,6 +29,7 @@ export class LobbyHtml implements IHtml {
 	private lobbyId!: HTMLSpanElement;
 	private lobbyIdCopy!: HTMLButtonElement;
 	private inviteList!: HTMLDivElement;
+	private playersCount!: HTMLSpanElement;
 
 	private readyWindow!: HTMLDivElement;
 	private ready!: HTMLButtonElement;
@@ -56,6 +57,7 @@ export class LobbyHtml implements IHtml {
 		this.lobbyId = div.querySelector("#lobby-info-id") as HTMLSpanElement;
 		this.lobbyIdCopy = div.querySelector("#lobby-info-copy") as HTMLButtonElement;
 		this.inviteList = div.querySelector(".lobby-invite__container") as HTMLDivElement;
+		this.playersCount = div.querySelector("#lobby-players-count") as HTMLSpanElement;
 
 		this.playersWindow = div.querySelector(".lobby-players-window") as HTMLDivElement;
 		this.inviteWindow = div.querySelector(".lobby-invite-window") as HTMLDivElement;
@@ -90,7 +92,7 @@ export class LobbyHtml implements IHtml {
 			html: this.readyWindow,
 			width: 1,
 			height: 1,
-			world: Matrix.RotationY(-Math.PI * 0.3).multiply(Matrix.Translation(5, 3.9, 1)),
+			world: Matrix.RotationX(-Math.PI * 0.2).multiply(Matrix.RotationY(-Math.PI * 0.3)).multiply(Matrix.Translation(5, 3.9, 1)),
 			enable: false
 		});
 
@@ -139,6 +141,11 @@ export class LobbyHtml implements IHtml {
 	public update(payload: lobby.IUpdateMessage) {
 		this.lobbyMap.textContent = payload.map as string;
 		this.lobbyMode.textContent = payload.mode as string;
+
+		if (payload.currentPlayers !== undefined && payload.maxPlayers !== undefined) {
+			this.playersCount.textContent = `(${payload.currentPlayers}/${payload.maxPlayers})`;
+		}
+
 		if (payload.mode === "ai" || payload.mode === "local")
 			this.needUpdateInvite = false;
 		if (this.needUpdateInvite) {
