@@ -13,8 +13,8 @@ export class Profile {
 	private brStatsDiv!: HTMLDivElement;
 	private matchHistoryDiv!: HTMLDivElement;
 	private profileImg!: HTMLImageElement;
-	private usernameElem!: HTMLHeadingElement;
-	private statusElem!: HTMLParagraphElement;
+	private usernameElem!: HTMLSpanElement;
+	private statusElem!: HTMLSpanElement;
 
 	private profilePopup: Popup;
 
@@ -49,59 +49,39 @@ export class Profile {
 		this.profilePopup = new Popup({
 			type: PopupType.custom,
 			title: "",
-			div: this.div
+			div: this.div,
+			id: "profile-popup"
 		});
+		this.div.id = "profile-popup-content";
 	}
 
 	private createProfileDiv() {
 		this.div = document.createElement("div");
-		this.div.style.display = "flex";
-		this.div.style.alignItems = "center";
-		this.div.style.gap = "10px";
-		this.div.style.backgroundColor = "transparent";
 
 		const profileDiv = document.createElement("div");
-		profileDiv.style.display = "flex";
-		profileDiv.style.flexDirection = "column";
-		profileDiv.style.alignItems = "center";
-		profileDiv.style.gap = "5px";
-		profileDiv.style.marginBottom = "10px";
-		profileDiv.style.border = "1px solid black";
+		profileDiv.id = "profile-info";
 
 
 		this.profileImg = document.createElement("img");
-		this.profileImg.alt = "Profile Image";
-		this.profileImg.style.width = "100px";
-		this.profileImg.style.height = "100px";
-		this.profileImg.style.objectFit = "cover";
-		this.profileImg.style.borderRadius = "50%";
 
-		this.usernameElem = document.createElement("h2");
+		this.usernameElem = document.createElement("span");
 
-		this.statusElem = document.createElement("p");
-		this.statusElem.style.fontSize = "12px";
+		this.statusElem = document.createElement("span");
+
+		this.usernameElem.id = "profile-username";
+		this.statusElem.id = "profile-status";
 
 		this.createStatDiv();
 		this.createMatchHistoryDiv();
 
-		profileDiv.appendChild(this.usernameElem);
+		this.matchHistoryDiv.id = "match-history-div";
+
 		profileDiv.appendChild(this.profileImg);
+		profileDiv.appendChild(this.usernameElem);
 		profileDiv.appendChild(this.statusElem);
 		this.div.appendChild(profileDiv);
+		this.statsDiv.appendChild(this.matchHistoryDiv);
 		this.div.appendChild(this.statsDiv);
-		this.div.appendChild(this.matchHistoryDiv);
-	}
-
-	private async getPlayerStats(uuid: string) {
-
-
-		await User.classicStats.check()
-			.then(() => { this.updateClassicStatsTable(User.classicStats) })
-			.catch((err) => { });
-
-		await User.brStats.check()
-			.then(() => { this.updateBrStatsTable(User.brStats) })
-			.catch((err) => { });
 	}
 
 	private updateBrStatsTable(stats: any) {
@@ -112,16 +92,6 @@ export class Profile {
 		this.brTdElements["Win Rate"].textContent = Math.round(stats.winRate * 100) + "%";
 		this.brTdElements["Best Placement"].textContent = stats.bestPlacement;
 		this.brTdElements["Average Placement"].textContent = stats.averagePlacement;
-	}
-
-	private async getMatchHistory() {
-
-
-		await User.matchHistory.getHistory()
-			.then(() => {
-				this.updateMatchHistoryTable(User.matchHistory.history);
-			})
-			.catch((err) => { });
 	}
 
 	private handleMatchResult(data: any, index: number) {
@@ -197,8 +167,6 @@ export class Profile {
 				this.matchHistoryRow[i].style.backgroundColor = "rgba(144, 238, 144, 0.5)";
 			else
 				this.matchHistoryRow[i].style.backgroundColor = "rgba(226, 50, 77, 0.5)";
-			this.matchHistoryRow[i].style.border = "1px solid black";
-			this.matchHistoryTdElements[i][1].style.border = "1px solid black";
 			this.matchHistoryTdElements[i][0].textContent = history[i].game_mode;
 			this.handleMatchResult(history[i], i);
 			this.matchHistoryTdElements[i][2].textContent = this.handleDate(history[i].created_at);
@@ -221,12 +189,6 @@ export class Profile {
 	private createMatchHistoryDiv() {
 
 		this.matchHistoryDiv = document.createElement("div");
-		this.matchHistoryDiv.id = "profile-match-history";
-		this.matchHistoryDiv.style.display = "flex";
-		this.matchHistoryDiv.style.flexDirection = "column";
-		this.matchHistoryDiv.style.gap = "5px";
-		this.matchHistoryDiv.style.marginTop = "10px";
-		this.matchHistoryDiv.style.border = "1px solid black";
 
 		const title = document.createElement("h4");
 		title.textContent = "Match History";
@@ -273,15 +235,9 @@ export class Profile {
 
 		this.statsDiv = document.createElement("div");
 		this.statsDiv.id = "profile-stats";
-		this.statsDiv.style.display = "flex";
-		this.statsDiv.style.flexDirection = "row";
-		this.statsDiv.style.gap = "5px";
-		this.statsDiv.style.marginTop = "10px";
 
 		this.classicStatsDiv = document.createElement("div");
 		this.classicStatsDiv.id = "classic-stats-div";
-		this.classicStatsDiv.style.flex = "1";
-		this.classicStatsDiv.style.border = "1px solid black";
 
 		const classicTitle = document.createElement("h4");
 		classicTitle.textContent = "Classic Stats";
@@ -290,8 +246,6 @@ export class Profile {
 
 		this.brStatsDiv = document.createElement("div");
 		this.brStatsDiv.id = "br-stats-div";
-		this.brStatsDiv.style.flex = "1";
-		this.brStatsDiv.style.border = "1px solid black";
 
 		const brTitle = document.createElement("h4");
 		brTitle.textContent = "Battle Royale Stats";
@@ -300,15 +254,9 @@ export class Profile {
 
 		this.classicTable = document.createElement("table");
 		this.classicTable.id = "classic-stats";
-		this.classicTable.style.width = "100%";
-		this.classicTable.style.borderCollapse = "collapse";
-		this.classicTable.style.marginTop = "10px";
 
 		this.brTable = document.createElement("table");
 		this.brTable.id = "br-stats";
-		this.brTable.style.width = "100%";
-		this.brTable.style.borderCollapse = "collapse";
-		this.brTable.style.marginTop = "10px";
 
 		const classicHeader = document.createElement("thead");
 
@@ -317,8 +265,6 @@ export class Profile {
 			const classicTitlesCell = document.createElement("th");
 			this.classicTdElements[statName] = document.createElement("td");
 
-			classicRow.style.border = "1px solid black";
-			classicTitlesCell.style.border = "1px solid black";
 
 			classicTitlesCell.textContent = statName;
 
@@ -334,8 +280,6 @@ export class Profile {
 			const brTitlesCell = document.createElement("th");
 			this.brTdElements[statName] = document.createElement("td");
 
-			brRow.style.border = "1px solid black";
-			brTitlesCell.style.border = "1px solid black";
 
 			brTitlesCell.textContent = statName;
 
@@ -352,14 +296,6 @@ export class Profile {
 		this.statsDiv.appendChild(this.brStatsDiv);
 	}
 
-	private async updateProfileInfo() {
-		await User.check();
-		this.profileImg.src = User.avatar || "/cdn/default_avatar.jpg";
-		this.usernameElem.textContent = User.username || "User";
-		this.statusElem.textContent = `Status: ${User.status || "offline"}`;
-		this.statusElem.style.color = User.status === "online" ? "green" : User.status === "offline" ? "orange" : "red";
-	}
-
 	// public async load() {
 	// 	this.updateProfileInfo();
 	// 	await this.getPlayerStats();
@@ -371,7 +307,7 @@ export class Profile {
 		if (uuid == User.uuid) {
 			this.profileImg.src = User.avatar;
 			this.usernameElem.textContent = User.username;
-			this.statusElem.textContent = `Status: ${User.status}`;
+			this.statusElem.textContent = `${User.status}`;
 			this.statusElem.style.color = User.status === "online" ? "green" : User.status === "offline" ? "orange" : "red";
 
 		} else {
@@ -379,7 +315,7 @@ export class Profile {
 				.catch((err) => htmlManager.notification.error(err));
 			this.profileImg.src = json.data.avatar_path;
 			this.usernameElem.textContent = json.data.username;
-			this.statusElem.textContent = `Status: ${json.data.status}`;
+			this.statusElem.textContent = `${json.data.status}`;
 			this.statusElem.style.color = json.data.status === "online" ? "green" : json.data.status === "offline" ? "orange" : "red";
 		}
 		await this.stats.update(uuid)

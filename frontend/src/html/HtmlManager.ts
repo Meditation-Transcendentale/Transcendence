@@ -1,3 +1,4 @@
+import { User } from "../User";
 import { Ath } from "./AthHtml";
 import { AuthHtml } from "./AuthHtml";
 import { CubeHtml } from "./CubeHtml";
@@ -65,6 +66,7 @@ class HtmlManager {
 		if (!this._once)
 			return;
 		this.settings = new Settings();
+		User.status = "online";
 		this._once = true;
 
 	}
