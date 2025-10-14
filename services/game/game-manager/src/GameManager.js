@@ -13,6 +13,7 @@ import {
 	decodeStateUpdate,
 	decodeMatchQuit,
 	encodeMatchEnd,
+	encodeMatchEndBr,
 } from "./proto/helper.js";
 
 export class GameManager {
@@ -77,7 +78,23 @@ export class GameManager {
 			error = "";
 		const request = decodeMatchCreateRequest(msg.data);
 		try {
-			const players = request.players;
+			let players = request.players;
+
+			// For BR mode: fill with bots to reach 100 players
+			if (mode === 'br') {
+				const targetPlayers = 100;
+				const realPlayers = players.length;
+
+				if (realPlayers < targetPlayers) {
+					console.log(`[GameManager] Filling BR game with ${targetPlayers - realPlayers} bots (${realPlayers} real players)`);
+
+					// Add bot UUIDs with "bot-" prefix to distinguish from real players
+					for (let i = realPlayers; i < targetPlayers; i++) {
+						players.push(`bot-${i}`);
+					}
+				}
+			}
+
 			gameId = this.createMatch({
 				mode,
 				players: players,
@@ -200,14 +217,58 @@ export class GameManager {
 			});
 			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		} else {
-			this.nc.publish(
-				`games.${match.mode}.${gameId}.match.end`,
-				new Uint8Array()
-			);
+			// BR mode: send final ranks with player UUIDs ordered by rank
+			const ranks = match.state.ranks || [];
+			const playerUUIDs = match.instance.players || [];
+
+			// Create array of {playerId, uuid, rank} objects
+			const playerRankings = playerUUIDs.map((uuid, playerId) => ({
+				playerId,
+				uuid,
+				rank: ranks[playerId] || 99  // Default rank 99 if not found
+			}));
+
+			// Sort by rank (1 = winner, higher numbers = worse placement)
+			playerRankings.sort((a, b) => a.rank - b.rank);
+
+			// Extract just the UUIDs in rank order
+			const orderedPlayerIds = playerRankings.map(p => p.uuid);
+
+			console.log(`[GameManager] BR game ended. Final rankings:`);
+			playerRankings.forEach((p, index) => {
+				const displayName = p.uuid.startsWith('bot-') ? `Bot ${p.uuid.substring(4)}` : p.uuid;
+				const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '  ';
+				console.log(`${medal} #${p.rank} - ${displayName}`);
+			});
+
+			const buf = encodeMatchEndBr({
+				playerIds: orderedPlayerIds
+			});
+			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		}
 		this.games.delete(gameId);
 
 		console.log(`[GameManager] Ended match ${gameId}`);
+		return true;
+	}
+
+	eliminatePlayerBR(gameId, uuid) {
+		const match = this.games.get(gameId);
+		if (!match || match.mode !== 'br') return false;
+
+		// Find the player ID from uuid
+		const playerId = match.instance.players.indexOf(uuid);
+		if (playerId === -1) {
+			console.warn(`[GameManager] Player ${uuid} not found in game ${gameId}`);
+			return false;
+		}
+
+		console.log(`[GameManager] Eliminating BR player ${uuid} (id: ${playerId}) from match ${gameId}`);
+
+		// Send elimination message to physics service
+		const eliminationData = JSON.stringify({ uuid: playerId.toString() });
+		this.nc.publish(`games.br.${gameId}.player.eliminate`, new TextEncoder().encode(eliminationData));
+
 		return true;
 	}
 
@@ -216,6 +277,27 @@ export class GameManager {
 
 		if (!match) return false;
 
+		// For BR mode: eliminate player but don't end game unless ≤1 players remain
+		if (match.mode === 'br') {
+			const activePlayers = match.state.gameState?.activePlayers || [];
+
+			// Check if quitting player is in active players
+			const playerId = match.instance.players.indexOf(uuid);
+			const isActivePlayer = activePlayers.includes(playerId);
+
+			console.log(`[GameManager] BR player ${uuid} (id: ${playerId}) quit. Active players: ${activePlayers.length}`);
+
+			// If this player is active and more than 1 active player remains, don't end game
+			// The physics will handle elimination naturally when it detects no input
+			if (isActivePlayer && activePlayers.length > 1) {
+				// Don't end the game, just mark for elimination
+				this.eliminatePlayerBR(gameId, uuid);
+				return true;
+			}
+			// Otherwise fall through to end the game
+		}
+
+		// End the game for non-BR modes or when BR has ≤1 players
 		if (match.interval) {
 			clearInterval(match.interval);
 			match.interval = null;
@@ -235,11 +317,34 @@ export class GameManager {
 			});
 			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		} else {
-			this.nc.publish(
-				`games.${match.mode}.${gameId}.match.end`,
-				new Uint8Array()
-			);
-			// this.nc.request('stats.endgame', jc.encode(), { timeout: 1000 });
+			// BR mode: send final ranks with player UUIDs ordered by rank
+			const ranks = match.state.ranks || [];
+			const playerUUIDs = match.instance.players || [];
+
+			// Create array of {playerId, uuid, rank} objects
+			const playerRankings = playerUUIDs.map((uuid, playerId) => ({
+				playerId,
+				uuid,
+				rank: ranks[playerId] || 99  // Default rank 99 if not found
+			}));
+
+			// Sort by rank (1 = winner, higher numbers = worse placement)
+			playerRankings.sort((a, b) => a.rank - b.rank);
+
+			// Extract just the UUIDs in rank order
+			const orderedPlayerIds = playerRankings.map(p => p.uuid);
+
+			console.log(`[GameManager] BR game ended (quit). Final rankings:`);
+			playerRankings.forEach((p, index) => {
+				const displayName = p.uuid.startsWith('bot-') ? `Bot ${p.uuid.substring(4)}` : p.uuid;
+				const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '  ';
+				console.log(`${medal} #${p.rank} - ${displayName}`);
+			});
+
+			const buf = encodeMatchEndBr({
+				playerIds: orderedPlayerIds
+			});
+			this.nc.publish(`games.${match.mode}.${gameId}.match.end`, buf);
 		}
 		this.games.delete(gameId);
 
@@ -258,6 +363,38 @@ export class GameManager {
 
 		const inputs = match.inputs[match.tick] || [];
 		const lastState = match.state;
+
+		// For BR mode: add random inputs for bot players
+		if (match.mode === 'br') {
+			const activePlayers = lastState.gameState?.activePlayers || [];
+
+			match.instance.players.forEach((uuid, paddleId) => {
+				// Check if this is a bot and is still active
+				if (uuid.startsWith('bot-') && activePlayers.includes(paddleId)) {
+					// Check if this bot already has input for this tick
+					const hasInput = inputs.some(input => input.id === paddleId);
+
+					if (!hasInput) {
+						// Generate random move: -1 (left), 0 (none), or 1 (right)
+						// Weight towards movement (less staying still)
+						const rand = Math.random();
+						let move;
+						if (rand < 0.45) {
+							move = -1; // Move left
+						} else if (rand < 0.9) {
+							move = 1; // Move right
+						} else {
+							move = 0; // Stay still
+						}
+
+						inputs.push({
+							id: paddleId,
+							move: move
+						});
+					}
+				}
+			});
+		}
 
 		try {
 			// Send PhysicsRequest over NATS req/rep
@@ -287,7 +424,7 @@ export class GameManager {
 			});
 			newState.stage = resp.stage;
 			newState.ranks = resp.ranks;
-			newState.events = resp.events || []; // ADD THIS
+			newState.events = resp.events || [];
 			newState.gameState = resp.gameState || {};
 			if (resp.goal) {
 				newState.score[resp.goal.scorerId] =

@@ -9,6 +9,7 @@ import {
 	encodeMatchInput,
 	encodeMatchQuit,
 	decodeMatchEnd,
+	decodeMatchEndBr,
 	// WS → client messages
 	encodeWelcomeMessage,
 	encodeGameStartMessage,
@@ -78,9 +79,20 @@ export default class UIService {
 			const sub = nc.subscribe('games.*.*.match.end');
 			(async () => {
 				for await (const m of sub) {
-					const [, , gameId] = m.subject.split('.');
-					// const { winnerId } = decodeMatchEnd(m.data);
-					const buf = encodeServerMessage({ end: m.data });
+					const [, mode, gameId] = m.subject.split('.');
+
+					let buf;
+					// Decode based on game mode
+					if (mode === 'br') {
+						// BR mode: decode MatchEndBr
+						const endData = decodeMatchEndBr(m.data);
+						buf = encodeServerMessage({ endBr: endData });
+						console.log(`[UI] BR game ${gameId} ended. Final rankings:`, endData.playerIds);
+					} else {
+						// Regular mode: decode MatchEnd
+						const endData = decodeMatchEnd(m.data);
+						buf = encodeServerMessage({ end: endData });
+					}
 
 					for (const sid of this.games.get(gameId) || []) {
 						const s = this.sessions.get(sid);
@@ -94,7 +106,6 @@ export default class UIService {
 					this.allowedByGame.delete(gameId);
 					this.games.delete(gameId);
 					this.readyPlayers.delete(gameId);
-					// console.log(`Game ${gameId} ended, winner paddleId=${winnerId}`);
 				}
 			})();
 		}
@@ -147,6 +158,8 @@ export default class UIService {
 	handlePaddleUpdate(ws, { paddleId, move }) {
 		// TODO maybe check if the paddle id is valid
 		const sess = this.sessions.get(ws.uuid);
+		if (!sess)
+			return;
 		const topic = `games.${sess.mode}.${sess.gameId}.match.input`;
 		natsClient.publish(topic, encodeMatchInput({ paddleId, move }));
 	}
@@ -179,8 +192,11 @@ export default class UIService {
 		const { uuid, mode, gameId } = ws;
 		const setup = this.allowedByGame.get(gameId);
 		if (!setup) {
+			console.log(`[UI] Ready handler: setup not found for gameId ${gameId}`);
 			return;
 		}
+
+		console.log(`[UI] Ready handler: uuid=${uuid}, mode=${mode}, gameId=${gameId}`);
 
 		// 1) Mark this player as ready
 		let readySet = this.readyPlayers.get(gameId);
@@ -190,11 +206,25 @@ export default class UIService {
 		}
 		readySet.add(uuid);
 
-		const { players } = setup;
+		const { players, mode: setupMode } = setup;
 
-		// 2) if all players are ready
-		if (readySet.size === players.length) {
-			const topic = `games.${mode}.${gameId}.match.start`;
+		// Use mode from setup if not available on ws
+		const gameMode = mode || setupMode;
+
+		// For BR mode: only wait for real players (non-bots) to be ready
+		let requiredPlayers = players.length;
+		if (gameMode === 'br') {
+			const realPlayers = players.filter(p => !p.startsWith('bot-'));
+			requiredPlayers = realPlayers.length;
+			console.log(`[UI] BR ready check: ${readySet.size}/${requiredPlayers} real players ready (${players.length} total including bots)`);
+		}
+
+		console.log(`[UI] Ready check: ${readySet.size}/${requiredPlayers} players ready (mode: ${gameMode})`);
+
+		// 2) if all required players are ready
+		if (readySet.size === requiredPlayers) {
+			console.log(`[UI] All players ready! Starting game ${gameId}`);
+			const topic = `games.${gameMode}.${gameId}.match.start`;
 			try {
 				natsClient.publish(topic, encodeMatchStart({ gameId: gameId }));
 			}
@@ -202,7 +232,7 @@ export default class UIService {
 				console.log(err);
 			}
 			const startBuff = encodeServerMessage({
-				start: { }
+				start: {}
 			});
 			// const buf = encodeGameStartMessage({});
 			this.uwsApp.publish(gameId, startBuff, /* isBinary= */ true);
@@ -214,7 +244,7 @@ export default class UIService {
 	handleSpectate(ws) {
 		const { uuid } = ws;
 		const sess = this.sessions.get(uuid);
-		
+
 		// 1) Must already be registered
 		if (!sess) {
 			//const err = encodeErrorMessage({ message: 'Session not found' });

@@ -227,6 +227,42 @@ export class NetworkingSystem extends System {
 
 				this.gameUI.updatePlayerCount(activePaddleCount);
 			}
+
+			// === BR Game End ===
+			if (serverMsg.endBr) {
+				console.log("🏆 BR Game Ended!");
+				const playerIds = serverMsg.endBr.playerIds || [];
+
+				console.log("\n====================================");
+				console.log("🏆 BATTLE ROYALE - FINAL RANKINGS");
+				console.log("====================================");
+
+				playerIds.forEach((uuid, index) => {
+					const rank = index + 1;
+					const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '  ';
+					const username = this.game.getUsername(uuid);
+					console.log(`${medal} #${rank} - ${username}`);
+				});
+
+				console.log("====================================\n");
+
+				// Display rankings in the game UI
+				const rankingsText = playerIds
+					.map((uuid, index) => {
+						const rank = index + 1;
+						const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+						const username = this.game.getUsername(uuid);
+						return `${medal} #${rank} ${username}`;
+					})
+					.join('\n');
+
+				// Show end screen with rankings
+				htmlManager.notification.add({
+					type: NotificationType.text,
+					text: `Game Over!\n\nFinal Rankings:\n${rankingsText}`,
+					duration: 10000
+				});
+			}
 		});
 	}
 
