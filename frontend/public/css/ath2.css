@@ -59,7 +59,11 @@
 	#change-password-btn, 
 	#change-avatar-btn, 
 	#toggle-2fa-btn, 
-	#logout-popup button {
+	#logout-popup button,
+	#change-username-popup button,
+	#change-password-popup button,
+	#change-avatar-popup button,
+	#update-2fa-popup button {
 		background-color: #0d0221;
 		color: #dda8fc;
 		border: 1px solid #dda8fc;
@@ -78,7 +82,11 @@
 	#ath-menu-item-profile:hover, 
 	#ath-menu-item-settings:hover, 
 	#ath-menu-item-logout:hover, 
-	#logout-popup button:hover {
+	#logout-popup button:hover,
+	#change-username-popup button:hover,
+	#change-password-popup button:hover,
+	#change-avatar-popup button:hover,
+	#update-2fa-popup button:hover {
 		color: white;
 		transform: translate3d(0, 0, 0) scale(1.05);
 		box-shadow: 1px 1px 1px black, -1px -1px 1px black;
@@ -97,32 +105,78 @@
 	#change-password-btn:focus, 
 	#change-avatar-btn:focus, 
 	#toggle-2fa-btn:focus, 
-	#logout-popup button:focus {
+	#logout-popup button:focus,
+	#change-username-popup button:focus,
+	#change-password-popup button:focus,
+	#change-avatar-popup button:focus,
+	#update-2fa-popup button:focus,
+	#change-username-popup input:focus,
+	#change-password-popup input:focus,
+	#change-avatar-popup input:focus,
+	#update-2fa-popup input:focus {
 		outline: none;
 }
 
-#settings-popup, #logout-popup {
-	background-color: #0d022180;
-	color: #dda8fc;
-	border: 1px solid #dda8fc;
-	font-family: Andale Mono, monospace;
-	padding: 15px;
-	padding-top: 10px;
-	border-radius: 1px;
-	cursor: pointer;
-	font-size: 18px;
+#settings-popup, 
+	#logout-popup,
+	#change-username-popup,
+	#change-password-popup,
+	#change-avatar-popup,
+	#update-2fa-popup {
+		background-color: #0d022180;
+		color: #dda8fc;
+		border: 1px solid #dda8fc;
+		font-family: Andale Mono, monospace;
+		padding: 15px;
+		padding-top: 10px;
+		border-radius: 1px;
+		cursor: pointer;
+		font-size: 18px;
 }
 
-#settings-popup header, #logout-popup header {
-	margin-bottom: 10px;
-	text-align: center;
+#settings-popup header, 
+	#logout-popup header,
+	#change-username-popup header,
+	#change-password-popup header,
+	#change-avatar-popup header,
+	#update-2fa-popup header {
+		margin-bottom: 10px;
+		text-align: center;
 }
 
-#logout-popup footer {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 10px;
-	margin-top: 10px;
+#logout-popup footer,
+	#change-username-popup footer,
+	#change-password-popup footer,
+	#update-2fa-popup footer {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 10px;
+		margin-top: 10px;
+}
+
+#change-username-popup input,
+	#change-password-popup input,
+	#change-avatar-popup input,
+	#update-2fa-popup input {
+		background-color: #0d022180;
+		color: #dda8fc;
+		border: 1px solid #dda8fc;
+		font-family: Andale Mono, monospace;
+		border-radius: 4px !important;
+		padding: 6px;
+		cursor: text;
+		font-size: 12px;
+		margin-top: 2px
+}
+
+#avatar-preview-img {
+		border: 1px solid #dda8fc !important;
+		align-self: center !important;
+		width: 100px !important;
+		height: 100px !important;
+		object-fit: cover !important;
+		border-radius: 50% !important;
+		margin-top: 6px !important;
 }
 
 
