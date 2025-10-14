@@ -19,6 +19,8 @@ export class BallGrass {
 	private deceleration = 0.9;
 	private attenuation = 0.1;
 
+	public ballOrigin: Vector3;
+
 
 	private tempVector3: Vector3;
 	constructor(assets: Assets) {
@@ -50,6 +52,8 @@ export class BallGrass {
 
 		})
 
+		this.ballOrigin = new Vector3();
+
 		this._enable = false;
 		this._update = "home";
 	}
@@ -69,9 +73,9 @@ export class BallGrass {
 		if (this.assets.ballPicker.z < 1) {
 			this.needReset = true;
 			this.assets.ballMesh.position.addInPlaceFromFloats(
-				-this.assets.ballMesh.position.x * 0.01 + this.movement.x,
+				(this.ballOrigin.x - this.assets.ballMesh.position.x) * 0.01 + this.movement.x,
 				0,
-				-this.assets.ballMesh.position.z * 0.01 + this.movement.y,
+				(this.ballOrigin.z - this.assets.ballMesh.position.z) * 0.01 + this.movement.y,
 			)
 			this.movement.scaleInPlace(this.deceleration);
 

@@ -14,7 +14,7 @@
    ==================================== */
 .join-lobby__title {
 	text-align: right;
-	color: white;
+	color: var(--color-lavender);
 	font-size: var(--font-size-small);
 }
 
@@ -22,11 +22,11 @@
 	flex: 10;
 	overflow: scroll !important;
 	pointer-events: all !important;
-	border: var(--spacing-sm) white solid;
+	border: var(--spacing-sm) var(--color-purple-light) solid;
 	padding: var(--spacing-sm);
 	margin: var(--spacing-md);
-	background-color: lightgrey;
-	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	background-color: rgba(93, 64, 112, 0.2);
+	/* matching existing theme */
 	border-left-style: none;
 	border-right-style: none;
 }
@@ -36,21 +36,20 @@
 	flex: auto;
 	height: fit-content;
 	font-size: var(--font-size-tiny);
-	/* border: var(--spacing-sm) white solid; */
 	margin: var(--spacing-md);
-	background-color: rgba(255, 255, 255, 0.3);
-	color: white;
+	background-color: rgba(255, 255, 255, 0.1);
+	/* softer for dark theme */
+	color: var(--color-lavender);
 }
 
 .join-lobby__content:hover {
-	background-color: rgba(255, 255, 255, 0.7);
-	color: black;
+	background-color: rgba(255, 255, 255, 0.3);
+	color: var(--color-space-deepest);
 }
 
 .join-lobby__content:active {
-	background-color: rgba(255, 255, 255, 0.3);
-	color: white;
-
+	background-color: rgba(255, 255, 255, 0.1);
+	color: var(--color-lavender);
 }
 
 .join-lobby__id {
@@ -69,27 +68,12 @@
 	text-align: center;
 }
 
-
-/* <div class="window join-info-window"> */
-/* 		<header class="window__title join-info__title">Lobby info</header> */
-/* 		<div class="join-info__container"> */
-/* 			<div class="join-info--left"> */
-/* 				<span class="join-info-mode"></span> */
-/* 				<span class="join-info-map"></span> */
-/* 			</div> */
-/* 			<div class="join-info--right"> */
-/* 				<div class="join-info__players"></div> */
-/* 			</div> */
-/* 			<button clas="join-info__button">JOIN LOBBY</button> */
-/* 		</div> */
-/* 	</div> */
-
 /* ====================================
-   JOIN - join-lobby components
+   JOIN - join-info components
    ==================================== */
 .join-info__title {
 	text-align: right;
-	color: white;
+	color: var(--color-lavender);
 	font-size: var(--font-size-small);
 }
 
@@ -98,14 +82,13 @@
 	display: grid;
 	overflow: scroll !important;
 	pointer-events: all !important;
-	border: var(--spacing-sm) white solid;
+	border: var(--spacing-sm) var(--color-purple-light) solid;
 	padding: var(--spacing-sm);
 	margin: var(--spacing-md);
-	background-color: lightgrey;
-	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	background-color: rgba(93, 64, 112, 0.2);
 	border-left-style: none;
 	border-right-style: none;
-	color: white;
+	color: var(--color-lavender);
 }
 
 .join-info__id {
@@ -117,7 +100,6 @@
 	text-align: center;
 	font-size: var(--font-size-tiny);
 	height: fit-content;
-
 }
 
 .join-info--left {
@@ -125,15 +107,12 @@
 	grid-row: 2 / 3;
 	display: block;
 	font-size: var(--font-size-verysmall);
-	/* background-color: red; */
-	border: var(--spacing-xs) white solid;
+	border: var(--spacing-xs) var(--color-purple-light) solid;
 	margin: var(--spacing-sm);
 	padding: var(--spacing-sm);
-	margin-top: var(--spacing-lg);
 	margin-top: var(--spacing-md);
-	background-color: rgba(255, 255, 255, 0.3);
-
-
+	background-color: rgba(157, 78, 221, 0.2);
+	/* consistent with theme */
 }
 
 .join-info--left>span {
@@ -147,46 +126,40 @@
 	display: block;
 	min-height: 10vh;
 	font-size: var(--font-size-verysmall);
-	border: var(--spacing-xs) white solid;
+	border: var(--spacing-xs) var(--color-purple-light) solid;
 	margin: var(--spacing-sm);
 	padding: var(--spacing-sm);
-	margin-top: var(--spacing-lg);
 	margin-top: var(--spacing-md);
-	background-color: rgba(255, 255, 255, 0.3);
+	background-color: rgba(157, 78, 221, 0.2);
 	overflow-y: scroll;
 	overflow-x: hidden;
-
-
 }
 
 .join-info__button {
 	grid-column: 1 / 5;
 	grid-row: 3/ 4;
 	font-size: var(--font-size-small);
-	margin-bottom: var(--spacing-md);
 	margin: var(--spacing-md);
-	/* align-self: center; */
-	background-color: white;
-	color: black;
+	background-color: var(--color-space-deepest);
+	color: var(--color-lavender);
 	border: none;
 }
 
 .join-info__button:hover {
-	background-color: black;
-	color: white;
+	background-color: var(--color-lavender);
+	color: var(--color-space-deepest);
 }
 
 .join-info__button:active {
-	background-color: white;
-	color: black;
+	background-color: var(--color-space-deepest);
+	color: var(--color-lavender);
 }
 
 .join-info__button:disabled {
-	background-color: rgba(0.7, 0.7, 0.7, 0.2);
-	color: rgba(255, 255, 255, 0.2);
+	background-color: rgba(93, 64, 112, 0.2);
+	color: rgba(224, 170, 255, 0.2);
 	pointer-events: none;
 }
-
 
 .join-info__players {
 	overflow: hidden;
@@ -196,7 +169,7 @@
 	display: block;
 	width: 100%;
 	text-align: center;
-	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	background-color: rgba(93, 64, 112, 0.2);
 	margin: var(--spacing-sm);
 }
 
@@ -205,7 +178,7 @@
    ==================================== */
 .join-input__title {
 	text-align: right;
-	color: white;
+	color: var(--color-lavender);
 	font-size: var(--font-size-small);
 }
 
@@ -213,14 +186,13 @@
 	flex: 10;
 	display: block;
 	pointer-events: all !important;
-	border: var(--spacing-sm) white solid;
+	border: var(--spacing-sm) var(--color-purple-light) solid;
 	padding: var(--spacing-sm);
 	margin: var(--spacing-md);
-	background-color: lightgrey;
-	background-color: rgba(0.7, 0.7, 0.7, 0.2);
+	background-color: rgba(93, 64, 112, 0.2);
 	border-left-style: none;
 	border-right-style: none;
-	color: white;
+	color: var(--color-lavender);
 	overflow: hidden;
 	height: fit-content;
 }
@@ -229,10 +201,9 @@
 	all: unset;
 	display: block;
 	height: fit-content;
-	background-color: rgba(255, 255, 255, 0.2);
-	color: black;
+	background-color: rgba(255, 255, 255, 0.1);
+	color: var(--color-lavender);
 	font-size: var(--font-size-small);
 	overflow: hidden;
 	text-align: center;
-
 }

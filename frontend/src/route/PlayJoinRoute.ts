@@ -30,6 +30,7 @@ export class PlayJoinRoute implements IRoute {
 		htmlManager.cube.name = "CREATE";
 		htmlManager.cube.clickEvent = () => routeManager.nav("/play/create");
 		htmlManager.cube.enable = true;
+		sceneManager.ballGrass.ballOrigin.set(-2, 0, 9);
 	}
 
 	public async unload(): Promise<void> {
