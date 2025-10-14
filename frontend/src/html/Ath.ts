@@ -415,7 +415,7 @@ class athSettings {
 
 		const previewImg = document.createElement("img");
 		previewImg.id = "avatar-preview-img";
-		
+
 		fileInput.addEventListener("change", () => {
 			const file = fileInput.files ? fileInput.files[0] : null;
 
