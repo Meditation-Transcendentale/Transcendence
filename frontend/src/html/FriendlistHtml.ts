@@ -1,4 +1,5 @@
 import { deleteRequest, ISearchRequestResponce, postRequest } from "../networking/request";
+import { stateManager } from "../state/StateManager";
 import { User } from "../User";
 import { htmlManager } from "./HtmlManager";
 import { NotificationType } from "./NotificationHtml";
@@ -43,6 +44,7 @@ export class FriendlistHtml {
 	public toogle() {
 		if (document.body.contains(this.div)) {
 			this.div.remove();
+			stateManager.friendlist = false;
 		} else {
 			this.form.reset();
 			// this.form.querySelector("[name=friend]")?.toggleAttribute("click", true)
@@ -52,6 +54,7 @@ export class FriendlistHtml {
 			// this.requestContainer.classList.add("hidden");
 			// this.searchContainer.classList.add("hidden");
 			document.body.appendChild(this.div);
+			stateManager.friendlist = true;
 		}
 		return;
 	}
@@ -213,6 +216,9 @@ export class FriendlistHtml {
 				.then(() => {
 					this.createUserElementAsync(uuid, "friend");
 				})
+				.catch((err) => notifError(err));
+		} else {
+			deleteRequest("friends/decline", { inputUuid: uuid })
 				.catch((err) => notifError(err));
 		}
 		this.request.get(uuid)?.div.remove();

@@ -11,7 +11,8 @@ type lobby = {
 	lobbyId: string,
 	map: string,
 	mode: string,
-	players: string[]
+	players: Array<{ uuid: string, ready: boolean }>,
+	maxPlayers: number
 }
 
 interface listResp {
@@ -42,6 +43,7 @@ export class PlayJoinHtml implements IHtml {
 	private _update: boolean;
 
 	private currentInfoId: string;
+	private currentInfoLobby!: lobby;
 
 	constructor() {
 		this._update = false;
@@ -160,7 +162,13 @@ export class PlayJoinHtml implements IHtml {
 			this.lobbyList.appendChild(this.createLobbyList(resp.lobbies[i]));
 			if (resp.lobbies[i].lobbyId == this.currentInfoId) {
 				found = true;
-				this.setLobbyInfo(resp.lobbies[i])
+				if (this.currentInfoLobby.players.length != resp.lobbies[i].players.length)
+					this.setLobbyInfo(resp.lobbies[i])
+				else
+					for (let j = 0; j < this.currentInfoLobby.players.length; j++)
+						if (this.currentInfoLobby.players[j].uuid != resp.lobbies[i].players[j].uuid)
+							this.setLobbyInfo(resp.lobbies[i])
+
 			}
 		}
 		if (!found)
@@ -187,10 +195,11 @@ export class PlayJoinHtml implements IHtml {
 		id.className = "join-lobby__id";
 		mode.className = "join-lobby__mode";
 		count.className = "join-lobby__count";
+		console.log(l);
 
 		id.textContent = l.lobbyId;
 		mode.textContent = l.mode;
-		count.textContent = `${l.players.length}/?`;
+		count.textContent = `${l.players.length}/${l.maxPlayers}`;
 
 		div.appendChild(id);
 		div.appendChild(mode);
@@ -204,12 +213,13 @@ export class PlayJoinHtml implements IHtml {
 		return div;
 	}
 
-	private async setLobbyInfo(lobby: any) {
+	private async setLobbyInfo(lobby: lobby) {
 		this.infoPlayers.innerHTML = "";
 		this.infoID.textContent = lobby.lobbyId;
 		this.infoMap.textContent = lobby.map;
 		this.infoMode.textContent = lobby.mode;
 		this.infoJoin.disabled = false;
+		this.currentInfoLobby = lobby;
 		for (let i = 0; i < lobby.players.length; i++) {
 			const name = await postRequest("info/search", { identifier: lobby.players[i].uuid, type: "uuid" }).catch((err) => { console.log(err) }) as any;
 			if (this.currentInfoId == lobby.lobbyId)
