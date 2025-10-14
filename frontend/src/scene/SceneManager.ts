@@ -195,6 +195,7 @@ class SceneManager {
 				this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = true;
 				this.assets.brRoot.setEnabled(false);
+				this.assets.brickRoot.setEnabled(false);
 				break;
 			}
 			case "void": {
@@ -212,6 +213,7 @@ class SceneManager {
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
+				this.assets.brickRoot.setEnabled(false);
 				break;
 			}
 			case "grass": {
@@ -234,6 +236,7 @@ class SceneManager {
 				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.assets.brRoot.setEnabled(false);
+				this.assets.brickRoot.setEnabled(false);
 				break;
 			}
 			case "monolith": {
@@ -253,6 +256,7 @@ class SceneManager {
 				// this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
+				this.assets.brickRoot.setEnabled(false);
 				break;
 			}
 			case "brick": {
@@ -270,6 +274,7 @@ class SceneManager {
 				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
+				this.assets.brickRoot.setEnabled(true);
 				break;
 			}
 			case "br": {
@@ -287,6 +292,7 @@ class SceneManager {
 				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(true);
+				this.assets.brickRoot.setEnabled(false);
 				break;
 			}
 

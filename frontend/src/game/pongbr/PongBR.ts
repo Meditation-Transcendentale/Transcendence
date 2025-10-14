@@ -118,7 +118,7 @@ export class PongBR {
 
 	private setupPostProcessing(): void {
 		this.pipeline = new DefaultRenderingPipeline(
-			"berserkPipeline",
+			"brPipeline",
 			true,
 			this.scene,
 			[this.camera]

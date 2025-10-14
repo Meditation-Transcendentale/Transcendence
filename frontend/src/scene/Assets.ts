@@ -62,6 +62,7 @@ export class Assets {
 	public statusRoot!: TransformNode;
 	public brRoot!: TransformNode; //
 	public grassRoot!: TransformNode;
+	public brickRoot!: TransformNode;
 
 	public ballMaterial!: ShaderMaterial;
 	public cubeMaterial!: ShaderMaterial;
@@ -477,6 +478,8 @@ export class Assets {
 		this.grassRoot.scaling.set(1, 1., 1);
 		this.grassHighMesh.parent = this.grassRoot;
 		this.grassLowMesh.parent = this.grassRoot;
+
+		this.brickRoot = new TransformNode("brickRoot", this.scene);
 	}
 
 	private loadShadows() {

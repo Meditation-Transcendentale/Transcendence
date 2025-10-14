@@ -43,7 +43,7 @@ export class BrickBreaker {
 		this.scene = scene;
 		this.gameUI = gameUI;
 		this.engine = scene.getEngine() as Engine;
-		this.root = new TransformNode("pongbrRoot", this.scene);
+		this.root = sceneManager.assets.brickRoot;
 		this.root.position.set(20, 50, 50);
 		this.root.scaling.set(1, 1, 1);
 
