@@ -217,6 +217,7 @@ app.delete('/delete', handleErrors(async (req, res) => {
 	await natsRequest(nats, jc, 'user.deleteFriendship', { friendshipId: friendship.id });
 
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.FRIEND_DELETED });
+	nats.publish(`notification.${friend.uuid}.friendRemove`, encodeFriendUpdate({ sender: user.uuid }));
 }));
 
 app.post('/block', handleErrors(async (req, res) => {

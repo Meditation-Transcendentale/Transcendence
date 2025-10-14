@@ -15527,6 +15527,7 @@ export const notif = $root.notif = (() => {
          * @property {notif.IFriendUpdate|null} [friendAccept] NotificationMessage friendAccept
          * @property {notif.IGameInvite|null} [gameInvite] NotificationMessage gameInvite
          * @property {notif.IStatusUpdate|null} [statusUpdate] NotificationMessage statusUpdate
+         * @property {notif.IFriendUpdate|null} [friendRemove] NotificationMessage friendRemove
          */
 
         /**
@@ -15576,17 +15577,25 @@ export const notif = $root.notif = (() => {
          */
         NotificationMessage.prototype.statusUpdate = null;
 
+        /**
+         * NotificationMessage friendRemove.
+         * @member {notif.IFriendUpdate|null|undefined} friendRemove
+         * @memberof notif.NotificationMessage
+         * @instance
+         */
+        NotificationMessage.prototype.friendRemove = null;
+
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
 
         /**
          * NotificationMessage payload.
-         * @member {"friendRequest"|"friendAccept"|"gameInvite"|"statusUpdate"|undefined} payload
+         * @member {"friendRequest"|"friendAccept"|"gameInvite"|"statusUpdate"|"friendRemove"|undefined} payload
          * @memberof notif.NotificationMessage
          * @instance
          */
         Object.defineProperty(NotificationMessage.prototype, "payload", {
-            get: $util.oneOfGetter($oneOfFields = ["friendRequest", "friendAccept", "gameInvite", "statusUpdate"]),
+            get: $util.oneOfGetter($oneOfFields = ["friendRequest", "friendAccept", "gameInvite", "statusUpdate", "friendRemove"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
@@ -15622,6 +15631,8 @@ export const notif = $root.notif = (() => {
                 $root.notif.GameInvite.encode(message.gameInvite, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             if (message.statusUpdate != null && Object.hasOwnProperty.call(message, "statusUpdate"))
                 $root.notif.StatusUpdate.encode(message.statusUpdate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+            if (message.friendRemove != null && Object.hasOwnProperty.call(message, "friendRemove"))
+                $root.notif.FriendUpdate.encode(message.friendRemove, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
             return writer;
         };
 
@@ -15672,6 +15683,10 @@ export const notif = $root.notif = (() => {
                     }
                 case 4: {
                         message.statusUpdate = $root.notif.StatusUpdate.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 5: {
+                        message.friendRemove = $root.notif.FriendUpdate.decode(reader, reader.uint32());
                         break;
                     }
                 default:
@@ -15748,6 +15763,16 @@ export const notif = $root.notif = (() => {
                         return "statusUpdate." + error;
                 }
             }
+            if (message.friendRemove != null && message.hasOwnProperty("friendRemove")) {
+                if (properties.payload === 1)
+                    return "payload: multiple values";
+                properties.payload = 1;
+                {
+                    let error = $root.notif.FriendUpdate.verify(message.friendRemove);
+                    if (error)
+                        return "friendRemove." + error;
+                }
+            }
             return null;
         };
 
@@ -15782,6 +15807,11 @@ export const notif = $root.notif = (() => {
                 if (typeof object.statusUpdate !== "object")
                     throw TypeError(".notif.NotificationMessage.statusUpdate: object expected");
                 message.statusUpdate = $root.notif.StatusUpdate.fromObject(object.statusUpdate);
+            }
+            if (object.friendRemove != null) {
+                if (typeof object.friendRemove !== "object")
+                    throw TypeError(".notif.NotificationMessage.friendRemove: object expected");
+                message.friendRemove = $root.notif.FriendUpdate.fromObject(object.friendRemove);
             }
             return message;
         };
@@ -15818,6 +15848,11 @@ export const notif = $root.notif = (() => {
                 object.statusUpdate = $root.notif.StatusUpdate.toObject(message.statusUpdate, options);
                 if (options.oneofs)
                     object.payload = "statusUpdate";
+            }
+            if (message.friendRemove != null && message.hasOwnProperty("friendRemove")) {
+                object.friendRemove = $root.notif.FriendUpdate.toObject(message.friendRemove, options);
+                if (options.oneofs)
+                    object.payload = "friendRemove";
             }
             return object;
         };
