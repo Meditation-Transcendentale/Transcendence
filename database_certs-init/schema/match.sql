@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS match (
 	match_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	game_mode TEXT NOT NULL CHECK (game_mode IN ('classic', 'br')),
-	winner_id INTEGER NOT NULL,
+	winner_id INTEGER,
 	total_players INTEGER NOT NULL,
 	FOREIGN KEY (winner_id) REFERENCES users(id) ON DELETE CASCADE
 );

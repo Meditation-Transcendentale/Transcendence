@@ -29,6 +29,10 @@ async function handleNatsSubscription(subject, handler) {
 	}
 }
 
+function isPlayerABot(playerUUID) {
+	return playerUUID.startsWith("bot-") || playerUUID.length < 35;
+}
+
 handleErrorsNats(async () => {
 	await Promise.all([
 		handleNatsSubscription("stats.getPlayerStats.classic", async (msg) => {
@@ -56,39 +60,39 @@ handleErrorsNats(async () => {
 		}),
 		handleNatsSubscription("stats.addBRMatchStatsInfos", async (msg) => {
 
-
 			const matchInfos = decodeMatchEndBr(msg.data);
-			console.log(matchInfos);
-			// const matchInfos = jc.decode(msg.data);
 
-			let winner_uuid;
-			for (const info of matchInfos) {
-				if (info.placement == 1) {
-					winner_uuid = info.uuid;
-					break;
-				}
+			let winnerId = null;
+
+			if (!isPlayerABot(matchInfos.playerIds[0])) {
+				const winner_uuid = matchInfos.playerIds[0];
+
+				const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: winner_uuid }), { timeout: 1000 });
+				const winnerDecoded = jc.decode(winner.data);
+
+				winnerId = winnerDecoded.data.id;
 			}
 
-			const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: winner_uuid }), { timeout: 1000 });
-			const winnerDecoded = jc.decode(winner.data);
+			const matchId = statService.addMatchInfos('br', winnerId, matchInfos.playerIds.length);
 
-			matchInfos.winner_id = winnerDecoded.data.id;
+			const ret = [];
+			let retIndex = 0;
 
-			const matchId = statService.addMatchInfos('br', matchInfos.winnerId, matchInfos.length);
+			for (let i = 0; i < matchInfos.playerIds.length; i++) {
+				if (isPlayerABot(matchInfos.playerIds[i])) continue;
 
-			for (let i = 0; i < matchInfos.length; i++) {
-				const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos[i].uuid }), { timeout: 1000 });
+				const user = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos.playerIds[i] }), { timeout: 1000 });
 				const userDecoded = jc.decode(user.data);
-				matchInfos[i].user_id = userDecoded.data.id;
-				matchInfos[i].match_id = matchId;
-				if (matchInfos[i].placement == 1) {
-					matchInfos[i].is_winner = true;
-				} else {
-					matchInfos[i].is_winner = false;
-				}
+				ret[retIndex] = {
+					match_id: matchId,
+					user_id: userDecoded.data.id,
+					placement: i + 1,
+					is_winner: (i === 0)
+				};
+				retIndex++;
 			}
 
-			statService.addBRMatchStatsInfos(matchInfos);
+			statService.addBRMatchStatsInfos(ret);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("stats.addClassicMatchStatsInfos", async (msg) => {
