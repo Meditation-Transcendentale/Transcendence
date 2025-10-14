@@ -106,7 +106,6 @@ export class PhysicsEngine {
 
 			const pillarAngle = sliceStart + pillarArc / 2;
 
-			console.log(`Pillar angle = ${pillarAngle}`);
 			const pillarSize = cfg.ARENA_RADIUS * pillarArc;
 
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
@@ -136,7 +135,6 @@ export class PhysicsEngine {
 		this.spawnState.targetBallCount = ballConfig.maxBalls;
 		this.spawnState.spawnedThisPhase = 0;
 
-		// console.log(`Started spawning for ${phase}: target ${ballConfig.maxBalls} balls`);
 	}
 
 	updateBallSpawning(currentTime) {
@@ -197,12 +195,10 @@ export class PhysicsEngine {
 		pd.velX[ballEnt] = Math.cos(dir) * speed;
 		pd.velY[ballEnt] = Math.sin(dir) * speed;
 
-		// console.log(`Spawned ball ${this.spawnState.spawnedThisPhase + 1}, next in ${this.spawnState.currentSpawnInterval.toFixed(0)}ms`);
 	}
 
 	stopBallSpawning() {
 		this.spawnState.enabled = false;
-		// console.log(`Ball spawning stopped. Spawned ${this.spawnState.spawnedThisPhase} balls this phase.`);
 	}
 
 	createBalls(numBalls) {
@@ -386,7 +382,6 @@ export class PhysicsEngine {
 			}
 		});
 
-		console.log(numActivePlayers);
 		const newAngleStep = (2 * Math.PI) / numActivePlayers;
 		const paddleArc = newAngleStep * cfg.PADDLE_FILL;
 		const halfArc = paddleArc / 2;
@@ -441,7 +436,6 @@ export class PhysicsEngine {
 			pd.posX[pillarEnt] = Math.cos(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
 			pd.posY[pillarEnt] = Math.sin(pillarAngle) * (cfg.ARENA_RADIUS + pillarSize / 2);
 			pd.rot[pillarEnt] = pillarAngle;
-			console.log(`Pillar angle = ${pillarAngle}`);
 			pd.halfW[pillarEnt] = pd.halfH[pillarEnt] = pd.radius[pillarEnt] = pillarSize / 2;
 		});
 
@@ -488,14 +482,12 @@ export class PhysicsEngine {
 		if (this.gameState.isRebuilding) return;
 
 		if (this.gameState.playerStates.eliminated.has(fixedPlayerId)) {
-			console.log("cant move you are dead");
 			return;
 		}
 
 		const paddleIndex = this.gameState.playerMapping[fixedPlayerId] ?? fixedPlayerId;
 
 		if (paddleIndex >= 0 && paddleIndex < this.paddleData.inputStates.length) {
-			console.log("can move");
 			this.paddleData.inputStates[paddleIndex] = Math.max(-1, Math.min(1, moveInput));
 		}
 	}
