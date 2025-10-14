@@ -89,16 +89,15 @@
 #button-module {
 	position: absolute;
 	pointer-events: auto;
-	background: rgba(13, 2, 33, 0.9);
+	background: transparent;
 	border-radius: 8px;
-	padding: 10px 15px;
+	/* padding: 10px 15px; */
 	color: #e0aaff;
 	font-family: 'spacegrotesk', sans-serif;
-	backdrop-filter: blur(5px);
-	transition: all 0.3s ease;
+	/* backdrop-filter: blur(5px); */
+	/* transition: all 0.3s ease; */
 
-	min-height: 40px;
-	min-width: 80px;
+	/* min-height: 40px; */
 
 	top: 20px;
 	left: 20px;
@@ -113,7 +112,7 @@
 }
 
 #timer-module:after,
-#button-module:after {
+.game-button:after {
 	content: '';
 	position: absolute;
 	top: calc(-1 * var(--borderWidth));
@@ -131,7 +130,7 @@
 			#e0aaff);
 	border-radius: calc(2 * var(--borderWidth));
 	z-index: -1;
-	animation: animatedgradient 5s ease alternate infinite;
+	/* animation: animatedgradient 5s ease alternate infinite; */
 	background-size: 300% 300%;
 }
 
@@ -149,18 +148,18 @@
 	}
 }
 
-#button-module {
-	flex-direction: column;
-	gap: 8px;
-	min-width: 120px;
-	min-height: auto;
-	justify-content: flex-start;
-}
+/* #button-module { */
+/* 	flex-direction: column; */
+/* 	min-height: auto; */
+/* 	justify-content: flex-start; */
+/* } */
 
 .game-button {
 	padding: 10px 15px;
-	background: rgba(13, 2, 33, 0.4);
+	background: transparent;
 	border: none;
+	margin-right: 10px;
+	margin-left: 10px;
 	border-radius: 6px;
 	color: #e0aaff;
 	cursor: pointer;
@@ -351,6 +350,7 @@
 		transform: scale(1);
 		color: #e0aaff;
 	}
+
 	25% {
 		transform: scale(1.5);
 		color: #ff4444;
@@ -359,10 +359,12 @@
 			0 0 40px rgba(255, 68, 68, 0.8),
 			0 0 60px rgba(255, 68, 68, 0.6);
 	}
+
 	50% {
 		transform: scale(1.3);
 		color: #ff6666;
 	}
+
 	100% {
 		transform: scale(1);
 		color: #e0aaff;
@@ -389,16 +391,16 @@ td {
 .game-ui-container.berserk #timer-module:after,
 .game-ui-container.berserk #button-module:after {
 	background: linear-gradient(60deg,
-		#000000,
-		#1a0000,
-		#330000,
-		#4d0000,
-		#660000,
-		#800000,
-		#990000,
-		#cc0000,
-		#ff0000,
-		#ff3333);
+			#000000,
+			#1a0000,
+			#330000,
+			#4d0000,
+			#660000,
+			#800000,
+			#990000,
+			#cc0000,
+			#ff0000,
+			#ff3333);
 }
 
 .game-ui-container.berserk .game-button {
@@ -435,12 +437,14 @@ td {
 			0 0 15px rgba(20, 0, 0, 0.8),
 			0 0 30px rgba(128, 0, 0, 0.6);
 	}
+
 	50% {
 		text-shadow:
 			0 0 25px rgba(255, 0, 0, 0.9),
 			0 0 50px rgba(255, 0, 0, 0.7),
 			0 0 75px rgba(204, 0, 0, 0.5);
 	}
+
 	100% {
 		text-shadow:
 			0 0 15px rgba(20, 0, 0, 0.8),
@@ -473,6 +477,7 @@ td {
 		transform: scale(1);
 		color: #ff4444;
 	}
+
 	25% {
 		transform: scale(1.5);
 		color: #ffffff;
@@ -482,10 +487,12 @@ td {
 			0 0 60px rgba(255, 0, 0, 0.6),
 			0 0 80px rgba(204, 0, 0, 0.4);
 	}
+
 	50% {
 		transform: scale(1.3);
 		color: #ff6666;
 	}
+
 	100% {
 		transform: scale(1);
 		color: #ff4444;

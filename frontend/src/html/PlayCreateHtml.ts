@@ -275,6 +275,8 @@ export class PlayCreateHtml implements IHtml {
 	private resetSelections() {
 		this.selectedMap = "";
 		this.selectedMode = "";
+		this.selectedDifficulty = "";
+		this.selectedSize = "";
 
 		document.querySelectorAll(".game-form__input--active").forEach(btn => {
 			btn.classList.remove("game-form__input--active");
@@ -296,7 +298,7 @@ export class PlayCreateHtml implements IHtml {
 		} else if (activePanel === "create-tournament") {
 			isEnabled = !!this.selectedMap;
 		} else if (activePanel === "create-brickbreaker") {
-			isEnabled = !!this.selectedMode;
+			isEnabled = !!this.selectedDifficulty;
 		} else if (activePanel === "create-battleroyal") {
 			isEnabled = true;
 		}
