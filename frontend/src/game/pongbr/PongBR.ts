@@ -151,6 +151,7 @@ export class PongBR {
 
 	}
 	public async start(gameId: string, uuid: string) {
+		this.uuid = uuid;
 		if (!this.inited) {
 			await this.init();
 		}

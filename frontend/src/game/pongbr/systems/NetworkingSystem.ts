@@ -247,11 +247,16 @@ export class NetworkingSystem extends System {
 				console.log("====================================\n");
 
 				// Display rankings in the game UI
-				const rankings = playerIds.map((uuid, index) => ({
-					rank: index + 1,
-					username: this.game.getUsername(uuid),
-					uuid: uuid
-				}));
+				const rankings = playerIds.map((uuid, index) => {
+					const isLocal = uuid === this.uuid;
+					console.log(`Player ${index + 1}: ${uuid}, isLocal: ${isLocal}, this.uuid: ${this.uuid}`);
+					return {
+						rank: index + 1,
+						username: this.game.getUsername(uuid),
+						uuid: uuid,
+						isLocalPlayer: isLocal
+					};
+				});
 
 				// Show end screen with rankings overlay
 				this.gameUI.showBRRankings(rankings);
