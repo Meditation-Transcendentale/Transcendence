@@ -37,6 +37,7 @@ export class HomeRoute implements IRoute {
 	public async load() {
 		if (!this.created)
 			await this.init();
+		htmlManager.ath.checkBeforeHome = false;
 		sceneManager.cameraManager.vue = "home";
 		sceneManager.load("home");
 		htmlManager.cube.name = "PLAY";

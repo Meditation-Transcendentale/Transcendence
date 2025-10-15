@@ -17,6 +17,7 @@ export class PongRoute implements IRoute {
 			routeManager.nav("/home");
 			return;
 		}
+		htmlManager.friendlist.remove();
 		sceneManager.cameraManager.vue = stateManager.gameMap;
 		sceneManager.load(stateManager.gameMap);
 		gameManager.launchPong();

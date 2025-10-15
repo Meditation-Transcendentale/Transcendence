@@ -22,6 +22,9 @@ export class Ath {
 
 	private _loaded = false;
 
+	public checkBeforeHome = false;
+	private homePopup: Popup;
+
 	constructor() {
 
 		this.containerUP = document.createElement("div");
@@ -32,7 +35,24 @@ export class Ath {
 		this.home.textContent = "⌂";
 		this.containerUP.appendChild(this.home);
 
-		this.home.addEventListener("click", () => routeManager.nav("/home"))
+		this.homePopup = new Popup({
+			type: PopupType.accept,
+			title: "BACK HOME ?",
+			text: "Are you sure you want to go back to the home page?",
+			accept: () => routeManager.nav("/home"),
+			decline: () => { },
+			acceptName: "PURSUE",
+			declineName: "STAY"
+		})
+
+
+
+		this.home.addEventListener("click", () => {
+			if (this.checkBeforeHome)
+				this.homePopup.show();
+			else
+				routeManager.nav("/home")
+		})
 
 
 		this.container = document.createElement("div");

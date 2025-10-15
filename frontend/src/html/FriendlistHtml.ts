@@ -59,6 +59,11 @@ export class FriendlistHtml {
 		return;
 	}
 
+	public remove() {
+		this.div.remove();
+		stateManager.friendlist = false;
+	}
+
 	private setupForm() {
 		this.form = document.createElement("form");
 		this.form.className = "friendlist-form";

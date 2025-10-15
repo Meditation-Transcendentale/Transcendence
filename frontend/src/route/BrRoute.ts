@@ -17,6 +17,7 @@ export class BrRoute implements IRoute {
 			routeManager.nav("/home");
 			return;
 		}
+		htmlManager.friendlist.remove();
 		sceneManager.cameraManager.vue = "br";
 		sceneManager.assets.scene.activeCamera = sceneManager.assets.cameraBr;
 		sceneManager.load("br");

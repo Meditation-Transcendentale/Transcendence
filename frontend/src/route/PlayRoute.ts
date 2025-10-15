@@ -1,3 +1,4 @@
+import { htmlManager } from "../html/HtmlManager";
 import { stateManager } from "../state/StateManager";
 import { IRoute } from "./IRoute";
 import { routeManager } from "./RouteManager";
@@ -11,6 +12,7 @@ export class PlayRoute implements IRoute {
 	}
 
 	public async load(): Promise<void> {
+		htmlManager.ath.checkBeforeHome = false;
 		routeManager.comebackRoute = "/home";
 		routeManager.nav(stateManager.playPath);
 	}
