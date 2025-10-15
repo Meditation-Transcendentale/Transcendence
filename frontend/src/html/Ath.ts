@@ -681,6 +681,7 @@ class athProfile {
 		await User.matchHistory.getHistory()
 			.then(() => {
 				this.updateMatchHistoryTable(User.matchHistory.history);
+				console.log(User.matchHistory.history);
 			})
 			.catch((err) => { });
 	}

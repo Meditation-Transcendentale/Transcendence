@@ -91,7 +91,9 @@
 
 #score-module {
 	position: fixed;
-
+	top: 3vh;
+	left: 50%;
+	transform: translateX(-50%);
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -99,18 +101,51 @@
 }
 
 #score-module .score-container {
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8vh;
 	align-items: center;
 	line-height: 1;
 }
 
+#score-module .score-label {
+	font-size: 2.5vh;
+	font-weight: 400;
+	color: rgba(224, 170, 255, 0.7);
+	font-family: 'spacegrotesk', sans-serif;
+	text-transform: uppercase;
+	letter-spacing: 0.3em;
+	text-align: center;
+	margin-bottom: 1vh;
+}
+
 #score-module .score-value {
-	font-size: 10vh;
+	font-size: 8vh;
 	font-weight: bold;
 	color: #e0aaff;
 	font-family: 'spacegrotesk', sans-serif;
 	animation: syncedGlow 5s ease alternate infinite;
+	text-align: center;
+}
+
+#score-module #score-label {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+#score-module #score-value {
+	grid-column: 1;
+	grid-row: 2;
+}
+
+#score-module #scorepb-label {
+	grid-column: 2;
+	grid-row: 1;
+}
+
+#score-module #scorepb-value {
+	grid-column: 2;
+	grid-row: 2;
 }
 
 @keyframes syncedGlow {
@@ -534,4 +569,49 @@
 			0 0 15px rgba(20, 0, 0, 0.8),
 			0 0 30px rgba(128, 0, 0, 0.6);
 	}
+}
+
+/* Brick breaker specific styling */
+.game-ui-container.brick #score-module {
+	top: 4vh;
+}
+
+.game-ui-container.brick #score-module .score-container {
+	gap: 12vh;
+	padding: 3vh 5vh;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(221, 168, 252, 0.2);
+	border-radius: 0px;
+	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.1);
+}
+
+.game-ui-container.brick #score-module .score-label {
+	font-size: 2.8vh;
+	color: rgba(224, 170, 255, 0.8);
+}
+
+.game-ui-container.brick #score-module .score-value {
+	font-size: 10vh;
+	color: #e0aaff;
+}
+
+.game-ui-container.brick #ending-module {
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.95), rgba(36, 0, 70, 0.9));
+	color: #e0aaff;
+}
+
+.game-ui-container.brick #ending-module .score-value {
+	color: #e0aaff;
+	animation: syncedGlow 5s ease alternate infinite;
+}
+
+.game-ui-container.brick #ending-module .result-label {
+	animation: syncedGlow 5s ease alternate infinite;
+}
+
+.game-ui-container.brick .game-ui-countdown {
+	color: #e0aaff;
+	animation: syncedGlow 5s ease alternate infinite;
 }
