@@ -39,8 +39,7 @@ export class Player {
 		this.goal = MeshBuilder.CreateCylinder("goal", { height: 0.5, diameter: 1, subdivisions: 16 }, this.scene);
 		this.goal.parent = game.root;
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
-		this.materialGoal.emissiveColor = new Color3(1, 1, 1.0);
-		// this.materialGoal.specularColor = new Color3(0.878, 0.667, 1.0);
+		this.materialGoal.emissiveColor = new Color3(1, 1, 1);
 		this.goal.material = this.materialGoal;
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
@@ -48,10 +47,14 @@ export class Player {
 
 		this.shield = MeshBuilder.CreateCylinder("shield", { height: 0.25, diameter: 1.8, tessellation: 64, arc: 0.5, enclose: true, updatable: true }, this.scene);
 		this.shield.parent = game.root;
+		this.shield.position.y = -2;
 		this.shield.rotation.y = Math.PI;
 		this.materialShield = new StandardMaterial("shieldMat", this.scene);
 		this.materialShield.emissiveColor = new Color3(0, 1, 0);
 		this.shield.material = this.materialShield;
+
+		this.game.gl.addIncludedOnlyMesh(this.goal);
+		this.game.gl.addIncludedOnlyMesh(this.shield);
 
 		this.angleFactor = 0.5;
 		this.isActive = 0.0;
@@ -72,15 +75,6 @@ export class Player {
 			this.pointer.y = e.clientY;
 		}
 
-		// window.addEventListener("keydown", (e) => {
-		// 	this.keysPressed.add(e.code);
-		// });
-		// window.addEventListener("keyup", (e) => this.keysPressed.delete(e.code));
-		// window.addEventListener("pointermove", (e) => {
-		// 	this.pointer.x = e.clientX;
-		// 	this.pointer.y = e.clientY;
-		// });
-
 		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
 		this.pointerSurface.parent = game.root;
 		const invMat = new StandardMaterial("surfaceMat", this.scene);
@@ -98,7 +92,7 @@ export class Player {
 			varying float vAlpha;
 
 			void main(void) {
-				vec3 color = vec3(122., 75. , 170.) / 255.;
+				vec3 color = vec3(1, 0.4, 0);
 				gl_FragColor = vec4( color, vAlpha);
 			}
 		`;
@@ -131,7 +125,7 @@ export class Player {
 				float newAngle = mix(angle, 0.0, angleFactor) - paddleRotation.y + PI * 1.5;
 				float radius = length(vec2(position.x, position.z));
 				vec2 newXZ = vec2(cos(newAngle), sin(newAngle)) * radius;
-				vec3 newPosition = vec3(newXZ.x, position.y, newXZ.y);
+				vec3 newPosition = vec3(newXZ.x, 2, newXZ.y);
 
 				newPosition += paddlePosition * vec3(-1., 1., -1.);
 				gl_Position = worldViewProjection * vec4(newPosition, 1.0);

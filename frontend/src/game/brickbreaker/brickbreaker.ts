@@ -1,4 +1,4 @@
-import { Engine, Scene, Vector3, Vector2, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Observer, TransformNode, FreeCamera, PointLight } from "../../babylon";
+import { Engine, Scene, Vector3, Vector2, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Observer, TransformNode, FreeCamera, PointLight, GlowLayer } from "../../babylon";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
 import { getRequest, patchRequest } from "../../networking/request";
@@ -35,6 +35,7 @@ export class BrickBreaker {
 	public leaderHard: any;
 	public mode: string = "normal";
 	public newHighScore: boolean = false;
+	public gl: GlowLayer;
 
 
 
@@ -48,13 +49,14 @@ export class BrickBreaker {
 		this.root.scaling.set(1, 1, 1);
 
 		this.camera = sceneManager.camera;
-		// const light = new PointLight("pointBrick", new Vector3(0, 200, 0), this.scene);
-		// light.intensity = 1.;
-		// light.parent = this.root;
-
+		
+		this.gl = new GlowLayer("glow", this.scene, { 
+			mainTextureRatio: 0.5,
+            blurKernelSize: 32
+        });
+		this.gl.intensity = 0.5;
 		this.createArena();
-
-
+		
 		this.ball = new Ball(this.scene, this.root, this);
 		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
 
@@ -113,7 +115,6 @@ export class BrickBreaker {
 
 		this.camera.parent = this.root;
 		this.camera.position.set(0, 30, 0);
-		// console.log("start:", this.camera.position);
 		this.lastTime = performance.now();
 		this.start1 = true;
 		this.update();
@@ -149,9 +150,6 @@ export class BrickBreaker {
 
 		this.player.update();
 		this.ball.update(delta, this.player, this.cols, this.layers, this.bricks);
-		// console.log("came pos:", this.camera.position);
-		// console.log("light pos:", this.light.position);
-		// console.log("sphere pos:", this.sphere.position);
 
 		this.id = requestAnimationFrame(() => this.update());
 		if (!this.start1) {
@@ -190,8 +188,7 @@ export class BrickBreaker {
 		this.arena = MeshBuilder.CreateDisc("arena", { radius: 5, tessellation: 128 }, this.scene);
 		this.arena.parent = this.root;
 		const mat = new StandardMaterial("arenaMat", this.scene);
-		mat.emissiveColor.set(0.5, 0.5, 0.5);
-		// mat.specularColor.set(0.2, 0.2, 0.2);
+		mat.emissiveColor.set(13 / 255 , 3 / 255, 32 / 255);
 		this.arena.material = mat;
 		this.arena.rotation.x = Math.PI / 2;
 		const radian = 2 * Math.PI;
@@ -210,6 +207,9 @@ export class BrickBreaker {
 		mesh.material = mat;
 		mesh.parent = this.root;
 		mesh.position.y += 0.45;
+
+		this.gl.addIncludedOnlyMesh(mesh);
+		this.gl.addIncludedOnlyMesh(this.arena);
 	}
 
 	private generateBricks(radius: number, layers: number, cols: number): Mesh[][] {
@@ -242,8 +242,8 @@ export class BrickBreaker {
 				mesh.parent = this.root;
 				mesh.position.y += 0.4;
 				const mat = new StandardMaterial("arenaMat", this.scene);
-				mat.emissiveColor.set(1, 1, 1);
-				// mat.specularColor.set(0.5, 0.5, 0.5);
+				mat.emissiveColor.set(224 / 255, 170 / 255, 1);
+				this.gl.addIncludedOnlyMesh(mesh);
 				mesh.material = mat;
 				bricksCols.push(mesh);
 			}
@@ -251,32 +251,6 @@ export class BrickBreaker {
 		}
 		return this.bricks;
 	}
-
-	// public dispose() {
-	// 	this.ball.ball.dispose();
-	// 	this.player.goal.dispose();
-	// 	this.player.shield.dispose();
-	// 	this.player.pointerSurface.dispose();
-	// 	this.arena.dispose();
-
-	// 	this.bricks.forEach(brickCol => {
-	// 		brickCol.forEach(brick => {
-	// 			brick.dispose();
-	// 		});
-	// 	});
-
-	// 	this.camera.dispose();
-	// 	this.light.dispose();
-	// 	this.engine.clear(new Color4(1, 1, 1, 1), true, true);
-	// 	this.engine.stopRenderLoop();
-
-	// 	this.scene?.dispose();
-	// 	this.engine?.dispose();
-
-	// 	clearTimeout(resizeTimeout);
-	// 	this.engine.dispose();
-	// 	// Router.nav(`/play`, false, false);
-	// }
 
 	private resizeGame() {
 		window.addEventListener("resize", () => {
@@ -288,6 +262,3 @@ export class BrickBreaker {
 		});
 	}
 }
-
-//const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-//new Game(canvas);
