@@ -1,3 +1,4 @@
+import { profile } from "console";
 import { postRequest } from "../networking/request";
 import { stateManager } from "../state/StateManager";
 import { streamManager } from "../stream/StreamManager";
@@ -7,6 +8,7 @@ import { IHtml } from "./IHtml";
 type PlayerState = {
   uuid: string;
   username: string;
+  profilePictureSrc: string;
   ready: boolean;
   connected: boolean;
   eliminated: boolean;
@@ -215,20 +217,28 @@ export class TournamentHtml implements IHtml {
     const row = document.createElement("div");
 
     const name = document.createElement("span");
+    name.id = "tournament-player-username";
+    name.style.flexGrow = "3";
     name.style.whiteSpace = "nowrap";
     name.style.maxWidth = "160px";
     name.style.overflow = "hidden";
     name.style.textOverflow = "ellipsis";
 
+    const profilePicture = document.createElement("img");
+    profilePicture.id = "tournament-profile-image";
     if (pid) {
       const player = this.players.get(pid);
-      if (!player?.username) {
+      if (!player) return row;
+      if (!player.username || !player.profilePictureSrc) {
         postRequest("info/search", { identifier: pid, type: "uuid" }).then(
           (json: any) => {
-            name.textContent = json.data.username;
+            player.username = json.data.username;
+            profilePicture.src = json.data.avatar_path;
           }
         );
-      } else name.textContent = player.username;
+      }
+      name.textContent = player.username;
+      profilePicture.src = player.profilePictureSrc;
     } else {
       name.textContent = "TBD";
       name.classList.add("tbd");
@@ -256,15 +266,28 @@ export class TournamentHtml implements IHtml {
         if (badge) inner.replaceChildren(badge);
       }
     }
-
+    
+    row.style.flexDirection = "row";
     if (side === "right") {
-      row.append(inner, name);
-      name.style.textAlign = "right";
-      row.style.flexDirection = "row";
+      if (profilePicture.src) {
+        row.append(inner, name, profilePicture);
+        name.style.textAlign = "right";
+        profilePicture.style.textAlign = "right";
+      }
+      else {
+        row.append(inner, name);
+        name.style.textAlign = "right";
+      }
     } else {
-      row.append(name, inner);
-      name.style.textAlign = "left";
-      row.style.flexDirection = "row";
+      if (profilePicture.src) {
+        row.append(profilePicture, name, inner);
+        profilePicture.style.textAlign = "left";
+        name.style.textAlign = "left";
+      }
+      else {
+        row.append(name, inner);
+        name.style.textAlign = "left";
+      }
     }
 
     const ps = pid ? this.players.get(pid) ?? null : null;
@@ -287,6 +310,7 @@ export class TournamentHtml implements IHtml {
     if (!p) return null;
     const s = document.createElement("span");
     s.className = "ready-checked";
+    s.style.flexGrow = "1";
     if (p.eliminated) {
       s.textContent = "Disqualified";
       return s;
