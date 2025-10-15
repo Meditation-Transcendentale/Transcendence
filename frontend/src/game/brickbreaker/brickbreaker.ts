@@ -48,9 +48,9 @@ export class BrickBreaker {
 		this.root.scaling.set(1, 1, 1);
 
 		this.camera = sceneManager.camera;
-		const light = new PointLight("pointBrick", new Vector3(0, 200, 0), this.scene);
-		light.intensity = 1.;
-		light.parent = this.root;
+		// const light = new PointLight("pointBrick", new Vector3(0, 200, 0), this.scene);
+		// light.intensity = 1.;
+		// light.parent = this.root;
 
 		this.createArena();
 
@@ -149,7 +149,7 @@ export class BrickBreaker {
 
 		this.player.update();
 		this.ball.update(delta, this.player, this.cols, this.layers, this.bricks);
-		console.log("came pos:", this.camera.position);
+		// console.log("came pos:", this.camera.position);
 		// console.log("light pos:", this.light.position);
 		// console.log("sphere pos:", this.sphere.position);
 
@@ -190,8 +190,8 @@ export class BrickBreaker {
 		this.arena = MeshBuilder.CreateDisc("arena", { radius: 5, tessellation: 128 }, this.scene);
 		this.arena.parent = this.root;
 		const mat = new StandardMaterial("arenaMat", this.scene);
-		mat.diffuseColor.set(0.2, 0.2, 0.2);
-		mat.specularColor.set(0.2, 0.2, 0.2);
+		mat.emissiveColor.set(0.5, 0.5, 0.5);
+		// mat.specularColor.set(0.2, 0.2, 0.2);
 		this.arena.material = mat;
 		this.arena.rotation.x = Math.PI / 2;
 		const radian = 2 * Math.PI;
@@ -242,8 +242,8 @@ export class BrickBreaker {
 				mesh.parent = this.root;
 				mesh.position.y += 0.4;
 				const mat = new StandardMaterial("arenaMat", this.scene);
-				mat.diffuseColor.set(1, 1, 1);
-				mat.specularColor.set(0.5, 0.5, 0.5);
+				mat.emissiveColor.set(1, 1, 1);
+				// mat.specularColor.set(0.5, 0.5, 0.5);
 				mesh.material = mat;
 				bricksCols.push(mesh);
 			}

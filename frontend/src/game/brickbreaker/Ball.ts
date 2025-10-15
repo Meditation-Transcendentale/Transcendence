@@ -1,4 +1,4 @@
-import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2, TransformNode } from "../../babylon";
+import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2, TransformNode, FresnelParameters, Color3 } from "../../babylon";
 import { Player } from "./Player";
 import { BrickBreaker } from "./brickbreaker";
 
@@ -28,16 +28,26 @@ export class Ball {
 		this.game = game;
 
 		this.matTouched = new StandardMaterial("touchedMat", this.scene);
-		this.matTouched.diffuseColor.set(1., 0, 0);
+		this.matTouched.emissiveFresnelParameters = new FresnelParameters();
+		this.matTouched.emissiveFresnelParameters.leftColor = Color3.White();
+		this.matTouched.emissiveFresnelParameters.rightColor = Color3.Red();
+		this.matTouched.emissiveFresnelParameters.power = 4.;
+		this.matTouched.emissiveFresnelParameters.bias = 0.2;
+		this.matTouched.emissiveColor.set(1., 1., 1.);
+		this.matTouched.specularPower = 16;
+		this.matTouched.alpha = 1.;
 		// this.matTouched.specularColor.set(0.5, 0.5, 0.5);
-		this.matTouched.emissiveColor.set(10., 0.1, 0.1);
+		this.matTouched.emissiveColor.set(1., 1, 1);
 		// this.matTouched
 		this.matUntouched = new StandardMaterial("untouchedMat", this.scene);
-		// this.matUntouched.diffuseColor.set(0, 0, 1);
-		// this.matUntouched.specularColor.set(0, 0, 5);
-		this.matUntouched.diffuseColor.set(0., 0, 1.);
-		// this.matUntouched.specularColor.set(0.5, 0.5, 0.5);
-		this.matUntouched.emissiveColor.set(0.1, 0.1, 10.);
+		this.matUntouched.emissiveFresnelParameters = new FresnelParameters();
+		this.matUntouched.emissiveFresnelParameters.leftColor = Color3.White();
+		this.matUntouched.emissiveFresnelParameters.rightColor = Color3.Blue();
+		this.matUntouched.emissiveFresnelParameters.power = 4.;
+		this.matUntouched.emissiveFresnelParameters.bias = 0.2;
+		this.matUntouched.emissiveColor.set(1., 1., 1.);
+		this.matUntouched.specularPower = 16;
+		this.matUntouched.alpha = 1.;
 		this.ball.material = this.matUntouched;
 	}
 
