@@ -31,12 +31,15 @@
   height: auto;
   max-height: 48vh;
   padding: 0;
-  background: linear-gradient(135deg, rgba(13, 2, 33, 0.4), rgba(36, 0, 70, 0.3));
+  background: linear-gradient(
+    135deg,
+    rgba(13, 2, 33, 0.4),
+    rgba(36, 0, 70, 0.3)
+  );
   backdrop-filter: blur(10px);
   border-radius: 8px;
   border: 1px solid rgba(157, 78, 221, 0.25);
-  box-shadow: 0 4px 20px rgba(13, 2, 33, 0.5),
-              0 0 40px rgba(90, 24, 154, 0.15);
+  box-shadow: 0 4px 20px rgba(13, 2, 33, 0.5), 0 0 40px rgba(90, 24, 154, 0.15);
   overflow: hidden;
 }
 
@@ -131,13 +134,15 @@
   animation: labelGlow 3s ease-in-out infinite;
 }
 
+
 /* Animations */
 @keyframes labelGlow {
-  0%, 100% {
+  0%,
+  100% {
     text-shadow: 0 2px 8px rgba(157, 78, 221, 0.4);
   }
   50% {
     text-shadow: 0 2px 12px rgba(157, 78, 221, 0.7),
-                 0 0 20px rgba(199, 125, 255, 0.4);
+      0 0 20px rgba(199, 125, 255, 0.4);
   }
 }

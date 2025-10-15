@@ -75,17 +75,19 @@
   );
   border: 2px solid var(--color-lavender);
   border-radius: 8px;
-  padding: 4px 12px;
-  position: relative;
+  padding: 4px 8px;
+  font-size: 12px;
+  /* position: relative; */
   color: var(--color-lavender);
   animation: readyPulse 2s ease-in-out infinite;
 }
 
 .match-info .ready-checked::before {
   position: absolute;
-  left: -24px;
+  /* left: -24px; */
   color: var(--color-lavender);
   text-shadow: 0 0 8px var(--color-purple-bright);
+  font-size: 12px;
   animation: checkBounce 0.6s ease-out;
 }
 
@@ -95,19 +97,21 @@
     var(--color-space-deep) 0%,
     var(--color-purple-dark) 100%
   );
+  font-size: 12px;
   border: 2px solid var(--color-purple-medium);
   border-radius: 8px;
-  padding: 4px 12px;
+  padding: 4px 8px;
   color: var(--color-purple-light);
-  position: relative;
+  /* position: relative; */
   opacity: 0.9;
 }
 
 .match-info .notReady-checked::before {
   position: absolute;
-  left: -24px;
+  /* left: -24px; */
   color: var(--color-purple-light);
   animation: waiting 1.5s ease-in-out infinite;
+  font-size: 12px;
 }
 
 .game.playing .match-info {
@@ -178,7 +182,11 @@
   padding: 4px 12px;
   font-size: 14px;
   color: var(--color-lavender);
-  background: linear-gradient(135deg, var(--color-purple-medium), var(--color-purple-bright));
+  background: linear-gradient(
+    135deg,
+    var(--color-purple-medium),
+    var(--color-purple-bright)
+  );
   border-radius: 999px;
   box-shadow: 0 0 6px rgba(99, 102, 241, 0.5);
   font-weight: bold;
@@ -227,3 +235,14 @@
   animation: myMatchPulse 1.6s ease-in-out infinite;
 }
 
+#tournament-profile-image {
+  width: 32px;
+  /* max-width: 32px; */
+  /* max-height:32px; */
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-purple-light);
+  transition: transform 0.2s ease;
+  /* flex-grow: 1; */
+}
