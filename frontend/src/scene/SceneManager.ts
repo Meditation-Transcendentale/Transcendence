@@ -262,7 +262,7 @@ class SceneManager {
 			case "brick": {
 				// this.camera.detachControl();
 				this.picker.enable = false;
-				this.assets.hemisphericLight.setEnabled(true);
+				this.assets.hemisphericLight.setEnabled(false);
 				this.grass.enable = false;
 				this.assets.ballMesh.setEnabled(false);
 				this.assets.groundMesh.setEnabled(false);

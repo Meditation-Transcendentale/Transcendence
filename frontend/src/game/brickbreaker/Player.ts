@@ -39,8 +39,8 @@ export class Player {
 		this.goal = MeshBuilder.CreateCylinder("goal", { height: 0.5, diameter: 1, subdivisions: 16 }, this.scene);
 		this.goal.parent = game.root;
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
-		this.materialGoal.diffuseColor = new Color3(0.878, 0.667, 1.0);
-		this.materialGoal.specularColor = new Color3(0.878, 0.667, 1.0);
+		this.materialGoal.emissiveColor = new Color3(1, 1, 1.0);
+		// this.materialGoal.specularColor = new Color3(0.878, 0.667, 1.0);
 		this.goal.material = this.materialGoal;
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
@@ -50,7 +50,7 @@ export class Player {
 		this.shield.parent = game.root;
 		this.shield.rotation.y = Math.PI;
 		this.materialShield = new StandardMaterial("shieldMat", this.scene);
-		this.materialShield.diffuseColor = new Color3(0, 1, 0);
+		this.materialShield.emissiveColor = new Color3(0, 1, 0);
 		this.shield.material = this.materialShield;
 
 		this.angleFactor = 0.5;
@@ -98,7 +98,7 @@ export class Player {
 			varying float vAlpha;
 
 			void main(void) {
-				vec3 color = vec3(1.0,0.5,0.0);
+				vec3 color = vec3(122., 75. , 170.) / 255.;
 				gl_FragColor = vec4( color, vAlpha);
 			}
 		`;
@@ -216,7 +216,7 @@ export class Player {
 		}
 		else {
 			this.isActive = 0.0;
-			this.alpha = 0.5;
+			this.alpha = 0.3;
 		}
 
 		if (this.inputDown === true) {
