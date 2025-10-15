@@ -14,6 +14,7 @@ class UserC {
 	public avatar!: string;
 	public twofa!: number;
 
+	public friendsBusy: Set<string>;
 	public friendsOnline: Set<string>;
 	public friendsAway: Set<string>;
 
@@ -25,6 +26,7 @@ class UserC {
 		console.log("%c USER", "color: white; background-color: red");
 		this.friendsOnline = new Set<string>;
 		this.friendsAway = new Set<string>;
+		this.friendsBusy = new Set<string>;
 		this.twofa = 0;
 		this.external = false;
 	}
@@ -54,23 +56,32 @@ class UserC {
 	}
 
 	public updateFriendStatus(user: ISearchRequestResponce) {
-		const change = (user.status !== "offline" && this.friendsOnline.has(user.uuid)) || (user.status == "offline" && this.friendsOnline.has(user.uuid));
-		if (user.status !== "offline") {
+		const change = (user.status !== "offline" && (this.friendsOnline.has(user.uuid) || this.friendsBusy.has(user.uuid))) || (user.status == "offline" && this.friendsOnline.has(user.uuid));
+		if (user.status === "online") {
 			this.friendsAway.delete(user.uuid);
 			this.friendsOnline.add(user.uuid);
-		} else {
+			this.friendsBusy.delete(user.uuid);
+		} else if (user.status === "offline") {
 			this.friendsOnline.delete(user.uuid);
-			this.friendsOnline.add(user.uuid);
+			this.friendsAway.add(user.uuid);
+			this.friendsBusy.delete(user.uuid);
+		} else {
+			this.friendsAway.delete(user.uuid);
+			this.friendsOnline.delete(user.uuid);
+			this.friendsBusy.add(user.uuid);
 		}
 		htmlManager.friendlist.updateStatus(user.uuid, user.status, change);
+		htmlManager.lobby.updateInviteCustom(user.uuid, user.status == "online");
 	}
 
 	public addFriend(user: ISearchRequestResponce) {
 		htmlManager.friendlist.addFriend(user);
-		if (user.status !== "offline")
+		if (user.status == "online")
 			this.friendsOnline.add(user.uuid);
-		else
+		else if (user.status == "offline")
 			this.friendsAway.add(user.uuid);
+		else
+			this.friendsBusy.add(user.uuid);
 	}
 
 	public requestFriends() {

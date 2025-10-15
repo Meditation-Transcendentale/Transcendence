@@ -28,6 +28,7 @@ export class TournamentRoute implements IRoute {
 	public async unload(): Promise<void> {
 		if (!this._loaded)
 			return;
+		this._loaded = false;
 		htmlManager.tournament.unload();
 		streamManager.tournament.disconnect();
 	}

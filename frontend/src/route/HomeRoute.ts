@@ -43,16 +43,10 @@ export class HomeRoute implements IRoute {
 		htmlManager.cube.name = "PLAY";
 		htmlManager.cube.enable = true;
 		htmlManager.cube.clickEvent = () => routeManager.nav("/play", false, false);
-		sceneManager.ballGrass.ballOrigin.set(0, 0, -10);
-		// htmlManager.cube.clickEvent = () => {
-		// 	document.body.appendChild(this.test);
-		// 	this.test.focus();
-		// };
-
+		sceneManager.ballGrass.ballOrigin.set(0, 0, -7);
 	}
 
 	public async unload() {
-		// htmlManager.home.unload();
 	}
 
 }

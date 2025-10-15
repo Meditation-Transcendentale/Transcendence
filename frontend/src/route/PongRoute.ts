@@ -30,6 +30,7 @@ export class PongRoute implements IRoute {
 	public async unload(): Promise<void> {
 		if (!this._loaded)
 			return;
+		this._loaded = false;
 		gameManager.stopPong();
 	}
 }

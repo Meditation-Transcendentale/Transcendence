@@ -38,6 +38,8 @@ export class LobbyHtml implements IHtml {
 	private invites: Map<string, HTMLDivElement>;
 	private needUpdateInvite: boolean;
 
+	public loaded = false;
+
 
 
 	constructor() {
@@ -117,6 +119,7 @@ export class LobbyHtml implements IHtml {
 	}
 
 	public load(): void {
+		this.loaded = true;
 		this.needUpdateInvite = true;
 		this.playersList.innerHTML = "";
 		this.lobbyId.innerHTML = stateManager.lobbyId;
@@ -129,6 +132,7 @@ export class LobbyHtml implements IHtml {
 	}
 
 	public unload(): void {
+		this.loaded = false;
 		sceneManager.css3dRenderer.setObjectEnable("lobby-players", false);
 		sceneManager.css3dRenderer.setObjectEnable("lobby-info", false);
 		sceneManager.css3dRenderer.setObjectEnable("lobby-invite", false);
@@ -225,6 +229,17 @@ export class LobbyHtml implements IHtml {
 			}
 			if (b && !this.invites.has(i))
 				this.createPlayerInvite(i);
+		}
+	}
+
+	public updateInviteCustom(uuid: string, value: boolean) {
+		if (!this.loaded)
+			return;
+		if (value && !this.invites.has(uuid)) {
+			this.createPlayerInvite(uuid);
+		} else if (!value) {
+			this.invites.get(uuid)?.remove();
+			this.invites.delete(uuid);
 		}
 	}
 
