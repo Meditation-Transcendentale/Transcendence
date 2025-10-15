@@ -1,59 +1,56 @@
 .friendlist-toggle {
-	/* background-color: var(--color-purple); */
-	background-color: #0d022180;
-	color: white;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
+	color: transparent;
 	font-family: var(--font-primary);
-	font-size: var(--font-size-tiny);
-	padding: var(--spacing-sm) var(--spacing-md);
-	border: none;
-	border-radius: var(--font-size-tiny);
+	font-size: 0;
+	width: 5vh;
+	height: 5vh;
+	padding: var(--spacing-m);
+	border: 1px solid rgba(221, 168, 252, 0.2);
+	border-radius: 0px;
 	cursor: pointer;
-	box-shadow: 0 3px 6px rgba(114, 9, 183, 0.6);
-	transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+	transition: all 0.3s ease;
 	user-select: none;
-	/* line-height: var(--font-size-tiny); */
-	/* align-items: center; */
 	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	overflow: hidden;
-	/* or flex */
-	/* vertical-align: middle; */
-	outline: 2px solid var(--color-lavender);
 	position: absolute;
-	bottom: var(--spacing-sm);
-	right: var(--spacing-sm);
+	bottom: var(--spacing-lg);
+	right: var(--spacing-lg);
+	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.1);
+}
 
+.friendlist-toggle::before {
+	content: '';
+	width: 100%;
+	height: 100%;
+	background: url('/assets/group.png') no-repeat center center;
+	background-size: contain;
+	display: block;
+	filter: brightness(0) saturate(100%) invert(85%) sepia(28%) saturate(1076%) hue-rotate(210deg) brightness(104%) contrast(101%);
 }
 
 .friendlist-toggle:hover {
-	color: white;
-	transform: translate3d(0, 0, 0) scale(1.05);
-	box-shadow: 1px 1px 1px black, -1px -1px 1px black;
-	text-shadow:
-		0 0 7px #fff,
-		0 0 10px #fff,
-		0 0 21px #fff,
-		0 0 42px #c77dff,
-		0 0 82px #c77dff,
-		0 0 92px #c77dff,
-		0 0 102px #c77dff,
-		0 0 151px #c77dff;
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.7), rgba(60, 9, 108, 0.5));
+	border-color: rgba(221, 168, 252, 0.4);
+	box-shadow: 0 4px 20px rgba(13, 2, 33, 0.6),
+	            0 0 30px rgba(157, 78, 221, 0.2);
 }
 
-
-/* .friendlist-toggle:hover { */
-/* 	background-color: var(--color-purple-bright); */
-/* 	box-shadow: 0 4px 12px rgba(157, 78, 221, 0.8); */
-/* } */
+.friendlist-toggle:hover::before {
+	filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(200%) contrast(100%);
+}
 
 .friendlist-toggle:active {
-	/* background-color: var(--color-purple-dark); */
-	background-color: #0d022180;
-	box-shadow: 0 2px 4px rgba(92, 24, 154, 0.9);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.8), rgba(36, 0, 70, 0.6));
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.7);
 }
 
 .friendlist-toggle:focus {
-	outline: 2px solid var(--color-lavender);
-	outline-offset: 2px;
+	outline: none;
 }
 
 /*
@@ -61,7 +58,7 @@
  * */
 .friendlist-container {
 	position: absolute;
-	bottom: var(--font-size-base);
+	bottom: calc(5vh + var(--spacing-lg) + var(--spacing-lg));
 	right: 0px;
 	font-family: var(--font-primary);
 	color: var(--color-lavender);
@@ -87,54 +84,61 @@
 
 .friendlist-form>button {
 	flex: 1;
-	/* background-color: var(--color-purple-medium); */
-	background-color: #0d0221;
-	border: none;
-	border-radius: var(--spacing-xs) var(--spacing-sm) 0 0;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(221, 168, 252, 0.3);
+	border-radius: 0px;
+	border-bottom: none;
 	color: var(--color-lavender);
 	font-weight: var(--font-weight-normal);
 	cursor: pointer;
-	padding: var(--spacing-xs) 0;
-	transition: background-color var(--transition-fast);
+	padding: var(--spacing-m) 0;
+	transition: all 0.3s ease;
 	user-select: none;
-	font-size: var(--font-size-button);
+	font-size: var(--font-size-verysmall);
 	line-height: 1.2;
 }
 
 .friendlist-form>button:hover {
-	background-color: var(--color-purple-bright);
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.7), rgba(60, 9, 108, 0.5));
+	border-color: rgba(221, 168, 252, 0.4);
+	color: white;
+	text-shadow: 0 0 10px rgba(199, 125, 255, 0.6);
 }
 
 .friendlist-form>button:active {
-	background-color: var(--color-purple-medium);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.8), rgba(36, 0, 70, 0.6));
 }
 
 .friendlist-form>button[click] {
-	background-color: var(--color-lavender);
-	color: var(--color-purple-dark);
+	background: linear-gradient(135deg, rgba(157, 78, 221, 0.4), rgba(199, 125, 255, 0.3));
+	border-color: rgba(221, 168, 252, 0.5);
+	color: var(--color-lavender);
 	cursor: default;
+	box-shadow: 0 0 20px rgba(157, 78, 221, 0.2);
 }
 
 .friendlist-content,
 .request-container,
 .searchContainer {
 	color: var(--color-lavender);
-	/* background-color: rgba(90, 24, 154, 0.4); */
-	background-color: #0d022180;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.95), rgba(36, 0, 70, 0.9));
+	backdrop-filter: blur(15px);
 	width: 100%;
 	flex-grow: 1;
 	min-height: 140px;
-	padding: var(--spacing-md);
-	border: var(--spacing-sm) solid var(--color-lavender);
-	/* border-top-right-radius: var(--spacing-m); */
-	border-bottom-right-radius: var(--spacing-m);
-	border-bottom-left-radius: var(--spacing-m);
+	padding: var(--spacing-lg);
+	border: 1px solid rgba(221, 168, 252, 0.3);
+	border-radius: 0px;
 	overflow-y: auto;
 	box-sizing: border-box;
 	font-size: var(--font-size-verysmall);
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-xs);
+	gap: var(--spacing-m);
+	box-shadow: 0 8px 32px rgba(13, 2, 33, 0.8),
+	            0 0 40px rgba(90, 24, 154, 0.2),
+	            inset 0 1px 0 rgba(221, 168, 252, 0.1);
 }
 
 .friendlist-online-content,
@@ -147,25 +151,68 @@
 .friendlist-user {
 	display: flex;
 	align-items: center;
-	background-color: var(--color-purple-medium);
-	border-radius: var(--spacing-xs);
-	padding: var(--spacing-xs) var(--spacing-sm);
-	gap: var(--spacing-xs);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
+	border-left: 3px solid rgba(221, 168, 252, 0.2);
+	border-top: 1px solid rgba(221, 168, 252, 0.2);
+	border-right: 1px solid rgba(221, 168, 252, 0.2);
+	border-bottom: 1px solid rgba(221, 168, 252, 0.2);
+	border-radius: 0px;
+	padding: var(--spacing-m) var(--spacing-m);
+	gap: var(--spacing-m);
 	box-sizing: border-box;
 	width: 100%;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	font-size: var(--font-size-verysmall);
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
+}
+
+.friendlist-user:hover {
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.7), rgba(60, 9, 108, 0.5));
+	border-color: rgba(221, 168, 252, 0.4);
+	box-shadow: 0 2px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.2);
+}
+
+/* Status-based left border colors */
+.friendlist-user:has(.friendlist-status[status="online"]) {
+	border-left-color: #4ade80;
+}
+
+.friendlist-user:has(.friendlist-status[status="offline"]) {
+	border-left-color: #6b7280;
+}
+
+.friendlist-user:has(.friendlist-status[status="away"]) {
+	border-left-color: #fbbf24;
+}
+
+.friendlist-user:has(.friendlist-status[status="in-game"]),
+.friendlist-user:has(.friendlist-status[status="ingame"]) {
+	border-left-color: #c77dff;
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3),
+	            -3px 0 10px rgba(199, 125, 255, 0.2);
+}
+
+.friendlist-profile {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: var(--spacing-m);
 }
 
 .friendlist-profile>img {
-	flex: 0 0 var(--font-size-verysmall);
-	width: var(--font-size-verysmall);
-	height: var(--font-size-verysmall);
+	flex: 0 0 var(--font-size-tiny);
+	width: var(--font-size-tiny);
+	height: var(--font-size-tiny);
 	border-radius: 50%;
+	border: 2px solid rgba(221, 168, 252, 0.4);
 	object-fit: cover;
 	user-select: none;
+	box-shadow: 0 0 10px rgba(157, 78, 221, 0.3);
 }
 
 .friendlist-profile>span {
@@ -176,10 +223,11 @@
 	color: var(--color-lavender);
 	font-weight: var(--font-weight-bold);
 	user-select: text;
+	line-height: var(--font-size-tiny);
 }
 
 .friendlist-status {
-	flex: 0 0 60px !important;
+	flex: 0 0 70px !important;
 	background-color: transparent;
 	border: none;
 	font-weight: var(--font-weight-normal);
@@ -187,43 +235,110 @@
 	user-select: none;
 	font-size: var(--font-size-verysmall);
 	font-style: italic;
-	color: var(--color-purple-bright);
+	position: relative;
+	padding-left: var(--spacing-lg);
 }
 
-.friendlist-status:not([status="offline"]) {
-	color: var(--color-lavender);
+/* Status indicator dot */
+.friendlist-status::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 1vh;
+	height: 1vh;
+	border-radius: 50%;
+	box-shadow: 0 0 8px currentColor;
+}
+
+/* Online status - Green */
+.friendlist-status[status="online"] {
+	color: #4ade80;
+}
+
+.friendlist-status[status="online"]::before {
+	background-color: #4ade80;
+}
+
+/* Offline status - Gray */
+.friendlist-status[status="offline"] {
+	color: #6b7280;
+}
+
+.friendlist-status[status="offline"]::before {
+	background-color: #6b7280;
+}
+
+/* Away status - Yellow/Orange */
+.friendlist-status[status="away"] {
+	color: #fbbf24;
+}
+
+.friendlist-status[status="away"]::before {
+	background-color: #fbbf24;
+}
+
+/* In-game status - Purple */
+.friendlist-status[status="in-game"],
+.friendlist-status[status="ingame"] {
+	color: #c77dff;
+}
+
+.friendlist-status[status="in-game"]::before,
+.friendlist-status[status="ingame"]::before {
+	background-color: #c77dff;
+	animation: pulse-status 2s ease-in-out infinite;
+}
+
+@keyframes pulse-status {
+	0%, 100% {
+		opacity: 1;
+		box-shadow: 0 0 8px currentColor;
+	}
+	50% {
+		opacity: 0.5;
+		box-shadow: 0 0 15px currentColor;
+	}
 }
 
 .friendlist-button {
-	flex: 0 0 40px;
-	background-color: var(--color-purple-bright);
-	border: none;
-	border-radius: var(--spacing-xs);
+	flex: 0 0 50px;
+	background: linear-gradient(135deg, rgba(157, 78, 221, 0.4), rgba(199, 125, 255, 0.3));
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(221, 168, 252, 0.3);
+	border-radius: 0px;
 	color: var(--color-lavender);
 	cursor: pointer;
 	font-weight: var(--font-weight-bold);
-	transition: background-color var(--transition-fast);
+	transition: all 0.3s ease;
 	user-select: none;
-	font-size: var(--font-size-button);
+	font-size: var(--font-size-verysmall);
 	line-height: 1;
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
 }
 
 .friendlist-button:hover {
-	background-color: var(--color-purple-light);
+	background: linear-gradient(135deg, rgba(157, 78, 221, 0.6), rgba(199, 125, 255, 0.5));
+	border-color: rgba(221, 168, 252, 0.5);
+	color: white;
+	text-shadow: 0 0 10px rgba(199, 125, 255, 0.6);
+	box-shadow: 0 2px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.3);
 }
 
 .friendlist-button:active {
-	background-color: var(--color-purple-bright);
+	background: linear-gradient(135deg, rgba(157, 78, 221, 0.3), rgba(199, 125, 255, 0.2));
 }
 
 /* Special handling for last button on request */
 .friendlist-button:nth-last-child(1) {
 	margin-left: var(--spacing-xs);
-	background-color: var(--color-purple-dark);
+	background: linear-gradient(135deg, rgba(60, 9, 108, 0.6), rgba(90, 24, 154, 0.4));
 }
 
 .friendlist-button:nth-last-child(1):hover {
-	background-color: var(--color-purple-medium);
+	background: linear-gradient(135deg, rgba(90, 24, 154, 0.7), rgba(114, 9, 183, 0.5));
 }
 
 /* Search container form */
@@ -237,15 +352,24 @@
 .friendlist-search-form input[type="search"] {
 	flex: 1;
 	width: 100%;
-	padding: var(--spacing-xs) var(--spacing-sm);
-	border-radius: var(--spacing-xs);
-	border: 1px solid var(--color-lavender);
-	background-color: var(--color-space-deep);
+	padding: var(--spacing-m) var(--spacing-m);
+	border-radius: 0px;
+	border: 1px solid rgba(221, 168, 252, 0.3);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
 	color: var(--color-lavender);
-	font-size: var(--font-size-input);
+	font-size: var(--font-size-verysmall);
 	outline: none;
 	user-select: text;
 	box-sizing: border-box;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
+}
+
+.friendlist-search-form input[type="search"]:focus {
+	border-color: rgba(221, 168, 252, 0.5);
+	box-shadow: 0 2px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.2);
 }
 
 .friendlist-search-form input[type="search"]::placeholder {
@@ -253,25 +377,32 @@
 }
 
 .friendlist-search-form button[type="submit"] {
-	background-color: var(--color-purple-medium);
-	border: none;
-	border-radius: var(--spacing-xs);
+	background: linear-gradient(135deg, rgba(90, 24, 154, 0.6), rgba(114, 9, 183, 0.4));
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(221, 168, 252, 0.3);
+	border-radius: 0px;
 	color: var(--color-lavender);
 	font-weight: var(--font-weight-bold);
 	cursor: pointer;
-	padding: var(--spacing-xs) var(--spacing-sm);
-	transition: background-color var(--transition-fast);
+	padding: var(--spacing-m) var(--spacing-lg);
+	transition: all 0.3s ease;
 	user-select: none;
-	font-size: var(--font-size-button);
+	font-size: var(--font-size-verysmall);
 	line-height: 1;
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
 }
 
 .friendlist-search-form button[type="submit"]:hover {
-	background-color: var(--color-purple-bright);
+	background: linear-gradient(135deg, rgba(114, 9, 183, 0.7), rgba(157, 78, 221, 0.5));
+	border-color: rgba(221, 168, 252, 0.5);
+	color: white;
+	text-shadow: 0 0 10px rgba(199, 125, 255, 0.6);
+	box-shadow: 0 2px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.3);
 }
 
 .friendlist-search-form button[type="submit"]:active {
-	background-color: var(--color-purple-medium);
+	background: linear-gradient(135deg, rgba(60, 9, 108, 0.8), rgba(90, 24, 154, 0.6));
 }
 
 .friendlist-search-results {

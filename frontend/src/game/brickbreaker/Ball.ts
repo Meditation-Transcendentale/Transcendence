@@ -29,14 +29,14 @@ export class Ball {
 		this.game = game;
 
 		this.matTouched = new StandardMaterial("touchedMat", this.scene);
-		this.matTouched.diffuseColor.set(0, 0, 0);
-		this.matTouched.specularColor.set(0, 0, 0);
-		this.matTouched.emissiveColor.set(1,0,0);
+		// this.matTouched.diffuseColor.set(1, 0, 0);
+		// this.matTouched.specularColor.set(5., 0, 0.);
+		this.matTouched.emissiveColor.set(200, 0, 0);
 		// this.matTouched
 		this.matUntouched = new StandardMaterial("untouchedMat", this.scene);
-		this.matUntouched.diffuseColor.set(0, 0, 0);
-		this.matUntouched.specularColor.set(0, 0, 0);
-		this.matUntouched.emissiveColor.set(0,0,1);
+		// this.matUntouched.diffuseColor.set(0, 0, 1);
+		// this.matUntouched.specularColor.set(0, 0, 5);
+		this.matUntouched.emissiveColor.set(0, 0, 200);
 	}
 
 	public updatePosition(x: number, z: number): void {
@@ -192,7 +192,7 @@ export class Ball {
 
 	// private endGame() {
 	// 	// end screen UI
-		
+
 	// 	this.game.end();
 	// 	// this.game.dispose();
 	// }

@@ -12,16 +12,28 @@
 	position: relative;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 8px;
-	background-color: #0d0221;
-	padding: 6px;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
+	padding: 8px 12px;
 	border-radius: 0px;
 	cursor: pointer;
 	color: #dda8fc;
-	border: 2px solid #dda8fc;
+	border: 1px solid rgba(221, 168, 252, 0.2);
+	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.1);
 	font-size: var(--font-size-base);
 	line-height: 0;
 	margin-right: var(--spacing-lg);
+	transition: all 0.3s ease;
+}
+
+#ath-home:hover {
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.7), rgba(60, 9, 108, 0.5));
+	border-color: rgba(221, 168, 252, 0.4);
+	box-shadow: 0 4px 20px rgba(13, 2, 33, 0.6),
+	            0 0 30px rgba(157, 78, 221, 0.2);
 }
 
 #ath-profile-section {
@@ -29,20 +41,32 @@
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	background-color: #0d0221;
-	padding: 6px;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
+	padding: 8px 12px;
 	border-radius: 0px;
 	cursor: pointer;
 	color: #dda8fc;
-	border: 2px solid #dda8fc;
+	border: 1px solid rgba(221, 168, 252, 0.2);
+	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.1);
+	transition: all 0.3s ease;
+}
+
+#ath-profile-section:hover {
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.7), rgba(60, 9, 108, 0.5));
+	border-color: rgba(221, 168, 252, 0.4);
+	box-shadow: 0 4px 20px rgba(13, 2, 33, 0.6),
+	            0 0 30px rgba(157, 78, 221, 0.2);
 }
 
 #ath-profile-section img {
 	width: 40px;
 	height: 40px;
 	border-radius: 50%;
-	border: 1px solid #dda8fc;
+	border: 2px solid rgba(221, 168, 252, 0.4);
 	object-fit: cover;
+	box-shadow: 0 0 10px rgba(157, 78, 221, 0.3);
 }
 
 #ath-trigger {
@@ -57,20 +81,64 @@
 	top: 100%;
 	right: 0;
 	left: 0;
-	background-color: #0d0221;
-	border: 2px solid #dda8fc;
-	margin-top: 5px;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.95), rgba(36, 0, 70, 0.9));
+	backdrop-filter: blur(15px);
+	border: 1px solid rgba(221, 168, 252, 0.25);
+	border-radius: 0px;
+	margin-top: 8px;
 	min-width: auto;
 	visibility: hidden;
+	opacity: 0;
 	overflow: hidden;
-	transition: all 0.3s ease;
-	transform: translateY(-10px);
+	transform-origin: top center;
+	transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+	transform: translateY(-20px) scaleY(0.3);
+	box-shadow: 0 8px 32px rgba(13, 2, 33, 0.8),
+	            0 0 40px rgba(90, 24, 154, 0.2),
+	            inset 0 1px 0 rgba(221, 168, 252, 0.1);
+}
+
+#ath-dropdown[style*="visibility: visible"] {
+	visibility: visible;
+	opacity: 1;
+	transform: translateY(0) scaleY(1);
+}
+
+#ath-menu-item-profile,
+#ath-menu-item-settings,
+#ath-menu-item-logout {
+	opacity: 0;
+	transform: translateX(-20px);
+	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#ath-dropdown[style*="visibility: visible"] #ath-menu-item-profile {
+	animation: slideInMenuItem 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
+}
+
+#ath-dropdown[style*="visibility: visible"] #ath-menu-item-settings {
+	animation: slideInMenuItem 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+}
+
+#ath-dropdown[style*="visibility: visible"] #ath-menu-item-logout {
+	animation: slideInMenuItem 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+}
+
+@keyframes slideInMenuItem {
+	from {
+		opacity: 0;
+		transform: translateX(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
 }
 
 #settings-div {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
+	gap: 16px;
 }
 
 #change-username-btn,
@@ -82,18 +150,19 @@
 #change-password-popup button,
 #change-avatar-popup button,
 #update-2fa-popup button {
-	background-color: #0d0221;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
 	color: #dda8fc;
-	border: 1px solid #dda8fc;
+	border: 1px solid rgba(221, 168, 252, 0.3);
 	font-family: Andale Mono, monospace;
-	padding: 8px;
+	padding: 12px 16px;
 	cursor: pointer;
-	font-size: 14px;
-	transition: background-color 0.3s ease;
+	font-size: 16px;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.1);
 }
 
-#ath-home:hover,
-#ath-profile-section:hover span,
 #change-username-btn:hover,
 #change-password-btn:hover,
 #change-avatar-btn:hover,
@@ -103,18 +172,12 @@
 #change-password-popup button:hover,
 #change-avatar-popup button:hover,
 #update-2fa-popup button:hover {
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.7), rgba(60, 9, 108, 0.5));
+	border-color: rgba(221, 168, 252, 0.5);
+	box-shadow: 0 4px 20px rgba(13, 2, 33, 0.6),
+	            0 0 30px rgba(157, 78, 221, 0.3);
 	color: white;
-	transform: translate3d(0, 0, 0) scale(1.05);
-	box-shadow: 1px 1px 1px black, -1px -1px 1px black;
-	text-shadow:
-		0 0 7px #fff,
-		0 0 10px #fff,
-		0 0 21px #fff,
-		0 0 42px #c77dff,
-		0 0 82px #c77dff,
-		0 0 92px #c77dff,
-		0 0 102px #c77dff,
-		0 0 151px #c77dff;
+	text-shadow: 0 0 10px rgba(199, 125, 255, 0.6);
 }
 
 #ath-menu-item-profile:hover,
@@ -149,21 +212,43 @@
 	outline: none;
 }
 
-#settings-popup,
+#settings-popup {
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.95), rgba(36, 0, 70, 0.9));
+	backdrop-filter: blur(15px);
+	color: #dda8fc;
+	border: 1px solid rgba(221, 168, 252, 0.3);
+	font-family: Andale Mono, monospace;
+	padding: 24px;
+	padding-top: 20px;
+	border-radius: 0px;
+	cursor: default;
+	font-size: 22px;
+	min-width: 350px;
+	max-width: 450px;
+	box-shadow: 0 8px 32px rgba(13, 2, 33, 0.8),
+	            0 0 40px rgba(90, 24, 154, 0.2),
+	            inset 0 1px 0 rgba(221, 168, 252, 0.1);
+}
+
 #logout-popup,
 #change-username-popup,
 #change-password-popup,
 #change-avatar-popup,
 #update-2fa-popup {
-	background-color: #0d022180;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.95), rgba(36, 0, 70, 0.9));
+	backdrop-filter: blur(15px);
 	color: #dda8fc;
-	border: 1px solid #dda8fc;
+	border: 1px solid rgba(221, 168, 252, 0.3);
 	font-family: Andale Mono, monospace;
-	padding: 15px;
-	padding-top: 10px;
-	border-radius: 1px;
-	cursor: pointer;
-	font-size: 18px;
+	padding: 24px;
+	padding-top: 20px;
+	border-radius: 0px;
+	cursor: default;
+	font-size: 22px;
+	min-width: 400px;
+	box-shadow: 0 8px 32px rgba(13, 2, 33, 0.8),
+	            0 0 40px rgba(90, 24, 154, 0.2),
+	            inset 0 1px 0 rgba(221, 168, 252, 0.1);
 }
 
 #settings-popup header,
@@ -172,8 +257,11 @@
 #change-password-popup header,
 #change-avatar-popup header,
 #update-2fa-popup header {
-	margin-bottom: 10px;
+	margin-bottom: 20px;
 	text-align: center;
+	font-size: 24px;
+	font-weight: bold;
+	text-shadow: 0 2px 10px rgba(157, 78, 221, 0.4);
 }
 
 #logout-popup footer,
@@ -182,31 +270,44 @@
 #update-2fa-popup footer {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 10px;
-	margin-top: 10px;
+	gap: 16px;
+	margin-top: 20px;
 }
 
 #change-username-popup input,
 #change-password-popup input,
 #change-avatar-popup input,
 #update-2fa-popup input {
-	background-color: #0d022180;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
 	color: #dda8fc;
-	border: 1px solid #dda8fc;
+	border: 1px solid rgba(221, 168, 252, 0.3);
 	font-family: Andale Mono, monospace;
-	border-radius: 4px !important;
-	padding: 6px;
+	border-radius: 0px !important;
+	padding: 12px;
 	cursor: text;
-	font-size: 12px;
-	margin-top: 2px
+	font-size: 16px;
+	margin-top: 8px;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
+}
+
+#change-username-popup input:focus,
+#change-password-popup input:focus,
+#change-avatar-popup input:focus,
+#update-2fa-popup input:focus {
+	border-color: rgba(221, 168, 252, 0.5);
+	box-shadow: 0 2px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.2);
 }
 
 #avatar-preview-img {
-	border: 1px solid #dda8fc !important;
+	border: 2px solid rgba(221, 168, 252, 0.4) !important;
 	align-self: center !important;
-	width: 100px !important;
-	height: 100px !important;
+	width: 120px !important;
+	height: 120px !important;
 	object-fit: cover !important;
 	border-radius: 50% !important;
-	margin-top: 6px !important;
+	margin-top: 12px !important;
+	box-shadow: 0 0 20px rgba(157, 78, 221, 0.3) !important;
 }

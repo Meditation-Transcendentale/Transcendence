@@ -22,33 +22,43 @@
 	flex: 10;
 	overflow: scroll !important;
 	pointer-events: all !important;
-	border: var(--spacing-sm) var(--color-purple-light) solid;
-	padding: var(--spacing-sm);
+	border: 1px solid rgba(221, 168, 252, 0.2);
+	padding: var(--spacing-lg);
 	margin: var(--spacing-md);
-	background-color: rgba(93, 64, 112, 0.2);
-	/* matching existing theme */
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.3), rgba(36, 0, 70, 0.2));
+	backdrop-filter: blur(10px);
 	border-left-style: none;
 	border-right-style: none;
+	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.3),
+	            0 0 20px rgba(157, 78, 221, 0.1);
 }
 
 .join-lobby__content {
 	display: flex;
 	flex: auto;
 	height: fit-content;
-	font-size: var(--font-size-tiny);
+	font-size: var(--font-size-small);
+	border: 1px solid rgba(221, 168, 252, 0.25);
 	margin: var(--spacing-md);
-	background-color: rgba(255, 255, 255, 0.1);
-	/* softer for dark theme */
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.4), rgba(36, 0, 70, 0.3));
+	backdrop-filter: blur(10px);
 	color: var(--color-lavender);
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
+	cursor: pointer;
+	transition: all 0.3s ease;
 }
 
 .join-lobby__content:hover {
-	background-color: rgba(255, 255, 255, 0.3);
-	color: var(--color-space-deepest);
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.7), rgba(60, 9, 108, 0.5));
+	border-color: rgba(221, 168, 252, 0.5);
+	color: white;
+	text-shadow: 0 0 10px rgba(199, 125, 255, 0.6);
+	box-shadow: 0 2px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.2);
 }
 
 .join-lobby__content:active {
-	background-color: rgba(255, 255, 255, 0.1);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.8), rgba(36, 0, 70, 0.6));
 	color: var(--color-lavender);
 }
 
@@ -82,24 +92,30 @@
 	display: grid;
 	overflow: scroll !important;
 	pointer-events: all !important;
-	border: var(--spacing-sm) var(--color-purple-light) solid;
-	padding: var(--spacing-sm);
+	border: 1px solid rgba(221, 168, 252, 0.2);
+	padding: var(--spacing-lg);
 	margin: var(--spacing-md);
-	background-color: rgba(93, 64, 112, 0.2);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.3), rgba(36, 0, 70, 0.2));
+	backdrop-filter: blur(10px);
 	border-left-style: none;
 	border-right-style: none;
 	color: var(--color-lavender);
+	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.3),
+	            0 0 20px rgba(157, 78, 221, 0.1);
 }
 
 .join-info__id {
 	grid-column: 1 / 5;
 	grid-row: 1 / 2;
-	margin: var(--spacing-sm);
+	margin: var(--spacing-md);
 	padding: var(--spacing-sm);
-	background-color: rgba(255, 255, 255, 0.1);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.4), rgba(36, 0, 70, 0.3));
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(221, 168, 252, 0.25);
 	text-align: center;
-	font-size: var(--font-size-tiny);
+	font-size: var(--font-size-small);
 	height: fit-content;
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
 }
 
 .join-info--left {
@@ -107,12 +123,13 @@
 	grid-row: 2 / 3;
 	display: block;
 	font-size: var(--font-size-verysmall);
-	border: var(--spacing-xs) var(--color-purple-light) solid;
+	border: 1px solid rgba(221, 168, 252, 0.25);
 	margin: var(--spacing-sm);
 	padding: var(--spacing-sm);
 	margin-top: var(--spacing-md);
-	background-color: rgba(157, 78, 221, 0.2);
-	/* consistent with theme */
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.4), rgba(36, 0, 70, 0.3));
+	backdrop-filter: blur(10px);
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
 }
 
 .join-info--left>span {
@@ -126,13 +143,15 @@
 	display: block;
 	min-height: 10vh;
 	font-size: var(--font-size-verysmall);
-	border: var(--spacing-xs) var(--color-purple-light) solid;
+	border: 1px solid rgba(221, 168, 252, 0.25);
 	margin: var(--spacing-sm);
 	padding: var(--spacing-sm);
 	margin-top: var(--spacing-md);
-	background-color: rgba(157, 78, 221, 0.2);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.4), rgba(36, 0, 70, 0.3));
+	backdrop-filter: blur(10px);
 	overflow-y: scroll;
 	overflow-x: hidden;
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
 }
 
 .join-info__button {
@@ -140,25 +159,33 @@
 	grid-row: 3/ 4;
 	font-size: var(--font-size-small);
 	margin: var(--spacing-md);
-	background-color: var(--color-space-deepest);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
 	color: var(--color-lavender);
-	border: none;
+	border: 1px solid rgba(221, 168, 252, 0.3);
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
 }
 
 .join-info__button:hover {
-	background-color: var(--color-lavender);
-	color: var(--color-space-deepest);
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.7), rgba(60, 9, 108, 0.5));
+	border-color: rgba(221, 168, 252, 0.5);
+	color: white;
+	text-shadow: 0 0 10px rgba(199, 125, 255, 0.6);
+	box-shadow: 0 2px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.2);
 }
 
 .join-info__button:active {
-	background-color: var(--color-space-deepest);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.8), rgba(36, 0, 70, 0.6));
 	color: var(--color-lavender);
 }
 
 .join-info__button:disabled {
-	background-color: rgba(93, 64, 112, 0.2);
-	color: rgba(224, 170, 255, 0.2);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.3), rgba(36, 0, 70, 0.2));
+	color: rgba(221, 168, 252, 0.3);
 	pointer-events: none;
+	border-color: rgba(221, 168, 252, 0.15);
 }
 
 .join-info__players {
@@ -169,8 +196,12 @@
 	display: block;
 	width: 100%;
 	text-align: center;
-	background-color: rgba(93, 64, 112, 0.2);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.5), rgba(36, 0, 70, 0.3));
+	backdrop-filter: blur(10px);
 	margin: var(--spacing-sm);
+	padding: var(--spacing-xs);
+	border: 1px solid rgba(221, 168, 252, 0.2);
+	box-shadow: 0 2px 8px rgba(13, 2, 33, 0.2);
 }
 
 /* ====================================
@@ -186,24 +217,31 @@
 	flex: 10;
 	display: block;
 	pointer-events: all !important;
-	border: var(--spacing-sm) var(--color-purple-light) solid;
-	padding: var(--spacing-sm);
+	border: 1px solid rgba(221, 168, 252, 0.2);
+	padding: var(--spacing-lg);
 	margin: var(--spacing-md);
-	background-color: rgba(93, 64, 112, 0.2);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.3), rgba(36, 0, 70, 0.2));
+	backdrop-filter: blur(10px);
 	border-left-style: none;
 	border-right-style: none;
 	color: var(--color-lavender);
 	overflow: hidden;
 	height: fit-content;
+	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.3),
+	            0 0 20px rgba(157, 78, 221, 0.1);
 }
 
 .join-input__input {
 	all: unset;
 	display: block;
 	height: fit-content;
-	background-color: rgba(255, 255, 255, 0.1);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.4), rgba(36, 0, 70, 0.3));
+	backdrop-filter: blur(10px);
 	color: var(--color-lavender);
 	font-size: var(--font-size-small);
 	overflow: hidden;
 	text-align: center;
+	border: 1px solid rgba(221, 168, 252, 0.25);
+	padding: var(--spacing-sm);
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
 }

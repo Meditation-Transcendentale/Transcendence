@@ -89,15 +89,11 @@
 #button-module {
 	position: absolute;
 	pointer-events: auto;
-	background: transparent;
-	border-radius: 8px;
-	/* padding: 10px 15px; */
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
+	border-radius: 0px;
 	color: #e0aaff;
 	font-family: 'spacegrotesk', sans-serif;
-	/* backdrop-filter: blur(5px); */
-	/* transition: all 0.3s ease; */
-
-	/* min-height: 40px; */
 
 	top: 20px;
 	left: 20px;
@@ -107,93 +103,43 @@
 	justify-content: center;
 	user-select: none;
 
-	--borderWidth: 3px;
-	position: relative;
+	border: 1px solid rgba(221, 168, 252, 0.2);
+	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.1);
+	transition: all 0.3s ease;
 }
 
-#timer-module:after,
-.game-button:after {
-	content: '';
-	position: absolute;
-	top: calc(-1 * var(--borderWidth));
-	left: calc(-1 * var(--borderWidth));
-	height: calc(100% + var(--borderWidth) * 2);
-	width: calc(100% + var(--borderWidth) * 2);
-	background: linear-gradient(60deg,
-			#0d0221,
-			#240046,
-			#3c096c,
-			#5a189a,
-			#7209b7,
-			#9d4edd,
-			#c77dff,
-			#e0aaff);
-	border-radius: calc(2 * var(--borderWidth));
-	z-index: -1;
-	/* animation: animatedgradient 5s ease alternate infinite; */
-	background-size: 300% 300%;
-}
-
-@keyframes animatedgradient {
-	0% {
-		background-position: 0% 50%;
-	}
-
-	50% {
-		background-position: 100% 50%;
-	}
-
-	100% {
-		background-position: 0% 50%;
-	}
-}
-
-/* #button-module { */
-/* 	flex-direction: column; */
-/* 	min-height: auto; */
-/* 	justify-content: flex-start; */
-/* } */
 
 .game-button {
 	padding: 10px 15px;
-	background: transparent;
-	border: none;
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.6), rgba(36, 0, 70, 0.4));
+	backdrop-filter: blur(10px);
 	margin-right: 10px;
 	margin-left: 10px;
-	border-radius: 6px;
+	border-radius: 0px;
 	color: #e0aaff;
 	cursor: pointer;
-	transition: all 0.4s ease-in-out;
+	transition: all 0.3s ease;
 	min-width: 100px;
 	font-family: 'spacegrotesk', sans-serif;
 	font-size: 14px;
 	font-weight: 300;
-	box-shadow: 1px 1px 1px black, -1px -1px 1px black;
-	transform: translateZ(0);
-	backface-visibility: hidden;
-	-moz-osx-font-smoothing: grayscale;
-	will-change: transform;
-	transform-origin: center center;
+	border: 1px solid rgba(221, 168, 252, 0.3);
+	box-shadow: 0 2px 10px rgba(13, 2, 33, 0.3);
 }
 
 .game-button:hover {
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.7), rgba(60, 9, 108, 0.5));
+	border-color: rgba(221, 168, 252, 0.5);
 	color: white;
-	padding: 12px 17px;
-	transform: translate3d(0, 0, 0) scale(1.05);
-	box-shadow: 1px 1px 1px black, -1px -1px 1px black;
-	text-shadow:
-		0 0 7px #fff,
-		0 0 10px #fff,
-		0 0 21px #fff,
-		0 0 42px #c77dff,
-		0 0 82px #c77dff,
-		0 0 92px #c77dff,
-		0 0 102px #c77dff,
-		0 0 151px #c77dff;
+	text-shadow: 0 0 10px rgba(199, 125, 255, 0.6);
+	box-shadow: 0 2px 15px rgba(13, 2, 33, 0.5),
+	            0 0 20px rgba(157, 78, 221, 0.2);
 }
 
 .game-button:active {
-	transform: scale(0.95);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.8), rgba(36, 0, 70, 0.6));
+	color: var(--color-lavender);
 }
 
 .game-ui-container.pong #scorevs-module .score-value {
@@ -239,10 +185,11 @@
 	justify-content: center;
 
 	pointer-events: auto;
-	background: rgba(13, 2, 33, 0.9);
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.95), rgba(36, 0, 70, 0.9));
 	color: #e0aaff;
 	font-family: 'spacegrotesk', sans-serif;
-	backdrop-filter: blur(5px);
+	backdrop-filter: blur(15px);
+	box-shadow: inset 0 0 100px rgba(157, 78, 221, 0.1);
 }
 
 #ending-module .score-value {
@@ -374,9 +321,9 @@
 	}
 }
 
-table,
-th,
-td {
+.game-ui-container table,
+.game-ui-container th,
+.game-ui-container td {
 	padding: 10px;
 	border: 2px solid white;
 	border-collapse: collapse;
