@@ -1,6 +1,7 @@
 import { htmlManager } from "./html/HtmlManager";
 import { NotificationType } from "./html/NotificationHtml";
 import { getRequest, ISearchRequestResponce, postRequest } from "./networking/request";
+import { streamManager } from "./stream/StreamManager";
 
 interface IFriend {
 	username: string,
@@ -44,7 +45,8 @@ class UserC {
 
 					if (this._once) {
 						this._once = false;
-						this.requestFriends();
+						this.requestFriends()
+							.then(() => streamManager.notification.connect());
 					}
 					resolve(true);
 				})
@@ -84,27 +86,29 @@ class UserC {
 			this.friendsBusy.add(user.uuid);
 	}
 
-	public requestFriends() {
-		getRequest("friends/get/friendlist")
-			.then((json: any) => {
-				console.log(json);
-				this.setupFriends(json.friendlist);
-				htmlManager.friendlist.resetFriends(json.friendlist);
-			})
-		getRequest("friends/get/requests")
-			.then((json: any) => {
-				console.log(json);
-				htmlManager.friendlist.resetRequest(json.friendsRequests);
-			})
-
+	public async requestFriends() {
+		const json: any = await getRequest("friends/get/friendlist")
+			.catch((err) => htmlManager.notification.error(err));
+		if (json && json.friendlist) {
+			this.setupFriends(json.friendlist);
+			htmlManager.friendlist.resetFriends(json.friendlist);
+		}
+		const js: any = await getRequest("friends/get/requests")
+			.catch((err) => htmlManager.notification.error(err));
+		if (js && js.friendlist) {
+			htmlManager.friendlist.resetRequest(json.friendsRequests);
+		}
 	}
 
 	private setupFriends(update: Array<{ id: number, friend_username: string, friend_uuid: string, friend_status: string }>) {
 		for (let i = 0; i < update.length; i++) {
-			if (update[i].friend_status !== "offline")
+			if (update[i].friend_status == "online")
 				this.friendsOnline.add(update[i].friend_uuid);
-			else
+			else if (update[i].friend_status == "offline")
 				this.friendsAway.add(update[i].friend_uuid);
+			else {
+				this.friendsBusy.add(update[i].friend_uuid);
+			}
 		}
 	}
 

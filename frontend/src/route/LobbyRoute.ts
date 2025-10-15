@@ -33,6 +33,7 @@ export class LobbyRoute implements IRoute {
 		sceneManager.load("home");
 		htmlManager.cube.enable = false;
 		sceneManager.ballGrass.ballOrigin.set(9, 0, -1);
+		htmlManager.notification.clearGameInvite();
 	}
 
 	public async unload(): Promise<void> {
