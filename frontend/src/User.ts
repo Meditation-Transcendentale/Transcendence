@@ -84,6 +84,20 @@ class UserC {
 			this.friendsAway.add(user.uuid);
 		else
 			this.friendsBusy.add(user.uuid);
+		htmlManager.lobby.updateInviteCustom(user.uuid, user.status == "online");
+	}
+
+	public async addFriendBis(uuid: string) {
+		const json: any = await postRequest("info/search", { identifier: uuid, type: "uuid" })
+			.catch((err) => htmlManager.notification.error(err));
+		const status = json.data.status;
+		if (status == "online")
+			this.friendsOnline.add(uuid);
+		else if (status == "offline")
+			this.friendsAway.add(uuid);
+		else
+			this.friendsBusy.add(uuid);
+		htmlManager.lobby.updateInviteCustom(uuid, status == "online");
 	}
 
 	public async requestFriends() {
@@ -115,7 +129,9 @@ class UserC {
 	public removeFriend(uuid: string) {
 		this.friendsOnline.delete(uuid);
 		this.friendsAway.delete(uuid);
+		this.friendsBusy.delete(uuid);
 		htmlManager.friendlist.removeFriend(uuid);
+		htmlManager.lobby.updateInviteCustom(uuid, false);
 	}
 
 }

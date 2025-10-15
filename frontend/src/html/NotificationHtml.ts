@@ -71,6 +71,8 @@ export class NotificationHtml {
 
 	private defaultDuration = 3000;
 
+	private gameInviteHistory: Set<string>;
+
 	constructor() {
 		this.history = new Set<HTMLElement>();
 
@@ -80,6 +82,8 @@ export class NotificationHtml {
 
 		this.default = document.createElement("div");
 		this.default.className = "notification";
+
+		this.gameInviteHistory = new Set<string>;
 		//Add close button
 	}
 
@@ -176,6 +180,8 @@ export class NotificationHtml {
 	}
 
 	private addGameInvite(option: IGameInvite) {
+		if (this.gameInviteHistory.has(option.lobbyid))
+			return;
 		const div = this.default.cloneNode(true) as HTMLDivElement;
 		const label = document.createElement("label");
 		const sender = document.createElement("span");
@@ -209,10 +215,14 @@ export class NotificationHtml {
 		})
 
 		this.container.prepend(div);
+		this.gameInviteHistory.add(option.lobbyid);
 		if (option.history) {
 			this.history.add(div);
 		}
-		setTimeout(() => { div.remove() }, option.duration + 100);
+		setTimeout(() => {
+			div.remove();
+			this.gameInviteHistory.delete(option.lobbyid);
+		}, option.duration + 100);
 
 	}
 
