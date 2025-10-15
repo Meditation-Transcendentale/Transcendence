@@ -43,6 +43,11 @@ handleErrorsNats(async () => {
 			userService.addGoogleUser(uuid, google_id, username, avatar_path);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
+		handleNatsSubscription("user.getGoogleUserByGoogleId", async (msg) => {
+			const { google_id } = jc.decode(msg.data);
+			const user = userService.getGoogleUserByGoogleId(google_id);
+			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
+		}),
 		handleNatsSubscription("user.add42User", async (msg) => {
 			const { ft_id, uuid, username, avatar_path } = jc.decode(msg.data);
 			userService.add42User(ft_id, uuid, username, avatar_path);

@@ -6,6 +6,7 @@ database.pragma("journal_mode=WAL");
 
 const getUserByUsernameStmt = database.prepare("SELECT * FROM users WHERE username = ?");
 const addGoogleUserStmt = database.prepare("INSERT INTO users (uuid, provider, google_id, username, avatar_path) VALUES (?, ?, ?, ?, ?)");
+const getGoogleUserByGoogleIdStmt = database.prepare("SELECT * FROM users WHERE google_id = ?");
 const add42UserStmt = database.prepare("INSERT INTO users (ft_id, uuid, provider, username, avatar_path) VALUES (?, ?, ?, ?, ?)");
 const get42UserByFtIdStmt = database.prepare("SELECT * FROM users WHERE ft_id = ?");
 const checkUsernameAvailabilityStmt = database.prepare("SELECT * FROM users WHERE username = ?");
@@ -100,6 +101,10 @@ const userService = {
 	},
 	addGoogleUser: (uuid, googleId, username, avatarPath) => {
 		addGoogleUserStmt.run(uuid, 'google', googleId, username, avatarPath);
+	},
+	getGoogleUserByGoogleId: (googleId) => {
+		const user = getGoogleUserByGoogleIdStmt.get(googleId);
+		return user;
 	},
 	add42User: (ft_id, uuid, username, avatarPath) => {
 		add42UserStmt.run(ft_id, uuid, '42', username, avatarPath);
@@ -241,7 +246,7 @@ const userService = {
 		return users;
 	},
 	addUserStatus: (userId, status) => {
-		const validStatuses = ['online', 'offline', 'in_lobby', 'in_game', 'in_tournament'];
+		const validStatuses = ['online', 'offline', 'in lobby', 'in game', 'in tournament'];
 		if (!validStatuses.includes(status)) {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
 		}
@@ -249,7 +254,7 @@ const userService = {
 	},
 	updateStatus: (userId, status, lobby_gameId) => {
 		console.log("updateStatus called with:", userId, status, lobby_gameId);
-		const validStatuses = ['online', 'offline', 'in_lobby', 'in_game', 'in_tournament'];
+		const validStatuses = ['online', 'offline', 'in lobby', 'in game', 'in tournament'];
 		if (status && !validStatuses.includes(status)) {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };
 		}

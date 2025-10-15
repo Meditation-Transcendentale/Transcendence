@@ -772,8 +772,8 @@ class athProfile {
 		if (!stats) return;
 
 		this.classicTdElements["Game Played"].textContent = stats.gamesPlayed;
-		this.classicTdElements["Wined"].textContent = stats.gamesWined;
-		this.classicTdElements["Loosed"].textContent = stats.gamesLoosed;
+		this.classicTdElements["Wins"].textContent = stats.gamesWined;
+		this.classicTdElements["Losses"].textContent = stats.gamesLoosed;
 		this.classicTdElements["Win Rate"].textContent = Math.round(stats.winRate * 100) + "%";
 		this.classicTdElements["Best Win Streak"].textContent = stats.bestWinStreak;
 		this.classicTdElements["Goals Scored"].textContent = stats.goalsScored;
@@ -830,8 +830,8 @@ class athProfile {
 
 	private createStatDiv() {
 
-		const classicPlayerStatsName = ["Game Played", "Wined", "Loosed", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded"];
-		const brPlayerStatsName = ["Game Played", 'Wined', "Win Rate", "Best Placement", "Average Placement"];
+		const classicPlayerStatsName = ["Game Played", "Wins", "Losses", "Win Rate", "Best Win Streak", "Goals Scored", "Goals Conceded"];
+		const brPlayerStatsName = ["Game Played", 'Wins', "Win Rate", "Best Placement", "Average Placement"];
 
 		this.statsDiv = document.createElement("div");
 		this.statsDiv.id = "profile-stats";
