@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
 	uuid TEXT NOT NULL UNIQUE,
 	provider TEXT NOT NULL CHECK (provider IN ('local', 'google', '42')) DEFAULT 'local',
 	google_id TEXT NULL UNIQUE,
+	ft_id TEXT NULL UNIQUE,
 	username TEXT NOT NULL UNIQUE,
 	password TEXT NULL,
 	avatar_path TEXT DEFAULT '/cdn/default_avatar.jpg',

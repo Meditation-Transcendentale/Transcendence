@@ -76,6 +76,7 @@ const returnMessages = {
 	STATUS_NOT_FOUND: 'Status not found for this user',
 	BAD_GAME_ID: 'Invalid game or lobby ID',
 	IDENTIFIER_TYPE_REQUIRED: 'Identifier and type are required',
+	PROVIDER_PASSWORD_CONFLICT: 'You cannot connect with a password for this account',
 };
 
 const statusReturn = { 
@@ -126,6 +127,7 @@ const userReturn = {
 	USER_035: { http: 200, code: 20013, message: returnMessages.LOGGED_IN },
 	USER_036: { http: 400, code: 40031, message: returnMessages.IDENTIFIER_TYPE_REQUIRED },
 	USER_037: { http: 400, code: 40032, message: returnMessages.INVALID_SEARCH_TYPE },
+	USER_038: { http: 400, code: 40033, message: returnMessages.PROVIDER_PASSWORD_CONFLICT },
 };
 
 const friendshipReturn = {
