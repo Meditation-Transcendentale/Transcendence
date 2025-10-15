@@ -4,7 +4,8 @@ import { User } from "../User";
 export enum PopupType {
 	accept,
 	validation,
-	custom
+	custom,
+	ok
 }
 
 interface IPopupOption {
@@ -23,13 +24,17 @@ interface IAcceptPopupOption extends IPopupOption {
 	decline: () => void;
 }
 
+interface IOKPopupOption extends IPopupOption {
+	text: string;
+}
+
 interface IValidationPopupOption extends IPopupOption {
 	input?: string;
 	submit: (password: string, token?: string, input?: string) => void;
 	abort: () => void;
 }
 
-export type PopupOption = ICustomPopupOption | IAcceptPopupOption | IValidationPopupOption;
+export type PopupOption = ICustomPopupOption | IAcceptPopupOption | IValidationPopupOption | IOKPopupOption;
 
 export class Popup {
 	private option: PopupOption;
@@ -80,6 +85,10 @@ export class Popup {
 			}
 			case PopupType.validation: {
 				this.generateValidationPopup(option as IValidationPopupOption);
+				break;
+			}
+			case PopupType.ok: {
+				this.generateOkPopup(option as IOKPopupOption);
 				break;
 			}
 		}
@@ -182,6 +191,16 @@ export class Popup {
 		this.form.addEventListener("submit", (e) => {
 			e.preventDefault();
 		})
+	}
+
+	private generateOkPopup(option: IOKPopupOption) {
+		const footer = document.createElement("footer");
+		const btn = document.createElement("button");
+
+		this.form.appendChild(footer);
+		footer.appendChild(btn);
+		btn.textContent = "OK";
+		this.dialog.classList.add("popup-ok");
 	}
 
 	public show() {
