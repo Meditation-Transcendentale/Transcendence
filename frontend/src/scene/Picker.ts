@@ -111,7 +111,6 @@ export class Picker {
 	private upEvent(ev: MouseEvent) {
 		if (!this._enabled)
 			return;
-		console.log("UP");
 		this.ballPicker.z = 0;
 		// this.assets.camera.attachControl();
 	}

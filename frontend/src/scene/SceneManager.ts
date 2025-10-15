@@ -172,12 +172,14 @@ class SceneManager {
 				break;
 			}
 			case "home": {
+
+				// this.camera.attachControl();
 				this.assets.grassRoot.scaling.y = 1;
 				this.assets.ballRoot.setEnabled(true);
 				this.assets.ballRoot.position.set(0, 0.25, 0);
 				this.assets.hemisphericLight.setEnabled(true);
 				this.assets.flashLight.range = 30;
-				this.assets.hemisphericLight.intensity = 0.1;
+				// this.assets.hemisphericLight.intensity = 0.1;
 				// this.assets.ballMesh.position.set(0, 0, 0);
 				this.assets.ballRoot.scalingDeterminant = 1.5;
 				this.picker.enable = true;
@@ -199,7 +201,6 @@ class SceneManager {
 				break;
 			}
 			case "void": {
-				// this.camera.detachControl();
 				this.picker.enable = false;
 				this.grass.enable = false;
 				this.assets.hemisphericLight.setEnabled(true);
