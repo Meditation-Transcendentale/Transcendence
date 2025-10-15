@@ -19,11 +19,14 @@ class UserC {
 
 	private _once = true;
 
+	public external: boolean;
+
 	constructor() {
 		console.log("%c USER", "color: white; background-color: red");
 		this.friendsOnline = new Set<string>;
 		this.friendsAway = new Set<string>;
 		this.twofa = 0;
+		this.external = false;
 	}
 
 	public check(): Promise<boolean> {
@@ -35,6 +38,8 @@ class UserC {
 					this.twofa = json.userInfo.two_fa_enabled;
 					this.avatar = json.userInfo.avatar_path;
 					this.status = json.userInfo.status;
+					this.external = json.userInfo.provider !== "local";
+
 					if (this._once) {
 						this._once = false;
 						this.requestFriends();

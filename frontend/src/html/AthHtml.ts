@@ -74,9 +74,14 @@ export class Ath {
 	}
 
 	private createMenuItems() {
+		const popup = new Popup({
+			type: PopupType.ok,
+			text: "You can't change your information, you are logged in from an external source",
+			title: "Settings"
+		})
 		const menuItems = [
 			{ text: "Profile", action: () => htmlManager.profile.load(User.uuid) },
-			{ text: "Settings", action: () => htmlManager.settings.load() },
+			{ text: "Settings", action: () => User.external ? popup.show() : htmlManager.settings.load() },
 			{ text: "Logout", action: () => this.quitFunction() }
 		];
 
