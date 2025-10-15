@@ -8,6 +8,8 @@ import { routeManager } from "./RouteManager";
 export class PongRoute implements IRoute {
 	public created: boolean;
 
+
+	private _loaded = false;
 	constructor() {
 		this.created = true;
 	}
@@ -17,6 +19,7 @@ export class PongRoute implements IRoute {
 			routeManager.nav("/home");
 			return;
 		}
+		this._loaded = true;
 		htmlManager.friendlist.remove();
 		sceneManager.cameraManager.vue = stateManager.gameMap;
 		sceneManager.load(stateManager.gameMap);
@@ -25,6 +28,8 @@ export class PongRoute implements IRoute {
 	}
 
 	public async unload(): Promise<void> {
+		if (!this._loaded)
+			return;
 		gameManager.stopPong();
 	}
 }
