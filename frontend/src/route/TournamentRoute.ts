@@ -8,6 +8,8 @@ import { routeManager } from "./RouteManager";
 export class TournamentRoute implements IRoute {
 	public created: boolean = true;
 
+	private _loaded = false;
+
 	constructor() { }
 
 	public async load(): Promise<void> {
@@ -15,6 +17,7 @@ export class TournamentRoute implements IRoute {
 			routeManager.nav("/home");
 			return;
 		}
+		this._loaded = true;
 		htmlManager.ath.checkBeforeHome = true;
 		sceneManager.load("home");
 		sceneManager.cameraManager.vue = "tournament";
@@ -23,6 +26,8 @@ export class TournamentRoute implements IRoute {
 	}
 
 	public async unload(): Promise<void> {
+		if (!this._loaded)
+			return;
 		htmlManager.tournament.unload();
 		streamManager.tournament.disconnect();
 	}
