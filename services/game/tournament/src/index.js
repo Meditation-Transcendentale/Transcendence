@@ -50,17 +50,5 @@ async function start() {
         }
     })();
 }
-//     async (data, msg) => {
-//             const req = decodeTournamentCreateRequest(data);
-//             console.log(`${req}|${req.players}|${req.players[0]}|${req.players[1]}|${req.players[2]}|${req.players[3]}|`)
-//             const tournamentId = tournamentService.create(req.players, uwsApp);
-//             const respTournamentCreate = encodeTournamentCreateResponse({
-//                 tournamentId: tournamentId,
-//             });
-//             console.log(tournamentId);
-//             msg.respond(respTournamentCreate);
-//             //send tournament id to the players uuid
-//         });
-// }
 
 start().catch(console.error);
