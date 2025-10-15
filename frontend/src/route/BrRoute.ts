@@ -8,6 +8,8 @@ import { routeManager } from "./RouteManager";
 export class BrRoute implements IRoute {
 	public created: boolean;
 
+	private _loaded = false;
+
 	constructor() {
 		this.created = true;
 	}
@@ -17,6 +19,7 @@ export class BrRoute implements IRoute {
 			routeManager.nav("/home");
 			return;
 		}
+		this._loaded = true;
 		htmlManager.friendlist.remove();
 		sceneManager.cameraManager.vue = "br";
 		sceneManager.assets.scene.activeCamera = sceneManager.assets.cameraBr;
@@ -26,6 +29,8 @@ export class BrRoute implements IRoute {
 	}
 
 	public async unload(): Promise<void> {
+		if (!this._loaded)
+			return;
 		sceneManager.assets.scene.activeCamera = sceneManager.camera;
 		gameManager.stopBr();
 	}
