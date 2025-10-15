@@ -686,9 +686,21 @@ class ScoreModule implements GameUIModule {
   }
 
   updateScore(score: number) {
+    const scoreIncreased = score > this.scoreValue;
     this.scoreValue = score;
     if (this.ref.scoreValue) {
       this.ref.scoreValue.textContent = score.toString();
+
+      // Trigger score animation on increase
+      if (scoreIncreased) {
+        this.ref.scoreValue.classList.remove('score-update');
+        void this.ref.scoreValue.offsetWidth; // Force reflow
+        this.ref.scoreValue.classList.add('score-update');
+
+        setTimeout(() => {
+          this.ref.scoreValue.classList.remove('score-update');
+        }, 600);
+      }
     }
     if (this.scoreValue > this.pb) {
       this.updateHighScore(this.scoreValue);
@@ -949,7 +961,7 @@ class EndingModule implements GameUIModule {
     }
   }
 
-  setBRRankings(rankings: Array<{ rank: number; username: string; uuid: string }>) {
+  setBRRankings(rankings: Array<{ rank: number; username: string; uuid: string; isLocalPlayer?: boolean }>) {
     // Hide dual/solo mode containers and brick leaderboard
     this.ref.dualModeContainer.style.display = "none";
     this.ref.soloModeContainer.style.display = "none";
@@ -1003,9 +1015,18 @@ class EndingModule implements GameUIModule {
         usernameCell.textContent = entry.username;
         row.appendChild(usernameCell);
 
-        // Mark the winner row (rank 1) for special styling
+        // Mark top 3 rows for special styling
         if (entry.rank === 1) {
           row.classList.add('winner-row');
+        } else if (entry.rank === 2) {
+          row.classList.add('silver-row');
+        } else if (entry.rank === 3) {
+          row.classList.add('bronze-row');
+        }
+
+        // Mark local player row
+        if (entry.isLocalPlayer) {
+          row.classList.add('local-player-row');
         }
 
         tbody.appendChild(row);

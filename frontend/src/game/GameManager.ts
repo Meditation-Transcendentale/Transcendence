@@ -102,8 +102,8 @@ export class GameManager {
 			enabledModules: ['score', 'buttons', 'ending'],
 			theme: 'pong',
 			modulePositions: {
-				score: { x: 'left', y: 'top', offset: { x: 200, y: 0 } },
-				buttons: { x: 'center', y: 'bottom' },
+				score: { x: 'left', y: 'top', offset: { x: 100, y: 0 } },
+				buttons: { x: 'center', y: 'bottom', offset: { x: 0, y: 85 } },
 				ending: { x: 'center', y: 'center' }
 			}
 		});
