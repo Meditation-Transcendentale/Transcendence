@@ -27,6 +27,7 @@
     - add tournament create number
     - match history stats update 
     - fix friend popup auto disable
+    - join disapeer popup cant
 
 ### tweak
     - 3D tweak

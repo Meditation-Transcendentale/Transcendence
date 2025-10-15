@@ -133,7 +133,10 @@ export class NetworkingSystem extends System {
 			if (serverMsg.start) {
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
-				ui?.gameUI.startCountdown(3);
+				ui?.gameUI.startCountdown(3, () => {
+					// Hide all images after countdown finishes
+					ui?.gameUI.hideAllImages();
+				});
 			}
 
 			// === Game End ===

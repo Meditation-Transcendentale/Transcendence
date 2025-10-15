@@ -80,23 +80,12 @@ export class Pong {
 
 	public async init() {
 		this.pongRoot = sceneManager.assets.ballRoot;
-		// this.pongRoot = new TransformNode("pongRoot", this.scene);
-		// this.pongRoot.position.set(2000, -3500, -3500);
-		// this.cam = this.scene.getCameraByName('fieldCamera') as FreeCamera;
-		// this.cam.position.x = 0;
-		// this.cam.position.y = 40;
-		// this.cam.position.z = -2;
-		// this.cam.detachControl();
 		this.baseMeshes = createBaseMeshes(this.scene, this.config, this.pongRoot);
 		this.instanceManagers = createInstanceManagers(this.baseMeshes);
 		this.uuid = getOrCreateUUID();
 
-		// const wsUrl = `ws://${window.location.hostname}:5004?uuid=${encodeURIComponent(this.uuid)}&gameId=${encodeURIComponent(this.gameId)}`;
-		// this.wsManager = new WebSocketManager(wsUrl);
 		this.inputManager = new InputManager();
 
-		// localPaddleId = await this.waitForRegistration();
-		//this.camera = createCamera(this.scene, this.canvas, localPaddleId, this.gameMode);
 		this.initECS(this.config, this.instanceManagers, this.uuid);
 		this.stateManager = new StateManager(this.ecs);
 		this.inited = true;
@@ -131,9 +120,6 @@ export class Pong {
 		this.wsManager = new WebSocketManager(wsUrl);
 
 		this.cam = sceneManager.camera;
-		// this.cam.position.x = 0;
-		// this.cam.position.y = 35;
-		// this.cam.position.z = -2;
 		this.cam.detachControl();
 
 		if (!this.inited) {
