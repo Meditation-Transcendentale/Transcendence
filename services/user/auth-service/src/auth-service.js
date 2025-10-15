@@ -234,10 +234,13 @@ let cached42Token = { token: null, expires_at: 0 };
 
 async function get42accessToken(code) {
 
+	console.log ('Requesting 42 access token with code:', code);
+
 	const now = Date.now();
 	if (cached42Token.token && now < cached42Token.expires_at - 10000) {
 		return { token42: cached42Token.token};
 	}
+
 
 	try {
 		const response = await axios.post(
@@ -247,8 +250,8 @@ async function get42accessToken(code) {
 				client_id: process.env.FT_API_UID,
 				client_secret: process.env.FT_API_SECRET,
 				code: code,
-				redirect_uri: 'https://localhost:3000/auth/42'
-				// redirect_uri: 'https://localhost:7000/auth/42'
+				redirect_uri: 'https://localhost:3000/auth/42' || `https://${process.env.HOSTNAME}:3000/auth/42`
+				// redirect_uri: `https://${process.env.HOSTNAME}:3000/auth/42`
 			}),
 			{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
 		);

@@ -45,6 +45,7 @@ services:
       - NATS_URL=${NATS_URL}
       - NATS_TOKEN=${NATS_TOKEN}
       - CDN_URL=${CDN_URL}
+      - HOSTNAME=${HOSTNAME}
     networks:
       - transcendence-network
     depends_on:
