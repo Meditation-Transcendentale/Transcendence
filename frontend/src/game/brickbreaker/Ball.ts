@@ -20,23 +20,25 @@ export class Ball {
 	// public launched: boolean = false;
 	// private score: number = 0;
 
-	constructor(scene: Scene, material: StandardMaterial, root: TransformNode, game: BrickBreaker) {
+	constructor(scene: Scene, root: TransformNode, game: BrickBreaker) {
 		this.ball = MeshBuilder.CreateSphere("ball", { diameter: 0.5 }, scene);
 		this.ball.parent = root;
 		this.ball.position = new Vector3(0, 0.25, 0);
-		this.ball.material = material;
 		this.scene = scene;
 		this.game = game;
 
 		this.matTouched = new StandardMaterial("touchedMat", this.scene);
-		// this.matTouched.diffuseColor.set(1, 0, 0);
-		// this.matTouched.specularColor.set(5., 0, 0.);
-		this.matTouched.emissiveColor.set(200, 0, 0);
+		this.matTouched.diffuseColor.set(1., 0, 0);
+		// this.matTouched.specularColor.set(0.5, 0.5, 0.5);
+		this.matTouched.emissiveColor.set(10., 0.1, 0.1);
 		// this.matTouched
 		this.matUntouched = new StandardMaterial("untouchedMat", this.scene);
 		// this.matUntouched.diffuseColor.set(0, 0, 1);
 		// this.matUntouched.specularColor.set(0, 0, 5);
-		this.matUntouched.emissiveColor.set(0, 0, 200);
+		this.matUntouched.diffuseColor.set(0., 0, 1.);
+		// this.matUntouched.specularColor.set(0.5, 0.5, 0.5);
+		this.matUntouched.emissiveColor.set(0.1, 0.1, 10.);
+		this.ball.material = this.matUntouched;
 	}
 
 	public updatePosition(x: number, z: number): void {

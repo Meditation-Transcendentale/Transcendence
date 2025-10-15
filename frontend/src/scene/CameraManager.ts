@@ -111,7 +111,7 @@ export class CameraManager {
 		this.contrast = 1.;
 		this.brightness = 0.;
 		this.gamma = 1;
-		this.tonemapping = 0;
+		this.tonemapping = 4;
 
 		UIaddSlider("contrast", this.contrast, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.contrast = n });
 		UIaddSlider("brightness", this.brightness, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.brightness = n });
