@@ -425,6 +425,10 @@ class GameUI {
     this.modules.ending?.setLeaderboard(data, mode);
   }
 
+  public showBRRankings(rankings: Array<{ rank: number; username: string; uuid: string }>) {
+    this.modules.ending?.setBRRankings(rankings);
+  }
+
   public showButton(
     id: string,
     text: string,
@@ -821,6 +825,12 @@ interface EndingHtmlReference {
   result: HTMLSpanElement;
   leaderboard: HTMLDivElement;
   players: HTMLDivElement;
+  leaderboardHeader: HTMLElement;
+  rankHeader: HTMLElement;
+  playerHeader: HTMLElement;
+  scoreHeader: HTMLElement;
+  brRankings: HTMLDivElement;
+  brRankingsList: HTMLElement;
 }
 
 type Player = {
@@ -844,6 +854,12 @@ class EndingModule implements GameUIModule {
       result: div.querySelector("#result-label") as HTMLSpanElement,
       leaderboard: div.querySelector("#leaderboard") as HTMLDivElement,
       players: div.querySelector("#players-list") as HTMLDivElement,
+      leaderboardHeader: div.querySelector("#leaderboard-header") as HTMLElement,
+      rankHeader: div.querySelector("#rank-header") as HTMLElement,
+      playerHeader: div.querySelector("#player-header") as HTMLElement,
+      scoreHeader: div.querySelector("#score-header") as HTMLElement,
+      brRankings: div.querySelector("#br-rankings") as HTMLDivElement,
+      brRankingsList: div.querySelector("#br-rankings-list") as HTMLElement,
     };
   }
 
@@ -931,6 +947,76 @@ class EndingModule implements GameUIModule {
         highscore: score,
       });
     }
+  }
+
+  setBRRankings(rankings: Array<{ rank: number; username: string; uuid: string }>) {
+    // Hide dual/solo mode containers and brick leaderboard
+    this.ref.dualModeContainer.style.display = "none";
+    this.ref.soloModeContainer.style.display = "none";
+    this.ref.result.style.display = "none";
+    this.ref.leaderboard.style.display = "none";
+
+    // Show BR rankings container
+    this.ref.brRankings.style.display = "grid";
+    this.ref.brRankings.innerHTML = "";
+
+    // Split rankings into columns (e.g., 4 columns for 100 players = 25 per column)
+    const playersPerColumn = Math.ceil(rankings.length / 4);
+
+    for (let col = 0; col < 4; col++) {
+      const startIdx = col * playersPerColumn;
+      const endIdx = Math.min(startIdx + playersPerColumn, rankings.length);
+      const columnRankings = rankings.slice(startIdx, endIdx);
+
+      if (columnRankings.length === 0) break;
+
+      const table = document.createElement("table");
+      table.className = "br-rankings-table";
+
+      // Add header
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+
+      const rankHeader = document.createElement("th");
+      rankHeader.textContent = "Rank";
+      headerRow.appendChild(rankHeader);
+
+      const playerHeader = document.createElement("th");
+      playerHeader.textContent = "Player";
+      headerRow.appendChild(playerHeader);
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Add body
+      const tbody = document.createElement("tbody");
+
+      columnRankings.forEach((entry) => {
+        const row = document.createElement("tr");
+
+        const rankCell = document.createElement("td");
+        const medal = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : '';
+        rankCell.textContent = `${medal} ${entry.rank}`;
+        row.appendChild(rankCell);
+
+        const usernameCell = document.createElement("td");
+        usernameCell.textContent = entry.username;
+        row.appendChild(usernameCell);
+
+        // Mark the winner row (rank 1) for special styling
+        if (entry.rank === 1) {
+          row.classList.add('winner-row');
+        }
+
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      this.ref.brRankings.appendChild(table);
+    }
+
+    // Show the ending module
+    this.div.style.display = "flex";
   }
 }
 

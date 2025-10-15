@@ -49,15 +49,27 @@
 				<span id="end-score-solo" class="score-value"></span>
 			</div>
 			<table id="leaderboard" style="position: absolute; transform: translateX(25vw)">
-				<thead>
+				<thead id="leaderboard-header">
 					<tr>
-						<th>Rank</th>
-						<th>Player</th>
-						<th>Best Score</th>
+						<th id="rank-header">Rank</th>
+						<th id="player-header">Player</th>
+						<th id="score-header">Best Score</th>
 					</tr>
 				</thead>
 				<tbody id="players-list" class="list-body"></tbody>
 			</table>
+			<div id="br-rankings" class="br-rankings-container" style="display: none;">
+				<table id="br-rankings-table">
+					<thead>
+						<tr>
+							<th>Rank</th>
+							<th>Player</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody id="br-rankings-list"></tbody>
+				</table>
+			</div>
 			<span id="result-label" class="result-label"></span>
 		</div>
 	</div>

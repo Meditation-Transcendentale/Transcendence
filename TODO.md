@@ -17,10 +17,12 @@
     - full DA for the site + css implementation
     - finish map (zoom, tweak light)
     - make button disapeer
+    - disable attach control
 
 
  ### fix
     - sanitize input
+    -focus br camera canva
     - change goal position physics pong
     - check websocket url
     - fx pong to delete
