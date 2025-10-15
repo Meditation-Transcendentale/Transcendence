@@ -239,22 +239,20 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 }));
 
-// let cached42Token = { token: null, expires_at: 0 };
 
-async function get42accessToken(code, ftCookie, res) {
+async function get42accessToken(code, referer, ftCookie, res) {
 
-	console.log ('Requesting 42 access token with code:', code);
 	const now = Date.now();
 
 	if (ftCookie && ftCookie.token && now < ftCookie.expires_at - 10000) {
 		return { token42: ftCookie.token };
 	}
 
-	// if (cached42Token.token && now < cached42Token.expires_at - 10000) {
-	// 	return { token42: cached42Token.token};
-	// }
-
 	let redirectUri = `https://${process.env.HOSTNAME}:7000/api/auth/42`;
+
+	if (referer === `https://localhost:7000/`) {
+		redirectUri = `https://localhost:7000/api/auth/42`;
+	}
 
 	try {
 		const response = await axios.post(
@@ -264,14 +262,12 @@ async function get42accessToken(code, ftCookie, res) {
 				client_id: process.env.FT_API_UID,
 				client_secret: process.env.FT_API_SECRET,
 				code: code,
-				redirect_uri: `https://${process.env.HOSTNAME}:7000/api/auth/42` 
+				redirect_uri: redirectUri
 			}),
 			{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
 		);
 		res.clearCookie('42accessToken', { path: '/' });
 		res.setCookie('42accessToken', { token: response.data.access_token, expires_at: now + response.data.expires_in * 1000 }, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
-		// cached42Token.token = response.data.access_token;
-		// cached42Token.expires_at = now + response.data.expires_in * 1000;
 		return { token42: response.data.access_token };
 	} catch (error) {
 		console.error('Error fetching 42 access token:', error);
@@ -283,7 +279,7 @@ async function get42accessToken(code, ftCookie, res) {
 
 app.get('/42', handleErrors42(async (req, res) => {
 	
-	const { token42 } = await get42accessToken(req.query.code, req.cookies['42accessToken'], res);
+	const { token42 } = await get42accessToken(req.query.code, req.headers.referer, req.cookies['42accessToken'], res);
 	// console.log('42 token:', token42);
 	let response;
 
