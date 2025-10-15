@@ -384,6 +384,10 @@ class GameUI {
     this.modules.scorevs?.updateScore(score1, score2);
   }
 
+  public setPlayerNames(player1: string, player2: string) {
+    this.modules.scorevs?.setPlayerNames(player1, player2);
+  }
+
   public hideScore() {
     this.modules.score?.unload();
   }
@@ -392,8 +396,8 @@ class GameUI {
     this.modules.score?.load();
   }
 
-  public startCountdown(initialValue: number) {
-    this.modules.countdown?.start(initialValue);
+  public startCountdown(initialValue: number, onComplete?: () => void) {
+    this.modules.countdown?.start(initialValue, onComplete);
   }
 
   public startTimer(duration?: number, onEnd?: () => void) {
@@ -447,6 +451,10 @@ class GameUI {
     this.modules.images?.removeImage(id);
   }
 
+  public hideAllImages() {
+    this.modules.images?.hideAll();
+  }
+
   public updatePlayerCount(playerLeft: number) {
     this.modules.playercounter?.update(playerLeft);
   }
@@ -487,7 +495,7 @@ class CountdownModule implements GameUIModule {
     this.stop();
   }
 
-  start(initialValue: number = 3) {
+  start(initialValue: number = 3, onComplete?: () => void) {
     this.countdownNumber = initialValue;
 
     this.updateDisplay();
@@ -498,6 +506,7 @@ class CountdownModule implements GameUIModule {
 
       if (this.countdownNumber <= 0) {
         this.unload();
+        onComplete?.();
       }
     }, this.delay);
   }
@@ -520,6 +529,10 @@ class CountdownModule implements GameUIModule {
 interface ScoreVersusHtmlReference {
   score1Value: HTMLSpanElement;
   score2Value: HTMLSpanElement;
+  player1Name?: HTMLSpanElement;
+  player2Name?: HTMLSpanElement;
+  score1Container?: HTMLDivElement;
+  score2Container?: HTMLDivElement;
 }
 
 class ScoreVersusModule implements GameUIModule {
@@ -527,6 +540,7 @@ class ScoreVersusModule implements GameUIModule {
   private ref: ScoreVersusHtmlReference;
   private score1 = 0;
   private score2 = 0;
+  private isStructureUpdated = false;
 
   constructor(div: HTMLDivElement) {
     this.div = div;
@@ -539,19 +553,102 @@ class ScoreVersusModule implements GameUIModule {
 
   load() {
     this.div.style.display = "flex";
+    if (!this.isStructureUpdated) {
+      this.updateStructure();
+    }
   }
 
   unload() {
     this.div.style.display = "none";
   }
 
+  private updateStructure() {
+    const container = this.div.querySelector('.scorevs-container');
+    if (!container) return;
+
+    // Wrap score1 in a player container
+    const score1Container = document.createElement('div');
+    score1Container.className = 'score-player';
+    score1Container.id = 'score1-player';
+
+    const player1Name = document.createElement('div');
+    player1Name.className = 'player-name';
+    player1Name.id = 'player1-name';
+    player1Name.textContent = 'Player 1';
+
+    score1Container.appendChild(player1Name);
+    score1Container.appendChild(this.ref.score1Value);
+
+    // Wrap score2 in a player container
+    const score2Container = document.createElement('div');
+    score2Container.className = 'score-player';
+    score2Container.id = 'score2-player';
+
+    const player2Name = document.createElement('div');
+    player2Name.className = 'player-name';
+    player2Name.id = 'player2-name';
+    player2Name.textContent = 'Player 2';
+
+    score2Container.appendChild(player2Name);
+    score2Container.appendChild(this.ref.score2Value);
+
+    // Replace the spans with the new containers
+    container.innerHTML = '';
+    container.appendChild(score1Container);
+    container.appendChild(score2Container);
+
+    // Update references
+    this.ref.player1Name = player1Name as HTMLSpanElement;
+    this.ref.player2Name = player2Name as HTMLSpanElement;
+    this.ref.score1Container = score1Container;
+    this.ref.score2Container = score2Container;
+
+    this.isStructureUpdated = true;
+  }
+
   updateScore(score1: number, score2: number) {
     if (score1 == 5 || score2 == 5) this.unload();
+
+    // Check if score increased for animation
+    const score1Increased = score1 > this.score1;
+    const score2Increased = score2 > this.score2;
+
     this.score1 = score1;
     this.score2 = score2;
+
     if (this.ref.score1Value && this.ref.score2Value) {
       this.ref.score1Value.textContent = score1.toString();
       this.ref.score2Value.textContent = score2.toString();
+
+      // Trigger goal animation
+      if (score1Increased) {
+        this.ref.score1Value.classList.remove('goal-scored');
+        void this.ref.score1Value.offsetWidth; // Force reflow
+        this.ref.score1Value.classList.add('goal-scored');
+
+        setTimeout(() => {
+          this.ref.score1Value.classList.remove('goal-scored');
+        }, 800);
+      }
+
+      if (score2Increased) {
+        this.ref.score2Value.classList.remove('goal-scored');
+        void this.ref.score2Value.offsetWidth; // Force reflow
+        this.ref.score2Value.classList.add('goal-scored');
+
+        setTimeout(() => {
+          this.ref.score2Value.classList.remove('goal-scored');
+        }, 800);
+      }
+    }
+  }
+
+  setPlayerNames(player1: string, player2: string) {
+    if (this.ref.player1Name) {
+      this.ref.player1Name.textContent = player1;
+    }
+    if (this.ref.player2Name) {
+      this.ref.player2Name.textContent = player2;
     }
   }
 }
@@ -921,6 +1018,12 @@ class ImageModule implements GameUIModule {
     if (position.offset) {
       img.style.transform += ` translate(${position.offset.x}vh, ${position.offset.y}vh)`;
     }
+  }
+
+  hideAll() {
+    this.images.forEach((img) => {
+      img.style.display = 'none';
+    });
   }
 }
 

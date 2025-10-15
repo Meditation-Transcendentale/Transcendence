@@ -30,14 +30,63 @@
 
 #scorevs-module .scorevs-container {
 	display: flex;
-	gap: 70vh;
+	justify-content: center;
+	width: 100%;
+	gap: 85vh;
 	line-height: 1;
+}
+
+#scorevs-module .score-player {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1vh;
+}
+
+#scorevs-module .player-name {
+	font-size: 4vh;
+	font-weight: 300;
+	color: rgba(255, 255, 255, 0.7);
+	font-family: 'spacegrotesk', sans-serif;
+	text-transform: uppercase;
+	letter-spacing: 0.2em;
 }
 
 #scorevs-module .score-value {
 	font-size: 15vh;
 	font-weight: bold;
 	color: white;
+	transition: all 0.3s ease;
+}
+
+#scorevs-module .score-value.goal-scored {
+	animation: goalScoreAnimation 0.8s ease-out;
+}
+
+@keyframes goalScoreAnimation {
+	0% {
+		transform: scale(1);
+	}
+
+	25% {
+		transform: scale(1.8);
+		color: #ffd700;
+		text-shadow:
+			0 0 30px rgba(255, 215, 0, 1),
+			0 0 60px rgba(255, 215, 0, 0.8),
+			0 0 90px rgba(255, 215, 0, 0.6);
+	}
+
+	50% {
+		transform: scale(1.5);
+		color: #ffed4e;
+	}
+
+	100% {
+		transform: scale(1);
+		color: white;
+		text-shadow: none;
+	}
 }
 
 #score-module {
@@ -105,7 +154,7 @@
 
 	border: 1px solid rgba(221, 168, 252, 0.2);
 	box-shadow: 0 4px 15px rgba(13, 2, 33, 0.5),
-	            0 0 20px rgba(157, 78, 221, 0.1);
+		0 0 20px rgba(157, 78, 221, 0.1);
 	transition: all 0.3s ease;
 }
 
@@ -134,7 +183,7 @@
 	color: white;
 	text-shadow: 0 0 10px rgba(199, 125, 255, 0.6);
 	box-shadow: 0 2px 15px rgba(13, 2, 33, 0.5),
-	            0 0 20px rgba(157, 78, 221, 0.2);
+		0 0 20px rgba(157, 78, 221, 0.2);
 }
 
 .game-button:active {
@@ -142,10 +191,48 @@
 	color: var(--color-lavender);
 }
 
+.game-ui-container.pong #scorevs-module .player-name {
+	color: rgba(224, 170, 255, 0.7);
+	font-family: 'spacegrotesk', sans-serif;
+}
+
 .game-ui-container.pong #scorevs-module .score-value {
 	color: #e0aaff;
 	font-family: 'spacegrotesk', sans-serif;
 	animation: syncedGlow 5s ease alternate infinite;
+}
+
+.game-ui-container.pong #scorevs-module .score-value.goal-scored {
+	animation: pongGoalScoreAnimation 0.8s ease-out;
+}
+
+@keyframes pongGoalScoreAnimation {
+	0% {
+		transform: scale(1);
+	}
+
+	25% {
+		transform: scale(1.8);
+		color: #ffd700;
+		text-shadow:
+			0 0 30px rgba(255, 215, 0, 1),
+			0 0 60px rgba(255, 215, 0, 0.8),
+			0 0 90px rgba(255, 215, 0, 0.6),
+			0 0 120px rgba(199, 125, 255, 0.4);
+	}
+
+	50% {
+		transform: scale(1.5);
+		color: #ffed4e;
+	}
+
+	100% {
+		transform: scale(1);
+		color: #e0aaff;
+		text-shadow:
+			0 0 15px rgba(13, 2, 33, 0.8),
+			0 0 30px rgba(90, 24, 154, 0.4);
+	}
 }
 
 .game-ui-container.pong .game-ui-countdown {
