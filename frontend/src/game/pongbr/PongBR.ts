@@ -207,7 +207,7 @@ export class PongBR {
 		this.startIntroCameraAnimation('Phase 1', 3.0);
 
 		this.networkingSystem.forceIndexRebuild();
-		this.camera.attachControl();
+		// this.camera.attachControl();
 
 		this.inputManager.enable();
 		this.pongRoot.setEnabled(true);

@@ -25,15 +25,15 @@ export class InputManager {
 		return this.keysPressed.has(keyCode);
 	}
 
-	enable(){
+	enable() {
 		if (!this.isActive) {
-			document.querySelector('canvas')?.addEventListener("keydown", this.keydownHandler);
-			document.querySelector('canvas')?.addEventListener("keyup", this.keyupHandler);
+			document.addEventListener("keydown", this.keydownHandler);
+			document.addEventListener("keyup", this.keyupHandler);
 			this.isActive = true;
 		}
 	}
 
-	disable(){
+	disable() {
 		if (this.isActive) {
 			document.removeEventListener("keydown", this.keydownHandler);
 			document.removeEventListener("keyup", this.keyupHandler);
