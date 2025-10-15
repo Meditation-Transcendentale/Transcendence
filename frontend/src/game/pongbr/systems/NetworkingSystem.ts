@@ -247,21 +247,14 @@ export class NetworkingSystem extends System {
 				console.log("====================================\n");
 
 				// Display rankings in the game UI
-				const rankingsText = playerIds
-					.map((uuid, index) => {
-						const rank = index + 1;
-						const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
-						const username = this.game.getUsername(uuid);
-						return `${medal} #${rank} ${username}`;
-					})
-					.join('\n');
+				const rankings = playerIds.map((uuid, index) => ({
+					rank: index + 1,
+					username: this.game.getUsername(uuid),
+					uuid: uuid
+				}));
 
-				// Show end screen with rankings
-				htmlManager.notification.add({
-					type: NotificationType.text,
-					text: `Game Over!\n\nFinal Rankings:\n${rankingsText}`,
-					duration: 10000
-				});
+				// Show end screen with rankings overlay
+				this.gameUI.showBRRankings(rankings);
 			}
 		});
 	}

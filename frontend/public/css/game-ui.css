@@ -615,3 +615,122 @@
 	color: #e0aaff;
 	animation: syncedGlow 5s ease alternate infinite;
 }
+
+/* Battle Royale specific styling */
+.game-ui-container.br #ending-module {
+	background: rgba(20, 0, 0, 0.98);
+	backdrop-filter: blur(20px);
+	color: #ff4444;
+}
+
+.game-ui-container.br #ending-module .ending-container {
+	width: 100%;
+	height: 100%;
+	max-width: 95vw;
+	max-height: 95vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0;
+	padding: 2vh;
+}
+
+.br-rankings-container {
+	width: 100%;
+	height: 100%;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 2.5vw;
+	justify-content: center;
+	align-items: start;
+	overflow: hidden;
+	padding: 2vh 2vw;
+	user-select: none;
+}
+
+.br-rankings-table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	border: none;
+	width: 100%;
+	height: auto;
+	font-size: clamp(12px, 1.5vh, 18px);
+	user-select: none;
+}
+
+.br-rankings-table th {
+	background: rgba(20, 0, 0, 0.95);
+	color: #ff4444;
+	font-weight: 600;
+	font-size: 1em;
+	padding: 1.2vh 2vh;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	border-top: 2px solid #660000;
+	border-left: 2px solid #660000;
+	border-right: 2px solid #660000;
+	border-bottom: none;
+	text-shadow: 0 0 7px #ff0000, 0 0 10px #ff0000;
+	font-family: 'spacegrotesk', sans-serif;
+	line-height: 1.2;
+}
+
+.br-rankings-table th:first-child {
+	border-left: 2px solid #660000;
+}
+
+.br-rankings-table th:last-child {
+	border-right: 2px solid #660000;
+}
+
+.br-rankings-table td {
+	background: rgba(10, 0, 0, 0.7);
+	color: #ff6666;
+	font-size: 1em;
+	padding: 0.8vh 2vh;
+	border-left: 2px solid #330000;
+	border-right: 2px solid #330000;
+	border-top: 1px solid #330000;
+	border-bottom: none;
+	transition: all 0.2s ease;
+	font-family: 'spacegrotesk', sans-serif;
+	line-height: 1.4;
+	white-space: nowrap;
+}
+
+.br-rankings-table tbody tr:last-child td {
+	border-bottom: 2px solid #660000;
+}
+
+.br-rankings-table tbody tr:hover td {
+	background: rgba(40, 0, 0, 0.9);
+	color: #ff4444;
+	border-color: #660000;
+	text-shadow: 0 0 5px #ff0000;
+}
+
+.br-rankings-table tbody tr.winner-row td {
+	background: rgba(40, 20, 0, 0.9);
+	border-color: #cc6600;
+	font-weight: bold;
+	color: #ffaa00;
+	text-shadow: 0 0 10px rgba(255, 170, 0, 0.8), 0 0 20px rgba(255, 100, 0, 0.5);
+}
+
+.br-rankings-table tbody tr.winner-row:hover td {
+	background: rgba(60, 30, 0, 0.95);
+	box-shadow: 0 0 20px rgba(255, 100, 0, 0.6);
+	border-color: #ff6600;
+	text-shadow: 0 0 15px rgba(255, 170, 0, 1), 0 0 30px rgba(255, 100, 0, 0.7);
+}
+
+.game-ui-container.br .playercounter-container {
+	color: #ff4444;
+	animation: berserkGlow 5s ease alternate infinite;
+}
+
+.game-ui-container.br .game-ui-countdown {
+	color: #ff4444;
+	animation: berserkGlow 5s ease alternate infinite;
+}
