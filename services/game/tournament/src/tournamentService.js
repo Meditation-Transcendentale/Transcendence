@@ -116,14 +116,6 @@ class Tournament {
 
       this.autoAdvanceWalkovers();
       this.sendUpdate();
-      if (!match.parent) {
-        const buf = encodeTournamentServerMessage({
-          finished: {},
-        });
-        console.log("FINAL FINISHED");
-        this.uwsApp.publish(this.id, buf, true);
-        return;
-      }
       this.maybeStartReadyCheck();
     });
 
