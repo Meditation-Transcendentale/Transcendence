@@ -107,7 +107,7 @@ const statService = {
 	},
 	addBRMatchStatsInfos: (matchResults) => {
 		const transaction = database.transaction(() => {
-			for (const [result] of matchResults.entries()) {
+			for (const [ index, result] of matchResults.entries()) {
 				addMatchStatsInfosStmt.run(
 					result.match_id, 
 					result.user_id, 
