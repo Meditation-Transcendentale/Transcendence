@@ -110,7 +110,7 @@ export class CameraManager {
 		this.contrast = 1.;
 		this.brightness = 0.;
 		this.gamma = 1;
-		this.tonemapping = 0;
+		this.tonemapping = 4;
 
 		this.colorCorrectionPostProcess.onApply = (effect) => {
 			effect.setFloat("contrast", this.contrast);

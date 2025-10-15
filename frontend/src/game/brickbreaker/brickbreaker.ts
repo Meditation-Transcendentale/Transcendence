@@ -55,10 +55,7 @@ export class BrickBreaker {
 		this.createArena();
 
 
-		const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
-		ballMaterial.diffuseColor.set(1, 0, 0);
-		ballMaterial.specularColor.set(0.5, 0, 0);
-		this.ball = new Ball(this.scene, ballMaterial, this.root, this);
+		this.ball = new Ball(this.scene, this.root, this);
 		this.player = new Player(this.scene, new Vector3(0, 0, 0), this);
 
 		this.ball.updatePosition(0, 1);
