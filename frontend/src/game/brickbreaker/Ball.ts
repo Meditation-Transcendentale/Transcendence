@@ -27,27 +27,12 @@ export class Ball {
 		this.scene = scene;
 		this.game = game;
 
+		this.game.gl.addIncludedOnlyMesh(this.ball);
+
 		this.matTouched = new StandardMaterial("touchedMat", this.scene);
-		this.matTouched.emissiveFresnelParameters = new FresnelParameters();
-		this.matTouched.emissiveFresnelParameters.leftColor = Color3.White();
-		this.matTouched.emissiveFresnelParameters.rightColor = Color3.Red();
-		this.matTouched.emissiveFresnelParameters.power = 4.;
-		this.matTouched.emissiveFresnelParameters.bias = 0.2;
-		this.matTouched.emissiveColor.set(1., 1., 1.);
-		this.matTouched.specularPower = 16;
-		this.matTouched.alpha = 1.;
-		// this.matTouched.specularColor.set(0.5, 0.5, 0.5);
-		this.matTouched.emissiveColor.set(1., 1, 1);
-		// this.matTouched
+		this.matTouched.emissiveColor = new Color3(1, 0.4, 0);
 		this.matUntouched = new StandardMaterial("untouchedMat", this.scene);
-		this.matUntouched.emissiveFresnelParameters = new FresnelParameters();
-		this.matUntouched.emissiveFresnelParameters.leftColor = Color3.White();
-		this.matUntouched.emissiveFresnelParameters.rightColor = Color3.Blue();
-		this.matUntouched.emissiveFresnelParameters.power = 4.;
-		this.matUntouched.emissiveFresnelParameters.bias = 0.2;
-		this.matUntouched.emissiveColor.set(1., 1., 1.);
-		this.matUntouched.specularPower = 16;
-		this.matUntouched.alpha = 1.;
+		this.matUntouched.emissiveColor.set(224 / 255, 170 / 255, 1);
 		this.ball.material = this.matUntouched;
 	}
 
@@ -72,11 +57,6 @@ export class Ball {
 					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x, 0, this.newposition.z - playerGoalPos.z).normalize();
 					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
 					this.speedScale = Math.min(this.speedScale * 1.1, 5);
-					console.log("speed Scale update:", this.speedScale);
-					// if (this.launched == false){
-					// 	this.game.gameUI.startTimer();
-					// 	this.launched = true;
-					// }
 				} else if (collideGoal && this.isDirty) {
 					this.touched = false;
 					this.ball.material = this.matUntouched;
@@ -202,13 +182,6 @@ export class Ball {
 		return distance <= ballRadius;
 	}
 
-	// private endGame() {
-	// 	// end screen UI
-
-	// 	this.game.end();
-	// 	// this.game.dispose();
-	// }
-
 	reset(): void {
 		this.touched = false;
 		this.isDirty = false;
@@ -217,7 +190,6 @@ export class Ball {
 		this.velocity.z = 0;
 		this.updatePosition(0, 0);
 		this.speedScale = 1;
-		// this.score = 0;
 	}
 
 	public getMesh(): Mesh {
