@@ -83,7 +83,7 @@ export class Picker {
 			this.ballPicker.x = ev.clientX;
 			this.ballPicker.y = ev.clientY;
 			this.ballPicker.z = 1.;
-			this.assets.camera.detachControl();
+			// this.assets.camera.detachControl();
 			return;
 		}
 		this.ballPicker.z = 0.;
@@ -105,7 +105,7 @@ export class Picker {
 		if (!this._enabled)
 			return;
 		this.ballPicker.z = 0;
-		this.assets.camera.attachControl();
+		// this.assets.camera.attachControl();
 	}
 
 	private upEvent(ev: MouseEvent) {
@@ -113,7 +113,7 @@ export class Picker {
 			return;
 		console.log("UP");
 		this.ballPicker.z = 0;
-		this.assets.camera.attachControl();
+		// this.assets.camera.attachControl();
 	}
 
 	private ballIsHit(x: number, y: number): boolean {

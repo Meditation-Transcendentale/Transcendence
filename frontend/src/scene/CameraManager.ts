@@ -165,6 +165,13 @@ export class CameraManager {
 			this.assets.scene.postProcessRenderPipelineManager.disableEffectInPipeline("pipeline", "fogEffect", this.assets.camera);
 	}
 
+	public set bloom(value: boolean) {
+		if (value)
+			this.assets.scene.postProcessRenderPipelineManager.enableEffectInPipeline("pipeline", this.bloomEffect._name, this.assets.camera);
+		else
+			this.assets.scene.postProcessRenderPipelineManager.disableEffectInPipeline("pipeline", this.bloomEffect._name, this.assets.camera);
+	}
+
 	public set vue(key: string) {
 		const vue = this.vues.get(key);
 		if (!vue)

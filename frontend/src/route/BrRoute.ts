@@ -31,6 +31,7 @@ export class BrRoute implements IRoute {
 	public async unload(): Promise<void> {
 		if (!this._loaded)
 			return;
+		this._loaded = false;
 		sceneManager.assets.scene.activeCamera = sceneManager.camera;
 		gameManager.stopBr();
 	}

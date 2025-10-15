@@ -103,6 +103,7 @@ export class Assets {
 
 		this.camera = new FreeCamera("camera", new Vector3(0, 6, 40), this.scene, true);
 		this.camera.updateUpVectorFromRotation = true;
+		this.camera.detachControl();
 
 		this.effectRenderer = new EffectRenderer(this.engine);
 

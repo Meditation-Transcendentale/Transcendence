@@ -8,6 +8,8 @@ import { routeManager } from "./RouteManager";
 export class LobbyRoute implements IRoute {
 	public created: boolean;
 
+	public _loaded = false;
+
 	constructor() {
 		this.created = false;
 	}
@@ -22,6 +24,7 @@ export class LobbyRoute implements IRoute {
 	public async load(): Promise<void> {
 		if (!this.created)
 			await this.init();
+		this._loaded = true;
 		htmlManager.ath.checkBeforeHome = true;
 		routeManager.comebackRoute = "/play";
 		htmlManager.lobby.load();
@@ -33,6 +36,7 @@ export class LobbyRoute implements IRoute {
 	}
 
 	public async unload(): Promise<void> {
+		this._loaded = false;
 		htmlManager.lobby.unload();
 		streamManager.lobby.quit();
 		streamManager.lobby.disconnect();
