@@ -126,7 +126,10 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 	const { username, password, token } = sanitizeLoginInput(req.body);
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
-		
+	
+	if (user.provider !== 'local') {
+		throw { status: userReturn.USER_038.http, code: userReturn.USER_038.code, message: userReturn.USER_038.message + ' (' + user.provider + ')' };
+	}
 	const isPasswordValid = await bcrypt.compare(password, user.password);
 	if (!isPasswordValid) {
 		throw { status: userReturn.USER_022.http, code: userReturn.USER_022.code, message: userReturn.USER_022.message };
@@ -245,6 +248,7 @@ async function get42accessToken(code) {
 				client_secret: process.env.FT_API_SECRET,
 				code: code,
 				redirect_uri: 'https://localhost:3000/auth/42'
+				// redirect_uri: 'https://localhost:7000/auth/42'
 			}),
 			{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
 		);
@@ -274,22 +278,32 @@ app.get('/42', handleErrors42(async (req, res) => {
 	} catch (error) {
 		throw { status: statusCode.UNAUTHORIZED, code: 401, message: returnMessages.UNAUTHORIZED };
 	}
-
-	const username = response.data.login;
+	console.log('42 user data:', response.data.id);
+	const ftId = response.data.id;
+	let username = response.data.login;
 	const avatar_path = response.data.image.link;
 
-	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
-	if (!user) {
-		console.log('Creating new user with username:', username);
+	let userByUsername = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
+	let userByFtId = await natsRequest(nats, jc, 'user.get42UserByFtId', { ft_id: ftId } );
+
+	if (!userByUsername) {
 		const uuid = uuidv4();
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
-		await natsRequest(nats, jc, 'user.add42User', { uuid, username, avatar_path: avatarCdnUrl });
-		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
-		await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "offline" });
-		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: user.id });
+		await natsRequest(nats, jc, 'user.add42User', { ft_id: ftId, uuid, username, avatar_path: avatarCdnUrl });
+		userByFtId = await natsRequest(nats, jc, 'user.get42UserByFtId', { ft_id: ftId } );
+		await natsRequest(nats, jc, 'status.addUserStatus', { userId: userByFtId.id, status: "offline" });
+		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: userByFtId.id });
+	} else if (userByUsername && userByUsername.provider !== '42' && !userByFtId) {
+		username = username + '_' + Math.random().toString(36).substring(2, 8);
+		const uuid = uuidv4();
+		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
+		await natsRequest(nats, jc, 'user.add42User', { ft_id: ftId, uuid, username, avatar_path: avatarCdnUrl });
+		userByFtId = await natsRequest(nats, jc, 'user.get42UserByFtId', { ft_id: ftId } );
+		await natsRequest(nats, jc, 'status.addUserStatus', { userId: userByFtId.id, status: "offline" });
+		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: userByFtId.id });
 	}
 
-	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	const accessToken = jwt.sign({ uuid: userByFtId.uuid, role: userByFtId.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.header("Content-Type", "text/html");

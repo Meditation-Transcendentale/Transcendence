@@ -45,13 +45,14 @@ const handleErrors42 = (fn) => async (req, res) => {
 		const status = error.status || statusCode.INTERNAL_SERVER_ERROR;
 		const message = error.message || returnMessages.INTERNAL_SERVER_ERROR;
 		const code = error.code || 500;
+		res.header("Content-Type", "text/html");
 		res.send(`
 			<!DOCTYPE html>
 			<html>
 				<head><title>Connexion 42</title></head>
 				<body>
 				<script>
-					window.opener.postMessage({ type: "ft_login_error" }, "*");
+					window.opener.postMessage({ type: "ft_login_error", status: ${status}, message: "${message}", code: ${code} }, "*");
 					window.close();
 				</script>
 				</body>

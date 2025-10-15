@@ -87,7 +87,7 @@ export class AuthHtml implements IHtml {
 			if (event.data.type === "ft_login_success") {
 				routeManager.nav("/home", true, true);
 			} else if (event.data.type === "ft_login_error") {
-				this.error.innerText = "Connection with 42 failed.";
+				this.error.innerText = "Connection with 42 failed : " + event.data.message;
 				this.error.classList.remove("hidden");
 			}
 		});

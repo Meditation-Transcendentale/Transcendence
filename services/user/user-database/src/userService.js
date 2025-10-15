@@ -6,7 +6,8 @@ database.pragma("journal_mode=WAL");
 
 const getUserByUsernameStmt = database.prepare("SELECT * FROM users WHERE username = ?");
 const addGoogleUserStmt = database.prepare("INSERT INTO users (uuid, provider, google_id, username, avatar_path) VALUES (?, ?, ?, ?, ?)");
-const add42UserStmt = database.prepare("INSERT INTO users (uuid, provider, username, avatar_path) VALUES (?, ?, ?, ?)");
+const add42UserStmt = database.prepare("INSERT INTO users (ft_id, uuid, provider, username, avatar_path) VALUES (?, ?, ?, ?, ?)");
+const get42UserByFtIdStmt = database.prepare("SELECT * FROM users WHERE ft_id = ?");
 const checkUsernameAvailabilityStmt = database.prepare("SELECT * FROM users WHERE username = ?");
 const registerUserStmt = database.prepare("INSERT INTO users (uuid, username, password) VALUES (?, ?, ?)");
 const getUserByIdStmt = database.prepare("SELECT * FROM users WHERE id = ?");
@@ -33,7 +34,7 @@ const addUserStatusStmt = database.prepare("INSERT INTO active_user (user_id, st
 const updateStatusStmt = database.prepare("UPDATE active_user SET status = ?, lobby_gameId = ? WHERE user_id = ?");
 const getUserFromUUIDStmt = database.prepare("SELECT * FROM users WHERE uuid = ?");
 const getUserInfoStmt = database.prepare(`
-	SELECT u.uuid, u.username, u.avatar_path, u.two_fa_enabled, au.status
+	SELECT u.uuid, u.username, u.avatar_path, u.two_fa_enabled, u.provider, au.status
 	FROM users u
 	JOIN active_user au ON u.id = au.user_id
 	WHERE u.id = ?`);
@@ -100,8 +101,12 @@ const userService = {
 	addGoogleUser: (uuid, googleId, username, avatarPath) => {
 		addGoogleUserStmt.run(uuid, 'google', googleId, username, avatarPath);
 	},
-	add42User: (uuid, username, avatarPath) => {
-		add42UserStmt.run(uuid, '42', username, avatarPath);
+	add42User: (ft_id, uuid, username, avatarPath) => {
+		add42UserStmt.run(ft_id, uuid, '42', username, avatarPath);
+	},
+	get42UserByFtId: (ft_id) => {
+		const user = get42UserByFtIdStmt.get(ft_id);
+		return user;
 	},
 	checkUsernameAvailability: (username) => {
 		const user = checkUsernameAvailabilityStmt.get(username);

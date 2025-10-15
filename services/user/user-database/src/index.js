@@ -44,9 +44,14 @@ handleErrorsNats(async () => {
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("user.add42User", async (msg) => {
-			const { uuid, username, avatar_path } = jc.decode(msg.data);
-			userService.add42User(uuid, username, avatar_path);
+			const { ft_id, uuid, username, avatar_path } = jc.decode(msg.data);
+			userService.add42User(ft_id, uuid, username, avatar_path);
 			nats.publish(msg.reply, jc.encode({ success: true }));
+		}),
+		handleNatsSubscription("user.get42UserByFtId", async (msg) => {
+			const { ft_id } = jc.decode(msg.data);
+			const user = userService.get42UserByFtId(ft_id);
+			nats.publish(msg.reply, jc.encode({ success: true, data: user }));
 		}),
 		handleNatsSubscription("user.checkUsernameAvailability", async (msg) => {
 			const { username } = jc.decode(msg.data);
