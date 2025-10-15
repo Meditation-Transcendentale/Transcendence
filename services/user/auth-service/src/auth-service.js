@@ -230,14 +230,21 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 }));
 
-let cached42Token = { token: null, expires_at: 0 };
+// let cached42Token = { token: null, expires_at: 0 };
 
-async function get42accessToken(code) {
+async function get42accessToken(code, ftCookie, res) {
 
+	console.log ('Requesting 42 access token with code:', code);
 	const now = Date.now();
-	if (cached42Token.token && now < cached42Token.expires_at - 10000) {
-		return { token42: cached42Token.token};
+
+	if (ftCookie && ftCookie.token && now < ftCookie.expires_at - 10000) {
+		return { token42: ftCookie.token };
 	}
+
+	// if (cached42Token.token && now < cached42Token.expires_at - 10000) {
+	// 	return { token42: cached42Token.token};
+	// }
+
 
 	try {
 		const response = await axios.post(
@@ -247,14 +254,15 @@ async function get42accessToken(code) {
 				client_id: process.env.FT_API_UID,
 				client_secret: process.env.FT_API_SECRET,
 				code: code,
-				redirect_uri: 'https://localhost:3000/auth/42'
-				// redirect_uri: 'https://localhost:7000/auth/42'
+				redirect_uri: `https://${process.env.HOSTNAME}:7000/api/auth/42`
 			}),
 			{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
 		);
-		cached42Token.token = response.data.access_token;
-		cached42Token.expires_at = now + response.data.expires_in * 1000;
-		return { token42: cached42Token.token};
+		res.clearCookie('42accessToken', { path: '/' });
+		res.setCookie('42accessToken', { token: response.data.access_token, expires_at: now + response.data.expires_in * 1000 }, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+		// cached42Token.token = response.data.access_token;
+		// cached42Token.expires_at = now + response.data.expires_in * 1000;
+		return { token42: response.data.access_token };
 	} catch (error) {
 		console.error('Error fetching 42 access token:', error);
 		throw { status: statusCode.INTERNAL_SERVER_ERROR, code: 500, message: returnMessages.INTERNAL_SERVER_ERROR };
@@ -265,7 +273,7 @@ async function get42accessToken(code) {
 
 app.get('/42', handleErrors42(async (req, res) => {
 	
-	const { token42 } = await get42accessToken(req.query.code);
+	const { token42 } = await get42accessToken(req.query.code, req.cookies['42accessToken'], res);
 	// console.log('42 token:', token42);
 	let response;
 
