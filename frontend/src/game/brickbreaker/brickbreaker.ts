@@ -1,4 +1,4 @@
-import { Engine, Scene, Vector3, Vector2, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Observer, TransformNode, FreeCamera, PointLight, GlowLayer } from "../../babylon";
+import { Engine, Scene, Vector3, Vector2, Color3, MeshBuilder, StandardMaterial, Mesh, PolygonMeshBuilder, Observer, TransformNode, FreeCamera, PointLight, GlowLayer } from "../../babylon";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
 import { getRequest, patchRequest } from "../../networking/request";
@@ -218,6 +218,14 @@ export class BrickBreaker {
 		const width = 0.4;
 		const radian = 2 * Math.PI;
 
+		const startHue = 278;
+		const startSat = 1;
+		const startVal = 0.5;
+
+		const endHue = 278;
+		const endSat = 0.33;
+		const endVal = 1;
+
 		for (let i = 0; i < cols; ++i) {
 			let bricksCols = [];
 			for (let j = 0; j < layers; ++j) {
@@ -242,7 +250,13 @@ export class BrickBreaker {
 				mesh.parent = this.root;
 				mesh.position.y += 0.4;
 				const mat = new StandardMaterial("arenaMat", this.scene);
-				mat.emissiveColor.set(224 / 255, 170 / 255, 1);
+
+				const t = (j + 1) / layers;
+				const hue = startHue + (endHue - startHue) * t;
+				const saturation = startSat + (endSat - startSat) * t;
+				const value = startVal + (endVal - startVal) * t;
+
+				mat.emissiveColor = Color3.FromHSV(hue, saturation, value);
 				this.gl.addIncludedOnlyMesh(mesh);
 				mesh.material = mat;
 				bricksCols.push(mesh);
