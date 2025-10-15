@@ -181,6 +181,7 @@ export class NotificationHtml {
 		const sender = document.createElement("span");
 
 		div.classList.add("notification-click");
+		div.classList.add("notification-game-invite");
 		label.className = "notification-text";
 		sender.className = "notification-username";
 
@@ -262,5 +263,9 @@ export class NotificationHtml {
 		} catch (err) {
 			this.add({ type: NotificationType.error, error: "error" })
 		}
+	}
+
+	public clearGameInvite() {
+		document.querySelectorAll(".notification-game-invite").forEach((e) => e.remove());
 	}
 }
