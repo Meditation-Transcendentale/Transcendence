@@ -90,7 +90,7 @@ class RouteManager {
 				}
 			});
 
-		if (history)
+		if (history && this.lastRoute !== this.routes.get(url.pathname) as IRoute)
 			window.history.pushState("", "", url.pathname + url.search)
 		// if (this.lastRoute != this.routes.get(url.pathname))
 		await this.lastRoute?.unload();
@@ -114,7 +114,7 @@ class RouteManager {
 	}
 
 	public comeback() {
-		this.nav(this.comebackRoute, false, false);
+		this.nav(this.comebackRoute, false, true);
 	}
 }
 

@@ -17,6 +17,7 @@ async function init() {
 	// createUser();
 	// createHtmlManager();
 	streamManager.builder.connect();
+	stateManager.init();
 	await sceneManager.loadMandatory();
 	routeManager.nav(window.location.href.substring(window.location.origin.length), false, true);
 	await gameManager.init();
@@ -32,7 +33,7 @@ async function init() {
 			if (stateManager.friendlist)
 				htmlManager.friendlist.toogle();
 			else
-				routeManager.comeback();
+				routeManager.nav("/home");
 		}
 		if (e.key == "p") {
 			console.log(sceneManager.camera.position, sceneManager.camera.getForwardRay().direction)

@@ -22,6 +22,7 @@ export class LobbyRoute implements IRoute {
 	public async load(): Promise<void> {
 		if (!this.created)
 			await this.init();
+		htmlManager.ath.checkBeforeHome = true;
 		routeManager.comebackRoute = "/play";
 		htmlManager.lobby.load();
 		streamManager.lobby.connect();

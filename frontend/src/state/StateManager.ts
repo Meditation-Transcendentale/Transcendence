@@ -27,6 +27,11 @@ class StateManager {
 		this.popup = 0;
 	}
 
+	public init() {
+		this.lobbyId = "";
+	}
+
+
 	public has(key: string): boolean {
 		return this.states.has(key);
 	}

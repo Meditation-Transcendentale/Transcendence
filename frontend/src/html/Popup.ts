@@ -22,6 +22,8 @@ interface ICustomPopupOption extends IPopupOption {
 interface IAcceptPopupOption extends IPopupOption {
 	accept: () => void;
 	decline: () => void;
+	acceptName?: string,
+	declineName?: string
 }
 
 interface IOKPopupOption extends IPopupOption {
@@ -76,7 +78,7 @@ export class Popup {
 
 		switch (option.type) {
 			case PopupType.accept: {
-				this.generateAcceptPopup();
+				this.generateAcceptPopup(option as IAcceptPopupOption);
 				break;
 			}
 			case PopupType.custom: {
@@ -101,21 +103,21 @@ export class Popup {
 		this.dialog.addEventListener("close", () => { this.close() })
 	}
 
-	private generateAcceptPopup() {
+	private generateAcceptPopup(option: IAcceptPopupOption) {
 		const footer = document.createElement("footer");
 		this.form.appendChild(footer);
 
 		const y = document.createElement("button");
 		const n = document.createElement("button");
-		y.textContent = "Accept";
-		n.textContent = "Decline";
+		y.textContent = option.acceptName || "Accept";
+		n.textContent = option.declineName || "Decline";
 
 		y.addEventListener("click", () => {
-			(this.option as IAcceptPopupOption).accept();
+			option.accept();
 		})
 
 		n.addEventListener("click", () => {
-			(this.option as IAcceptPopupOption).decline();
+			option.decline();
 		})
 
 		footer.appendChild(y);
