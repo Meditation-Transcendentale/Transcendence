@@ -309,6 +309,7 @@ export class FriendlistHtml {
 				btn.addEventListener("click", () => {
 					div.remove();
 					this.friend.delete(uuid);
+					User.removeFriend(uuid);
 					deleteRequest("friends/delete", { inputUuid: uuid })
 						.catch((err) => notifError(err));
 				})
@@ -330,6 +331,7 @@ export class FriendlistHtml {
 						.then(() => {
 							div.remove();
 							this.request.delete(uuid);
+							User.addFriendBis(uuid);
 							this.createUserElementAsync(uuid, "friend");
 						})
 						.catch((err) => notifError(err));
@@ -416,6 +418,7 @@ export class FriendlistHtml {
 				btn.addEventListener("click", () => {
 					div.remove();
 					this.friend.delete(uuid);
+					User.removeFriend(uuid);
 					deleteRequest("friends/delete", { inputUuid: uuid })
 						.catch((err) => notifError(err));
 				})
@@ -437,6 +440,7 @@ export class FriendlistHtml {
 						.then(() => {
 							div.remove();
 							this.request.delete(uuid);
+							User.addFriendBis(uuid);
 							this.createUserElementAsync(uuid, "friend");
 						})
 						.catch((err) => notifError(err));
