@@ -100,7 +100,7 @@ class RouteManager {
 		this.lastRoute = this.routes.get(url.pathname) as IRoute;
 
 		if (url.pathname !== "/auth") {
-			streamManager.notification.connect();
+			// streamManager.notification.connect();
 		}
 
 		if (url.pathname !== "/auth" && url.pathname !== "/br" && url.pathname !== "/pong" && url.pathname !== "/brick") {
