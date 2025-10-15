@@ -111,17 +111,17 @@
 }
 
 .join-lobby-window {
-	width: 50vh;
-	height: 70vh;
+	width: 60vh;
+	height: 80vh;
 }
 
 .join-info-window {
-	width: 30vh;
-	height: 30vh;
+	width: 50vh;
+	height: 45vh;
 }
 
 .join-input-window {
-	width: fit-content;
-	height: 11vh;
+	width: 60vh;
+	height: 15vh;
 
 }

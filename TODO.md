@@ -10,7 +10,7 @@
  ### Feature
 
     - leaderboard br
-    - (spectate)
+    - (spectate) check spectate leave
     - breaknreaker tutorial create button
 
  ### visual
@@ -25,6 +25,8 @@
     - check websocket url
     - fx pong to delete
     - add tournament create number
+    - match history stats update 
+    - fix friend popup auto disable
 
 ### tweak
     - 3D tweak

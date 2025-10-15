@@ -49,7 +49,7 @@ export class BrickBreaker {
 
 		this.camera = sceneManager.camera;
 		const light = new PointLight("pointBrick", new Vector3(0, 200, 0), this.scene);
-		light.intensity = 0.5;
+		light.intensity = 1.;
 		light.parent = this.root;
 
 		this.createArena();
@@ -193,8 +193,8 @@ export class BrickBreaker {
 		this.arena = MeshBuilder.CreateDisc("arena", { radius: 5, tessellation: 128 }, this.scene);
 		this.arena.parent = this.root;
 		const mat = new StandardMaterial("arenaMat", this.scene);
-		mat.diffuseColor.set(1, 1, 1);
-		mat.specularColor.set(0.5, 0.5, 0.5);
+		mat.diffuseColor.set(0.2, 0.2, 0.2);
+		mat.specularColor.set(0.2, 0.2, 0.2);
 		this.arena.material = mat;
 		this.arena.rotation.x = Math.PI / 2;
 		const radian = 2 * Math.PI;
