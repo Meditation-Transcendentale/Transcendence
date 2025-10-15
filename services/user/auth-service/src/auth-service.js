@@ -209,21 +209,30 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 	const { sub: google_id, name: username, picture: avatar_path } = payload;
 
+	let userByUsername = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
+	let userById = await natsRequest(nats, jc, 'user.getGoogleUserByGoogleId', { google_id } );
 
-	let user = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
-	if (!user) {
-		console.log('Creating new user with username:', username);
+
+	if (!userByUsername) {
 		const uuid = uuidv4();
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
-		// console.log('Avatar CDN URL:', avatarCdnUrl);
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
 		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatar_path: avatarCdnUrl });
-		user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
-		await natsRequest(nats, jc, 'status.addUserStatus', { userId: user.id, status: "offline" });
-		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: user.id });
+		userById = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+		await natsRequest(nats, jc, 'status.addUserStatus', { userId: userById.id, status: "offline" });
+		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: userById.id });
+	} else if (userByUsername && userByUsername.provider !== 'google' && !userById) {
+		username = username + '_' + Math.random().toString(36).substring(2, 8);
+		const uuid = uuidv4();
+		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
+		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
+		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatar_path: avatarCdnUrl });
+		userById = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+		await natsRequest(nats, jc, 'status.addUserStatus', { userId: userById.id, status: "offline" });
+		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: userById.id });
 	}
 
-	const accessToken = jwt.sign({ uuid: user.uuid, role: user.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
+	const accessToken = jwt.sign({ uuid: userById.uuid, role: userById.role }, process.env.JWT_SECRETKEY, { expiresIn: '24h' });
 	res.setCookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 
 	res.code(retCode).send({ message: retMessage });
@@ -245,6 +254,7 @@ async function get42accessToken(code, ftCookie, res) {
 	// 	return { token42: cached42Token.token};
 	// }
 
+	let redirectUri = `https://${process.env.HOSTNAME}:7000/api/auth/42`;
 
 	try {
 		const response = await axios.post(
@@ -254,7 +264,7 @@ async function get42accessToken(code, ftCookie, res) {
 				client_id: process.env.FT_API_UID,
 				client_secret: process.env.FT_API_SECRET,
 				code: code,
-				redirect_uri: `https://${process.env.HOSTNAME}:7000/api/auth/42`
+				redirect_uri: `https://${process.env.HOSTNAME}:7000/api/auth/42` 
 			}),
 			{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
 		);
