@@ -1,4 +1,5 @@
 import { BloomEffect, Engine, FxaaPostProcess, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Vector3 } from "../babylon"
+import { UIaddSlider } from "../UIUtils";
 import { Assets } from "./Assets";
 
 interface ICameraVue {
@@ -111,6 +112,11 @@ export class CameraManager {
 		this.brightness = 0.;
 		this.gamma = 1;
 		this.tonemapping = 0;
+
+		UIaddSlider("contrast", this.contrast, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.contrast = n });
+		UIaddSlider("brightness", this.brightness, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.brightness = n });
+		UIaddSlider("gamma", this.gamma, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.gamma = n });
+		UIaddSlider("tonemapping", this.tonemapping, { step: 1, min: 0, max: 8 }, (n: number) => { this.tonemapping = n });
 
 		this.colorCorrectionPostProcess.onApply = (effect) => {
 			effect.setFloat("contrast", this.contrast);
