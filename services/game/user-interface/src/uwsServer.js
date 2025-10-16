@@ -84,7 +84,7 @@ export function startWsServer({ port, handlers }) {
 			const msg = decodeClientMessage(Buffer.from(raw));
 			if (msg.paddleUpdate) handlers.paddleUpdate(ws, msg.paddleUpdate);
 			else if (msg.quit) handlers.quit(ws);
-			else if (msg.ready) { console.log (`ready|${ws.uuid}`) ; handlers.ready(ws); }
+			else if (msg.ready) { console.log(`ready|${ws.uuid}`); handlers.ready(ws); }
 			else if (msg.spectate) handlers.spectate(ws);
 			else {
 				console.warn('Unknown ClientMessage payload');

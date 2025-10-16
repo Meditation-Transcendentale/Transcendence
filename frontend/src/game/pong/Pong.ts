@@ -194,6 +194,7 @@ export class Pong {
 		const buffer = encodeClientMessage(payload);
 
 		this.wsManager.socket.send(buffer);
+		this.wsManager.socket.close();
 		this.stateManager.setter(false);
 		this.cam.parent = null;
 
