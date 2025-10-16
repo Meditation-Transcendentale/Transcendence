@@ -69,10 +69,8 @@ export class TournamentStream implements IStream {
       console.log(
         `UPDATE RECEIVED: ${payload.update.tournamentRoot?.winnerId}`
       );
-	  htmlManager.tournament.update(payload.update);
-      if (
-        payload.update.tournamentRoot.winnerId
-      )
+      htmlManager.tournament.update(payload.update);
+      if (payload.update.tournamentRoot.winnerId)
         htmlManager.tournament.finished();
       else {
         htmlManager.tournament.render();
@@ -81,7 +79,6 @@ export class TournamentStream implements IStream {
     if (payload.readyCheck) {
       htmlManager.tournament.readyCheck(payload.readyCheck);
       console.log(`READY CHECK RECEIVED: ${payload.readyCheck.deadlineMs}`);
-      htmlManager.tournament.render();
     }
     if (payload.startGame) {
       console.log(`START GAME RECEIVED`);

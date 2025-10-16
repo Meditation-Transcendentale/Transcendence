@@ -4,6 +4,7 @@ import { stateManager } from "../state/StateManager";
 import { streamManager } from "../stream/StreamManager";
 import { User } from "../User";
 import { IHtml } from "./IHtml";
+import { routeManager } from "../route/RouteManager";
 
 type PlayerState = {
   uuid: string;
@@ -31,7 +32,7 @@ export type TournamentServerUpdate = {
 };
 export type TournamentServerReadyCheck = { deadlineMs: number };
 
-export type   TournamentServerMessage = {
+export type TournamentServerMessage = {
   update?: TournamentServerUpdate;
   readyCheck?: TournamentServerReadyCheck;
   startGame?: { gameId: string };
@@ -99,21 +100,16 @@ export class TournamentHtml implements IHtml {
     this.readyActive = true;
     this.readyDeadline = payload.deadlineMs;
     this.startReadyCountdown();
+    this.render()
   }
 
   public finished() {
-    console.log("LOLOL")
-
     const root = this.tree;
     if (!root || !root.winnerId) return;
 
-    console.log("LOLOL2")
-
-    const { gold, silver, bronze } = this.computePodiumIds(root);
-    console.log("LOLOL3")
+    const { gold, silver, bronzes } = this.computePodiumIds(root);
 
     this.injectPodiumStyles();
-    console.log("LOLOL4")
 
     if (this.treeEl) {
       this.treeEl.style.filter = "blur(2px) saturate(120%)";
@@ -121,9 +117,7 @@ export class TournamentHtml implements IHtml {
       this.treeEl.style.transition = "filter 400ms ease, opacity 400ms ease";
     }
 
-
-    this.showPodiumOverlay({ gold, silver, bronze });
-
+    this.showPodiumOverlay({ gold, silver, bronzes });
   }
 
   private initDOM() {
@@ -162,7 +156,6 @@ export class TournamentHtml implements IHtml {
     this.rootEl.append(this.toolbarEl, this.treeEl);
     this.div.appendChild(this.rootEl);
 
-    this.render();
   }
 
   private sendReady() {
@@ -207,7 +200,7 @@ export class TournamentHtml implements IHtml {
       const badge = this.toolbarEl.querySelector(
         ".ready-countdown"
       ) as HTMLSpanElement | null;
-      if (badge) badge.textContent = "";
+      if (badge) this.toolbarEl.removeChild(badge);
       clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
@@ -254,7 +247,7 @@ export class TournamentHtml implements IHtml {
         postRequest("info/search", { identifier: pid, type: "uuid" }).then(
           (json: any) => {
             player.username = json.data.username;
-            profilePicture.src = json.data.avatar_path;
+            player.profilePictureSrc = json.data.avatar_path;
           }
         );
       }
@@ -317,6 +310,7 @@ export class TournamentHtml implements IHtml {
 
   private makeReadyButton(): HTMLButtonElement {
     const b = document.createElement("button");
+    b.className = "ready-btn";
     b.textContent = "Ready";
     b.addEventListener("click", () => this.sendReady());
     return b;
@@ -470,9 +464,10 @@ export class TournamentHtml implements IHtml {
   }
 
   public render() {
-    const leftLane = this.treeEl.querySelector(".bracket-left") as HTMLElement;
-    const ctrLane = this.treeEl.querySelector(".bracket-center") as HTMLElement;
-    const rightLane = this.treeEl.querySelector(
+    let newTree = this.treeEl;
+    const leftLane = newTree.querySelector(".bracket-left") as HTMLElement;
+    const ctrLane = newTree.querySelector(".bracket-center") as HTMLElement;
+    const rightLane = newTree.querySelector(
       ".bracket-right"
     ) as HTMLElement;
 
@@ -516,6 +511,7 @@ export class TournamentHtml implements IHtml {
       );
       rightLane.appendChild(col);
     }
+    this.treeEl = newTree;
   }
 
   private isPlaying(node: MatchNode): boolean {
@@ -529,207 +525,66 @@ export class TournamentHtml implements IHtml {
     return amIn && !node.winnerId;
   }
 
-
   private computePodiumIds(root: MatchNode): {
     gold: string | null;
     silver: string | null;
-    bronze: string | null;
+    bronzes: string[];
   } {
     const gold = root.winnerId ?? null;
 
     const finalists = [root.player1Id ?? null, root.player2Id ?? null];
     const silver = finalists.find((id) => id && id !== gold) ?? null;
 
-    let bronze: string | null = null;
-    const left = root.left ?? null;
-    const right = root.right ?? null;
+    const bronzes: string[] = [];
+    const sides = [root.left ?? null, root.right ?? null];
 
-    if (gold && left && right) {
-      const champFromLeft = left.winnerId === gold;
-      const side = champFromLeft ? left : right;
-      if (side && side.player1Id && side.player2Id && side.winnerId) {
-        bronze =
-          side.player1Id === side.winnerId ? side.player2Id : side.player1Id;
-      }
+    for (const semi of sides) {
+      if (!semi || !semi.winnerId || !semi.player1Id || !semi.player2Id)
+        continue;
+      const loser =
+        semi.player1Id === semi.winnerId ? semi.player2Id : semi.player1Id;
+      if (loser) bronzes.push(loser);
     }
-    return { gold, silver, bronze };
+
+    return { gold, silver, bronzes };
   }
 
   private injectPodiumStyles() {
-    if ((this as any)._podiumStyleEl) return;
+    if ((this as any)._podiumStyleElV2) return;
     const css = document.createElement("style");
-    css.id = "tournament-podium-styles";
-    css.textContent = `
-  .podium-overlay {
-    position: fixed; inset: 0; display: grid; place-items: center;
-    background:
-      radial-gradient(160vh 100vh at 50% 60%, rgba(13,2,33,.96) 0%, rgba(36,0,70,.95) 60%, rgba(13,2,33,.98) 100%),
-      linear-gradient(120deg, rgba(157,78,221,.12), rgba(199,125,255,.06));
-    backdrop-filter: blur(8px) saturate(115%);
-    z-index: 9999;
-    overflow: hidden;
-  }
-  .podium-overlay::before,
-  .podium-overlay::after {
-    content: "";
-    position: absolute; inset: -20%;
-    background: radial-gradient(circle at 30% 20%, rgba(157,78,221,.18), transparent 40%),
-                radial-gradient(circle at 70% 80%, rgba(199,125,255,.14), transparent 35%);
-    filter: blur(26px);
-    animation: nebula 18s ease-in-out infinite alternate;
-    opacity: .6;
-  }
-  .podium-overlay::after { animation-duration: 24s; animation-direction: alternate-reverse; }
+    css.id = "tournament-podium-styles-v2";
 
-  @keyframes nebula {
-    0% { transform: scale(1) translate(0,0); }
-    50% { transform: scale(1.06) translate(2%, -2%); }
-    100% { transform: scale(1.1) translate(-2%, 2%); }
-  }
-
-  .podium-wrap {
-    position: relative;
-    width: min(920px, 92vw);3rd
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 28px;
-    align-items: end;
-    font-family: var(--font-primary);
-    color: var(--color-lavender);
-  }
-
-  .podium-title {
-    position: absolute; top: -84px; left: 50%; transform: translateX(-50%);
-    font-size: clamp(28px, 4vw, 42px);
-    letter-spacing: .06em;
-    color: var(--color-lavender);
-    text-shadow: 0 0 28px rgba(157,78,221,.6);
-    white-space: nowrap;
-  }
-
-  .tier {
-    position: relative;
-    display: grid;
-    grid-template-rows: auto auto;
-    justify-items: center;
-    gap: 14px;
-  }
-
-  .badge {
-    font-size: 14px; letter-spacing: .12em; text-transform: uppercase;
-    padding: 6px 10px; border-radius: 999px;
-    border: 1px solid rgba(199,125,255,.4);
-    background: linear-gradient(135deg, rgba(90,24,154,.35), rgba(157,78,221,.22));
-    box-shadow: 0 0 14px rgba(157,78,221,.35) inset, 0 0 20px rgba(157,78,221,.25);
-  }
-
-  .plinth {
-    width: 100%; border-radius: 18px;
-    background:
-      linear-gradient(180deg, rgba(114,9,183,.22), rgba(92,0,150,.2) 40%, rgba(60,9,108,.18) 100%),
-      linear-gradient(135deg, rgba(199,125,255,.16), rgba(157,78,221,.08));
-    border: 2px solid var(--color-purple-bright);
-    box-shadow: 0 10px 36px rgba(157,78,221,.35), 0 0 40px rgba(199,125,255,.2) inset;
-    position: relative; overflow: hidden;
-  }
-  .plinth::after {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(90deg, rgba(255,255,255,.0) 0%, rgba(255,255,255,.08) 50%, rgba(255,255,255,.0) 100%);
-    transform: translateX(-100%);
-    animation: sweep 4.6s ease-in-out infinite;
-  }
-  @keyframes sweep { 0%,15% { transform: translateX(-120%);} 50% { transform: translateX(120%);} 100% { transform: translateX(120%);} }
-
-  .tier--gold .plinth { height: 220px; }
-  .tier--silver .plinth { height: 160px; }
-  .tier--bronze .plinth { height: 120px; }
-
-  .avatar {
-    width: 92px; height: 92px; border-radius: 50%;
-    border: 3px solid var(--color-purple-light);
-    box-shadow: 0 0 26px rgba(199,125,255,.45);
-    overflow: hidden; position: relative;
-  }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .avatar--placeholder {
-    display: grid; place-items: center;
-    background: linear-gradient(135deg, rgba(114,9,183,.25), rgba(157,78,221,.18));
-    font-size: 36px;
-  }
-
-  .name {
-    font-size: clamp(16px, 2.4vw, 22px);
-    text-shadow: 0 2px 12px rgba(157,78,221,.6);
-    max-width: 14ch; text-align: center;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-
-  .crown {
-    position: absolute; top: -16px; font-size: 26px;
-    filter: drop-shadow(0 8px 12px rgba(199,125,255,.5));
-    animation: float 3s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-
-  .cta {
-    position: absolute; bottom: -84px; left: 50%; transform: translateX(-50%);
-    padding: 12px 18px; border-radius: 12px; cursor: pointer;
-    color: var(--color-lavender);
-    background: linear-gradient(135deg, var(--color-purple-medium), var(--color-purple-bright));
-    border: 2px solid var(--color-purple-light);
-    box-shadow: 0 10px 24px rgba(157,78,221,.45);
-    font-size: 16px; letter-spacing: .06em;
-  }
-  .cta:hover { filter: brightness(1.05); }
-
-  /* subtle particles */
-  .spark {
-    position: absolute; width: 4px; height: 4px; border-radius: 50%;
-    background: var(--color-purple-light); opacity: .7;
-    box-shadow: 0 0 10px var(--color-purple-bright);
-    animation: rise 6s linear infinite;
-  }
-  @keyframes rise {
-    0% { transform: translateY(0) scale(1); opacity:.0; }
-    10% { opacity:.7; }
-    100% { transform: translateY(-180px) scale(.8); opacity: .0; }
-  }
-  `;
     document.head.appendChild(css);
-    (this as any)._podiumStyleEl = css;
+    (this as any)._podiumStyleElV2 = css;
   }
 
   private showPodiumOverlay(ids: {
     gold: string | null;
     silver: string | null;
-    bronze: string | null;
+    bronzes: string[];
   }) {
     const overlay = document.createElement("div");
     overlay.className = "podium-overlay";
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-label", "Tournament Podium");
 
-    const makeTier = (
-      place: "gold" | "silver" | "bronze",
-      pid: string | null
-    ) => {
-      const tier = document.createElement("div");
-      tier.className = `tier tier--${place}`;
+    const wrap = document.createElement("div");
+    wrap.className = "podium-wrap";
 
-      const badge = document.createElement("div");
-      badge.className = "badge";
-      badge.textContent =
-        place === "gold" ? "1st" : place === "silver" ? "2nd" : "3rd";
+    const title = document.createElement("div");
+    title.className = "podium-title";
+    title.textContent = "Mysterious Podium";
+
+    const renderPerson = (pid: string | null) => {
+      const person = document.createElement("div");
+      person.className = "person";
 
       const avatar = document.createElement("div");
       avatar.className = "avatar avatar--placeholder";
-      let name = document.createElement("div");
-      name.className = "name";
-      name.textContent = "TBD";
 
+      const name = document.createElement("div");
+      name.className = "name";
+      
       if (pid) {
         const p = this.players.get(pid) || null;
         if (p) {
@@ -748,9 +603,21 @@ export class TournamentHtml implements IHtml {
       } else {
         avatar.textContent = "•";
       }
+      
+      name.classList.add("glitch");
+      name.setAttribute("data-text", name.textContent || "");
 
-      const plinth = document.createElement("div");
-      plinth.className = "plinth";
+      person.append(avatar, name);
+      return person;
+    };
+
+    const makeTier = (place: "gold" | "silver", pid: string | null) => {
+      const tier = document.createElement("div");
+      tier.className = `tier tier--${place}`;
+
+      const badge = document.createElement("div");
+      badge.className = "label";
+      badge.textContent = place === "gold" ? "1st" : "2nd";
 
       if (place === "gold") {
         const crown = document.createElement("div");
@@ -759,31 +626,51 @@ export class TournamentHtml implements IHtml {
         tier.appendChild(crown);
       }
 
-      tier.append(badge, avatar, name, plinth);
+      const plinth = document.createElement("div");
+      plinth.className = "plinth";
+
+      tier.append(badge, renderPerson(pid), plinth);
       return tier;
     };
 
-    const wrap = document.createElement("div");
-    wrap.className = "podium-wrap";
-    const title = document.createElement("div");
-    title.className = "podium-title";
-    title.textContent = "Mysterious Podium";
+    const makeBronzeTier = (pids: string[]) => {
+      const tier = document.createElement("div");
+      tier.className = "tier tier--bronze";
+
+      const badge = document.createElement("div");
+      badge.className = "label";
+      badge.textContent = "3rd";
+
+      const duo = document.createElement("div");
+      duo.className = "duo";
+      const [a, b] = [pids[0] ?? null, pids[1] ?? null];
+      duo.append(renderPerson(a as any), renderPerson(b as any));
+
+      const plinth = document.createElement("div");
+      plinth.className = "plinth";
+
+      tier.append(badge, duo, plinth);
+      return tier;
+    };
 
     wrap.append(
       makeTier("silver", ids.silver),
       makeTier("gold", ids.gold),
-      makeTier("bronze", ids.bronze)
+      makeBronzeTier(ids.bronzes)
     );
 
     const cta = document.createElement("button");
     cta.className = "cta";
-    cta.textContent = "Continue";
+    cta.innerHTML = `Leave the tournament<span aria-hidden="true">`;
+
     cta.addEventListener("click", () => {
-      overlay.remove();
       if (this.treeEl) {
         this.treeEl.style.filter = "";
         this.treeEl.style.opacity = "";
       }
+      overlay.remove();
+      this.rootEl.remove();
+      routeManager.nav("/home");
     });
 
     for (let i = 0; i < 18; i++) {
@@ -796,15 +683,6 @@ export class TournamentHtml implements IHtml {
     }
 
     overlay.append(title, wrap, cta);
-
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) cta.click();
-    });
-    const esc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") cta.click();
-    };
-    document.addEventListener("keydown", esc, { once: true });
-
     this.rootEl?.appendChild(overlay);
   }
 }
