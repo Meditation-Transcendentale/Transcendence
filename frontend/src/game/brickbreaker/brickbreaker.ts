@@ -26,7 +26,6 @@ export class BrickBreaker {
 	public gameUI: GameUI;
 	public mode: string = "normal";
 	
-	
 	public score: number = 0;
 	public pbEasy: number = 0;
 	public pbNormal: number = 0;
@@ -183,4 +182,79 @@ export class BrickBreaker {
 		this.isStarted = false;
 		this.player.disableInput();
 	}
+
+
+	public showTutorial() {
+		const tutorialOverlay = document.createElement('div');
+		tutorialOverlay.className = 'tutorial-overlay';
+		
+		tutorialOverlay.innerHTML = `
+			<div class="tutorial-container">
+				
+				<button class="tutorial-close"
+					onmouseover="this.style.background='#a855f7'; this.style.color='#000';" 
+					onmouseout="this.style.background='transparent'; this.style.color='#a855f7';">&times;</button>
+				
+				<div class="tutorial-content">
+					<h2 class="tutorial-title">How to Play</h2>
+					
+					<div id="tutorial-brick" class="tutorial-step">
+						<div class="tutorial">
+							<img class="tutorial-src" src="/assets/gifs/break-bricks.gif" alt="goal">
+							<p class="tutorial-text">Break all the bricks by bouncing the ball with your shield and try to make the best score.</p>
+						</div>
+					</div>
+
+					<div id="tutorial-move" class="tutorial-step">
+						<div class="tutorial">
+							<img class="tutorial-src" src="/assets/gif_move_player.gif" alt="Move player">
+							<p class="tutorial-text">Use the mouse to move</p>
+						</div>
+					</div>
+					
+					<div id="tutorial-shield" class="tutorial-step">
+						<div class="tutorial">
+							<img class="tutorial-src" src="/assets/gifs/power-ups.gif" alt="Shield">
+							<p class="tutorial-text">Press Space to activate your shield. The shield depletes while active and regenerates when released.</p>
+						</div>
+					</div>
+
+					<div id="tutorial-points" class="tutorial-step">
+						<div class="tutorial">
+							<img class="tutorial-src" src="/assets/gifs/power-ups.gif" alt="Points">
+							<p class="tutorial-text">Each layer is worth a different amount of points. The closer to the edge, the higher the score.</p>
+						</div>
+					</div>
+
+					<div id="tutorial-ball" class="tutorial-step">
+						<div class="tutorial">
+							<img class="tutorial-src" src="/assets/gifs/power-ups.gif" alt="Speed">
+							<p class="tutorial-text">Hit the ball with your shield to activate it and destroy bricks. The ball deactivates when hitting other surfaces. Any contact with the ball means game over. Each consecutive hit increases the ball's speed, and faster balls award more points per brick destroyed.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		`;
+		
+		document.body.appendChild(tutorialOverlay);
+		
+		const closeBtn = tutorialOverlay.querySelector('.tutorial-close');
+		const startBtn = tutorialOverlay.querySelector('.tutorial-start');
+		
+		const closeTutorial = () => {
+			tutorialOverlay.style.opacity = '0';
+			setTimeout(() => tutorialOverlay.remove(), 300);
+		};
+		
+		closeBtn?.addEventListener('click', closeTutorial);
+		startBtn?.addEventListener('click', closeTutorial);
+		tutorialOverlay.addEventListener('click', (e) => {
+			if (e.target === tutorialOverlay) closeTutorial();
+		});
+
+		tutorialOverlay.style.opacity = '0';
+		setTimeout(() => tutorialOverlay.style.transition = 'opacity 0.3s ease', 10);
+		setTimeout(() => tutorialOverlay.style.opacity = '1', 20);
+	}
+
 }
