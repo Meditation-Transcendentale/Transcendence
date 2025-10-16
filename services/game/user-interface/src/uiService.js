@@ -167,10 +167,12 @@ export default class UIService {
 		const sess = this.sessions.get(ws.uuid);
 		if (!sess) return;
 
-		const { uuid, mode, gameId } = sess;
+		const { uuid, mode, gameId, role } = sess;
 
-		const topic = `games.${mode}.${gameId}.match.quit`;
-		natsClient.publish(topic, encodeMatchQuit({ uuid }));
+		if (role !== 'spectator') {
+			const topic = `games.${mode}.${gameId}.match.quit`;
+			natsClient.publish(topic, encodeMatchQuit({ uuid }));
+		}
 
 		this.sessions.delete(uuid);
 
