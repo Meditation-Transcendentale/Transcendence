@@ -85,12 +85,6 @@ const addApiKeyHeader = (req, headers) => {
 	return headers;
 };
 
-const addApiKeyHeaderAuth = (req, headers) => {
-	headers['x-api-key'] = process.env.API_GATEWAY_KEY;
-	headers['from'] = req.headers['referer'];
-	return headers;
-}
-
 app.register(fastifyHttpProxy, {
 	upstream: 'https://register-service:4001',
 	prefix: '/register',
@@ -105,7 +99,7 @@ app.register(fastifyHttpProxy, {
 	prefix: '/auth',
 	http2: false,
 	replyOptions: {
-		rewriteRequestHeaders: addApiKeyHeaderAuth
+		rewriteRequestHeaders: addApiKeyHeader
 	}
 });
 
