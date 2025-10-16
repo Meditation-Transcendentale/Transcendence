@@ -85,9 +85,10 @@ clean:
 	$(MAKE) down
 	$(MAKE) cleanShared
 	$(MAKE) cleanVolumes
+	$(MAKE) cleanCDN
 
 cleanCDN:
 	@if [ -d ./services/cdn/public ]; then \
-		rm -rf ./services/cdn/public/*.*; \
+		find ./services/cdn/public -maxdepth 1 -type f ! -name 'doNotDelete' ! -name 'default_avatar.jpg' -exec rm -f {} \; ; \
 	fi
 
