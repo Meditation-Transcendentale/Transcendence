@@ -53,6 +53,7 @@ export class PongBR {
 	private thinInstanceSystem!: ThinInstanceSystem;
 	private spaceSkybox!: SpaceSkybox;
 	private statue!: Mesh;
+	private smileTarget: any = null;
 	public currentBallScale: Vector3 = new Vector3(1, 1, 1);
 	private gameUI: GameUI;
 	private localPaddleIndex: number = 0;
@@ -92,7 +93,9 @@ export class PongBR {
 
 		this.baseMeshes = createBaseMeshes(this.scene, this.rotatingContainer);
 		this.instanceManagers = this.createInstanceManagers(this.baseMeshes);
-		this.statue = initStatue(this.scene, this.pongRoot);
+		const statueResult = initStatue(this.scene, this.pongRoot);
+		this.statue = statueResult.statue;
+		this.smileTarget = statueResult.smileTarget;
 		const blackholeResult = createBlackHoleBackdrop(this.scene, this.statue.position, this.pongRoot);
 		blackholeResult.backdrop.setEnabled(false);
 		this.blackholeObserver = blackholeResult.observer;
@@ -168,6 +171,8 @@ export class PongBR {
 
 		localPaddleId = await this.waitForRegistration();
 
+		this.gameUI.showBRInputHints();
+
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
 		this.ecs.addSystem(this.inputSystem);
 		this.networkingSystem = new NetworkingSystem(
@@ -195,6 +200,7 @@ export class PongBR {
 			}
 		});
 
+		this.smileTarget.influence = 0.0;
 		this.spaceSkybox.onGameLoad();
 		this.localPaddleIndex = localPaddleId;
 		this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, this.localPaddleIndex);
@@ -204,15 +210,21 @@ export class PongBR {
 
 		this.currentBallScale = BALL_SCALES[100];
 
-		this.startIntroCameraAnimation('Phase 1', 3.0);
-
 		this.networkingSystem.forceIndexRebuild();
-		// this.camera.attachControl();
 
-		this.inputManager.enable();
 		this.pongRoot.setEnabled(true);
 		this.stateManager.start();
 		this.spaceSkybox.disable();
+
+		this.inputManager.disable();
+
+		this.startIntroCameraAnimation('Phase 1', 3.0);
+
+		setTimeout(() => {
+			this.gameUI.startCountdown(3, () => {
+				this.gameUI.hideBRInputHints();
+			});
+		}, 1500);
 	}
 	public stop(): void {
 		this.stateManager.stop();
@@ -460,11 +472,41 @@ export class PongBR {
 		this.isTransitioning = true;
 		this.startPhaseFadeOut();
 		this.startPhaseAnimation(duration);
+
+		if (phase === 'Phase 2' && this.smileTarget) {
+			this.animateStatueSmile(3.0);
+		}
 	}
 
 	private startIntroCameraAnimation(phase: string, duration: number): void {
 		this.startCameraAnimation(phase, duration);
 		this.startPhaseAnimation(duration);
+		this.inputManager.enable();
+	}
+
+	/**
+	 * Animates the statue's smile morph target from hidden (0.0) to fully visible (1.0)
+	 * Uses smoothstep easing for a natural smile animation
+	 */
+	private animateStatueSmile(duration: number): void {
+		if (!this.smileTarget) return;
+
+		const startTime = performance.now();
+		const startInfluence = this.smileTarget.influence;
+		const targetInfluence = 1.0;
+
+		const smileObserver = this.scene.onBeforeRenderObservable.add(() => {
+			const elapsed = (performance.now() - startTime) / 1000;
+			const progress = Math.min(elapsed / duration, 1.0);
+
+			if (progress < 1.0) {
+				const eased = progress * progress * (3.0 - 2.0 * progress);
+				this.smileTarget.influence = startInfluence + (targetInfluence - startInfluence) * eased;
+			} else {
+				this.smileTarget.influence = targetInfluence;
+				this.scene.onBeforeRenderObservable.remove(smileObserver);
+			}
+		});
 	}
 
 	private startPhaseAnimation(duration: number): void {

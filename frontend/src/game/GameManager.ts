@@ -90,7 +90,7 @@ export class GameManager {
 			}
 		})
 		this.brUI = new GameUI(div.cloneNode(true) as HTMLDivElement, {
-			enabledModules: ['buttons', 'ending', 'images', 'playercounter', 'elimination', 'phasechange'],
+			enabledModules: ['buttons', 'ending', 'images', 'playercounter', 'elimination', 'phasechange', 'countdown', 'brinputhints'],
 			theme: 'berserk',
 			modulePositions: {
 				buttons: { x: 'center', y: 'bottom', offset: { x: 0, y: 50 } },
@@ -98,7 +98,9 @@ export class GameManager {
 				images: { x: 'center', y: 'center' },
 				playercounter: { x: "left", y: 'top' },
 				elimination: { x: 'center', y: 'bottom', offset: { x: 0, y: 0 } },
-				phasechange: { x: 'center', y: 'top', offset: { x: 0, y: 260 } }
+				phasechange: { x: 'center', y: 'top', offset: { x: 0, y: 260 } },
+				countdown: { x: 'center', y: 'center' },
+				brinputhints: { x: 'center', y: 'bottom' }
 			}
 		})
 		this.brickUI = new GameUI(div.cloneNode(true) as HTMLDivElement, {

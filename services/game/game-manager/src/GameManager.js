@@ -135,6 +135,13 @@ export class GameManager {
 		const match = this.games.get(gameId);
 		if (!match || match.status !== "running") return;
 
+		if (match.mode === 'br') {
+			const currentPhase = match.state.gameState?.currentPhase;
+			if (!currentPhase || currentPhase === 'Pre-Game') {
+				return;
+			}
+		}
+
 		// queue inputs for next tick
 		this.handleInput({
 			gameId,
@@ -281,17 +288,14 @@ export class GameManager {
 			console.log(`[GameManager] Remaining real players: ${remainingRealPlayers.length}`);
 
 			if (isActivePlayer && remainingRealPlayers.length > 0) {
-				// There are other real players, just eliminate this one
 				this.eliminatePlayerBR(gameId, uuid);
 				return true;
 			}
 
-			// If quitting player is active and this will end the game, assign them a rank first
 			if (isActivePlayer) {
 				if (!match.state.ranks) {
 					match.state.ranks = [];
 				}
-				// Assign rank based on number of active players (they finish at this position)
 				match.state.ranks[playerId] = activePlayers.length;
 				console.log(`[GameManager] Assigned rank ${activePlayers.length} to quitting player ${uuid} (id: ${playerId})`);
 			}
@@ -355,59 +359,63 @@ export class GameManager {
 
 		if (match.mode === 'br') {
 			const activePlayers = lastState.gameState?.activePlayers || [];
+			const currentPhase = lastState.gameState?.currentPhase;
 
-			if (!this.botStates.has(gameId)) {
-				this.botStates.set(gameId, new Map());
-			}
-			const gameBotStates = this.botStates.get(gameId);
+			if (!currentPhase || currentPhase === 'Pre-Game') {
+			} else {
+				if (!this.botStates.has(gameId)) {
+					this.botStates.set(gameId, new Map());
+				}
+				const gameBotStates = this.botStates.get(gameId);
 
-			match.instance.players.forEach((uuid, paddleId) => {
-				if (uuid.startsWith('bot-') && activePlayers.includes(paddleId)) {
-					const hasInput = inputs.some(input => input.id === paddleId);
+				match.instance.players.forEach((uuid, paddleId) => {
+					if (uuid.startsWith('bot-') && activePlayers.includes(paddleId)) {
+						const hasInput = inputs.some(input => input.id === paddleId);
 
-					if (!hasInput) {
-						if (!gameBotStates.has(paddleId)) {
-							gameBotStates.set(paddleId, {
-								lastMove: 0,
-								moveChangeTime: match.tick,
-								currentDirection: 0
-							});
-						}
-
-						const botState = gameBotStates.get(paddleId);
-						const ticksSinceLastChange = match.tick - botState.moveChangeTime;
-
-						const minTicksBeforeChange = 20;
-						const maxTicksBeforeChange = 40;
-						const shouldChangeDirection = ticksSinceLastChange >= minTicksBeforeChange &&
-							(ticksSinceLastChange >= maxTicksBeforeChange || Math.random() < 0.05);
-
-						let move = botState.currentDirection;
-
-						if (shouldChangeDirection) {
-							const rand = Math.random();
-							if (rand < 0.4) {
-								move = -1;
-							} else if (rand < 0.8) {
-								move = 1;
-							} else {
-								move = 0;
+						if (!hasInput) {
+							if (!gameBotStates.has(paddleId)) {
+								gameBotStates.set(paddleId, {
+									lastMove: 0,
+									moveChangeTime: match.tick,
+									currentDirection: 0
+								});
 							}
 
-							botState.currentDirection = move;
-							botState.moveChangeTime = match.tick;
-						}
+							const botState = gameBotStates.get(paddleId);
+							const ticksSinceLastChange = match.tick - botState.moveChangeTime;
 
-						if (move !== botState.lastMove) {
-							inputs.push({
-								id: paddleId,
-								move: move
-							});
-							botState.lastMove = move;
+							const minTicksBeforeChange = 20;
+							const maxTicksBeforeChange = 40;
+							const shouldChangeDirection = ticksSinceLastChange >= minTicksBeforeChange &&
+								(ticksSinceLastChange >= maxTicksBeforeChange || Math.random() < 0.05);
+
+							let move = botState.currentDirection;
+
+							if (shouldChangeDirection) {
+								const rand = Math.random();
+								if (rand < 0.4) {
+									move = -1;
+								} else if (rand < 0.8) {
+									move = 1;
+								} else {
+									move = 0;
+								}
+
+								botState.currentDirection = move;
+								botState.moveChangeTime = match.tick;
+							}
+
+							if (move !== botState.lastMove) {
+								inputs.push({
+									id: paddleId,
+									move: move
+								});
+								botState.lastMove = move;
+							}
 						}
 					}
-				}
-			});
+				});
+			}
 		}
 
 		try {

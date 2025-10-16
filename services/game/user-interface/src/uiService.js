@@ -123,14 +123,10 @@ export default class UIService {
 
 		// 2) Reject if this player isn't on the whitelist
 		if (!players.includes(uuid)) {
-			console.log("included");
-			this.sessions.set(uuid, { ws, role, gameId, mode, uuid });
+			this.sessions.set(uuid, { ws, role: 'spectator', gameId, mode, uuid });
 			this.games.get(gameId).add(uuid);
 			this.handleSpectate(ws);
-			// const errBuf = encodeErrorMessage({ message: 'Not allowed to join this game' });
-			// ws.send(errBuf, true);
-			// console.log("NOT ALLOWED TO JOIN");
-			// return ws.close();
+			return;
 		}
 
 		// 3) Prevent double-registration
@@ -141,7 +137,6 @@ export default class UIService {
 		// }
 
 		// 4) Register player
-		console.log("handled");
 		this.sessions.set(uuid, { ws, role, gameId, mode, uuid });
 		this.games.get(gameId).add(uuid);
 
@@ -224,16 +219,18 @@ export default class UIService {
 		if (readySet.size === requiredPlayers) {
 			console.log(`[UI] All players ready! Starting game ${gameId}`);
 			const topic = `games.${gameMode}.${gameId}.match.start`;
+
+			const startBuff = encodeServerMessage({
+				start: {}
+			});
+			this.uwsApp.publish(gameId, startBuff, /* isBinary= */ true);
+
 			try {
 				natsClient.publish(topic, encodeMatchStart({ gameId: gameId }));
 			}
 			catch (err) {
 				console.log(err);
 			}
-			const startBuff = encodeServerMessage({
-				start: {}
-			});
-			this.uwsApp.publish(gameId, startBuff, /* isBinary= */ true);
 
 			this.readyPlayers.delete(gameId);
 		}
@@ -245,28 +242,9 @@ export default class UIService {
 
 		// 1) Must already be registered
 		if (!sess) {
-			console.log("no sess");
-			//const err = encodeErrorMessage({ message: 'Session not found' });
-			//ws.send(err, true);
 			return ws.close();
 		}
 		console.log("server receive spectating:", uuid);
-		// 2) Change role
-		sess.role = "spectator";
-		delete sess.paddleId;
-	}
-	handleSpectate(ws) {
-		const { uuid } = ws;
-		const sess = this.sessions.get(uuid);
-
-		// 1) Must already be registered
-		if (!sess) {
-			//const err = encodeErrorMessage({ message: 'Session not found' });
-			//ws.send(err, true);
-			return ws.close();
-		}
-		console.log("server receive spectating:", uuid);
-		// 2) Change role
 		sess.role = 'spectator';
 		delete sess.paddleId;
 	}
