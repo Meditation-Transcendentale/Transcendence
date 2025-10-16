@@ -13,7 +13,6 @@ Welcome to the **Transcendence** project! This repository is a full-stack multip
 | Message Broker| NATS                    |
 | Game Services | Node.js Microservices   |
 | Auth          | JWT / OAuth2 (planned)  |
-| Logging       | ELK Stack (planned)     |
 | CI/CD         | GitHub Actions + Docker |
 
 ---
