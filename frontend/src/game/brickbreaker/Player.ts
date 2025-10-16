@@ -12,7 +12,7 @@ export class Player {
 	private shieldMat: ShaderMaterial;
 	private velocity: Vector3;
 
-	private angleFactor: number;
+	private angleFactor: number = 0.5;
 	private lastInputDelay: number;
 	private isActive: number = 0.0;
 	private alpha: number = 1.;
@@ -36,17 +36,27 @@ export class Player {
 		this.scene = scene;
 		this.game = game;
 
+		
+		this.lastInputDelay = performance.now();
+		
+		this.createMeshes(position);
+		this.spawnShield();
+		this.eventHandler();
+		this.setupShaders();
+	}
+
+	createMeshes(position: Vector3) {
 		this.goal = MeshBuilder.CreateCylinder("goal", { height: 0.5, diameter: 1, subdivisions: 16 }, this.scene);
-		this.goal.parent = game.root;
+		this.goal.parent = this.game.root;
 		this.materialGoal = new StandardMaterial("goalMat", this.scene);
 		this.materialGoal.emissiveColor = new Color3(1, 1, 1);
 		this.goal.material = this.materialGoal;
 		this.goal.position.set(position.x, position.y, position.z);
 		this.velocity = new Vector3(0, 0, 0);
-		this.pointer = new Vector2(game.root.position.x, game.root.position.z);
+		this.pointer = new Vector2(this.game.root.position.x, this.game.root.position.z);
 
 		this.shield = MeshBuilder.CreateCylinder("shield", { height: 0.25, diameter: 1.8, tessellation: 64, arc: 0.5, enclose: true, updatable: true }, this.scene);
-		this.shield.parent = game.root;
+		this.shield.parent = this.game.root;
 		this.shield.position.y = -2;
 		this.shield.rotation.y = Math.PI;
 		this.materialShield = new StandardMaterial("shieldMat", this.scene);
@@ -56,12 +66,18 @@ export class Player {
 		this.game.gl.addIncludedOnlyMesh(this.goal);
 		this.game.gl.addIncludedOnlyMesh(this.shield);
 
-		this.angleFactor = 0.5;
-		this.isActive = 0.0;
-		this.lastInputDelay = performance.now();
+		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
+		this.pointerSurface.parent = this.game.root;
+		const invMat = new StandardMaterial("surfaceMat", this.scene);
+		invMat.diffuseColor.set(0, 0, 0);
+		invMat.alpha = 0;
+		this.pointerSurface.position.y = 0;
+		this.pointerSurface.material = invMat;
+		this.pointerSurface.rotation.x = Math.PI / 2;
+		this.pointerSurface.isPickable = true;
+	}
 
-		this.spawnShield();
-
+	eventHandler() {
 		this.keydownHandler = (e: KeyboardEvent) => {
 			this.keysPressed.add(e.code);
 		}
@@ -74,17 +90,9 @@ export class Player {
 			this.pointer.x = e.clientX;
 			this.pointer.y = e.clientY;
 		}
+	}
 
-		this.pointerSurface = MeshBuilder.CreatePlane("surface", { size: 40, sideOrientation: Mesh.DOUBLESIDE }, this.scene);
-		this.pointerSurface.parent = game.root;
-		const invMat = new StandardMaterial("surfaceMat", this.scene);
-		invMat.diffuseColor.set(0, 0, 0);
-		invMat.alpha = 0;
-		this.pointerSurface.position.y = 0;
-		this.pointerSurface.material = invMat;
-		this.pointerSurface.rotation.x = Math.PI / 2;
-		this.pointerSurface.isPickable = true;
-
+	setupShaders() {
 		Effect.ShadersStore['customFragmentShader'] = `
 			precision highp float;
 
