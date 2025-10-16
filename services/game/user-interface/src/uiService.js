@@ -29,11 +29,8 @@ export default class UIService {
 		this.nc = null;
 	}
 	async start() {
-		// 0) Connect to NATS
 		const nc = await natsClient.connect(process.env.NATS_URL);
 		this.nc = nc;
-
-		// 1) Start µWS WebSocket server
 		this.uwsApp = startWsServer({
 			port: Number(process.env.SERVER_PORT) || 5004,
 			handlers: {
@@ -45,7 +42,6 @@ export default class UIService {
 			},
 		});
 
-		// 2) MatchSetup → record players & mode
 		{
 			const sub = nc.subscribe("games.*.*.match.setup");
 			(async () => {
@@ -59,7 +55,6 @@ export default class UIService {
 			})();
 		}
 
-		// 3) StateUpdate → broadcast StateMessage
 		{
 			const sub = nc.subscribe("games.*.*.match.state");
 			(async () => {
@@ -74,7 +69,6 @@ export default class UIService {
 			})();
 		}
 
-		// 4) MatchEnd → broadcast GameEndMessage & cleanup
 		{
 			const sub = nc.subscribe('games.*.*.match.end');
 			(async () => {
@@ -101,7 +95,6 @@ export default class UIService {
 					this.allowedByGame.delete(gameId);
 					this.games.delete(gameId);
 					this.readyPlayers.delete(gameId);
-					// console.log(`Game ${gameId} ended, winner paddleId=${winnerId}`);
 				}
 			})();
 		}
@@ -119,28 +112,13 @@ export default class UIService {
 		}
 
 		const { players, mode } = setup;
-		console.log("uuid=", uuid);
 
-		// 2) Reject if this player isn't on the whitelist
 		if (!players.includes(uuid)) {
 			this.sessions.set(uuid, { ws, role: 'spectator', gameId, mode, uuid });
 			this.games.get(gameId).add(uuid);
 			this.handleSpectate(ws);
-			const welcomeBuf = encodeServerMessage({
-				welcome: { paddleId: '-1' },
-			});
-			ws.send(welcomeBuf, true);
 			return;
 		}
-
-		// 3) Prevent double-registration
-		// if (this.sessions.has(uuid)) {
-		// 	const errBuf = encodeErrorMessage({ message: 'Already registered' });
-		// 	ws.send(errBuf, true);
-		// 	return ws.close();
-		// }
-
-		// 4) Register player
 		this.sessions.set(uuid, { ws, role, gameId, mode, uuid });
 		this.games.get(gameId).add(uuid);
 
@@ -156,7 +134,6 @@ export default class UIService {
 	}
 
 	handlePaddleUpdate(ws, { paddleId, move }) {
-		// TODO maybe check if the paddle id is valid
 		const sess = this.sessions.get(ws.uuid);
 		const topic = `games.${sess.mode}.${sess.gameId}.match.input`;
 		natsClient.publish(topic, encodeMatchInput({ paddleId, move }));
@@ -184,8 +161,6 @@ export default class UIService {
 		if (readySet) {
 			readySet.delete(uuid);
 		}
-
-		//ws.close();
 	}
 
 	handleReady(ws) {
@@ -196,9 +171,6 @@ export default class UIService {
 			return;
 		}
 
-		console.log(`[UI] Ready handler: uuid=${uuid}, mode=${mode}, gameId=${gameId}`);
-
-		// 1) Mark this player as ready
 		let readySet = this.readyPlayers.get(gameId);
 		if (!readySet) {
 			readySet = new Set();
@@ -217,9 +189,6 @@ export default class UIService {
 			console.log(`[UI] BR ready check: ${readySet.size}/${requiredPlayers} real players ready (${players.length} total including bots)`);
 		}
 
-		console.log(`[UI] Ready check: ${readySet.size}/${requiredPlayers} players ready (mode: ${gameMode})`);
-
-		// 2) if all required players are ready
 		if (readySet.size === requiredPlayers) {
 			console.log(`[UI] All players ready! Starting game ${gameId}`);
 			const topic = `games.${gameMode}.${gameId}.match.start`;
@@ -244,12 +213,16 @@ export default class UIService {
 		const { uuid } = ws;
 		const sess = this.sessions.get(uuid);
 
-		// 1) Must already be registered
 		if (!sess) {
 			return ws.close();
 		}
-		console.log("server receive spectating:", uuid);
+
 		sess.role = 'spectator';
 		delete sess.paddleId;
+
+		const welcomeBuf = encodeServerMessage({
+			welcome: { paddleId: -1 },
+		});
+		ws.send(welcomeBuf, true);
 	}
 }

@@ -171,7 +171,11 @@ export class PongBR {
 
 		localPaddleId = await this.waitForRegistration();
 
-		this.gameUI.showBRInputHints();
+		const isSpectator = localPaddleId === -1;
+
+		if (!isSpectator) {
+			this.gameUI.showBRInputHints();
+		}
 
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
 		this.ecs.addSystem(this.inputSystem);
@@ -202,7 +206,7 @@ export class PongBR {
 
 		this.smileTarget.influence = 0.0;
 		this.spaceSkybox.onGameLoad();
-		this.localPaddleIndex = localPaddleId;
+		this.localPaddleIndex = isSpectator ? 0 : localPaddleId;
 		this.paddleBundles = createGameTemplate(this.ecs, 100, this.rotatingContainer, this.gameUI, this.localPaddleIndex);
 		this.baseMeshes.paddle.material.setUniform("playerCount", 100);
 		this.baseMeshes.paddle.material.setUniform("paddleId", this.localPaddleIndex);
@@ -220,11 +224,13 @@ export class PongBR {
 
 		this.startIntroCameraAnimation('Phase 1', 3.0);
 
-		setTimeout(() => {
-			this.gameUI.startCountdown(3, () => {
-				this.gameUI.hideBRInputHints();
-			});
-		}, 1500);
+		if (!isSpectator) {
+			setTimeout(() => {
+				this.gameUI.startCountdown(3, () => {
+					this.gameUI.hideBRInputHints();
+				});
+			}, 1500);
+		}
 	}
 	public stop(): void {
 		this.stateManager.stop();

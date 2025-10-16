@@ -22,20 +22,21 @@ export function createPlayer(ecs: ECSManager, config: GameTemplateConfig, localP
 	scoreUI.addComponent(new UIComponent(gameMode, gameUI));
 	ecs.addEntity(scoreUI);
 
-	console.log("local id:", localPaddleId);
+	const isSpectator = localPaddleId === -1;
 
-	// console.log("create player === ", gameMode);
 	for (let i = 0; i < 2; i++) {
 		const paddleEntity = new Entity();
 		const posX = config.arenaSizeX / 2 / 10 * 9;
 		const x = i % 2 ? -posX : posX;
 		const rotation_y = i % 2 ? -90 * Math.PI / 180 : 90 * Math.PI / 180;
 		paddleEntity.addComponent(new PaddleComponent(i, new Vector3(x, 0.25, 0), 0));
-		if (i === localPaddleId || gameMode == "local") {
+
+		if (!isSpectator && (i === localPaddleId || gameMode == "local")) {
 			paddleEntity.addComponent(new InputComponent(true, gameMode));
 		}
-		else
+		else {
 			paddleEntity.addComponent(new InputComponent(false, gameMode));
+		}
 		paddleEntity.addComponent(new TransformComponent(
 			new Vector3(x, 0.25, 0),
 			new Vector3(0, rotation_y, 0),
