@@ -26,6 +26,10 @@
   overflow: visible; /* Allow the "LIVE" pill to extend outside of the match card */
 }
 
+.spacer {
+  pointer-events: none;
+}
+
 .game .match-info:hover {
   transform: translateY(-4px);
   box-shadow: 0 0 20px var(--color-purple-bright);
@@ -116,9 +120,13 @@
 
 .game.playing .match-info {
   position: relative;
-  overflow: hidden;
   border-color: var(--color-purple-bright);
   box-shadow: 0 0 28px rgba(157, 78, 221, 0.55);
+}
+
+.playing-bar {
+  border-bottom-left-radius: 999px;
+  border-bottom-right-radius: 999px;
 }
 
 .game.playing .playing-bar {
@@ -139,7 +147,8 @@
       var(--color-purple-dark)
     );
   background-size: 200% 100%;
-  animation: playingSlide 6s linear infinite;
+  animation: playingSlide 3s linear infinite;
+  z-index: 12;
   box-shadow: 0 0 16px var(--color-purple-bright);
 }
 
@@ -195,6 +204,7 @@
   z-index: 12;
 }
 
+
 @keyframes playingSlide {
   0% {
     background-position: 0% 50%;
@@ -209,9 +219,10 @@
   cursor: pointer;
 }
 
-.game.playing .match-info:hover::after {
+.game.playing .match-info:hover::before {
   content: "👁";
   position: absolute;
+  background: transparent;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(1.5);
@@ -237,12 +248,9 @@
 
 #tournament-profile-image {
   width: 32px;
-  /* max-width: 32px; */
-  /* max-height:32px; */
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--color-purple-light);
   transition: transform 0.2s ease;
-  /* flex-grow: 1; */
 }
