@@ -134,8 +134,8 @@ export class NetworkingSystem extends System {
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
 				ui?.gameUI.startCountdown(3, () => {
-					// Hide all images after countdown finishes
-					ui?.gameUI.hideAllImages();
+					// Hide input hints after countdown finishes
+					ui?.gameUI.hideInputHints();
 				});
 			}
 
@@ -146,9 +146,8 @@ export class NetworkingSystem extends System {
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
 
-				let win = false;
-				if (this.myScore == 5)
-					win = true;
+				// Check if the local player won by comparing winnerId with local UUID
+				const win = serverMsg.end.winnerId === this.uuid;
 
 				ui?.gameUI.showEnd(ui.gameMode, win, this.scoreLeft, this.scoreRight);
 				console.log("Received GameEndMessage");

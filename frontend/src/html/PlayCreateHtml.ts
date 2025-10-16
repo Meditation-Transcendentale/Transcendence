@@ -222,8 +222,9 @@ export class PlayCreateHtml implements IHtml {
 					routeManager.nav("/brick");
 				}
 				else if (this.selectedMode === "tournament" && this.selectedSize) {
-					stateManager.gameMap = "void";
+					stateManager.gameMap = "grass";
 					stateManager.gameMode = this.selectedMode;
+					stateManager.tournamentSize = this.selectedSize;
 					createGame();
 				}
 			});

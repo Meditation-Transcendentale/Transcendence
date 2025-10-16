@@ -13,18 +13,16 @@
     - breaknreaker tutorial create button
 
  ### visual
-    - full DA for the site + css implementation
-    - finish map (zoom, tweak light)
-    - make button disapeer
 
 
  ### fix
+    - join sanitize injection js
+    - error handling input frontend
+    - cleanup input settings
     - sanitize input
-    - change goal position physics pong
     - check websocket url
-    - add tournament create number
     - join disapeer popup cant
-    - online wrong end you lose instead of you win
+    - lobby join by id weird stuff when id is invalid
 
 ### tweak
     - 3D tweak

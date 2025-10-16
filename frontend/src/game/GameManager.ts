@@ -78,14 +78,15 @@ export class GameManager {
 			.catch((err) => alert(err)) as HTMLDivElement;
 
 		this.pongUI = new GameUI(div, {
-			enabledModules: ['scorevs', 'buttons', 'countdown', 'ending', 'images'],
+			enabledModules: ['scorevs', 'buttons', 'countdown', 'ending', 'images', 'inputhints'],
 			theme: 'pong',
 			modulePositions: {
 				scorevs: { x: 'center', y: 'top' },
-				buttons: { x: 'center', y: 'bottom' },
+				buttons: { x: 'center', y: 'bottom', offset: { x: 0, y: 50 } },
 				countdown: { x: 'center', y: 'center' },
 				ending: { x: 'center', y: 'center' },
-				images: { x: 'center', y: 'center' }
+				images: { x: 'center', y: 'center' },
+				inputhints: { x: 'center', y: 'center' }
 			}
 		})
 		this.brUI = new GameUI(div.cloneNode(true) as HTMLDivElement, {
