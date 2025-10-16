@@ -39,11 +39,12 @@ export class Settings {
 			submit: (password: string, token?: string, input?: string) => {
 				patchRequest("update-info/username", { username: input, password: password, token: token })
 					.then(async (json) => {
+						console.log(json);
 						await User.check(),
 							htmlManager.ath.updateProfileInfo(),
 							this.changeUsernamePopup.close()
 					})
-					.catch((err) => { })
+					.catch((err) => { htmlManager.notification.error(err) })
 			},
 			abort: () => {
 			}
@@ -60,7 +61,7 @@ export class Settings {
 						await User.check(),
 							this.changePasswordPopup.close()
 					})
-					.catch((err) => { })
+					.catch((err) => { htmlManager.notification.error(err) })
 			},
 			abort: () => {
 			}
@@ -123,7 +124,7 @@ export class Settings {
 						htmlManager.ath.updateProfileInfo();
 						this.changeAvatarPopup.close();
 					})
-					.catch((err) => { })
+					.catch((err) => { htmlManager.notification.error(err) })
 			}
 		});
 
@@ -144,7 +145,7 @@ export class Settings {
 						this.settingsPopup.close(),
 						this.twoFAEnabled = User.twofa === 1;
 				})
-				.catch((err: any) => { err.json() })
+				.catch((err: any) => { htmlManager.notification.error(err) })
 
 		} else {
 			postRequest("update-info/enable-2fa", { password })
@@ -162,7 +163,7 @@ export class Settings {
 						this.settingsPopup.close(),
 						this.twoFAEnabled = User.twofa === 1;
 				})
-				.catch((err: any) => { err.json() })
+				.catch((err: any) => { htmlManager.notification.error(err) })
 		}
 
 	}

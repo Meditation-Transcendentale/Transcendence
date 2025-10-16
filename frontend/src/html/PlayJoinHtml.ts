@@ -82,7 +82,7 @@ export class PlayJoinHtml implements IHtml {
 			html: this.infoWindow,
 			width: 1.5,
 			height: 1.5,
-			world: Matrix.RotationY(Math.PI * 0.6).multiply(Matrix.Translation(-1, 4.5, 13)),
+			world: Matrix.RotationY(Math.PI * 0.6).multiply(Matrix.Translation(-1, 4.5, 15)),
 			enable: false
 		})
 
@@ -127,14 +127,14 @@ export class PlayJoinHtml implements IHtml {
 		this.input.value = "";
 		this.lobbyList.innerHTML = "";
 		sceneManager.css3dRenderer.setObjectEnable("join-list", true);
-		sceneManager.css3dRenderer.setObjectEnable("join-id", true);
+		// sceneManager.css3dRenderer.setObjectEnable("join-id", true);
 	}
 
 	public unload() {
 		this._update = false;
 		sceneManager.css3dRenderer.setObjectEnable("join-list", false);
 		sceneManager.css3dRenderer.setObjectEnable("join-info", false);
-		sceneManager.css3dRenderer.setObjectEnable("join-id", false);
+		// sceneManager.css3dRenderer.setObjectEnable("join-id", false);
 		this.css.remove();
 	}
 

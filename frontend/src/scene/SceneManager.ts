@@ -172,32 +172,7 @@ class SceneManager {
 				break;
 			}
 			case "home": {
-
-				// this.camera.attachControl();
-				this.assets.grassRoot.scaling.y = 1;
-				this.assets.ballRoot.setEnabled(true);
-				this.assets.ballRoot.position.set(0, 0.25, 0);
-				this.assets.hemisphericLight.setEnabled(true);
-				this.assets.flashLight.range = 30;
-				// this.assets.hemisphericLight.intensity = 0.1;
-				// this.assets.ballMesh.position.set(0, 0, 0);
-				this.assets.ballRoot.scalingDeterminant = 1.5;
-				this.picker.enable = true;
-				this.grass.enable = true;
-				this.assets.ballMesh.setEnabled(true);
-				this.assets.groundMesh.setEnabled(true);
-				this.butterfly.enable = true;
-				this.ballGrass.updateType = "home";
-				this.fog.enable = true;
-				this.assets.monolithMesh.setEnabled(true);
-				this.cameraManager.bloom = true;
-
-				this.assets.monolithRoot.setEnabled(true);
-
-				this.beforeRender.add(this.assets.monolithMovement);
-				this.cameraManager.fogEnabled = true;
-				this.assets.brRoot.setEnabled(false);
-				this.assets.brickRoot.setEnabled(false);
+				this.resetDefaultValue();
 				break;
 			}
 			case "void": {
@@ -304,6 +279,35 @@ class SceneManager {
 
 
 		}
+	}
+
+	private resetDefaultValue() {
+		this.assets.flashLight.setEnabled(true);
+		this.assets.flashLight.range = 30;
+		this.assets.flashLight.intensity = 2.7;
+		this.assets.flashLight.position = this.camera.position;
+
+		this.assets.hemisphericLight.setEnabled(true);
+		this.assets.hemisphericLight.intensity = 0.2;
+
+		this.assets.grassRoot.scaling.y = 1;
+		this.assets.ballRoot.setEnabled(true);
+		this.assets.ballRoot.position.set(0, 0.25, 0);
+		this.assets.ballRoot.scalingDeterminant = 1.5;
+		this.picker.enable = true;
+		this.grass.enable = true;
+		this.assets.ballMesh.setEnabled(true);
+		this.assets.groundMesh.setEnabled(true);
+		this.butterfly.enable = true;
+		this.ballGrass.updateType = "home";
+		this.fog.enable = true;
+		this.assets.monolithMesh.setEnabled(true);
+		this.cameraManager.bloom = true;
+		this.assets.monolithRoot.setEnabled(true);
+		this.beforeRender.add(this.assets.monolithMovement);
+		this.cameraManager.fogEnabled = true;
+		this.assets.brRoot.setEnabled(false);
+		this.assets.brickRoot.setEnabled(false);
 	}
 
 	private initFogDepthTexture() {

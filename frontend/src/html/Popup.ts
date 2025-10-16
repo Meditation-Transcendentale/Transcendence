@@ -210,6 +210,7 @@ export class Popup {
 		if (this.option.type == PopupType.validation) {
 			this.token.hidden = User.twofa == 0;
 			this.token.required = User.twofa != 0;
+			this.form.reset();
 		}
 		document.body.appendChild(this.dialog);
 		// this.dialog.open = true;

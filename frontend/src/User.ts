@@ -59,6 +59,12 @@ class UserC {
 
 	public updateFriendStatus(user: ISearchRequestResponce) {
 		const change = (user.status !== "offline" && (this.friendsOnline.has(user.uuid) || this.friendsBusy.has(user.uuid))) || (user.status == "offline" && this.friendsOnline.has(user.uuid));
+
+		if (user.status == "offline" || user.status == "online" && this.friendsAway.has(user.uuid))
+			htmlManager.notification.add({
+				type: NotificationType.text,
+				text: `${user.username} ${user.status}`,
+			});
 		if (user.status === "online") {
 			this.friendsAway.delete(user.uuid);
 			this.friendsOnline.add(user.uuid);
@@ -72,6 +78,7 @@ class UserC {
 			this.friendsOnline.delete(user.uuid);
 			this.friendsBusy.add(user.uuid);
 		}
+
 		htmlManager.friendlist.updateStatus(user.uuid, user.status, change);
 		htmlManager.lobby.updateInviteCustom(user.uuid, user.status == "online");
 	}

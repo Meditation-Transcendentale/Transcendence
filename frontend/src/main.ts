@@ -19,6 +19,7 @@ async function init() {
 	streamManager.builder.connect();
 	stateManager.init();
 	await sceneManager.loadMandatory();
+	htmlManager.cube.enable = false;
 	routeManager.nav(window.location.href.substring(window.location.origin.length), false, true);
 	await gameManager.init();
 
