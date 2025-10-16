@@ -5,7 +5,6 @@ import { connect, JSONCodec } from "nats";
 import uWS from "uWebSockets.js";
 import { v4 as uuidv4 } from "uuid";
 import config from "./config.js";
-import client from "prom-client";
 import fs from "fs";
 import {
   encodeNotificationMessage,
@@ -40,13 +39,6 @@ async function start() {
     },
   });
   await app.register(fastifyCors, { origin: "*" });
-
-  client.collectDefaultMetrics();
-
-  app.get("/metrics", async (req, res) => {
-    res.type("text/plain");
-    res.send(await client.register.metrics());
-  });
 
   await app.listen({ port: config.PORT, host: "0.0.0.0" });
   app.log.info(`HTTP API listening on ${config.PORT}`);

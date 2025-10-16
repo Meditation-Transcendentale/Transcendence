@@ -7,7 +7,6 @@ dotenv.config({ path: "../../../.env" });
 
 import { decodeMatchEnd, decodeMatchEndBr } from "./proto/helper.js";
 
-
 const jc = JSONCodec();
 const nats = await connect({ 
 	servers: process.env.NATS_URL,
