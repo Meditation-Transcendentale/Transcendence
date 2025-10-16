@@ -26,7 +26,7 @@ export class GameManager {
 	public launchPong() {
 		this.pongUI.load();
 		this.pongUI.showButton('quit', 'Quit', () => {
-			routeManager.nav("/home", false, true);
+			routeManager.comeback();
 			console.log('Game quit');
 		});
 		this.pong.start(stateManager.gameId, User.uuid, stateManager.gameMode, stateManager.gameMap);
@@ -40,7 +40,7 @@ export class GameManager {
 			console.log('Restart');
 		});
 		this.brickUI.showButton('quit', 'Quit', () => {
-			routeManager.nav('/home', false, true);
+			routeManager.comeback();
 			console.log('Quit');
 		});
 		this.brick.start(stateManager.gameMode);
@@ -49,7 +49,7 @@ export class GameManager {
 	public launchBr() {
 		this.brUI.load();
 		this.brUI.showButton('quit', 'Quit', () => {
-			routeManager.nav('/home', false, true);
+			routeManager.comeback();
 			console.log('Game quit');
 		});
 		this.br.start(stateManager.gameId, User.uuid);
