@@ -49,6 +49,7 @@ const getBrickBreakerLeaderboard_easyStmt = database.prepare(`
 	SELECT users.username, brickbreaker_stats.easy_mode_hscore
 	FROM brickbreaker_stats
 	JOIN users ON brickbreaker_stats.user_id = users.id
+	WHERE brickbreaker_stats.easy_mode_hscore > 0
 	ORDER BY brickbreaker_stats.easy_mode_hscore DESC
 	LIMIT 10
 `);
@@ -56,6 +57,7 @@ const getBrickBreakerLeaderboard_normalStmt = database.prepare(`
 	SELECT users.username, brickbreaker_stats.normal_mode_hscore
 	FROM brickbreaker_stats
 	JOIN users ON brickbreaker_stats.user_id = users.id
+	WHERE brickbreaker_stats.normal_mode_hscore > 0
 	ORDER BY brickbreaker_stats.normal_mode_hscore DESC
 	LIMIT 10
 `);
@@ -63,6 +65,7 @@ const getBrickBreakerLeaderboard_hardStmt = database.prepare(`
 	SELECT users.username, brickbreaker_stats.hard_mode_hscore
 	FROM brickbreaker_stats
 	JOIN users ON brickbreaker_stats.user_id = users.id
+	WHERE brickbreaker_stats.hard_mode_hscore > 0
 	ORDER BY brickbreaker_stats.hard_mode_hscore DESC
 	LIMIT 10
 `);
