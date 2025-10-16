@@ -10,6 +10,7 @@ interface GameUIModules {
 	elimination?: EliminationModule;
 	phasechange?: PhaseChangeModule;
 	inputhints?: InputHintsModule;
+	brinputhints?: BRInputHintsModule;
 }
 
 interface ModulePosition {
@@ -45,6 +46,7 @@ interface GameUIConfig {
 		elimination?: ModulePosition;
 		phasechange?: ModulePosition;
 		inputhints?: ModulePosition;
+		brinputhints?: ModulePosition;
 	};
 }
 
@@ -61,6 +63,7 @@ interface GameUIHtmlReference {
 	eliminationModule: HTMLDivElement;
 	phasechangeModule: HTMLDivElement;
 	inputhintsModule: HTMLDivElement;
+	brinputhintsModule: HTMLDivElement;
 }
 
 class GameUI {
@@ -91,6 +94,7 @@ class GameUI {
 			eliminationModule: div.querySelector("#elimination-module") as HTMLDivElement,
 			phasechangeModule: div.querySelector("#phasechange-module") as HTMLDivElement,
 			inputhintsModule: div.querySelector("#inputhints-module") as HTMLDivElement,
+			brinputhintsModule: div.querySelector("#brinputhints-module") as HTMLDivElement,
 		};
 
 		this.initializeModules();
@@ -140,6 +144,11 @@ class GameUI {
 				case "inputhints":
 					this.modules.inputhints = new InputHintsModule(
 						this.ref.inputhintsModule
+					);
+					break;
+				case "brinputhints":
+					this.modules.brinputhints = new BRInputHintsModule(
+						this.ref.brinputhintsModule
 					);
 					break;
 			}
@@ -399,6 +408,8 @@ class GameUI {
 				return this.ref.phasechangeModule;
 			case "inputhints":
 				return this.ref.inputhintsModule;
+			case "brinputhints":
+				return this.ref.brinputhintsModule;
 			// case 'spectate': return this.ref.spectateModule;
 			default:
 				return null;
@@ -513,6 +524,14 @@ class GameUI {
 
 	public hideInputHints() {
 		this.modules.inputhints?.hide();
+	}
+
+	public showBRInputHints() {
+		this.modules.brinputhints?.show();
+	}
+
+	public hideBRInputHints() {
+		this.modules.brinputhints?.hide();
 	}
 }
 
@@ -1421,6 +1440,46 @@ class InputHintsModule implements GameUIModule {
 	hide() {
 		this.div.classList.add("hidden");
 
+		setTimeout(() => {
+			this.unload();
+		}, 500);
+	}
+}
+
+interface BRInputHintsHtmlReference {
+	brinputhintsContainer: HTMLDivElement;
+}
+
+class BRInputHintsModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: BRInputHintsHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			brinputhintsContainer: div.querySelector(".brinputhints-container") as HTMLDivElement,
+		};
+	}
+
+	load() {
+		this.div.style.display = "flex";
+	}
+
+	unload() {
+		this.div.style.display = "none";
+	}
+
+	show() {
+		// Remove hidden class to trigger fade-in
+		this.div.classList.remove("hidden");
+		this.load();
+	}
+
+	hide() {
+		// Add hidden class to trigger fade-out
+		this.div.classList.add("hidden");
+
+		// Actually hide the module after transition completes (0.5s)
 		setTimeout(() => {
 			this.unload();
 		}, 500);

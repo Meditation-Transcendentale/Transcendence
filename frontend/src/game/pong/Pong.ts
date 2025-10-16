@@ -105,7 +105,6 @@ export class Pong {
 				}
 			});
 		}
-		console.log("UU", uuid);
 		const wsUrl =
 			`wss://${window.location.hostname}:7000/game?` +
 			`uuid=${encodeURIComponent(uuid)}&` +
@@ -123,7 +122,6 @@ export class Pong {
 		this.baseMeshes.paddle.setEnabled(true);
 		this.baseMeshes.arena.setEnabled(true);
 		this.baseMeshes.ball.setEnabled(true);
-		// this.cam.parent = this.pongRoot;
 		this.cam.minZ = 0.2;
 		if (maps == "monolith") {
 			this.pongRoot.position.set(0, 7, 0);
@@ -150,7 +148,6 @@ export class Pong {
 		);
 		this.ecs.addSystem(this.networkingSystem);
 
-		console.log("create player");
 		createPlayer(
 			this.ecs,
 			this.config,
@@ -165,7 +162,6 @@ export class Pong {
 		this.stateManager.setter(true);
 		this.gameUI.updateScoreVersus(0, 0);
 
-		// Show input hints based on game mode
 		this.gameUI.showInputHints(this.gameMode);
 
 		const readyPayload: userinterface.IClientMessage = { ready: {} };
