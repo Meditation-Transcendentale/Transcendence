@@ -453,23 +453,25 @@
 
 .game-ui-container.berserk #timer-module,
 .game-ui-container.berserk #button-module {
-	background: rgba(20, 0, 0, 0.95);
+	background: none;
+	box-shadow: none;
+	backdrop-filter: none;
 	color: #ff4444;
 }
 
 .game-ui-container.berserk #timer-module:after,
 .game-ui-container.berserk #button-module:after {
-	background: linear-gradient(60deg,
-			#000000,
-			#1a0000,
-			#330000,
-			#4d0000,
-			#660000,
-			#800000,
-			#990000,
-			#cc0000,
-			#ff0000,
-			#ff3333);
+	/* background: linear-gradient(60deg, */
+	/* 		#000000, */
+	/* 		#1a0000, */
+	/* 		#330000, */
+	/* 		#4d0000, */
+	/* 		#660000, */
+	/* 		#800000, */
+	/* 		#990000, */
+	/* 		#cc0000, */
+	/* 		#ff0000, */
+	/* 		#ff3333); */
 }
 
 .game-ui-container.berserk .game-button {
@@ -835,4 +837,176 @@
 .game-ui-container.br .game-ui-countdown {
 	color: #ff4444;
 	animation: berserkGlow 5s ease alternate infinite;
+}
+
+/* Elimination Message Module */
+#elimination-module {
+	position: fixed;
+	bottom: 15vh;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 2000;
+	pointer-events: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.elimination-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.elimination-message {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1vh;
+	padding: 2vh 4vh;
+	/* background: linear-gradient(135deg, rgba(20, 0, 0, 0.7), rgba(60, 0, 0, 0.6)); */
+	/* backdrop-filter: blur(10px); */
+	/* border: 1px solid rgba(255, 0, 0, 0.6); */
+	border-radius: 0;
+	/* box-shadow: */
+	/* 	0 0 20px rgba(255, 0, 0, 0.5), */
+	/* 	0 0 40px rgba(255, 0, 0, 0.3); */
+	animation: eliminationSlideIn 0.6s ease-out;
+	font-family: 'spacegrotesk', sans-serif;
+	opacity: 0.85;
+}
+
+.elimination-text {
+	font-size: 4vh;
+	font-weight: 700;
+	color: #ffffff;
+	text-shadow:
+		0 0 15px rgba(255, 0, 0, 0.8),
+		0 0 30px rgba(255, 0, 0, 0.6),
+		0 2px 5px rgba(0, 0, 0, 0.6);
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+.elimination-subtitle {
+	font-size: 2vh;
+	font-weight: 400;
+	color: #ff8888;
+	text-shadow:
+		0 0 10px rgba(255, 136, 136, 0.6);
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	opacity: 0.8;
+	text-align: center;
+}
+
+@keyframes eliminationSlideIn {
+	0% {
+		transform: translateY(50px);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translateY(0);
+		opacity: 0.85;
+	}
+}
+
+/* BR-specific elimination styling */
+.game-ui-container.br .elimination-message {
+	background: linear-gradient(135deg, rgba(20, 0, 0, 0.95), rgba(60, 0, 0, 0.9));
+	border-color: #ff0000;
+}
+
+/* Berserk-specific elimination styling */
+.game-ui-container.berserk .elimination-message {
+	/* background: linear-gradient(135deg, rgba(20, 0, 0, 0.98), rgba(80, 0, 0, 0.95)); */
+	/* border-color: #ff0000; */
+}
+
+/* Phase Change Module */
+#phasechange-module {
+	position: fixed;
+	top: 10vh;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 3000;
+	pointer-events: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.phasechange-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.phasechange-message {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5vh;
+	padding: 2vh 5vh;
+	/* background: linear-gradient(135deg, rgba(20, 0, 0, 0.8), rgba(60, 0, 0, 0.75)); */
+	/* backdrop-filter: blur(10px); */
+	/* border: 2px solid rgba(255, 0, 0, 0.7); */
+	border-radius: 0;
+	/* box-shadow: */
+	/* 	0 0 20px rgba(255, 0, 0, 0.5), */
+	/* 	0 0 40px rgba(255, 0, 0, 0.3); */
+	animation: phaseChangeSlideIn 0.5s ease-out;
+	font-family: 'spacegrotesk', sans-serif;
+}
+
+.phasechange-message.fade-out {
+	animation: phaseChangeFadeOut 0.5s ease-out forwards;
+}
+
+.phasechange-phase {
+	font-size: 5vh;
+	font-weight: 800;
+	color: #ffffff;
+	text-shadow:
+		0 0 15px rgba(255, 0, 0, 0.9),
+		0 0 30px rgba(255, 0, 0, 0.7),
+		0 2px 5px rgba(0, 0, 0, 0.7);
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+.phasechange-subtitle {
+	font-size: 2.5vh;
+	font-weight: 500;
+	color: #ff8888;
+	text-shadow:
+		0 0 10px rgba(255, 136, 136, 0.7);
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+@keyframes phaseChangeSlideIn {
+	0% {
+		transform: translateY(-30px);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes phaseChangeFadeOut {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
 }

@@ -53,8 +53,8 @@ export class GameManager {
 		(async () => {
 			for await (const msg of subEnd) {
 				const [, , gameId] = msg.subject.split(".");
-				const uuid = decodeMatchQuit(msg.data);
-				await this.quitMatch(gameId, uuid);
+				const quitMsg = decodeMatchQuit(msg.data);
+				await this.quitMatch(gameId, quitMsg.uuid);
 			}
 		})();
 
@@ -272,9 +272,28 @@ export class GameManager {
 
 			console.log(`[GameManager] BR player ${uuid} (id: ${playerId}) quit. Active players: ${activePlayers.length}`);
 
-			if (isActivePlayer && activePlayers.length > 1) {
+			// Check if there are other real (non-bot) players remaining after this quit
+			const remainingRealPlayers = activePlayers.filter(pId => {
+				const playerUuid = match.instance.players[pId];
+				return pId !== playerId && !playerUuid.startsWith('bot-');
+			});
+
+			console.log(`[GameManager] Remaining real players: ${remainingRealPlayers.length}`);
+
+			if (isActivePlayer && remainingRealPlayers.length > 0) {
+				// There are other real players, just eliminate this one
 				this.eliminatePlayerBR(gameId, uuid);
 				return true;
+			}
+
+			// If quitting player is active and this will end the game, assign them a rank first
+			if (isActivePlayer) {
+				if (!match.state.ranks) {
+					match.state.ranks = [];
+				}
+				// Assign rank based on number of active players (they finish at this position)
+				match.state.ranks[playerId] = activePlayers.length;
+				console.log(`[GameManager] Assigned rank ${activePlayers.length} to quitting player ${uuid} (id: ${playerId})`);
 			}
 		}
 

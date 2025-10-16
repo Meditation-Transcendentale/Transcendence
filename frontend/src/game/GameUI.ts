@@ -7,6 +7,8 @@ interface GameUIModules {
   ending?: EndingModule;
   images?: ImageModule;
   playercounter?: PlayerCounterModule;
+  elimination?: EliminationModule;
+  phasechange?: PhaseChangeModule;
 }
 
 interface ModulePosition {
@@ -39,6 +41,8 @@ interface GameUIConfig {
 		ending?: ModulePosition;
 		images?: ModulePosition;
 		playercounter?: ModulePosition;
+		elimination?: ModulePosition;
+		phasechange?: ModulePosition;
 	};
 }
 
@@ -52,6 +56,8 @@ interface GameUIHtmlReference {
   endingModule: HTMLDivElement;
   imageModule: HTMLDivElement;
   playercounterModule: HTMLDivElement;
+  eliminationModule: HTMLDivElement;
+  phasechangeModule: HTMLDivElement;
 }
 
 class GameUI {
@@ -79,6 +85,8 @@ class GameUI {
       playercounterModule: div.querySelector(
         "#playercounter-module"
       ) as HTMLDivElement,
+      eliminationModule: div.querySelector("#elimination-module") as HTMLDivElement,
+      phasechangeModule: div.querySelector("#phasechange-module") as HTMLDivElement,
     };
 
     this.initializeModules();
@@ -113,6 +121,16 @@ class GameUI {
         case "playercounter":
           this.modules.playercounter = new PlayerCounterModule(
             this.ref.playercounterModule
+          );
+          break;
+        case "elimination":
+          this.modules.elimination = new EliminationModule(
+            this.ref.eliminationModule
+          );
+          break;
+        case "phasechange":
+          this.modules.phasechange = new PhaseChangeModule(
+            this.ref.phasechangeModule
           );
           break;
       }
@@ -366,6 +384,10 @@ class GameUI {
       // case 'death': return this.ref.deathModule;
       case "playercounter":
         return this.ref.playercounterModule;
+      case "elimination":
+        return this.ref.eliminationModule;
+      case "phasechange":
+        return this.ref.phasechangeModule;
       // case 'spectate': return this.ref.spectateModule;
       default:
         return null;
@@ -425,8 +447,11 @@ class GameUI {
     this.modules.ending?.setLeaderboard(data, mode);
   }
 
-  public showBRRankings(rankings: Array<{ rank: number; username: string; uuid: string }>) {
+  public showBRRankings(rankings: Array<{ rank: number; username: string; uuid: string; isLocalPlayer?: boolean }>) {
     this.modules.ending?.setBRRankings(rankings);
+    // Hide elimination message and player counter when leaderboard appears
+    this.modules.elimination?.unload();
+    this.modules.playercounter?.unload();
   }
 
   public showButton(
@@ -461,6 +486,14 @@ class GameUI {
 
   public updatePlayerCount(playerLeft: number) {
     this.modules.playercounter?.update(playerLeft);
+  }
+
+  public showEliminationMessage(username: string) {
+    this.modules.elimination?.showElimination(username);
+  }
+
+  public showPhaseChange(phase: string, playerCount: number) {
+    this.modules.phasechange?.showPhaseChange(phase, playerCount);
   }
 }
 
@@ -1225,5 +1258,105 @@ class PlayerCounterModule implements GameUIModule {
 // 	}
 
 // }
+
+interface EliminationHtmlReference {
+	eliminationContainer: HTMLDivElement;
+}
+
+class EliminationModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: EliminationHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			eliminationContainer: div.querySelector("#elimination-container") as HTMLDivElement,
+		};
+	}
+
+	load() {
+		this.div.style.display = "flex";
+	}
+
+	unload() {
+		this.div.style.display = "none";
+		if (this.ref.eliminationContainer) {
+			this.ref.eliminationContainer.innerHTML = "";
+		}
+	}
+
+	showElimination(username: string) {
+		const messageDiv = document.createElement("div");
+		messageDiv.className = "elimination-message";
+
+		const text = document.createElement("div");
+		text.className = "elimination-text";
+		text.innerHTML = `YOU WERE ELIMINATED`;
+
+		const subtitle = document.createElement("div");
+		subtitle.className = "elimination-subtitle";
+		subtitle.textContent = "Spectating...";
+
+		messageDiv.appendChild(text);
+		messageDiv.appendChild(subtitle);
+
+		this.ref.eliminationContainer.innerHTML = "";
+		this.ref.eliminationContainer.appendChild(messageDiv);
+	}
+}
+
+interface PhaseChangeHtmlReference {
+	phasechangeContainer: HTMLDivElement;
+}
+
+class PhaseChangeModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: PhaseChangeHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			phasechangeContainer: div.querySelector("#phasechange-container") as HTMLDivElement,
+		};
+	}
+
+	load() {
+		this.div.style.display = "flex";
+	}
+
+	unload() {
+		this.div.style.display = "none";
+		if (this.ref.phasechangeContainer) {
+			this.ref.phasechangeContainer.innerHTML = "";
+		}
+	}
+
+	showPhaseChange(phase: string, playerCount: number) {
+		const messageDiv = document.createElement("div");
+		messageDiv.className = "phasechange-message";
+
+		const phaseText = document.createElement("div");
+		phaseText.className = "phasechange-phase";
+		phaseText.textContent = phase.toUpperCase();
+
+		const subtitle = document.createElement("div");
+		subtitle.className = "phasechange-subtitle";
+		subtitle.textContent = `${playerCount} Players Remaining`;
+
+		messageDiv.appendChild(phaseText);
+		messageDiv.appendChild(subtitle);
+
+		this.ref.phasechangeContainer.innerHTML = "";
+		this.ref.phasechangeContainer.appendChild(messageDiv);
+
+		// Auto-remove after 3 seconds
+		setTimeout(() => {
+			messageDiv.classList.add("fade-out");
+			setTimeout(() => {
+				messageDiv.remove();
+			}, 500);
+		}, 3000);
+	}
+}
 
 export default GameUI;
