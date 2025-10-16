@@ -26,6 +26,8 @@ export class FriendlistHtml {
 	private searchContainer!: HTMLDivElement;
 	private searchResult!: HTMLDivElement;
 
+	private searchForm!: HTMLFormElement;
+
 	private friendOnlinesContainer!: HTMLDivElement;
 	private friendAwayContainer!: HTMLDivElement;
 
@@ -45,6 +47,8 @@ export class FriendlistHtml {
 		if (document.body.contains(this.div)) {
 			this.div.remove();
 			stateManager.friendlist = false;
+			this.searchForm.reset();
+			this.searchResult.innerHTML = "";
 		} else {
 			this.form.reset();
 			// this.form.querySelector("[name=friend]")?.toggleAttribute("click", true)
@@ -106,6 +110,8 @@ export class FriendlistHtml {
 					break;
 				}
 				case "search": {
+					this.searchForm.reset();
+					this.searchResult.innerHTML = "";
 					this.friendContainer.classList.add("hidden");
 					this.requestContainer.classList.add("hidden");
 					this.searchContainer.classList.remove("hidden");
@@ -176,6 +182,8 @@ export class FriendlistHtml {
 					}
 				})
 		})
+
+		this.searchForm = form;
 
 		this.searchContainer.appendChild(form);
 

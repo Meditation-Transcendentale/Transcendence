@@ -130,7 +130,7 @@ vec3 RRTAndODTFit(vec3 v) {
 	return a / b;
 }
 
-vec3 hillACES(vec3 color) {
+vec3 hillACESwithFuckedMat(vec3 color) {
                
 	color = ACESInputMat * color; 
 
@@ -159,7 +159,7 @@ void main() {
 	} else if (tonemapping == 7) {
 		color = Uncharted2ToneMapping(color);
 	} else if (tonemapping == 8) {
-		color = hillACES(color);
+		color = hillACESwithFuckedMat(color);
 	}
 	// color = pow(color, vec3(1. / gamma));
 	gl_FragColor.rgb = color;

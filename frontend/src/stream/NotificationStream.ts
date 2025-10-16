@@ -140,10 +140,6 @@ export class NotificationStream implements IStream {
 			type: "uuid",
 		}) //data.username
 			.then((json: any) => {
-				htmlManager.notification.add({
-					type: NotificationType.text,
-					text: `${json.data.username} ${notification.status}`,
-				});
 				json.data.status = notification.status;
 				User.updateFriendStatus(json.data);
 				// htmlManager.addNotification({type: "game-invite", uuid: notification.sender, username: json.data.username, lobbyId: notification.lobbyid});
