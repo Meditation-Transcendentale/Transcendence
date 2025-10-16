@@ -7,6 +7,7 @@ class StateManager {
 	public gameSubMode!: string;
 	public gameId!: string;
 	public tournamentId!: string;
+	public tournamentSize!: string;
 
 	public popup: number;
 	public friendlist!: boolean;
@@ -19,6 +20,7 @@ class StateManager {
 		this.gameMode = "";
 		this.gameMap = "";
 		this.gameSubMode = "";
+		this.tournamentSize = "";
 		this.gameId = "";
 		this.tournamentId = "";
 		this.playPath = "";
