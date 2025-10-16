@@ -25,18 +25,11 @@ export const Physics = {
 	   * @returns {{ gameId: string, tick: number, balls: Array, paddles: Array }}
 	   */
 
-	// message PhysicsRequest {
-	//   string gameId = 1;
-	//   int64 tick = 2;
-	//   repeated PaddleInput input = 3;
-	//   int32 stage = 4; // BR mode stage; others: ignored
-	// }
 	processTick({ gameId, tick, input }) {
 		if (!this.games.has(gameId)) {
 			console.log(`[physics] Initializing new game ${gameId}`);
 			this.games.set(gameId, new Game(gameId));
 		}
-		// console.log(performance.now());
 		let events = [];
 		const game = this.games.get(gameId);
 		const em = game.entityManager;
@@ -85,7 +78,7 @@ export const Physics = {
 			updateAABB(pos, collider);
 			tree.insert(entity, collider.aabb);
 		}
-		
+
 		for (let step = 0; step < subSteps; step++) {
 			if (game.start == false && Date.now() - game.now >= game.delay)
 				game.start = true;
@@ -264,7 +257,7 @@ export const Physics = {
 			else if (input.type === 'resetBall') {
 				game.resetBall();
 			}
-			else if (input.type === 'serve' ) {
+			else if (input.type === 'serve') {
 				game.launchBall();
 			}
 		}
