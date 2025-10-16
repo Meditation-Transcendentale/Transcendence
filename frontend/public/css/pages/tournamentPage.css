@@ -241,13 +241,13 @@
 }
 
 .tier--gold .plinth {
-  height: 220px;
+  height: 340px;
 }
 .tier--silver .plinth {
-  height: 160px;
+  height: 220px;
 }
 .tier--bronze .plinth {
-  height: 120px;
+  height: 180px;
 }
 
 .avatar {
