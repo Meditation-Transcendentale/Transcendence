@@ -165,40 +165,8 @@ export class Pong {
 		this.stateManager.setter(true);
 		this.gameUI.updateScoreVersus(0, 0);
 
-		if (this.gameMode == "local") {
-			this.gameUI.showImage("up", "/assets/Up.png", "small", {
-				offset: { x: 70, y: -3 },
-			});
-			this.gameUI.showImage("down", "/assets/Down.png", "small", {
-				offset: { x: 70, y: 15 },
-			});
-			this.gameUI.showImage("w", "/assets/W.png", "small", {
-				offset: { x: -70, y: -3 },
-			});
-			this.gameUI.showImage("s", "/assets/S.png", "small", {
-				offset: { x: -70, y: 15 },
-			});
-		} else if (this.gameMode == "ai") {
-			this.gameUI.showImage("w", "/assets/W.png", "small", {
-				offset: { x: -70, y: -3 },
-			});
-			this.gameUI.showImage("s", "/assets/S.png", "small", {
-				offset: { x: -70, y: 15 },
-			});
-		} else if (this.gameMode == "online") {
-			this.gameUI.showImage("up", "/assets/Up.png", "small", {
-				offset: { x: -80, y: -3 },
-			});
-			this.gameUI.showImage("down", "/assets/Down.png", "small", {
-				offset: { x: -80, y: 15 },
-			});
-			this.gameUI.showImage("w", "/assets/W.png", "small", {
-				offset: { x: -70, y: -3 },
-			});
-			this.gameUI.showImage("s", "/assets/S.png", "small", {
-				offset: { x: -70, y: 15 },
-			});
-		}
+		// Show input hints based on game mode
+		this.gameUI.showInputHints(this.gameMode);
 
 		const readyPayload: userinterface.IClientMessage = { ready: {} };
 		const readyBuf = encodeClientMessage(readyPayload);
@@ -222,20 +190,6 @@ export class Pong {
 			},
 		};
 
-		if (this.gameMode == "local") {
-			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: 70, y: -3 } });
-			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: 70, y: 15 } });
-			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
-			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
-		} else if (this.gameMode == "ai") {
-			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
-			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
-		} else if (this.gameMode == "online") {
-			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: -80, y: -3 } });
-			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: -80, y: 15 } });
-			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
-			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
-		}
 		const buffer = encodeClientMessage(payload);
 
 		this.wsManager.socket.send(buffer);
