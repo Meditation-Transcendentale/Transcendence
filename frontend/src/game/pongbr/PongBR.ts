@@ -244,6 +244,7 @@ export class PongBR {
 		};
 		const buffer = encodeClientMessage(payload);
 		this.wsManager.socket.send(buffer);
+		this.wsManager.socket.close();
 		this.pongRoot.setEnabled(false);
 
 		console.log("game paused");
