@@ -70,6 +70,7 @@ export class TournamentHtml implements IHtml {
   public load() {
     document.head.appendChild(this.css);
     document.body.appendChild(this.div);
+    this.div.appendChild(this.rootEl);
   }
 
   public unload(): void {
@@ -100,7 +101,7 @@ export class TournamentHtml implements IHtml {
     this.readyActive = true;
     this.readyDeadline = payload.deadlineMs;
     this.startReadyCountdown();
-    this.render()
+    this.render();
   }
 
   public finished() {
@@ -155,7 +156,6 @@ export class TournamentHtml implements IHtml {
 
     this.rootEl.append(this.toolbarEl, this.treeEl);
     this.div.appendChild(this.rootEl);
-
   }
 
   private sendReady() {
@@ -467,9 +467,7 @@ export class TournamentHtml implements IHtml {
     let newTree = this.treeEl;
     const leftLane = newTree.querySelector(".bracket-left") as HTMLElement;
     const ctrLane = newTree.querySelector(".bracket-center") as HTMLElement;
-    const rightLane = newTree.querySelector(
-      ".bracket-right"
-    ) as HTMLElement;
+    const rightLane = newTree.querySelector(".bracket-right") as HTMLElement;
 
     leftLane.innerHTML = "";
     ctrLane.innerHTML = "";
@@ -584,7 +582,7 @@ export class TournamentHtml implements IHtml {
 
       const name = document.createElement("div");
       name.className = "name";
-      
+
       if (pid) {
         const p = this.players.get(pid) || null;
         if (p) {
@@ -603,7 +601,7 @@ export class TournamentHtml implements IHtml {
       } else {
         avatar.textContent = "•";
       }
-      
+
       name.classList.add("glitch");
       name.setAttribute("data-text", name.textContent || "");
 
