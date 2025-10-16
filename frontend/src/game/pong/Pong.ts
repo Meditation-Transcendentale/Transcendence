@@ -148,6 +148,8 @@ export class Pong {
 		);
 		this.ecs.addSystem(this.networkingSystem);
 
+		const isSpectator = localPaddleId === -1;
+
 		createPlayer(
 			this.ecs,
 			this.config,
@@ -156,17 +158,20 @@ export class Pong {
 			this.gameUI
 		);
 
-		console.log("start");
-		this.inputManager.enable();
+		if (!isSpectator) {
+			this.inputManager.enable();
+		}
+
 		this.pongRoot.setEnabled(true);
 		this.stateManager.setter(true);
 		this.gameUI.updateScoreVersus(0, 0);
 
-		this.gameUI.showInputHints(this.gameMode);
-
-		const readyPayload: userinterface.IClientMessage = { ready: {} };
-		const readyBuf = encodeClientMessage(readyPayload);
-		this.wsManager.socket.send(readyBuf);
+		if (!isSpectator) {
+			this.gameUI.showInputHints(this.gameMode);
+			const readyPayload: userinterface.IClientMessage = { ready: {} };
+			const readyBuf = encodeClientMessage(readyPayload);
+			this.wsManager.socket.send(readyBuf);
+		}
 
 		this.stateManager.update();
 
