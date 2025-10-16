@@ -23,8 +23,6 @@
     - change goal position physics pong
     - check websocket url
     - add tournament create number
-    - match history stats update 
-    - fix friend popup auto disable
     - join disapeer popup cant
     - online wrong end you lose instead of you win
 
