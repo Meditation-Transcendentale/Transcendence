@@ -104,6 +104,9 @@ export class NetworkingSystem extends System {
 						if (playerCountChanged) {
 							console.log(`🔄 Arena rebuild: ${this.currentPlayerCount} → ${newPlayerCount} players, local→${newLocalIndex}`);
 							this.game.transitionToRound(newPlayerCount, newLocalIndex);
+
+							this.gameUI.showPhaseChange(this.currentPhase, newPlayerCount);
+
 							this.currentPlayerCount = newPlayerCount;
 							this.indexesDirty = true;
 						} else if (localIndexChanged) {
@@ -185,23 +188,28 @@ export class NetworkingSystem extends System {
 								username = `Player ${p.paddleId}`;
 							else
 								username = this.game.getUsername(uuid);
+
 							htmlManager.notification.add({
 								type: NotificationType.text,
 								text: `${username} was eliminated!`,
 								duration: 1000
 							});
+
+							if (paddleComp.isLocal) {
+								this.gameUI.showEliminationMessage(username);
+							}
 						}
 						if (paddleComp.isLocal && !this.spectateButtonOn) {
-							this.gameUI.showButton('spectate', 'Spectate', () => {
-								console.log('Spectating...');
-								const payload: userinterface.IClientMessage = {
-									spectate: {}
-								};
-
-								const buffer = encodeClientMessage(payload);
-								this.wsManager.socket.send(buffer);
-							});
-							this.spectateButtonOn = true;
+							// this.gameUI.showButton('spectate', 'Spectate', () => {
+							// 	console.log('Spectating...');
+							// 	const payload: userinterface.IClientMessage = {
+							// 		spectate: {}
+							// 	};
+							//
+							// 	const buffer = encodeClientMessage(payload);
+							// 	this.wsManager.socket.send(buffer);
+							// });
+							// this.spectateButtonOn = true;
 						}
 					} else {
 						activePaddleCount++;

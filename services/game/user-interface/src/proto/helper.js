@@ -86,10 +86,10 @@ export function encodeMatchInput(payload) {
 }
 
 export function encodeMatchQuit(payload) {
-	const err = Proto.userinterface.MatchQuit.verify(payload);
+	const err = Proto.shared.MatchQuit.verify(payload);
 	if (err) throw new Error(err);
-	return Proto.userinterface.MatchQuit
-		.encode(Proto.userinterface.MatchQuit.create(payload))
+	return Proto.shared.MatchQuit
+		.encode(Proto.shared.MatchQuit.create(payload))
 		.finish();
 }
 
