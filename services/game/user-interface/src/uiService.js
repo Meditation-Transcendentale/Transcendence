@@ -126,6 +126,10 @@ export default class UIService {
 			this.sessions.set(uuid, { ws, role: 'spectator', gameId, mode, uuid });
 			this.games.get(gameId).add(uuid);
 			this.handleSpectate(ws);
+			const welcomeBuf = encodeServerMessage({
+				welcome: { paddleId: '-1' },
+			});
+			ws.send(welcomeBuf, true);
 			return;
 		}
 
