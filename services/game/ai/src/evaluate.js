@@ -19,20 +19,19 @@ export function evaluateNode(node) {
       beta: -999
     }
   }
-  const d_opp = (futureBallY - oppY) / VSPAN;
   const ang = vy / nz(vx);
+  
+  const d_opp = (futureBallY - oppY) / VSPAN;
 
-
-  //heuristics
   const f_align = -Math.tanh(Math.abs(d_me));
   const f_opp = Math.tanh(Math.abs(d_opp));
   const f_angle = -Math.tanh(Math.abs(ang));
   const f_center = -Math.tanh(Math.abs(meY / VSPAN));
   const f_speed = Math.log1p(Math.hypot(vx, vy));
-
+  
   const base =
     20 * f_align +
-    100 * f_opp +
+    50 * f_opp +
     30 * f_angle +
     15 * f_center +
     8 * f_speed;
