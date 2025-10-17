@@ -26,6 +26,8 @@ import { Ball } from "../brickbreaker/Ball.js";
 import { PaddleComponent } from "./components/PaddleComponent.js";
 import GameUI from "../GameUI.js";
 import { sceneManager } from "../../scene/SceneManager.js";
+import { User } from "../../User.js";
+import { getRandomAIName } from "./utils/aiNames.js";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
@@ -165,6 +167,23 @@ export class Pong {
 		this.pongRoot.setEnabled(true);
 		this.stateManager.setter(true);
 		this.gameUI.updateScoreVersus(0, 0);
+
+		if (this.gameMode === "ai") {
+			const aiName = getRandomAIName();
+			if (localPaddleId === 0) {
+				this.gameUI.setPlayerNames(User.username, aiName);
+			} else {
+				this.gameUI.setPlayerNames(aiName, User.username);
+			}
+		} else if (this.gameMode === "online") {
+			if (localPaddleId === 0) {
+				this.gameUI.setPlayerNames(User.username, "Opponent");
+			} else {
+				this.gameUI.setPlayerNames("Opponent", User.username);
+			}
+		} else if (this.gameMode === "local") {
+			this.gameUI.setPlayerNames("Player 1", "Player 2");
+		}
 
 		if (!isSpectator) {
 			this.gameUI.showInputHints(this.gameMode);

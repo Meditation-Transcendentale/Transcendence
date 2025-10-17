@@ -12,7 +12,7 @@ import { decodeServerMessage, encodeClientMessage } from './utils/proto/helper.j
 import type { userinterface } from './utils/proto/message.js';
 import { PaddleBundle } from "./templates/builder.js";
 import { createGameTemplate } from "./templates/builder.js";
-import { ArcRotateCamera, Scene, TransformNode, Vector3, Mesh, Animation, DefaultRenderingPipeline, Color4, Engine } from "../../babylon";
+import { ArcRotateCamera, Scene, TransformNode, Vector3, Mesh, Animation, DefaultRenderingPipeline, Color4, Engine, ImageProcessingConfiguration } from "../../babylon";
 import { BallComponent } from "./components/BallComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
 import { WallComponent } from "./components/WallComponent.js";
@@ -65,6 +65,8 @@ export class PongBR {
 	private isPhaseAnimating: boolean = false;
 	private isTransitioning: boolean = false;
 	private uuidToUsername: Map<string, string> = new Map();
+	private imageProcessingConfig!: any;
+	private pipelineisDisposed: boolean = false;
 
 
 	constructor(canvas: any, scene: Scene, gameUI: GameUI) {
@@ -142,22 +144,33 @@ export class PongBR {
 		this.pipeline.grain.animated = true;
 
 		this.pipeline.imageProcessingEnabled = true;
-		this.pipeline.imageProcessing.vignetteEnabled = true;
-		this.pipeline.imageProcessing.vignetteWeight = 2.0;
-		this.pipeline.imageProcessing.vignetteColor = new Color4(0.05, 0.02, 0.02, 1);
-		this.pipeline.imageProcessing.contrast = 1.1;
-		this.pipeline.imageProcessing.exposure = 1.1;
-		this.pipeline.imageProcessing.toneMappingEnabled = true;
-		this.pipeline.imageProcessing.toneMappingType = 1;
+
+		this.imageProcessingConfig = new ImageProcessingConfiguration();
+		this.pipeline.imageProcessing.imageProcessingConfiguration = this.imageProcessingConfig;
+
+		this.imageProcessingConfig.vignetteEnabled = true;
+		this.imageProcessingConfig.vignetteWeight = 2.0;
+		this.imageProcessingConfig.vignetteColor = new Color4(0.05, 0.02, 0.02, 1);
+		this.imageProcessingConfig.contrast = 1.1;
+		this.imageProcessingConfig.exposure = 1.1;
+		this.imageProcessingConfig.toneMappingEnabled = true;
+		this.imageProcessingConfig.toneMappingType = 1;
 
 		this.pipeline.fxaaEnabled = true;
 
 	}
+
 	public async start(gameId: string, uuid: string) {
 		this.uuid = uuid;
 		if (!this.inited) {
 			await this.init();
+		} else {
+			if (this.pipelineisDisposed) {
+				this.setupPostProcessing();
+				this.pipelineisDisposed = false;
+			}
 		}
+
 		if (this.wsManager) {
 			this.wsManager.socket.close();
 			this.ecs.removeSystem(this.inputSystem);
@@ -176,6 +189,9 @@ export class PongBR {
 		if (!isSpectator) {
 			this.gameUI.showBRInputHints();
 		}
+		this.camera.alpha = LOADING_CAMERA.alpha;
+		this.camera.beta = LOADING_CAMERA.beta;
+		this.camera.radius = LOADING_CAMERA.radius;
 
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
 		this.ecs.addSystem(this.inputSystem);
@@ -217,16 +233,17 @@ export class PongBR {
 		this.networkingSystem.forceIndexRebuild();
 
 		this.pongRoot.setEnabled(true);
-		this.stateManager.start();
 		this.spaceSkybox.disable();
 
 		this.inputManager.disable();
+
+		this.stateManager.start();
 
 		this.startIntroCameraAnimation('Phase 1', 3.0);
 
 		if (!isSpectator) {
 			setTimeout(() => {
-				this.gameUI.startCountdown(3, () => {
+				this.gameUI.startCountdown(4, () => {
 					this.gameUI.hideBRInputHints();
 				});
 			}, 1500);
@@ -236,6 +253,15 @@ export class PongBR {
 		this.stateManager.stop();
 		this.spaceSkybox.onGameUnload();
 		this.inputManager.disable();
+
+		this.isPhaseAnimating = false;
+		this.isTransitioning = false;
+
+		if (this.phaseAnimationObserver) {
+			this.scene.onBeforeRenderObservable.remove(this.phaseAnimationObserver);
+			this.phaseAnimationObserver = null;
+		}
+
 		const payload: userinterface.IClientMessage = {
 			quit: {
 				uuid: this.uuid,
@@ -247,7 +273,10 @@ export class PongBR {
 		this.wsManager.socket.close();
 		this.pongRoot.setEnabled(false);
 
-		console.log("game paused");
+		if (this.pipeline) {
+			this.pipeline.dispose();
+			this.pipelineisDisposed = true;
+		}
 	}
 
 	public dispose(): void {
@@ -322,23 +351,31 @@ export class PongBR {
 		const fadeDuration = 0.5;
 		const startTime = performance.now();
 
-		const originalExposure = this.pipeline.imageProcessing.exposure;
-		const originalVignetteWeight = this.pipeline.imageProcessing.vignetteWeight;
+		const originalExposure = this.imageProcessingConfig.exposure;
+		const originalVignetteWeight = this.imageProcessingConfig.vignetteWeight;
 
 		if (this.phaseAnimationObserver) {
 			this.scene.onBeforeRenderObservable.remove(this.phaseAnimationObserver);
 		}
 
 		this.phaseAnimationObserver = this.scene.onBeforeRenderObservable.add(() => {
+			if (this.pipelineisDisposed) {
+				if (this.phaseAnimationObserver) {
+					this.scene.onBeforeRenderObservable.remove(this.phaseAnimationObserver);
+					this.phaseAnimationObserver = null;
+				}
+				return;
+			}
+
 			const elapsed = (performance.now() - startTime) / 1000;
 
 			if (elapsed < fadeDuration) {
 				const fadeProgress = elapsed / fadeDuration;
-				this.pipeline.imageProcessing.exposure = originalExposure * (1.0 - fadeProgress);
-				this.pipeline.imageProcessing.vignetteWeight = originalVignetteWeight + (10.0 * fadeProgress);
+				this.imageProcessingConfig.exposure = originalExposure * (1.0 - fadeProgress);
+				this.imageProcessingConfig.vignetteWeight = originalVignetteWeight + (10.0 * fadeProgress);
 			} else {
-				this.pipeline.imageProcessing.exposure = 0.0;
-				this.pipeline.imageProcessing.vignetteWeight = originalVignetteWeight + 10.0;
+				this.imageProcessingConfig.exposure = 0.0;
+				this.imageProcessingConfig.vignetteWeight = originalVignetteWeight + 10.0;
 			}
 		});
 	}
@@ -348,8 +385,8 @@ export class PongBR {
 		const cameraDuration = 1.5;
 		const startTime = performance.now();
 
-		const originalExposure = this.pipeline.imageProcessing.exposure;
-		const originalVignetteWeight = this.pipeline.imageProcessing.vignetteWeight;
+		const originalExposure = this.imageProcessingConfig.exposure;
+		const originalVignetteWeight = this.imageProcessingConfig.vignetteWeight;
 
 		const phase = this.getPhaseFromPlayerCount(nextCount);
 		this.startCameraAnimation(phase, cameraDuration);
@@ -359,15 +396,24 @@ export class PongBR {
 		}
 
 		this.phaseAnimationObserver = this.scene.onBeforeRenderObservable.add(() => {
+			if (this.pipelineisDisposed) {
+				if (this.phaseAnimationObserver) {
+					this.scene.onBeforeRenderObservable.remove(this.phaseAnimationObserver);
+					this.phaseAnimationObserver = null;
+				}
+				this.isTransitioning = false;
+				return;
+			}
+
 			const elapsed = (performance.now() - startTime) / 1000;
 
 			if (elapsed < fadeInDuration) {
 				const fadeProgress = elapsed / fadeInDuration;
-				this.pipeline.imageProcessing.exposure = originalExposure * fadeProgress;
-				this.pipeline.imageProcessing.vignetteWeight = originalVignetteWeight + (10.0 * (1.0 - fadeProgress));
+				this.imageProcessingConfig.exposure = originalExposure * fadeProgress;
+				this.imageProcessingConfig.vignetteWeight = originalVignetteWeight + (10.0 * (1.0 - fadeProgress));
 			} else {
-				this.pipeline.imageProcessing.exposure = originalExposure;
-				this.pipeline.imageProcessing.vignetteWeight = originalVignetteWeight;
+				this.imageProcessingConfig.exposure = originalExposure;
+				this.imageProcessingConfig.vignetteWeight = originalVignetteWeight;
 
 				this.isTransitioning = false;
 
@@ -481,7 +527,7 @@ export class PongBR {
 		this.startPhaseAnimation(duration);
 
 		if (phase === 'Phase 2' && this.smileTarget) {
-			this.animateStatueSmile(3.0);
+			this.animateStatueSmile(0.0);
 		}
 	}
 
@@ -521,15 +567,24 @@ export class PongBR {
 		this.phaseAnimationStartTime = performance.now();
 
 		const originalBloomWeight = this.pipeline.bloomWeight;
-		const originalVignetteWeight = this.pipeline.imageProcessing.vignetteWeight;
-		const originalContrast = this.pipeline.imageProcessing.contrast;
-		const originalExposure = this.pipeline.imageProcessing.exposure;
+		const originalVignetteWeight = this.imageProcessingConfig.vignetteWeight;
+		const originalContrast = this.imageProcessingConfig.contrast;
+		const originalExposure = this.imageProcessingConfig.exposure;
 
 		if (this.phaseAnimationObserver) {
 			this.scene.onBeforeRenderObservable.remove(this.phaseAnimationObserver);
 		}
 
 		this.phaseAnimationObserver = this.scene.onBeforeRenderObservable.add(() => {
+			if (!this.pipeline || this.pipelineisDisposed) {
+				if (this.phaseAnimationObserver) {
+					this.scene.onBeforeRenderObservable.remove(this.phaseAnimationObserver);
+					this.phaseAnimationObserver = null;
+				}
+				this.isPhaseAnimating = false;
+				return;
+			}
+
 			const elapsed = (performance.now() - this.phaseAnimationStartTime) / 1000;
 			const progress = Math.min(elapsed / duration, 1.0);
 
@@ -561,16 +616,24 @@ export class PongBR {
 					exposureBoost = Math.sin(progress / 0.3 * Math.PI) * 0.5;
 				}
 
-				this.pipeline.bloomWeight = originalBloomWeight * bloomMultiplier;
-				this.pipeline.imageProcessing.vignetteWeight = originalVignetteWeight * vignetteMultiplier;
-				this.pipeline.imageProcessing.contrast = originalContrast + contrastBoost;
-				this.pipeline.imageProcessing.exposure = originalExposure + exposureBoost + flashIntensity;
+				if (this.pipeline && !this.pipeline.isDisposed) {
+					this.pipeline.bloomWeight = originalBloomWeight * bloomMultiplier;
+				}
+				if (this.imageProcessingConfig) {
+					this.imageProcessingConfig.vignetteWeight = originalVignetteWeight * vignetteMultiplier;
+					this.imageProcessingConfig.contrast = originalContrast + contrastBoost;
+					this.imageProcessingConfig.exposure = originalExposure + exposureBoost + flashIntensity;
+				}
 
 			} else {
-				this.pipeline.bloomWeight = originalBloomWeight;
-				this.pipeline.imageProcessing.vignetteWeight = originalVignetteWeight;
-				this.pipeline.imageProcessing.contrast = originalContrast;
-				this.pipeline.imageProcessing.exposure = originalExposure;
+				if (this.pipeline && !this.pipeline.isDisposed) {
+					this.pipeline.bloomWeight = originalBloomWeight;
+				}
+				if (this.imageProcessingConfig) {
+					this.imageProcessingConfig.vignetteWeight = originalVignetteWeight;
+					this.imageProcessingConfig.contrast = originalContrast;
+					this.imageProcessingConfig.exposure = originalExposure;
+				}
 
 				this.scene.onBeforeRenderObservable.remove(this.phaseAnimationObserver);
 				this.phaseAnimationObserver = null;

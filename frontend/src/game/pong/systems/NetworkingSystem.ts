@@ -16,6 +16,8 @@ import { UIComponent } from "../components/UIComponent.js";
 import { localPaddleId } from "../Pong";
 import { tournament } from "../../../networking/message.js";
 import { routeManager } from "../../../route/RouteManager.js";
+import { postRequest } from "../../../networking/request.js";
+import { User } from "../../../User.js";
 
 export class NetworkingSystem extends System {
 	private wsManager: WebSocketManager;
@@ -26,6 +28,8 @@ export class NetworkingSystem extends System {
 	private mode: string;
 	private scoreLeft: number;
 	private scoreRight: number;
+	private opponentNameFetched: boolean;
+	private uuid: string;
 	// private endUI = globalEndUI;
 
 
@@ -40,6 +44,7 @@ export class NetworkingSystem extends System {
 		this.oldVelX = 0;
 		this.oldVelY = 0;
 		this.mode = mode;
+		this.opponentNameFetched = false;
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -64,8 +69,18 @@ export class NetworkingSystem extends System {
 				const balls = state.balls ?? [];
 				const paddles = state.paddles ?? [];
 				const score = state.score ?? [];
+
+				if (this.mode === "online" && !this.opponentNameFetched && paddles.length >= 2) {
+
+					const opponentPaddle = paddles.find(p => p.uuid && p.uuid !== this.uuid);
+
+					if (opponentPaddle && opponentPaddle.uuid) {
+						this.fetchOpponentName(opponentPaddle.uuid, entities);
+						this.opponentNameFetched = true;
+					}
+				}
+
 				// 1. Ball updates
-				// console.log(balls);
 				balls.forEach(b => {
 					const e = entities.find(e =>
 						e.hasComponent(BallComponent) &&
@@ -114,18 +129,8 @@ export class NetworkingSystem extends System {
 					let ui = e?.getComponent(UIComponent);
 					this.scoreLeft = score[0];
 					this.scoreRight = score[1];
-					// this.myScore = score[localPaddleId] ?? 0;
-					// const otherId = score
-					// 	.map((_, i) => i)
-					// 	.find(i => i !== localPaddleId)!;
-					// this.opponentScore = score[otherId] ?? 0;
-					// console.log("localPaddleId:", localPaddleId);
 					if (ui) {
 						ui.gameUI.updateScoreVersus(this.scoreLeft, this.scoreRight);
-						// if (localPaddleId != 0)
-						// 	ui.gameUI.updateScoreVersus(this.opponentScore, this.myScore);
-						// else
-						// 	ui.gameUI.updateScoreVersus(this.myScore, this.opponentScore);
 					}
 				}
 			}
@@ -146,16 +151,40 @@ export class NetworkingSystem extends System {
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				let ui = e?.getComponent(UIComponent);
 
-				// Check if the local player won by comparing winnerId with local UUID
 				const win = serverMsg.end.winnerId === this.uuid;
 
 				ui?.gameUI.showEnd(ui.gameMode, win, this.scoreLeft, this.scoreRight);
 				console.log("Received GameEndMessage");
-				// const scores = serverMsg.end.score as number[];
-				// const myScore = scores[localPaddleId] ?? 0;
-				// const other = scores.find((_, i) => i !== localPaddleId) ?? 0;
-				// global.endUI = gameEndUI(myScore < other);
 			}
 		});
+	}
+
+	private async fetchOpponentName(opponentUuid: string, entities: Entity[]): Promise<void> {
+		try {
+			console.log("Fetching opponent name for UUID:", opponentUuid);
+
+			const response: any = await postRequest("info/search", {
+				identifier: opponentUuid,
+				type: "uuid"
+			});
+
+			console.log("Opponent info response:", response);
+
+			if (response && response.data && response.data.username) {
+				const opponentName = response.data.username;
+
+				const e = entities.find(e => e.hasComponent(UIComponent));
+				const ui = e?.getComponent(UIComponent);
+				if (ui) {
+					if (localPaddleId === 0) {
+						ui.gameUI.setPlayerNames(User.username, opponentName);
+					} else {
+						ui.gameUI.setPlayerNames(opponentName, User.username);
+					}
+				}
+			}
+		} catch (error) {
+			console.error("Failed to fetch opponent name:", error);
+		}
 	}
 }

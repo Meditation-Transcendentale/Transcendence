@@ -105,7 +105,7 @@ export class GameManager {
 		})
 		this.brickUI = new GameUI(div.cloneNode(true) as HTMLDivElement, {
 			enabledModules: ['score', 'buttons', 'ending'],
-			theme: 'pong',
+			theme: 'brick',
 			modulePositions: {
 				score: { x: 'left', y: 'top', offset: { x: 100, y: 0 } },
 				buttons: { x: 'center', y: 'bottom', offset: { x: 0, y: 85 } },

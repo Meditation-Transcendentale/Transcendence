@@ -312,6 +312,7 @@
 	font-family: 'spacegrotesk', sans-serif;
 	backdrop-filter: blur(15px);
 	box-shadow: inset 0 0 100px rgba(157, 78, 221, 0.1);
+	user-select: none;
 }
 
 #ending-module .score-value {
@@ -343,7 +344,6 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 5vh;
 }
 
 .dual-mode {
@@ -443,12 +443,34 @@
 	}
 }
 
-.game-ui-container table,
+.game-ui-container table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	font-family: 'spacegrotesk', sans-serif;
+	padding: 0;
+}
+
 .game-ui-container th,
 .game-ui-container td {
-	padding: 10px;
-	border: 2px solid white;
-	border-collapse: collapse;
+	padding: 1.5vh 2vh;
+	border: 2px solid rgba(221, 168, 252, 0.3);
+	transition: all 0.2s ease;
+}
+
+.game-ui-container th {
+	background: linear-gradient(135deg, rgba(13, 2, 33, 0.9), rgba(36, 0, 70, 0.8));
+	color: #e0aaff;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+	border-bottom: 2px solid rgba(157, 78, 221, 0.6);
+}
+
+.game-ui-container td {
+	background: rgba(13, 2, 33, 0.7);
+	color: rgba(224, 170, 255, 0.9);
+	padding: 1.5vh 2vh;
 }
 
 .game-ui-container.berserk #timer-module,
@@ -590,15 +612,8 @@
 }
 
 .game-ui-container.brick #score-module .score-container {
-	gap: 15vh;
-	padding: 4vh 6vh;
-	background: linear-gradient(135deg, rgba(13, 2, 33, 0.85), rgba(36, 0, 70, 0.75));
-	backdrop-filter: blur(15px);
-	border: 2px solid rgba(221, 168, 252, 0.3);
+	padding: 2vh 2vh;
 	border-radius: 0px;
-	box-shadow: 0 8px 32px rgba(13, 2, 33, 0.7),
-		0 0 40px rgba(157, 78, 221, 0.2),
-		inset 0 0 30px rgba(157, 78, 221, 0.05);
 	position: relative;
 	overflow: hidden;
 }
@@ -700,6 +715,178 @@
 .game-ui-container.brick .game-ui-countdown {
 	color: #e0aaff;
 	animation: syncedGlow 5s ease alternate infinite;
+}
+
+/* Brick Breaker Solo Mode Ending Container */
+.game-ui-container.brick .solo-mode {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1vh;
+}
+
+/* Score label */
+.game-ui-container.brick .solo-mode::before {
+	content: 'Score';
+	font-size: 3vh;
+	font-weight: 600;
+	color: rgba(224, 170, 255, 0.8);
+	text-transform: uppercase;
+	letter-spacing: 0.3em;
+	text-shadow: 0 0 10px rgba(157, 78, 221, 0.6);
+	margin-bottom: -1vh;
+}
+
+/* Brick Breaker Leaderboard Table */
+.game-ui-container.brick #leaderboard {
+	width: 50%;
+	max-width: 45vh;
+	border-collapse: separate;
+	border-spacing: 0;
+	box-shadow:
+		0 0 30px rgba(157, 78, 221, 0.25),
+		0 6px 24px rgba(13, 2, 33, 0.7);
+	border-radius: 0px;
+	overflow: hidden;
+	position: relative;
+	transform: none;
+	margin: 0 auto;
+}
+
+.game-ui-container.brick #leaderboard th {
+	background: linear-gradient(135deg, rgba(36, 0, 70, 0.95), rgba(13, 2, 33, 0.9));
+	color: #c77dff;
+	font-size: 2vh;
+	padding: 1vh 2vh;
+	text-shadow:
+		0 0 10px rgba(157, 78, 221, 0.7),
+		0 0 20px rgba(157, 78, 221, 0.3);
+	border-bottom: 2px solid rgba(157, 78, 221, 0.7);
+	letter-spacing: 0.15em;
+}
+
+.game-ui-container.brick #leaderboard td {
+	background: rgba(13, 2, 33, 0.85);
+	color: rgba(224, 170, 255, 0.95);
+	font-size: 1.8vh;
+	padding: 0.8vh 2vh;
+	border-bottom: 1px solid rgba(157, 78, 221, 0.2);
+	transition: all 0.3s ease;
+}
+
+.game-ui-container.brick #players-list tr {
+	transition: all 0.3s ease;
+}
+
+.game-ui-container.brick #players-list tr:hover td {
+	background: rgba(36, 0, 70, 0.8);
+	color: #ffffff;
+	text-shadow: 0 0 10px rgba(199, 125, 255, 0.6);
+}
+
+/* First place (high score) styling */
+.game-ui-container.brick #players-list tr:first-child td {
+	background: linear-gradient(135deg, rgba(157, 78, 221, 0.3), rgba(90, 24, 154, 0.3));
+	color: #ffd700;
+	font-weight: bold;
+	font-size: 3.2vh;
+	text-shadow:
+		0 0 15px rgba(255, 215, 0, 0.8),
+		0 0 30px rgba(255, 215, 0, 0.5);
+	border-bottom: 2px solid rgba(255, 215, 0, 0.5);
+}
+
+.game-ui-container.brick #players-list tr:first-child:hover td {
+	background: linear-gradient(135deg, rgba(157, 78, 221, 0.5), rgba(90, 24, 154, 0.5));
+	text-shadow:
+		0 0 20px rgba(255, 215, 0, 1),
+		0 0 40px rgba(255, 215, 0, 0.7);
+}
+
+/* Second place styling */
+.game-ui-container.brick #players-list tr:nth-child(2) td {
+	background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(90, 24, 154, 0.2));
+	color: #c0c0c0;
+	font-weight: 600;
+	font-size: 3vh;
+	text-shadow: 0 0 10px rgba(192, 192, 192, 0.6);
+	border-bottom: 2px solid rgba(192, 192, 192, 0.4);
+}
+
+/* Third place styling */
+.game-ui-container.brick #players-list tr:nth-child(3) td {
+	background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(90, 24, 154, 0.15));
+	color: #cd7f32;
+	font-weight: 600;
+	font-size: 3vh;
+	text-shadow: 0 0 10px rgba(205, 127, 50, 0.6);
+	border-bottom: 2px solid rgba(205, 127, 50, 0.4);
+}
+
+/* Result label for "New High Score!" */
+.game-ui-container.brick #ending-module #result-label {
+	font-size: 6vh;
+	font-weight: bold;
+	color: #ffd700;
+	text-shadow:
+		0 0 20px rgba(255, 215, 0, 1),
+		0 0 40px rgba(255, 215, 0, 0.8),
+		0 0 60px rgba(199, 125, 255, 0.5);
+	animation: highScorePulse 2s ease-in-out infinite;
+	margin-bottom: 0vh;
+	display: block;
+	order: -1;
+}
+
+@keyframes highScorePulse {
+
+	0%,
+	100% {
+		transform: scale(1);
+		text-shadow:
+			0 0 20px rgba(255, 215, 0, 1),
+			0 0 40px rgba(255, 215, 0, 0.8),
+			0 0 60px rgba(199, 125, 255, 0.5);
+	}
+
+	50% {
+		transform: scale(1.05);
+		text-shadow:
+			0 0 30px rgba(255, 215, 0, 1),
+			0 0 60px rgba(255, 215, 0, 0.9),
+			0 0 90px rgba(199, 125, 255, 0.6);
+	}
+}
+
+/* Score display in solo mode ending */
+.game-ui-container.brick .solo-mode #end-score-solo {
+	font-size: 18vh;
+	margin-bottom: 1vh;
+	color: #ffffff;
+	font-weight: bold;
+	text-shadow:
+		0 0 30px rgba(157, 78, 221, 1),
+		0 0 60px rgba(157, 78, 221, 0.8),
+		0 0 90px rgba(199, 125, 255, 0.6);
+	animation: scoreDisplayPulse 3s ease-in-out infinite;
+}
+
+@keyframes scoreDisplayPulse {
+
+	0%,
+	100% {
+		text-shadow:
+			0 0 30px rgba(157, 78, 221, 1),
+			0 0 60px rgba(157, 78, 221, 0.8),
+			0 0 90px rgba(199, 125, 255, 0.6);
+	}
+
+	50% {
+		text-shadow:
+			0 0 40px rgba(199, 125, 255, 1),
+			0 0 80px rgba(199, 125, 255, 0.9),
+			0 0 120px rgba(157, 78, 221, 0.7);
+	}
 }
 
 /* Battle Royale specific styling */
@@ -1083,13 +1270,16 @@
 }
 
 @keyframes keyPulse {
-	0%, 100% {
+
+	0%,
+	100% {
 		box-shadow:
 			0 4px 15px rgba(13, 2, 33, 0.5),
 			0 0 20px rgba(157, 78, 221, 0.2),
 			inset 0 0 20px rgba(157, 78, 221, 0.1);
 		border-color: rgba(221, 168, 252, 0.4);
 	}
+
 	50% {
 		box-shadow:
 			0 4px 20px rgba(13, 2, 33, 0.7),
@@ -1100,12 +1290,15 @@
 }
 
 @keyframes arrowFloat {
-	0%, 100% {
+
+	0%,
+	100% {
 		transform: translateY(0);
 		text-shadow:
 			0 0 10px rgba(157, 78, 221, 0.8),
 			0 0 20px rgba(157, 78, 221, 0.5);
 	}
+
 	50% {
 		transform: translateY(-5px);
 		text-shadow:
@@ -1175,13 +1368,16 @@
 }
 
 @keyframes brKeyPulse {
-	0%, 100% {
+
+	0%,
+	100% {
 		box-shadow:
 			0 4px 15px rgba(20, 0, 0, 0.7),
 			0 0 20px rgba(255, 0, 0, 0.3),
 			inset 0 0 20px rgba(255, 0, 0, 0.1);
 		border-color: rgba(255, 68, 68, 0.5);
 	}
+
 	50% {
 		box-shadow:
 			0 4px 20px rgba(20, 0, 0, 0.9),
@@ -1192,12 +1388,15 @@
 }
 
 @keyframes brArrowFloat {
-	0%, 100% {
+
+	0%,
+	100% {
 		transform: translateX(0);
 		text-shadow:
 			0 0 10px rgba(255, 0, 0, 0.8),
 			0 0 20px rgba(255, 0, 0, 0.5);
 	}
+
 	50% {
 		transform: translateX(-5px);
 		text-shadow:
