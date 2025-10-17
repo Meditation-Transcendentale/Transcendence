@@ -1052,25 +1052,25 @@
 }
 
 .tutorial-content::-webkit-scrollbar {
-  width: 10px;
+	width: 10px;
 }
 
 .tutorial-content::-webkit-scrollbar-track {
-  background: transparent;
+	background: transparent;
 }
 
 .tutorial-content::-webkit-scrollbar-thumb {
-  background: #a855f7;
-  border-radius: 10px;
+	background: #a855f7;
+	border-radius: 10px;
 }
 
 .tutorial-content::-webkit-scrollbar-thumb:hover {
-  background: #c084fc;
+	background: #c084fc;
 }
 
 .tutorial-content {
-  scrollbar-width: thin;
-  scrollbar-color: #a855f7 transparent;
+	scrollbar-width: thin;
+	scrollbar-color: #a855f7 transparent;
 }
 
 .tutorial-title {
@@ -1134,6 +1134,8 @@
 	line-height: 1.6;
 	margin: 0;
 	letter-spacing: 1px;
+}
+
 /* Elimination Message Module */
 #elimination-module {
 	position: fixed;
