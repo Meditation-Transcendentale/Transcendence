@@ -51,7 +51,6 @@ const nats = await connect({
 const jc = JSONCodec();
 
 const USERNAME_REGEX = /^[a-zA-Z0-9]{3,20}$/;
-// const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!?@#$%&*()_{};:|,.<>]{8,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!"#$%&'()*+,\\\-.\/:;<=>?@\[\]^_{|}~]{8,}$/;
 
 function sanitizeRegisterInput(input) {
@@ -63,10 +62,6 @@ function sanitizeRegisterInput(input) {
 }
 
 app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
-
-	// console.log('Content-Type:', req.headers['content-type']);
-	// console.log('Raw body:', req.body);
-	// console.log('Body type:', typeof req.body);
 
 	const { username, password } = sanitizeRegisterInput(req.body);
 
@@ -83,7 +78,28 @@ app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
 	const hashedPassword = await bcrypt.hash(password, 10);
 	const uuid = uuidv4();
 
-	await natsRequest(nats, jc, 'user.registerUser', { uuid, username, hashedPassword });
+	const randomAvatar = [
+		'/cdn/default_avatar1.jpg',
+		'/cdn/default_avatar2.gif',
+		'/cdn/default_avatar3.jpg',
+		'/cdn/default_avatar4.jpg',
+		'/cdn/default_avatar5.jpg',
+		'/cdn/default_avatar6.jpg',
+		'/cdn/default_avatar7.jpg',
+		'/cdn/default_avatar8.jpg',
+		'/cdn/default_avatar9.jpg',
+		'/cdn/default_avatar10.jpg',
+		'/cdn/default_avatar11.gif',
+		'/cdn/default_avatar12.gif',
+		'/cdn/default_avatar13.gif',
+		'/cdn/default_avatar14.jpg',
+	];
+	const randomInt = Math.floor(Math.random() * randomAvatar.length);
+	// const randomInt = Math.random() < 0.5 ? 0 : 1;
+	console.log(randomInt);
+	const avatar = randomAvatar[randomInt];
+
+	await natsRequest(nats, jc, 'user.registerUser', { uuid, username, hashedPassword, avatar });
 
 	const user = await natsRequest(nats, jc, 'user.getUserFromUUID', { uuid });
 

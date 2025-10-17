@@ -98,7 +98,6 @@ async function getAvatarCdnUrl(avatar, uuid) {
 	}
 	await removeOldAvatars(uuid);
 	const randomAddition = Math.random().toString(36).substring(2, 8);
-	// console.log(`Avatar upload: ${uuid}, type: ${fileType.ext}, random: ${randomAddition}`);
 
 	const filename = `${uuid}_${randomAddition}.${fileType.ext}`;
 	const fullPath = `/app/cdn_data/${filename}`;
@@ -168,7 +167,6 @@ app.patch('/avatar', handleErrors(async (req, res) => {
 	}
 
 	const cdnPath = await getAvatarCdnUrl(avatar, user.uuid);
-	console.log(`Avatar uploaded: ${cdnPath}`);
 
 	await natsRequest(nats, jc, 'user.updateAvatar', { avatar: cdnPath, userId: user.id });
 
@@ -183,7 +181,6 @@ app.patch('/avatar', handleErrors(async (req, res) => {
 
 }));
 
-// const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!?@#$%&*()_{};:|,.<>]{8,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!"#$%&'()*+,\\\-.\/:;<=>?@\[\]^_{|}~]{8,}$/;
 
 const passwordSchema = {

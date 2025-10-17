@@ -51,7 +51,7 @@ cert-database/
 stat.md
 
 services/cdn/public/*
-!services/cdn/public/default_avatar.png
+!services/cdn/public/default_avatar*
 !services/cdn/public/doNotDelete
 !services/cdn/public/
 

@@ -147,8 +147,6 @@ const twoFARoutes = (app) => {
 		if (validator.isInt(token)) {
 				token = parseInt(token, 10);
 		}
-		console.log("Token:", token);
-		console.log("Password:", password);
 		try {
 
 			const agent = new https.Agent({

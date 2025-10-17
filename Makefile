@@ -87,6 +87,6 @@ clean:
 
 cleanCDN:
 	@if [ -d ./services/cdn/public ]; then \
-		find ./services/cdn/public -maxdepth 1 -type f ! -name 'doNotDelete' ! -name 'default_avatar.jpg' -exec rm -f {} \; ; \
+		find ./services/cdn/public -maxdepth 1 -type f ! -name 'doNotDelete' ! -name 'default_avatar*' -exec rm -f {} \; ; \
 	fi
 
