@@ -9,28 +9,20 @@
 
  ### Feature
 
-    - leaderboard br
     - (spectate) check spectate leave
     - breaknreaker tutorial create button
 
  ### visual
-    - full DA for the site + css implementation
-    - finish map (zoom, tweak light)
-    - make button disapeer
-    - disable attach control
 
 
  ### fix
+    - join sanitize injection js
+    - error handling input frontend
+    - cleanup input settings
     - sanitize input
-    -focus br camera canva
-    - change goal position physics pong
     - check websocket url
-    - fx pong to delete
-    - add tournament create number
-    - match history stats update 
-    - fix friend popup auto disable
     - join disapeer popup cant
-    - online wrong end you lose instead of you win
+    - lobby join by id weird stuff when id is invalid
 
 ### tweak
     - 3D tweak

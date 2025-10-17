@@ -67,10 +67,8 @@ services:
       # - PORT=5003
     ports:
       - "5003:5003"
-      # - "5050:5050" # For metrics
     networks:
       - game-network
-      - metrics-network
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
@@ -89,7 +87,6 @@ services:
     command: npm run start
     ports:
     - "5004:5004"
-    # - "5051:5051" # For metrics
     restart: unless-stopped
     environment:
       - SERVICE_NAME=user-interface
@@ -106,7 +103,6 @@ services:
     networks:
       - game-network
       - transcendence-network
-      - metrics-network
     
 
   pong-physics:
@@ -126,8 +122,6 @@ services:
       - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
-    # ports:
-    # - "5052:5052" # For metrics
     depends_on:
       database_certs-init:
         condition: service_completed_successfully
@@ -135,7 +129,6 @@ services:
         condition: service_started
     networks:
       - game-network
-      - metrics-network
 
   pongbr-physics:
     container_name: pongBR_physics
@@ -149,7 +142,6 @@ services:
       - ./shared/certs:/app/certs:ro
     command: npm run dev
     # ports:
-    # - "5053:5053" # For metrics
     restart: unless-stopped
     environment:
       - SERVICE_NAME=pongBR-physics
@@ -164,7 +156,6 @@ services:
         condition: service_started
     networks:
       - game-network
-      - metrics-network
 
   ai:
     container_name: ai_service

@@ -4,6 +4,7 @@ import { stateManager } from "../state/StateManager";
 import { streamManager } from "../stream/StreamManager";
 import { User } from "../User";
 import { IHtml } from "./IHtml";
+import { routeManager } from "../route/RouteManager";
 
 type PlayerState = {
   uuid: string;
@@ -69,6 +70,7 @@ export class TournamentHtml implements IHtml {
   public load() {
     document.head.appendChild(this.css);
     document.body.appendChild(this.div);
+    this.div.appendChild(this.rootEl);
   }
 
   public unload(): void {
@@ -99,10 +101,24 @@ export class TournamentHtml implements IHtml {
     this.readyActive = true;
     this.readyDeadline = payload.deadlineMs;
     this.startReadyCountdown();
+    this.render();
   }
 
   public finished() {
-    console.log(`${this.tree?.winnerId} yep gg`);
+    const root = this.tree;
+    if (!root || !root.winnerId) return;
+
+    const { gold, silver, bronzes } = this.computePodiumIds(root);
+
+    this.injectPodiumStyles();
+
+    if (this.treeEl) {
+      this.treeEl.style.filter = "blur(2px) saturate(120%)";
+      this.treeEl.style.opacity = "0.35";
+      this.treeEl.style.transition = "filter 400ms ease, opacity 400ms ease";
+    }
+
+    this.showPodiumOverlay({ gold, silver, bronzes });
   }
 
   private initDOM() {
@@ -140,8 +156,6 @@ export class TournamentHtml implements IHtml {
 
     this.rootEl.append(this.toolbarEl, this.treeEl);
     this.div.appendChild(this.rootEl);
-
-    this.render();
   }
 
   private sendReady() {
@@ -186,7 +200,7 @@ export class TournamentHtml implements IHtml {
       const badge = this.toolbarEl.querySelector(
         ".ready-countdown"
       ) as HTMLSpanElement | null;
-      if (badge) badge.textContent = "";
+      if (badge) this.toolbarEl.removeChild(badge);
       clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
@@ -233,7 +247,7 @@ export class TournamentHtml implements IHtml {
         postRequest("info/search", { identifier: pid, type: "uuid" }).then(
           (json: any) => {
             player.username = json.data.username;
-            profilePicture.src = json.data.avatar_path;
+            player.profilePictureSrc = json.data.avatar_path;
           }
         );
       }
@@ -266,15 +280,14 @@ export class TournamentHtml implements IHtml {
         if (badge) inner.replaceChildren(badge);
       }
     }
-    
+
     row.style.flexDirection = "row";
     if (side === "right") {
       if (profilePicture.src) {
         row.append(inner, name, profilePicture);
         name.style.textAlign = "right";
         profilePicture.style.textAlign = "right";
-      }
-      else {
+      } else {
         row.append(inner, name);
         name.style.textAlign = "right";
       }
@@ -283,8 +296,7 @@ export class TournamentHtml implements IHtml {
         row.append(profilePicture, name, inner);
         profilePicture.style.textAlign = "left";
         name.style.textAlign = "left";
-      }
-      else {
+      } else {
         row.append(name, inner);
         name.style.textAlign = "left";
       }
@@ -298,6 +310,7 @@ export class TournamentHtml implements IHtml {
 
   private makeReadyButton(): HTMLButtonElement {
     const b = document.createElement("button");
+    b.className = "ready-btn";
     b.textContent = "Ready";
     b.addEventListener("click", () => this.sendReady());
     return b;
@@ -451,11 +464,10 @@ export class TournamentHtml implements IHtml {
   }
 
   public render() {
-    const leftLane = this.treeEl.querySelector(".bracket-left") as HTMLElement;
-    const ctrLane = this.treeEl.querySelector(".bracket-center") as HTMLElement;
-    const rightLane = this.treeEl.querySelector(
-      ".bracket-right"
-    ) as HTMLElement;
+    let newTree = this.treeEl;
+    const leftLane = newTree.querySelector(".bracket-left") as HTMLElement;
+    const ctrLane = newTree.querySelector(".bracket-center") as HTMLElement;
+    const rightLane = newTree.querySelector(".bracket-right") as HTMLElement;
 
     leftLane.innerHTML = "";
     ctrLane.innerHTML = "";
@@ -497,6 +509,7 @@ export class TournamentHtml implements IHtml {
       );
       rightLane.appendChild(col);
     }
+    this.treeEl = newTree;
   }
 
   private isPlaying(node: MatchNode): boolean {
@@ -508,5 +521,166 @@ export class TournamentHtml implements IHtml {
     if (!uid) return false;
     const amIn = node.player1Id === uid || node.player2Id === uid;
     return amIn && !node.winnerId;
+  }
+
+  private computePodiumIds(root: MatchNode): {
+    gold: string | null;
+    silver: string | null;
+    bronzes: string[];
+  } {
+    const gold = root.winnerId ?? null;
+
+    const finalists = [root.player1Id ?? null, root.player2Id ?? null];
+    const silver = finalists.find((id) => id && id !== gold) ?? null;
+
+    const bronzes: string[] = [];
+    const sides = [root.left ?? null, root.right ?? null];
+
+    for (const semi of sides) {
+      if (!semi || !semi.winnerId || !semi.player1Id || !semi.player2Id)
+        continue;
+      const loser =
+        semi.player1Id === semi.winnerId ? semi.player2Id : semi.player1Id;
+      if (loser) bronzes.push(loser);
+    }
+
+    return { gold, silver, bronzes };
+  }
+
+  private injectPodiumStyles() {
+    if ((this as any)._podiumStyleElV2) return;
+    const css = document.createElement("style");
+    css.id = "tournament-podium-styles-v2";
+
+    document.head.appendChild(css);
+    (this as any)._podiumStyleElV2 = css;
+  }
+
+  private showPodiumOverlay(ids: {
+    gold: string | null;
+    silver: string | null;
+    bronzes: string[];
+  }) {
+    const overlay = document.createElement("div");
+    overlay.className = "podium-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-label", "Tournament Podium");
+
+    const wrap = document.createElement("div");
+    wrap.className = "podium-wrap";
+
+    const title = document.createElement("div");
+    title.className = "podium-title";
+    title.textContent = "Mysterious Podium";
+
+    const renderPerson = (pid: string | null) => {
+      const person = document.createElement("div");
+      person.className = "person";
+
+      const avatar = document.createElement("div");
+      avatar.className = "avatar avatar--placeholder";
+
+      const name = document.createElement("div");
+      name.className = "name";
+
+      if (pid) {
+        const p = this.players.get(pid) || null;
+        if (p) {
+          name.textContent = p.username || "Mystery Player";
+          if (p.profilePictureSrc) {
+            const img = document.createElement("img");
+            img.src = p.profilePictureSrc;
+            avatar.classList.remove("avatar--placeholder");
+            avatar.replaceChildren(img);
+          } else if (p.username) {
+            avatar.textContent = p.username.charAt(0).toUpperCase();
+          }
+        } else {
+          avatar.textContent = "•";
+        }
+      } else {
+        avatar.textContent = "•";
+      }
+
+      name.classList.add("glitch");
+      name.setAttribute("data-text", name.textContent || "");
+
+      person.append(avatar, name);
+      return person;
+    };
+
+    const makeTier = (place: "gold" | "silver", pid: string | null) => {
+      const tier = document.createElement("div");
+      tier.className = `tier tier--${place}`;
+
+      const badge = document.createElement("div");
+      badge.className = "label";
+      badge.textContent = place === "gold" ? "1st" : "2nd";
+
+      if (place === "gold") {
+        const crown = document.createElement("div");
+        crown.className = "crown";
+        crown.textContent = "👑";
+        tier.appendChild(crown);
+      }
+
+      const plinth = document.createElement("div");
+      plinth.className = "plinth";
+
+      tier.append(badge, renderPerson(pid), plinth);
+      return tier;
+    };
+
+    const makeBronzeTier = (pids: string[]) => {
+      const tier = document.createElement("div");
+      tier.className = "tier tier--bronze";
+
+      const badge = document.createElement("div");
+      badge.className = "label";
+      badge.textContent = "3rd";
+
+      const duo = document.createElement("div");
+      duo.className = "duo";
+      const [a, b] = [pids[0] ?? null, pids[1] ?? null];
+      duo.append(renderPerson(a as any), renderPerson(b as any));
+
+      const plinth = document.createElement("div");
+      plinth.className = "plinth";
+
+      tier.append(badge, duo, plinth);
+      return tier;
+    };
+
+    wrap.append(
+      makeTier("silver", ids.silver),
+      makeTier("gold", ids.gold),
+      makeBronzeTier(ids.bronzes)
+    );
+
+    const cta = document.createElement("button");
+    cta.className = "cta";
+    cta.innerHTML = `Leave the tournament<span aria-hidden="true">`;
+
+    cta.addEventListener("click", () => {
+      if (this.treeEl) {
+        this.treeEl.style.filter = "";
+        this.treeEl.style.opacity = "";
+      }
+      overlay.remove();
+      this.rootEl.remove();
+      routeManager.nav("/home");
+    });
+
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement("div");
+      s.className = "spark";
+      s.style.left = `${12 + Math.random() * 76}%`;
+      s.style.bottom = `${-20 + Math.random() * 60}px`;
+      s.style.animationDelay = `${Math.random() * 6}s`;
+      overlay.appendChild(s);
+    }
+
+    overlay.append(title, wrap, cta);
+    this.rootEl?.appendChild(overlay);
   }
 }

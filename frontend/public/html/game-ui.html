@@ -48,7 +48,7 @@
 			<div class="solo-mode">
 				<span id="end-score-solo" class="score-value"></span>
 			</div>
-			<table id="leaderboard" style="position: absolute; transform: translateX(25vw)">
+			<table id="leaderboard">
 				<thead id="leaderboard-header">
 					<tr>
 						<th id="rank-header">Rank</th>
@@ -87,6 +87,58 @@
 				<span id="playercounter-label" class="playercounter-label">Players alive</span>
 			</div>
 			<span id="playercounter-value" class="playercounter-value">0</span>
+		</div>
+	</div>
+
+	<!-- Elimination Message Module -->
+	<div id="elimination-module" class="game-ui-elimination" style="display: none;">
+		<div id="elimination-container" class="elimination-container">
+		</div>
+	</div>
+
+	<!-- Phase Change Module -->
+	<div id="phasechange-module" class="game-ui-phasechange" style="display: none;">
+		<div id="phasechange-container" class="phasechange-container">
+		</div>
+	</div>
+
+	<!-- Input Hints Module -->
+	<div id="inputhints-module" class="game-ui-inputhints" style="display: none;">
+		<div class="inputhints-container">
+			<div class="inputhints-left">
+				<div class="key-hint">
+					<span class="key">W</span>
+					<span class="arrow">↑</span>
+				</div>
+				<div class="key-hint">
+					<span class="key">S</span>
+					<span class="arrow">↓</span>
+				</div>
+			</div>
+			<div class="inputhints-right">
+				<div class="key-hint">
+					<span class="key">↑</span>
+					<span class="arrow">↑</span>
+				</div>
+				<div class="key-hint">
+					<span class="key">↓</span>
+					<span class="arrow">↓</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- BR Input Hints Module -->
+	<div id="brinputhints-module" class="game-ui-brinputhints" style="display: none;">
+		<div class="brinputhints-container">
+			<div class="key-hint">
+				<span class="arrow">←</span>
+				<span class="key">A</span>
+			</div>
+			<div class="key-hint">
+				<span class="key">D</span>
+				<span class="arrow">→</span>
+			</div>
 		</div>
 	</div>
 

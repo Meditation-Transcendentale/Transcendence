@@ -26,7 +26,7 @@ export class GameManager {
 	public launchPong() {
 		this.pongUI.load();
 		this.pongUI.showButton('quit', 'Quit', () => {
-			routeManager.nav("/home", false, true);
+			routeManager.comeback();
 			console.log('Game quit');
 		});
 		this.pong.start(stateManager.gameId, User.uuid, stateManager.gameMode, stateManager.gameMap);
@@ -43,7 +43,7 @@ export class GameManager {
 			console.log('Restart');
 		});
 		this.brickUI.showButton('quit', 'Quit', () => {
-			routeManager.nav('/home', false, true);
+			routeManager.comeback();
 			console.log('Quit');
 		});
 		this.brick.start(stateManager.gameMode);
@@ -52,7 +52,7 @@ export class GameManager {
 	public launchBr() {
 		this.brUI.load();
 		this.brUI.showButton('quit', 'Quit', () => {
-			routeManager.nav('/home', false, true);
+			routeManager.comeback();
 			console.log('Game quit');
 		});
 		this.br.start(stateManager.gameId, User.uuid);
@@ -81,29 +81,34 @@ export class GameManager {
 			.catch((err) => alert(err)) as HTMLDivElement;
 
 		this.pongUI = new GameUI(div, {
-			enabledModules: ['scorevs', 'buttons', 'countdown', 'ending', 'images'],
+			enabledModules: ['scorevs', 'buttons', 'countdown', 'ending', 'images', 'inputhints'],
 			theme: 'pong',
 			modulePositions: {
 				scorevs: { x: 'center', y: 'top' },
-				buttons: { x: 'center', y: 'bottom' },
+				buttons: { x: 'center', y: 'bottom', offset: { x: 0, y: 50 } },
 				countdown: { x: 'center', y: 'center' },
 				ending: { x: 'center', y: 'center' },
-				images: { x: 'center', y: 'center' }
+				images: { x: 'center', y: 'center' },
+				inputhints: { x: 'center', y: 'center' }
 			}
 		})
 		this.brUI = new GameUI(div.cloneNode(true) as HTMLDivElement, {
-			enabledModules: ['buttons', 'ending', 'images', 'playercounter'],
+			enabledModules: ['buttons', 'ending', 'images', 'playercounter', 'elimination', 'phasechange', 'countdown', 'brinputhints'],
 			theme: 'berserk',
 			modulePositions: {
-				buttons: { x: 'right', y: 'bottom' },
+				buttons: { x: 'center', y: 'bottom', offset: { x: 0, y: 50 } },
 				ending: { x: 'center', y: 'center' },
 				images: { x: 'center', y: 'center' },
-				playercounter: { x: "left", y: 'top' }
+				playercounter: { x: "left", y: 'top' },
+				elimination: { x: 'center', y: 'bottom', offset: { x: 0, y: 0 } },
+				phasechange: { x: 'center', y: 'top', offset: { x: 0, y: 260 } },
+				countdown: { x: 'center', y: 'center' },
+				brinputhints: { x: 'center', y: 'bottom' }
 			}
 		})
 		this.brickUI = new GameUI(div.cloneNode(true) as HTMLDivElement, {
 			enabledModules: ['score', 'buttons', 'ending'],
-			theme: 'pong',
+			theme: 'brick',
 			modulePositions: {
 				score: { x: 'left', y: 'top', offset: { x: 100, y: 0 } },
 				buttons: { x: 'center', y: 'bottom', offset: { x: 0, y: 85 } },

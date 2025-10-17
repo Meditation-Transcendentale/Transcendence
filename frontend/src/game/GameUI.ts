@@ -1,29 +1,33 @@
 interface GameUIModules {
-  scorevs?: ScoreVersusModule;
-  score?: ScoreModule;
-  timer?: TimerModule;
-  buttons?: ButtonModule;
-  countdown?: CountdownModule;
-  ending?: EndingModule;
-  images?: ImageModule;
-  playercounter?: PlayerCounterModule;
+	scorevs?: ScoreVersusModule;
+	score?: ScoreModule;
+	timer?: TimerModule;
+	buttons?: ButtonModule;
+	countdown?: CountdownModule;
+	ending?: EndingModule;
+	images?: ImageModule;
+	playercounter?: PlayerCounterModule;
+	elimination?: EliminationModule;
+	phasechange?: PhaseChangeModule;
+	inputhints?: InputHintsModule;
+	brinputhints?: BRInputHintsModule;
 }
 
 interface ModulePosition {
-  x?: "left" | "center" | "right" | number;
-  y?: "top" | "center" | "bottom" | number;
-  anchor?:
-    | "top-left"
-    | "top-center"
-    | "top-right"
-    | "center-left"
-    | "center"
-    | "center-right"
-    | "bottom-left"
-    | "bottom-center"
-    | "bottom-right";
-  offset?: { x: number; y: number };
-  zIndex?: number;
+	x?: "left" | "center" | "right" | number;
+	y?: "top" | "center" | "bottom" | number;
+	anchor?:
+	| "top-left"
+	| "top-center"
+	| "top-right"
+	| "center-left"
+	| "center"
+	| "center-right"
+	| "bottom-left"
+	| "bottom-center"
+	| "bottom-right";
+	offset?: { x: number; y: number };
+	zIndex?: number;
 }
 
 interface GameUIConfig {
@@ -39,1099 +43,1166 @@ interface GameUIConfig {
 		ending?: ModulePosition;
 		images?: ModulePosition;
 		playercounter?: ModulePosition;
+		elimination?: ModulePosition;
+		phasechange?: ModulePosition;
+		inputhints?: ModulePosition;
+		brinputhints?: ModulePosition;
 	};
 }
 
 interface GameUIHtmlReference {
-  container: HTMLDivElement;
-  scorevsModule: HTMLDivElement;
-  scoreModule: HTMLDivElement;
-  timerModule: HTMLDivElement;
-  buttonModule: HTMLDivElement;
-  countdownModule: HTMLDivElement;
-  endingModule: HTMLDivElement;
-  imageModule: HTMLDivElement;
-  playercounterModule: HTMLDivElement;
+	container: HTMLDivElement;
+	scorevsModule: HTMLDivElement;
+	scoreModule: HTMLDivElement;
+	timerModule: HTMLDivElement;
+	buttonModule: HTMLDivElement;
+	countdownModule: HTMLDivElement;
+	endingModule: HTMLDivElement;
+	imageModule: HTMLDivElement;
+	playercounterModule: HTMLDivElement;
+	eliminationModule: HTMLDivElement;
+	phasechangeModule: HTMLDivElement;
+	inputhintsModule: HTMLDivElement;
+	brinputhintsModule: HTMLDivElement;
 }
 
 class GameUI {
-  private div: HTMLDivElement;
-  private modules: GameUIModules = {};
-  private config: GameUIConfig;
-  private loaded = false;
-  private css: HTMLLinkElement;
-  private ref: GameUIHtmlReference;
+	private div: HTMLDivElement;
+	private modules: GameUIModules = {};
+	private config: GameUIConfig;
+	private loaded = false;
+	private css: HTMLLinkElement;
+	private ref: GameUIHtmlReference;
 
-  constructor(div: HTMLDivElement, config: GameUIConfig) {
-    this.div = div;
-    this.config = config;
-    this.css = div.querySelector("link") as HTMLLinkElement;
+	constructor(div: HTMLDivElement, config: GameUIConfig) {
+		this.div = div;
+		this.config = config;
+		this.css = div.querySelector("link") as HTMLLinkElement;
 
-    this.ref = {
-      container: this.div,
-      scorevsModule: div.querySelector("#scorevs-module") as HTMLDivElement,
-      scoreModule: div.querySelector("#score-module") as HTMLDivElement,
-      timerModule: div.querySelector("#timer-module") as HTMLDivElement,
-      buttonModule: div.querySelector("#button-module") as HTMLDivElement,
-      countdownModule: div.querySelector("#countdown-module") as HTMLDivElement,
-      endingModule: div.querySelector("#ending-module") as HTMLDivElement,
-      imageModule: div.querySelector("#image-module") as HTMLDivElement,
-      playercounterModule: div.querySelector(
-        "#playercounter-module"
-      ) as HTMLDivElement,
-    };
+		this.ref = {
+			container: this.div,
+			scorevsModule: div.querySelector("#scorevs-module") as HTMLDivElement,
+			scoreModule: div.querySelector("#score-module") as HTMLDivElement,
+			timerModule: div.querySelector("#timer-module") as HTMLDivElement,
+			buttonModule: div.querySelector("#button-module") as HTMLDivElement,
+			countdownModule: div.querySelector("#countdown-module") as HTMLDivElement,
+			endingModule: div.querySelector("#ending-module") as HTMLDivElement,
+			imageModule: div.querySelector("#image-module") as HTMLDivElement,
+			playercounterModule: div.querySelector(
+				"#playercounter-module"
+			) as HTMLDivElement,
+			eliminationModule: div.querySelector("#elimination-module") as HTMLDivElement,
+			phasechangeModule: div.querySelector("#phasechange-module") as HTMLDivElement,
+			inputhintsModule: div.querySelector("#inputhints-module") as HTMLDivElement,
+			brinputhintsModule: div.querySelector("#brinputhints-module") as HTMLDivElement,
+		};
 
-    this.initializeModules();
-  }
+		this.initializeModules();
+	}
 
-  private initializeModules() {
-    this.config.enabledModules.forEach((moduleName) => {
-      switch (moduleName) {
-        case "scorevs":
-          this.modules.scorevs = new ScoreVersusModule(this.ref.scorevsModule);
-          break;
-        case "score":
-          this.modules.score = new ScoreModule(this.ref.scoreModule);
-          break;
-        case "timer":
-          this.modules.timer = new TimerModule(this.ref.timerModule);
-          break;
-        case "buttons":
-          this.modules.buttons = new ButtonModule(this.ref.buttonModule);
-          break;
-        case "countdown":
-          this.modules.countdown = new CountdownModule(
-            this.ref.countdownModule
-          );
-          break;
-        case "ending":
-          this.modules.ending = new EndingModule(this.ref.endingModule);
-          break;
-        case "images":
-          this.modules.images = new ImageModule(this.ref.imageModule);
-          break;
-        case "playercounter":
-          this.modules.playercounter = new PlayerCounterModule(
-            this.ref.playercounterModule
-          );
-          break;
-      }
-    });
-  }
+	private initializeModules() {
+		this.config.enabledModules.forEach((moduleName) => {
+			switch (moduleName) {
+				case "scorevs":
+					this.modules.scorevs = new ScoreVersusModule(this.ref.scorevsModule);
+					break;
+				case "score":
+					this.modules.score = new ScoreModule(this.ref.scoreModule);
+					break;
+				case "timer":
+					this.modules.timer = new TimerModule(this.ref.timerModule);
+					break;
+				case "buttons":
+					this.modules.buttons = new ButtonModule(this.ref.buttonModule);
+					break;
+				case "countdown":
+					this.modules.countdown = new CountdownModule(
+						this.ref.countdownModule
+					);
+					break;
+				case "ending":
+					this.modules.ending = new EndingModule(this.ref.endingModule);
+					break;
+				case "images":
+					this.modules.images = new ImageModule(this.ref.imageModule);
+					break;
+				case "playercounter":
+					this.modules.playercounter = new PlayerCounterModule(
+						this.ref.playercounterModule
+					);
+					break;
+				case "elimination":
+					this.modules.elimination = new EliminationModule(
+						this.ref.eliminationModule
+					);
+					break;
+				case "phasechange":
+					this.modules.phasechange = new PhaseChangeModule(
+						this.ref.phasechangeModule
+					);
+					break;
+				case "inputhints":
+					this.modules.inputhints = new InputHintsModule(
+						this.ref.inputhintsModule
+					);
+					break;
+				case "brinputhints":
+					this.modules.brinputhints = new BRInputHintsModule(
+						this.ref.brinputhintsModule
+					);
+					break;
+			}
+		});
+	}
 
-  public load() {
-    if (this.loaded) return;
+	public load() {
+		if (this.loaded) return;
 
-    document.head.appendChild(this.css);
+		document.head.appendChild(this.css);
 
-    this.ref.container.className += ` ${this.config.theme || "game"}`;
-    if (this.config.globalPosition) {
-      this.ref.container.className += ` ${this.config.globalPosition}`;
-    }
+		this.ref.container.className += ` ${this.config.theme || "game"}`;
+		if (this.config.globalPosition) {
+			this.ref.container.className += ` ${this.config.globalPosition}`;
+		}
 
-    document.body.appendChild(this.ref.container);
+		document.body.appendChild(this.ref.container);
 
-    this.ref.container.style.display = "flex";
+		this.ref.container.style.display = "flex";
 
-    Object.entries(this.modules).forEach(([moduleName, module]) => {
-      if (module) {
-        module.load();
-        this.applyModulePosition(moduleName as keyof GameUIModules);
-      }
-    });
+		Object.entries(this.modules).forEach(([moduleName, module]) => {
+			if (module) {
+				module.load();
+				this.applyModulePosition(moduleName as keyof GameUIModules);
+			}
+		});
 
-    this.loaded = true;
-  }
+		this.loaded = true;
+	}
 
-  public unload() {
-    if (!this.loaded) return;
+	public unload() {
+		if (!this.loaded) return;
 
-    Object.values(this.modules).forEach((module) => {
-      module?.unload();
-    });
+		Object.values(this.modules).forEach((module) => {
+			module?.unload();
+		});
 
-    this.ref.container?.remove();
+		this.ref.container?.remove();
 
-    this.loaded = false;
-  }
+		this.loaded = false;
+	}
 
-  private applyModulePosition(moduleName: keyof GameUIModules) {
-    const moduleElement = this.getModuleElement(moduleName);
-    const position = this.config.modulePositions?.[moduleName];
+	private applyModulePosition(moduleName: keyof GameUIModules) {
+		const moduleElement = this.getModuleElement(moduleName);
+		const position = this.config.modulePositions?.[moduleName];
 
-    if (!moduleElement || !position) return;
+		if (!moduleElement || !position) return;
 
-    moduleElement.style.position = "absolute";
-    moduleElement.style.top = "";
-    moduleElement.style.bottom = "";
-    moduleElement.style.left = "";
-    moduleElement.style.right = "";
-    moduleElement.style.transform = "";
+		moduleElement.style.position = "absolute";
+		moduleElement.style.top = "";
+		moduleElement.style.bottom = "";
+		moduleElement.style.left = "";
+		moduleElement.style.right = "";
+		moduleElement.style.transform = "";
 
-    if (position.anchor) {
-      this.applyAnchorPosition(moduleElement, position);
-    } else {
-      this.applyCoordinatePosition(moduleElement, position);
-    }
+		if (position.anchor) {
+			this.applyAnchorPosition(moduleElement, position);
+		} else {
+			this.applyCoordinatePosition(moduleElement, position);
+		}
 
-    if (position.offset) {
-      const currentTransform = moduleElement.style.transform || "";
-      moduleElement.style.transform = `${currentTransform} translate(${position.offset.x}px, ${position.offset.y}px)`;
-    }
+		if (position.offset) {
+			const currentTransform = moduleElement.style.transform || "";
+			moduleElement.style.transform = `${currentTransform} translate(${position.offset.x}px, ${position.offset.y}px)`;
+		}
 
-    if (position.zIndex !== undefined) {
-      moduleElement.style.zIndex = position.zIndex.toString();
-    }
-  }
+		if (position.zIndex !== undefined) {
+			moduleElement.style.zIndex = position.zIndex.toString();
+		}
+	}
 
-  private applyAnchorPosition(element: HTMLElement, position: ModulePosition) {
-    const anchor = position.anchor!;
+	private applyAnchorPosition(element: HTMLElement, position: ModulePosition) {
+		const anchor = position.anchor!;
 
-    switch (anchor) {
-      case "top-left":
-        element.style.top = "20px";
-        element.style.left = "20px";
-        break;
-      case "top-center":
-        element.style.top = "20px";
-        element.style.left = "50%";
-        element.style.transform = "translateX(-50%)";
-        break;
-      case "top-right":
-        element.style.top = "20px";
-        element.style.left = "85%";
-        break;
-      case "center-left":
-        element.style.top = "50%";
-        element.style.left = "20px";
-        element.style.transform = "translateY(-50%)";
-        break;
-      case "center":
-        element.style.top = "50%";
-        element.style.left = "50%";
-        element.style.transform = "translate(-50%, -50%)";
-        break;
-      case "center-right":
-        element.style.top = "50%";
-        element.style.left = "85%";
-        element.style.transform = "translateY(-50%)";
-        break;
-      case "bottom-left":
-        element.style.top = "85%";
-        element.style.left = "20px";
-        break;
-      case "bottom-center":
-        element.style.top = "85%";
-        element.style.left = "50%";
-        element.style.transform = "translateX(-50%)";
-        break;
-      case "bottom-right":
-        element.style.top = "85%";
-        element.style.left = "85%";
-        break;
-    }
-  }
+		switch (anchor) {
+			case "top-left":
+				element.style.top = "20px";
+				element.style.left = "20px";
+				break;
+			case "top-center":
+				element.style.top = "20px";
+				element.style.left = "50%";
+				element.style.transform = "translateX(-50%)";
+				break;
+			case "top-right":
+				element.style.top = "20px";
+				element.style.left = "85%";
+				break;
+			case "center-left":
+				element.style.top = "50%";
+				element.style.left = "20px";
+				element.style.transform = "translateY(-50%)";
+				break;
+			case "center":
+				element.style.top = "50%";
+				element.style.left = "50%";
+				element.style.transform = "translate(-50%, -50%)";
+				break;
+			case "center-right":
+				element.style.top = "50%";
+				element.style.left = "85%";
+				element.style.transform = "translateY(-50%)";
+				break;
+			case "bottom-left":
+				element.style.top = "85%";
+				element.style.left = "20px";
+				break;
+			case "bottom-center":
+				element.style.top = "85%";
+				element.style.left = "50%";
+				element.style.transform = "translateX(-50%)";
+				break;
+			case "bottom-right":
+				element.style.top = "85%";
+				element.style.left = "85%";
+				break;
+		}
+	}
 
-  private applyCoordinatePosition(
-    element: HTMLElement,
-    position: ModulePosition
-  ) {
-    element.style.top = "";
-    element.style.bottom = "";
-    element.style.left = "";
-    element.style.right = "";
+	private applyCoordinatePosition(
+		element: HTMLElement,
+		position: ModulePosition
+	) {
+		element.style.top = "";
+		element.style.bottom = "";
+		element.style.left = "";
+		element.style.right = "";
 
-    if (position.x !== undefined) {
-      if (typeof position.x === "string") {
-        switch (position.x) {
-          case "left":
-            element.style.left = "20px";
-            break;
-          case "center":
-            element.style.left = "50%";
-            element.style.transform = "translateX(-50%)";
-            break;
-          case "right":
-            element.style.left = "85%";
-            break;
-        }
-      } else {
-        element.style.left = `${position.x}px`;
-      }
-    }
+		if (position.x !== undefined) {
+			if (typeof position.x === "string") {
+				switch (position.x) {
+					case "left":
+						element.style.left = "20px";
+						break;
+					case "center":
+						element.style.left = "50%";
+						element.style.transform = "translateX(-50%)";
+						break;
+					case "right":
+						element.style.left = "85%";
+						break;
+				}
+			} else {
+				element.style.left = `${position.x}px`;
+			}
+		}
 
-    if (position.y !== undefined) {
-      const currentTransform = element.style.transform || "";
-      if (typeof position.y === "string") {
-        switch (position.y) {
-          case "top":
-            element.style.top = "20px";
-            break;
-          case "center":
-            element.style.top = "50%";
-            if (currentTransform.includes("translateX")) {
-              element.style.transform = currentTransform.replace(
-                "translateX(-50%)",
-                "translate(-50%, -50%)"
-              );
-            } else {
-              element.style.transform = "translateY(-50%)";
-            }
-            break;
-          case "bottom":
-            element.style.top = "85%";
-            // Remove any top positioning that might conflict
-            //element.style.top = '';
-            break;
-        }
-      } else {
-        element.style.top = `${position.y}px`;
-        element.style.bottom = ""; // Clear bottom if using pixel value
-      }
-    }
-  }
+		if (position.y !== undefined) {
+			const currentTransform = element.style.transform || "";
+			if (typeof position.y === "string") {
+				switch (position.y) {
+					case "top":
+						element.style.top = "20px";
+						break;
+					case "center":
+						element.style.top = "50%";
+						if (currentTransform.includes("translateX")) {
+							element.style.transform = currentTransform.replace(
+								"translateX(-50%)",
+								"translate(-50%, -50%)"
+							);
+						} else {
+							element.style.transform = "translateY(-50%)";
+						}
+						break;
+					case "bottom":
+						element.style.top = "85%";
+						// Remove any top positioning that might conflict
+						//element.style.top = '';
+						break;
+				}
+			} else {
+				element.style.top = `${position.y}px`;
+				element.style.bottom = ""; // Clear bottom if using pixel value
+			}
+		}
+	}
 
-  public setModulePosition(
-    moduleName: keyof GameUIModules,
-    position: ModulePosition
-  ) {
-    if (!this.config.modulePositions) {
-      this.config.modulePositions = {};
-    }
-    this.config.modulePositions[moduleName] = position;
+	public setModulePosition(
+		moduleName: keyof GameUIModules,
+		position: ModulePosition
+	) {
+		if (!this.config.modulePositions) {
+			this.config.modulePositions = {};
+		}
+		this.config.modulePositions[moduleName] = position;
 
-    if (this.loaded) {
-      this.applyModulePosition(moduleName);
-    }
-  }
+		if (this.loaded) {
+			this.applyModulePosition(moduleName);
+		}
+	}
 
-  public getModulePosition(
-    moduleName: keyof GameUIModules
-  ): ModulePosition | undefined {
-    return this.config.modulePositions?.[moduleName];
-  }
+	public getModulePosition(
+		moduleName: keyof GameUIModules
+	): ModulePosition | undefined {
+		return this.config.modulePositions?.[moduleName];
+	}
 
-  public resetModulePosition(moduleName: keyof GameUIModules) {
-    if (this.config.modulePositions) {
-      delete this.config.modulePositions[moduleName];
+	public resetModulePosition(moduleName: keyof GameUIModules) {
+		if (this.config.modulePositions) {
+			delete this.config.modulePositions[moduleName];
 
-      const element = this.getModuleElement(moduleName);
-      if (element) {
-        element.style.position = "";
-        element.style.top = "";
-        element.style.bottom = "";
-        element.style.left = "";
-        element.style.right = "";
-        element.style.transform = "";
-        element.style.zIndex = "";
-      }
-    }
-  }
+			const element = this.getModuleElement(moduleName);
+			if (element) {
+				element.style.position = "";
+				element.style.top = "";
+				element.style.bottom = "";
+				element.style.left = "";
+				element.style.right = "";
+				element.style.transform = "";
+				element.style.zIndex = "";
+			}
+		}
+	}
 
-  public animateModulePosition(
-    moduleName: keyof GameUIModules,
-    newPosition: ModulePosition,
-    duration: number = 500
-  ) {
-    const element = this.getModuleElement(moduleName);
-    if (!element) return;
+	public animateModulePosition(
+		moduleName: keyof GameUIModules,
+		newPosition: ModulePosition,
+		duration: number = 500
+	) {
+		const element = this.getModuleElement(moduleName);
+		if (!element) return;
 
-    element.style.transition = `all ${duration}ms ease-in-out`;
+		element.style.transition = `all ${duration}ms ease-in-out`;
 
-    this.setModulePosition(moduleName, newPosition);
+		this.setModulePosition(moduleName, newPosition);
 
-    setTimeout(() => {
-      element.style.transition = "";
-    }, duration);
-  }
+		setTimeout(() => {
+			element.style.transition = "";
+		}, duration);
+	}
 
-  private getModuleElement(
-    moduleName: keyof GameUIModules
-  ): HTMLElement | null {
-    switch (moduleName) {
-      case "scorevs":
-        return this.ref.scorevsModule;
-      case "score":
-        return this.ref.scoreModule;
-      case "timer":
-        return this.ref.timerModule;
-      case "buttons":
-        return this.ref.buttonModule;
-      case "countdown":
-        return this.ref.countdownModule;
-      case "ending":
-        return this.ref.endingModule;
-      case "images":
-        return this.ref.imageModule;
-      // case 'death': return this.ref.deathModule;
-      case "playercounter":
-        return this.ref.playercounterModule;
-      // case 'spectate': return this.ref.spectateModule;
-      default:
-        return null;
-    }
-  }
+	private getModuleElement(
+		moduleName: keyof GameUIModules
+	): HTMLElement | null {
+		switch (moduleName) {
+			case "scorevs":
+				return this.ref.scorevsModule;
+			case "score":
+				return this.ref.scoreModule;
+			case "timer":
+				return this.ref.timerModule;
+			case "buttons":
+				return this.ref.buttonModule;
+			case "countdown":
+				return this.ref.countdownModule;
+			case "ending":
+				return this.ref.endingModule;
+			case "images":
+				return this.ref.imageModule;
+			// case 'death': return this.ref.deathModule;
+			case "playercounter":
+				return this.ref.playercounterModule;
+			case "elimination":
+				return this.ref.eliminationModule;
+			case "phasechange":
+				return this.ref.phasechangeModule;
+			case "inputhints":
+				return this.ref.inputhintsModule;
+			case "brinputhints":
+				return this.ref.brinputhintsModule;
+			// case 'spectate': return this.ref.spectateModule;
+			default:
+				return null;
+		}
+	}
 
-  public updateScore(score: number) {
-    this.modules.score?.updateScore(score);
-  }
+	public updateScore(score: number) {
+		this.modules.score?.updateScore(score);
+	}
 
-  public updateHighScore(score: number) {
-    this.modules.score?.updateHighScore(score);
-  }
+	public updateHighScore(score: number) {
+		this.modules.score?.updateHighScore(score);
+	}
 
-  public updateScoreVersus(score1: number, score2: number) {
-    this.modules.scorevs?.updateScore(score1, score2);
-  }
+	public updateScoreVersus(score1: number, score2: number) {
+		this.modules.scorevs?.updateScore(score1, score2);
+	}
 
-  public setPlayerNames(player1: string, player2: string) {
-    this.modules.scorevs?.setPlayerNames(player1, player2);
-  }
+	public setPlayerNames(player1: string, player2: string) {
+		this.modules.scorevs?.setPlayerNames(player1, player2);
+	}
 
-  public hideScore() {
-    this.modules.score?.unload();
-  }
+	public hideScore() {
+		this.modules.score?.unload();
+	}
 
-  public showScore() {
-    this.modules.score?.load();
-  }
+	public showScore() {
+		this.modules.score?.load();
+	}
 
-  public startCountdown(initialValue: number, onComplete?: () => void) {
-    this.modules.countdown?.start(initialValue, onComplete);
-  }
+	public startCountdown(initialValue: number, onComplete?: () => void) {
+		this.modules.countdown?.start(initialValue, onComplete);
+	}
 
-  public startTimer(duration?: number, onEnd?: () => void) {
-    this.modules.timer?.start(duration, onEnd);
-  }
+	public startTimer(duration?: number, onEnd?: () => void) {
+		this.modules.timer?.start(duration, onEnd);
+	}
 
-  public stopTimer() {
-    this.modules.timer?.stop();
-  }
+	public stopTimer() {
+		this.modules.timer?.stop();
+	}
 
-  public showEnd(
-    mode: string,
-    result: boolean,
-    score1: number,
-    score2?: number
-  ) {
-    this.modules.ending?.setResult(mode, result, score1, score2);
-  }
+	public showEnd(
+		mode: string,
+		result: boolean,
+		score1: number,
+		score2?: number
+	) {
+		this.modules.ending?.setResult(mode, result, score1, score2);
+	}
 
-  public hideEnd() {
-    this.modules.ending?.unload();
-  }
+	public hideEnd() {
+		this.modules.ending?.unload();
+	}
 
-  public setLeaderboard(data: any, mode: string) {
-    this.modules.ending?.setLeaderboard(data, mode);
-  }
+	public setLeaderboard(data: any, mode: string) {
+		this.modules.ending?.setLeaderboard(data, mode);
+	}
 
-  public showBRRankings(rankings: Array<{ rank: number; username: string; uuid: string }>) {
-    this.modules.ending?.setBRRankings(rankings);
-  }
+	public showBRRankings(rankings: Array<{ rank: number; username: string; uuid: string; isLocalPlayer?: boolean }>) {
+		this.modules.ending?.setBRRankings(rankings);
+		// Hide elimination message and player counter when leaderboard appears
+		this.modules.elimination?.unload();
+		this.modules.playercounter?.unload();
+	}
 
-  public showButton(
-    id: string,
-    text: string,
-    callback: () => void,
-    style?: string
-  ) {
-    this.modules.buttons?.addButton(id, text, callback, style);
-  }
+	public showButton(
+		id: string,
+		text: string,
+		callback: () => void,
+		style?: string
+	) {
+		this.modules.buttons?.addButton(id, text, callback, style);
+	}
 
-  public hideButton(id: string) {
-    this.modules.buttons?.removeButton(id);
-  }
+	public hideButton(id: string) {
+		this.modules.buttons?.removeButton(id);
+	}
 
-  public showImage(
-    id: string,
-    src: string,
-    style?: string,
-    position?: ImagePosition
-  ) {
-    this.modules.images?.addImage(id, src, style, position);
-  }
+	public showImage(
+		id: string,
+		src: string,
+		style?: string,
+		position?: ImagePosition
+	) {
+		this.modules.images?.addImage(id, src, style, position);
+	}
 
-  public hideImage(id: string) {
-    this.modules.images?.removeImage(id);
-  }
+	public hideImage(id: string) {
+		this.modules.images?.removeImage(id);
+	}
 
-  public hideAllImages() {
-    this.modules.images?.hideAll();
-  }
+	public hideAllImages() {
+		this.modules.images?.hideAll();
+	}
 
-  public updatePlayerCount(playerLeft: number) {
-    this.modules.playercounter?.update(playerLeft);
-  }
+	public updatePlayerCount(playerLeft: number) {
+		this.modules.playercounter?.update(playerLeft);
+	}
+
+	public showEliminationMessage(username: string) {
+		this.modules.elimination?.showElimination(username);
+	}
+
+	public showPhaseChange(phase: string, playerCount: number) {
+		this.modules.phasechange?.showPhaseChange(phase, playerCount);
+	}
+
+	public showInputHints(mode: string) {
+		this.modules.inputhints?.show(mode);
+	}
+
+	public hideInputHints() {
+		this.modules.inputhints?.hide();
+	}
+
+	public showBRInputHints() {
+		this.modules.brinputhints?.show();
+	}
+
+	public hideBRInputHints() {
+		this.modules.brinputhints?.hide();
+	}
 }
 
 interface GameUIModule {
-  load(): void;
-  unload(): void;
+	load(): void;
+	unload(): void;
 }
 
 interface CountdownHtmlReference {
-  countdownLabel: HTMLSpanElement;
-  countdownValue: HTMLSpanElement;
+	countdownLabel: HTMLSpanElement;
+	countdownValue: HTMLSpanElement;
 }
 
 class CountdownModule implements GameUIModule {
-  private div: HTMLDivElement;
-  private ref: CountdownHtmlReference;
-  private delay = 1000;
-  private countdownNumber = 3;
-  private countdownInterval?: NodeJS.Timeout;
+	private div: HTMLDivElement;
+	private ref: CountdownHtmlReference;
+	private delay = 1000;
+	private countdownNumber = 3;
+	private countdownInterval?: NodeJS.Timeout;
 
-  constructor(div: HTMLDivElement) {
-    this.div = div;
-    this.ref = {
-      countdownLabel: div.querySelector("#countdown-label") as HTMLSpanElement,
-      countdownValue: div.querySelector("#countdown-value") as HTMLSpanElement,
-    };
-  }
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			countdownLabel: div.querySelector("#countdown-label") as HTMLSpanElement,
+			countdownValue: div.querySelector("#countdown-value") as HTMLSpanElement,
+		};
+	}
 
-  load() {
-    this.div.style.display = "flex";
-  }
+	load() {
+		this.div.style.display = "flex";
+	}
 
-  unload() {
-    this.ref.countdownValue.textContent = "";
-    this.div.style.display = "none";
-    this.stop();
-  }
+	unload() {
+		this.ref.countdownValue.textContent = "";
+		this.div.style.display = "none";
+		this.stop();
+	}
 
-  start(initialValue: number = 3, onComplete?: () => void) {
-    this.countdownNumber = initialValue;
+	start(initialValue: number = 3, onComplete?: () => void) {
+		this.countdownNumber = initialValue;
 
-    this.updateDisplay();
+		this.updateDisplay();
 
-    this.countdownInterval = setInterval(() => {
-      this.countdownNumber--;
-      this.updateDisplay();
+		this.countdownInterval = setInterval(() => {
+			this.countdownNumber--;
+			this.updateDisplay();
 
-      if (this.countdownNumber <= 0) {
-        this.unload();
-        onComplete?.();
-      }
-    }, this.delay);
-  }
+			if (this.countdownNumber <= 0) {
+				this.unload();
+				onComplete?.();
+			}
+		}, this.delay);
+	}
 
-  updateDisplay() {
-    if (this.ref.countdownValue) {
-      this.ref.countdownValue.textContent = this.countdownNumber.toString();
-      this.ref.countdownValue.className = "countdown-number";
-    }
-  }
+	updateDisplay() {
+		if (this.ref.countdownValue) {
+			this.ref.countdownValue.textContent = this.countdownNumber.toString();
+			this.ref.countdownValue.className = "countdown-number";
+		}
+	}
 
-  stop() {
-    if (this.countdownInterval) {
-      clearInterval(this.countdownInterval);
-      this.countdownInterval = undefined;
-    }
-  }
+	stop() {
+		if (this.countdownInterval) {
+			clearInterval(this.countdownInterval);
+			this.countdownInterval = undefined;
+		}
+	}
 }
 
 interface ScoreVersusHtmlReference {
-  score1Value: HTMLSpanElement;
-  score2Value: HTMLSpanElement;
-  player1Name?: HTMLSpanElement;
-  player2Name?: HTMLSpanElement;
-  score1Container?: HTMLDivElement;
-  score2Container?: HTMLDivElement;
+	score1Value: HTMLSpanElement;
+	score2Value: HTMLSpanElement;
+	player1Name?: HTMLSpanElement;
+	player2Name?: HTMLSpanElement;
+	score1Container?: HTMLDivElement;
+	score2Container?: HTMLDivElement;
 }
 
 class ScoreVersusModule implements GameUIModule {
-  private div: HTMLDivElement;
-  private ref: ScoreVersusHtmlReference;
-  private score1 = 0;
-  private score2 = 0;
-  private isStructureUpdated = false;
+	private div: HTMLDivElement;
+	private ref: ScoreVersusHtmlReference;
+	private score1 = 0;
+	private score2 = 0;
+	private isStructureUpdated = false;
 
-  constructor(div: HTMLDivElement) {
-    this.div = div;
+	constructor(div: HTMLDivElement) {
+		this.div = div;
 
-    this.ref = {
-      score1Value: div.querySelector("#score1-value") as HTMLSpanElement,
-      score2Value: div.querySelector("#score2-value") as HTMLSpanElement,
-    };
-  }
+		this.ref = {
+			score1Value: div.querySelector("#score1-value") as HTMLSpanElement,
+			score2Value: div.querySelector("#score2-value") as HTMLSpanElement,
+		};
+	}
 
-  load() {
-    this.div.style.display = "flex";
-    if (!this.isStructureUpdated) {
-      this.updateStructure();
-    }
-  }
+	load() {
+		this.div.style.display = "flex";
+		if (!this.isStructureUpdated) {
+			this.updateStructure();
+		}
+	}
 
-  unload() {
-    this.div.style.display = "none";
-  }
+	unload() {
+		this.div.style.display = "none";
+	}
 
-  private updateStructure() {
-    const container = this.div.querySelector('.scorevs-container');
-    if (!container) return;
+	private updateStructure() {
+		const container = this.div.querySelector('.scorevs-container');
+		if (!container) return;
 
-    // Wrap score1 in a player container
-    const score1Container = document.createElement('div');
-    score1Container.className = 'score-player';
-    score1Container.id = 'score1-player';
+		// Wrap score1 in a player container
+		const score1Container = document.createElement('div');
+		score1Container.className = 'score-player';
+		score1Container.id = 'score1-player';
 
-    const player1Name = document.createElement('div');
-    player1Name.className = 'player-name';
-    player1Name.id = 'player1-name';
-    player1Name.textContent = 'Player 1';
+		const player1Name = document.createElement('div');
+		player1Name.className = 'player-name';
+		player1Name.id = 'player1-name';
+		player1Name.textContent = 'Player 1';
 
-    score1Container.appendChild(player1Name);
-    score1Container.appendChild(this.ref.score1Value);
+		score1Container.appendChild(player1Name);
+		score1Container.appendChild(this.ref.score1Value);
 
-    // Wrap score2 in a player container
-    const score2Container = document.createElement('div');
-    score2Container.className = 'score-player';
-    score2Container.id = 'score2-player';
+		// Wrap score2 in a player container
+		const score2Container = document.createElement('div');
+		score2Container.className = 'score-player';
+		score2Container.id = 'score2-player';
 
-    const player2Name = document.createElement('div');
-    player2Name.className = 'player-name';
-    player2Name.id = 'player2-name';
-    player2Name.textContent = 'Player 2';
+		const player2Name = document.createElement('div');
+		player2Name.className = 'player-name';
+		player2Name.id = 'player2-name';
+		player2Name.textContent = 'Player 2';
 
-    score2Container.appendChild(player2Name);
-    score2Container.appendChild(this.ref.score2Value);
+		score2Container.appendChild(player2Name);
+		score2Container.appendChild(this.ref.score2Value);
 
-    // Replace the spans with the new containers
-    container.innerHTML = '';
-    container.appendChild(score1Container);
-    container.appendChild(score2Container);
+		// Replace the spans with the new containers
+		container.innerHTML = '';
+		container.appendChild(score1Container);
+		container.appendChild(score2Container);
 
-    // Update references
-    this.ref.player1Name = player1Name as HTMLSpanElement;
-    this.ref.player2Name = player2Name as HTMLSpanElement;
-    this.ref.score1Container = score1Container;
-    this.ref.score2Container = score2Container;
+		// Update references
+		this.ref.player1Name = player1Name as HTMLSpanElement;
+		this.ref.player2Name = player2Name as HTMLSpanElement;
+		this.ref.score1Container = score1Container;
+		this.ref.score2Container = score2Container;
 
-    this.isStructureUpdated = true;
-  }
+		this.isStructureUpdated = true;
+	}
 
-  updateScore(score1: number, score2: number) {
-    if (score1 == 5 || score2 == 5) this.unload();
+	updateScore(score1: number, score2: number) {
+		if (score1 == 5 || score2 == 5) this.unload();
 
-    // Check if score increased for animation
-    const score1Increased = score1 > this.score1;
-    const score2Increased = score2 > this.score2;
+		// Check if score increased for animation
+		const score1Increased = score1 > this.score1;
+		const score2Increased = score2 > this.score2;
 
-    this.score1 = score1;
-    this.score2 = score2;
+		this.score1 = score1;
+		this.score2 = score2;
 
-    if (this.ref.score1Value && this.ref.score2Value) {
-      this.ref.score1Value.textContent = score1.toString();
-      this.ref.score2Value.textContent = score2.toString();
+		if (this.ref.score1Value && this.ref.score2Value) {
+			this.ref.score1Value.textContent = score1.toString();
+			this.ref.score2Value.textContent = score2.toString();
 
-      // Trigger goal animation
-      if (score1Increased) {
-        this.ref.score1Value.classList.remove('goal-scored');
-        void this.ref.score1Value.offsetWidth; // Force reflow
-        this.ref.score1Value.classList.add('goal-scored');
+			// Trigger goal animation
+			if (score1Increased) {
+				this.ref.score1Value.classList.remove('goal-scored');
+				void this.ref.score1Value.offsetWidth; // Force reflow
+				this.ref.score1Value.classList.add('goal-scored');
 
-        setTimeout(() => {
-          this.ref.score1Value.classList.remove('goal-scored');
-        }, 800);
-      }
+				setTimeout(() => {
+					this.ref.score1Value.classList.remove('goal-scored');
+				}, 800);
+			}
 
-      if (score2Increased) {
-        this.ref.score2Value.classList.remove('goal-scored');
-        void this.ref.score2Value.offsetWidth; // Force reflow
-        this.ref.score2Value.classList.add('goal-scored');
+			if (score2Increased) {
+				this.ref.score2Value.classList.remove('goal-scored');
+				void this.ref.score2Value.offsetWidth; // Force reflow
+				this.ref.score2Value.classList.add('goal-scored');
 
-        setTimeout(() => {
-          this.ref.score2Value.classList.remove('goal-scored');
-        }, 800);
-      }
-    }
-  }
+				setTimeout(() => {
+					this.ref.score2Value.classList.remove('goal-scored');
+				}, 800);
+			}
+		}
+	}
 
-  setPlayerNames(player1: string, player2: string) {
-    if (this.ref.player1Name) {
-      this.ref.player1Name.textContent = player1;
-    }
-    if (this.ref.player2Name) {
-      this.ref.player2Name.textContent = player2;
-    }
-  }
+	setPlayerNames(player1: string, player2: string) {
+		if (this.ref.player1Name) {
+			this.ref.player1Name.textContent = player1;
+		}
+		if (this.ref.player2Name) {
+			this.ref.player2Name.textContent = player2;
+		}
+	}
 }
 
 interface ScoreHtmlReference {
-  scoreValue: HTMLSpanElement;
-  scorePBValue: HTMLSpanElement;
+	scoreValue: HTMLSpanElement;
+	scorePBValue: HTMLSpanElement;
 }
 
 class ScoreModule implements GameUIModule {
-  private div: HTMLDivElement;
-  private ref: ScoreHtmlReference;
-  private scoreValue = 0;
-  private pb = 0;
+	private div: HTMLDivElement;
+	private ref: ScoreHtmlReference;
+	private scoreValue = 0;
+	private pb = 0;
 
-  constructor(div: HTMLDivElement) {
-    this.div = div;
+	constructor(div: HTMLDivElement) {
+		this.div = div;
 
-    this.ref = {
-      scoreValue: div.querySelector("#score-value") as HTMLSpanElement,
-      scorePBValue: div.querySelector("#scorepb-value") as HTMLSpanElement,
-    };
-  }
+		this.ref = {
+			scoreValue: div.querySelector("#score-value") as HTMLSpanElement,
+			scorePBValue: div.querySelector("#scorepb-value") as HTMLSpanElement,
+		};
+	}
 
-  load() {
-    this.div.style.display = "flex";
-  }
+	load() {
+		this.div.style.display = "flex";
+	}
 
-  unload() {
-    this.div.style.display = "none";
-  }
+	unload() {
+		this.div.style.display = "none";
+	}
 
-  updateScore(score: number) {
-    const scoreIncreased = score > this.scoreValue;
-    this.scoreValue = score;
-    if (this.ref.scoreValue) {
-      this.ref.scoreValue.textContent = score.toString();
+	updateScore(score: number) {
+		const scoreIncreased = score > this.scoreValue;
+		this.scoreValue = score;
+		if (this.ref.scoreValue) {
+			this.ref.scoreValue.textContent = score.toString();
 
-      // Trigger score animation on increase
-      if (scoreIncreased) {
-        this.ref.scoreValue.classList.remove('score-update');
-        void this.ref.scoreValue.offsetWidth; // Force reflow
-        this.ref.scoreValue.classList.add('score-update');
+			// Trigger score animation on increase
+			if (scoreIncreased) {
+				this.ref.scoreValue.classList.remove('score-update');
+				void this.ref.scoreValue.offsetWidth; // Force reflow
+				this.ref.scoreValue.classList.add('score-update');
 
-        setTimeout(() => {
-          this.ref.scoreValue.classList.remove('score-update');
-        }, 600);
-      }
-    }
-    if (this.scoreValue > this.pb) {
-      this.updateHighScore(this.scoreValue);
-    }
-  }
+				setTimeout(() => {
+					this.ref.scoreValue.classList.remove('score-update');
+				}, 600);
+			}
+		}
+		if (this.scoreValue > this.pb) {
+			this.updateHighScore(this.scoreValue);
+		}
+	}
 
-  updateHighScore(score: number) {
-    this.pb = score;
-    if (this.ref.scorePBValue) {
-      this.ref.scorePBValue.textContent = score.toString();
-    }
-  }
+	updateHighScore(score: number) {
+		this.pb = score;
+		if (this.ref.scorePBValue) {
+			this.ref.scorePBValue.textContent = score.toString();
+		}
+	}
 }
 
 interface TimerHtmlReference {
-  timerLabel: HTMLSpanElement;
-  timerValue: HTMLSpanElement;
+	timerLabel: HTMLSpanElement;
+	timerValue: HTMLSpanElement;
 }
 
 class TimerModule implements GameUIModule {
-  private div: HTMLDivElement;
-  private ref: TimerHtmlReference;
-  private timeLeft = 0;
-  private timerInterval?: NodeJS.Timeout;
-  private onTimerEnd?: () => void;
+	private div: HTMLDivElement;
+	private ref: TimerHtmlReference;
+	private timeLeft = 0;
+	private timerInterval?: NodeJS.Timeout;
+	private onTimerEnd?: () => void;
 
-  constructor(div: HTMLDivElement) {
-    this.div = div;
-    this.ref = {
-      timerLabel: div.querySelector("#timer-label") as HTMLSpanElement,
-      timerValue: div.querySelector("#timer-value") as HTMLSpanElement,
-    };
-  }
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			timerLabel: div.querySelector("#timer-label") as HTMLSpanElement,
+			timerValue: div.querySelector("#timer-value") as HTMLSpanElement,
+		};
+	}
 
-  load() {
-    this.div.style.display = "flex";
-  }
+	load() {
+		this.div.style.display = "flex";
+	}
 
-  unload() {
-    this.div.style.display = "none";
-    this.stop();
-  }
+	unload() {
+		this.div.style.display = "none";
+		this.stop();
+	}
 
-  start(duration: number = 60, onEnd?: () => void) {
-    this.timeLeft = duration;
-    this.onTimerEnd = onEnd;
-    this.updateDisplay();
+	start(duration: number = 60, onEnd?: () => void) {
+		this.timeLeft = duration;
+		this.onTimerEnd = onEnd;
+		this.updateDisplay();
 
-    this.timerInterval = setInterval(() => {
-      this.timeLeft--;
-      this.updateDisplay();
+		this.timerInterval = setInterval(() => {
+			this.timeLeft--;
+			this.updateDisplay();
 
-      if (this.timeLeft <= 0) {
-        this.stop();
-        this.onTimerEnd?.();
-      }
-    }, 1000);
-  }
+			if (this.timeLeft <= 0) {
+				this.stop();
+				this.onTimerEnd?.();
+			}
+		}, 1000);
+	}
 
-  stop() {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-      this.timerInterval = undefined;
-    }
-  }
+	stop() {
+		if (this.timerInterval) {
+			clearInterval(this.timerInterval);
+			this.timerInterval = undefined;
+		}
+	}
 
-  private updateDisplay() {
-    const minutes = Math.floor(this.timeLeft / 60);
-    const seconds = this.timeLeft % 60;
-    if (this.ref.timerValue) {
-      this.ref.timerValue.textContent = `${minutes}:${seconds
-        .toString()
-        .padStart(2, "0")}`;
-    }
-  }
+	private updateDisplay() {
+		const minutes = Math.floor(this.timeLeft / 60);
+		const seconds = this.timeLeft % 60;
+		if (this.ref.timerValue) {
+			this.ref.timerValue.textContent = `${minutes}:${seconds
+				.toString()
+				.padStart(2, "0")}`;
+		}
+	}
 }
 
 interface ButtonHtmlReference {
-  buttonContainer: HTMLDivElement;
+	buttonContainer: HTMLDivElement;
 }
 
 class ButtonModule implements GameUIModule {
-  private div: HTMLDivElement;
-  private ref: ButtonHtmlReference;
-  private buttons: Map<string, HTMLButtonElement> = new Map();
+	private div: HTMLDivElement;
+	private ref: ButtonHtmlReference;
+	private buttons: Map<string, HTMLButtonElement> = new Map();
 
-  constructor(div: HTMLDivElement) {
-    this.div = div;
-    this.ref = {
-      buttonContainer: div.querySelector("#button-container") as HTMLDivElement,
-    };
-  }
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			buttonContainer: div.querySelector("#button-container") as HTMLDivElement,
+		};
+	}
 
-  load() {
-    this.div.style.display = "flex";
-  }
+	load() {
+		this.div.style.display = "flex";
+	}
 
-  unload() {
-    this.div.style.display = "none";
-    this.buttons.clear();
-    if (this.ref.buttonContainer) {
-      this.ref.buttonContainer.innerHTML = "";
-    }
-  }
+	unload() {
+		this.div.style.display = "none";
+		this.buttons.clear();
+		if (this.ref.buttonContainer) {
+			this.ref.buttonContainer.innerHTML = "";
+		}
+	}
 
-  addButton(id: string, text: string, callback: () => void, style?: string) {
-    this.removeButton(id);
+	addButton(id: string, text: string, callback: () => void, style?: string) {
+		this.removeButton(id);
 
-    const button = document.createElement("button");
-    button.textContent = text;
-    button.className = `game-button ${style || ""}`;
-    button.id = `game-btn-${id}`;
-    button.addEventListener("click", callback);
+		const button = document.createElement("button");
+		button.textContent = text;
+		button.className = `game-button ${style || ""}`;
+		button.id = `game-btn-${id}`;
+		button.addEventListener("click", callback);
 
-    this.buttons.set(id, button);
-    this.ref.buttonContainer.appendChild(button);
-  }
+		this.buttons.set(id, button);
+		this.ref.buttonContainer.appendChild(button);
+	}
 
-  removeButton(id: string) {
-    const button = this.buttons.get(id);
-    if (button) {
-      button.remove();
-      this.buttons.delete(id);
-    }
-  }
+	removeButton(id: string) {
+		const button = this.buttons.get(id);
+		if (button) {
+			button.remove();
+			this.buttons.delete(id);
+		}
+	}
 }
 
 interface EndingHtmlReference {
-  score1Value: HTMLSpanElement;
-  score2Value: HTMLSpanElement;
-  scoreSolo: HTMLSpanElement;
-  dualModeContainer: HTMLDivElement;
-  soloModeContainer: HTMLDivElement;
-  result: HTMLSpanElement;
-  leaderboard: HTMLDivElement;
-  players: HTMLDivElement;
-  leaderboardHeader: HTMLElement;
-  rankHeader: HTMLElement;
-  playerHeader: HTMLElement;
-  scoreHeader: HTMLElement;
-  brRankings: HTMLDivElement;
-  brRankingsList: HTMLElement;
+	score1Value: HTMLSpanElement;
+	score2Value: HTMLSpanElement;
+	scoreSolo: HTMLSpanElement;
+	dualModeContainer: HTMLDivElement;
+	soloModeContainer: HTMLDivElement;
+	result: HTMLSpanElement;
+	leaderboard: HTMLDivElement;
+	players: HTMLDivElement;
+	leaderboardHeader: HTMLElement;
+	rankHeader: HTMLElement;
+	playerHeader: HTMLElement;
+	scoreHeader: HTMLElement;
+	brRankings: HTMLDivElement;
+	brRankingsList: HTMLElement;
 }
 
 type Player = {
-  username: string;
-  highscore: number;
+	username: string;
+	highscore: number;
 };
 
 class EndingModule implements GameUIModule {
-  private div: HTMLDivElement;
-  private ref: EndingHtmlReference;
-  private leaderboard: Player[] = [];
+	private div: HTMLDivElement;
+	private ref: EndingHtmlReference;
+	private leaderboard: Player[] = [];
 
-  constructor(div: HTMLDivElement) {
-    this.div = div;
-    this.ref = {
-      score1Value: div.querySelector("#end-score1-value") as HTMLSpanElement,
-      score2Value: div.querySelector("#end-score2-value") as HTMLSpanElement,
-      scoreSolo: div.querySelector("#end-score-solo") as HTMLSpanElement,
-      dualModeContainer: div.querySelector(".dual-mode") as HTMLDivElement,
-      soloModeContainer: div.querySelector(".solo-mode") as HTMLDivElement,
-      result: div.querySelector("#result-label") as HTMLSpanElement,
-      leaderboard: div.querySelector("#leaderboard") as HTMLDivElement,
-      players: div.querySelector("#players-list") as HTMLDivElement,
-      leaderboardHeader: div.querySelector("#leaderboard-header") as HTMLElement,
-      rankHeader: div.querySelector("#rank-header") as HTMLElement,
-      playerHeader: div.querySelector("#player-header") as HTMLElement,
-      scoreHeader: div.querySelector("#score-header") as HTMLElement,
-      brRankings: div.querySelector("#br-rankings") as HTMLDivElement,
-      brRankingsList: div.querySelector("#br-rankings-list") as HTMLElement,
-    };
-  }
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			score1Value: div.querySelector("#end-score1-value") as HTMLSpanElement,
+			score2Value: div.querySelector("#end-score2-value") as HTMLSpanElement,
+			scoreSolo: div.querySelector("#end-score-solo") as HTMLSpanElement,
+			dualModeContainer: div.querySelector(".dual-mode") as HTMLDivElement,
+			soloModeContainer: div.querySelector(".solo-mode") as HTMLDivElement,
+			result: div.querySelector("#result-label") as HTMLSpanElement,
+			leaderboard: div.querySelector("#leaderboard") as HTMLDivElement,
+			players: div.querySelector("#players-list") as HTMLDivElement,
+			leaderboardHeader: div.querySelector("#leaderboard-header") as HTMLElement,
+			rankHeader: div.querySelector("#rank-header") as HTMLElement,
+			playerHeader: div.querySelector("#player-header") as HTMLElement,
+			scoreHeader: div.querySelector("#score-header") as HTMLElement,
+			brRankings: div.querySelector("#br-rankings") as HTMLDivElement,
+			brRankingsList: div.querySelector("#br-rankings-list") as HTMLElement,
+		};
+	}
 
-  load() {
-    this.div.style.display = "none";
-  }
+	load() {
+		this.div.style.display = "none";
+	}
 
-  unload() {
-    this.div.style.display = "none";
-  }
+	unload() {
+		this.div.style.display = "none";
+	}
 
-  setResult(mode: string, result: boolean, score: number, score2?: number) {
-    if (mode === "brick") {
-      this.ref.dualModeContainer.style.display = "none";
-      this.ref.soloModeContainer.style.display = "flex";
+	setResult(mode: string, result: boolean, score: number, score2?: number) {
+		if (mode === "brick") {
+			this.ref.dualModeContainer.style.display = "none";
+			this.ref.soloModeContainer.style.display = "flex";
 
-      if (this.ref.scoreSolo) this.ref.scoreSolo.textContent = score.toString();
+			if (this.ref.scoreSolo) this.ref.scoreSolo.textContent = score.toString();
 
-      if (result === true) this.ref.result.innerHTML = "New High Score!";
-      else this.ref.result.innerHTML = "";
+			if (result === true) this.ref.result.innerHTML = "New High Score!";
+			else this.ref.result.innerHTML = "";
 
-      // this.ref.leaderboard.style.display = 'flex';
-      this.ref.players.innerHTML = "";
+			// this.ref.leaderboard.style.display = 'flex';
+			this.ref.players.innerHTML = "";
 
-      for (let i = 0; i < this.leaderboard.length; i++) {
-        const row = document.createElement("tr");
+			for (let i = 0; i < this.leaderboard.length; i++) {
+				const row = document.createElement("tr");
 
-        const positionCell = document.createElement("td");
-        positionCell.textContent = (i + 1).toString();
-        row.appendChild(positionCell);
+				const positionCell = document.createElement("td");
+				positionCell.textContent = (i + 1).toString();
+				row.appendChild(positionCell);
 
-        const usernameCell = document.createElement("td");
-        usernameCell.textContent = this.leaderboard[i].username;
-        row.appendChild(usernameCell);
+				const usernameCell = document.createElement("td");
+				usernameCell.textContent = this.leaderboard[i].username;
+				row.appendChild(usernameCell);
 
-        const scoreCell = document.createElement("td");
-        scoreCell.textContent = this.leaderboard[i].highscore.toString();
-        row.appendChild(scoreCell);
+				const scoreCell = document.createElement("td");
+				scoreCell.textContent = this.leaderboard[i].highscore.toString();
+				row.appendChild(scoreCell);
 
-        this.ref.players.appendChild(row);
-      }
-    } else {
-      this.ref.leaderboard.style.display = "none";
-      this.ref.dualModeContainer.style.display = "flex";
-      this.ref.soloModeContainer.style.display = "none";
+				this.ref.players.appendChild(row);
+			}
+		} else {
+			this.ref.leaderboard.style.display = "none";
+			this.ref.dualModeContainer.style.display = "flex";
+			this.ref.soloModeContainer.style.display = "none";
 
-      if (this.ref.score1Value)
-        this.ref.score1Value.textContent = score.toString();
-      if (this.ref.score2Value && score2 !== undefined)
-        this.ref.score2Value.textContent = score2.toString();
+			if (this.ref.score1Value)
+				this.ref.score1Value.textContent = score.toString();
+			if (this.ref.score2Value && score2 !== undefined)
+				this.ref.score2Value.textContent = score2.toString();
 
-      if (mode == "local") {
-        if (result)
-          this.ref.result.innerHTML = 'Player 1 <span class="win">Win</span>';
-        else
-          this.ref.result.innerHTML = 'Player 2 <span class="win">Win</span>';
-      } else if (mode == "ai" || mode == "online") {
-        if (result)
-          this.ref.result.innerHTML = 'You <span class="win">Win</span>';
-        else this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
-      }
-    }
+			if (mode == "local") {
+				if (result)
+					this.ref.result.innerHTML = 'Player 1 <span class="win">Win</span>';
+				else
+					this.ref.result.innerHTML = 'Player 2 <span class="win">Win</span>';
+			} else if (mode == "ai" || mode == "online") {
+				if (result)
+					this.ref.result.innerHTML = 'You <span class="win">Win</span>';
+				else this.ref.result.innerHTML = 'You <span class="lose">Lose</span>';
+			}
+		}
 
-    this.div.style.display = "flex";
-  }
+		this.div.style.display = "flex";
+	}
 
-  setLeaderboard(data: any, mode: string) {
-    this.leaderboard = [];
-    for (let i = 0; i < data.length; i++) {
-      let score = 0;
-      switch (mode) {
-        case "easy":
-          score = data[i].easy_mode_hscore;
-          break;
-        case "normal":
-          score = data[i].normal_mode_hscore;
-          break;
-        case "hard":
-          score = data[i].hard_mode_hscore;
-          break;
-      }
+	setLeaderboard(data: any, mode: string) {
+		this.leaderboard = [];
+		for (let i = 0; i < data.length; i++) {
+			let score = 0;
+			switch (mode) {
+				case "easy":
+					score = data[i].easy_mode_hscore;
+					break;
+				case "normal":
+					score = data[i].normal_mode_hscore;
+					break;
+				case "hard":
+					score = data[i].hard_mode_hscore;
+					break;
+			}
 
-      this.leaderboard.push({
-        username: data[i].username,
-        highscore: score,
-      });
-    }
-  }
+			this.leaderboard.push({
+				username: data[i].username,
+				highscore: score,
+			});
+		}
+	}
 
-  setBRRankings(rankings: Array<{ rank: number; username: string; uuid: string; isLocalPlayer?: boolean }>) {
-    // Hide dual/solo mode containers and brick leaderboard
-    this.ref.dualModeContainer.style.display = "none";
-    this.ref.soloModeContainer.style.display = "none";
-    this.ref.result.style.display = "none";
-    this.ref.leaderboard.style.display = "none";
+	setBRRankings(rankings: Array<{ rank: number; username: string; uuid: string; isLocalPlayer?: boolean }>) {
+		// Hide dual/solo mode containers and brick leaderboard
+		this.ref.dualModeContainer.style.display = "none";
+		this.ref.soloModeContainer.style.display = "none";
+		this.ref.result.style.display = "none";
+		this.ref.leaderboard.style.display = "none";
 
-    // Show BR rankings container
-    this.ref.brRankings.style.display = "grid";
-    this.ref.brRankings.innerHTML = "";
+		// Show BR rankings container
+		this.ref.brRankings.style.display = "grid";
+		this.ref.brRankings.innerHTML = "";
 
-    // Split rankings into columns (e.g., 4 columns for 100 players = 25 per column)
-    const playersPerColumn = Math.ceil(rankings.length / 4);
+		// Split rankings into columns (e.g., 4 columns for 100 players = 25 per column)
+		const playersPerColumn = Math.ceil(rankings.length / 4);
 
-    for (let col = 0; col < 4; col++) {
-      const startIdx = col * playersPerColumn;
-      const endIdx = Math.min(startIdx + playersPerColumn, rankings.length);
-      const columnRankings = rankings.slice(startIdx, endIdx);
+		for (let col = 0; col < 4; col++) {
+			const startIdx = col * playersPerColumn;
+			const endIdx = Math.min(startIdx + playersPerColumn, rankings.length);
+			const columnRankings = rankings.slice(startIdx, endIdx);
 
-      if (columnRankings.length === 0) break;
+			if (columnRankings.length === 0) break;
 
-      const table = document.createElement("table");
-      table.className = "br-rankings-table";
+			const table = document.createElement("table");
+			table.className = "br-rankings-table";
 
-      // Add header
-      const thead = document.createElement("thead");
-      const headerRow = document.createElement("tr");
+			// Add header
+			const thead = document.createElement("thead");
+			const headerRow = document.createElement("tr");
 
-      const rankHeader = document.createElement("th");
-      rankHeader.textContent = "Rank";
-      headerRow.appendChild(rankHeader);
+			const rankHeader = document.createElement("th");
+			rankHeader.textContent = "Rank";
+			headerRow.appendChild(rankHeader);
 
-      const playerHeader = document.createElement("th");
-      playerHeader.textContent = "Player";
-      headerRow.appendChild(playerHeader);
+			const playerHeader = document.createElement("th");
+			playerHeader.textContent = "Player";
+			headerRow.appendChild(playerHeader);
 
-      thead.appendChild(headerRow);
-      table.appendChild(thead);
+			thead.appendChild(headerRow);
+			table.appendChild(thead);
 
-      // Add body
-      const tbody = document.createElement("tbody");
+			// Add body
+			const tbody = document.createElement("tbody");
 
-      columnRankings.forEach((entry) => {
-        const row = document.createElement("tr");
+			columnRankings.forEach((entry) => {
+				const row = document.createElement("tr");
 
-        const rankCell = document.createElement("td");
-        const medal = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : '';
-        rankCell.textContent = `${medal} ${entry.rank}`;
-        row.appendChild(rankCell);
+				const rankCell = document.createElement("td");
+				const medal = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : '';
+				rankCell.textContent = `${medal} ${entry.rank}`;
+				row.appendChild(rankCell);
 
-        const usernameCell = document.createElement("td");
-        usernameCell.textContent = entry.username;
-        row.appendChild(usernameCell);
+				const usernameCell = document.createElement("td");
+				usernameCell.textContent = entry.username;
+				row.appendChild(usernameCell);
 
-        // Mark top 3 rows for special styling
-        if (entry.rank === 1) {
-          row.classList.add('winner-row');
-        } else if (entry.rank === 2) {
-          row.classList.add('silver-row');
-        } else if (entry.rank === 3) {
-          row.classList.add('bronze-row');
-        }
+				// Mark top 3 rows for special styling
+				if (entry.rank === 1) {
+					row.classList.add('winner-row');
+				} else if (entry.rank === 2) {
+					row.classList.add('silver-row');
+				} else if (entry.rank === 3) {
+					row.classList.add('bronze-row');
+				}
 
-        // Mark local player row
-        if (entry.isLocalPlayer) {
-          row.classList.add('local-player-row');
-        }
+				// Mark local player row
+				if (entry.isLocalPlayer) {
+					row.classList.add('local-player-row');
+				}
 
-        tbody.appendChild(row);
-      });
+				tbody.appendChild(row);
+			});
 
-      table.appendChild(tbody);
-      this.ref.brRankings.appendChild(table);
-    }
+			table.appendChild(tbody);
+			this.ref.brRankings.appendChild(table);
+		}
 
-    // Show the ending module
-    this.div.style.display = "flex";
-  }
+		// Show the ending module
+		this.div.style.display = "flex";
+	}
 }
 
 interface ImageHtmlReference {
-  imageContainer: HTMLDivElement;
+	imageContainer: HTMLDivElement;
 }
 
 interface ImagePosition {
-  x?: "left" | "center" | "right" | number;
-  y?: "top" | "center" | "bottom" | number;
-  anchor?:
-    | "top-left"
-    | "top-center"
-    | "top-right"
-    | "center-left"
-    | "center"
-    | "center-right"
-    | "bottom-left"
-    | "bottom-center"
-    | "bottom-right";
-  offset?: { x: number; y: number };
+	x?: "left" | "center" | "right" | number;
+	y?: "top" | "center" | "bottom" | number;
+	anchor?:
+	| "top-left"
+	| "top-center"
+	| "top-right"
+	| "center-left"
+	| "center"
+	| "center-right"
+	| "bottom-left"
+	| "bottom-center"
+	| "bottom-right";
+	offset?: { x: number; y: number };
 }
 
 class ImageModule implements GameUIModule {
-  private div: HTMLDivElement;
-  private ref: ImageHtmlReference;
-  private images: Map<string, HTMLImageElement> = new Map();
-  private positions: Map<string, ImagePosition> = new Map();
+	private div: HTMLDivElement;
+	private ref: ImageHtmlReference;
+	private images: Map<string, HTMLImageElement> = new Map();
+	private positions: Map<string, ImagePosition> = new Map();
 
-  constructor(div: HTMLDivElement) {
-    this.div = div;
-    this.ref = {
-      imageContainer: div.querySelector("#image-container") as HTMLDivElement,
-    };
-  }
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			imageContainer: div.querySelector("#image-container") as HTMLDivElement,
+		};
+	}
 
-  load() {
-    this.div.style.display = "flex";
-    this.ref.imageContainer.style.position = "relative";
-  }
+	load() {
+		this.div.style.display = "flex";
+		this.ref.imageContainer.style.position = "relative";
+	}
 
-  unload() {
-    this.div.style.display = "none";
-    this.images.clear();
-    this.positions.clear();
-    if (this.ref.imageContainer) {
-      this.ref.imageContainer.innerHTML = "";
-    }
-  }
+	unload() {
+		this.div.style.display = "none";
+		this.images.clear();
+		this.positions.clear();
+		if (this.ref.imageContainer) {
+			this.ref.imageContainer.innerHTML = "";
+		}
+	}
 
-  addImage(id: string, src: string, style?: string, position?: ImagePosition) {
-    this.removeImage(id);
+	addImage(id: string, src: string, style?: string, position?: ImagePosition) {
+		this.removeImage(id);
 
-    const img = document.createElement("img");
-    img.src = src;
-    img.className = `game-image ${style || ""}`;
-    img.id = `game-img-${id}`;
+		const img = document.createElement("img");
+		img.src = src;
+		img.className = `game-image ${style || ""}`;
+		img.id = `game-img-${id}`;
 
-    this.images.set(id, img);
-    this.ref.imageContainer.appendChild(img);
+		this.images.set(id, img);
+		this.ref.imageContainer.appendChild(img);
 
-    if (position) this.setImagePosition(id, position);
-  }
+		if (position) this.setImagePosition(id, position);
+	}
 
-  removeImage(id: string) {
-    const img = this.images.get(id);
-    if (img) {
-      img.remove();
-      this.images.delete(id);
-      this.positions.delete(id);
-    }
-  }
+	removeImage(id: string) {
+		const img = this.images.get(id);
+		if (img) {
+			img.remove();
+			this.images.delete(id);
+			this.positions.delete(id);
+		}
+	}
 
-  setImagePosition(id: string, position: ImagePosition) {
-    const img = this.images.get(id);
-    if (!img) return;
+	setImagePosition(id: string, position: ImagePosition) {
+		const img = this.images.get(id);
+		if (!img) return;
 
-    this.positions.set(id, position);
+		this.positions.set(id, position);
 
-    img.style.position = "absolute";
-    img.style.top = "50%";
-    img.style.left = "50%";
-    img.style.transform = "translate(-50%, -50%)";
+		img.style.position = "absolute";
+		img.style.top = "50%";
+		img.style.left = "50%";
+		img.style.transform = "translate(-50%, -50%)";
 
-    if (position.offset) {
-      img.style.transform += ` translate(${position.offset.x}vh, ${position.offset.y}vh)`;
-    }
-  }
+		if (position.offset) {
+			img.style.transform += ` translate(${position.offset.x}vh, ${position.offset.y}vh)`;
+		}
+	}
 
-  hideAll() {
-    this.images.forEach((img) => {
-      img.style.display = 'none';
-    });
-  }
+	hideAll() {
+		this.images.forEach((img) => {
+			img.style.display = 'none';
+		});
+	}
 }
 
 // interface DeathHtmlReference{
@@ -1160,7 +1231,7 @@ class ImageModule implements GameUIModule {
 // }
 
 interface PlayerCounterHtmlReference {
-  playerCounterValue: HTMLSpanElement;
+	playerCounterValue: HTMLSpanElement;
 }
 
 class PlayerCounterModule implements GameUIModule {
@@ -1168,22 +1239,22 @@ class PlayerCounterModule implements GameUIModule {
 	private ref: PlayerCounterHtmlReference;
 	private lastPlayerCount: number = -1;
 
-  constructor(div: HTMLDivElement) {
-    this.div = div;
-    this.ref = {
-      playerCounterValue: div.querySelector(
-        "#playercounter-value"
-      ) as HTMLSpanElement,
-    };
-  }
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			playerCounterValue: div.querySelector(
+				"#playercounter-value"
+			) as HTMLSpanElement,
+		};
+	}
 
-  load() {
-    this.div.style.display = "flex";
-  }
+	load() {
+		this.div.style.display = "flex";
+	}
 
-  unload() {
-    this.div.style.display = "none";
-  }
+	unload() {
+		this.div.style.display = "none";
+	}
 
 	update(playerLeft: number) {
 		if (this.lastPlayerCount !== -1 && playerLeft !== this.lastPlayerCount) {
@@ -1225,5 +1296,194 @@ class PlayerCounterModule implements GameUIModule {
 // 	}
 
 // }
+
+interface EliminationHtmlReference {
+	eliminationContainer: HTMLDivElement;
+}
+
+class EliminationModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: EliminationHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			eliminationContainer: div.querySelector("#elimination-container") as HTMLDivElement,
+		};
+	}
+
+	load() {
+		this.div.style.display = "flex";
+	}
+
+	unload() {
+		this.div.style.display = "none";
+		if (this.ref.eliminationContainer) {
+			this.ref.eliminationContainer.innerHTML = "";
+		}
+	}
+
+	showElimination(username: string) {
+		const messageDiv = document.createElement("div");
+		messageDiv.className = "elimination-message";
+
+		const text = document.createElement("div");
+		text.className = "elimination-text";
+		text.innerHTML = `YOU WERE ELIMINATED`;
+
+		const subtitle = document.createElement("div");
+		subtitle.className = "elimination-subtitle";
+		subtitle.textContent = "Spectating...";
+
+		messageDiv.appendChild(text);
+		messageDiv.appendChild(subtitle);
+
+		this.ref.eliminationContainer.innerHTML = "";
+		this.ref.eliminationContainer.appendChild(messageDiv);
+	}
+}
+
+interface PhaseChangeHtmlReference {
+	phasechangeContainer: HTMLDivElement;
+}
+
+class PhaseChangeModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: PhaseChangeHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			phasechangeContainer: div.querySelector("#phasechange-container") as HTMLDivElement,
+		};
+	}
+
+	load() {
+		this.div.style.display = "flex";
+	}
+
+	unload() {
+		this.div.style.display = "none";
+		if (this.ref.phasechangeContainer) {
+			this.ref.phasechangeContainer.innerHTML = "";
+		}
+	}
+
+	showPhaseChange(phase: string, playerCount: number) {
+		const messageDiv = document.createElement("div");
+		messageDiv.className = "phasechange-message";
+
+		const phaseText = document.createElement("div");
+		phaseText.className = "phasechange-phase";
+		phaseText.textContent = phase.toUpperCase();
+
+		const subtitle = document.createElement("div");
+		subtitle.className = "phasechange-subtitle";
+		subtitle.textContent = `${playerCount} Players Remaining`;
+
+		messageDiv.appendChild(phaseText);
+		messageDiv.appendChild(subtitle);
+
+		this.ref.phasechangeContainer.innerHTML = "";
+		this.ref.phasechangeContainer.appendChild(messageDiv);
+
+		// Auto-remove after 3 seconds
+		setTimeout(() => {
+			messageDiv.classList.add("fade-out");
+			setTimeout(() => {
+				messageDiv.remove();
+			}, 500);
+		}, 3000);
+	}
+}
+
+interface InputHintsHtmlReference {
+	inputhintsContainer: HTMLDivElement;
+	inputhintsLeft: HTMLDivElement;
+	inputhintsRight: HTMLDivElement;
+}
+
+class InputHintsModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: InputHintsHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			inputhintsContainer: div.querySelector(".inputhints-container") as HTMLDivElement,
+			inputhintsLeft: div.querySelector(".inputhints-left") as HTMLDivElement,
+			inputhintsRight: div.querySelector(".inputhints-right") as HTMLDivElement,
+		};
+	}
+
+	load() {
+		this.div.style.display = "flex";
+	}
+
+	unload() {
+		this.div.style.display = "none";
+	}
+
+	show(mode: string) {
+		if (mode === "local" || mode === "online") {
+			this.ref.inputhintsLeft.style.display = "flex";
+			this.ref.inputhintsRight.style.display = "flex";
+		} else if (mode === "ai") {
+			this.ref.inputhintsLeft.style.display = "flex";
+			this.ref.inputhintsRight.style.display = "none";
+		}
+
+		this.div.classList.remove("hidden");
+		this.load();
+	}
+
+	hide() {
+		this.div.classList.add("hidden");
+
+		setTimeout(() => {
+			this.unload();
+		}, 500);
+	}
+}
+
+interface BRInputHintsHtmlReference {
+	brinputhintsContainer: HTMLDivElement;
+}
+
+class BRInputHintsModule implements GameUIModule {
+	private div: HTMLDivElement;
+	private ref: BRInputHintsHtmlReference;
+
+	constructor(div: HTMLDivElement) {
+		this.div = div;
+		this.ref = {
+			brinputhintsContainer: div.querySelector(".brinputhints-container") as HTMLDivElement,
+		};
+	}
+
+	load() {
+		this.div.style.display = "flex";
+	}
+
+	unload() {
+		this.div.style.display = "none";
+	}
+
+	show() {
+		// Remove hidden class to trigger fade-in
+		this.div.classList.remove("hidden");
+		this.load();
+	}
+
+	hide() {
+		// Add hidden class to trigger fade-out
+		this.div.classList.add("hidden");
+
+		// Actually hide the module after transition completes (0.5s)
+		setTimeout(() => {
+			this.unload();
+		}, 500);
+	}
+}
 
 export default GameUI;

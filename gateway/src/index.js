@@ -59,20 +59,6 @@ app.setErrorHandler((error, req, res) => {
 });
 
 const verifyJWT = async (req, res) => {
-	if (req.raw.url && req.raw.url.endsWith('/metrics') || req.raw.url.endsWith('/health')) {
-		if (req.raw.url.endsWith('/health')) {
-			return;
-		}
-		const metricsAuth = req.headers['authorization'];
-		if (metricsAuth && metricsAuth.startsWith('Basic ')) {
-			const base64Credentials = metricsAuth.split(' ')[1];
-			const [username, password] = Buffer.from(base64Credentials, 'base64').toString('utf-8').split(':');
-			if (username === 'metrics' && password === process.env.METRICS_PASSWORD) {
-				return;
-			}
-		}
-		return res.code(403).send({ message: 'Forbidden' });
-	}
 
 	const token = req.cookies.accessToken;
 	if (!token) {
@@ -148,11 +134,6 @@ app.register(fastifyHttpProxy, {
 		}
 	}
 });
-
-//app.register(fastifyHttpProxy, {
-//	upstream: 'https://lobby_manager:5011',
-//	prefix: '/lobbies',
-//});
 
 app.register(fastifyHttpProxy, {
 	upstream: 'https://lobby_manager:5001',

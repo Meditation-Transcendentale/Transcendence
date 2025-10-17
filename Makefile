@@ -4,10 +4,8 @@ DOCKER_COMPOSE_USER = -f docker-compose.yml
 DOCKER_COMPOSE_STATS = -f ./services/stats/docker-compose-stats.yml
 DOCKER_COMPOSE_FRONTEND = -f ./frontend/docker-compose.yml
 DOCKER_COMPOSE_GAME = -f ./services/game/docker-compose.dev.yml
-DOCKER_COMPOSE_METRICS = -f ./metrics/docker-compose-metrics.yml
 
 TARGET ?= all
-METRICS ?= false
 TEST ?= false
 
 COMMENTED_LINE = // database.exec(test);
@@ -28,10 +26,6 @@ else ifeq ($(TARGET),all)
 						  $(DOCKER_COMPOSE_GAME)
 else
 	$(error Unknown TARGET value '$(TARGET)')
-endif
-
-ifeq ($(METRICS),true)
-	DOCKER_COMPOSE_FILE += $(DOCKER_COMPOSE_METRICS)
 endif
 
 ifeq ($(TEST),true)
@@ -66,9 +60,7 @@ cleanShared:
 	fi
 
 filldb:
-	sed -i 's|^$(COMMENTED_LINE)|$(UNCOMMENTED_LINE)|' database_certs-init/src/initDB.js
-	$(MAKE) re
-	sed -i 's|^$(UNCOMMENTED_LINE)|$(COMMENTED_LINE)|' database_certs-init/src/initDB.js
+	FILL_DB=true $(MAKE) re
 	
 
 update-hostname-env:
@@ -91,9 +83,10 @@ clean:
 	$(MAKE) down
 	$(MAKE) cleanShared
 	$(MAKE) cleanVolumes
+	$(MAKE) cleanCDN
 
 cleanCDN:
 	@if [ -d ./services/cdn/public ]; then \
-		rm -rf ./services/cdn/public/*.*; \
+		find ./services/cdn/public -maxdepth 1 -type f ! -name 'doNotDelete' ! -name 'default_avatar.jpg' -exec rm -f {} \; ; \
 	fi
 

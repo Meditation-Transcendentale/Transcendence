@@ -452,6 +452,7 @@
 .friendlist-profile {
 	cursor: pointer;
 	flex: 3;
+	overflow: hidden;
 }
 
 .friendlist-profile:hover {

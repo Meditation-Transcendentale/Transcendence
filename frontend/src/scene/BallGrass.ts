@@ -21,6 +21,8 @@ export class BallGrass {
 
 	public ballOrigin: Vector3;
 
+	private gravity: Vector2;
+
 
 	private tempVector3: Vector3;
 	constructor(assets: Assets) {
@@ -31,6 +33,7 @@ export class BallGrass {
 		this.tempVector3 = new Vector3();
 
 		this.movement = new Vector2();
+		this.gravity = new Vector2();
 
 		this.ballGrassEffect = new EffectWrapper({
 			name: "picker",
@@ -72,10 +75,16 @@ export class BallGrass {
 	public moveBall(deltaTime: number) {
 		if (this.assets.ballPicker.z < 1) {
 			this.needReset = true;
+			this.gravity.set(
+				this.ballOrigin.x - this.assets.ballMesh.absolutePosition.x,
+				this.ballOrigin.z - this.assets.ballMesh.absolutePosition.z
+			);
+			const l = this.gravity.length();
+			this.gravity.scaleInPlace(Math.min(1, l) * 0.016);
 			this.assets.ballMesh.position.addInPlaceFromFloats(
-				(this.ballOrigin.x - this.assets.ballMesh.position.x) * 0.01 + this.movement.x,
+				this.gravity.x + this.movement.x,
 				0,
-				(this.ballOrigin.z - this.assets.ballMesh.position.z) * 0.01 + this.movement.y,
+				this.gravity.y + this.movement.y,
 			)
 			this.movement.scaleInPlace(this.deceleration);
 
@@ -102,7 +111,6 @@ export class BallGrass {
 			// } else {
 			if (Math.abs(x) > this.maxDist * 0.5 && Math.abs(z) > this.maxDist * 0.5) {
 				this.assets.ballPicker.z = 0;
-				this.assets.camera.attachControl();
 			}
 		}
 	}

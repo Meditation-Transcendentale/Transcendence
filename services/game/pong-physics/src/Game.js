@@ -42,7 +42,6 @@ export class Game {
 
 		for (let i = 0; i < 2; i++) {
 			const offset = (config.arenaWidth / 2 * config.paddleOffsetRatio) * config.scaleFactor;
-			console.log("pos=", offset);
 			const x = (i === 0 ? 1 : -1) * offset;
 			const y = 0;
 			const rotation_y = (i === 0 ? 90 : -90) * Math.PI / 180;
@@ -74,7 +73,7 @@ export class Game {
 				wallWidth = config.arenaWidth * config.scaleFactor;
 				isGoal = false;
 			} else {
-				x = (config.arenaWidth / 2 + config.wallHeight) * config.scaleFactor;
+				x = (config.arenaWidth / 2 * config.paddleOffsetRatio + config.wallHeight) * config.scaleFactor;
 				y = 0;
 				rotation = 90 * Math.PI / 180;
 				wallWidth = config.arenaHeight * config.scaleFactor;

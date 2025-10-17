@@ -41,7 +41,7 @@ export class Fog {
 
 	public render() {
 		if (!this._enable) { return }
-		this.assets.fogDepthTexture.render();
+		this.assets.fogDepthTexture.render(false, false);
 		this.assets.effectRenderer.render(this.fogEffect, this.assets.fogRenderTexture);
 	}
 

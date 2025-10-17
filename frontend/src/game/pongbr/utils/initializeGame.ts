@@ -1,11 +1,11 @@
-import { Color3, Effect, Mesh, MeshBuilder, PBRMaterial, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "../../../babylon";
+import { Color3, Effect, Mesh, MeshBuilder, MorphTarget, PBRMaterial, Scene, ShaderMaterial, StandardMaterial, TransformNode, Vector3 } from "../../../babylon";
 import { PaddleMaterial } from './PaddleMaterial';
 import { WallMaterial } from "./WallMaterial";
 import { BallMaterial } from "./BallMaterial";
 
 Effect.ShadersRepository = "";
 
-export function initStatue(scene: Scene, pongRoot: TransformNode): Mesh {
+export function initStatue(scene: Scene, pongRoot: TransformNode): { statue: Mesh, smileTarget: MorphTarget | null } {
 	const statue = scene.getMeshByName('__root__') as Mesh;
 	statue.parent = pongRoot;
 	statue.rotationQuaternion = null;
@@ -14,11 +14,18 @@ export function initStatue(scene: Scene, pongRoot: TransformNode): Mesh {
 	statue.scaling.setAll(70);
 	statue.freezeWorldMatrix();
 	statue.doNotSyncBoundingInfo = true;
+
 	const headMesh = scene.getMeshByName('Head.001') as Mesh;
 	const material = headMesh.material as PBRMaterial;
-	material.freeze();
 
-	return statue;
+	let smileTarget: MorphTarget | null = null;
+	if (headMesh && headMesh.morphTargetManager) {
+		smileTarget = headMesh.morphTargetManager.getTarget(0);
+		if (smileTarget) {
+			smileTarget.influence = 0.0;
+		}
+	}
+	return { statue, smileTarget };
 }
 
 export function createWallMesh(scene: Scene, pongRoot: TransformNode): Mesh {

@@ -12,7 +12,6 @@ import { WebSocketManager } from "./network/WebSocketManager.js";
 import { InputManager } from "./input/InputManager.js";
 import { getOrCreateUUID } from "./utils/getUUID.js";
 import { createGameTemplate, GameTemplateConfig, createPlayer, } from "./templates/GameTemplate.js";
-import { VisualEffectSystem } from "./systems/VisualEffectSystem.js";
 import { UISystem } from "./systems/UISystem.js";
 import {
 	createCamera, createBaseMeshes, createInstanceManagers,
@@ -27,6 +26,8 @@ import { Ball } from "../brickbreaker/Ball.js";
 import { PaddleComponent } from "./components/PaddleComponent.js";
 import GameUI from "../GameUI.js";
 import { sceneManager } from "../../scene/SceneManager.js";
+import { User } from "../../User.js";
+import { getRandomAIName } from "./utils/aiNames.js";
 
 const API_BASE = `http://${window.location.hostname}:4000`;
 export let localPaddleId: any = null;
@@ -42,9 +43,6 @@ export class Pong {
 	public stateManager!: StateManager;
 	private wsManager!: WebSocketManager;
 	private inputManager!: InputManager;
-
-	private visualEffectSystem!: VisualEffectSystem;
-	// private uiSystem!: UISystem;
 
 	private uuid!: string;
 	private baseMeshes!: { arena: Mesh, ball: Mesh, paddle: Mesh, wall: Mesh };
@@ -97,14 +95,11 @@ export class Pong {
 		gameMode: string,
 		maps: string
 	) {
-		// const maps = 0;
 		this.gameMode = gameMode;
 		if (this.wsManager) {
 			this.wsManager.socket.close();
 			this.ecs.removeSystem(this.inputSystem);
 			this.ecs.removeSystem(this.networkingSystem);
-			//delete player
-			//this.ecs.removeEntityById(7);
 			const allEntities = this.ecs.getAllEntities();
 			allEntities.forEach((entity) => {
 				if (entity.hasComponent(PaddleComponent)) {
@@ -112,7 +107,6 @@ export class Pong {
 				}
 			});
 		}
-		console.log("UU", uuid);
 		const wsUrl =
 			`wss://${window.location.hostname}:7000/game?` +
 			`uuid=${encodeURIComponent(uuid)}&` +
@@ -130,7 +124,6 @@ export class Pong {
 		this.baseMeshes.paddle.setEnabled(true);
 		this.baseMeshes.arena.setEnabled(true);
 		this.baseMeshes.ball.setEnabled(true);
-		// this.cam.parent = this.pongRoot;
 		this.cam.minZ = 0.2;
 		if (maps == "monolith") {
 			this.pongRoot.position.set(0, 7, 0);
@@ -148,7 +141,6 @@ export class Pong {
 		}
 		localPaddleId = await this.waitForRegistration();
 
-		// 4) Plug networking into ECS
 		this.inputSystem = new InputSystem(this.inputManager, this.wsManager);
 		this.ecs.addSystem(this.inputSystem);
 		this.networkingSystem = new NetworkingSystem(
@@ -158,8 +150,8 @@ export class Pong {
 		);
 		this.ecs.addSystem(this.networkingSystem);
 
-		//add player
-		console.log("create player");
+		const isSpectator = localPaddleId === -1;
+
 		createPlayer(
 			this.ecs,
 			this.config,
@@ -168,70 +160,42 @@ export class Pong {
 			this.gameUI
 		);
 
-		console.log("start");
-		//this.engine = new Engine(this.canvas, true);
-		//engine = this.engine;
-		this.inputManager.enable();
-		this.pongRoot.setEnabled(true);
-		// this.stateManager.set_ecs(this.ecs);
-		this.stateManager.setter(true);
-		// this.gameUI.startCountdown(3);
-		this.gameUI.updateScoreVersus(0, 0);
-
-		if (this.gameMode == "local") {
-			this.gameUI.showImage("up", "/assets/Up.png", "small", {
-				offset: { x: 70, y: -3 },
-			});
-			this.gameUI.showImage("down", "/assets/Down.png", "small", {
-				offset: { x: 70, y: 15 },
-			});
-			this.gameUI.showImage("w", "/assets/W.png", "small", {
-				offset: { x: -70, y: -3 },
-			});
-			this.gameUI.showImage("s", "/assets/S.png", "small", {
-				offset: { x: -70, y: 15 },
-			});
-		} else if (this.gameMode == "ai") {
-			this.gameUI.showImage("w", "/assets/W.png", "small", {
-				offset: { x: -70, y: -3 },
-			});
-			this.gameUI.showImage("s", "/assets/S.png", "small", {
-				offset: { x: -70, y: 15 },
-			});
-		} else if (this.gameMode == "online") {
-			this.gameUI.showImage("up", "/assets/Up.png", "small", {
-				offset: { x: -80, y: -3 },
-			});
-			this.gameUI.showImage("down", "/assets/Down.png", "small", {
-				offset: { x: -80, y: 15 },
-			});
-			this.gameUI.showImage("w", "/assets/W.png", "small", {
-				offset: { x: -70, y: -3 },
-			});
-			this.gameUI.showImage("s", "/assets/S.png", "small", {
-				offset: { x: -70, y: 15 },
-			});
+		if (!isSpectator) {
+			this.inputManager.enable();
 		}
 
-		const readyPayload: userinterface.IClientMessage = { ready: {} };
-		const readyBuf = encodeClientMessage(readyPayload);
-		this.wsManager.socket.send(readyBuf);
+		this.pongRoot.setEnabled(true);
+		this.stateManager.setter(true);
+		this.gameUI.updateScoreVersus(0, 0);
+
+		if (this.gameMode === "ai") {
+			const aiName = getRandomAIName();
+			if (localPaddleId === 0) {
+				this.gameUI.setPlayerNames(User.username, aiName);
+			} else {
+				this.gameUI.setPlayerNames(aiName, User.username);
+			}
+		} else if (this.gameMode === "online") {
+			if (localPaddleId === 0) {
+				this.gameUI.setPlayerNames(User.username, "Opponent");
+			} else {
+				this.gameUI.setPlayerNames("Opponent", User.username);
+			}
+		} else if (this.gameMode === "local") {
+			this.gameUI.setPlayerNames("Player 1", "Player 2");
+		}
+
+		if (!isSpectator) {
+			this.gameUI.showInputHints(this.gameMode);
+			const readyPayload: userinterface.IClientMessage = { ready: {} };
+			const readyBuf = encodeClientMessage(readyPayload);
+			this.wsManager.socket.send(readyBuf);
+		}
 
 		this.stateManager.update();
 
-		//this.engine.runRenderLoop(() => {
-		//	this.scene.render();
-		//this.scene.onBeforeRenderObservable.add(() => {
-		//	// called _before_ every frame is drawn
-		//	this.baseMeshes.portal.material.setFloat("time", performance.now() * 0.001);
-		//});
-		//	//this.baseMeshes.portal.material.enableResolutionUniform();
-		//});
 	}
 	public stop(): void {
-		// if (this.uiSystem) {
-		// 	this.uiSystem.disableUI();
-		// }
 		const ballEntity = this.ecs.entitiesWith(BallComponent)[0] as Entity;
 		const ballComp = ballEntity.getComponent(BallComponent) as BallComponent;
 		ballComp.velocity.x = 0;
@@ -246,24 +210,10 @@ export class Pong {
 			},
 		};
 
-		if (this.gameMode == "local") {
-			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: 70, y: -3 } });
-			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: 70, y: 15 } });
-			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
-			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
-		} else if (this.gameMode == "ai") {
-			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
-			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
-		} else if (this.gameMode == "online") {
-			this.gameUI.showImage('up', '/assets/Up.png', 'small', { offset: { x: -80, y: -3 } });
-			this.gameUI.showImage('down', '/assets/Down.png', 'small', { offset: { x: -80, y: 15 } });
-			this.gameUI.showImage('w', '/assets/W.png', 'small', { offset: { x: -70, y: -3 } });
-			this.gameUI.showImage('s', '/assets/S.png', 'small', { offset: { x: -70, y: 15 } });
-		}
 		const buffer = encodeClientMessage(payload);
 
 		this.wsManager.socket.send(buffer);
-		// this.pongRoot.setEnabled(false);
+		this.wsManager.socket.close();
 		this.stateManager.setter(false);
 		this.cam.parent = null;
 
@@ -289,11 +239,6 @@ export class Pong {
 			)
 		);
 		this.ecs.addSystem(new MovementSystem());
-		this.visualEffectSystem = new VisualEffectSystem(this.scene, this.baseMeshes.ball);
-		this.ecs.addSystem(this.visualEffectSystem);
-		// this.uiSystem = new UISystem(this);
-		// this.scoreUI = this.uiSystem.scoreUI;
-		// this.ecs.addSystem(this.uiSystem);
 
 		createGameTemplate(this.ecs, config);
 	}

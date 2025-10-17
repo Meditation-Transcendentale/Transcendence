@@ -164,7 +164,6 @@ services:
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
       - API_GATEWAY_KEY=${API_GATEWAY_KEY}
-      - METRICS_PASSWORD=${METRICS_PASSWORD}
     networks:
       - transcendence-network
     depends_on:
@@ -199,7 +198,6 @@ services:
         condition: service_started
     networks:
       - transcendence-network
-      - metrics-network
 
   docs-service:
     build:
@@ -239,6 +237,7 @@ services:
       - NODE_ENV=development
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
+      - FILL_DB=${FILL_DB}
     networks:
       - transcendence-network
   
@@ -256,26 +255,6 @@ services:
       database_certs-init:
         condition: service_completed_successfully
     restart: unless-stopped
-
-  # prometheus:
-  #   image: prom/prometheus:latest
-  #   container_name: prometheus
-  #   volumes:
-  #     - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-  #     - ./prometheus/web-config.yml:/etc/prometheus/web-config.yml
-  #     - ./shared/certs:/etc/prometheus/certs:ro
-  #   ports:
-  #     - "9090:9090"
-  #   command:
-  #     - '--config.file=/etc/prometheus/prometheus.yml'
-  #     - '--web.config.file=/etc/prometheus/web-config.yml'
-  #     - '--web.listen-address=:9090'
-  #     - '--web.enable-lifecycle'
-  #   depends_on:
-  #     database_certs-init:
-  #       condition: service_completed_successfully
-  #   networks:
-  #     - transcendence-network
 
 volumes:
   user_shared:
@@ -295,9 +274,6 @@ networks:
   transcendence-network:
     driver: bridge
     name: api-network
-  metrics-network:
-    driver: bridge
-    name: metrics-network
   nats-network:
     driver: bridge
     name: nats-network
