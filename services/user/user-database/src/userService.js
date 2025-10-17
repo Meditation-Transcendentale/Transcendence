@@ -10,7 +10,7 @@ const getGoogleUserByGoogleIdStmt = database.prepare("SELECT * FROM users WHERE 
 const add42UserStmt = database.prepare("INSERT INTO users (ft_id, uuid, provider, username, avatar_path) VALUES (?, ?, ?, ?, ?)");
 const get42UserByFtIdStmt = database.prepare("SELECT * FROM users WHERE ft_id = ?");
 const checkUsernameAvailabilityStmt = database.prepare("SELECT * FROM users WHERE username = ?");
-const registerUserStmt = database.prepare("INSERT INTO users (uuid, username, password) VALUES (?, ?, ?)");
+const registerUserStmt = database.prepare("INSERT INTO users (uuid, username, password, avatar_path) VALUES (?, ?, ?, ?)");
 const getUserByIdStmt = database.prepare("SELECT * FROM users WHERE id = ?");
 const addFriendRequestStmt = database.prepare("INSERT INTO friendslist (user_id_1, user_id_2) VALUES (?, ?)");
 const getFriendshipByIdStmt = database.prepare("SELECT * FROM friendslist WHERE id = ?");
@@ -119,8 +119,8 @@ const userService = {
 			throw { status: userReturn.USER_002.http, code: userReturn.USER_002.code, message: userReturn.USER_002.message };
 		}
 	},
-	registerUser: (uuid, username, hashedPassword) => {
-		registerUserStmt.run(uuid, username, hashedPassword);
+	registerUser: (uuid, username, hashedPassword, avatar) => {
+		registerUserStmt.run(uuid, username, hashedPassword, avatar);
 	},
 	getUserFromId: (id) => {
 		const user = getUserByIdStmt.get(id);

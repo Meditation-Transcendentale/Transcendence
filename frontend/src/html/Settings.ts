@@ -103,7 +103,7 @@ export class Settings {
 		fileInput.addEventListener("change", () => {
 			const file = fileInput.files ? fileInput.files[0] : null;
 
-			const url = file ? URL.createObjectURL(file) : "/cdn/default_avatar.jpg";
+			const url = file ? URL.createObjectURL(file) : "/cdn/default_avatar1.jpg";
 			previewImg.src = url;
 
 			div.appendChild(previewImg);

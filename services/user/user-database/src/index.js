@@ -64,8 +64,8 @@ handleErrorsNats(async () => {
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("user.registerUser", async (msg) => {
-			const { uuid, username, hashedPassword } = jc.decode(msg.data);
-			userService.registerUser(uuid, username, hashedPassword);
+			const { uuid, username, hashedPassword, avatar } = jc.decode(msg.data);
+			userService.registerUser(uuid, username, hashedPassword, avatar);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),
 		handleNatsSubscription("user.getUserFromId", async (msg) => {
