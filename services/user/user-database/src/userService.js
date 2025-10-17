@@ -228,7 +228,6 @@ const userService = {
 	},
 	getUserForFriendResearch: (username) => {
 		const user = getUserForFriendResearchStmt.get(username);
-		console.log("getUserForFriendResearch:", username, user);
 		if (!user) {
 			throw { status: userReturn.USER_001.http, code: userReturn.USER_001.code, message: userReturn.USER_001.message };
 		}
@@ -236,9 +235,6 @@ const userService = {
 	},
 	getUserStatus: (userId) => {
 		const status = getUserStatusStmt.get(userId);
-		// if (!status) {
-		// 	throw { status: statusCode.NOT_FOUND, message: returnMessages.PLAYER_INACTIVE };
-		// }
 		return status;
 	},
 	getAllUsers: () => {
@@ -253,7 +249,6 @@ const userService = {
 		addUserStatusStmt.run(userId, status);
 	},
 	updateStatus: (userId, status, lobby_gameId) => {
-		console.log("updateStatus called with:", userId, status, lobby_gameId);
 		const validStatuses = ['online', 'offline', 'in lobby', 'in game', 'in tournament'];
 		if (status && !validStatuses.includes(status)) {
 			throw { status: statusReturn.STATUS_003.http, code: statusReturn.STATUS_003.code, message: statusReturn.STATUS_003.message };

@@ -62,7 +62,6 @@ const verifyJWT = async (req, res) => {
 
 	const token = req.cookies.accessToken;
 	if (!token) {
-		console.log('No token provided');
 		return res.code(401).send({ message: 'No token provided' });
 	}
 
@@ -74,7 +73,6 @@ const verifyJWT = async (req, res) => {
 	const data = response.data;
 
 	if (!data.valid) {
-		console.log('Invalid token');
 		return res.code(401).send({ message: 'Invalid token' });
 	}
 	req.user = data.user;

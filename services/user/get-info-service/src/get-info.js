@@ -71,9 +71,7 @@ app.post('/search', { schema: searchSchema }, handleErrors(async (req, res) => {
 	if (!identifier || !type) {
 		throw { status: userReturn.USER_036.http, code: userReturn.USER_036.code, message: userReturn.USER_036.message };
 	}
-	console.log("GET INFO", identifier, type);
 
-	// console.log(`Searching for user by ${type}: ${identifier}`);
 	let responseData;
 	switch (type) {
 		case 'username':
@@ -104,21 +102,6 @@ app.get('/status', handleErrors(async (req, res) => {
 
 	res.code(statusCode.SUCCESS).send({ statusInfos: status });
 
-}));
-
-app.post(`/users`, handleErrors(async (req, res) => {
-
-	const pw = req.body.pw;
-	``
-	if (!pw || !pw.length) {
-		return res.code(statusCode.UNAUTHORIZED).send({ message: returnMessages.UNAUTHORIZED });
-	}
-	if (pw !== process.env.PSSWD) {
-		return res.code(statusCode.UNAUTHORIZED).send({ message: returnMessages.UNAUTHORIZED });
-	}
-	const users = await natsRequest(nats, jc, 'user.getAllUsers');
-
-	res.code(statusCode.SUCCESS).send({ users: users });
 }));
 
 app.get('/health', (req, res) => {

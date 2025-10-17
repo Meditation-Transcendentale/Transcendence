@@ -98,7 +98,6 @@ handleErrorsNats(async () => {
 			
 			const matchInfos = decodeMatchEnd(msg.data);
 
-			console.log (`${matchInfos.winnerId}|${matchInfos.loserId}|${matchInfos.score[0]}|${matchInfos.score[1]}|${matchInfos.forfeitId}`);
 			const winner = await nats.request('user.getUserFromUUID', jc.encode({ uuid: matchInfos.winnerId }), { timeout: 1000 });
 			const winnerDecoded = jc.decode(winner.data);
 
@@ -159,7 +158,6 @@ handleErrorsNats(async () => {
 		}),
 		handleNatsSubscription("stats.addBrickBreakerStats", async (msg) => {
 			const { playerId } = jc.decode(msg.data);
-			console.log (`Adding brickbreaker stats for playerId`);
 			statService.addBrickBreakerStats(playerId);
 			nats.publish(msg.reply, jc.encode({ success: true }));
 		}),

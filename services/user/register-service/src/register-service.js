@@ -51,7 +51,6 @@ const nats = await connect({
 const jc = JSONCodec();
 
 const USERNAME_REGEX = /^[a-zA-Z0-9]{3,20}$/;
-// const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!?@#$%&*()_{};:|,.<>]{8,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9!"#$%&'()*+,\\\-.\/:;<=>?@\[\]^_{|}~]{8,}$/;
 
 function sanitizeRegisterInput(input) {
@@ -63,10 +62,6 @@ function sanitizeRegisterInput(input) {
 }
 
 app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
-
-	// console.log('Content-Type:', req.headers['content-type']);
-	// console.log('Raw body:', req.body);
-	// console.log('Body type:', typeof req.body);
 
 	const { username, password } = sanitizeRegisterInput(req.body);
 
