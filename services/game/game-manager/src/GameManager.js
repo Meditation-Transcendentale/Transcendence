@@ -436,7 +436,8 @@ export class GameManager {
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles.map(paddle => {
-				const playerIndex = paddle.paddleId !== undefined ? paddle.paddleId : paddle.playerId;
+				// Use paddle.id as the player index (0 or 1)
+				const playerIndex = paddle.id;
 				const uuid = match.instance.players[playerIndex] || '';
 				return {
 					...paddle,

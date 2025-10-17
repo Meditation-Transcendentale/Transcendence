@@ -16,22 +16,43 @@
   width: 90%;
   height: 6.8vh;
   text-align: center;
-  border: var(--spacing-md) white solid;
+  border: 2px solid rgba(157, 78, 221, 0.6);
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
   font-weight: var(--font-weight-bold);
   letter-spacing: 4vh;
   line-height: 0;
   font-size: var(--font-size-large);
+  background: linear-gradient(135deg, rgba(36, 0, 70, 0.95), rgba(13, 2, 33, 0.9));
+  color: #c77dff;
+  text-shadow:
+    0 0 10px rgba(157, 78, 221, 0.7),
+    0 0 20px rgba(157, 78, 221, 0.3);
+  transition: all 0.3s ease;
+  box-shadow:
+    0 0 20px rgba(157, 78, 221, 0.2),
+    0 4px 15px rgba(13, 2, 33, 0.5);
 }
 
 .create-btn:hover {
-  color: var(--window-background);
-  background-color: var(--window-color);
+  background: linear-gradient(135deg, rgba(90, 24, 154, 0.95), rgba(36, 0, 70, 0.9));
+  border-color: rgba(199, 125, 255, 0.8);
+  color: #e0aaff;
+  text-shadow:
+    0 0 15px rgba(199, 125, 255, 1),
+    0 0 30px rgba(157, 78, 221, 0.8);
+  box-shadow:
+    0 0 30px rgba(157, 78, 221, 0.5),
+    0 6px 20px rgba(13, 2, 33, 0.7);
+  transform: translateY(-2px);
 }
 
 .create-btn:active {
-  border-color: blue;
+  border-color: rgba(157, 78, 221, 1);
+  transform: translateY(0px);
+  box-shadow:
+    0 0 25px rgba(157, 78, 221, 0.7),
+    0 2px 10px rgba(13, 2, 33, 0.8);
 }
 
 /* Return Button */
