@@ -17,6 +17,7 @@ export class BrickRoute implements IRoute {
 			routeManager.nav("/home");
 			return;
 		}
+		htmlManager.friendlist.remove();
 		sceneManager.cameraManager.vue = "brick";
 		sceneManager.load("brick");
 		gameManager.launchBrick();
