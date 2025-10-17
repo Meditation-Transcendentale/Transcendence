@@ -175,7 +175,7 @@ export class Pong {
 			} else {
 				this.gameUI.setPlayerNames(aiName, User.username);
 			}
-		} else if (this.gameMode === "online") {
+		} else if (this.gameMode === "online" || this.gameMode === "tournament") {
 			if (localPaddleId === 0) {
 				this.gameUI.setPlayerNames(User.username, "Opponent");
 			} else {
