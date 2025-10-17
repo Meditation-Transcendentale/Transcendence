@@ -271,8 +271,8 @@ export class Player {
 			} else {
 				this.goal.rotation.y = Math.atan2(direction.x, direction.z);
 				direction.normalize();
-				speed *= Math.min(distance * 2, 1);
-				this.velocity = Vector3.Lerp(this.velocity, direction.scale(speed), 0.5);
+				speed *= Math.min(distance * 2, 100);
+				this.velocity = Vector3.Lerp(this.velocity, direction.scale(speed), 1.);
 			}
 		}
 		this.updatePosition();

@@ -1,6 +1,7 @@
-import { BloomEffect, Engine, FxaaPostProcess, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Vector3 } from "../babylon"
+import { BloomEffect, EffectWrapper, Engine, FxaaPostProcess, InternalTexture, PostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, RenderTargetTexture, RenderTargetWrapper, Vector3 } from "../babylon"
 import { UIaddSlider } from "../UIUtils";
 import { Assets } from "./Assets";
+import { sceneManager } from "./SceneManager";
 
 interface ICameraVue {
 	position: Vector3,
@@ -22,12 +23,20 @@ export class CameraManager {
 	private bloomEffect: BloomEffect;
 	private fxaaEffect: PostProcessRenderEffect;
 
+	private lumaEffect: EffectWrapper;
+
 
 	private fogAbsorption: Vector3;
 	private contrast: number;
 	private brightness: number;
 	private gamma: number;
 	private tonemapping: number;
+	private lmax: number;
+	private cmax: number;
+
+
+	private lumaInput!: RenderTargetWrapper;
+	private lumaTexture: RenderTargetTexture;
 
 
 	constructor(assets: Assets) {
@@ -101,29 +110,63 @@ export class CameraManager {
 
 
 		this.colorCorrectionPostProcess = new PostProcess("colorCorrection", "colorCorrection", {
-			uniforms: ["contrast", "brightness", "gamma", "tonemapping"],
+			uniforms: ["contrast", "brightness", "gamma", "tonemapping", "_Ldmax", "_Cmax"],
 			size: 1.,
 			camera: this.assets.camera,
 			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE,
 			textureType: Engine.TEXTURETYPE_HALF_FLOAT,
-			reusable: false
+			reusable: false,
+			samplers: ["lumaSampler"]
 		})
 		this.contrast = 1.;
 		this.brightness = 0.;
 		this.gamma = 1;
 		this.tonemapping = 4;
 
+		this.lmax = 10;
+		this.cmax = 10;
+
+
 		UIaddSlider("contrast", this.contrast, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.contrast = n });
 		UIaddSlider("brightness", this.brightness, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.brightness = n });
 		UIaddSlider("gamma", this.gamma, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.gamma = n });
-		UIaddSlider("tonemapping", this.tonemapping, { step: 1, min: 0, max: 8 }, (n: number) => { this.tonemapping = n });
+		UIaddSlider("tonemapping", this.tonemapping, { step: 1, min: 0, max: 9 }, (n: number) => { this.tonemapping = n });
+		UIaddSlider("lmax", this.lmax, { step: 1, min: 0, max: 300 }, (n: number) => { this.lmax = n });
+		UIaddSlider("cmax", this.cmax, { step: 1, min: 0, max: 100 }, (n: number) => { this.cmax = n });
+
+
+		this.lumaTexture = this.assets.lumaTexture;
+
+		this.fogPostProcess.onAfterRenderObservable.add(() => {
+			this.assets.effectRenderer.render(this.lumaEffect, this.lumaTexture);
+		})
 
 		this.colorCorrectionPostProcess.onApply = (effect) => {
 			effect.setFloat("contrast", this.contrast);
 			effect.setFloat("brightness", this.brightness);
 			effect.setFloat("gamma", this.gamma);
 			effect.setInt("tonemapping", this.tonemapping);
+			effect.setFloat("_Ldmax", this.lmax);
+			effect.setFloat("_Cmax", this.cmax);
+
+			effect.setTexture("lumaSampler", this.lumaTexture);
 		}
+
+
+		this.lumaEffect = new EffectWrapper({
+			name: "luma",
+			engine: sceneManager.engine,
+			useShaderStore: true,
+			fragmentShader: "luma",
+			samplers: ["textureSampler"]
+		});
+
+		this.lumaEffect.onApplyObservable.add(() => {
+			this.lumaEffect.effect.setTextureFromPostProcessOutput("textureSampler", this.fogPostProcess);
+		})
+
+
+
 
 		this.fxaaPostProcess = new FxaaPostProcess("fxaa", {
 			size: 1.,
@@ -136,6 +179,7 @@ export class CameraManager {
 		this.assets.camera.detachPostProcess(this.colorCorrectionPostProcess);
 		this.assets.camera.detachPostProcess(this.fogPostProcess);
 		this.assets.camera.detachPostProcess(this.fxaaPostProcess);
+		// this.assets.camera.detachPostProcess(this.lumaPostProcess);
 
 		this.fogEffect = new PostProcessRenderEffect(this.assets.engine, "fogEffect", () => {
 			return [this.fogPostProcess];

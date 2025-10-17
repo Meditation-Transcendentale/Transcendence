@@ -80,5 +80,7 @@ export { Animation } from "@babylonjs/core/Animations/animation";
 export { MorphTarget } from "@babylonjs/core/Morph/morphTarget";
 export { Constants } from "@babylonjs/core/Engines/constants";
 export { ImageProcessingConfiguration } from "@babylonjs/core";
+export { InternalTexture } from "@babylonjs/core/Materials/Textures/internalTexture";
+export { RenderTargetWrapper } from "@babylonjs/core/Engines/renderTargetWrapper";
 import "@babylonjs/core/Culling/ray";
 
