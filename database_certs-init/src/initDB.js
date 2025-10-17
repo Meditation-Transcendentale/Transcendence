@@ -12,6 +12,9 @@ schemas.forEach((file) => {
 	database.exec(sql);
 });
 
-database.exec(test);
+if (process.env.FILL_DB === 'true') {
+	database.exec(test);
+}
+
 
 console.log("Database initialized successfully!");

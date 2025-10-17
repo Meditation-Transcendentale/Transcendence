@@ -60,9 +60,7 @@ cleanShared:
 	fi
 
 filldb:
-	sed -i 's|^$(COMMENTED_LINE)|$(UNCOMMENTED_LINE)|' database_certs-init/src/initDB.js
-	$(MAKE) re
-	sed -i 's|^$(UNCOMMENTED_LINE)|$(COMMENTED_LINE)|' database_certs-init/src/initDB.js
+	FILL_DB=true $(MAKE) re
 	
 
 update-hostname-env:
