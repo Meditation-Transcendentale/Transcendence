@@ -200,36 +200,36 @@ export class BrickBreaker {
 					
 					<div id="tutorial-brick" class="tutorial-step">
 						<div class="tutorial">
-							<img class="tutorial-src" src="/assets/gifs/break-bricks.gif" alt="goal">
+							<img class="tutorial-src" src="/assets/tuto.gif" alt="goal">
 							<p class="tutorial-text">Break all the bricks by bouncing the ball with your shield and try to make the best score.</p>
 						</div>
 					</div>
 
 					<div id="tutorial-move" class="tutorial-step">
 						<div class="tutorial">
-							<img class="tutorial-src" src="/assets/gif_move_player.gif" alt="Move player">
-							<p class="tutorial-text">Use the mouse to move</p>
+							<img class="tutorial-src" src="/assets/tuto-move-crop.gif" alt="Move player">
+							<p class="tutorial-text">Use the mouse to move.</p>
 						</div>
 					</div>
 					
 					<div id="tutorial-shield" class="tutorial-step">
 						<div class="tutorial">
-							<img class="tutorial-src" src="/assets/gifs/power-ups.gif" alt="Shield">
+							<img class="tutorial-src" src="/assets/tuto-shield-crop.gif" alt="Shield">
 							<p class="tutorial-text">Press Space to activate your shield. The shield depletes while active and regenerates when released.</p>
 						</div>
 					</div>
 
 					<div id="tutorial-points" class="tutorial-step">
 						<div class="tutorial">
-							<img class="tutorial-src" src="/assets/gifs/power-ups.gif" alt="Points">
-							<p class="tutorial-text">Each layer is worth a different amount of points. The closer to the edge, the higher the score.</p>
+							<img class="tutorial-src" src="/assets/tuto-bricks-crop.gif" alt="Points">
+							<p class="tutorial-text">Each layer is worth a different amount of points. The closer to the edge, the higher the score. Each consecutive hit increases the ball's speed, and faster balls award more points per brick destroyed.</p>
 						</div>
 					</div>
 
 					<div id="tutorial-ball" class="tutorial-step">
 						<div class="tutorial">
-							<img class="tutorial-src" src="/assets/gifs/power-ups.gif" alt="Speed">
-							<p class="tutorial-text">Hit the ball with your shield to activate it and destroy bricks. The ball deactivates when hitting other surfaces. Any contact with the ball means game over. Each consecutive hit increases the ball's speed, and faster balls award more points per brick destroyed.</p>
+							<img class="tutorial-src" src="/assets/tuto-ball-crop.gif" alt="Speed">
+							<p class="tutorial-text">Hit the ball with your shield to activate it and destroy bricks. The ball deactivates when hitting other surfaces. Any contact with the ball means game over.</p>
 						</div>
 					</div>
 				</div>
