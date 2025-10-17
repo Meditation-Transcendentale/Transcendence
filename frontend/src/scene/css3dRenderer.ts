@@ -40,7 +40,7 @@ export class Css3dRenderer {
 		this.cameraDiv.style.willChange = 'transform';
 
 
-		this.perspective = this.height * 0.5 * this.camera.getProjectionMatrix().m[5];
+		this.perspective = this.height * 0.5 * this.camera.getProjectionMatrix().m[5] * window.devicePixelRatio;
 		document.body.style.perspective = `${this.perspective}px`;
 		this.dirty = true;
 	}
@@ -101,7 +101,7 @@ export class Css3dRenderer {
 	public resize() {
 		this.width = sceneManager.resolution.width;
 		this.height = sceneManager.resolution.height;
-		this.perspective = this.height * 0.5 * this.camera.getProjectionMatrix().m[5];
+		this.perspective = this.height * 0.5 * this.camera.getProjectionMatrix().m[5] * window.devicePixelRatio;
 		document.body.style.perspective = `${this.perspective}px`;
 		this.dirty = true;
 		this.cameraDiv.style.width = `${this.width}px`;
