@@ -127,12 +127,13 @@ export class CameraManager {
 		this.cmax = 10;
 
 
-		UIaddSlider("contrast", this.contrast, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.contrast = n });
-		UIaddSlider("brightness", this.brightness, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.brightness = n });
-		UIaddSlider("gamma", this.gamma, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.gamma = n });
-		UIaddSlider("tonemapping", this.tonemapping, { step: 1, min: 0, max: 9 }, (n: number) => { this.tonemapping = n });
-		UIaddSlider("lmax", this.lmax, { step: 1, min: 0, max: 300 }, (n: number) => { this.lmax = n });
-		UIaddSlider("cmax", this.cmax, { step: 1, min: 0, max: 100 }, (n: number) => { this.cmax = n });
+		document.body.querySelector("#utils-details")?.remove();
+		// UIaddSlider("contrast", this.contrast, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.contrast = n });
+		// UIaddSlider("brightness", this.brightness, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.brightness = n });
+		// UIaddSlider("gamma", this.gamma, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.gamma = n });
+		// UIaddSlider("tonemapping", this.tonemapping, { step: 1, min: 0, max: 9 }, (n: number) => { this.tonemapping = n });
+		// UIaddSlider("lmax", this.lmax, { step: 1, min: 0, max: 300 }, (n: number) => { this.lmax = n });
+		// UIaddSlider("cmax", this.cmax, { step: 1, min: 0, max: 100 }, (n: number) => { this.cmax = n });
 
 
 		this.lumaTexture = this.assets.lumaTexture;

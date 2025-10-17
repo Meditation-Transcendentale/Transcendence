@@ -79,7 +79,7 @@ class UserC {
 			this.friendsBusy.add(user.uuid);
 		}
 
-		htmlManager.friendlist.updateStatus(user.uuid, user.status, change);
+		htmlManager.friendlist.updateStatus(user, change);
 		htmlManager.lobby.updateInviteCustom(user.uuid, user.status == "online");
 	}
 
@@ -116,8 +116,8 @@ class UserC {
 		}
 		const js: any = await getRequest("friends/get/requests")
 			.catch((err) => htmlManager.notification.error(err));
-		if (js && js.friendlist) {
-			htmlManager.friendlist.resetRequest(json.friendsRequests);
+		if (js && js.friendsRequests) {
+			htmlManager.friendlist.resetRequest(js.friendsRequests);
 		}
 	}
 

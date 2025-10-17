@@ -1,6 +1,7 @@
 import { avatarRequest, deleteRequest, patchRequest, postRequest } from "../networking/request";
 import { User } from "../User";
 import { htmlManager } from "./HtmlManager";
+import { NotificationType } from "./NotificationHtml";
 import { Popup, PopupType } from "./Popup";
 
 export class Settings {
@@ -114,18 +115,25 @@ export class Settings {
 
 		uploadBtn.addEventListener("click", () => {
 			const file = fileInput.files ? fileInput.files[0] : null;
-			if (file) {
-				const formData = new FormData();
-				formData.append("avatar", file);
+			if (file && file.size < 5000000) {
+				try {
+					const formData = new FormData();
+					formData.append("avatar", file);
 
-				avatarRequest("update-info/avatar", formData)
-					.then(async (json) => {
-						await User.check();
-						htmlManager.ath.updateProfileInfo();
-						this.changeAvatarPopup.close();
-					})
-					.catch((err) => { htmlManager.notification.error(err) })
-			}
+					avatarRequest("update-info/avatar", formData)
+						.then(async (json) => {
+							await User.check();
+							htmlManager.ath.updateProfileInfo();
+							this.changeAvatarPopup.close();
+						})
+						.catch((err) => { htmlManager.notification.error(err); })
+				} catch (err) {
+					htmlManager.notification.error(err)
+				}
+			} else if (file && file.size >= 5000000)
+				htmlManager.notification.add({ type: NotificationType.error, error: "File too big, must be less than 5Mo" });
+			else
+				htmlManager.notification.add({ type: NotificationType.error, error: "No file provided" });
 		});
 
 		div.appendChild(fileInput);

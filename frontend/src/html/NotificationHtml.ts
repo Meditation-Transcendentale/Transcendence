@@ -269,7 +269,8 @@ export class NotificationHtml {
 			err.json()
 				.then((json: any) => {
 					this.add({ type: NotificationType.error, error: json.message })
-				});
+				})
+				.catch(() => { });
 		} catch (err) {
 			this.add({ type: NotificationType.error, error: "error" })
 		}
