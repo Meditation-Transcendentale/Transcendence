@@ -115,6 +115,7 @@ export class PongBR {
 			const time = performance.now() / 1000;
 			this.baseMeshes.paddle.material.setUniform("time", time);
 			this.baseMeshes.ball.material.setUniform("time", time);
+			this.baseMeshes.pillar.material.setUniform("time", time);
 		});
 
 		this.setupPostProcessing();

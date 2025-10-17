@@ -2,6 +2,7 @@ import { Color3, Effect, Mesh, MeshBuilder, MorphTarget, PBRMaterial, Scene, Sha
 import { PaddleMaterial } from './PaddleMaterial';
 import { WallMaterial } from "./WallMaterial";
 import { BallMaterial } from "./BallMaterial";
+import { PillarMaterial } from "./PillarMaterial";
 
 Effect.ShadersRepository = "";
 
@@ -105,6 +106,7 @@ export function createPaddleMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 // utils/initializeGame.ts
 
 export function createPillarMesh(scene: Scene, pongRoot: TransformNode): Mesh {
+	const light = scene.getLightByName("whitelight2");
 	const m = MeshBuilder.CreateBox("pillarBase", {
 		width: 1.,
 		height: 1,
@@ -112,11 +114,9 @@ export function createPillarMesh(scene: Scene, pongRoot: TransformNode): Mesh {
 	}, scene);
 	m.parent = pongRoot;
 	m.isVisible = true;
-	const mat = new StandardMaterial("pillarMat", scene);
-	mat.diffuseColor = new Color3(0.15, 0.1, 0.1);
-	mat.emissiveColor = new Color3(0.08, 0.03, 0.03);
-	mat.freeze();
+	const mat = new PillarMaterial("pillarMat", scene);
 	m.material = mat;
+	// light?.includedOnlyMeshes.push(m);
 	return m;
 }
 
