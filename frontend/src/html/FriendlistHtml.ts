@@ -243,20 +243,21 @@ export class FriendlistHtml {
 		this.request.delete(uuid);
 	}
 
-	public updateStatus(uuid: string, status: string, change: boolean) {
-		if (!this.friend.has(uuid))
+	public updateStatus(user: ISearchRequestResponce, change: boolean) {
+		if (!this.friend.has(user.uuid))
 			return;
-		const friend = this.friend.get(uuid) as IFriendUser;
+		const friend = this.friend.get(user.uuid) as IFriendUser;
 		if (change)
 			friend.div.remove();
-		friend.status.textContent = status;
-		friend.status.setAttribute("status", status);
+		friend.status.textContent = user.status;
+		friend.status.setAttribute("status", user.status);
+		friend.username.textContent = user.username;
+		friend.avatar.src = user.avatar_path;
 		if (change)
 			if (status !== "offline")
 				this.friendOnlinesContainer.appendChild(friend.div);
 			else
 				this.friendAwayContainer.appendChild(friend.div);
-
 	}
 
 	private createUserElement(user: ISearchRequestResponce, type: string) {
