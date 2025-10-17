@@ -101,7 +101,7 @@ export class MonolithMaterial extends CustomMaterial {
 			}
 
 			// === COMBINE ANIMATIONS ===
-			vec3 totalDisplacement = ( (mouseAnimation * mouseInfluence)) ;
+			vec3 totalDisplacement = (baseWave * (mouseAnimation * mouseInfluence)) ;
 			worldPos.xyz += totalDisplacement;
 			float displacement = length(worldPos.xyz - originalWorldPos.xyz);
 			float maxDisplacement = 1.0;
