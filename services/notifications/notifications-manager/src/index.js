@@ -169,13 +169,18 @@ async function start() {
 }
 
 async function sendStatus(senderId, data, nc, jc) {
-  try {
-    await nc.request(
-      "status.updateUserStatus",
-      jc.encode({ userId: senderId, status: data.status, option: data.option })
-    );
-  } catch (err) {
-    console.error(`[${SERVICE_NAME}] Failed to update status:`, err);
+  if (data.status !== "update") {
+    try {
+      await nc.request(
+        "status.updateUserStatus",
+        jc.encode({ userId: senderId, status: data.status, option: data.option })
+      );
+    } catch (err) {
+      console.error(`[${SERVICE_NAME}] Failed to update status:`, err);
+    }
+  }
+  else {
+    data.status = "online";
   }
   try {
     const resp = await friendlist_Request(senderId, nc, jc);

@@ -29,6 +29,7 @@ SERVICES=(
   "notifications"
   "tournament"
   "friends-service"
+  "update_user_info-service"
   "spa"
   "stats_database"
   "100ptest"
@@ -54,6 +55,9 @@ for svc in "${SERVICES[@]}"; do
       ;;
     friends-service)
       OUT_DIR="../../services/user/friends-service/src/proto"
+      ;;
+    update_user_info-service)
+      OUT_DIR="../../services/user/update_user_info-service/src/proto"
       ;;
     spa)
       OUT_DIR="../../frontend/src/spa/proto"
@@ -140,6 +144,11 @@ for svc in "${SERVICES[@]}"; do
       )
       ;;
     "friends-service")
+      PROTO_SOURCES=(
+        "$SHARED_PROTO_DIR/notif.proto"
+      )
+      ;;
+    "update_user_info-service")
       PROTO_SOURCES=(
         "$SHARED_PROTO_DIR/notif.proto"
       )
