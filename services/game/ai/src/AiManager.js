@@ -63,9 +63,16 @@ export class AiManager {
                 const now = performance.now();
                 if (now - match.lastRun >= 1000) {
                         const node = this.stateToNode(state);
-                        const result = topLevelSearch(node);
-                        match.targetOffset = node.ballState.ballVel[0] <= 0 ? result.aiPaddlePos : result.futureBallState.ballPos[1];
-                        match.lastRun = now;
+                        try {
+                            const result = topLevelSearch(node);
+                            if (node.ballState.ballVel[0] <= 0)
+                                match.targetOffset = result.aiPaddlePos
+                            else 
+                                match.targetOffset = Math.max(Math.min(result.futureBallState.ballPos[1], 3.5), -3.5);;
+                            match.lastRun = now;
+                        } catch (err) {
+                            console.log (err);
+                        }
                     }
                 if (match.targetOffset == null) continue;
                 const myPaddle = state.paddles[1];
