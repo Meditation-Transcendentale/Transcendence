@@ -52,6 +52,7 @@ export class Assets {
 	public fogRenderTexture!: RenderTargetTexture;
 	public ballGrassTextureA!: RenderTargetTexture;
 	public ballGrassTextureB!: RenderTargetTexture;
+	public lumaTexture!: RenderTargetTexture;
 
 	public fogUBO!: UniformBuffer;
 	public monolithUBO!: UniformBuffer;
@@ -245,7 +246,7 @@ export class Assets {
 
 	private loadTextureMandatory() {
 		const fogMaxResolution = Math.min(1080, sceneManager.resolution.width);
-		const fogRatio = 1.;
+		const fogRatio = 0.75;
 		stateManager.set("fogMaxResolution", fogMaxResolution);
 		stateManager.set("fogRatio", fogRatio);
 		this.fogDepthTexture = new RenderTargetTexture("fogDepth", { width: fogMaxResolution * fogRatio, height: fogMaxResolution * fogRatio * sceneManager.resolutionRatio }, this.scene, {
@@ -284,6 +285,15 @@ export class Assets {
 			samplingMode: Engine.TEXTURE_BILINEAR_SAMPLINGMODE
 		})
 		this.ballGrassTextureB = this.ballGrassTextureA.clone();
+
+		this.lumaTexture = new RenderTargetTexture("luma", { width: 512, height: 512 }, this.scene, {
+			format: Engine.TEXTUREFORMAT_R,
+			type: Engine.TEXTURETYPE_HALF_FLOAT,
+			generateMipMaps: true,
+		});
+		this.lumaTexture.wrapU = Engine.TEXTURE_CLAMP_ADDRESSMODE;
+		this.lumaTexture.wrapV = Engine.TEXTURE_CLAMP_ADDRESSMODE;
+		this.lumaTexture.samples = 1;
 	}
 
 	private loadUBOMandatory() {

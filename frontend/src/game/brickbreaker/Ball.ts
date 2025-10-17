@@ -58,7 +58,7 @@ export class Ball {
 					this.ball.material = this.matTouched;
 					const newOrientation = new Vector3(this.newposition.x - playerGoalPos.x, 0, this.newposition.z - playerGoalPos.z).normalize();
 					this.velocity.set(newOrientation.x * this.speed * this.speedScale, 0, newOrientation.z * this.speed * this.speedScale);
-					this.speedScale = Math.min(this.speedScale * 1.1, 5);
+					this.speedScale = Math.min(this.speedScale * 1.1, 10);
 				} else if (collideGoal && this.isDirty) {
 					this.touched = false;
 					this.ball.material = this.matUntouched;

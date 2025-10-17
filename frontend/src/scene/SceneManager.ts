@@ -47,6 +47,7 @@ class SceneManager {
 			useHighPrecisionFloats: true,
 			useHighPrecisionMatrix: true,
 			antialias: true,
+			disableWebGL2Support: false
 		}, true); //antial, option, adpatToDeviceRAtio
 		this.engine.setDepthBuffer(true);
 		this.updateResolution();

@@ -36,16 +36,42 @@ void main(void) {
 }
 `;
 
-
-Effect.ShadersStore["colorCorrectionFragmentShader"] = `
+Effect.ShadersStore["lumaFragmentShader"] = `
 precision highp float;
 
 uniform sampler2D	textureSampler;
 
+
+varying vec2	vUV;
+
+float luma(vec3 color) {
+  return dot(color, vec3(0.299, 0.587, 0.114));
+}
+
+
+void main(void) {
+	vec3	color = texture(textureSampler, vUV).rgb;
+
+	gl_FragColor.r = luma(color); 
+}
+`
+
+
+Effect.ShadersStore["colorCorrectionFragmentShader"] = `
+#extension GL_EXT_shader_texture_lod : enable
+precision highp float;
+
+
+uniform sampler2D	textureSampler;
+uniform sampler2D	lumaSampler;
+
 uniform float	brightness;
 uniform float	contrast;
 uniform float	gamma;
-uniform int	tonemapping;
+uniform int	tonemapping;	
+uniform float _Ldmax;
+uniform  float  _Cmax ;
+
 
 varying vec2	vUV;
 
@@ -140,6 +166,31 @@ vec3 hillACESwithFuckedMat(vec3 color) {
 	return pow(color, vec3(1. / gamma));
 }
 
+float log10(float x) {
+	return log(x) * (1. / log(10.));
+}
+
+vec3 tumblinRushmeier(vec3 col) {
+	
+		float Lin = dot(col, vec3(0.2126, 0.7152, 0.0722));
+
+		float Lavg = textureLod(lumaSampler, vUV, 10.).r;
+
+		float logLrw = log10(Lavg) + 0.84;
+		float alphaRw = 0.4 * logLrw + 2.92;
+		float betaRw = -0.4 * logLrw * logLrw - 2.584 * logLrw + 2.0208;
+		float Lwd = _Ldmax / sqrt(_Cmax);
+		float logLd = log10(Lwd) + 0.84;
+		float alphaD = 0.4 * logLd + 2.92;
+		float betaD = -0.4 * logLd * logLd - 2.584 * logLd + 2.0208;
+		float Lout = pow(Lin, alphaRw / alphaD) / _Ldmax * pow(10.0, (betaRw - betaD) / alphaD) - (1.0 / _Cmax);
+
+		col = col / Lin * Lout;
+
+		col = clamp(col, vec3(0.), vec3(1.));
+		return pow(col, vec3(1. / gamma));
+}
+
 void main() {
 	vec3 color = texture(textureSampler, vUV).rgb;
 	color = max(vec3(0.),(color - 0.5) * contrast + 0.5);
@@ -160,9 +211,12 @@ void main() {
 		color = Uncharted2ToneMapping(color);
 	} else if (tonemapping == 8) {
 		color = hillACESwithFuckedMat(color);
+	} else if (tonemapping == 9) {
+		color = tumblinRushmeier(color);
 	}
 	// color = pow(color, vec3(1. / gamma));
 	gl_FragColor.rgb = color;
+	// gl_FragColor.rgb = vec3(textureLod(lumaSampler, vUV, 4.).r);
 	gl_FragColor.a = 1.;
 }
 `;
