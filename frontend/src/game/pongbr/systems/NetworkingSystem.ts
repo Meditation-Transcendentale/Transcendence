@@ -167,9 +167,7 @@ export class NetworkingSystem extends System {
 					if (!paddleComp || !paddle) return;
 
 					if (p.dead) {
-						// Check if this is a new death (paddle was alive before)
-						const wasAlive = paddle.enabled;
-
+						const wasAlreadyEliminated = this.eliminatedPlayers.has(p.uuid);
 
 						paddle.disable();
 
@@ -181,13 +179,10 @@ export class NetworkingSystem extends System {
 							}
 						}
 
-						if (wasAlive) {
-							let uuid = p.uuid;
-							let username;
-							if (!uuid)
-								username = `Player ${p.paddleId}`;
-							else
-								username = this.game.getUsername(uuid);
+						if (!wasAlreadyEliminated) {
+							this.eliminatedPlayers.add(p.uuid);
+
+							const username = this.game.getUsername(p.uuid);
 
 							htmlManager.notification.add({
 								type: NotificationType.text,
