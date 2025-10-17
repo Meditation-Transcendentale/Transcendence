@@ -66,6 +66,7 @@ export class NotificationStream implements IStream {
 			this.onGameInvite(newNotification.gameInvite);
 		}
 		if (newNotification.statusUpdate != null) {
+			console.log ("status update");
 			this.onUpdateStatus(newNotification.statusUpdate);
 		}
 		if (newNotification.friendRemove != null) {
