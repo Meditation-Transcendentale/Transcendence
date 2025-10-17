@@ -258,25 +258,7 @@ export class FriendlistHtml {
 				this.friendOnlinesContainer.appendChild(friend.div);
 			else
 				this.friendAwayContainer.appendChild(friend.div);
-
-
 	}
-
-	// public updateStatus(uuid: string, status: string, change: boolean) {
-	// 	if (!this.friend.has(uuid))
-	// 		return;
-	// 	const friend = this.friend.get(uuid) as IFriendUser;
-	// 	if (change)
-	// 		friend.div.remove();
-	// 	friend.status.textContent = status;
-	// 	friend.status.setAttribute("status", status);
-	// 	if (change)
-	// 		if (status !== "offline")
-	// 			this.friendOnlinesContainer.appendChild(friend.div);
-	// 		else
-	// 			this.friendAwayContainer.appendChild(friend.div);
-	//
-	// }
 
 	private createUserElement(user: ISearchRequestResponce, type: string) {
 		const uuid = user.uuid;
