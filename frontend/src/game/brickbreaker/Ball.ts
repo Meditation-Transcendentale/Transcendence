@@ -1,4 +1,4 @@
-import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2, TransformNode, FresnelParameters, Color3 } from "../../babylon";
+import { MeshBuilder, Scene, Vector3, Mesh, StandardMaterial, Vector2, TransformNode, Color3 } from "../../babylon";
 import { Player } from "./Player";
 import { BrickBreaker } from "./brickbreaker";
 
@@ -17,8 +17,6 @@ export class Ball {
 	private newposition: Vector3 = new Vector3(0, 0.25, 0);
 	private isDirty: boolean = false;
 	public bricksLeft: number = 0;
-	// public launched: boolean = false;
-	// private score: number = 0;
 
 	constructor(scene: Scene, root: TransformNode, game: BrickBreaker) {
 		this.ball = MeshBuilder.CreateSphere("ball", { diameter: 0.5 }, scene);
@@ -39,6 +37,10 @@ export class Ball {
 	public updatePosition(x: number, z: number): void {
 		this.ball.position.set(x, 0.25, z);
 		this.newposition.set(x, 0.25, z);
+	}
+
+	public setVelocity(velocity: Vector3): void {
+		this.velocity.copyFrom(velocity);
 	}
 
 	public update(delta: number, player: Player, cols: number, layers: number, bricks: Mesh[][]): void {
@@ -190,22 +192,5 @@ export class Ball {
 		this.velocity.z = 0;
 		this.updatePosition(0, 0);
 		this.speedScale = 1;
-	}
-
-	public getMesh(): Mesh {
-		return this.ball;
-	}
-	public getPosition(): Vector3 {
-		return this.ball.position;
-	}
-	public getVelocity(): Vector3 {
-		return this.velocity;
-	}
-	public setPosition(position: Vector3): void {
-		this.ball.position.x = position.x;
-		this.ball.position.z = position.y;
-	}
-	public setVelocity(velocity: Vector3): void {
-		this.velocity.copyFrom(velocity);
 	}
 }

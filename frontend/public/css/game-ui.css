@@ -1026,6 +1026,114 @@
 	animation: berserkGlow 5s ease alternate infinite;
 }
 
+.tutorial-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.95);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 999999;
+	backdrop-filter: blur(10px);
+}
+
+.tutorial-container {
+	background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 100%);
+	border: 2px solid #a855f7;
+	border-radius: 20px;
+	max-width: 700px;
+	max-height: 85vh;
+	position: relative;
+	box-shadow: 0 0 40px rgba(168, 85, 247, 0.4), 0 0 80px rgba(168, 85, 247, 0.2);
+	overflow: hidden;
+}
+
+.tutorial-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.tutorial-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tutorial-content::-webkit-scrollbar-thumb {
+  background: #a855f7;
+  border-radius: 10px;
+}
+
+.tutorial-content::-webkit-scrollbar-thumb:hover {
+  background: #c084fc;
+}
+
+.tutorial-content {
+  scrollbar-width: thin;
+  scrollbar-color: #a855f7 transparent;
+}
+
+.tutorial-title {
+	margin: 0 0 40px 0;
+	text-align: center;
+	color: #ffffff;
+	font-size: 32px;
+	text-transform: uppercase;
+	letter-spacing: 4px;
+	text-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+}
+
+.tutorial-content {
+	max-height: 85vh;
+	overflow-y: auto;
+	padding: 40px;
+	padding-right: 30px;
+}
+
+.tutorial-step {
+	margin-bottom: 40px;
+	text-align: center;
+}
+
+.tutorial {
+	background: rgba(168, 85, 247, 0.1);
+	border: 1px solid rgba(168, 85, 247, 0.3);
+	border-radius: 15px;
+	padding: 20px;
+	margin-bottom: 20px;
+}
+
+.tutorial-close {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	background: transparent;
+	border: 2px solid #a855f7;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	font-size: 24px;
+	cursor: pointer;
+	color: #a855f7;
+	line-height: 1;
+	transition: all 0.3s ease;
+	font-weight: bold;
+	z-index: 10;
+}
+
+.tutorial-src {
+	width: 100%;
+	max-width: 450px;
+	border-radius: 10px;
+	box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+}
+
+.tutorial-text {
+	color: #e9d5ff;
+	font-size: 18px;
+	line-height: 1.6;
+	margin: 0;
+	letter-spacing: 1px;
 /* Elimination Message Module */
 #elimination-module {
 	position: fixed;

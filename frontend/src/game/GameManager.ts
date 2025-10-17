@@ -35,6 +35,9 @@ export class GameManager {
 
 	public launchBrick() {
 		this.brickUI.load();
+		this.brickUI.showButton('tuto', 'How to play', () => {
+			this.brick.showTutorial();
+		});
 		this.brickUI.showButton('restart', 'Restart', () => {
 			this.brick.restart();
 			console.log('Restart');
