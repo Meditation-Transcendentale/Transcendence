@@ -200,11 +200,7 @@ async function get42accessToken(code, referer, ftCookie, res) {
 		return { token42: ftCookie.token };
 	}
 
-	let redirectUri = `https://${process.env.HOSTNAME}:7000/api/auth/42`;
-
-	if (referer === `https://localhost:7000/`) {
-		redirectUri = `https://localhost:7000/api/auth/42`;
-	}
+	let redirectUri = referer + `api/auth/42`;
 
 	try {
 		const response = await axios.post(
@@ -239,6 +235,8 @@ async function get42accessToken(code, referer, ftCookie, res) {
 			return { token42: response.data.access_token };
 		} catch (error) {
 			console.error('Error fetching 42 access token with localhost redirect:', error);
+			console.log('referer:', referer);
+			console.log('redirectUri:', redirectUri);
 			throw { status: statusCode.INTERNAL_SERVER_ERROR, code: 500, message: returnMessages.INTERNAL_SERVER_ERROR };
 		}
 	}
