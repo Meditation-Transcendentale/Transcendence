@@ -18,6 +18,7 @@ export class TournamentRoute implements IRoute {
 			return;
 		}
 		this._loaded = true;
+		htmlManager.friendlist.remove();
 		htmlManager.ath.checkBeforeHome = true;
 		sceneManager.load("home");
 		sceneManager.cameraManager.vue = "tournament";
