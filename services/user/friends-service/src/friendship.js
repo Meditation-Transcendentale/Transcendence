@@ -7,7 +7,7 @@ import { connect, JSONCodec } from 'nats';
 import { statusCode, returnMessages, userReturn, friendshipReturn } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from '../../shared/natsRequest.mjs';
-import { encodeNotificationMessage, encodeFriendUpdate } from "./proto/helper.js";
+import { encodeFriendUpdate } from "./proto/helper.js";
 
 dotenv.config({ path: "../../../../.env" });
 

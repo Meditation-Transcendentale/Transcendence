@@ -14,6 +14,7 @@ import { statusRoutes } from "./status.js";
 import { statusCode, returnMessages, userReturn } from "../../shared/returnValues.mjs";
 import { handleErrors } from "../../shared/handleErrors.mjs";
 import { natsRequest } from "../../shared/natsRequest.mjs";
+import { encodeStatusUpdate } from "./proto/helper.js";
 
 dotenv.config({ path: "../../../../.env" });
 
@@ -147,8 +148,13 @@ app.patch('/username', { schema: usernameSchema }, handleErrors(async (req, res)
 		await checkPassword2FA(user, password, token);
 		await natsRequest(nats, jc, 'user.updateUsername', { username, userId: user.id });
 	}
-
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.USERNAME_UPDATED });
+	try {
+		nats.publish(`notification.${user.uuid}.status`, encodeStatusUpdate({ sender: user.uuid.toString(), status: "update" }));
+	} catch (err) 
+	{
+		console.log (err)
+	}
 
 }));
 
@@ -168,6 +174,12 @@ app.patch('/avatar', handleErrors(async (req, res) => {
 
 	res.header('Cache-Control', 'no-store');
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.AVATAR_UPDATED, data: { cdnPath } });
+	try {
+		nats.publish(`notification.${user.uuid}.status`, encodeStatusUpdate({ sender: user.uuid.toString(), status: "update" }));
+	} catch (err) 
+	{
+		console.log (err)
+	}
 
 }));
 
