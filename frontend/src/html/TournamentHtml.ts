@@ -77,7 +77,7 @@ export class TournamentHtml implements IHtml {
     this.readyActive = false;
     this.css.remove();
     const podium = document.querySelector(".podium-overlay");
-    if (podium) { console.log ("REMOVE PODIUM"); podium.remove(); }
+    if (podium) { podium.remove(); }
     this.div.remove();
     this.stopReadyCountdown();
     streamManager.tournament.disconnect();
@@ -652,7 +652,6 @@ export class TournamentHtml implements IHtml {
         this.treeEl.style.filter = "";
         this.treeEl.style.opacity = "";
       }
-      console.log ("REMOVE PODIUM2");
       overlay.remove();
       this.rootEl.remove();
       routeManager.nav("/home");
