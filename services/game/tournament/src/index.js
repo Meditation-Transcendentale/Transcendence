@@ -40,12 +40,10 @@ async function start() {
     (async () => {
         for await (const msg of subCreate) {
             const req = decodeTournamentCreateRequest(msg.data);
-            console.log(`${req}|${req.players}|${req.players[0]}|${req.players[1]}|${req.players[2]}|${req.players[3]}|`)
             const tournamentId = tournamentService.create(req.players, uwsApp);
             const respTournamentCreate = encodeTournamentCreateResponse({
                 tournamentId: tournamentId,
             });
-            console.log(tournamentId);
             msg.respond(respTournamentCreate);
         }
     })();

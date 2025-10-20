@@ -9,11 +9,10 @@ import { topLevelSearch } from './bstar.js';
 import { performance } from 'node:perf_hooks';
 import { GameStateNode } from './GameStateNode.js';
 
-//paddle 0 = 13, paddle 1 = -13
 export class AiManager {
     constructor(nc) {
         this.nc = nc;
-        this.games = new Map(); // gameId -> {bestMove, profile, lastRun}
+        this.games = new Map();
 
         this.subCreate = null;
         this.subState = null;
@@ -27,11 +26,10 @@ export class AiManager {
         (async () => {
             for await (const msg of subCreate) {
                 const [, , gameId] = msg.subject.split('.');
-                //const data = decodeMatchCreateRequest(msg.data);
                 if (!this.games.has(gameId)) {
                     this.games.set(gameId, {
                         targetOffset: null,
-                        profile: null, //toenable
+                        profile: null,
                         lastRun: 0,
                     });
                 }

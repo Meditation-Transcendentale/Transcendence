@@ -51,7 +51,6 @@ class MatchNode {
 			const unfinished =
 				!!node.player1Id && !!node.player2Id && node.gameId && !node.winnerId;
 			if (unfinished) {
-				console.log(`ingame:${node.player1Id}|${node.player2Id}`);
 				yield node;
 				return;
 			}
@@ -67,7 +66,6 @@ class MatchNode {
 			const readyToStart =
 				!!node.player1Id && !!node.player2Id && !node.gameId && !node.winnerId;
 			if (readyToStart) {
-				console.log(`waiting:${node.player1Id}|${node.player2Id}`);
 				yield node;
 				return;
 			}
@@ -102,7 +100,6 @@ class Tournament {
 		natsClient.subscribe("games.tournament.*.match.end", (data, msg) => {
 			const parts = String(msg.subject || "").split(".");
 			const gameId = parts[2];
-			console.log("match end received");
 			if (!gameId) return;
 
 			const match = this.findMatchByGameId(this.root, gameId);
@@ -142,7 +139,6 @@ class Tournament {
 		if (this.readyTimer) clearTimeout(this.readyTimer);
 		this.readyTimer = setTimeout(() => this.handleReadyTimeout(), 20_000);
 
-		console.log("sending ready check");
 		const buf = encodeTournamentServerMessage({
 			readyCheck: { deadlineMs: this.readyDeadlineMs },
 		});
@@ -232,9 +228,7 @@ class Tournament {
 	maybeStartReadyCheck() {
 		if (this.readyActive) return;
 		if (!this.allConnected() || this.root.winnerId) return;
-		console.log("1");
 		if (!this.hasAnyActiveMatch()) this.sendReadyCheck();
-		console.log("2");
 	}
 
 	async handleReadyTimeout() {
@@ -325,7 +319,6 @@ class Tournament {
 			const candidates = [];
 			for (const m of this.root.getWaitingMatches()) {
 				candidates.push(m);
-				console.log("ADD CANDIDATE");
 			}
 
 			for (const match of candidates) {
@@ -352,9 +345,7 @@ class Tournament {
 						throw new Error("Invalid match.create response");
 					match.gameId = resp.gameId;
 					match.score = [0, 0];
-					console.log(
-						`new game: ${match.gameId}|p1:${match.player1Id}|p2:${match.player2Id}`
-					);
+
 					const startBuf = encodeTournamentServerMessage({
 						startGame: { gameId: match.gameId },
 					});
@@ -465,7 +456,6 @@ export default class tournamentService {
 		const p = t.getPlayerByUuid(playerId);
 		if (!p) return;
 		if (p.isEliminated) {
-			console.log("sending to eliminated:", playerId);
 			try {
 				const startBuf = encodeTournamentServerMessage({
 					startGame: { gameId: null },

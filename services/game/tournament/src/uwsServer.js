@@ -37,7 +37,6 @@ export function createUwsApp(path, tournamentService) {
                 }
                 set.add(ws);
                 ws.subscribe(ws.tournamentId);
-                ws.subscribe(`user.${ws.userId}`);
                 console.log (`${ws.tournamentId}|${ws.userId}`);
                 tournamentService.join(ws.tournamentId, ws.userId);
             } catch (err) {
@@ -52,13 +51,11 @@ export function createUwsApp(path, tournamentService) {
                 const payload = decodeTournamentClientMessage(new Uint8Array(message));
 
                 if (payload.ready) {
-                    console.log(`${ws.userId} sent ready`);
                     await tournamentService.ready(ws, ws.tournamentId, ws.userId);
                     return;
                 }
 
                 if (payload.quit) {
-                    console.log("QUIT RECEIVED");
                     tournamentService.quit(ws.tournamentId, ws.userId);
                     return;
                 }
