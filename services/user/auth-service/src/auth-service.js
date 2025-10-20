@@ -201,7 +201,7 @@ async function get42accessToken(code, referer, ftCookie, res) {
 	}
 
 	let redirectUri = referer + `api/auth/42`;
-	if (referer === undefined)
+	if (referer === undefined || referer === "https://api.intra.42.fr/")
 		redirectUri = `https://${process.env.HOSTNAME}:7000/api/auth/42`;
 
 	try {

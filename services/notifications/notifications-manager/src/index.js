@@ -29,7 +29,6 @@ async function start() {
     token: process.env.NATS_TOKEN,
     tls: { rejectUnauthorized: false },
   });
-  // console.log('[NATS] Connected to', process.env.NATS_URL);
 
   const app = Fastify({
     logger: true,
@@ -109,7 +108,6 @@ async function start() {
       }
     });
 
-  console.log("[NATS] Setting up subscription...");
   nc.subscribe(`notification.*.*`, {
     callback: (_err, msg) => {
       if (_err) {
