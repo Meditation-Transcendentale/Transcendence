@@ -30,9 +30,9 @@
 
 #scorevs-module .scorevs-container {
 	display: flex;
-	justify-content: center;
+	justify-content: space-between;
 	width: 100%;
-	gap: 85vh;
+	padding: 0 10vw;
 	line-height: 1;
 }
 
@@ -41,6 +41,7 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 1vh;
+	min-width: 20vw;
 }
 
 #scorevs-module .player-name {
