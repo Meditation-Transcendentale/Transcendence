@@ -122,6 +122,16 @@ uniform float mouseInfluenceRadius;
 uniform vec3 origin;
 uniform vec3 oldOrigin;
 uniform float textGlow;
+uniform vec3 trail0;
+uniform vec3 trail1;
+uniform vec3 trail2;
+uniform vec3 trail3;
+uniform vec3 trail4;
+uniform vec3 trail5;
+uniform vec3 trail6;
+uniform vec3 trail7;
+uniform float mouseSpeed;
+uniform vec3 cameraPos;
 
 varying	float	vDepthMetric;
 
@@ -159,24 +169,66 @@ void main(void) {
 	float verticalWave = sin(worldPos2.y * 0.3 - t * 2.0) * 0.1 * baseWaveIntensity;
 	baseWave.x += verticalWave;
 	baseWave.z += verticalWave * 0.5;
-	// === MOUSE INFLUENCE ANIMATION ===
 	float distanceToMouse = length(worldPos2 - origin);
 	float mouseInfluence = smoothstep(mouseInfluenceRadius, 0.0, distanceToMouse);
-	// Calculate mouse movement direction
+
 	vec3 mouseMovement = origin - oldOrigin;
 	float mouseSpeed = length(mouseMovement);
-	vec3 mouseDirection = mouseMovement ; // Movement direction
-	vec3 pushDirection = normalize(worldPos2 - origin + vec3(0.001)); // Direction from mouse to voxel
-	float pushStrength = mouseSpeed * 2.0; // Scale with mouse speed
-	vec3 mouseAnimation = vec3(
-	    sin(t * 3.0 + animOffset.x * 6.28) * animOffset.x,
-	    sin(t * 2.5 + animOffset.y * 6.28) * animOffset.y,
-	    cos(t * 2.8 + animOffset.z * 6.28) * animOffset.z
-	) * animationIntensity * 3.;
-	float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
 
-	mouseAnimation += mouseDirection * radialPulse * animationIntensity;
-	mouseAnimation+= pushDirection * 0.05 * mouseInfluence;
+	vec3 mouseAnimation = vec3(0.0);
+
+	vec3 trailDisplacement = vec3(0.0);
+	float speedMultiplier = 1.0 + (mouseSpeed * 0.3);
+
+	float trailDist0 = length(worldPos2 - trail0);
+	float trailInf0 = smoothstep(mouseInfluenceRadius * 0.7, 0.0, trailDist0);
+	vec3 trailPush0 = normalize(worldPos2 - trail0 + vec3(0.001));
+	float spring0 = sin(t * 6.0 - trailDist0 * 4.0) * exp(-trailDist0 * 1.0);
+	trailDisplacement += trailPush0 * trailInf0 * 0.15 * speedMultiplier * (1.0 + spring0 * 0.25);
+
+	float trailDist1 = length(worldPos2 - trail1);
+	float trailInf1 = smoothstep(mouseInfluenceRadius * 0.6, 0.0, trailDist1);
+	vec3 trailPush1 = normalize(worldPos2 - trail1 + vec3(0.001));
+	float spring1 = sin(t * 5.5 - trailDist1 * 3.5) * exp(-trailDist1 * 1.2);
+	trailDisplacement += trailPush1 * trailInf1 * 0.12 * speedMultiplier * (1.0 + spring1 * 0.2);
+
+	float trailDist2 = length(worldPos2 - trail2);
+	float trailInf2 = smoothstep(mouseInfluenceRadius * 0.5, 0.0, trailDist2);
+	vec3 trailPush2 = normalize(worldPos2 - trail2 + vec3(0.001));
+	float spring2 = sin(t * 5.0 - trailDist2 * 3.0) * exp(-trailDist2 * 1.4);
+	trailDisplacement += trailPush2 * trailInf2 * 0.09 * speedMultiplier * (1.0 + spring2 * 0.15);
+
+	float trailDist3 = length(worldPos2 - trail3);
+	float trailInf3 = smoothstep(mouseInfluenceRadius * 0.4, 0.0, trailDist3);
+	vec3 trailPush3 = normalize(worldPos2 - trail3 + vec3(0.001));
+	float spring3 = sin(t * 4.5 - trailDist3 * 2.5) * exp(-trailDist3 * 1.6);
+	trailDisplacement += trailPush3 * trailInf3 * 0.06 * speedMultiplier * (1.0 + spring3 * 0.1);
+
+	float trailDist4 = length(worldPos2 - trail4);
+	float trailInf4 = smoothstep(mouseInfluenceRadius * 0.3, 0.0, trailDist4);
+	vec3 trailPush4 = normalize(worldPos2 - trail4 + vec3(0.001));
+	float spring4 = sin(t * 4.0 - trailDist4 * 2.0) * exp(-trailDist4 * 1.8);
+	trailDisplacement += trailPush4 * trailInf4 * 0.03 * speedMultiplier * (1.0 + spring4 * 0.05);
+
+	float trailDist5 = length(worldPos2 - trail5);
+	float trailInf5 = smoothstep(mouseInfluenceRadius * 0.25, 0.0, trailDist5);
+	vec3 trailPush5 = normalize(worldPos2 - trail5 + vec3(0.001));
+	float spring5 = sin(t * 3.5 - trailDist5 * 1.5) * exp(-trailDist5 * 2.0);
+	trailDisplacement += trailPush5 * trailInf5 * 0.02 * speedMultiplier * (1.0 + spring5 * 0.03);
+
+	float trailDist6 = length(worldPos2 - trail6);
+	float trailInf6 = smoothstep(mouseInfluenceRadius * 0.2, 0.0, trailDist6);
+	vec3 trailPush6 = normalize(worldPos2 - trail6 + vec3(0.001));
+	float spring6 = sin(t * 3.0 - trailDist6 * 1.0) * exp(-trailDist6 * 2.2);
+	trailDisplacement += trailPush6 * trailInf6 * 0.015 * speedMultiplier * (1.0 + spring6 * 0.02);
+
+	float trailDist7 = length(worldPos2 - trail7);
+	float trailInf7 = smoothstep(mouseInfluenceRadius * 0.15, 0.0, trailDist7);
+	vec3 trailPush7 = normalize(worldPos2 - trail7 + vec3(0.001));
+	float spring7 = sin(t * 2.5 - trailDist7 * 0.5) * exp(-trailDist7 * 2.4);
+	trailDisplacement += trailPush7 * trailInf7 * 0.01 * speedMultiplier * (1.0 + spring7 * 0.01);
+
+	mouseAnimation += trailDisplacement;
 
 	vec3 originalWorldPos = worldPos.xyz;
 
@@ -193,10 +245,17 @@ if(textGlow > 0.0) {
             worldPos.xyz += dimensionOffset * phaseAmount;
 }
 
-	// === COMBINE ANIMATIONS ===
-	vec3 totalDisplacement = ( (mouseAnimation * mouseInfluence)) ;
+	vec3 totalDisplacement = (mouseAnimation * mouseInfluence) + trailDisplacement;
+	totalDisplacement *= 0.4;
+	float edgeFalloff = smoothstep(mouseInfluenceRadius * 0.8, mouseInfluenceRadius * 0.3, distanceToMouse);
+	totalDisplacement *= edgeFalloff;
 	worldPos.xyz += totalDisplacement;
 
+	float vTrailGlow = (trailInf0 + trailInf1 * 0.9 + trailInf2 * 0.8 + trailInf3 * 0.7 +
+	                    trailInf4 * 0.6 + trailInf5 * 0.5 + trailInf6 * 0.4 + trailInf7 * 0.3) * speedMultiplier;
+	float scalePulse = vTrailGlow * 0.05;
+	vec3 toCenter = worldPos.xyz - worldPos2;
+	worldPos.xyz += toCenter * scalePulse;
 
 	gl_Position = viewProjection*worldPos;
 
@@ -279,21 +338,13 @@ void main(void) {
 	// === MOUSE INFLUENCE ANIMATION ===
 	float distanceToMouse = length(worldPos2 - origin);
 	float mouseInfluence = smoothstep(mouseInfluenceRadius, 0.0, distanceToMouse);
-	// Calculate mouse movement direction
+
+	// Calculate mouse movement direction (needed for trail calculations)
 	vec3 mouseMovement = origin - oldOrigin;
 	float mouseSpeed = length(mouseMovement);
-	vec3 mouseDirection = mouseMovement ; // Movement direction
-	vec3 pushDirection = normalize(worldPos2 - origin + vec3(0.001)); // Direction from mouse to voxel
-	float pushStrength = mouseSpeed * 2.0; // Scale with mouse speed
-	vec3 mouseAnimation = vec3(
-	    sin(t * 3.0 + animOffset.x * 6.28) * animOffset.x,
-	    sin(t * 2.5 + animOffset.y * 6.28) * animOffset.y,
-	    cos(t * 2.8 + animOffset.z * 6.28) * animOffset.z
-	) * animationIntensity * 3.;
-	float radialPulse = sin(t * 4.0 - distanceToMouse * 2.0) * 0.3;
 
-	mouseAnimation += mouseDirection * radialPulse * animationIntensity;
-	mouseAnimation+= pushDirection * 0.05 * mouseInfluence;
+	// Removed all mouse displacement animations - only keeping influence for glow
+	vec3 mouseAnimation = vec3(0.0);
 
 	vec3 originalWorldPos = worldPos.xyz;
 

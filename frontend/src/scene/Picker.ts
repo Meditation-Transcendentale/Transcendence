@@ -44,17 +44,50 @@ export class Picker {
 			return;
 
 		this.gpuPicker.pickAsync(this.cursor.x, this.cursor.y, false).then((pickInfo) => {
+			let newOrigin = new Vector3(0, -10, 0);
+			let isOnMonolith = false;
+
+			if (!this.assets.monolithHoverEnabled) {
+				this.assets.monolithOrigin.set(0, -10, 0);
+				this.assets.monolithOldOrigin.set(0, -10, 0);
+				for (let i = 0; i < this.assets.monolithTrail.length; i++) {
+					this.assets.monolithTrail[i].set(0, -10, 0);
+				}
+				this.assets.monolithMouseSpeed = 0.0;
+				this.moved = false;
+				return;
+			}
+
 			if (pickInfo && pickInfo.thinInstanceIndex != null) {
 				this.assets.monolithAnimationIntensity = 0.1;
 				if (pickInfo.thinInstanceIndex < this.assets.monolithVoxelPositions.length) {
 					const voxelPosition = this.assets.monolithVoxelPositions[pickInfo.thinInstanceIndex];
 					this.assets.monolithOldOrigin.copyFrom(this.assets.monolithOrigin);
-					this.assets.monolithOrigin.copyFrom(voxelPosition).addInPlace(this.assets.monolithRoot.position);
+					newOrigin.copyFrom(voxelPosition).addInPlace(this.assets.monolithRoot.position);
+					this.assets.monolithOrigin.copyFrom(newOrigin);
+					isOnMonolith = true;
 				}
 			} else {
 				this.assets.monolithAnimationIntensity = 0.1;
 				this.assets.monolithOldOrigin.copyFrom(this.assets.monolithOrigin);
-				this.assets.monolithOrigin.set(0, -10, 0);
+				this.assets.monolithOrigin.copyFrom(newOrigin);
+				for (let i = 0; i < this.assets.monolithTrail.length; i++) {
+					this.assets.monolithTrail[i].set(0, -10, 0);
+				}
+				this.assets.monolithMouseSpeed = 0.0;
+			}
+
+			if (isOnMonolith) {
+				const moveDistance = newOrigin.subtract(this.assets.monolithOldOrigin).length();
+				this.assets.monolithMouseSpeed = Math.min(moveDistance * 50.0, 5.0);
+
+				const distanceFromLastTrail = newOrigin.subtract(this.assets.monolithTrail[0]).length();
+				if (distanceFromLastTrail > 0.1) {
+					for (let i = this.assets.monolithTrail.length - 1; i > 0; i--) {
+						this.assets.monolithTrail[i].copyFrom(this.assets.monolithTrail[i - 1]);
+					}
+					this.assets.monolithTrail[0].copyFrom(newOrigin);
+				}
 			}
 		});
 		this.moved = false;

@@ -232,6 +232,7 @@ class SceneManager {
 				this.beforeRender.delete(this.assets.monolithMovement);
 				this.assets.monolithRoot.position.set(0, 0, 0);
 				this.assets.hemisphericLight.setEnabled(true);
+				this.assets.monolithHoverEnabled = false;
 				// this.beforeRender.add(this.assets.monolithMovement);
 				this.cameraManager.fogEnabled = false;
 				this.assets.brRoot.setEnabled(false);
@@ -303,6 +304,7 @@ class SceneManager {
 		this.ballGrass.updateType = "home";
 		this.fog.enable = true;
 		this.assets.monolithMesh.setEnabled(true);
+		this.assets.monolithHoverEnabled = true;
 		this.cameraManager.bloom = true;
 		this.assets.monolithRoot.setEnabled(true);
 		this.beforeRender.add(this.assets.monolithMovement);

@@ -14,6 +14,8 @@
 
 
  ### fix
+    picker monolith map
+    lobby map and mode not updated
 
 ### tweak
     - 3D tweak
