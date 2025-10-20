@@ -161,6 +161,12 @@ export class Profile {
 
 		console.log("history length: ", history.length);
 		console.log("history: ", history);
+		for (let i = 0; i < 10; i++) {
+			this.matchHistoryTdElements[i][0].textContent = "";
+			this.matchHistoryTdElements[i][1].textContent = "";
+			this.matchHistoryTdElements[i][2].textContent = "";
+			this.matchHistoryRow[i].style.backgroundColor = "transparent";
+		}
 		for (let i = 0; i < history.length; i++) {
 			console.log("history length i: ", i);
 			if (history[i].is_winner)
