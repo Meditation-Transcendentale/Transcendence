@@ -162,7 +162,8 @@ export class Settings {
 						this.twoFAQrCodePopup = new Popup({
 							type: PopupType.custom,
 							title: "Scan this QR code with your authenticator app.",
-							div: this.createQrCodeDiv()
+							div: this.createQrCodeDiv(),
+							id: "qrcode-popup"
 						});
 					this.twoFAQrCodePopup.show(),
 						await User.check(),
