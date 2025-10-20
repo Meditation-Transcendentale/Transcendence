@@ -70,12 +70,14 @@ export class NetworkingSystem extends System {
 				const paddles = state.paddles ?? [];
 				const score = state.score ?? [];
 
-				if (this.mode === "online" && !this.opponentNameFetched && paddles.length >= 2) {
+				if ((this.mode === "online" || this.mode === "tournament") && !this.opponentNameFetched && paddles.length >= 2) {
 
-					const opponentPaddle = paddles.find(p => p.uuid && p.uuid !== this.uuid);
 
-					if (opponentPaddle && opponentPaddle.uuid) {
-						this.fetchOpponentName(opponentPaddle.uuid, entities);
+					const paddle0uuid = paddles.find(p => p.uuid && p.id === 0);
+					const paddle1uuid = paddles.find(p => p.uuid && p.id === 1);
+
+					if (paddle0uuid && paddle0uuid.uuid && paddle1uuid && paddle1uuid.uuid) {
+						this.fetchOpponentName(paddle0uuid.uuid, paddle1uuid.uuid, entities);
 						this.opponentNameFetched = true;
 					}
 				}
@@ -159,28 +161,28 @@ export class NetworkingSystem extends System {
 		});
 	}
 
-	private async fetchOpponentName(opponentUuid: string, entities: Entity[]): Promise<void> {
+	private async fetchOpponentName(paddle0uuid: string, paddle1uuid: string, entities: Entity[]): Promise<void> {
 		try {
-			console.log("Fetching opponent name for UUID:", opponentUuid);
 
 			const response: any = await postRequest("info/search", {
-				identifier: opponentUuid,
+				identifier: paddle0uuid,
+				type: "uuid"
+			});
+			const response1: any = await postRequest("info/search", {
+				identifier: paddle1uuid,
 				type: "uuid"
 			});
 
 			console.log("Opponent info response:", response);
 
 			if (response && response.data && response.data.username) {
-				const opponentName = response.data.username;
+				const p1Name = response.data.username;
+				const p2Name = response1.data.username;
 
 				const e = entities.find(e => e.hasComponent(UIComponent));
 				const ui = e?.getComponent(UIComponent);
 				if (ui) {
-					if (localPaddleId === 0) {
-						ui.gameUI.setPlayerNames(User.username, opponentName);
-					} else {
-						ui.gameUI.setPlayerNames(opponentName, User.username);
-					}
+					ui.gameUI.setPlayerNames(p1Name, p2Name);
 				}
 			}
 		} catch (error) {
