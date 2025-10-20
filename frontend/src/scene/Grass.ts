@@ -81,23 +81,7 @@ export class Grass {
 
 	public update(time: number) {
 		if (!this._enable) { return; }
-		// this._grassShader.setFloat("time", time);
-		// this._grassShader.setFloat("oldTime", this._pastTime);
 		this.assets.grassMaterial.setTexture("textureSampler", this.assets.ballGrassTextureB);
-		// this._grassShader.setVec3("ballPosition", this.ballPosition);
-		// this._grassShader.setFloat("ballRadius", radius);
-		// this._grassShader.setColor3("ballLightColor", this.ballLightColor);
-		//
-		// this._pastTime = time;
-		//
-		// this.grassDepthMaterial.setFloat("time", time);
-		// this.grassDepthMaterial.setTexture("textureSampler", texture);
-
-
-		// camera._updateFrustumPlanes();
-		// for (let i = 0; i < this._tiles.length; i++) {
-		// 	this._tiles[i].isInFrustrum(camera._frustumPlanes);
-		// }
 	}
 
 

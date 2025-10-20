@@ -3,7 +3,6 @@
 @import url("popup.css");
 @import url("loading.css");
 @import url("notification.css");
-@import url("class.css");
 @import url("friendlist.css");
 @import url("main.css");
 @import url("profile.css");
@@ -44,6 +43,10 @@ body * {
 	font-family: var(--font-primary);
 }
 
+.hidden {
+	display: none !important;
+}
+
 #fps {
 	position: absolute;
 	background-color: black;
@@ -57,70 +60,63 @@ body * {
 	height: 20px;
 }
 
-.frame {
-	position: absolute;
-	top: 0;
-	left: 0;
-	border: 2px solid var(--color-space-deep);
-	min-height: 10px;
-	min-width: 10px;
-	overflow: hidden;
-	/* transition: */
-	/* 	top 2s, */
-	/* 	left 2s, */
-	/* 	width 5s, 0.3s height 5s, 0.3s; */
-	z-index: 2;
-}
-
-.frame-new {
-	position: absolute;
-	pointer-events: auto;
-	width: 100px;
-	height: 100px;
-	overflow: hidden;
-	background-color: var(--frame-color);
-	z-index: 2;
-}
-
-.frame:hover {
-	mix-blend-mode: difference;
-	background-color: white;
-	border-color: black;
-}
-
-.frame:hover>.frame-text {
-	mix-blend-mode: difference;
-	background-color: black;
-	color: white;
-}
-
-.frame-text {
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 100%;
-	color: var(--frame-text-color);
-	background-color: var(--frame-color);
-	font-family: sans-serif;
-	font-weight: bold;
-	font-size: 2vh;
-	pointer-events: none;
-}
-
 .frame-hover {
 	width: auto;
 	font-size: var(--font-size-verysmall);
-	background-color: var(--color-space-deep);
-	color: #DE01E0;
+	background-color: #A7CFA5;
+	/*var(--color-space-deep);*/
+	/* color: var(--color-lavender); */
+	color: #a857fa;
 	pointer-events: none;
 	opacity: 1;
 	pointer-events: none;
-	/* animation: glitch 0.1s linear infinite; */
-	/* animation-timing-function: step-start; */
 	text-align: right;
 	font-family: var(--font-primary);
 	font-weight: 500;
 }
+
+
+.frame {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 3px solid;
+	border-color: #88CF84;
+	min-height: 10px;
+	min-width: 10px;
+	overflow: hidden;
+	z-index: 2;
+
+	box-shadow: 0 0 10px var(--color-purple-bright), 0 0 20px var(--color-purple-bright);
+	background-color: rgba(114, 9, 183, 0.05);
+	animation: pulse-glow 3s infinite;
+	transition:
+		top var(--transition-slow),
+		left var(--transition-slow),
+		width var(--transition-normal),
+		height var(--transition-normal),
+		box-shadow var(--transition-normal);
+}
+
+.frame:hover {
+	mix-blend-mode: difference;
+	border-color: white;
+}
+
+@keyframes pulse-glow {
+	0% {
+		box-shadow: 0 0 10px var(--color-purple-bright);
+	}
+
+	50% {
+		box-shadow: 0 0 20px var(--color-purple-light);
+	}
+
+	100% {
+		box-shadow: 0 0 10px var(--color-purple-bright);
+	}
+}
+
 
 #utils-details {
 	position: absolute;

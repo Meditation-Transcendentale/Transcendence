@@ -51,10 +51,6 @@ export class CameraManager {
 			position: new Vector3(-10, 3.5, -18),
 			target: new Vector3(-10, 3.5, -18).addInPlaceFromFloats(0.86, 0.14, 0.5),
 		})
-		// this.vues.set("join", {
-		// 	position: new Vector3(6.4, 3, 16.9),
-		// 	target: new Vector3(6.4, 3, 16.9).addInPlaceFromFloats(-0.8, 0.2, -0.6)
-		// })
 		this.vues.set("join", {
 			position: new Vector3(6.9, 5.6, 18.6),
 			target: new Vector3(6.9, 5.6, 18.6).addInPlaceFromFloats(-0.666, -0.105, -0.74)
@@ -127,7 +123,7 @@ export class CameraManager {
 		this.cmax = 10;
 
 
-		document.body.querySelector("#utils-details")?.remove();
+		// document.body.querySelector("#utils-details")?.remove();
 		// UIaddSlider("contrast", this.contrast, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.contrast = n });
 		// UIaddSlider("brightness", this.brightness, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.brightness = n });
 		// UIaddSlider("gamma", this.gamma, { step: 0.05, min: 0, max: 4 }, (n: number) => { this.gamma = n });
@@ -180,7 +176,6 @@ export class CameraManager {
 		this.assets.camera.detachPostProcess(this.colorCorrectionPostProcess);
 		this.assets.camera.detachPostProcess(this.fogPostProcess);
 		this.assets.camera.detachPostProcess(this.fxaaPostProcess);
-		// this.assets.camera.detachPostProcess(this.lumaPostProcess);
 
 		this.fogEffect = new PostProcessRenderEffect(this.assets.engine, "fogEffect", () => {
 			return [this.fogPostProcess];

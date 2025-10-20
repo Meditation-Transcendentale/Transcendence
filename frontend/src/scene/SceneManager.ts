@@ -1,7 +1,6 @@
 import { Engine, FreeCamera, Scene } from "../babylon";
 import { stateManager } from "../state/StateManager";
 import { CameraManager } from "./CameraManager";
-import { Tracker } from "./Tracker";
 import "./Shader/Shader.ts";
 import { UBOManager } from "./UBOManager";
 import { Butterfly } from "./Butterfly";
@@ -24,7 +23,6 @@ class SceneManager {
 	public time!: number;
 
 	public assets: Assets;
-	public tracker: Tracker;
 
 	public cameraManager!: CameraManager;
 	public uboManager!: UBOManager;
@@ -54,21 +52,14 @@ class SceneManager {
 		// this.engine.setHardwareScalingLevel(2.0);
 		this.engine.getCaps().textureFloatRender = true;
 
-		window.addEventListener('resize', () => {
-			this.updateResolution();
-			this.engine.resize(true);
-			// this.environment.resize();
-			// this.cssRenderer.resize(window.innerWidth, window.innerHeight)
-		})
-
-		this.fps = document.getElementById('fps') as HTMLElement;
+		this.fps = document.createElement("div");
+		this.fps.id = "fps";
+		// document.body.appendChild(this.fps);
 
 
 		this.beforeRender = new Set<any>;
 
-
 		this.assets = new Assets(this.engine);
-		this.tracker = new Tracker();
 
 		this.scene.onBeforeCameraRenderObservable.add(() => {
 			this.update();
@@ -89,7 +80,6 @@ class SceneManager {
 			i();
 		}
 		this.lightsManager.update();
-		// this.tracker.update(this.time, this.scene.deltaTime * 0.001);
 		this.picker.update(this.time);
 		this.ballGrass.update(this.time, this.scene.deltaTime * 0.001);
 		this.css3dRenderer.update();
@@ -149,6 +139,7 @@ class SceneManager {
 
 	public resize() {
 		this.engine.resize(true);
+		this.updateResolution();
 		const fogMaxResolution = Math.min(1080, this.resolution.width);
 		const fogRatio = stateManager.get("fogRatio");
 		this.assets.fogRenderTexture.resize({

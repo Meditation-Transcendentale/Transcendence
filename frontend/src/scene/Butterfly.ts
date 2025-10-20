@@ -89,26 +89,16 @@ export class Butterfly {
 						}
 					}
 				}
-				// ff += +onEdge;
 				flock.scaleInPlace(ff > 0 ? 1 / ff : 1);
 				align.scaleInPlace(ff > 0 ? 1. / ff : 1);
 				flock.subtractInPlace(ff > 0 ? ip : v0);
 				align.subtractInPlace(ff > 0 ? iv : v0);
 
-				// this.origin.subtractToRef(ip, cursor);
-				// const cursorL = cursor.length();
-				// cursor.scaleInPlace(cursorL < 2 ? 0.02 : 0.);
-				// const cursorField = cursorL < 2.5 ? 0 : 1.;
-
-				// flock.scaleInPlace(0.5 * speed * this.flock * cursorField);
 				flock.scaleInPlace(0.5 * speed * this.flock);
-				// flock.subtractInPlace(onEdge == true ? ip.scale(speed)  : v0);
 				align.scaleInPlace(1 * speed);
 				repel.scaleInPlace(2 * speed);
 
-				iv.addInPlace(align).addInPlace(flock).addInPlace(repel);//.addInPlace(cursor);
-				const l = iv.length();
-				//iv.scaleInPlace((l > this.speed * 2 ? this.speed * 1.2 / l : 1) * (l < this.speed ? this.speed / l : 1));
+				iv.addInPlace(align).addInPlace(flock).addInPlace(repel); const l = iv.length();
 				if (l > speed * 2) {
 					iv.scaleInPlace(speed * 1.2 / l)
 				} else if (l < speed) {
@@ -181,9 +171,7 @@ export class Butterfly {
 	}
 
 	private bound(v: Vector3, p: Vector3, speed: number) {
-		// v.x = (Math.abs(p.x) > 9 ? (speed * -Math.sign(p.x)) * 0.5 : v.x);
 		v.y = (p.y > 1. || p.y < 0 ? (speed * -Math.sign(p.y)) * 0.5 : v.y);
-		// v.z = (Math.abs(p.z) > 9 ? (speed * -Math.sign(p.z)) * 0.5 : v.z);
 
 	}
 
@@ -253,7 +241,7 @@ interface gridoptions {
 
 
 class Grid2D {
-	public cells: Array<Cell>; //May change to Array<int16Array>
+	public cells: Array<Cell>;
 	public outCell: Cell;
 
 	public readonly width: number;
@@ -288,7 +276,6 @@ class Grid2D {
 		this.cellCount = this.widthCount * Math.ceil(this.depth / this.cellSize);
 
 		this.cells = new Array<Cell>(this.cellCount)
-		//console.log(this.cellCount);
 		for (let i = 0; i < this.cellCount; i++) {
 			this.cells[i] = {
 				indexes: new Int16Array(this.minPerCell),
@@ -338,17 +325,11 @@ class Grid2D {
 		//console.log(position.x, position.y, position.z);
 
 		if (x >= this.widthCount || x < 0 || z >= this.depthCount || z < 0) { // WHEN freeze fucking break
-			// console.warn(position, x);
-			// alert("OUT OF BOUND")
-			// x = 0;
 			return this.outCell;
 		}
 
 		z *= this.widthCount;
 		x += z;
-		// if (!this.usedCell.has(x)) { //Maybe put it somewhere else;
-		// 	this.usedCell.add(x);
-		// }
 
 		return this.cells[x];
 	}
