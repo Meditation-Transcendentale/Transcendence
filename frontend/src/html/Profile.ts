@@ -163,7 +163,7 @@ export class Profile {
 		console.log("history: ", history);
 		for (let i = 0; i < 10; i++) {
 			this.matchHistoryTdElements[i][0].textContent = "";
-			this.matchHistoryTdElements[i][1].textContent = "";
+			this.matchHistoryBtns[i].textContent = "";
 			this.matchHistoryTdElements[i][2].textContent = "";
 			this.matchHistoryRow[i].style.backgroundColor = "transparent";
 		}
