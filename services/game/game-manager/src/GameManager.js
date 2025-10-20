@@ -10,7 +10,6 @@ import {
 	encodeStateUpdate,
 	encodeMatchSetup,
 	encodeMatchScoreUpdate,
-	decodeStateUpdate,
 	decodeMatchQuit,
 	encodeMatchEnd,
 	encodeMatchEndBr,
@@ -277,15 +276,12 @@ export class GameManager {
 			const playerId = match.instance.players.indexOf(uuid);
 			const isActivePlayer = activePlayers.includes(playerId);
 
-			console.log(`[GameManager] BR player ${uuid} (id: ${playerId}) quit. Active players: ${activePlayers.length}`);
 
-			// Check if there are other real (non-bot) players remaining after this quit
 			const remainingRealPlayers = activePlayers.filter(pId => {
 				const playerUuid = match.instance.players[pId];
 				return pId !== playerId && !playerUuid.startsWith('bot-');
 			});
 
-			console.log(`[GameManager] Remaining real players: ${remainingRealPlayers.length}`);
 
 			if (isActivePlayer && remainingRealPlayers.length > 0) {
 				this.eliminatePlayerBR(gameId, uuid);
@@ -297,7 +293,6 @@ export class GameManager {
 					match.state.ranks = [];
 				}
 				match.state.ranks[playerId] = activePlayers.length;
-				console.log(`[GameManager] Assigned rank ${activePlayers.length} to quitting player ${uuid} (id: ${playerId})`);
 			}
 		}
 
@@ -436,7 +431,6 @@ export class GameManager {
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles.map(paddle => {
-				// Use paddle.id as the player index (0 or 1)
 				const playerIndex = paddle.id;
 				const uuid = match.instance.players[playerIndex] || '';
 				return {
@@ -454,7 +448,6 @@ export class GameManager {
 					(newState.score[resp.goal.scorerId] || 0) + 1;
 
 				if (match.mode === "tournament") {
-					console.log(`${newState.score}|${newState.score[0]}|${newState.score[1]}|${resp.goal.scorerId}`);
 					const scoreBuf = encodeMatchScoreUpdate({ score: newState.score });
 					this.nc.publish(`games.tournament.${gameId}.score`, scoreBuf);
 				}
