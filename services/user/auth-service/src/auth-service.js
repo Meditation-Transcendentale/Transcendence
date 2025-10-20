@@ -201,6 +201,9 @@ async function get42accessToken(code, referer, ftCookie, res) {
 	}
 
 	let redirectUri = referer + `api/auth/42`;
+	if (referer === undefined)
+		redirectUri = `https://${process.env.HOSTNAME}:7000/api/auth/42`;
+	console.log('Using redirect URI:', redirectUri);
 
 	try {
 		const response = await axios.post(
@@ -226,7 +229,7 @@ async function get42accessToken(code, referer, ftCookie, res) {
 					client_id: process.env.FT_API_UID,
 					client_secret: process.env.FT_API_SECRET,
 					code: code,
-					redirect_uri: `https://localhost:7000/api/auth/42`
+					redirect_uri: redirectUri.replace(".42lyon.fr", "")
 				}),
 				{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
 			);
@@ -234,8 +237,25 @@ async function get42accessToken(code, referer, ftCookie, res) {
 			res.setCookie('42accessToken', { token: response.data.access_token, expires_at: now + response.data.expires_in * 1000 }, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 			return { token42: response.data.access_token };
 		} catch (error) {
-			console.error('Error fetching 42 access token with localhost redirect:', error);
-			throw { status: statusCode.INTERNAL_SERVER_ERROR, code: 500, message: returnMessages.INTERNAL_SERVER_ERROR };
+			try {
+				const response = await axios.post(
+				'https://api.intra.42.fr/oauth/token',
+				new URLSearchParams({
+					grant_type: 'authorization_code',
+					client_id: process.env.FT_API_UID,
+					client_secret: process.env.FT_API_SECRET,
+					code: code,
+					redirect_uri: `https://localhost:7000/api/auth/42`
+				}),
+				{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
+			);
+			res.clearCookie('42accessToken', { path: '/' });
+			res.setCookie('42accessToken', { token: response.data.access_token, expires_at: now + response.data.expires_in * 1000 }, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+			return { token42: response.data.access_token };
+			} catch (err) {
+				console.error('Error fetching 42 access token with localhost redirect:', error);
+				throw { status: statusCode.INTERNAL_SERVER_ERROR, code: 500, message: returnMessages.INTERNAL_SERVER_ERROR };
+			}
 		}
 	}
 }
