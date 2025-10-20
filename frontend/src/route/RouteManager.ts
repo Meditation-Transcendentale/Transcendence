@@ -9,8 +9,6 @@ import { IRoute } from "./IRoute";
 import { LobbyRoute } from "./LobbyRoute";
 import { PlayCreateRoute } from "./PlayCreateRoute";
 import { PlayJoinRoute } from "./PlayJoinRoute";
-import { PlayMapRoute } from "./PlayMapRoute";
-import { PlayModeRoute } from "./PlayModeRoute";
 import { PlayRoute } from "./PlayRoute";
 import { PongRoute } from "./PongRoute";
 import { TournamentRoute } from "./TournamentRoute";
@@ -34,8 +32,6 @@ class RouteManager {
 		this.routes.set("/play", new PlayRoute());
 		this.routes.set("/play/create", new PlayCreateRoute());
 		this.routes.set("/play/join", new PlayJoinRoute());
-		this.routes.set("/play/mode", new PlayModeRoute());
-		this.routes.set("/play/map", new PlayMapRoute());
 		this.routes.set("/tournament", new TournamentRoute());
 		this.routes.set("/pong", new PongRoute());
 		this.routes.set("/brick", new BrickRoute());
@@ -92,16 +88,11 @@ class RouteManager {
 
 		if (history && this.lastRoute !== this.routes.get(url.pathname) as IRoute)
 			window.history.pushState("", "", url.pathname + url.search)
-		// if (this.lastRoute != this.routes.get(url.pathname))
 		await this.lastRoute?.unload();
-		// else
-		// 	console.log("DEJA VUU");
 		await this.routes.get(url.pathname)?.load();
 		this.lastRoute = this.routes.get(url.pathname) as IRoute;
 
-		if (url.pathname !== "/auth") {
-			// streamManager.notification.connect();
-		}
+
 
 		if (url.pathname !== "/auth" && url.pathname !== "/br" && url.pathname !== "/pong" && url.pathname !== "/brick") {
 			htmlManager.ath.load();

@@ -65,7 +65,7 @@ export class Ath {
 
 		this.profileImage = document.createElement("img");
 		this.profileImage.id = "ath-profile-image";
-		this.profileImage.src = "/cdn/default_avatar1.jpg";
+		// this.profileImage.src = "/cdn/default_avatar1.jpg";
 		// this.setupProfileImageStyles();
 
 		this.trigger = document.createElement("span");
@@ -89,7 +89,7 @@ export class Ath {
 
 		this.css = document.createElement("link");
 		this.css.rel = "stylesheet";
-		this.css.href = "../../css/ath2.css";
+		this.css.href = "../../css/ath.css";
 		document.head.appendChild(this.css);
 	}
 

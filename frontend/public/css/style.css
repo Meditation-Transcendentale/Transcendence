@@ -3,7 +3,6 @@
 @import url("popup.css");
 @import url("loading.css");
 @import url("notification.css");
-@import url("class.css");
 @import url("friendlist.css");
 @import url("main.css");
 @import url("profile.css");
@@ -42,6 +41,10 @@ canvas {
 
 body * {
 	font-family: var(--font-primary);
+}
+
+.hidden {
+	display: none !important;
 }
 
 #fps {

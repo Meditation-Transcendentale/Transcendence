@@ -1,13 +1,8 @@
 {
   "name": "transcendence-frontend",
   "scripts": {
-    "watch": "node esbuild.watch.mjs",
-    "build-nginx": "tsc && esbuild src/main.ts --bundle --minify --sourcemap --outfile=dist/app.js --target=es2020",
-    "dev-nginx": "esbuild src/main.ts --bundle --sourcemap --outfile=dist/app.js --servedir=public",
-    "dev": "vite --host",
-    "start": "esbuild --servedir=./",
-    "clean": "rm -rf dist"
-  },
+    "watch": "node esbuild.watch.mjs"
+      },
   "devDependencies": {
     "@babylonjs/core": "8.11.0",
     "@babylonjs/gui": "8.11.0",

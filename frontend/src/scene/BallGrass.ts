@@ -90,9 +90,7 @@ export class BallGrass {
 
 		} else {
 			if (this.needReset && this.assets.ballPicker.z > 0) {
-				// this.position.copyFrom(this.assets.ballRoot.position);
 				this.position.copyFrom(this.assets.ballMesh.absolutePosition);
-				// this.assets.ballMesh.position.addToRef(this.assets.ballRoot.position, this.position);
 				this.needReset = false;
 			}
 			const ray = this.assets.scene.createPickingRay(this.assets.ballPicker.x, this.assets.ballPicker.y).direction;
@@ -100,15 +98,12 @@ export class BallGrass {
 
 			let x = this.assets.camera.position.x - ray.x * delta;
 			let z = this.assets.camera.position.z - ray.z * delta;
-			// if (Math.abs(x) < this.maxDist * 0.5 && Math.abs(z) < this.maxDist * 0.5) {
 			this.movement.set(
 				(x - this.position.x),
 				(z - this.position.z)
 			)
 			this.assets.ballMesh.position.addInPlaceFromFloats(this.movement.x / this.assets.ballRoot.scalingDeterminant, 0, this.movement.y / this.assets.ballRoot.scalingDeterminant)
 			this.position.set(x, 0, z);
-			// this.assets.ballMesh.position.set(x, 0, z);
-			// } else {
 			if (Math.abs(x) > this.maxDist * 0.5 && Math.abs(z) > this.maxDist * 0.5) {
 				this.assets.ballPicker.z = 0;
 			}
