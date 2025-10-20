@@ -1,7 +1,8 @@
 {
   "name": "transcendence-frontend",
   "scripts": {
-    "watch": "node esbuild.watch.mjs"
+    "watch": "node esbuild.watch.mjs",
+	"build": "node esbuild.build.mjs"
       },
   "devDependencies": {
     "@babylonjs/core": "8.11.0",

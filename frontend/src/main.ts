@@ -14,9 +14,7 @@ let loader: HTMLElement;
 async function init() {
 	console.log("Page load with url: ", window.location.href.substring(window.location.origin.length));
 
-	// createUser();
-	// createHtmlManager();
-	streamManager.builder.connect();
+	// streamManager.builder.connect();
 	stateManager.init();
 	await sceneManager.loadMandatory();
 	htmlManager.cube.enable = false;
@@ -35,10 +33,6 @@ async function init() {
 				htmlManager.friendlist.toogle();
 			else
 				routeManager.nav("/home");
-		}
-		if (e.key == "p") {
-			console.log(sceneManager.camera.position, sceneManager.camera.getForwardRay().direction)
-			// console.log(sceneManager.assets.ballMesh.absolutePosition);
 		}
 	})
 
@@ -76,7 +70,6 @@ async function checkOnlyOneTab() {
 		}
 		if (msg.data === "already-open") {
 			first = false;
-			//alert("aaaaaaaa");
 		}
 	})
 	setTimeout(() => {
