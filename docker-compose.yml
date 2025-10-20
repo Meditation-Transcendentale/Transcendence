@@ -120,7 +120,6 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NATS_URL=${NATS_URL}
       - NATS_TOKEN=${NATS_TOKEN}
-      - PSSWD=${PSSWD}
     networks:
       - transcendence-network
     depends_on:
