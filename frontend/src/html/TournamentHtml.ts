@@ -77,7 +77,7 @@ export class TournamentHtml implements IHtml {
     this.readyActive = false;
     this.css.remove();
     const podium = document.querySelector(".podium-overlay");
-    if (podium) podium.remove();
+    if (podium) { console.log ("REMOVE PODIUM"); podium.remove(); }
     this.div.remove();
     this.stopReadyCountdown();
     streamManager.tournament.disconnect();
@@ -113,12 +113,6 @@ export class TournamentHtml implements IHtml {
     const { gold, silver, bronzes } = this.computePodiumIds(root);
 
     this.injectPodiumStyles();
-
-    if (this.treeEl) {
-      this.treeEl.style.filter = "blur(2px) saturate(120%)";
-      this.treeEl.style.opacity = "0.35";
-      this.treeEl.style.transition = "filter 400ms ease, opacity 400ms ease";
-    }
 
     this.showPodiumOverlay({ gold, silver, bronzes });
   }
@@ -658,6 +652,7 @@ export class TournamentHtml implements IHtml {
         this.treeEl.style.filter = "";
         this.treeEl.style.opacity = "";
       }
+      console.log ("REMOVE PODIUM2");
       overlay.remove();
       this.rootEl.remove();
       routeManager.nav("/home");
