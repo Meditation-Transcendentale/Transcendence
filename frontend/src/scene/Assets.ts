@@ -87,6 +87,10 @@ export class Assets {
 	public monolithAnimationIntensity: number;
 	public monolithOrigin: Vector3;
 	public monolithOldOrigin: Vector3;
+	public monolithTrail: Vector3[];
+	public monolithTrailLength: number;
+	public monolithMouseSpeed: number;
+	public monolithHoverEnabled: boolean;
 
 	public redLightShadow!: ShadowGenerator; //
 	public whiteLightShadow!: ShadowGenerator; //
@@ -111,6 +115,10 @@ export class Assets {
 		this.monolithAnimationIntensity = monolithOption.animationIntensity;
 		this.monolithOrigin = new Vector3(0, -10, 0);
 		this.monolithOldOrigin = new Vector3(0, -10, 0);
+		this.monolithTrailLength = 8;
+		this.monolithTrail = Array.from({ length: this.monolithTrailLength }, () => new Vector3(0, -10, 0));
+		this.monolithMouseSpeed = 0.0;
+		this.monolithHoverEnabled = true;
 	}
 
 	public async loadMandatory() {
@@ -384,9 +392,22 @@ export class Assets {
 		this.monolithMaterial.onBindObservable.add(() => {
 			const effect = this.monolithMaterial.getEffect();
 			effect.setFloat("time", sceneManager.time);
+			effect.setFloat("animationSpeed", monolithOption.animationSpeed);
 			effect.setFloat("animationIntensity", this.monolithAnimationIntensity);
+			effect.setFloat("baseWaveIntensity", monolithOption.baseWaveIntensity);
+			effect.setFloat("mouseInfluenceRadius", monolithOption.mouseInfluenceRadius);
 			effect.setVector3("origin", this.monolithOrigin);
 			effect.setVector3("oldOrigin", this.monolithOldOrigin);
+			effect.setVector3("trail0", this.monolithTrail[0]);
+			effect.setVector3("trail1", this.monolithTrail[1]);
+			effect.setVector3("trail2", this.monolithTrail[2]);
+			effect.setVector3("trail3", this.monolithTrail[3]);
+			effect.setVector3("trail4", this.monolithTrail[4]);
+			effect.setVector3("trail5", this.monolithTrail[5]);
+			effect.setVector3("trail6", this.monolithTrail[6]);
+			effect.setVector3("trail7", this.monolithTrail[7]);
+			effect.setFloat("mouseSpeed", this.monolithMouseSpeed);
+			effect.setVector3("cameraPos", this.camera.position);
 
 		})
 
@@ -429,7 +450,7 @@ export class Assets {
 		this.monolithDepthMaterial = new ShaderMaterial("monolithDepth", this.scene, "monolithDepth", {
 			attributes: ["position", "world0", "world1", "world2", "world3", "instanceID"],
 			uniforms: ["world", "viewProjection", "depthValues", "time", "animationSpeed", "animationIntensity", "baseWaveIntensity", "mouseInfluenceRadius", "origin",
-				"oldOrigin", "textGlow", "floatingOffset"]
+				"oldOrigin", "textGlow", "floatingOffset", "trail0", "trail1", "trail2", "trail3", "trail4", "mouseSpeed"]
 		});
 		this.monolithDepthMaterial.setFloat('animationSpeed', monolithOption.animationSpeed);
 		this.monolithDepthMaterial.setFloat('animationIntensity', monolithOption.animationIntensity);
@@ -451,6 +472,16 @@ export class Assets {
 			this.monolithDepthMaterial.setFloat("animationIntensity", this.monolithAnimationIntensity);
 			this.monolithDepthMaterial.setVector3("origin", this.monolithOrigin);
 			this.monolithDepthMaterial.setVector3("oldOrigin", this.monolithOldOrigin);
+			this.monolithDepthMaterial.setVector3("trail0", this.monolithTrail[0]);
+			this.monolithDepthMaterial.setVector3("trail1", this.monolithTrail[1]);
+			this.monolithDepthMaterial.setVector3("trail2", this.monolithTrail[2]);
+			this.monolithDepthMaterial.setVector3("trail3", this.monolithTrail[3]);
+			this.monolithDepthMaterial.setVector3("trail4", this.monolithTrail[4]);
+			this.monolithDepthMaterial.setVector3("trail5", this.monolithTrail[5]);
+			this.monolithDepthMaterial.setVector3("trail6", this.monolithTrail[6]);
+			this.monolithDepthMaterial.setVector3("trail7", this.monolithTrail[7]);
+			this.monolithDepthMaterial.setFloat("mouseSpeed", this.monolithMouseSpeed);
+			this.monolithDepthMaterial.setVector3("cameraPos", this.camera.position);
 		})
 	}
 

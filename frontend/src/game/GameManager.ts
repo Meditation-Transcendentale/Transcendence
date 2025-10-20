@@ -16,7 +16,6 @@ export class GameManager {
 	private pong!: Pong;
 	private br!: PongBR;
 	private brick!: BrickBreaker;
-	//
 	private pongRunning: boolean;
 
 	constructor() {
@@ -84,7 +83,7 @@ export class GameManager {
 			enabledModules: ['scorevs', 'buttons', 'countdown', 'ending', 'images', 'inputhints'],
 			theme: 'pong',
 			modulePositions: {
-				scorevs: { x: 'center', y: 'top' },
+				scorevs: { x: 'center', y: 'top', offset: { x: 55, y: 0 } },
 				buttons: { x: 'center', y: 'bottom', offset: { x: 0, y: 50 } },
 				countdown: { x: 'center', y: 'center' },
 				ending: { x: 'center', y: 'center' },

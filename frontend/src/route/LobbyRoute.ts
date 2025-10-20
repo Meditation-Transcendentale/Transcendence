@@ -32,6 +32,7 @@ export class LobbyRoute implements IRoute {
 		sceneManager.cameraManager.vue = "lobby";
 		sceneManager.load("home");
 		htmlManager.cube.enable = false;
+		sceneManager.assets.monolithHoverEnabled = false;
 		sceneManager.ballGrass.ballOrigin.set(9, 0, -1);
 		htmlManager.notification.clearGameInvite();
 	}

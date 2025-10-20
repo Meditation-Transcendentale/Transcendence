@@ -43,7 +43,7 @@ const verifyApiKey = (req, res, done) => {
 
 app.addHook('onRequest', verifyApiKey);
 
-const nats = await connect({ 
+const nats = await connect({
 	servers: process.env.NATS_URL,
 	token: process.env.NATS_TOKEN,
 	tls: { rejectUnauthorized: false }
@@ -95,8 +95,6 @@ app.post('/', { schema: registerSchema }, handleErrors(async (req, res) => {
 		'/cdn/default_avatar14.jpg',
 	];
 	const randomInt = Math.floor(Math.random() * randomAvatar.length);
-	// const randomInt = Math.random() < 0.5 ? 0 : 1;
-	console.log(randomInt);
 	const avatar = randomAvatar[randomInt];
 
 	await natsRequest(nats, jc, 'user.registerUser', { uuid, username, hashedPassword, avatar });
