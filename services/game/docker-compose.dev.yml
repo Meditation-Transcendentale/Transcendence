@@ -140,7 +140,7 @@ services:
       - ./services/game/pongBR-physics/package.json:/app/package.json
       - ./services/game/pongBR-physics/.env.example:/app/.env
       - ./shared/certs:/app/certs:ro
-    command: npm run dev
+    command: npm run start
     # ports:
     restart: unless-stopped
     environment:
