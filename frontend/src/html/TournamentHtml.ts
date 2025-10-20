@@ -76,6 +76,8 @@ export class TournamentHtml implements IHtml {
   public unload(): void {
     this.readyActive = false;
     this.css.remove();
+    const podium = document.querySelector(".podium-overlay");
+    if (podium) podium.remove();
     this.div.remove();
     this.stopReadyCountdown();
     streamManager.tournament.disconnect();
