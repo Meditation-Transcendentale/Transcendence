@@ -605,7 +605,7 @@ export class PhysicsEngine {
 
 				return {
 					id: currentPaddleIndex,
-					paddleId: fixedPlayerId,  // Changed from playerId to match proto field name
+					paddleId: fixedPlayerId,
 					move: this.paddleData.inputStates[currentPaddleIndex] || 0,
 					offset: this.paddleData.offsets[currentPaddleIndex] || 0,
 					dead: this.paddleData.dead[fixedPlayerId] === 1

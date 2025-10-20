@@ -63,7 +63,8 @@ export class NetworkingSystem extends System {
 				const paddles = state.paddles ?? [];
 				const events = state.events ?? [];
 
-				// Fetch usernames on first state message with paddle UUIDs
+				let rebuildHappenedThisFrame = false;
+
 				if (!this.usernamesFetched && paddles.length > 0) {
 					console.log(`🔍 First paddles data:`, paddles.slice(0, 3));
 					const playerUUIDs = paddles
@@ -94,6 +95,7 @@ export class NetworkingSystem extends System {
 					}
 
 					if (event.type === 'REBUILD_COMPLETE') {
+						rebuildHappenedThisFrame = true;
 						const mapping = event.playerMapping || {};
 						const newLocalIndex = mapping[localPaddleId] ?? -1;
 						const newPlayerCount = event.activePlayers.length;
@@ -157,6 +159,10 @@ export class NetworkingSystem extends System {
 					}
 				});
 
+				if (rebuildHappenedThisFrame) {
+					return;
+				}
+
 				let activePaddleCount = 0;
 				paddles.forEach(p => {
 					const e = this.paddleIndexToEntity.get(p.id as number);
@@ -190,22 +196,11 @@ export class NetworkingSystem extends System {
 								duration: 1000
 							});
 
-							if (paddleComp.isLocal) {
+							if (p.uuid === this.uuid) {
 								this.gameUI.showEliminationMessage(username);
 							}
 						}
-						if (paddleComp.isLocal && !this.spectateButtonOn) {
-							// this.gameUI.showButton('spectate', 'Spectate', () => {
-							// 	console.log('Spectating...');
-							// 	const payload: userinterface.IClientMessage = {
-							// 		spectate: {}
-							// 	};
-							//
-							// 	const buffer = encodeClientMessage(payload);
-							// 	this.wsManager.socket.send(buffer);
-							// });
-							// this.spectateButtonOn = true;
-						}
+
 					} else {
 						activePaddleCount++;
 						paddle.enable();
@@ -233,26 +228,18 @@ export class NetworkingSystem extends System {
 
 			// === BR Game End ===
 			if (serverMsg.endBr) {
-				console.log("🏆 BR Game Ended!");
 				const playerIds = serverMsg.endBr.playerIds || [];
 
-				console.log("\n====================================");
-				console.log("🏆 BATTLE ROYALE - FINAL RANKINGS");
-				console.log("====================================");
 
 				playerIds.forEach((uuid, index) => {
 					const rank = index + 1;
 					const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '  ';
 					const username = this.game.getUsername(uuid);
-					console.log(`${medal} #${rank} - ${username}`);
 				});
 
-				console.log("====================================\n");
 
-				// Display rankings in the game UI
 				const rankings = playerIds.map((uuid, index) => {
 					const isLocal = uuid === this.uuid;
-					console.log(`Player ${index + 1}: ${uuid}, isLocal: ${isLocal}, this.uuid: ${this.uuid}`);
 					return {
 						rank: index + 1,
 						username: this.game.getUsername(uuid),
@@ -261,7 +248,6 @@ export class NetworkingSystem extends System {
 					};
 				});
 
-				// Show end screen with rankings overlay
 				this.gameUI.showBRRankings(rankings);
 			}
 		});
@@ -290,7 +276,6 @@ export class NetworkingSystem extends System {
 		}
 
 		this.indexesDirty = false;
-		console.log(`✅ Indices: ${this.ballIdToEntity.size} balls, ${this.paddleIndexToEntity.size} paddles, ${this.wallIndexToEntity.size} walls`);
 	}
 
 	public forceIndexRebuild(): void {

@@ -431,11 +431,14 @@ export class GameManager {
 			newState.tick = resp.tick;
 			newState.balls = resp.balls;
 			newState.paddles = resp.paddles.map(paddle => {
-				const playerIndex = paddle.id;
+				let playerIndex;
+				if (match.mode === "br")
+					playerIndex = paddle.paddleId;
+				else
+					playerIndex = paddle.id;
 				const uuid = match.instance.players[playerIndex] || '';
 				return {
 					...paddle,
-					paddleId: playerIndex,
 					uuid: uuid
 				};
 			});
