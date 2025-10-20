@@ -43,11 +43,10 @@ export class TournamentStream implements IStream {
     };
 
     this.ws.onerror = () => {
-      console.log("tournament stream error");
     };
 
     this.ws.onclose = () => {
-      this.connected = false; /*htmlManager.tournament.close()*/
+      this.connected = false;
     };
   }
 
@@ -66,9 +65,6 @@ export class TournamentStream implements IStream {
     ) as TournamentServerMessage;
 
     if (payload.update) {
-      console.log(
-        `UPDATE RECEIVED: ${payload.update.tournamentRoot?.winnerId}`
-      );
       htmlManager.tournament.update(payload.update);
       if (payload.update.tournamentRoot.winnerId)
         htmlManager.tournament.finished();
@@ -78,10 +74,9 @@ export class TournamentStream implements IStream {
     }
     if (payload.readyCheck) {
       htmlManager.tournament.readyCheck(payload.readyCheck);
-      console.log(`READY CHECK RECEIVED: ${payload.readyCheck.deadlineMs}`);
     }
     if (payload.startGame) {
-      console.log(`START GAME RECEIVED`);
+      console.log(`START GME RECEIVED`);
       stateManager.gameId = payload.startGame.gameId;
       stateManager.gameMap = "void";
       stateManager.gameMode = "tournament";

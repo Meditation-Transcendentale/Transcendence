@@ -76,6 +76,8 @@ export class TournamentHtml implements IHtml {
   public unload(): void {
     this.readyActive = false;
     this.css.remove();
+    const podium = document.querySelector(".podium-overlay");
+    if (podium) podium.remove();
     this.div.remove();
     this.stopReadyCountdown();
     streamManager.tournament.disconnect();
@@ -131,18 +133,6 @@ export class TournamentHtml implements IHtml {
     this.toolbarEl = document.createElement("div");
     this.toolbarEl.className = "toolbar";
 
-    const countdown = document.createElement("span");
-    countdown.className = "ready-countdown";
-    countdown.style.marginRight = "auto";
-    countdown.style.fontVariantNumeric = "tabular-nums";
-
-    const leaveBtn = document.createElement("button");
-    leaveBtn.id = "leave-btn";
-    leaveBtn.textContent = "Leave";
-    leaveBtn.addEventListener("click", () => this.sendQuit());
-
-    this.toolbarEl.append(countdown, leaveBtn);
-
     this.treeEl = document.createElement("div");
     this.treeEl.id = "tournament-tree";
     this.treeEl.className = "bracket";
@@ -176,9 +166,11 @@ export class TournamentHtml implements IHtml {
   }
 
   private startReadyCountdown() {
-    const badge = this.toolbarEl.querySelector(
-      ".ready-countdown"
-    ) as HTMLSpanElement | null;
+    const badge = document.createElement("span");
+    badge.className = "ready-countdown";
+    badge.style.marginRight = "auto";
+    badge.style.fontVariantNumeric = "tabular-nums";
+    this.toolbarEl.appendChild(badge);
     const tick = () => {
       if (!badge) return;
       const ms = Math.max(0, this.readyDeadline - Date.now());

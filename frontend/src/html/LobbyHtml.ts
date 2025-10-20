@@ -54,8 +54,8 @@ export class LobbyHtml implements IHtml {
 		// this.playersWindow = div.querySelector("#players-window") as HTMLDivElement;
 		this.infoWindow = div.querySelector("#info-window") as HTMLDivElement;
 		this.playersList = div.querySelector(".lobby-players__container") as HTMLDivElement;
-		this.lobbyMode = div.querySelector("#lobby-mode") as HTMLSpanElement;
-		this.lobbyMap = div.querySelector("#lobby-map") as HTMLSpanElement;
+		this.lobbyMode = div.querySelector("#lobby-info-mode") as HTMLSpanElement;
+		this.lobbyMap = div.querySelector("#lobby-info-map") as HTMLSpanElement;
 		this.lobbyId = div.querySelector("#lobby-info-id") as HTMLSpanElement;
 		this.lobbyIdCopy = div.querySelector("#lobby-info-copy") as HTMLButtonElement;
 		this.inviteList = div.querySelector(".lobby-invite__container") as HTMLDivElement;
@@ -143,7 +143,7 @@ export class LobbyHtml implements IHtml {
 	}
 
 	public update(payload: lobby.IUpdateMessage) {
-		this.lobbyMap.textContent = payload.map as string;
+		this.lobbyMap.textContent = payload.map || "default";
 		this.lobbyMode.textContent = payload.mode as string;
 
 		if (payload.currentPlayers !== undefined && payload.maxPlayers !== undefined) {
