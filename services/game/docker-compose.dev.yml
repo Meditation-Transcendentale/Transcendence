@@ -4,7 +4,6 @@ services:
     container_name: nats_game
     environment:
       - NATS_GAME_TOKEN=${NATS_GAME_TOKEN}
-      - NATS_LEAF_TOKEN=${NATS_LEAF_TOKEN}
     volumes:
       - ./services/game/nats-server.conf:/nats-server.conf:ro
       - ./shared/certs:/etc/certs:ro

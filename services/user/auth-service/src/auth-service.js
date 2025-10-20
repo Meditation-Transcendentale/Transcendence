@@ -203,7 +203,6 @@ async function get42accessToken(code, referer, ftCookie, res) {
 	let redirectUri = referer + `api/auth/42`;
 	if (referer === undefined)
 		redirectUri = `https://${process.env.HOSTNAME}:7000/api/auth/42`;
-	console.log('Using redirect URI:', redirectUri);
 
 	try {
 		const response = await axios.post(
