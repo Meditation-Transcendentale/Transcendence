@@ -69,13 +69,17 @@ const verifyJWT = async (req, res) => {
 		rejectUnauthorized: false
 	});
 
-	const response = await axios.post('https://auth-service:4002/auth', { token }, { headers: { 'x-api-key': process.env.API_GATEWAY_KEY }, httpsAgent: agent });
-	const data = response.data;
-
-	if (!data.valid) {
+	try {
+		const response = await axios.post('https://auth-service:4002/auth', { token }, { headers: { 'x-api-key': process.env.API_GATEWAY_KEY }, httpsAgent: agent });
+		const data = response.data;
+		if (!data.valid) {
+			return res.code(401).send({ message: 'Invalid token' });
+		}
+		req.user = data.user;
+	} catch (error) {
 		return res.code(401).send({ message: 'Invalid token' });
 	}
-	req.user = data.user;
+
 };
 
 const addApiKeyHeader = (req, headers) => {

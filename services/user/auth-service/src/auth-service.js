@@ -321,11 +321,17 @@ app.get('/42', handleErrors42(async (req, res) => {
 app.post('/auth', handleErrorsValid(async (req, res) => {
 
 	const { token } = req.body;
+	let decodedToken;
 
 	if (!token) {
 		throw { status: userReturn.USER_023.http, code: userReturn.USER_023.code, message: userReturn.USER_023.message, valid: false };
 	}
-	const decodedToken = jwt.verify(token, process.env.JWT_SECRETKEY);
+	try {
+		decodedToken = jwt.verify(token, process.env.JWT_SECRETKEY);
+	} catch (error) {
+		throw { status: userReturn.USER_013.http, code: userReturn.USER_013.code, message: userReturn.USER_013.message, valid: false };
+	}
+	
 	return res.code(statusCode.SUCCESS).send({ valid: true, user: decodedToken });
 }));
 
