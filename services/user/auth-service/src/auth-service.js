@@ -252,8 +252,7 @@ async function get42accessToken(code, referer, ftCookie, res) {
 			res.setCookie('42accessToken', { token: response.data.access_token, expires_at: now + response.data.expires_in * 1000 }, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
 			return { token42: response.data.access_token };
 			} catch (err) {
-				console.error('Error fetching 42 access token with localhost redirect:', error);
-				throw { status: statusCode.INTERNAL_SERVER_ERROR, code: 500, message: returnMessages.INTERNAL_SERVER_ERROR };
+				throw { status: statusCode.USER_039.http, code: statusCode.USER_039.code, message: statusCode.USER_039.message };
 			}
 		}
 	}
