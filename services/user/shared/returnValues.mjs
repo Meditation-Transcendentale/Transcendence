@@ -77,6 +77,7 @@ const returnMessages = {
 	BAD_GAME_ID: 'Invalid game or lobby ID',
 	IDENTIFIER_TYPE_REQUIRED: 'Identifier and type are required',
 	PROVIDER_PASSWORD_CONFLICT: 'You cannot connect with a password for this account',
+	UNKNOWN_42_API_URI: 'Unknown uri from 42 API',
 };
 
 const statusReturn = { 
@@ -128,6 +129,7 @@ const userReturn = {
 	USER_036: { http: 400, code: 40031, message: returnMessages.IDENTIFIER_TYPE_REQUIRED },
 	USER_037: { http: 400, code: 40032, message: returnMessages.INVALID_SEARCH_TYPE },
 	USER_038: { http: 400, code: 40033, message: returnMessages.PROVIDER_PASSWORD_CONFLICT },
+	USER_039: { http: 401, code: 40139, message: returnMessages.UNKNOWN_42_API_URI },
 };
 
 const friendshipReturn = {
