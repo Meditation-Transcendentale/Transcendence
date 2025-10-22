@@ -21,9 +21,10 @@ export class LobbyRoute implements IRoute {
 		this.created = true;
 	}
 
-	public async load(): Promise<void> {
-		if (!this.created)
+	public async load(): Promise<boolean> {
+		if (!this.created) {
 			await this.init();
+		}
 		this._loaded = true;
 		htmlManager.ath.checkBeforeHome = true;
 		routeManager.comebackRoute = "/play";
@@ -35,6 +36,7 @@ export class LobbyRoute implements IRoute {
 		sceneManager.assets.monolithHoverEnabled = false;
 		sceneManager.ballGrass.ballOrigin.set(9, 0, -1);
 		htmlManager.notification.clearGameInvite();
+		return true;
 	}
 
 	public async unload(): Promise<void> {

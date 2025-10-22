@@ -23,6 +23,7 @@ export class AuthRoute implements IRoute {
 		sceneManager.cameraManager.vue = "auth";
 		sceneManager.load("auth");
 		htmlManager.auth.load();
+		return true
 	}
 
 	public async unload() {

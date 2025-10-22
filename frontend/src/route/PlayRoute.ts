@@ -11,10 +11,11 @@ export class PlayRoute implements IRoute {
 		stateManager.playPath = "/play/create";
 	}
 
-	public async load(): Promise<void> {
+	public async load(): Promise<boolean> {
 		htmlManager.ath.checkBeforeHome = false;
 		routeManager.comebackRoute = "/home";
 		routeManager.nav(stateManager.playPath);
+		return true;
 	}
 
 	public async unload(): Promise<void> {

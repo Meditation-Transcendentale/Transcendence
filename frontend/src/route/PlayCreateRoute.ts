@@ -19,7 +19,7 @@ export class PlayCreateRoute implements IRoute {
 		this.created = true;
 	}
 
-	public async load(): Promise<void> {
+	public async load(): Promise<boolean> {
 		if (!this.created)
 			await this.init();
 		htmlManager.ath.checkBeforeHome = false;
@@ -32,6 +32,7 @@ export class PlayCreateRoute implements IRoute {
 		htmlManager.cube.clickEvent = () => routeManager.nav("/play/join");
 		htmlManager.cube.enable = true;
 		sceneManager.ballGrass.ballOrigin.set(0, 0, -9);
+		return true;
 	}
 
 	public async unload(): Promise<void> {

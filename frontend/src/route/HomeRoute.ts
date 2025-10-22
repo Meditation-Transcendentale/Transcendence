@@ -21,6 +21,7 @@ export class HomeRoute implements IRoute {
 		htmlManager.cube.enable = true;
 		htmlManager.cube.clickEvent = () => routeManager.nav("/play", false, false);
 		sceneManager.ballGrass.ballOrigin.set(0, 0, -7);
+		return true;
 	}
 
 	public async unload() {

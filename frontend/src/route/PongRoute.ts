@@ -14,10 +14,10 @@ export class PongRoute implements IRoute {
 		this.created = true;
 	}
 
-	public async load(): Promise<void> {
+	public async load(): Promise<boolean> {
 		if (stateManager.gameId == "") {
 			routeManager.nav("/home");
-			return;
+			return false;
 		}
 		this._loaded = true;
 		htmlManager.friendlist.remove();
@@ -25,6 +25,7 @@ export class PongRoute implements IRoute {
 		sceneManager.load(stateManager.gameMap);
 		gameManager.launchPong();
 		htmlManager.cube.enable = false;
+		return false;
 	}
 
 	public async unload(): Promise<void> {
