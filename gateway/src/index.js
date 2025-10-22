@@ -55,7 +55,7 @@ app.register(fastifyCORS, {
 
 app.setErrorHandler((error, req, res) => {
 	app.log.error(error);
-	return res.code(500).send({ message: 'Server Error' });
+	return res.code(400).send({ message: 'Bad Request' });
 });
 
 const verifyJWT = async (req, res) => {
