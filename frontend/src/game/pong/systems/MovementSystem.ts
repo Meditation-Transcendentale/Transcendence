@@ -27,13 +27,16 @@ export class MovementSystem extends System {
 				const now = performance.now();
 				const age = now - ball.lastServerUpdate;
 
-				if (age < 17) {
+				if (age < 100) {
 					const dist = Vector3.Distance(ball.position, ball.serverPosition);
-					if (dist > 0 && dist < 1) {
-						const corrected = Vector3.Lerp(ball.position, ball.serverPosition, 0.1);
-						ball.position.copyFrom(corrected);
-					} else if (dist > 1) {
+
+					if (dist > 5) {
 						ball.position.copyFrom(ball.serverPosition);
+					} else if (dist > 0) {
+						const smoothness = 8.0;
+						const lerpFactor = 1.0 - Math.exp(-smoothness * (deltaTime / 1000));
+						const corrected = Vector3.Lerp(ball.position, ball.serverPosition, lerpFactor);
+						ball.position.copyFrom(corrected);
 					}
 				}
 			}
@@ -44,7 +47,6 @@ export class MovementSystem extends System {
 				if (paddle.id == localPaddleId || input.gameMode == "local") {
 					const dist = Math.abs(paddle.offset - paddle.serverOffset);
 					if (dist > 0) {
-						// console.log("dist", dist);
 						if (dist >= 0.5) {
 							paddle.offset = paddle.serverOffset;
 						} else {

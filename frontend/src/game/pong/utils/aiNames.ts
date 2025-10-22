@@ -8,18 +8,18 @@ const AI_NAMES = [
 	"Binary Beast",
 	"Quantum Paddle",
 	"Matrix Master",
-	"Cyber Striker",
+	"Hurararararararara",
 	"Digital Destroyer",
-	"AI-nstein",
+	"ElFlamingoBob",
 	"The Calculator",
 	"Logic Lord",
 	"Byte Brawler",
 	"Code Crusher",
 	"Data Demon",
-	"Pixel Punisher",
-	"Circuit Smasher",
-	"Bot Bouncer",
-	"Silicon Slayer"
+	"Mergelin The Encoder",
+	"Wise Rayqua29",
+	"Evil Godo",
+	"Pillofixlesgpustp"
 ];
 
 export function getRandomAIName(): string {
