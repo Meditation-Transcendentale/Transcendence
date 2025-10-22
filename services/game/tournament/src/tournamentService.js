@@ -255,7 +255,6 @@ class Tournament {
 			} else if (!r1 && r2) {
 				if (p1 && !p1.isEliminated) p1.isEliminated = true;
 				match.setResult({
-					winnerId: match.player2Id,
 					score: [0, 0],
 					forfeitId: match.player1Id,
 				});

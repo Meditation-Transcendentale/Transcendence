@@ -47,6 +47,8 @@ export class TournamentHtml implements IHtml {
   private oldTree: MatchNode | null = null;
   private players: Map<string, PlayerState>;
 
+  private overlay: HTMLDivElement | null = null;
+
   private readyActive = false;
   private readyDeadline = 0;
   private countdownTimer: number | null = null;
@@ -60,7 +62,7 @@ export class TournamentHtml implements IHtml {
     this.css.rel = "stylesheet";
     this.css.type = "text/css";
     this.css.href = "/css/main.css";
-
+    this.overlay = null;
     this.div = document.createElement("div");
 
     this.players = new Map<string, PlayerState>();
@@ -71,16 +73,16 @@ export class TournamentHtml implements IHtml {
     document.head.appendChild(this.css);
     document.body.appendChild(this.div);
     this.div.appendChild(this.rootEl);
+    if (this.overlay) this.overlay.remove();
   }
 
   public unload(): void {
     this.readyActive = false;
     this.css.remove();
-    const podium = document.querySelector(".podium-overlay");
-    if (podium) { podium.remove(); }
+    if (this.overlay) this.overlay.remove();
     this.div.remove();
     this.stopReadyCountdown();
-    streamManager.tournament.disconnect();      console.log(`START GME RECEIVED`);
+    streamManager.tournament.disconnect();
   }
 
   public update(payload: TournamentServerUpdate) {
@@ -550,10 +552,10 @@ export class TournamentHtml implements IHtml {
     silver: string | null;
     bronzes: string[];
   }) {
-    const overlay = document.createElement("div");
-    overlay.className = "podium-overlay";
-    overlay.setAttribute("role", "dialog");
-    overlay.setAttribute("aria-label", "Tournament Podium");
+    this.overlay = document.createElement("div");
+    this.overlay.className = "podium-overlay";
+    this.overlay.setAttribute("role", "dialog");
+    this.overlay.setAttribute("aria-label", "Tournament Podium");
 
     const wrap = document.createElement("div");
     wrap.className = "podium-wrap";
@@ -651,11 +653,7 @@ export class TournamentHtml implements IHtml {
     cta.innerHTML = `Leave the tournament<span aria-hidden="true">`;
 
     cta.addEventListener("click", () => {
-      if (this.treeEl) {
-        this.treeEl.style.filter = "";
-        this.treeEl.style.opacity = "";
-      }
-      overlay.remove();
+      if (this.overlay) this.overlay.remove();
       this.rootEl.remove();
       routeManager.nav("/home");
     });
@@ -666,10 +664,10 @@ export class TournamentHtml implements IHtml {
       s.style.left = `${12 + Math.random() * 76}%`;
       s.style.bottom = `${-20 + Math.random() * 60}px`;
       s.style.animationDelay = `${Math.random() * 6}s`;
-      overlay.appendChild(s);
+      this.overlay.appendChild(s);
     }
 
-    overlay.append(title, wrap, cta);
-    this.rootEl?.appendChild(overlay);
+    this.overlay.append(title, wrap, cta);
+    this.rootEl?.appendChild(this.overlay);
   }
 }
