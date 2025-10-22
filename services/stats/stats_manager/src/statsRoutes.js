@@ -128,6 +128,20 @@ export default async function statsRoutes(app) {
 
 		const { mode, score } = req.body;
 
+
+	    if (typeof score !== 'number' || isNaN(score) || !isFinite(score)) {
+            throw { status: 400, code: 40032, message: 'Score must be a valid number' };
+        }
+        if (!Number.isInteger(score)) {
+            throw { status: 400, code: 40033, message: 'Score must be an integer' };
+        }
+        if (score < 0) {
+            throw { status: 400, code: 40034, message: 'Score must be non-negative' };
+        }
+        if (score > Number.MAX_SAFE_INTEGER) {
+            throw { status: 400, code: 40035, message: 'Score exceeds maximum allowed value' };
+        }
+
 		const user = await nats.request('user.getUserFromHeader', jc.encode({ headers: req.headers }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
 		if (!userResult.success) {
