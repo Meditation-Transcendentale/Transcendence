@@ -2,7 +2,7 @@
 export default {
 	PORT: 5001,
 	WS_PORT: 5011,
-	HEARTBEAT_INTERVAL: 500,
+	HEARTBEAT_INTERVAL: 2000,
 	NATS_URL: 'nats://nats_game:4222',
 	WS_PATH: '/lobbies',
 	MAX_PLAYERS: {
