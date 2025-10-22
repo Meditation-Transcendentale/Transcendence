@@ -76,9 +76,8 @@ export class TournamentStream implements IStream {
       htmlManager.tournament.readyCheck(payload.readyCheck);
     }
     if (payload.startGame) {
-      console.log(`START GME RECEIVED`);
       stateManager.gameId = payload.startGame.gameId;
-      stateManager.gameMap = "void";
+      stateManager.gameMap = "grass";
       stateManager.gameMode = "tournament";
       routeManager.comebackRoute = "/tournament";
       routeManager.nav("/pong");
@@ -98,7 +97,7 @@ export class TournamentStream implements IStream {
 
   public spectate(gameId: string) {
     stateManager.gameId = gameId;
-    stateManager.gameMap = "void";
+    stateManager.gameMap = "grass";
     stateManager.gameMode = "tournament";
     routeManager.comebackRoute = "/tournament";
     routeManager.nav("/pong");

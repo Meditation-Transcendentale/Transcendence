@@ -80,7 +80,7 @@ export class TournamentHtml implements IHtml {
     if (podium) { podium.remove(); }
     this.div.remove();
     this.stopReadyCountdown();
-    streamManager.tournament.disconnect();
+    streamManager.tournament.disconnect();      console.log(`START GME RECEIVED`);
   }
 
   public update(payload: TournamentServerUpdate) {
@@ -102,7 +102,10 @@ export class TournamentHtml implements IHtml {
   public readyCheck(payload: TournamentServerReadyCheck) {
     this.readyActive = true;
     this.readyDeadline = payload.deadlineMs;
-    this.startReadyCountdown();
+    const me = this.players.get(User.uuid);
+    if (me && !me.eliminated) {
+      this.startReadyCountdown();
+    }
     this.render();
   }
 
