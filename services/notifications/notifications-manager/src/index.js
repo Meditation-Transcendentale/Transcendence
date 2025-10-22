@@ -262,7 +262,7 @@ async function friendlist_Request(uuid, nc, jc) {
       `[${SERVICE_NAME}] Unexpected error in friendlist_Request:`,
       err
     );
-    throw { status: 500, message: "Internal error while fetching friend list" };
+    throw { status: 404, message: "friend list not found" };
   }
 }
 

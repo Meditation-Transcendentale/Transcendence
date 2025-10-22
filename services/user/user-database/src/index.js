@@ -18,9 +18,9 @@ async function handleNatsSubscription(subject, handler) {
 		try {
 			await handler(msg);
 		} catch (error) {
-			const status = error.status || 500;
-			const message = error.message || "Internal Server Error";
-			const code = error.code || 500;
+			const status = error.status || 400;
+			const message = error.message || "Bad Request";
+			const code = error.code || 400;
 			nats.publish(msg.reply, jc.encode({ success: false, status, message, code }));
 		}
 	}

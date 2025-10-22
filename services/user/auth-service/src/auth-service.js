@@ -124,7 +124,7 @@ async function removeOldAvatars(uuid) {
 async function getAvatarCdnUrl(picture, uuid) {
 	const response = await fetch(picture);
 	if (response.status !== 200) {
-		throw { status: statusCode.INTERNAL_SERVER_ERROR, code: 500, message: returnMessages.INTERNAL_SERVER_ERROR };
+		throw { status: 401, code: 401, message: "Unauthorized" };
 	}
 
 	const arrayBuffer = await response.arrayBuffer();
@@ -227,11 +227,10 @@ async function get42accessToken(code, ftCookie, res, stateRedirectUri) {
 
 		return { token42: response.data.access_token };
 	} catch (error) {
-		console.error('42 OAuth token exchange failed:', error.response?.data || error.message);
 		throw {
-			status: userReturn.USER_039.http,
-			code: userReturn.USER_039.code,
-			message: userReturn.USER_039.message + ': ' + (error.response?.data?.error_description || error.message)
+			status: 401,
+			code: 401,
+			message: returnMessages.UNAUTHORIZED
 		};
 	}
 }
