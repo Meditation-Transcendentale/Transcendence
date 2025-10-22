@@ -1,4 +1,5 @@
 import { htmlManager } from "../html/HtmlManager";
+import { tournament } from "../networking/message";
 import { stateManager } from "../state/StateManager";
 import { streamManager } from "../stream/StreamManager";
 import { User } from "../User";
@@ -48,8 +49,8 @@ class RouteManager {
 
 		window.addEventListener("popstate", () => {
 			this.ha = false;
+			stateManager.tournamentId = "";
 			const url = window.location.href.substring(window.location.origin.length);
-			alert(url);
 			this.nav(window.location.href.substring(window.location.origin.length), false, false);
 		});
 	}

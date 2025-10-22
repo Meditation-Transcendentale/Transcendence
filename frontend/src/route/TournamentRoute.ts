@@ -14,7 +14,7 @@ export class TournamentRoute implements IRoute {
 
 	public async load(): Promise<boolean> {
 		if (stateManager.tournamentId == "") {
-			routeManager.nav("/home");
+			routeManager.nav("/play", false, false, true);
 			return false;
 		}
 		this._loaded = true;
