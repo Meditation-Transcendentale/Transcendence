@@ -80,6 +80,7 @@ class Tournament {
 	constructor(id, playerIds, uwsApp) {
 		this.id = id;
 		this.uwsApp = uwsApp;
+		this.matchMax;
 
 		this.players = playerIds.map((id) => ({
 			id,
@@ -96,6 +97,8 @@ class Tournament {
 		this.readyTimer = null;
 
 		this.scheduling = false;
+
+		this.matchI = 0;
 
 		natsClient.subscribe("games.tournament.*.match.end", (data, msg) => {
 			const parts = String(msg.subject || "").split(".");
@@ -162,11 +165,9 @@ class Tournament {
 	}
 
 	buildTournamentTree() {
-		if (this.players.length === 0) throw new Error("Empty player list");
-		if (this.players.length % 2 !== 0)
-			throw new Error("Odd player count not supported");
 
 		const ids = this.players.map((p) => p.id);
+		this.matchMax = Math.log2(ids.length);
 		const leaves = [];
 		for (let i = 0; i < ids.length; i += 2) {
 			const node = new MatchNode();
@@ -228,7 +229,10 @@ class Tournament {
 	maybeStartReadyCheck() {
 		if (this.readyActive) return;
 		if (!this.allConnected() || this.root.winnerId) return;
-		if (!this.hasAnyActiveMatch()) this.sendReadyCheck();
+		if (!this.hasAnyActiveMatch()) {
+			this.sendReadyCheck();
+			this.matchI++;
+		}
 	}
 
 	async handleReadyTimeout() {
@@ -259,6 +263,7 @@ class Tournament {
 				if (p1 && !p1.isEliminated) p1.isEliminated = true;
 				if (p2 && !p2.isEliminated) p2.isEliminated = true;
 				match.forfeitId = null;
+				match.winnerId = match.player1Id;
 				match.score = [0, 0];
 			}
 		}
@@ -422,7 +427,7 @@ export default class tournamentService {
 	constructor() {
 		this.tournaments = new Map();
 		this.interval = setInterval(
-			() => this.cleanup(),
+			() => { this.cleanup(); },
 			config.HEARTBEAT_INTERVAL
 		);
 	}
@@ -490,8 +495,8 @@ export default class tournamentService {
 		const toDelete = [];
 
 		for (const [id, tournament] of this.tournaments) {
-			if (tournament.isEmpty()) {
-				console.log(`Cleaning up empty tournament: ${id}`);
+			if (tournament.matchMax && tournament.matchI > tournament.matchMax) {
+				console.log(`Cleaning up finished tournament: ${id}`);
 				toDelete.push(id);
 			} else if (tournament.isStale()) {
 				console.log(
