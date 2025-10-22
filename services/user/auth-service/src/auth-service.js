@@ -28,7 +28,7 @@ const app = fastify({
 
 app.register(fastifyCookie);
 
-const nats = await connect({ 
+const nats = await connect({
 	servers: process.env.NATS_URL,
 	token: process.env.NATS_TOKEN,
 	tls: { rejectUnauthorized: false }
@@ -65,7 +65,7 @@ function sanitizeLoginInput(input) {
 	if (input.token !== undefined && validator.isInt(input.token)) {
 		input.token = parseInt(input.token, 10);
 	}
-	
+
 	return {
 		username: validator.escape(input.username),
 		password: validator.escape(input.password),
@@ -77,8 +77,8 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 
 	const { username, password, token } = sanitizeLoginInput(req.body);
 
-	const user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
-	
+	const user = await natsRequest(nats, jc, 'user.getUserFromUsername', { username });
+
 	if (user.provider !== 'local') {
 		throw { status: userReturn.USER_038.http, code: userReturn.USER_038.code, message: userReturn.USER_038.message + ' (' + user.provider + ')' };
 	}
@@ -97,7 +97,7 @@ app.post('/login', { schema: loginSchema }, handleErrors(async (req, res) => {
 		});
 
 		try {
-			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: {'user': JSON.stringify({ uuid: user.uuid }), 'x-api-key': process.env.API_GATEWAY_KEY } , httpsAgent: agent });
+			const response = await axios.post('https://update_user_info-service:4003/verify-2fa', { token }, { headers: { 'user': JSON.stringify({ uuid: user.uuid }), 'x-api-key': process.env.API_GATEWAY_KEY }, httpsAgent: agent });
 			if (response.data.valid == false) {
 				throw { status: statusCode.UNAUTHORIZED, code: response.data.code, message: response.data.message };
 			}
@@ -129,14 +129,14 @@ async function getAvatarCdnUrl(picture, uuid) {
 
 	const arrayBuffer = await response.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
-	
+
 	await removeOldAvatars(uuid);
 	const randomAddition = Math.random().toString(36).substring(2, 8);
 	const filename = `${uuid}_${randomAddition}.png`;
 	const fullPath = `/app/cdn_data/${filename}`;
 
 	fs.writeFileSync(fullPath, buffer);
-	
+
 	return `/cdn/${filename}`;
 
 }
@@ -144,7 +144,7 @@ async function getAvatarCdnUrl(picture, uuid) {
 // https://developers.google.com/oauthplayground/
 
 app.post('/auth-google', handleErrors(async (req, res) => {
-	
+
 	const { token } = req.body;
 	let retCode = statusCode.SUCCESS, retMessage = returnMessages.LOGGED_IN;
 
@@ -156,13 +156,13 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 		idToken: token,
 		audience: process.env.GOOGLE_CLIENT_ID
 	});
-	
+
 	const payload = ticket.getPayload();
 
 	const { sub: google_id, name: username, picture: avatar_path } = payload;
 
-	let userByUsername = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
-	let userById = await natsRequest(nats, jc, 'user.getGoogleUserByGoogleId', { google_id } );
+	let userByUsername = await natsRequest(nats, jc, 'user.checkUserExists', { username });
+	let userById = await natsRequest(nats, jc, 'user.getGoogleUserByGoogleId', { google_id });
 
 
 	if (!userByUsername) {
@@ -170,7 +170,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
 		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatar_path: avatarCdnUrl });
-		userById = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+		userById = await natsRequest(nats, jc, 'user.getUserFromUsername', { username });
 		await natsRequest(nats, jc, 'status.addUserStatus', { userId: userById.id, status: "offline" });
 		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: userById.id });
 	} else if (userByUsername && userByUsername.provider !== 'google' && !userById) {
@@ -179,7 +179,7 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
 		retCode = statusCode.CREATED, retMessage = returnMessages.GOOGLE_CREATED_LOGGED_IN;
 		await natsRequest(nats, jc, 'user.addGoogleUser', { uuid, google_id, username, avatar_path: avatarCdnUrl });
-		userById = await natsRequest(nats, jc, 'user.getUserFromUsername', { username } );
+		userById = await natsRequest(nats, jc, 'user.getUserFromUsername', { username });
 		await natsRequest(nats, jc, 'status.addUserStatus', { userId: userById.id, status: "offline" });
 		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: userById.id });
 	}
@@ -191,18 +191,20 @@ app.post('/auth-google', handleErrors(async (req, res) => {
 
 }));
 
-
-async function get42accessToken(code, referer, ftCookie, res) {
-
+async function get42accessToken(code, ftCookie, res, stateRedirectUri) {
 	const now = Date.now();
 
 	if (ftCookie && ftCookie.token && now < ftCookie.expires_at - 10000) {
 		return { token42: ftCookie.token };
 	}
 
-	let redirectUri = referer + `api/auth/42`;
-	if (referer === undefined || referer === "https://api.intra.42.fr/")
-		redirectUri = `https://${process.env.HOSTNAME}:7000/api/auth/42`;
+	if (!stateRedirectUri) {
+		throw {
+			status: statusCode.BAD_REQUEST,
+			code: 400,
+			message: 'Missing redirect_uri in state parameter'
+		};
+	}
 
 	try {
 		const response = await axios.post(
@@ -212,57 +214,41 @@ async function get42accessToken(code, referer, ftCookie, res) {
 				client_id: process.env.FT_API_UID,
 				client_secret: process.env.FT_API_SECRET,
 				code: code,
-				redirect_uri: redirectUri
+				redirect_uri: stateRedirectUri
 			}),
-			{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
+			{ headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
 		);
+
 		res.clearCookie('42accessToken', { path: '/' });
-		res.setCookie('42accessToken', { token: response.data.access_token, expires_at: now + response.data.expires_in * 1000 }, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+		res.setCookie('42accessToken', {
+			token: response.data.access_token,
+			expires_at: now + response.data.expires_in * 1000
+		}, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+
 		return { token42: response.data.access_token };
 	} catch (error) {
-		try {
-			const response = await axios.post(
-				'https://api.intra.42.fr/oauth/token',
-				new URLSearchParams({
-					grant_type: 'authorization_code',
-					client_id: process.env.FT_API_UID,
-					client_secret: process.env.FT_API_SECRET,
-					code: code,
-					redirect_uri: redirectUri.replace(".42lyon.fr", "")
-				}),
-				{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
-			);
-			res.clearCookie('42accessToken', { path: '/' });
-			res.setCookie('42accessToken', { token: response.data.access_token, expires_at: now + response.data.expires_in * 1000 }, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
-			return { token42: response.data.access_token };
-		} catch (error) {
-			try {
-				const response = await axios.post(
-				'https://api.intra.42.fr/oauth/token',
-				new URLSearchParams({
-					grant_type: 'authorization_code',
-					client_id: process.env.FT_API_UID,
-					client_secret: process.env.FT_API_SECRET,
-					code: code,
-					redirect_uri: `https://localhost:7000/api/auth/42`
-				}),
-				{ headers: {'Content-Type':'application/x-www-form-urlencoded'} }
-			);
-			res.clearCookie('42accessToken', { path: '/' });
-			res.setCookie('42accessToken', { token: response.data.access_token, expires_at: now + response.data.expires_in * 1000 }, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
-			return { token42: response.data.access_token };
-			} catch (err) {
-				throw { status: statusCode.USER_039.http, code: statusCode.USER_039.code, message: statusCode.USER_039.message };
-			}
-		}
+		console.error('42 OAuth token exchange failed:', error.response?.data || error.message);
+		throw {
+			status: userReturn.USER_039.http,
+			code: userReturn.USER_039.code,
+			message: userReturn.USER_039.message + ': ' + (error.response?.data?.error_description || error.message)
+		};
 	}
 }
 
-
-
 app.get('/42', handleErrors42(async (req, res) => {
 
-	const { token42 } = await get42accessToken(req.query.code, req.headers.referer, req.cookies['42accessToken'], res);
+	let stateRedirectUri = null;
+	if (req.query.state) {
+		try {
+			const state = JSON.parse(decodeURIComponent(req.query.state));
+			stateRedirectUri = state.redirect_uri;
+		} catch (e) {
+			console.log('Failed to parse state parameter:', e);
+		}
+	}
+
+	const { token42 } = await get42accessToken(req.query.code, req.cookies['42accessToken'], res, stateRedirectUri);
 
 	let response;
 
@@ -279,14 +265,14 @@ app.get('/42', handleErrors42(async (req, res) => {
 	let username = response.data.login;
 	const avatar_path = response.data.image.link;
 
-	let userByUsername = await natsRequest(nats, jc, 'user.checkUserExists', { username } );
-	let userByFtId = await natsRequest(nats, jc, 'user.get42UserByFtId', { ft_id: ftId } );
+	let userByUsername = await natsRequest(nats, jc, 'user.checkUserExists', { username });
+	let userByFtId = await natsRequest(nats, jc, 'user.get42UserByFtId', { ft_id: ftId });
 
 	if (!userByUsername) {
 		const uuid = uuidv4();
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
 		await natsRequest(nats, jc, 'user.add42User', { ft_id: ftId, uuid, username, avatar_path: avatarCdnUrl });
-		userByFtId = await natsRequest(nats, jc, 'user.get42UserByFtId', { ft_id: ftId } );
+		userByFtId = await natsRequest(nats, jc, 'user.get42UserByFtId', { ft_id: ftId });
 		await natsRequest(nats, jc, 'status.addUserStatus', { userId: userByFtId.id, status: "offline" });
 		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: userByFtId.id });
 	} else if (userByUsername && userByUsername.provider !== '42' && !userByFtId) {
@@ -294,7 +280,7 @@ app.get('/42', handleErrors42(async (req, res) => {
 		const uuid = uuidv4();
 		const avatarCdnUrl = await getAvatarCdnUrl(avatar_path, uuid);
 		await natsRequest(nats, jc, 'user.add42User', { ft_id: ftId, uuid, username, avatar_path: avatarCdnUrl });
-		userByFtId = await natsRequest(nats, jc, 'user.get42UserByFtId', { ft_id: ftId } );
+		userByFtId = await natsRequest(nats, jc, 'user.get42UserByFtId', { ft_id: ftId });
 		await natsRequest(nats, jc, 'status.addUserStatus', { userId: userByFtId.id, status: "offline" });
 		await natsRequest(nats, jc, 'stats.addBrickBreakerStats', { playerId: userByFtId.id });
 	}
@@ -330,7 +316,7 @@ app.post('/auth', handleErrorsValid(async (req, res) => {
 	} catch (error) {
 		throw { status: userReturn.USER_013.http, code: userReturn.USER_013.code, message: userReturn.USER_013.message, valid: false };
 	}
-	
+
 	return res.code(statusCode.SUCCESS).send({ valid: true, user: decodedToken });
 }));
 
@@ -342,7 +328,7 @@ app.post('/logout', handleErrors(async (req, res) => {
 	}
 
 	res.clearCookie('accessToken', { path: '/' });
-	
+
 	res.code(statusCode.SUCCESS).send({ message: returnMessages.LOGGED_OUT });
 
 }));
