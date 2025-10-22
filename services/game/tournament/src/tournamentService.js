@@ -97,6 +97,9 @@ class Tournament {
 
 		this.scheduling = false;
 
+		this.matchMax = null;
+		this.matchI = 0;
+
 		natsClient.subscribe("games.tournament.*.match.end", (data, msg) => {
 			const parts = String(msg.subject || "").split(".");
 			const gameId = parts[2];
@@ -229,6 +232,7 @@ class Tournament {
 		if (this.readyActive) return;
 		if (!this.allConnected() || this.root.winnerId) return;
 		if (!this.hasAnyActiveMatch()) this.sendReadyCheck();
+		this.matchI++;
 	}
 
 	async handleReadyTimeout() {
@@ -432,6 +436,7 @@ export default class tournamentService {
 		const shuffled = shuffle(players);
 		const t = new Tournament(id, shuffled, uwsApp);
 		this.tournaments.set(id, t);
+		t.matchMax = Math.log2(players.size);
 		return id;
 	}
 
@@ -490,8 +495,8 @@ export default class tournamentService {
 		const toDelete = [];
 
 		for (const [id, tournament] of this.tournaments) {
-			if (tournament.isEmpty()) {
-				console.log(`Cleaning up empty tournament: ${id}`);
+			if (tournament.matchI >= tournament.matchMax) {
+				console.log(`Cleaning up finished tournament: ${id}`);
 				toDelete.push(id);
 			} else if (tournament.isStale()) {
 				console.log(
