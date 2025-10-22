@@ -13,6 +13,7 @@ import {
   TournamentServerMessage,
   TournamentServerUpdate,
 } from "../html/TournamentHtml";
+import { NotificationType } from "../html/NotificationHtml";
 
 export class TournamentStream implements IStream {
   public ws: WebSocket | null;
@@ -81,6 +82,11 @@ export class TournamentStream implements IStream {
       stateManager.gameMode = "tournament";
       routeManager.comebackRoute = "/tournament";
       routeManager.nav("/pong");
+      this.disconnect();
+    }
+    if (payload.finished) {
+      routeManager.nav("/home");
+      htmlManager.notification.add({type: NotificationType.error, error: "A player was not ready"});
       this.disconnect();
     }
   }
