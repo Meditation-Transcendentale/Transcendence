@@ -14,7 +14,7 @@ export class BrickRoute implements IRoute {
 
 	public async load(): Promise<boolean> {
 		if (stateManager.gameMode == "") {
-			routeManager.nav("/home");
+			routeManager.nav("/play", false, false, true);
 			return false;
 		}
 		htmlManager.friendlist.remove();
@@ -22,7 +22,7 @@ export class BrickRoute implements IRoute {
 		sceneManager.load("brick");
 		gameManager.launchBrick();
 		htmlManager.cube.enable = false;
-		return false;
+		return true;
 	}
 
 	public async unload(): Promise<void> {

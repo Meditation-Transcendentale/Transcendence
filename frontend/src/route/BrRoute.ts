@@ -16,7 +16,7 @@ export class BrRoute implements IRoute {
 
 	public async load(): Promise<boolean> {
 		if (stateManager.gameId == "") {
-			routeManager.nav("/home");
+			routeManager.nav("/play", false, false, true);
 			return false;
 		}
 		this._loaded = true;
@@ -26,7 +26,7 @@ export class BrRoute implements IRoute {
 		sceneManager.load("br");
 		gameManager.launchBr();
 		htmlManager.cube.enable = false;
-		return false;
+		return true;
 	}
 
 	public async unload(): Promise<void> {

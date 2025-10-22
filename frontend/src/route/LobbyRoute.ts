@@ -1,6 +1,7 @@
 import { htmlManager } from "../html/HtmlManager";
 import { fetchHTML } from "../networking/utils";
 import { sceneManager } from "../scene/SceneManager";
+import { stateManager } from "../state/StateManager";
 import { streamManager } from "../stream/StreamManager";
 import { IRoute } from "./IRoute";
 import { routeManager } from "./RouteManager";
@@ -25,6 +26,10 @@ export class LobbyRoute implements IRoute {
 		if (!this.created) {
 			await this.init();
 		}
+		if (stateManager.lobbyId == "") {
+			routeManager.nav("/play", false, false);
+			return false;
+		}
 		this._loaded = true;
 		htmlManager.ath.checkBeforeHome = true;
 		routeManager.comebackRoute = "/play";
@@ -41,6 +46,7 @@ export class LobbyRoute implements IRoute {
 
 	public async unload(): Promise<void> {
 		this._loaded = false;
+		stateManager.lobbyId = "";
 		htmlManager.lobby.unload();
 		streamManager.lobby.quit();
 		streamManager.lobby.disconnect();
