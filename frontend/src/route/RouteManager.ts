@@ -86,10 +86,10 @@ class RouteManager {
 				}
 			});
 
-		if (history && this.lastRoute !== this.routes.get(url.pathname) as IRoute)
-			window.history.pushState("", "", url.pathname + url.search)
 		await this.lastRoute?.unload();
-		await this.routes.get(url.pathname)?.load();
+		const success = await this.routes.get(url.pathname)?.load();
+		if (success && history && this.lastRoute !== this.routes.get(url.pathname) as IRoute)
+			window.history.pushState("", "", url.pathname + url.search)
 		this.lastRoute = this.routes.get(url.pathname) as IRoute;
 
 

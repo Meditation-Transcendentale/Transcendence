@@ -12,10 +12,10 @@ export class TournamentRoute implements IRoute {
 
 	constructor() { }
 
-	public async load(): Promise<void> {
+	public async load(): Promise<boolean> {
 		if (stateManager.tournamentId == "") {
 			routeManager.nav("/home");
-			return;
+			return false;
 		}
 		this._loaded = true;
 		htmlManager.friendlist.remove();
@@ -24,6 +24,7 @@ export class TournamentRoute implements IRoute {
 		sceneManager.cameraManager.vue = "tournament";
 		htmlManager.tournament.load();
 		streamManager.tournament.connect();
+		return true;
 	}
 
 	public async unload(): Promise<void> {

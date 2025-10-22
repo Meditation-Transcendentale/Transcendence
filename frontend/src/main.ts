@@ -31,8 +31,8 @@ async function init() {
 				return;
 			if (stateManager.friendlist)
 				htmlManager.friendlist.toogle();
-			else
-				routeManager.nav("/home");
+			// else
+			// 	routeManager.nav("/home");
 		}
 	})
 

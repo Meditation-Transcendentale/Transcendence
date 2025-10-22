@@ -12,16 +12,17 @@ export class BrickRoute implements IRoute {
 		this.created = true;
 	}
 
-	public async load(): Promise<void> {
+	public async load(): Promise<boolean> {
 		if (stateManager.gameMode == "") {
 			routeManager.nav("/home");
-			return;
+			return false;
 		}
 		htmlManager.friendlist.remove();
 		sceneManager.cameraManager.vue = "brick";
 		sceneManager.load("brick");
 		gameManager.launchBrick();
 		htmlManager.cube.enable = false;
+		return false;
 	}
 
 	public async unload(): Promise<void> {

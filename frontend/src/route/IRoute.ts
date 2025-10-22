@@ -8,6 +8,6 @@
  */
 export interface IRoute {
 	created: boolean;
-	load(): Promise<void>;
+	load(): Promise<boolean>;
 	unload(): Promise<void>;
 }
