@@ -111,8 +111,10 @@ class Tournament {
 			const decoded = decodeMatchEnd(data);
 			match.setResult(decoded);
 			this.getPlayerByUuid(decoded.loserId).isEliminated = true;
-			if (decoded.forfeitId)
+			if (decoded.forfeitId) {
 				this.getPlayerByUuid(decoded.forfeitId).isConnected = false;
+				this.getPlayerByUuid(decoded.forfeitId).isEliminated = true;
+			}
 
 			this.autoAdvanceWalkovers();
 			this.sendUpdate();
@@ -262,7 +264,6 @@ class Tournament {
 				if (p1 && !p1.isEliminated) p1.isEliminated = true;
 				if (p2 && !p2.isEliminated) p2.isEliminated = true;
 				match.forfeitId = null;
-				match.winnerId = match.player1Id;
 				match.score = [0, 0];
 			}
 		}
