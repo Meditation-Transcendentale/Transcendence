@@ -2,6 +2,7 @@ import { postRequest } from "../networking/request";
 import { routeManager } from "../route/RouteManager";
 import { IHtml } from "./IHtml";
 
+
 export class AuthHtml implements IHtml {
 	private css!: HTMLLinkElement;
 	private container!: HTMLDivElement;
@@ -78,16 +79,16 @@ export class AuthHtml implements IHtml {
 	}
 
 	private intraLogin() {
-
 		const redirectUri = `https://${window.location.hostname}:7000/api/auth/42`;
 		const uri = encodeURIComponent(redirectUri);
 		const state = encodeURIComponent(JSON.stringify({ redirect_uri: redirectUri }));
 		console.log('Decoded redirect_uri:', decodeURIComponent(uri));
 		const intraUrl = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-400234df0a18d81e039591e1b141029e457ec4d673a0f23e7fc3828493a2c593&redirect_uri=${uri}&response_type=code&state=${state}`;
+
 		window.open(intraUrl, "42Intra", "width=600,height=600");
 
 		window.addEventListener("message", (event) => {
-			// if (event.origin !== "https://localhost:3000") return;
+			if (event.origin !== `https://${window.location.hostname}:7000`) return;
 
 			if (event.data.type === "ft_login_success") {
 				routeManager.nav("/home", true, true);
