@@ -112,7 +112,9 @@ export function createUwsApp(path, lobbyService) {
 		close: (ws) => {
 			try {
 				sockets.get(ws.lobbyId)?.delete(ws);
-				lobbyService.quit(ws.lobbyId, ws.userId);
+				const newState = lobbyService.quit(ws.lobbyId, ws.userId);
+				const updateBuf = encodeServerMessage({ update: newState });
+				app.publish(ws.lobbyId, updateBuf, true);
 			} catch (err) {
 				console.error(`Error during close: ${err.message}`);
 			}
