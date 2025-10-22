@@ -14,6 +14,8 @@ class StateManager {
 
 	public playPath!: string;
 
+	public page: string;
+
 	constructor() {
 		this.states = new Map<string, any>;
 		this.lobbyId = "";
@@ -25,6 +27,8 @@ class StateManager {
 		this.tournamentId = "";
 		this.playPath = "";
 		this.friendlist = false;
+
+		this.page = "";
 
 		this.popup = 0;
 	}

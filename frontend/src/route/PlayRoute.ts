@@ -14,10 +14,11 @@ export class PlayRoute implements IRoute {
 	public async load(): Promise<boolean> {
 		htmlManager.ath.checkBeforeHome = false;
 		routeManager.comebackRoute = "/home";
-		routeManager.nav(stateManager.playPath);
+		routeManager.nav(stateManager.playPath, false, false, true);
 		return true;
 	}
 
 	public async unload(): Promise<void> {
+		routeManager.ha = true;
 	}
 }

@@ -16,7 +16,7 @@ export class PongRoute implements IRoute {
 
 	public async load(): Promise<boolean> {
 		if (stateManager.gameId == "") {
-			routeManager.nav("/home");
+			routeManager.nav("/play", false, false, true);
 			return false;
 		}
 		this._loaded = true;
@@ -25,7 +25,7 @@ export class PongRoute implements IRoute {
 		sceneManager.load(stateManager.gameMap);
 		gameManager.launchPong();
 		htmlManager.cube.enable = false;
-		return false;
+		return true;
 	}
 
 	public async unload(): Promise<void> {
