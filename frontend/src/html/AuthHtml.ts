@@ -79,9 +79,12 @@ export class AuthHtml implements IHtml {
 	}
 
 	private intraLogin() {
+		const redirectUri = `https://${window.location.hostname}:7000/api/auth/42`;
+		const uri = encodeURIComponent(redirectUri);
+		const state = encodeURIComponent(JSON.stringify({ redirect_uri: redirectUri }));
+		console.log('Decoded redirect_uri:', decodeURIComponent(uri));
+		const intraUrl = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-400234df0a18d81e039591e1b141029e457ec4d673a0f23e7fc3828493a2c593&redirect_uri=${uri}&response_type=code&state=${state}`;
 
-		const uri = encodeURIComponent(`https://${window.location.hostname}:7000/api/auth/42`);
-		const intraUrl = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-a52a0d9baca0584c24f69c90aaea3aae24b86c22f3e4e27838f8ce9249d5fd93&redirect_uri=${uri}&response_type=code`;
 		window.open(intraUrl, "42Intra", "width=600,height=600");
 
 		window.addEventListener("message", (event) => {

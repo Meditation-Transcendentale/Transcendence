@@ -40,7 +40,6 @@ export function createUwsApp(path, lobbyService) {
 			const { lobbyId } = ws;
 			sockets.set(lobbyId, sockets.get(lobbyId) || new Set());
 			sockets.get(lobbyId).add(ws);
-			console.log(`1:${lobbyId}`);
 			console.log(`JOIN: ${lobbyId}|${ws.userId}`);
 
 			try {
