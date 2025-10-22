@@ -29,10 +29,12 @@ class Lobby {
 
 	addPlayer(userId) {
 		if (this.players.size >= this.maxPlayers) {
-			throw new Error(`Lobby is full (max ${this.maxPlayers})`);
+			const message = `Lobby is full (max ${this.maxPlayers})`;
+			throw { status: 400, code: 400, message: message };
 		}
 		if (this.players.has(userId)) {
-			throw new Error(`Player already in lobby`);
+			const message2 = `Player already in lobby`;
+			throw { status: 400, code: 400, message: message2 };
 		}
 		this.updateActivity();
 		natsClient.publish(
@@ -55,7 +57,10 @@ class Lobby {
 
 	markReady(userId) {
 		const p = this.players.get(userId);
-		if (!p) throw new Error("Player not in lobby");
+		if (!p) {
+			const message = `Player not in lobby`;
+			throw { status: 400, code: 400, message: message };
+		}
 		p.isReady = true;
 		this.updateActivity();
 	}
@@ -124,7 +129,6 @@ export default class LobbyService {
 		const id = Date.now().toString();
 		const lobby = new Lobby({ id, mode, map, size });
 		this.lobbies.set(id, lobby);
-		console.log(`Lobby ID = ${id}`);
 		return lobby.getState();
 	}
 
@@ -132,7 +136,6 @@ export default class LobbyService {
 		const lobby = this.lobbies.get(lobbyId);
 		if (!lobby) return null;
 		lobby.addPlayer(userId);
-		console.log(`ADDED ${userId}`);
 		return lobby.getState();
 	}
 
@@ -214,7 +217,7 @@ export default class LobbyService {
 
 	getLobby(id) {
 		const lobby = this.lobbies.get(id);
-		if (!lobby) throw new Error("Lobby not found");
+		if (!lobby) throw { status: 400, code: 400, message: "Lobby not found" };
 		return lobby.getState();
 	}
 
