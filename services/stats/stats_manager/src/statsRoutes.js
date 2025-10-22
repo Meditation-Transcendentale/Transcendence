@@ -130,17 +130,20 @@ export default async function statsRoutes(app) {
 
 
 	    if (typeof score !== 'number' || isNaN(score) || !isFinite(score)) {
-            throw { status: 400, code: 40032, message: 'Score must be a valid number' };
+            throw { status: 400, code: 400, message: 'Score must be a valid number' };
         }
         if (!Number.isInteger(score)) {
-            throw { status: 400, code: 40033, message: 'Score must be an integer' };
+            throw { status: 400, code: 400, message: 'Score must be an integer' };
         }
         if (score < 0) {
-            throw { status: 400, code: 40034, message: 'Score must be non-negative' };
+            throw { status: 400, code: 400, message: 'Score must be non-negative' };
         }
         if (score > Number.MAX_SAFE_INTEGER) {
-            throw { status: 400, code: 40035, message: 'Score exceeds maximum allowed value' };
+            throw { status: 400, code: 400, message: 'Score exceeds maximum allowed value' };
         }
+		if ((score > 110000 && mode === 'easy') || (score > 4400 && mode === 'normal') || (score > 11100 && mode === 'hard')) {
+			throw { status: 400, code: 400, message: 'Score exceeds maximum for selected mode' };
+		}
 
 		const user = await nats.request('user.getUserFromHeader', jc.encode({ headers: req.headers }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
