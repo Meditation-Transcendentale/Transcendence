@@ -166,6 +166,15 @@ class Tournament {
 		this.uwsApp.publish(this.id, buf, true);
 	}
 
+	sendFinished() {
+		const buf = encodeTournamentServerMessage({
+			finished: {
+
+			}
+		});
+		this.uwsApp.publish(this.id, buf, true);
+	}
+
 	buildTournamentTree() {
 
 		const ids = this.players.map((p) => p.id);
@@ -220,6 +229,7 @@ class Tournament {
 	}
 	allNonEliminatedPlayersReady() {
 		const alive = this.players.filter((p) => !p.isEliminated);
+		console.log (alive);
 		return alive.length > 0 && alive.every((p) => p.isReady);
 	}
 
@@ -246,25 +256,9 @@ class Tournament {
 			const r1 = !!p1 && !p1.isEliminated && p1.isReady;
 			const r2 = !!p2 && !p2.isEliminated && p2.isReady;
 
-			if (r1 && r2) {
-			} else if (r1 && !r2) {
-				if (p2 && !p2.isEliminated) p2.isEliminated = true;
-				match.setResult({
-					winnerId: match.player1Id,
-					score: [0, 0],
-					forfeitId: match.player2Id,
-				});
-			} else if (!r1 && r2) {
-				if (p1 && !p1.isEliminated) p1.isEliminated = true;
-				match.setResult({
-					score: [0, 0],
-					forfeitId: match.player1Id,
-				});
-			} else {
-				if (p1 && !p1.isEliminated) p1.isEliminated = true;
-				if (p2 && !p2.isEliminated) p2.isEliminated = true;
-				match.forfeitId = null;
-				match.score = [0, 0];
+			if (!r1 || !r2) {
+				this.sendFinished();
+				return;
 			}
 		}
 
@@ -460,17 +454,6 @@ export default class tournamentService {
 
 		const p = t.getPlayerByUuid(playerId);
 		if (!p) return;
-		if (p.isEliminated) {
-			try {
-				const startBuf = encodeTournamentServerMessage({
-					startGame: { gameId: null },
-				});
-				t.uwsApp.publish(`user.${playerId}`, startBuf, true);
-			} catch (err) {
-				console.error("error:", err);
-			}
-			return;
-		}
 
 		p.isReady = true;
 		t.sendUpdate();
@@ -483,7 +466,7 @@ export default class tournamentService {
 			await t.scheduleReadyMatches();
 			t.readyActive = false;
 			t.sendUpdate();
-			t.maybeStartReadyCheck();
+			// t.maybeStartReadyCheck();
 		}
 	}
 
