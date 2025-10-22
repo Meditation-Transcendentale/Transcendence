@@ -85,7 +85,7 @@ export class TournamentStream implements IStream {
 			this.disconnect();
 		}
 		if (payload.finished) {
-			routeManager.nav("/home");
+			routeManager.nav("/play", false, false, true);
 			htmlManager.notification.add({ type: NotificationType.error, error: "A player was not ready" });
 			this.disconnect();
 		}
