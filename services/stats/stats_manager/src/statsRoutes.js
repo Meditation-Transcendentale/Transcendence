@@ -128,6 +128,10 @@ export default async function statsRoutes(app) {
 
 		const { mode, score } = req.body;
 
+		if (Number.isInteger(score) === false) {
+			throw { status: 400, code: 400, message: 'Score must be an integer' };
+		}
+
 		const user = await nats.request('user.getUserFromHeader', jc.encode({ headers: req.headers }), { timeout: 1000 });
 		const userResult = jc.decode(user.data);
 		if (!userResult.success) {
