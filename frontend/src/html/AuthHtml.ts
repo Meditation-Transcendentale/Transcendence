@@ -2,6 +2,7 @@ import { postRequest } from "../networking/request";
 import { routeManager } from "../route/RouteManager";
 import { IHtml } from "./IHtml";
 
+
 export class AuthHtml implements IHtml {
 	private css!: HTMLLinkElement;
 	private container!: HTMLDivElement;
@@ -79,15 +80,12 @@ export class AuthHtml implements IHtml {
 
 	private intraLogin() {
 
-		console.log(window.location.hostname);
 		const uri = encodeURIComponent(`https://${window.location.hostname}:7000/api/auth/42`);
 		const intraUrl = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-a52a0d9baca0584c24f69c90aaea3aae24b86c22f3e4e27838f8ce9249d5fd93&redirect_uri=${uri}&response_type=code`;
-		// const intraUrl = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-a52a0d9baca0584c24f69c90aaea3aae24b86c22f3e4e27838f8ce9249d5fd93&redirect_uri=https%3A%2F%2Flocalhost%3A3000%2Fauth%2F42&response_type=code";
-		// window.open(intraUrl, "42Intra", "width=600,height=600");
 		window.open(intraUrl, "42Intra", "width=600,height=600");
 
 		window.addEventListener("message", (event) => {
-			// if (event.origin !== "https://localhost:3000") return;
+			if (event.origin !== `https://${window.location.hostname}:7000`) return;
 
 			if (event.data.type === "ft_login_success") {
 				routeManager.nav("/home", true, true);
